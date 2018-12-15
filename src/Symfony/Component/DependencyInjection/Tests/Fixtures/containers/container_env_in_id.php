@@ -11,7 +11,7 @@ $container->setParameter('env(BAR)', 'bar');
 
 $container->register('foo', 'stdClass')->setPublic(true)
    ->addArgument(new Reference('bar_%env(BAR)%'))
-   ->addArgument(array('baz_%env(BAR)%' => new Reference('baz_%env(BAR)%')));
+   ->addArgument(['baz_%env(BAR)%' => new Reference('baz_%env(BAR)%')]);
 
 $container->register('bar', 'stdClass')->setPublic(true)
    ->addArgument(new Reference('bar_%env(BAR)%'));

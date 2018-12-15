@@ -30,10 +30,10 @@ class FormThemeTest extends TestCase
     public function testConstructor()
     {
         $form = new NameExpression('form', 0);
-        $resources = new Node(array(
+        $resources = new Node([
             new ConstantExpression('tpl1', 0),
             new ConstantExpression('tpl2', 0),
-        ));
+        ]);
 
         $node = new FormThemeNode($form, $resources, 0);
 
@@ -45,12 +45,12 @@ class FormThemeTest extends TestCase
     public function testCompile()
     {
         $form = new NameExpression('form', 0);
-        $resources = new ArrayExpression(array(
+        $resources = new ArrayExpression([
             new ConstantExpression(0, 0),
             new ConstantExpression('tpl1', 0),
             new ConstantExpression(1, 0),
             new ConstantExpression('tpl2', 0),
-        ), 0);
+        ], 0);
 
         $node = new FormThemeNode($form, $resources, 0);
 

@@ -65,7 +65,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     /**
      * {@inheritdoc}
      */
-    public function renderResponse($view, array $parameters = array(), Response $response = null)
+    public function renderResponse($view, array $parameters = [], Response $response = null)
     {
         if (null === $response) {
             $response = new Response();

@@ -30,17 +30,17 @@ class LoggingTranslatorPassTest extends TestCase
         $container->setAlias('translator', 'translator.default');
         $translationWarmerDefinition = $container->register('translation.warmer')
             ->addArgument(new Reference('translator'))
-            ->addTag('container.service_subscriber', array('id' => 'translator'))
-            ->addTag('container.service_subscriber', array('id' => 'foo'));
+            ->addTag('container.service_subscriber', ['id' => 'translator'])
+            ->addTag('container.service_subscriber', ['id' => 'foo']);
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
 
         $this->assertEquals(
-            array('container.service_subscriber' => array(
-                array('id' => 'foo'),
-                array('key' => 'translator', 'id' => 'translator.logging.inner'),
-            )),
+            ['container.service_subscriber' => [
+                ['id' => 'foo'],
+                ['key' => 'translator', 'id' => 'translator.logging.inner'],
+            ]],
             $translationWarmerDefinition->getTags()
         );
     }

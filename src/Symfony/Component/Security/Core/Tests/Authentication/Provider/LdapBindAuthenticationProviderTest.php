@@ -107,7 +107,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
 
-        $collection = new \ArrayIterator(array(new Entry('')));
+        $collection = new \ArrayIterator([new Entry('')]);
 
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query

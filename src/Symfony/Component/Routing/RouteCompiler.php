@@ -46,10 +46,10 @@ class RouteCompiler implements RouteCompilerInterface
      */
     public static function compile(Route $route)
     {
-        $hostVariables = array();
-        $variables = array();
+        $hostVariables = [];
+        $variables = [];
         $hostRegex = null;
-        $hostTokens = array();
+        $hostTokens = [];
 
         if ('' !== $host = $route->getHost()) {
             $result = self::compilePattern($route, $host, true);
@@ -94,9 +94,9 @@ class RouteCompiler implements RouteCompilerInterface
 
     private static function compilePattern(Route $route, $pattern, $isHost)
     {
-        $tokens = array();
-        $variables = array();
-        $matches = array();
+        $tokens = [];
+        $variables = [];
+        $matches = [];
         $pos = 0;
         $defaultSeparator = $isHost ? '.' : '/';
         $useUtf8 = preg_match('//u', $pattern);
@@ -143,9 +143,9 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             if ($isSeparator && $precedingText !== $precedingChar) {
-                $tokens[] = array('text', substr($precedingText, 0, -\strlen($precedingChar)));
+                $tokens[] = ['text', substr($precedingText, 0, -\strlen($precedingChar))];
             } elseif (!$isSeparator && \strlen($precedingText) > 0) {
-                $tokens[] = array('text', $precedingText);
+                $tokens[] = ['text', $precedingText];
             }
 
             $regexp = $route->getRequirement($varName);
@@ -184,12 +184,12 @@ class RouteCompiler implements RouteCompilerInterface
                 }
             }
 
-            $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);
+            $tokens[] = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
             $variables[] = $varName;
         }
 
         if ($pos < \strlen($pattern)) {
-            $tokens[] = array('text', substr($pattern, $pos));
+            $tokens[] = ['text', substr($pattern, $pos)];
         }
 
         // find the first optional token
@@ -222,12 +222,12 @@ class RouteCompiler implements RouteCompilerInterface
             }
         }
 
-        return array(
+        return [
             'staticPrefix' => self::determineStaticPrefix($route, $tokens),
             'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
-        );
+        ];
     }
 
     /**

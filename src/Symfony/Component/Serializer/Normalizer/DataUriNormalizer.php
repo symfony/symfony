@@ -25,11 +25,11 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
  */
 class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    private static $supportedTypes = array(
+    private static $supportedTypes = [
         \SplFileInfo::class => true,
         \SplFileObject::class => true,
         File::class => true,
-    );
+    ];
 
     /**
      * @var MimeTypeGuesserInterface
@@ -48,7 +48,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!$object instanceof \SplFileInfo) {
             throw new InvalidArgumentException('The object must be an instance of "\SplFileInfo".');
@@ -89,7 +89,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      * @throws InvalidArgumentException
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
             throw new NotNormalizableValueException('The provided "data:" URI is not valid.');

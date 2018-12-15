@@ -26,9 +26,9 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  */
 class RingBuffer implements \ArrayAccess
 {
-    private $values = array();
+    private $values = [];
 
-    private $indices = array();
+    private $indices = [];
 
     private $cursor = 0;
 

@@ -26,7 +26,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
 
     private static $autoloadLevel = 0;
     private static $autoloadedClass;
-    private static $existsCache = array();
+    private static $existsCache = [];
 
     /**
      * @param string    $resource The fully-qualified class name
@@ -105,7 +105,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
             $this->isFresh(0);
         }
 
-        return serialize(array($this->resource, $this->exists));
+        return serialize([$this->resource, $this->exists]);
     }
 
     /**
@@ -126,10 +126,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
         }
         $e = new \ReflectionException("Class $class not found");
         $trace = $e->getTrace();
-        $autoloadFrame = array(
+        $autoloadFrame = [
             'function' => 'spl_autoload_call',
-            'args' => array($class),
-        );
+            'args' => [$class],
+        ];
         $i = 1 + array_search($autoloadFrame, $trace, true);
 
         if (isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
@@ -151,11 +151,11 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
                     return;
             }
 
-            $props = array(
+            $props = [
                 'file' => $trace[$i]['file'],
                 'line' => $trace[$i]['line'],
                 'trace' => \array_slice($trace, 1 + $i),
-            );
+            ];
 
             foreach ($props as $p => $v) {
                 $r = new \ReflectionProperty('Exception', $p);

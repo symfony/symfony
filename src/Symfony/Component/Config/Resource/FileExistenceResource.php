@@ -63,7 +63,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
      */
     public function serialize()
     {
-        return serialize(array($this->resource, $this->exists));
+        return serialize([$this->resource, $this->exists]);
     }
 
     /**

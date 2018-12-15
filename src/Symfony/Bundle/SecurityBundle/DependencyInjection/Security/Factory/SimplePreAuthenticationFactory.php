@@ -57,8 +57,8 @@ class SimplePreAuthenticationFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.simple_preauth'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($config['authenticator']));
-        $listener->addMethodCall('setSessionAuthenticationStrategy', array(new Reference('security.authentication.session_strategy.'.$id)));
+        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
 
-        return array($provider, $listenerId, null);
+        return [$provider, $listenerId, null];
     }
 }

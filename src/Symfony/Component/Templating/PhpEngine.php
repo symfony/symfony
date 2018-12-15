@@ -29,14 +29,14 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     /**
      * @var HelperInterface[]
      */
-    protected $helpers = array();
-    protected $parents = array();
-    protected $stack = array();
+    protected $helpers = [];
+    protected $parents = [];
+    protected $stack = [];
     protected $charset = 'UTF-8';
-    protected $cache = array();
-    protected $escapers = array();
-    protected static $escaperCache = array();
-    protected $globals = array();
+    protected $cache = [];
+    protected $escapers = [];
+    protected static $escaperCache = [];
+    protected $globals = [];
     protected $parser;
 
     private $evalTemplate;
@@ -47,7 +47,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param LoaderInterface             $loader  A loader instance
      * @param HelperInterface[]           $helpers An array of helper instances
      */
-    public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
+    public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = [])
     {
         $this->parser = $parser;
         $this->loader = $loader;
@@ -65,7 +65,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    public function render($name, array $parameters = array())
+    public function render($name, array $parameters = [])
     {
         $storage = $this->load($name);
         $key = hash('sha256', serialize($storage));
@@ -127,7 +127,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    protected function evaluate(Storage $template, array $parameters = array())
+    protected function evaluate(Storage $template, array $parameters = [])
     {
         $this->evalTemplate = $template;
         $this->evalParameters = $parameters;
@@ -235,7 +235,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function setHelpers(array $helpers)
     {
-        $this->helpers = array();
+        $this->helpers = [];
         $this->addHelpers($helpers);
     }
 
@@ -358,7 +358,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     public function setEscaper($context, callable $escaper)
     {
         $this->escapers[$context] = $escaper;
-        self::$escaperCache[$context] = array();
+        self::$escaperCache[$context] = [];
     }
 
     /**
@@ -419,7 +419,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     {
         $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
-        $this->escapers = array(
+        $this->escapers = [
             'html' =>
                 /**
                  * Runs the PHP function htmlspecialchars on the value passed.
@@ -472,9 +472,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
                     return $value;
                 },
-        );
+        ];
 
-        self::$escaperCache = array();
+        self::$escaperCache = [];
     }
 
     /**

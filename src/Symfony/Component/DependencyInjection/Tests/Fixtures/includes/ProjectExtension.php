@@ -14,7 +14,7 @@ class ProjectExtension implements ExtensionInterface
         if ($configs) {
             $config = call_user_func_array('array_merge', $configs);
         } else {
-            $config = array();
+            $config = [];
         }
 
         $configuration->setDefinition('project.service.bar', new Definition('FooClass'));

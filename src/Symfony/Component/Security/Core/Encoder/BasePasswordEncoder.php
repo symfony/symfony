@@ -30,7 +30,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
     protected function demergePasswordAndSalt($mergedPasswordSalt)
     {
         if (empty($mergedPasswordSalt)) {
-            return array('', '');
+            return ['', ''];
         }
 
         $password = $mergedPasswordSalt;
@@ -42,7 +42,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
             $password = substr($mergedPasswordSalt, 0, $saltBegins);
         }
 
-        return array($password, $salt);
+        return [$password, $salt];
     }
 
     /**

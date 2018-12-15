@@ -31,7 +31,7 @@ class ApplicationTesterTest extends TestCase
         ;
 
         $this->tester = new ApplicationTester($this->application);
-        $this->tester->run(array('command' => 'foo', 'foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
+        $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
     protected function tearDown()

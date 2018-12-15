@@ -57,7 +57,7 @@ class KernelForTest extends Kernel
 
     public function getBundles()
     {
-        return array();
+        return [];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

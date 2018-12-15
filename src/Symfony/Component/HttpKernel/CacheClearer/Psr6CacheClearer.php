@@ -18,9 +18,9 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class Psr6CacheClearer implements CacheClearerInterface
 {
-    private $pools = array();
+    private $pools = [];
 
-    public function __construct(array $pools = array())
+    public function __construct(array $pools = [])
     {
         $this->pools = $pools;
     }

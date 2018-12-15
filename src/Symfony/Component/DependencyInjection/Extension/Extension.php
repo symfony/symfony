@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
-    private $processedConfigs = array();
+    private $processedConfigs = [];
 
     /**
      * {@inheritdoc}
@@ -104,7 +104,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
         try {
             return $this->processedConfigs;
         } finally {
-            $this->processedConfigs = array();
+            $this->processedConfigs = [];
         }
     }
 

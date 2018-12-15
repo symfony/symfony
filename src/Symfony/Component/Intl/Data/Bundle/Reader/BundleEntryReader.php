@@ -33,7 +33,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     /**
      * A mapping of locale aliases to locales.
      */
-    private $localeAliases = array();
+    private $localeAliases = [];
 
     /**
      * Creates an entry reader based on the given resource bundle reader.
@@ -76,7 +76,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
         $readSucceeded = false;
         $exception = null;
         $currentLocale = $locale;
-        $testedLocales = array();
+        $testedLocales = [];
 
         while (null !== $currentLocale) {
             // Resolve any aliases to their target locales

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-$operators = array('not', '!', 'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', 'matches', '**');
+$operators = ['not', '!', 'or', '||', '&&', 'and', '|', '^', '&', '==', '===', '!=', '!==', '<', '>', '>=', '<=', 'not in', 'in', '..', '+', '-', '~', '*', '/', '%', 'matches', '**'];
 $operators = array_combine($operators, array_map('strlen', $operators));
 arsort($operators);
 
-$regex = array();
+$regex = [];
 foreach ($operators as $operator => $length) {
     // an operator that ends with a character must be followed by
     // a whitespace or a parenthesis

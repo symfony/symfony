@@ -27,12 +27,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = array();
+    private $lists = [];
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = array();
+    private $views = [];
 
     /**
      * Generates a SHA-256 hash for the given value.
@@ -73,7 +73,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     private static function flatten(array $array, &$output)
     {
         if (null === $output) {
-            $output = array();
+            $output = [];
         }
 
         foreach ($array as $key => $value) {
@@ -118,7 +118,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // choice list is returned.
         self::flatten($choices, $flatChoices);
 
-        $hash = self::generateHash(array($flatChoices, $value), 'fromChoices');
+        $hash = self::generateHash([$flatChoices, $value], 'fromChoices');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);
@@ -132,7 +132,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        $hash = self::generateHash(array($loader, $value), 'fromLoader');
+        $hash = self::generateHash([$loader, $value], 'fromLoader');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromLoader($loader, $value);
@@ -148,7 +148,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
-        $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr));
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(

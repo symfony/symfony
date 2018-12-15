@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'esi' => array(
+$container->loadFromExtension('framework', [
+    'esi' => [
         'enabled' => false,
-    ),
-));
+    ],
+]);

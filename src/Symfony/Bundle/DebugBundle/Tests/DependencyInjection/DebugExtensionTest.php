@@ -22,36 +22,36 @@ class DebugExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
-        $container->loadFromExtension('debug', array());
+        $container->loadFromExtension('debug', []);
         $this->compileContainer($container);
 
-        $expectedTags = array(
-            array(
+        $expectedTags = [
+            [
                 'id' => 'dump',
                 'template' => '@Debug/Profiler/dump.html.twig',
                 'priority' => 240,
-            ),
-        );
+            ],
+        ];
 
         $this->assertSame($expectedTags, $container->getDefinition('data_collector.dump')->getTag('data_collector'));
     }
 
     private function createContainer()
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
+        $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => true,
-            'kernel.bundles' => array('DebugBundle' => 'Symfony\\Bundle\\DebugBundle\\DebugBundle'),
-        )));
+            'kernel.bundles' => ['DebugBundle' => 'Symfony\\Bundle\\DebugBundle\\DebugBundle'],
+        ]));
 
         return $container;
     }
 
     private function compileContainer(ContainerBuilder $container)
     {
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
     }
 }

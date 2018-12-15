@@ -9,6 +9,6 @@
  * file that was distributed with this source code.
  */
 
-return array(
+return [
     'Foo' => 'Bar',
-);
+];

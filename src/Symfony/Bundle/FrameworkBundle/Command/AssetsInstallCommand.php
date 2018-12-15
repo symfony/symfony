@@ -64,9 +64,9 @@ class AssetsInstallCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'public'),
-            ))
+            ])
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
             ->setDescription('Installs bundles web assets under a public directory')
@@ -139,10 +139,10 @@ EOT
 
         $io->newLine();
 
-        $rows = array();
+        $rows = [];
         $copyUsed = false;
         $exitCode = 0;
-        $validAssetDirs = array();
+        $validAssetDirs = [];
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
@@ -175,13 +175,13 @@ EOT
                 }
 
                 if ($method === $expectedMethod) {
-                    $rows[] = array(sprintf('<fg=green;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94" /* HEAVY CHECK MARK (U+2714) */), $message, $method);
+                    $rows[] = [sprintf('<fg=green;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94" /* HEAVY CHECK MARK (U+2714) */), $message, $method];
                 } else {
-                    $rows[] = array(sprintf('<fg=yellow;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method);
+                    $rows[] = [sprintf('<fg=yellow;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'WARNING' : '!'), $message, $method];
                 }
             } catch (\Exception $e) {
                 $exitCode = 1;
-                $rows[] = array(sprintf('<fg=red;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage());
+                $rows[] = [sprintf('<fg=red;options=bold>%s</>', '\\' === \DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage()];
             }
         }
         // remove the assets of the bundles that no longer exist
@@ -191,7 +191,7 @@ EOT
         }
 
         if ($rows) {
-            $io->table(array('', 'Bundle', 'Method / Error'), $rows);
+            $io->table(['', 'Bundle', 'Method / Error'], $rows);
         }
 
         if (0 !== $exitCode) {

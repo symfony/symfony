@@ -27,8 +27,8 @@ class GetAttrNode extends Node
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, $type)
     {
         parent::__construct(
-            array('node' => $node, 'attribute' => $attribute, 'arguments' => $arguments),
-            array('type' => $type)
+            ['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments],
+            ['type' => $type]
         );
     }
 
@@ -82,7 +82,7 @@ class GetAttrNode extends Node
                 if (!\is_object($obj)) {
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
-                if (!\is_callable($toCall = array($obj, $this->nodes['attribute']->attributes['value']))) {
+                if (!\is_callable($toCall = [$obj, $this->nodes['attribute']->attributes['value']])) {
                     throw new \RuntimeException(sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], \get_class($obj)));
                 }
 
@@ -102,13 +102,13 @@ class GetAttrNode extends Node
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:
-                return array($this->nodes['node'], '.', $this->nodes['attribute']);
+                return [$this->nodes['node'], '.', $this->nodes['attribute']];
 
             case self::METHOD_CALL:
-                return array($this->nodes['node'], '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')');
+                return [$this->nodes['node'], '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')'];
 
             case self::ARRAY_CALL:
-                return array($this->nodes['node'], '[', $this->nodes['attribute'], ']');
+                return [$this->nodes['node'], '[', $this->nodes['attribute'], ']'];
         }
     }
 }

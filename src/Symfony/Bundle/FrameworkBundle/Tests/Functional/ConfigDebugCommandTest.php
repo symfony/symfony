@@ -25,15 +25,15 @@ class ConfigDebugCommandTest extends WebTestCase
 
     protected function setUp()
     {
-        $kernel = static::createKernel(array('test_case' => 'ConfigDump', 'root_config' => 'config.yml'));
+        $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
-        $this->application->doRun(new ArrayInput(array()), new NullOutput());
+        $this->application->doRun(new ArrayInput([]), new NullOutput());
     }
 
     public function testDumpBundleName()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'TestBundle'));
+        $ret = $tester->execute(['name' => 'TestBundle']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('custom: foo', $tester->getDisplay());
@@ -42,7 +42,7 @@ class ConfigDebugCommandTest extends WebTestCase
     public function testDumpBundleOption()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'TestBundle', 'path' => 'custom'));
+        $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'custom']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('foo', $tester->getDisplay());
@@ -51,7 +51,7 @@ class ConfigDebugCommandTest extends WebTestCase
     public function testParametersValuesAreResolved()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'framework'));
+        $ret = $tester->execute(['name' => 'framework']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertContains("locale: '%env(LOCALE)%'", $tester->getDisplay());
@@ -61,7 +61,7 @@ class ConfigDebugCommandTest extends WebTestCase
     public function testDumpUndefinedBundleOption()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('name' => 'TestBundle', 'path' => 'foo'));
+        $tester->execute(['name' => 'TestBundle', 'path' => 'foo']);
 
         $this->assertContains('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }

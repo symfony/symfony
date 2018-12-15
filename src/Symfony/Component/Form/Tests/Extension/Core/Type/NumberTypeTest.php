@@ -37,7 +37,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testDefaultFormattingWithGrouping()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('grouping' => true));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true]);
         $form->setData('12345.67890');
 
         $this->assertSame('12.345,679', $form->createView()->vars['value']);
@@ -45,7 +45,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testDefaultFormattingWithScale()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 2));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2]);
         $form->setData('12345.67890');
 
         $this->assertSame('12345,68', $form->createView()->vars['value']);
@@ -53,7 +53,7 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testDefaultFormattingWithRounding()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP]);
         $form->setData('12345.54321');
 
         $this->assertSame('12346', $form->createView()->vars['value']);
@@ -66,9 +66,9 @@ class NumberTypeTest extends BaseTypeTest
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10.0)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
-        ));
+        ]);
         $form->submit(null);
 
         $this->assertSame($emptyData, $form->getViewData());

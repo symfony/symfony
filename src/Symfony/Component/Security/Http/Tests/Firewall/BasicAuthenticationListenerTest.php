@@ -23,10 +23,10 @@ class BasicAuthenticationListenerTest extends TestCase
 {
     public function testHandleWithValidUsernameAndPasswordServerParameters()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(
+        $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',
             'PHP_AUTH_PW' => 'ThePassword',
-        ));
+        ]);
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
 
@@ -69,10 +69,10 @@ class BasicAuthenticationListenerTest extends TestCase
 
     public function testHandleWhenAuthenticationFails()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(
+        $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',
             'PHP_AUTH_PW' => 'ThePassword',
-        ));
+        ]);
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
 
@@ -99,7 +99,7 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager(array($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock())),
+            new AuthenticationProviderManager([$this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock()]),
             'TheProviderKey',
             $authenticationEntryPoint
         );
@@ -148,9 +148,9 @@ class BasicAuthenticationListenerTest extends TestCase
 
     public function testHandleWithASimilarAuthenticatedToken()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_USER' => 'TheUsername'));
+        $request = new Request([], [], [], [], [], ['PHP_AUTH_USER' => 'TheUsername']);
 
-        $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', array('ROLE_FOO'));
+        $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', ['ROLE_FOO']);
 
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $tokenStorage
@@ -198,12 +198,12 @@ class BasicAuthenticationListenerTest extends TestCase
 
     public function testHandleWithADifferentAuthenticatedToken()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(
+        $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',
             'PHP_AUTH_PW' => 'ThePassword',
-        ));
+        ]);
 
-        $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', array('ROLE_FOO'));
+        $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', ['ROLE_FOO']);
 
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $tokenStorage
@@ -228,7 +228,7 @@ class BasicAuthenticationListenerTest extends TestCase
 
         $listener = new BasicAuthenticationListener(
             $tokenStorage,
-            new AuthenticationProviderManager(array($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock())),
+            new AuthenticationProviderManager([$this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock()]),
             'TheProviderKey',
             $authenticationEntryPoint
         );

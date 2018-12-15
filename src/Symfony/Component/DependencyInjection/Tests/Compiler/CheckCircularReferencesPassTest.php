@@ -55,11 +55,11 @@ class CheckCircularReferencesPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->setFactory(array(new Reference('b'), 'getInstance'));
+            ->setFactory([new Reference('b'), 'getInstance']);
 
         $container
             ->register('b', 'stdClass')
-            ->setFactory(array(new Reference('a'), 'getInstance'));
+            ->setFactory([new Reference('a'), 'getInstance']);
 
         $this->process($container);
     }
@@ -88,7 +88,7 @@ class CheckCircularReferencesPassTest extends TestCase
 
         $container
             ->register('b', 'stdClass')
-            ->setFactory(array(new Reference('c'), 'getInstance'));
+            ->setFactory([new Reference('c'), 'getInstance']);
 
         $container->register('c')->addArgument(new Reference('a'));
 
@@ -112,7 +112,7 @@ class CheckCircularReferencesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
-        $container->register('b')->addMethodCall('setA', array(new Reference('a')));
+        $container->register('b')->addMethodCall('setA', [new Reference('a')]);
 
         $this->process($container);
 
@@ -135,7 +135,7 @@ class CheckCircularReferencesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
-        $container->register('b')->addArgument(new IteratorArgument(array(new Reference('a'))));
+        $container->register('b')->addArgument(new IteratorArgument([new Reference('a')]));
 
         $this->process($container);
 
@@ -147,11 +147,11 @@ class CheckCircularReferencesPassTest extends TestCase
     {
         $compiler = new Compiler();
         $passConfig = $compiler->getPassConfig();
-        $passConfig->setOptimizationPasses(array(
+        $passConfig->setOptimizationPasses([
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
-        ));
-        $passConfig->setRemovingPasses(array());
+        ]);
+        $passConfig->setRemovingPasses([]);
 
         $compiler->compile($container);
     }

@@ -38,7 +38,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
 
-        $this->assertEquals(array('a', 'b'), $attributeMetadata->getGroups());
+        $this->assertEquals(['a', 'b'], $attributeMetadata->getGroups());
     }
 
     public function testMaxDepth()
@@ -62,7 +62,7 @@ class AttributeMetadataTest extends TestCase
 
         $attributeMetadata1->merge($attributeMetadata2);
 
-        $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
+        $this->assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
     }
 

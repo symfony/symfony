@@ -8,9 +8,9 @@ class LdapTestCase extends TestCase
 {
     protected function getLdapConfig()
     {
-        return array(
+        return [
             'host' => getenv('LDAP_HOST'),
             'port' => getenv('LDAP_PORT'),
-        );
+        ];
     }
 }

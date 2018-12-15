@@ -43,7 +43,7 @@ class FunctionsTest extends TestCase
         $return = dump($var1, $var2, $var3);
         $out = ob_get_clean();
 
-        $this->assertEquals(array($var1, $var2, $var3), $return);
+        $this->assertEquals([$var1, $var2, $var3], $return);
     }
 
     protected function setupVarDumper()

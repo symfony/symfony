@@ -63,7 +63,7 @@ class ComposerResource implements SelfCheckingResourceInterface, \Serializable
 
     private static function refresh()
     {
-        self::$runtimeVendors = array();
+        self::$runtimeVendors = [];
 
         foreach (get_declared_classes() as $class) {
             if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

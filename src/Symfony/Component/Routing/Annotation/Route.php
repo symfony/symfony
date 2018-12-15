@@ -23,12 +23,12 @@ class Route
 {
     private $path;
     private $name;
-    private $requirements = array();
-    private $options = array();
-    private $defaults = array();
+    private $requirements = [];
+    private $options = [];
+    private $defaults = [];
     private $host;
-    private $methods = array();
-    private $schemes = array();
+    private $methods = [];
+    private $schemes = [];
     private $condition;
 
     /**
@@ -114,7 +114,7 @@ class Route
 
     public function setSchemes($schemes)
     {
-        $this->schemes = \is_array($schemes) ? $schemes : array($schemes);
+        $this->schemes = \is_array($schemes) ? $schemes : [$schemes];
     }
 
     public function getSchemes()
@@ -124,7 +124,7 @@ class Route
 
     public function setMethods($methods)
     {
-        $this->methods = \is_array($methods) ? $methods : array($methods);
+        $this->methods = \is_array($methods) ? $methods : [$methods];
     }
 
     public function getMethods()

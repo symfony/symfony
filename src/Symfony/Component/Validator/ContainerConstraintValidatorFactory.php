@@ -28,7 +28,7 @@ class ContainerConstraintValidatorFactory implements ConstraintValidatorFactoryI
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->validators = array();
+        $this->validators = [];
     }
 
     /**

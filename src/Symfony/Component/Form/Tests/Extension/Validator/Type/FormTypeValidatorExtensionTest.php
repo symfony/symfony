@@ -33,9 +33,9 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $builder = $this->factory->createBuilder(
             FormTypeTest::TESTED_TYPE,
             null,
-            array(
+            [
                 'validation_groups' => 'group',
-            )
+            ]
         );
         $builder->add('firstName', FormTypeTest::TESTED_TYPE);
         $form = $builder->getForm();
@@ -46,14 +46,14 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
             ->will($this->returnValue(new ConstraintViolationList()));
 
         // specific data is irrelevant
-        $form->submit(array());
+        $form->submit([]);
     }
 
     public function testValidConstraint()
     {
-        $form = $this->createForm(array('constraints' => $valid = new Valid()));
+        $form = $this->createForm(['constraints' => $valid = new Valid()]);
 
-        $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
+        $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
     public function testValidatorInterface()
@@ -69,21 +69,21 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))
             ->getFormFactory()
-            ->create(FormTypeTest::TESTED_TYPE, null, (array('validation_groups' => new GroupSequence(array('First', 'Second')))))
-            ->add('field', TextTypeTest::TESTED_TYPE, array(
-                'constraints' => array(
-                    new Length(array('min' => 10, 'groups' => array('First'))),
-                    new Email(array('groups' => array('Second'))),
-                ),
-            ))
+            ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
+            ->add('field', TextTypeTest::TESTED_TYPE, [
+                'constraints' => [
+                    new Length(['min' => 10, 'groups' => ['First']]),
+                    new Email(['groups' => ['Second']]),
+                ],
+            ])
         ;
 
-        $form->submit(array('field' => 'wrong'));
+        $form->submit(['field' => 'wrong']);
 
         $this->assertCount(1, $form->getErrors(true));
     }
 
-    protected function createForm(array $options = array())
+    protected function createForm(array $options = [])
     {
         return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
     }

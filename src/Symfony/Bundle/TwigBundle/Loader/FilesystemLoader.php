@@ -33,7 +33,7 @@ class FilesystemLoader extends BaseFilesystemLoader
      */
     public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser, $rootPath = null)
     {
-        parent::__construct(array(), $rootPath);
+        parent::__construct([], $rootPath);
 
         $this->locator = $locator;
         $this->parser = $parser;

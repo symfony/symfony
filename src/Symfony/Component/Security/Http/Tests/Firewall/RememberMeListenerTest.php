@@ -420,7 +420,7 @@ class RememberMeListenerTest extends TestCase
             $sessionStrategy = ($withSessionStrategy ? $this->getSessionStrategy() : null)
         );
 
-        return array($listener, $tokenStorage, $service, $manager, $logger, $dispatcher, $sessionStrategy);
+        return [$listener, $tokenStorage, $service, $manager, $logger, $dispatcher, $sessionStrategy];
     }
 
     protected function getLogger()

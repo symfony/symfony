@@ -40,7 +40,7 @@ class ScriptDataProvider
 
     public function getScripts()
     {
-        return $this->reader->readEntry($this->path, 'meta', array('Scripts'));
+        return $this->reader->readEntry($this->path, 'meta', ['Scripts']);
     }
 
     public function getName($script, $displayLocale = null)
@@ -49,7 +49,7 @@ class ScriptDataProvider
             $displayLocale = Locale::getDefault();
         }
 
-        return $this->reader->readEntry($this->path, $displayLocale, array('Names', $script));
+        return $this->reader->readEntry($this->path, $displayLocale, ['Names', $script]);
     }
 
     public function getNames($displayLocale = null)
@@ -58,7 +58,7 @@ class ScriptDataProvider
             $displayLocale = Locale::getDefault();
         }
 
-        $names = $this->reader->readEntry($this->path, $displayLocale, array('Names'));
+        $names = $this->reader->readEntry($this->path, $displayLocale, ['Names']);
 
         if ($names instanceof \Traversable) {
             $names = iterator_to_array($names);

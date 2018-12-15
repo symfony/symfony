@@ -19,7 +19,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     private $name = 'attributes';
     private $storageKey;
 
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * @param string $storageKey The key used to store attributes in the session
@@ -95,7 +95,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      */
     public function replace(array $attributes)
     {
-        $this->attributes = array();
+        $this->attributes = [];
         foreach ($attributes as $key => $value) {
             $this->set($key, $value);
         }
@@ -121,7 +121,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     public function clear()
     {
         $return = $this->attributes;
-        $this->attributes = array();
+        $this->attributes = [];
 
         return $return;
     }

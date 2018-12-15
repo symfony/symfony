@@ -84,7 +84,7 @@ class GuardListener
             $roles = $token->getRoles();
         }
 
-        $variables = array(
+        $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
@@ -97,7 +97,7 @@ class GuardListener
             'trust_resolver' => $this->trustResolver,
             // needed for the is_valid expression function
             'validator' => $this->validator,
-        );
+        ];
 
         return $variables;
     }

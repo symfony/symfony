@@ -36,7 +36,7 @@ interface NormalizerInterface
      *                                    reference handler can fix it
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
      */
-    public function normalize($object, $format = null, array $context = array());
+    public function normalize($object, $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.

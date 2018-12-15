@@ -21,7 +21,7 @@ class TestSingularAndPluralProps
     private $email;
 
     /** @var array */
-    private $emails = array();
+    private $emails = [];
 
     /**
      * @return string|null
@@ -60,6 +60,6 @@ class TestSingularAndPluralProps
      */
     public function removeEmail($email)
     {
-        $this->emails = array_diff($this->emails, array($email));
+        $this->emails = array_diff($this->emails, [$email]);
     }
 }

@@ -31,12 +31,12 @@ class PhpGeneratorDumper extends GeneratorDumper
      *
      * @return string A PHP class representing the generator class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'class' => 'ProjectUrlGenerator',
             'base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-        ), $options);
+        ], $options);
 
         return <<<EOF
 <?php
@@ -80,7 +80,7 @@ EOF;
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
-            $properties = array();
+            $properties = [];
             $properties[] = $compiledRoute->getVariables();
             $properties[] = $route->getDefaults();
             $properties[] = $route->getRequirements();

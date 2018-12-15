@@ -24,7 +24,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
      *
      * @see http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
      */
-    protected $defaultExtensions = array(
+    protected $defaultExtensions = [
         'application/andrew-inset' => 'ez',
         'application/applixware' => 'aw',
         'application/atom+xml' => 'atom',
@@ -796,7 +796,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'video/x-sgi-movie' => 'movie',
         'video/x-smv' => 'smv',
         'x-conference/x-cooltalk' => 'ice',
-    );
+    ];
 
     /**
      * {@inheritdoc}

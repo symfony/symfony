@@ -22,12 +22,12 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
 {
     public function provider()
     {
-        return array(
+        return [
             //from property PhpDoc
-            array(Zoo::class),
+            [Zoo::class],
             //from argument constructor PhpDoc
-            array(ZooImmutable::class),
-        );
+            [ZooImmutable::class],
+        ];
     }
 
     /**
@@ -43,10 +43,10 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
     ]
 }
 EOF;
-        $serializer = new Serializer(array(
+        $serializer = new Serializer([
             new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
             new ArrayDenormalizer(),
-        ), array('json' => new JsonEncoder()));
+        ], ['json' => new JsonEncoder()]);
         //WHEN
         /** @var Zoo $zoo */
         $zoo = $serializer->deserialize($json, $class, 'json');
@@ -59,7 +59,7 @@ EOF;
 class Zoo
 {
     /** @var Animal[] */
-    private $animals = array();
+    private $animals = [];
 
     /**
      * @return Animal[]
@@ -81,12 +81,12 @@ class Zoo
 class ZooImmutable
 {
     /** @var Animal[] */
-    private $animals = array();
+    private $animals = [];
 
     /**
      * @param Animal[] $animals
      */
-    public function __construct(array $animals = array())
+    public function __construct(array $animals = [])
     {
         $this->animals = $animals;
     }

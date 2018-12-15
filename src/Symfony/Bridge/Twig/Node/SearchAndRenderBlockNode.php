@@ -53,7 +53,7 @@ class SearchAndRenderBlockNode extends FunctionExpression
                         // Only insert the label into the array if it is not empty
                         if (!twig_test_empty($label->getAttribute('value'))) {
                             $originalVariables = $variables;
-                            $variables = new ArrayExpression(array(), $lineno);
+                            $variables = new ArrayExpression([], $lineno);
                             $labelKey = new ConstantExpression('label', $lineno);
 
                             if (null !== $originalVariables) {

@@ -23,8 +23,8 @@ class NameNode extends Node
     public function __construct($name)
     {
         parent::__construct(
-            array(),
-            array('name' => $name)
+            [],
+            ['name' => $name]
         );
     }
 
@@ -40,6 +40,6 @@ class NameNode extends Node
 
     public function toArray()
     {
-        return array($this->attributes['name']);
+        return [$this->attributes['name']];
     }
 }

@@ -29,7 +29,7 @@ class RedirectableUrlMatcher extends BaseMatcher
      */
     public function redirect($path, $route, $scheme = null)
     {
-        return array(
+        return [
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
             'path' => $path,
             'permanent' => true,
@@ -37,6 +37,6 @@ class RedirectableUrlMatcher extends BaseMatcher
             'httpPort' => $this->context->getHttpPort(),
             'httpsPort' => $this->context->getHttpsPort(),
             '_route' => $route,
-        );
+        ];
     }
 }

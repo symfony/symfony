@@ -43,8 +43,8 @@ class SecondTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array(
+        return [
             'second' => (int) $matched,
-        );
+        ];
     }
 }

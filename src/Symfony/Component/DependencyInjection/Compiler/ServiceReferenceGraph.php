@@ -28,7 +28,7 @@ class ServiceReferenceGraph
     /**
      * @var ServiceReferenceGraphNode[]
      */
-    private $nodes = array();
+    private $nodes = [];
 
     /**
      * Checks if the graph has a specific node.
@@ -78,7 +78,7 @@ class ServiceReferenceGraph
         foreach ($this->nodes as $node) {
             $node->clear();
         }
-        $this->nodes = array();
+        $this->nodes = [];
     }
 
     /**

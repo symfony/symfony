@@ -33,23 +33,23 @@ class LoaderResolverTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
         $container = new ContainerBuilder();
-        $this->resolver = new LoaderResolver(array(
+        $this->resolver = new LoaderResolver([
             new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
             new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
             new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini')),
             new PhpFileLoader($container, new FileLocator(self::$fixturesPath.'/php')),
             new ClosureLoader($container),
-        ));
+        ]);
     }
 
     public function provideResourcesToLoad()
     {
-        return array(
-            array('ini_with_wrong_ext.xml', 'ini', IniFileLoader::class),
-            array('xml_with_wrong_ext.php', 'xml', XmlFileLoader::class),
-            array('php_with_wrong_ext.yml', 'php', PhpFileLoader::class),
-            array('yaml_with_wrong_ext.ini', 'yaml', YamlFileLoader::class),
-        );
+        return [
+            ['ini_with_wrong_ext.xml', 'ini', IniFileLoader::class],
+            ['xml_with_wrong_ext.php', 'xml', XmlFileLoader::class],
+            ['php_with_wrong_ext.yml', 'php', PhpFileLoader::class],
+            ['yaml_with_wrong_ext.ini', 'yaml', YamlFileLoader::class],
+        ];
     }
 
     /**

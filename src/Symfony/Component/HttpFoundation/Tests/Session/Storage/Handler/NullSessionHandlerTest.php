@@ -54,6 +54,6 @@ class NullSessionHandlerTest extends TestCase
 
     public function getStorage()
     {
-        return new NativeSessionStorage(array(), new NullSessionHandler());
+        return new NativeSessionStorage([], new NullSessionHandler());
     }
 }

@@ -30,7 +30,7 @@ class SurrogateListenerTest extends TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
-        $dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
+        $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, $response);
         $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
@@ -44,7 +44,7 @@ class SurrogateListenerTest extends TestCase
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
-        $dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
+        $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
         $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 
@@ -58,7 +58,7 @@ class SurrogateListenerTest extends TestCase
         $response = new Response('foo');
         $listener = new SurrogateListener(new Esi());
 
-        $dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
+        $dispatcher->addListener(KernelEvents::RESPONSE, [$listener, 'onKernelResponse']);
         $event = new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
         $dispatcher->dispatch(KernelEvents::RESPONSE, $event);
 

@@ -36,5 +36,5 @@ interface DenormalizableInterface
      *
      * @return object
      */
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array());
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = []);
 }

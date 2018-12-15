@@ -36,14 +36,14 @@ class WebLinkExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('link', array($this, 'link')),
-            new TwigFunction('preload', array($this, 'preload')),
-            new TwigFunction('dns_prefetch', array($this, 'dnsPrefetch')),
-            new TwigFunction('preconnect', array($this, 'preconnect')),
-            new TwigFunction('prefetch', array($this, 'prefetch')),
-            new TwigFunction('prerender', array($this, 'prerender')),
-        );
+        return [
+            new TwigFunction('link', [$this, 'link']),
+            new TwigFunction('preload', [$this, 'preload']),
+            new TwigFunction('dns_prefetch', [$this, 'dnsPrefetch']),
+            new TwigFunction('preconnect', [$this, 'preconnect']),
+            new TwigFunction('prefetch', [$this, 'prefetch']),
+            new TwigFunction('prerender', [$this, 'prerender']),
+        ];
     }
 
     /**
@@ -55,7 +55,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The relation URI
      */
-    public function link($uri, $rel, array $attributes = array())
+    public function link($uri, $rel, array $attributes = [])
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
             return $uri;
@@ -80,7 +80,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function preload($uri, array $attributes = array())
+    public function preload($uri, array $attributes = [])
     {
         return $this->link($uri, 'preload', $attributes);
     }
@@ -93,7 +93,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function dnsPrefetch($uri, array $attributes = array())
+    public function dnsPrefetch($uri, array $attributes = [])
     {
         return $this->link($uri, 'dns-prefetch', $attributes);
     }
@@ -106,7 +106,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function preconnect($uri, array $attributes = array())
+    public function preconnect($uri, array $attributes = [])
     {
         return $this->link($uri, 'preconnect', $attributes);
     }
@@ -119,7 +119,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function prefetch($uri, array $attributes = array())
+    public function prefetch($uri, array $attributes = [])
     {
         return $this->link($uri, 'prefetch', $attributes);
     }
@@ -132,7 +132,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function prerender($uri, array $attributes = array())
+    public function prerender($uri, array $attributes = [])
     {
         return $this->link($uri, 'prerender', $attributes);
     }

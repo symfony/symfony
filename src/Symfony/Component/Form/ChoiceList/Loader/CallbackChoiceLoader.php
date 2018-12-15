@@ -56,7 +56,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     {
         // Optimize
         if (empty($values)) {
-            return array();
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -69,7 +69,7 @@ class CallbackChoiceLoader implements ChoiceLoaderInterface
     {
         // Optimize
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         return $this->loadChoiceList($value)->getValuesForChoices($choices);

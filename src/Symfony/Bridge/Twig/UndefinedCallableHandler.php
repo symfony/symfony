@@ -19,15 +19,15 @@ use Twig\Error\SyntaxError;
  */
 class UndefinedCallableHandler
 {
-    private static $filterComponents = array(
+    private static $filterComponents = [
         'humanize' => 'form',
         'trans' => 'translation',
         'transchoice' => 'translation',
         'yaml_encode' => 'yaml',
         'yaml_dump' => 'yaml',
-    );
+    ];
 
-    private static $functionComponents = array(
+    private static $functionComponents = [
         'asset' => 'asset',
         'asset_version' => 'asset',
         'dump' => 'debug-bundle',
@@ -54,15 +54,15 @@ class UndefinedCallableHandler
         'workflow_transitions' => 'workflow',
         'workflow_has_marked_place' => 'workflow',
         'workflow_marked_places' => 'workflow',
-    );
+    ];
 
-    private static $fullStackEnable = array(
+    private static $fullStackEnable = [
         'form' => 'enable "framework.form"',
         'security-core' => 'add the "SecurityBundle"',
         'security-http' => 'add the "SecurityBundle"',
         'web-link' => 'enable "framework.web_link"',
         'workflow' => 'enable "framework.workflows"',
-    );
+    ];
 
     public static function onUndefinedFilter($name)
     {

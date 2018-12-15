@@ -37,7 +37,7 @@ class PhpProcess extends Process
         if (false === $php = $executableFinder->find(false)) {
             $php = null;
         } else {
-            $php = array_merge(array($php), $executableFinder->findArguments());
+            $php = array_merge([$php], $executableFinder->findArguments());
         }
         if ('phpdbg' === \PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');

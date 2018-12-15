@@ -20,6 +20,6 @@ class JsonAuthenticationSuccessHandler implements AuthenticationSuccessHandlerIn
 {
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
-        return new JsonResponse(array('message' => sprintf('Good game @%s!', $token->getUsername())));
+        return new JsonResponse(['message' => sprintf('Good game @%s!', $token->getUsername())]);
     }
 }

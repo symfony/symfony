@@ -49,7 +49,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
             return new Marking();
         }
 
-        return new Marking(array($placeName => 1));
+        return new Marking([$placeName => 1]);
     }
 
     /**

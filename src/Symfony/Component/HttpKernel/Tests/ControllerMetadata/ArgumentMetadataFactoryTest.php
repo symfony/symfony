@@ -33,55 +33,55 @@ class ArgumentMetadataFactoryTest extends TestCase
 
     public function testSignature1()
     {
-        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature1'));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, false, null),
             new ArgumentMetadata('bar', 'array', false, false, null),
             new ArgumentMetadata('baz', 'callable', false, false, null),
-        ), $arguments);
+        ], $arguments);
     }
 
     public function testSignature2()
     {
-        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature2'));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature2']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', self::class, false, true, null, true),
             new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, true, null, true),
             new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, true, null, true),
-        ), $arguments);
+        ], $arguments);
     }
 
     public function testSignature3()
     {
-        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature3'));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature3']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, false, null),
             new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null),
-        ), $arguments);
+        ], $arguments);
     }
 
     public function testSignature4()
     {
-        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature4'));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature4']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', null, false, true, 'default'),
             new ArgumentMetadata('bar', null, false, true, 500),
-            new ArgumentMetadata('baz', null, false, true, array()),
-        ), $arguments);
+            new ArgumentMetadata('baz', null, false, true, []),
+        ], $arguments);
     }
 
     public function testSignature5()
     {
-        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature5'));
+        $arguments = $this->factory->createArgumentMetadata([$this, 'signature5']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', 'array', false, true, null, true),
             new ArgumentMetadata('bar', null, false, false, null),
-        ), $arguments);
+        ], $arguments);
     }
 
     /**
@@ -89,12 +89,12 @@ class ArgumentMetadataFactoryTest extends TestCase
      */
     public function testVariadicSignature()
     {
-        $arguments = $this->factory->createArgumentMetadata(array(new VariadicController(), 'action'));
+        $arguments = $this->factory->createArgumentMetadata([new VariadicController(), 'action']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', null, false, false, null),
             new ArgumentMetadata('bar', null, true, false, null),
-        ), $arguments);
+        ], $arguments);
     }
 
     /**
@@ -102,13 +102,13 @@ class ArgumentMetadataFactoryTest extends TestCase
      */
     public function testBasicTypesSignature()
     {
-        $arguments = $this->factory->createArgumentMetadata(array(new BasicTypesController(), 'action'));
+        $arguments = $this->factory->createArgumentMetadata([new BasicTypesController(), 'action']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', 'string', false, false, null),
             new ArgumentMetadata('bar', 'int', false, false, null),
             new ArgumentMetadata('baz', 'float', false, false, null),
-        ), $arguments);
+        ], $arguments);
     }
 
     /**
@@ -116,14 +116,14 @@ class ArgumentMetadataFactoryTest extends TestCase
      */
     public function testNullableTypesSignature()
     {
-        $arguments = $this->factory->createArgumentMetadata(array(new NullableController(), 'action'));
+        $arguments = $this->factory->createArgumentMetadata([new NullableController(), 'action']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new ArgumentMetadata('foo', 'string', false, false, null, true),
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
             new ArgumentMetadata('mandatory', null, false, false, null, true),
-        ), $arguments);
+        ], $arguments);
     }
 
     private function signature1(self $foo, array $bar, callable $baz)
@@ -138,7 +138,7 @@ class ArgumentMetadataFactoryTest extends TestCase
     {
     }
 
-    private function signature4($foo = 'default', $bar = 500, $baz = array())
+    private function signature4($foo = 'default', $bar = 500, $baz = [])
     {
     }
 

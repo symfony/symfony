@@ -63,13 +63,13 @@ class ExceptionListenerTest extends TestCase
 
     public function getAuthenticationExceptionProvider()
     {
-        return array(
-            array($e = new AuthenticationException(), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, array(), 0)),
-            array(new \LogicException('random', 0, $e = new AuthenticationException()), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, array(), 0)),
-            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AuthenticationException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, array(), 0)),
-            array(new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AccessDeniedException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, array(), 0)),
-            array($e = new AuthenticationException('random', 0, new \LogicException()), new HttpException(Response::HTTP_UNAUTHORIZED, 'random', $e, array(), 0)),
-        );
+        return [
+            [$e = new AuthenticationException(), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, [], 0)],
+            [new \LogicException('random', 0, $e = new AuthenticationException()), new HttpException(Response::HTTP_UNAUTHORIZED, '', $e, [], 0)],
+            [new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AuthenticationException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, [], 0)],
+            [new \LogicException('random', 0, $e = new AuthenticationException('embed', 0, new AccessDeniedException())), new HttpException(Response::HTTP_UNAUTHORIZED, 'embed', $e, [], 0)],
+            [$e = new AuthenticationException('random', 0, new \LogicException()), new HttpException(Response::HTTP_UNAUTHORIZED, 'random', $e, [], 0)],
+        ];
     }
 
     public function testExceptionWhenEntryPointReturnsBadValue()
@@ -159,13 +159,13 @@ class ExceptionListenerTest extends TestCase
 
     public function getAccessDeniedExceptionProvider()
     {
-        return array(
-            array(new AccessDeniedException()),
-            array(new \LogicException('random', 0, $e = new AccessDeniedException()), $e),
-            array(new \LogicException('random', 0, $e = new AccessDeniedException('embed', new AccessDeniedException())), $e),
-            array(new \LogicException('random', 0, $e = new AccessDeniedException('embed', new AuthenticationException())), $e),
-            array(new AccessDeniedException('random', new \LogicException())),
-        );
+        return [
+            [new AccessDeniedException()],
+            [new \LogicException('random', 0, $e = new AccessDeniedException()), $e],
+            [new \LogicException('random', 0, $e = new AccessDeniedException('embed', new AccessDeniedException())), $e],
+            [new \LogicException('random', 0, $e = new AccessDeniedException('embed', new AuthenticationException())), $e],
+            [new AccessDeniedException('random', new \LogicException())],
+        ];
     }
 
     private function createEntryPoint(Response $response = null)

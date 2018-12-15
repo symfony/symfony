@@ -85,11 +85,11 @@ abstract class AdapterTestCase extends CachePoolTest
         $item = $cache->getItem('foo');
         $this->assertFalse($item->isHit());
 
-        foreach ($cache->getItems(array('foo')) as $item) {
+        foreach ($cache->getItems(['foo']) as $item) {
         }
         $cache->save($item->set(new NotUnserializable()));
 
-        foreach ($cache->getItems(array('foo')) as $item) {
+        foreach ($cache->getItems(['foo']) as $item) {
         }
         $this->assertFalse($item->isHit());
     }

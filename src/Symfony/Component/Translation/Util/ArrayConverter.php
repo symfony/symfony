@@ -35,7 +35,7 @@ class ArrayConverter
      */
     public static function expandToTree(array $messages)
     {
-        $tree = array();
+        $tree = [];
 
         foreach ($messages as $id => $value) {
             $referenceToElement = &self::getElementByPath($tree, explode('.', $id));

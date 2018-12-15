@@ -29,7 +29,7 @@ class TransNode extends Node
 {
     public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, $lineno = 0, $tag = null)
     {
-        $nodes = array('body' => $body);
+        $nodes = ['body' => $body];
         if (null !== $domain) {
             $nodes['domain'] = $domain;
         }
@@ -43,14 +43,14 @@ class TransNode extends Node
             $nodes['locale'] = $locale;
         }
 
-        parent::__construct($nodes, array(), $lineno, $tag);
+        parent::__construct($nodes, [], $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
 
-        $defaults = new ArrayExpression(array(), -1);
+        $defaults = new ArrayExpression([], -1);
         if ($this->hasNode('vars') && ($vars = $this->getNode('vars')) instanceof ArrayExpression) {
             $defaults = $this->getNode('vars');
             $vars = null;
@@ -109,7 +109,7 @@ class TransNode extends Node
         } elseif ($body instanceof TextNode) {
             $msg = $body->getAttribute('data');
         } else {
-            return array($body, $vars);
+            return [$body, $vars];
         }
 
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
@@ -127,6 +127,6 @@ class TransNode extends Node
             }
         }
 
-        return array(new ConstantExpression(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars);
+        return [new ConstantExpression(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars];
     }
 }

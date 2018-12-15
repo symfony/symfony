@@ -249,13 +249,13 @@ class UploadedFileTest extends TestCase
 
     public function uploadedFileErrorProvider()
     {
-        return array(
-            array(UPLOAD_ERR_INI_SIZE),
-            array(UPLOAD_ERR_FORM_SIZE),
-            array(UPLOAD_ERR_PARTIAL),
-            array(UPLOAD_ERR_NO_TMP_DIR),
-            array(UPLOAD_ERR_EXTENSION),
-        );
+        return [
+            [UPLOAD_ERR_INI_SIZE],
+            [UPLOAD_ERR_FORM_SIZE],
+            [UPLOAD_ERR_PARTIAL],
+            [UPLOAD_ERR_NO_TMP_DIR],
+            [UPLOAD_ERR_EXTENSION],
+        ];
     }
 
     public function testIsInvalidIfNotHttpUpload()

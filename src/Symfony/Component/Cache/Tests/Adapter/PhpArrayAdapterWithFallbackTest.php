@@ -19,14 +19,14 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testGetItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testGetItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testHasItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testPrune' => 'PhpArrayAdapter just proxies',
-    );
+    ];
 
     protected static $file;
 

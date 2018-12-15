@@ -43,7 +43,7 @@ class IdReader
         $this->om = $om;
         $this->classMetadata = $classMetadata;
         $this->singleId = 1 === \count($ids);
-        $this->intId = $this->singleId && \in_array($idType, array('integer', 'smallint', 'bigint'));
+        $this->intId = $this->singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
         $this->idField = current($ids);
 
         // single field association are resolved, since the schema column could be an int

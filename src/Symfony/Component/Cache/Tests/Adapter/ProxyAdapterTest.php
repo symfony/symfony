@@ -21,11 +21,11 @@ use Symfony\Component\Cache\CacheItem;
  */
 class ProxyAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testPrune' => 'ProxyAdapter just proxies',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {

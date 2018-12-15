@@ -45,7 +45,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     protected function extractAttributes($object, $format = null, array $context = array())
     {
         // If not using groups, detect manually
-        $attributes = array();
+        $attributes = [];
 
         // methods
         $reflClass = new \ReflectionClass($object);
@@ -98,7 +98,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         return $this->propertyAccessor->getValue($object, $attribute);
     }
@@ -106,7 +106,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);

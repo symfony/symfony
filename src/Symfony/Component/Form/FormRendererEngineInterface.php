@@ -136,5 +136,5 @@ interface FormRendererEngineInterface
      *
      * @return string The HTML markup
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array());
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = []);
 }

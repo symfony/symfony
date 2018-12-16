@@ -63,18 +63,18 @@ class UrlPackageTest extends TestCase
 
     public function getContextConfigs()
     {
-        return array(
-            array(false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com', 'https://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com', 'https://example.com'), '', 'fooa', 'https://example.com/fooa?v1'),
-            array(false, array('http://example.com/bar'), '', 'foo', 'http://example.com/bar/foo?v1'),
-            array(false, array('http://example.com/bar/'), '', 'foo', 'http://example.com/bar/foo?v1'),
-            array(false, array('//example.com/bar/'), '', 'foo', '//example.com/bar/foo?v1'),
+        return [
+            [false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'fooa', 'https://example.com/fooa?v1'],
+            [false, ['http://example.com/bar'], '', 'foo', 'http://example.com/bar/foo?v1'],
+            [false, ['http://example.com/bar/'], '', 'foo', 'http://example.com/bar/foo?v1'],
+            [false, ['//example.com/bar/'], '', 'foo', '//example.com/bar/foo?v1'],
 
-            array(true, array('http://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(true, array('http://example.com', 'https://example.com'), '', 'foo', 'https://example.com/foo?v1'),
-        );
+            [true, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [true, ['http://example.com', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
+        ];
     }
 
     public function testVersionStrategyGivesAbsoluteURL()
@@ -93,7 +93,7 @@ class UrlPackageTest extends TestCase
      */
     public function testNoBaseUrls()
     {
-        new UrlPackage(array(), new EmptyVersionStrategy());
+        new UrlPackage([], new EmptyVersionStrategy());
     }
 
     /**

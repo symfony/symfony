@@ -128,7 +128,7 @@ class Cookie
             $sameSite = strtolower($sameSite);
         }
 
-        if (!\in_array($sameSite, array(self::SAMESITE_LAX, self::SAMESITE_STRICT, null), true)) {
+        if (!\in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, null], true)) {
             throw new \InvalidArgumentException('The "sameSite" parameter value is not valid.');
         }
 

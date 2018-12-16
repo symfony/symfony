@@ -28,10 +28,10 @@ class SerializerCacheWarmerTest extends TestCase
             $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
         }
 
-        $loaders = array(
+        $loaders = [
             new XmlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/person.xml'),
             new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/author.yml'),
-        );
+        ];
 
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);

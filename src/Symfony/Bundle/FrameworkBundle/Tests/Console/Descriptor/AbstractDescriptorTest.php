@@ -83,13 +83,13 @@ abstract class AbstractDescriptorTest extends TestCase
     /** @dataProvider getDescribeContainerDefinitionWithArgumentsShownTestData */
     public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription)
     {
-        $this->assertDescription($expectedDescription, $definition, array('show_arguments' => true));
+        $this->assertDescription($expectedDescription, $definition, ['show_arguments' => true]);
     }
 
     public function getDescribeContainerDefinitionWithArgumentsShownTestData()
     {
         $definitions = ObjectsProvider::getContainerDefinitions();
-        $definitionsWithArgs = array();
+        $definitionsWithArgs = [];
 
         foreach ($definitions as $key => $definition) {
             $definitionsWithArgs[str_replace('definition_', 'definition_arguments_', $key)] = $definition;
@@ -110,7 +110,7 @@ abstract class AbstractDescriptorTest extends TestCase
     }
 
     /** @dataProvider getDescribeContainerDefinitionWhichIsAnAliasTestData */
-    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = array())
+    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = [])
     {
         $this->assertDescription($expectedDescription, $builder, $options);
     }
@@ -122,7 +122,7 @@ abstract class AbstractDescriptorTest extends TestCase
         $builder->setDefinition('service_2', $builder->getDefinition('definition_2'));
 
         $aliases = ObjectsProvider::getContainerAliases();
-        $aliasesWithDefinitions = array();
+        $aliasesWithDefinitions = [];
         foreach ($aliases as $name => $alias) {
             $aliasesWithDefinitions[str_replace('alias_', 'alias_with_definition_', $name)] = $alias;
         }
@@ -180,14 +180,14 @@ abstract class AbstractDescriptorTest extends TestCase
 
     abstract protected function getFormat();
 
-    private function assertDescription($expectedDescription, $describedObject, array $options = array())
+    private function assertDescription($expectedDescription, $describedObject, array $options = [])
     {
         $options['raw_output'] = true;
         $options['raw_text'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {
-            $options['output'] = new SymfonyStyle(new ArrayInput(array()), $output);
+            $options['output'] = new SymfonyStyle(new ArrayInput([]), $output);
         }
 
         $this->getDescriptor()->describe($output, $describedObject, $options);

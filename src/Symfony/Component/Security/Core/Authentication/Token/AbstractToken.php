@@ -138,12 +138,12 @@ abstract class AbstractToken implements TokenInterface
     public function serialize()
     {
         return serialize(
-            array(
+            [
                 \is_object($this->user) ? clone $this->user : $this->user,
                 $this->authenticated,
                 array_map(function ($role) { return clone $role; }, $this->roles),
                 $this->attributes,
-            )
+            ]
         );
     }
 
@@ -224,7 +224,7 @@ abstract class AbstractToken implements TokenInterface
         $class = \get_class($this);
         $class = substr($class, strrpos($class, '\\') + 1);
 
-        $roles = array();
+        $roles = [];
         foreach ($this->roles as $role) {
             $roles[] = $role->getRole();
         }

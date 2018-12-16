@@ -138,7 +138,7 @@ class TextDescriptor extends Descriptor
                 }
 
                 if (!$sorted) {
-                    $options[$group] = array();
+                    $options[$group] = [];
                 } else {
                     $options[$group][] = null;
                 }
@@ -161,15 +161,15 @@ class TextDescriptor extends Descriptor
     private function getDumpFunction()
     {
         $cloner = new VarCloner();
-        $cloner->addCasters(array('Closure' => function ($c, $a) {
+        $cloner->addCasters(['Closure' => function ($c, $a) {
             $prefix = Caster::PREFIX_VIRTUAL;
 
-            return array(
+            return [
                 $prefix.'parameters' => isset($a[$prefix.'parameters']) ? \count($a[$prefix.'parameters']->value) : 0,
                 $prefix.'file' => $a[$prefix.'file'],
                 $prefix.'line' => $a[$prefix.'line'],
-            );
-        }));
+            ];
+        }]);
         $dumper = new CliDumper(null, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
         $dumper->setColors($this->output->isDecorated());
 

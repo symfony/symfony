@@ -134,12 +134,12 @@ class ProxyDumperTest extends TestCase
      */
     public function getProxyCandidates()
     {
-        $definitions = array(
-            array(new Definition(__CLASS__), true),
-            array(new Definition('stdClass'), true),
-            array(new Definition(uniqid('foo', true)), false),
-            array(new Definition(), false),
-        );
+        $definitions = [
+            [new Definition(__CLASS__), true],
+            [new Definition('stdClass'), true],
+            [new Definition(uniqid('foo', true)), false],
+            [new Definition(), false],
+        ];
 
         array_map(
             function ($definition) {

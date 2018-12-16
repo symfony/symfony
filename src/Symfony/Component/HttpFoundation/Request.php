@@ -61,17 +61,17 @@ class Request
     /**
      * @var string[]
      */
-    protected static $trustedProxies = array();
+    protected static $trustedProxies = [];
 
     /**
      * @var string[]
      */
-    protected static $trustedHostPatterns = array();
+    protected static $trustedHostPatterns = [];
 
     /**
      * @var string[]
      */
-    protected static $trustedHosts = array();
+    protected static $trustedHosts = [];
 
     /**
      * Names for headers that can be trusted when
@@ -250,7 +250,7 @@ class Request
      * @param array                $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
-    public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
@@ -268,7 +268,7 @@ class Request
      * @param array                $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
         $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
@@ -339,9 +339,9 @@ class Request
      *
      * @return static
      */
-    public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    public static function create($uri, $method = 'GET', $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
-        $server = array_replace(array(
+        $server = array_replace([
             'SERVER_NAME' => 'localhost',
             'SERVER_PORT' => 80,
             'HTTP_HOST' => 'localhost',
@@ -354,7 +354,7 @@ class Request
             'SCRIPT_FILENAME' => '',
             'SERVER_PROTOCOL' => 'HTTP/1.1',
             'REQUEST_TIME' => time(),
-        ), $server);
+        ], $server);
 
         $server['PATH_INFO'] = '';
         $server['REQUEST_METHOD'] = strtoupper($method);
@@ -402,10 +402,10 @@ class Request
                 // no break
             case 'PATCH':
                 $request = $parameters;
-                $query = array();
+                $query = [];
                 break;
             default:
-                $request = array();
+                $request = [];
                 $query = $parameters;
                 break;
         }
@@ -428,7 +428,7 @@ class Request
         $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
 
-        return self::createRequestFromFactory($query, $request, array(), $cookies, $files, $server, $content);
+        return self::createRequestFromFactory($query, $request, [], $cookies, $files, $server, $content);
     }
 
     /**
@@ -532,7 +532,7 @@ class Request
         }
 
         $cookieHeader = '';
-        $cookies = array();
+        $cookies = [];
 
         foreach ($this->cookies as $k => $v) {
             $cookies[] = $k.'='.$v;
@@ -644,7 +644,7 @@ class Request
             return sprintf('{%s}i', $hostPattern);
         }, $hostPatterns);
         // we need to reset trusted hosts on trusted host patterns change
-        self::$trustedHosts = array();
+        self::$trustedHosts = [];
     }
 
     /**
@@ -1405,7 +1405,7 @@ class Request
             static::initializeFormats();
         }
 
-        return isset(static::$formats[$format]) ? static::$formats[$format] : array();
+        return isset(static::$formats[$format]) ? static::$formats[$format] : [];
     }
 
     /**
@@ -1448,7 +1448,7 @@ class Request
             static::initializeFormats();
         }
 
-        static::$formats[$format] = \is_array($mimeTypes) ? $mimeTypes : array($mimeTypes);
+        static::$formats[$format] = \is_array($mimeTypes) ? $mimeTypes : [$mimeTypes];
     }
 
     /**
@@ -1578,7 +1578,7 @@ class Request
      */
     public function isMethodIdempotent()
     {
-        return \in_array($this->getMethod(), array('HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE'));
+        return \in_array($this->getMethod(), ['HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE']);
     }
 
     /**
@@ -1590,7 +1590,7 @@ class Request
      */
     public function isMethodCacheable()
     {
-        return \in_array($this->getMethod(), array('GET', 'HEAD'));
+        return \in_array($this->getMethod(), ['GET', 'HEAD']);
     }
 
     /**
@@ -1704,7 +1704,7 @@ class Request
             return $locales[0];
         }
 
-        $extendedPreferredLanguages = array();
+        $extendedPreferredLanguages = [];
         foreach ($preferredLanguages as $language) {
             $extendedPreferredLanguages[] = $language;
             if (false !== $position = strpos($language, '_')) {
@@ -1732,7 +1732,7 @@ class Request
         }
 
         $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
-        $this->languages = array();
+        $this->languages = [];
         foreach ($languages as $lang => $acceptHeaderItem) {
             if (false !== strpos($lang, '-')) {
                 $codes = explode('-', $lang);
@@ -1994,19 +1994,19 @@ class Request
      */
     protected static function initializeFormats()
     {
-        static::$formats = array(
-            'html' => array('text/html', 'application/xhtml+xml'),
-            'txt' => array('text/plain'),
-            'js' => array('application/javascript', 'application/x-javascript', 'text/javascript'),
-            'css' => array('text/css'),
-            'json' => array('application/json', 'application/x-json'),
-            'jsonld' => array('application/ld+json'),
-            'xml' => array('text/xml', 'application/xml', 'application/x-xml'),
-            'rdf' => array('application/rdf+xml'),
-            'atom' => array('application/atom+xml'),
-            'rss' => array('application/rss+xml'),
-            'form' => array('application/x-www-form-urlencoded'),
-        );
+        static::$formats = [
+            'html' => ['text/html', 'application/xhtml+xml'],
+            'txt' => ['text/plain'],
+            'js' => ['application/javascript', 'application/x-javascript', 'text/javascript'],
+            'css' => ['text/css'],
+            'json' => ['application/json', 'application/x-json'],
+            'jsonld' => ['application/ld+json'],
+            'xml' => ['text/xml', 'application/xml', 'application/x-xml'],
+            'rdf' => ['application/rdf+xml'],
+            'atom' => ['application/atom+xml'],
+            'rss' => ['application/rss+xml'],
+            'form' => ['application/x-www-form-urlencoded'],
+        ];
     }
 
     /**
@@ -2051,7 +2051,7 @@ class Request
         return false;
     }
 
-    private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    private static function createRequestFromFactory(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
         if (self::$requestFactory) {
             $request = \call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
@@ -2081,8 +2081,8 @@ class Request
 
     private function getTrustedValues($type, $ip = null)
     {
-        $clientValues = array();
-        $forwardedValues = array();
+        $clientValues = [];
+        $forwardedValues = [];
 
         if (self::$trustedHeaders[$type] && $this->headers->has(self::$trustedHeaders[$type])) {
             foreach (explode(',', $this->headers->get(self::$trustedHeaders[$type])) as $v) {
@@ -2117,7 +2117,7 @@ class Request
         }
 
         if (!$this->isForwardedValid) {
-            return null !== $ip ? array('0.0.0.0', $ip) : array();
+            return null !== $ip ? ['0.0.0.0', $ip] : [];
         }
         $this->isForwardedValid = false;
 
@@ -2127,7 +2127,7 @@ class Request
     private function normalizeAndFilterClientIps(array $clientIps, $ip)
     {
         if (!$clientIps) {
-            return array();
+            return [];
         }
         $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
         $firstTrustedIp = null;
@@ -2163,6 +2163,6 @@ class Request
         }
 
         // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : array($firstTrustedIp);
+        return $clientIps ? array_reverse($clientIps) : [$firstTrustedIp];
     }
 }

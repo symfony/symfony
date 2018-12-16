@@ -160,7 +160,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      */
     public function setOptions(array $options)
     {
-        $this->options = array();
+        $this->options = [];
 
         foreach ($options as $option) {
             $this->setOption($option);
@@ -176,8 +176,8 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      */
     public function apply($text)
     {
-        $setCodes = array();
-        $unsetCodes = array();
+        $setCodes = [];
+        $unsetCodes = [];
 
         if (null !== $this->foreground) {
             $setCodes[] = $this->foreground['set'];

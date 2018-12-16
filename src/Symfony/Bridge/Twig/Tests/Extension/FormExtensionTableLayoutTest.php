@@ -34,30 +34,30 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     {
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
+        $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ));
+        ]);
 
-        $environment = new Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, ['strict_variables' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         $environment->addExtension(new FormExtension());
 
-        $rendererEngine = new TwigRendererEngine(array(
+        $rendererEngine = new TwigRendererEngine([
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ], $environment);
         $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 

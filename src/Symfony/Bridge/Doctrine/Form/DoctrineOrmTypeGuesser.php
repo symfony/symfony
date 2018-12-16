@@ -26,7 +26,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     protected $registry;
 
-    private $cache = array();
+    private $cache = [];
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -39,7 +39,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     public function guessType($class, $property)
     {
         if (!$ret = $this->getMetadata($class)) {
-            return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', array(), Guess::LOW_CONFIDENCE);
+            return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TextType', [], Guess::LOW_CONFIDENCE);
         }
 
         list($metadata, $name) = $ret;
@@ -133,7 +133,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return new ValueGuess($mapping['length'], Guess::HIGH_CONFIDENCE);
             }
 
-            if (\in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Type::DECIMAL, Type::FLOAT])) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -146,7 +146,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
     {
         $ret = $this->getMetadata($class);
         if ($ret && isset($ret[0]->fieldMappings[$property]) && !$ret[0]->hasAssociation($property)) {
-            if (\in_array($ret[0]->getTypeOfField($property), array(Type::DECIMAL, Type::FLOAT))) {
+            if (\in_array($ret[0]->getTypeOfField($property), [Type::DECIMAL, Type::FLOAT])) {
                 return new ValueGuess(null, Guess::MEDIUM_CONFIDENCE);
             }
         }
@@ -164,7 +164,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
         $this->cache[$class] = null;
         foreach ($this->registry->getManagers() as $name => $em) {
             try {
-                return $this->cache[$class] = array($em->getClassMetadata($class), $name);
+                return $this->cache[$class] = [$em->getClassMetadata($class), $name];
             } catch (MappingException $e) {
                 // not an entity or mapped super class
             } catch (LegacyMappingException $e) {

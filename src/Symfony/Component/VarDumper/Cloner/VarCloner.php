@@ -74,7 +74,7 @@ class VarCloner extends AbstractCloner
                     if (\is_int($k)) {
                         continue;
                     }
-                    foreach (array($k => true) as $gk => $gv) {
+                    foreach ([$k => true] as $gk => $gv) {
                     }
                     if ($gk !== $k) {
                         $fromObjCast = true;
@@ -163,7 +163,7 @@ class VarCloner extends AbstractCloner
                             // Happens with copies of $GLOBALS
                             if (isset($v[$gid])) {
                                 unset($v[$gid]);
-                                $a = array();
+                                $a = [];
                                 foreach ($v as $gk => &$gv) {
                                     $a[$gk] = &$gv;
                                 }
@@ -254,12 +254,12 @@ class VarCloner extends AbstractCloner
 
                 if ($arrayStub === $stub) {
                     if ($arrayStub->cut) {
-                        $stub = array($arrayStub->cut, $arrayStub->class => $arrayStub->position);
+                        $stub = [$arrayStub->cut, $arrayStub->class => $arrayStub->position];
                         $arrayStub->cut = 0;
                     } elseif (isset(self::$arrayCache[$arrayStub->class][$arrayStub->position])) {
                         $stub = self::$arrayCache[$arrayStub->class][$arrayStub->position];
                     } else {
-                        self::$arrayCache[$arrayStub->class][$arrayStub->position] = $stub = array($arrayStub->class => $arrayStub->position);
+                        self::$arrayCache[$arrayStub->class][$arrayStub->position] = $stub = [$arrayStub->class => $arrayStub->position];
                     }
                 }
 
@@ -273,10 +273,10 @@ class VarCloner extends AbstractCloner
             if ($fromObjCast) {
                 $fromObjCast = false;
                 $refs = $vals;
-                $vals = array();
+                $vals = [];
                 $j = -1;
                 foreach ($queue[$i] as $k => $v) {
-                    foreach (array($k => true) as $gk => $gv) {
+                    foreach ([$k => true] as $gk => $gv) {
                     }
                     if ($gk !== $k) {
                         $vals = (object) $vals;

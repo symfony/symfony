@@ -61,7 +61,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
 
@@ -72,7 +72,7 @@ class TranslationExtension extends AbstractExtension
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
-        );
+        ];
     }
 
     /**
@@ -80,7 +80,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getNodeVisitors()
     {
-        return array($this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor());
+        return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
     public function getTranslationNodeVisitor()

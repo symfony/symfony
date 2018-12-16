@@ -89,7 +89,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
     {
         CacheItem::validateKey($key);
 
-        return $this->setMultiple(array($key => $value), $ttl);
+        return $this->setMultiple([$key => $value], $ttl);
     }
 
     /**
@@ -100,7 +100,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
-        $valuesArray = array();
+        $valuesArray = [];
 
         foreach ($values as $key => $value) {
             \is_int($key) || CacheItem::validateKey($key);

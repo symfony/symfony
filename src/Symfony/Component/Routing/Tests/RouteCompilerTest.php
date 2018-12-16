@@ -202,45 +202,45 @@ class RouteCompilerTest extends TestCase
 
     public function provideCompileImplicitUtf8Data()
     {
-        return array(
-            array(
+        return [
+            [
                 'Static UTF-8 route',
-                array('/foé'),
-                '/foé', '#^/foé$#sDu', array(), array(
-                    array('text', '/foé'),
-                ),
+                ['/foé'],
+                '/foé', '#^/foé$#sDu', [], [
+                    ['text', '/foé'],
+                ],
                 'patterns',
-            ),
+            ],
 
-            array(
+            [
                 'Route with an implicit UTF-8 requirement',
-                array('/{bar}', array('bar' => null), array('bar' => 'é')),
-                '', '#^/(?P<bar>é)?$#sDu', array('bar'), array(
-                    array('variable', '/', 'é', 'bar', true),
-                ),
+                ['/{bar}', ['bar' => null], ['bar' => 'é']],
+                '', '#^/(?P<bar>é)?$#sDu', ['bar'], [
+                    ['variable', '/', 'é', 'bar', true],
+                ],
                 'requirements',
-            ),
+            ],
 
-            array(
+            [
                 'Route with a UTF-8 class requirement',
-                array('/{bar}', array('bar' => null), array('bar' => '\pM')),
-                '', '#^/(?P<bar>\pM)?$#sDu', array('bar'), array(
-                    array('variable', '/', '\pM', 'bar', true),
-                ),
+                ['/{bar}', ['bar' => null], ['bar' => '\pM']],
+                '', '#^/(?P<bar>\pM)?$#sDu', ['bar'], [
+                    ['variable', '/', '\pM', 'bar', true],
+                ],
                 'requirements',
-            ),
+            ],
 
-            array(
+            [
                 'Route with a UTF-8 separator',
-                array('/foo/{bar}§{_format}', array(), array(), array('compiler_class' => Utf8RouteCompiler::class)),
-                '/foo', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#sDu', array('bar', '_format'), array(
-                    array('variable', '§', '[^/]++', '_format', true),
-                    array('variable', '/', '[^/§]++', 'bar', true),
-                    array('text', '/foo'),
-                ),
+                ['/foo/{bar}§{_format}', [], [], ['compiler_class' => Utf8RouteCompiler::class]],
+                '/foo', '#^/foo/(?P<bar>[^/§]++)§(?P<_format>[^/]++)$#sDu', ['bar', '_format'], [
+                    ['variable', '§', '[^/]++', '_format', true],
+                    ['variable', '/', '[^/§]++', 'bar', true],
+                    ['text', '/foo'],
+                ],
                 'patterns',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -258,7 +258,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testRouteCharsetMismatch()
     {
-        $route = new Route("/\xE9/{bar}", array(), array('bar' => '.'), array('utf8' => true));
+        $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
         $compiled = $route->compile();
     }
@@ -268,7 +268,7 @@ class RouteCompilerTest extends TestCase
      */
     public function testRequirementCharsetMismatch()
     {
-        $route = new Route('/foo/{bar}', array(), array('bar' => "\xE9"), array('utf8' => true));
+        $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
         $compiled = $route->compile();
     }
@@ -295,11 +295,11 @@ class RouteCompilerTest extends TestCase
 
     public function getVariableNamesStartingWithADigit()
     {
-        return array(
-           array('09'),
-           array('123'),
-           array('1e2'),
-        );
+        return [
+           ['09'],
+           ['123'],
+           ['1e2'],
+        ];
     }
 
     /**
@@ -312,65 +312,65 @@ class RouteCompilerTest extends TestCase
 
         $compiled = $route->compile();
         $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-        $this->assertEquals($regex, str_replace(array("\n", ' '), '', $compiled->getRegex()), $name.' (regex)');
+        $this->assertEquals($regex, str_replace(["\n", ' '], '', $compiled->getRegex()), $name.' (regex)');
         $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
         $this->assertEquals($pathVariables, $compiled->getPathVariables(), $name.' (path variables)');
         $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
-        $this->assertEquals($hostRegex, str_replace(array("\n", ' '), '', $compiled->getHostRegex()), $name.' (host regex)');
+        $this->assertEquals($hostRegex, str_replace(["\n", ' '], '', $compiled->getHostRegex()), $name.' (host regex)');
         $this->assertEquals($hostVariables, $compiled->getHostVariables(), $name.' (host variables)');
         $this->assertEquals($hostTokens, $compiled->getHostTokens(), $name.' (host tokens)');
     }
 
     public function provideCompileWithHostData()
     {
-        return array(
-            array(
+        return [
+            [
                 'Route with host pattern',
-                array('/hello', array(), array(), array(), 'www.example.com'),
-                '/hello', '#^/hello$#sD', array(), array(), array(
-                    array('text', '/hello'),
-                ),
-                '#^www\.example\.com$#sDi', array(), array(
-                    array('text', 'www.example.com'),
-                ),
-            ),
-            array(
+                ['/hello', [], [], [], 'www.example.com'],
+                '/hello', '#^/hello$#sD', [], [], [
+                    ['text', '/hello'],
+                ],
+                '#^www\.example\.com$#sDi', [], [
+                    ['text', 'www.example.com'],
+                ],
+            ],
+            [
                 'Route with host pattern and some variables',
-                array('/hello/{name}', array(), array(), array(), 'www.example.{tld}'),
-                '/hello', '#^/hello/(?P<name>[^/]++)$#sD', array('tld', 'name'), array('name'), array(
-                    array('variable', '/', '[^/]++', 'name'),
-                    array('text', '/hello'),
-                ),
-                '#^www\.example\.(?P<tld>[^\.]++)$#sDi', array('tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', 'www.example'),
-                ),
-            ),
-            array(
+                ['/hello/{name}', [], [], [], 'www.example.{tld}'],
+                '/hello', '#^/hello/(?P<name>[^/]++)$#sD', ['tld', 'name'], ['name'], [
+                    ['variable', '/', '[^/]++', 'name'],
+                    ['text', '/hello'],
+                ],
+                '#^www\.example\.(?P<tld>[^\.]++)$#sDi', ['tld'], [
+                    ['variable', '.', '[^\.]++', 'tld'],
+                    ['text', 'www.example'],
+                ],
+            ],
+            [
                 'Route with variable at beginning of host',
-                array('/hello', array(), array(), array(), '{locale}.example.{tld}'),
-                '/hello', '#^/hello$#sD', array('locale', 'tld'), array(), array(
-                    array('text', '/hello'),
-                ),
-                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#sDi', array('locale', 'tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', '.example'),
-                    array('variable', '', '[^\.]++', 'locale'),
-                ),
-            ),
-            array(
+                ['/hello', [], [], [], '{locale}.example.{tld}'],
+                '/hello', '#^/hello$#sD', ['locale', 'tld'], [], [
+                    ['text', '/hello'],
+                ],
+                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#sDi', ['locale', 'tld'], [
+                    ['variable', '.', '[^\.]++', 'tld'],
+                    ['text', '.example'],
+                    ['variable', '', '[^\.]++', 'locale'],
+                ],
+            ],
+            [
                 'Route with host variables that has a default value',
-                array('/hello', array('locale' => 'a', 'tld' => 'b'), array(), array(), '{locale}.example.{tld}'),
-                '/hello', '#^/hello$#sD', array('locale', 'tld'), array(), array(
-                    array('text', '/hello'),
-                ),
-                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#sDi', array('locale', 'tld'), array(
-                    array('variable', '.', '[^\.]++', 'tld'),
-                    array('text', '.example'),
-                    array('variable', '', '[^\.]++', 'locale'),
-                ),
-            ),
-        );
+                ['/hello', ['locale' => 'a', 'tld' => 'b'], [], [], '{locale}.example.{tld}'],
+                '/hello', '#^/hello$#sD', ['locale', 'tld'], [], [
+                    ['text', '/hello'],
+                ],
+                '#^(?P<locale>[^\.]++)\.example\.(?P<tld>[^\.]++)$#sDi', ['locale', 'tld'], [
+                    ['variable', '.', '[^\.]++', 'tld'],
+                    ['text', '.example'],
+                    ['variable', '', '[^\.]++', 'locale'],
+                ],
+            ],
+        ];
     }
 
     /**

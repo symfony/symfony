@@ -32,7 +32,7 @@ class ProfilerPassTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
         $builder->register('my_collector_service')
-            ->addTag('data_collector', array('template' => 'foo'));
+            ->addTag('data_collector', ['template' => 'foo']);
 
         $profilerPass = new ProfilerPass();
         $profilerPass->process($builder);

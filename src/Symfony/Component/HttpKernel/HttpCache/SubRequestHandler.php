@@ -63,8 +63,8 @@ class SubRequestHandler
         }
 
         // compute trusted values, taking any trusted proxies into account
-        $trustedIps = array();
-        $trustedValues = array();
+        $trustedIps = [];
+        $trustedValues = [];
         foreach (array_reverse($request->getClientIps()) as $ip) {
             $trustedIps[] = $ip;
             $trustedValues[] = sprintf('for="%s"', $ip);
@@ -95,7 +95,7 @@ class SubRequestHandler
 
         // ensure 127.0.0.1 is set as trusted proxy
         if (!IpUtils::checkIp('127.0.0.1', $trustedProxies)) {
-            Request::setTrustedProxies(array_merge($trustedProxies, array('127.0.0.1')), Request::getTrustedHeaderSet());
+            Request::setTrustedProxies(array_merge($trustedProxies, ['127.0.0.1']), Request::getTrustedHeaderSet());
         }
 
         try {

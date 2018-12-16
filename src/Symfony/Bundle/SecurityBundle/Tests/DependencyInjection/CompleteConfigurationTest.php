@@ -56,30 +56,30 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.concrete'); }));
 
-        $expectedProviders = array(
+        $expectedProviders = [
             'security.user.provider.concrete.default',
             'security.user.provider.concrete.digest',
             'security.user.provider.concrete.basic',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
-        );
+        ];
 
-        $this->assertEquals(array(), array_diff($expectedProviders, $providers));
-        $this->assertEquals(array(), array_diff($providers, $expectedProviders));
+        $this->assertEquals([], array_diff($expectedProviders, $providers));
+        $this->assertEquals([], array_diff($providers, $expectedProviders));
 
         // chain provider
-        $this->assertEquals(array(new IteratorArgument(array(
+        $this->assertEquals([new IteratorArgument([
             new Reference('security.user.provider.concrete.service'),
             new Reference('security.user.provider.concrete.basic'),
-        ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+        ])], $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()
     {
         $container = $this->getContainer('container1');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = array();
-        $configs = array();
+        $listeners = [];
+        $configs = [];
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
@@ -350,7 +350,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $container = $this->getContainer('container1');
 
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $matchers = array();
+        $matchers = [];
 
         foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
@@ -359,16 +359,16 @@ abstract class CompleteConfigurationTest extends TestCase
             }
         }
 
-        $this->assertEquals(array(
-            array(
+        $this->assertEquals([
+            [
                 '/login',
-            ),
-            array(
+            ],
+            [
                 '/test',
                 'foo\\.example\\.org',
-                array('GET', 'POST'),
-            ),
-        ), $matchers);
+                ['GET', 'POST'],
+            ],
+        ], $matchers);
     }
 
     public function testUserCheckerAliasIsRegistered()
@@ -383,14 +383,14 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('container1');
 
-        $rules = array();
+        $rules = [];
         foreach ($container->getDefinition('security.access_map')->getMethodCalls() as $call) {
             if ('add' == $call[0]) {
-                $rules[] = array((string) $call[1][0], $call[1][1], $call[1][2]);
+                $rules[] = [(string) $call[1][0], $call[1][1], $call[1][2]];
             }
         }
 
-        $matcherIds = array();
+        $matcherIds = [];
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
@@ -424,10 +424,10 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('merge');
 
-        $this->assertEquals(array(
-            'FOO' => array('MOO'),
-            'ADMIN' => array('USER'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
+        $this->assertEquals([
+            'FOO' => ['MOO'],
+            'ADMIN' => ['USER'],
+        ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
     public function testEncoders()
@@ -435,10 +435,10 @@ abstract class CompleteConfigurationTest extends TestCase
         $container = $this->getContainer('container1');
 
         $this->assertEquals(array(array(
-            'JMS\FooBundle\Entity\User1' => array(
+            'JMS\FooBundle\Entity\User1' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => array(false),
-            ),
+                'arguments' => [false],
+            ],
             'JMS\FooBundle\Entity\User2' => array(
                 'algorithm' => 'sha1',
                 'encode_as_base64' => false,

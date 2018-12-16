@@ -69,7 +69,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             try {
                 $response->headers->set(
                     'X-Debug-Token-Link',
-                    $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')), UrlGeneratorInterface::ABSOLUTE_URL)
+                    $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
                 $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
@@ -80,7 +80,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : array();
+        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : [];
 
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
@@ -94,7 +94,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -139,8 +139,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::RESPONSE => array('onKernelResponse', -128),
-        );
+        return [
+            KernelEvents::RESPONSE => ['onKernelResponse', -128],
+        ];
     }
 }

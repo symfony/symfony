@@ -100,13 +100,13 @@ class ControllerNameParserTest extends TestCase
     public function getMissingControllersTest()
     {
         // a normal bundle
-        $bundles = array(
-            array('FooBundle:Fake:index'),
-        );
+        $bundles = [
+            ['FooBundle:Fake:index'],
+        ];
 
         // a bundle with children
         if (Kernel::VERSION_ID < 40000) {
-            $bundles[] = array('SensioFooBundle:Fake:index');
+            $bundles[] = ['SensioFooBundle:Fake:index'];
         }
 
         return $bundles;

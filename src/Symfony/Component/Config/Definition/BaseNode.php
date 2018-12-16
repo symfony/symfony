@@ -127,7 +127,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function addEquivalentValue($originalValue, $equivalentValue)
     {
-        $this->equivalentValues[] = array($originalValue, $equivalentValue);
+        $this->equivalentValues[] = [$originalValue, $equivalentValue];
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getDeprecationMessage($node, $path)
     {
-        return strtr($this->deprecationMessage, array('%node%' => $node, '%path%' => $path));
+        return strtr($this->deprecationMessage, ['%node%' => $node, '%path%' => $path]);
     }
 
     /**

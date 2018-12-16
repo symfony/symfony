@@ -102,7 +102,7 @@ class WebProfilerExtension extends ProfilerExtension
             return '<span class="dump-inline">'.$message.'</span>';
         }
 
-        $replacements = array();
+        $replacements = [];
         foreach ($context as $k => $v) {
             $k = '{'.twig_escape_filter($env, $k).'}';
             $replacements['&quot;<b>'.$k.'</b>&quot;'] = $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);

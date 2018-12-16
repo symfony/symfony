@@ -62,7 +62,7 @@ EOF
 
         $builder = $this->getContainerBuilder();
         $serviceIds = $builder->getServiceIds();
-        $serviceIds = array_filter($serviceIds, array($this, 'filterToServiceTypes'));
+        $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
         if ($search = $input->getArgument('search')) {
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($search) {

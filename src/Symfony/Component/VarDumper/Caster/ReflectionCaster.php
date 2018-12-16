@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ReflectionCaster
 {
-    private static $extraMap = array(
+    private static $extraMap = [
         'docComment' => 'getDocComment',
         'extension' => 'getExtensionName',
         'isDisabled' => 'isDisabled',
@@ -29,7 +29,7 @@ class ReflectionCaster
         'isUserDefined' => 'isUserDefined',
         'isGenerator' => 'isGenerator',
         'isVariadic' => 'isVariadic',
-    );
+    ];
 
     public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested, $filter = 0)
     {
@@ -107,28 +107,28 @@ class ReflectionCaster
             $a[$prefix.'this'] = new CutStub($c->getThis());
         }
         $function = $c->getFunction();
-        $frame = array(
+        $frame = [
             'class' => isset($function->class) ? $function->class : null,
             'type' => isset($function->class) ? ($function->isStatic() ? '::' : '->') : null,
             'function' => $function->name,
             'file' => $c->getExecutingFile(),
             'line' => $c->getExecutingLine(),
-        );
+        ];
         if ($trace = $c->getTrace(DEBUG_BACKTRACE_IGNORE_ARGS)) {
             $function = new \ReflectionGenerator($c->getExecutingGenerator());
-            array_unshift($trace, array(
+            array_unshift($trace, [
                 'function' => 'yield',
                 'file' => $function->getExecutingFile(),
                 'line' => $function->getExecutingLine() - 1,
-            ));
+            ]);
             $trace[] = $frame;
             $a[$prefix.'trace'] = new TraceStub($trace, false, 0, -1, -1);
         } else {
             $function = new FrameStub($frame, false, true);
-            $function = ExceptionCaster::castFrameStub($function, array(), $function, true);
-            $a[$prefix.'executing'] = new EnumStub(array(
+            $function = ExceptionCaster::castFrameStub($function, [], $function, true);
+            $a[$prefix.'executing'] = new EnumStub([
                 "\0~separator= \0".$frame['class'].$frame['type'].$frame['function'].'()' => $function[$prefix.'src'],
-            ));
+            ]);
         }
 
         $a[Caster::PREFIX_VIRTUAL.'closed'] = false;
@@ -144,11 +144,11 @@ class ReflectionCaster
             $a[$prefix.'modifiers'] = implode(' ', $n);
         }
 
-        self::addMap($a, $c, array(
+        self::addMap($a, $c, [
             'extends' => 'getParentClass',
             'implements' => 'getInterfaceNames',
             'constants' => 'getConstants',
-        ));
+        ]);
 
         foreach ($c->getProperties() as $n) {
             $a[$prefix.'properties'][$n->name] = $n;

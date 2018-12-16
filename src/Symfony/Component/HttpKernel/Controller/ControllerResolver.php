@@ -233,7 +233,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
 
         $collection = get_class_methods($controller);
 
-        $alternatives = array();
+        $alternatives = [];
 
         foreach ($collection as $item) {
             $lev = levenshtein($method, $item);

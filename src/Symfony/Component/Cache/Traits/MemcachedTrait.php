@@ -22,12 +22,12 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 trait MemcachedTrait
 {
-    private static $defaultClientOptions = array(
+    private static $defaultClientOptions = [
         'persistent_id' => null,
         'username' => null,
         'password' => null,
         'serializer' => 'php',
-    );
+    ];
 
     private $client;
     private $lazyClient;
@@ -73,10 +73,10 @@ trait MemcachedTrait
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = array())
+    public static function createConnection($servers, array $options = [])
     {
         if (\is_string($servers)) {
-            $servers = array($servers);
+            $servers = [$servers];
         } elseif (!\is_array($servers)) {
             throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, %s given.', \gettype($servers)));
         }
@@ -154,12 +154,12 @@ trait MemcachedTrait
 
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {
-                $oldServers = array();
+                $oldServers = [];
                 foreach ($client->getServerList() as $server) {
-                    $oldServers[] = array($server['host'], $server['port']);
+                    $oldServers[] = [$server['host'], $server['port']];
                 }
 
-                $newServers = array();
+                $newServers = [];
                 foreach ($servers as $server) {
                     if (1 < \count($server)) {
                         $server = array_values($server);
@@ -199,7 +199,7 @@ trait MemcachedTrait
             $lifetime += time();
         }
 
-        $encodedValues = array();
+        $encodedValues = [];
         foreach ($values as $key => $value) {
             $encodedValues[rawurlencode($key)] = $value;
         }
@@ -218,7 +218,7 @@ trait MemcachedTrait
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
-            $result = array();
+            $result = [];
             foreach ($encodedResult as $key => $value) {
                 $result[rawurldecode($key)] = $value;
             }

@@ -51,11 +51,11 @@ trait BlockingStoreTestTrait
         $parentPID = posix_getpid();
 
         // Block SIGHUP signal
-        pcntl_sigprocmask(SIG_BLOCK, array(SIGHUP));
+        pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
 
         if ($childPID = pcntl_fork()) {
             // Wait the start of the child
-            pcntl_sigwaitinfo(array(SIGHUP), $info);
+            pcntl_sigwaitinfo([SIGHUP], $info);
 
             try {
                 // This call should failed given the lock should already by acquired by the child

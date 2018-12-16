@@ -86,7 +86,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $values = array_filter($values);
         if (empty($values)) {
-            return array();
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -100,7 +100,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $choices = array_filter($choices);
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // If no callable is set, choices are the same as values

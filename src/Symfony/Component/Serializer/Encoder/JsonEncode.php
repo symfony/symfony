@@ -32,7 +32,7 @@ class JsonEncode implements EncoderInterface
      *
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $context = $this->resolveContext($context);
 

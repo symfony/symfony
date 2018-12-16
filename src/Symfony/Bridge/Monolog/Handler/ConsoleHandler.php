@@ -43,13 +43,13 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
     private $output;
-    private $verbosityLevelMap = array(
+    private $verbosityLevelMap = [
         OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
         OutputInterface::VERBOSITY_NORMAL => Logger::WARNING,
         OutputInterface::VERBOSITY_VERBOSE => Logger::NOTICE,
         OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
-    );
+    ];
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -131,10 +131,10 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ConsoleEvents::COMMAND => array('onCommand', 255),
-            ConsoleEvents::TERMINATE => array('onTerminate', -255),
-        );
+        return [
+            ConsoleEvents::COMMAND => ['onCommand', 255],
+            ConsoleEvents::TERMINATE => ['onTerminate', -255],
+        ];
     }
 
     /**

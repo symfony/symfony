@@ -53,7 +53,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', TestServiceSubscriber::class)
-            ->addTag('container.service_subscriber', array('bar' => '123'))
+            ->addTag('container.service_subscriber', ['bar' => '123'])
         ;
 
         (new RegisterServiceSubscribersPass())->process($container);
@@ -95,8 +95,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->register('foo', TestServiceSubscriber::class)
             ->setAutowired(true)
             ->addArgument(new Reference(PsrContainerInterface::class))
-            ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'bar'))
-            ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'baz')) // should be ignored: the first wins
+            ->addTag('container.service_subscriber', ['key' => 'bar', 'id' => 'bar'])
+            ->addTag('container.service_subscriber', ['key' => 'bar', 'id' => 'baz']) // should be ignored: the first wins
         ;
 
         (new RegisterServiceSubscribersPass())->process($container);
@@ -128,10 +128,10 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->register('foo_service', TestServiceSubscriber::class)
             ->setAutowired(true)
             ->addArgument(new Reference(PsrContainerInterface::class))
-            ->addTag('container.service_subscriber', array(
+            ->addTag('container.service_subscriber', [
                 'key' => 'test',
                 'id' => TestServiceSubscriber::class,
-            ))
+            ])
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
         $container->compile();

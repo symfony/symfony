@@ -26,7 +26,7 @@ class ProcessHelperTest extends TestCase
     public function testVariousProcessRuns($expected, $cmd, $verbosity, $error)
     {
         $helper = new ProcessHelper();
-        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
         $output = $this->getOutputStream($verbosity);
         $helper->run($output, $cmd, $error);
         $this->assertEquals($expected, $this->getOutput($output));
@@ -35,7 +35,7 @@ class ProcessHelperTest extends TestCase
     public function testPassedCallbackIsExecuted()
     {
         $helper = new ProcessHelper();
-        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
         $output = $this->getOutputStream(StreamOutput::VERBOSITY_NORMAL);
 
         $executed = false;

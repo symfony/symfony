@@ -41,7 +41,7 @@ class ExpressionLanguageTest extends TestCase
 
     public function provider()
     {
-        $roles = array('ROLE_USER', 'ROLE_ADMIN');
+        $roles = ['ROLE_USER', 'ROLE_ADMIN'];
         $user = new User('username', 'password', $roles);
 
         $noToken = null;

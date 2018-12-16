@@ -130,7 +130,7 @@ EOT
 
     private static function getDotenvVars()
     {
-        $vars = array();
+        $vars = [];
         foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {
             if ('' !== $name && false !== $value = getenv($name)) {
                 $vars[$name] = $value;

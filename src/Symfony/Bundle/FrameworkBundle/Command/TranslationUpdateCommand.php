@@ -78,7 +78,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
@@ -89,7 +89,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
-            ))
+            ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
@@ -299,7 +299,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

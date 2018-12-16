@@ -99,13 +99,13 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
 
-            $schemes = array();
+            $schemes = [];
             foreach ($route->getSchemes() as $scheme) {
                 $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
             }
             $route->setSchemes($schemes);
 
-            $methods = array();
+            $methods = [];
             foreach ($route->getMethods() as $method) {
                 $methods = array_merge($methods, explode('|', $this->resolve($method)));
             }
@@ -170,8 +170,8 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'routing.loader' => LoaderInterface::class,
-        );
+        ];
     }
 }

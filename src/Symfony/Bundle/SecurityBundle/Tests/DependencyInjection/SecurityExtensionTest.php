@@ -319,8 +319,8 @@ class SecurityExtensionTest extends TestCase
         $bundle = new SecurityBundle();
         $bundle->build($container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
 
         return $container;
     }

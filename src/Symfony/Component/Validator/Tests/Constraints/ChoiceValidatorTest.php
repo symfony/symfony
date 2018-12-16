@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 function choice_callback()
 {
-    return array('foo', 'bar');
+    return ['foo', 'bar'];
 }
 
 class ChoiceValidatorTest extends ConstraintValidatorTestCase
@@ -29,12 +29,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public static function staticCallback()
     {
-        return array('foo', 'bar');
+        return ['foo', 'bar'];
     }
 
     public function objectMethodCallback()
     {
-        return array('foo', 'bar');
+        return ['foo', 'bar'];
     }
 
     /**

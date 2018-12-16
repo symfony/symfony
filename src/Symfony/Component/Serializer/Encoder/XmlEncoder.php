@@ -49,7 +49,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         if ($data instanceof \DOMDocument) {
             return $data->saveXML();
@@ -75,7 +75,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         if ('' === trim($data)) {
             throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
@@ -111,7 +111,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         if ($rootNode->hasChildNodes()) {
             $xpath = new \DOMXPath($dom);
-            $data = array();
+            $data = [];
             foreach ($xpath->query('namespace::*', $dom->documentElement) as $nsNode) {
                 $data['@'.$nsNode->nodeName] = $nsNode->nodeValue;
             }
@@ -129,7 +129,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $rootNode->nodeValue;
         }
 
-        $data = array();
+        $data = [];
 
         foreach ($rootNode->attributes as $attrKey => $attr) {
             $data['@'.$attrKey] = $attr->nodeValue;
@@ -259,7 +259,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @return array|string
      */
-    private function parseXml(\DOMNode $node, array $context = array())
+    private function parseXml(\DOMNode $node, array $context = [])
     {
         $data = $this->parseXmlAttributes($node, $context);
 

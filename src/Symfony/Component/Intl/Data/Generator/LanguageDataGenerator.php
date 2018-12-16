@@ -112,7 +112,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->languageCodes = array();
+        $this->languageCodes = [];
     }
 
     /**

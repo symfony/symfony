@@ -93,7 +93,7 @@ trait AbstractTrait
         try {
             return $this->doHave($id);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', ['key' => $key, 'exception' => $e]);
 
             return false;
         }
@@ -120,7 +120,7 @@ trait AbstractTrait
         try {
             return $this->doClear($this->namespace) || $cleared;
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to clear the cache', array('exception' => $e));
+            CacheItem::log($this->logger, 'Failed to clear the cache', ['exception' => $e]);
 
             return false;
         }
@@ -131,7 +131,7 @@ trait AbstractTrait
      */
     public function deleteItem($key)
     {
-        return $this->deleteItems(array($key));
+        return $this->deleteItems([$key]);
     }
 
     /**
@@ -139,7 +139,7 @@ trait AbstractTrait
      */
     public function deleteItems(array $keys)
     {
-        $ids = array();
+        $ids = [];
 
         foreach ($keys as $key) {
             $ids[$key] = $this->getId($key);
@@ -159,12 +159,12 @@ trait AbstractTrait
         foreach ($ids as $key => $id) {
             try {
                 $e = null;
-                if ($this->doDelete(array($id))) {
+                if ($this->doDelete([$id])) {
                     continue;
                 }
             } catch (\Exception $e) {
             }
-            CacheItem::log($this->logger, 'Failed to delete key "{key}"', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to delete key "{key}"', ['key' => $key, 'exception' => $e]);
             $ok = false;
         }
 

@@ -54,7 +54,7 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::create(new ConflictHttpException());
         $this->assertEquals('409', $flattened->getStatusCode());
 
-        $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
+        $flattened = FlattenException::create(new MethodNotAllowedHttpException(['POST']));
         $this->assertEquals('405', $flattened->getStatusCode());
 
         $flattened = FlattenException::create(new AccessDeniedHttpException());
@@ -89,23 +89,23 @@ class FlattenExceptionTest extends TestCase
 
     public function testHeadersForHttpException()
     {
-        $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
-        $this->assertEquals(array('Allow' => 'POST'), $flattened->getHeaders());
+        $flattened = FlattenException::create(new MethodNotAllowedHttpException(['POST']));
+        $this->assertEquals(['Allow' => 'POST'], $flattened->getHeaders());
 
         $flattened = FlattenException::create(new UnauthorizedHttpException('Basic realm="My Realm"'));
-        $this->assertEquals(array('WWW-Authenticate' => 'Basic realm="My Realm"'), $flattened->getHeaders());
+        $this->assertEquals(['WWW-Authenticate' => 'Basic realm="My Realm"'], $flattened->getHeaders());
 
         $flattened = FlattenException::create(new ServiceUnavailableHttpException('Fri, 31 Dec 1999 23:59:59 GMT'));
-        $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
+        $this->assertEquals(['Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'], $flattened->getHeaders());
 
         $flattened = FlattenException::create(new ServiceUnavailableHttpException(120));
-        $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
+        $this->assertEquals(['Retry-After' => 120], $flattened->getHeaders());
 
         $flattened = FlattenException::create(new TooManyRequestsHttpException('Fri, 31 Dec 1999 23:59:59 GMT'));
-        $this->assertEquals(array('Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'), $flattened->getHeaders());
+        $this->assertEquals(['Retry-After' => 'Fri, 31 Dec 1999 23:59:59 GMT'], $flattened->getHeaders());
 
         $flattened = FlattenException::create(new TooManyRequestsHttpException(120));
-        $this->assertEquals(array('Retry-After' => 120), $flattened->getHeaders());
+        $this->assertEquals(['Retry-After' => 120], $flattened->getHeaders());
     }
 
     /**
@@ -135,7 +135,7 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertSame($flattened2, $flattened->getPrevious());
 
-        $this->assertSame(array($flattened2), $flattened->getAllPrevious());
+        $this->assertSame([$flattened2], $flattened->getAllPrevious());
     }
 
     /**
@@ -204,15 +204,15 @@ class FlattenExceptionTest extends TestCase
 
         $incomplete = unserialize('O:14:"BogusTestClass":0:{}');
 
-        $exception = $this->createException(array(
-            (object) array('foo' => 1),
+        $exception = $this->createException([
+            (object) ['foo' => 1],
             new NotFoundHttpException(),
             $incomplete,
             $dh,
             $fh,
             function () {},
-            array(1, 2),
-            array('foo' => 123),
+            [1, 2],
+            ['foo' => 123],
             null,
             true,
             false,
@@ -222,7 +222,7 @@ class FlattenExceptionTest extends TestCase
             '',
             INF,
             NAN,
-        ));
+        ]);
 
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
@@ -262,7 +262,7 @@ class FlattenExceptionTest extends TestCase
     public function testRecursionInArguments()
     {
         $a = null;
-        $a = array('foo', array(2, &$a));
+        $a = ['foo', [2, &$a]];
         $exception = $this->createException($a);
 
         $flattened = FlattenException::create($exception);
@@ -272,7 +272,7 @@ class FlattenExceptionTest extends TestCase
 
     public function testTooBigArray()
     {
-        $a = array();
+        $a = [];
         for ($i = 0; $i < 20; ++$i) {
             for ($j = 0; $j < 50; ++$j) {
                 for ($k = 0; $k < 10; ++$k) {
@@ -287,7 +287,7 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
 
-        $this->assertSame($trace[1]['args'][0], array('array', array('array', '*SKIPPED over 10000 entries*')));
+        $this->assertSame($trace[1]['args'][0], ['array', ['array', '*SKIPPED over 10000 entries*']]);
 
         $serializeTrace = serialize($trace);
 

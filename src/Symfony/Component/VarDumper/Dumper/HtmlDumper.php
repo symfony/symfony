@@ -108,7 +108,7 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $output = null, array $extraDisplayOptions = array())
+    public function dump(Data $data, $output = null, array $extraDisplayOptions = [])
     {
         $this->extraDisplayOptions = $extraDisplayOptions;
         $result = parent::dump($data, $output);
@@ -785,7 +785,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    protected function style($style, $value, $attr = array())
+    protected function style($style, $value, $attr = [])
     {
         if ('' === $value) {
             return '';
@@ -873,7 +873,7 @@ EOHTML
         }
 
         if (-1 === $depth) {
-            $args = array('"'.$this->dumpId.'"');
+            $args = ['"'.$this->dumpId.'"'];
             if ($this->extraDisplayOptions) {
                 $args[] = json_encode($this->extraDisplayOptions, JSON_FORCE_OBJECT);
             }
@@ -895,7 +895,7 @@ EOHTML
         $options = $this->extraDisplayOptions + $this->displayOptions;
 
         if ($fmt = $options['fileLinkFormat']) {
-            return \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
         }
 
         return false;

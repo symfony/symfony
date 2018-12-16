@@ -20,7 +20,7 @@ class FilenameFilterIteratorTest extends IteratorTestCase
      */
     public function testAccept($matchPatterns, $noMatchPatterns, $expected)
     {
-        $inner = new InnerNameIterator(array('test.php', 'test.py', 'foo.php'));
+        $inner = new InnerNameIterator(['test.php', 'test.py', 'foo.php']);
 
         $iterator = new FilenameFilterIterator($inner, $matchPatterns, $noMatchPatterns);
 

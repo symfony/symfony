@@ -46,7 +46,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
@@ -57,7 +57,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
-            ))
+            ])
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
@@ -157,7 +157,7 @@ EOF
      */
     protected function validateInput(InputInterface $input)
     {
-        $options = array('tags', 'tag', 'parameters', 'parameter');
+        $options = ['tags', 'tag', 'parameters', 'parameter'];
 
         $optionsCount = 0;
         foreach ($options as $option) {
@@ -192,7 +192,7 @@ EOF
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
             $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
-            $container->getCompilerPassConfig()->setRemovingPasses(array());
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->compile();
         } else {
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));

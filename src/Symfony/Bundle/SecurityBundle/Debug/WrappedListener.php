@@ -67,10 +67,10 @@ final class WrappedListener implements ListenerInterface
             $this->stub = self::$hasVarDumper ? new ClassStub(\get_class($this->listener)) : \get_class($this->listener);
         }
 
-        return array(
+        return [
             'response' => $this->response,
             'time' => $this->time,
             'stub' => $this->stub,
-        );
+        ];
     }
 }

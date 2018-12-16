@@ -37,7 +37,7 @@ class MaxIdLengthAdapterTest extends TestCase
     public function testLongKeyVersioning()
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
-            ->setConstructorArgs(array(str_repeat('-', 26)))
+            ->setConstructorArgs([str_repeat('-', 26)])
             ->getMock();
 
         $reflectionClass = new \ReflectionClass(AbstractAdapter::class);
@@ -69,7 +69,7 @@ class MaxIdLengthAdapterTest extends TestCase
     public function testTooLongNamespace()
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
-            ->setConstructorArgs(array(str_repeat('-', 40)))
+            ->setConstructorArgs([str_repeat('-', 40)])
             ->getMock();
     }
 }

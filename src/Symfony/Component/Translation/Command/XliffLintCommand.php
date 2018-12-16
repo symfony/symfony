@@ -104,7 +104,7 @@ EOF
     {
         // Avoid: Warning DOMDocument::loadXML(): Empty string supplied as input
         if ('' === trim($content)) {
-            return array('file' => $file, 'valid' => true);
+            return ['file' => $file, 'valid' => true];
         }
 
         libxml_use_internal_errors(true);
@@ -193,7 +193,7 @@ EOF
         }
 
         foreach ($this->getDirectoryIterator($fileOrDirectory) as $file) {
-            if (!\in_array($file->getExtension(), array('xlf', 'xliff'))) {
+            if (!\in_array($file->getExtension(), ['xlf', 'xliff'])) {
                 continue;
             }
 

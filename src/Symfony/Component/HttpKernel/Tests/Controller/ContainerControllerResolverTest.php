@@ -195,7 +195,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(array('app.my_controller' => true)))
+            ->will($this->returnValue(['app.my_controller' => true]))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);

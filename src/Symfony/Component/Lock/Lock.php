@@ -76,7 +76,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
             }
 
             $this->dirty = true;
-            $this->logger->info('Successfully acquired the "{resource}" lock.', array('resource' => $this->key));
+            $this->logger->info('Successfully acquired the "{resource}" lock.', ['resource' => $this->key]);
 
             if ($this->ttl) {
                 $this->refresh();
@@ -89,7 +89,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
             return true;
         } catch (LockConflictedException $e) {
             $this->dirty = false;
-            $this->logger->notice('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', ['resource' => $this->key]);
 
             if ($blocking) {
                 throw $e;
@@ -97,7 +97,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
 
             return false;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to acquire the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
+            $this->logger->notice('Failed to acquire the "{resource}" lock.', ['resource' => $this->key, 'exception' => $e]);
             throw new LockAcquiringException(sprintf('Failed to acquire the "%s" lock.', $this->key), 0, $e);
         }
     }

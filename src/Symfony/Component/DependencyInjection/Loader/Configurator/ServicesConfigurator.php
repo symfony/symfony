@@ -83,7 +83,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         $definition->setBindings($defaults->getBindings());
-        $definition->setChanges(array());
+        $definition->setChanges([]);
 
         $configurator = new ServiceConfigurator($this->container, $this->instanceof, $allowParent, $this, $definition, $id, $defaults->getTags());
 
@@ -136,7 +136,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $allowParent = !$this->defaults->getChanges() && empty($this->instanceof);
         $definition = $this->container->getDefinition($id);
 
-        return new ServiceConfigurator($this->container, $definition->getInstanceofConditionals(), $allowParent, $this, $definition, $id, array());
+        return new ServiceConfigurator($this->container, $definition->getInstanceofConditionals(), $allowParent, $this, $definition, $id, []);
     }
 
     /**

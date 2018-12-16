@@ -207,7 +207,7 @@ final class Inflector
                     $firstUpper = ctype_upper($pluralRev[$j - 1]);
 
                     if (\is_array($newSuffix)) {
-                        $singulars = array();
+                        $singulars = [];
 
                         foreach ($newSuffix as $newSuffixEntry) {
                             $singulars[] = $newBase.($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);

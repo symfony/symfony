@@ -49,14 +49,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function getValidBics()
     {
         // http://formvalidation.io/validators/bic/
-        return array(
-            array('ASPKAT2LXXX'),
-            array('ASPKAT2L'),
-            array('DSBACNBXSHA'),
-            array('UNCRIT2B912'),
-            array('DABADKKK'),
-            array('RZOOAT2L303'),
-        );
+        return [
+            ['ASPKAT2LXXX'],
+            ['ASPKAT2L'],
+            ['DSBACNBXSHA'],
+            ['UNCRIT2B912'],
+            ['DABADKKK'],
+            ['RZOOAT2L303'],
+        ];
     }
 
     /**
@@ -64,9 +64,9 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidBics($bic, $code)
     {
-        $constraint = new Bic(array(
+        $constraint = new Bic([
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate($bic, $constraint);
 

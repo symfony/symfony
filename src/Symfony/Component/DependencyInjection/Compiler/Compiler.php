@@ -141,7 +141,7 @@ class Compiler
                 $pass->process($container);
             }
         } catch (\Exception $e) {
-            $usedEnvs = array();
+            $usedEnvs = [];
             $prev = $e;
 
             do {

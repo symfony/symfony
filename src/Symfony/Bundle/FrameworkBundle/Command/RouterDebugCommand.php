@@ -81,12 +81,12 @@ class RouterDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
-            ))
+            ])
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:

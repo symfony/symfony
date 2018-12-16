@@ -193,17 +193,17 @@ class PhpDocExtractorTest extends TestCase
 
     public function dockBlockFallbackTypesProvider()
     {
-        return array(
-            'pub' => array(
-                'pub', array(new Type(Type::BUILTIN_TYPE_STRING)),
-            ),
-            'protAcc' => array(
-                'protAcc', array(new Type(Type::BUILTIN_TYPE_INT)),
-            ),
-            'protMut' => array(
-                'protMut', array(new Type(Type::BUILTIN_TYPE_BOOL)),
-            ),
-        );
+        return [
+            'pub' => [
+                'pub', [new Type(Type::BUILTIN_TYPE_STRING)],
+            ],
+            'protAcc' => [
+                'protAcc', [new Type(Type::BUILTIN_TYPE_INT)],
+            ],
+            'protMut' => [
+                'protMut', [new Type(Type::BUILTIN_TYPE_BOOL)],
+            ],
+        ];
     }
 
     /**

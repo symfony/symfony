@@ -33,7 +33,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * @var DebugStack[]
      */
-    private $loggers = array();
+    private $loggers = [];
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -58,24 +58,24 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $queries = array();
+        $queries = [];
         foreach ($this->loggers as $name => $logger) {
             $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
         }
 
-        $this->data = array(
+        $this->data = [
             'queries' => $queries,
             'connections' => $this->connections,
             'managers' => $this->managers,
-        );
+        ];
     }
 
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
 
         foreach ($this->loggers as $logger) {
-            $logger->queries = array();
+            $logger->queries = [];
             $logger->currentQuery = 0;
         }
     }
@@ -133,10 +133,10 @@ class DoctrineDataCollector extends DataCollector
     {
         $query['explainable'] = true;
         if (null === $query['params']) {
-            $query['params'] = array();
+            $query['params'] = [];
         }
         if (!\is_array($query['params'])) {
-            $query['params'] = array($query['params']);
+            $query['params'] = [$query['params']];
         }
         foreach ($query['params'] as $j => $param) {
             if (isset($query['types'][$j])) {

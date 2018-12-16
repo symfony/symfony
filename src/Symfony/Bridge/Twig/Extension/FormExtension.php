@@ -65,10 +65,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             // {% form_theme form "SomeBundle::widgets.twig" %}
             new FormThemeTokenParser(),
-        );
+        ];
     }
 
     /**
@@ -94,10 +94,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('humanize', array('Symfony\Component\Form\FormRenderer', 'humanize')),
-            new TwigFilter('form_encode_currency', array('Symfony\Component\Form\FormRenderer', 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
-        );
+        return [
+            new TwigFilter('humanize', ['Symfony\Component\Form\FormRenderer', 'humanize']),
+            new TwigFilter('form_encode_currency', ['Symfony\Component\Form\FormRenderer', 'encodeCurrency'], ['is_safe' => ['html'], 'needs_environment' => true]),
+        ];
     }
 
     /**
@@ -105,10 +105,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getTests()
     {
-        return array(
+        return [
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
             new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
-        );
+        ];
     }
 
     /**

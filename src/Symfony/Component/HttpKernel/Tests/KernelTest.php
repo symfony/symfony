@@ -92,7 +92,7 @@ class KernelTest extends TestCase
 
     public function testBootInitializesBundlesAndContainer()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
         $kernel->expects($this->once())
             ->method('initializeBundles');
         $kernel->expects($this->once())
@@ -107,10 +107,10 @@ class KernelTest extends TestCase
         $bundle->expects($this->once())
             ->method('setContainer');
 
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'getBundles'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'getBundles']);
         $kernel->expects($this->once())
             ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
+            ->will($this->returnValue([$bundle]));
 
         $kernel->boot();
     }
@@ -118,7 +118,7 @@ class KernelTest extends TestCase
     public function testBootSetsTheBootedFlagToTrue()
     {
         // use test kernel to access isBooted()
-        $kernel = $this->getKernelForTest(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernelForTest(['initializeBundles', 'initializeContainer']);
         $kernel->boot();
 
         $this->assertTrue($kernel->isBooted());
@@ -140,7 +140,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'doLoadClassCache']);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -196,7 +196,7 @@ class KernelTest extends TestCase
 
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
         $kernel->expects($this->once())
             ->method('initializeBundles');
 
@@ -210,7 +210,7 @@ class KernelTest extends TestCase
         $bundle->expects($this->once())
             ->method('shutdown');
 
-        $kernel = $this->getKernel(array(), array($bundle));
+        $kernel = $this->getKernel([], [$bundle]);
 
         $kernel->boot();
         $kernel->shutdown();
@@ -223,10 +223,10 @@ class KernelTest extends TestCase
             ->method('setContainer')
             ->with(null);
 
-        $kernel = $this->getKernel(array('getBundles'));
+        $kernel = $this->getKernel(['getBundles']);
         $kernel->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
+            ->will($this->returnValue([$bundle]));
 
         $kernel->boot();
         $kernel->shutdown();
@@ -246,7 +246,7 @@ class KernelTest extends TestCase
             ->method('handle')
             ->with($request, $type, $catch);
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -264,7 +264,7 @@ class KernelTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $kernel = $this->getKernel(array('getHttpKernel', 'boot'));
+        $kernel = $this->getKernel(['getHttpKernel', 'boot']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -384,7 +384,7 @@ EOF;
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
 
-        $expected = serialize(array($env, $debug));
+        $expected = serialize([$env, $debug]);
         $this->assertEquals($expected, $kernel->serialize());
     }
 
@@ -731,7 +731,7 @@ EOF;
         $fooBundle = $this->getBundle(null, null, 'FooBundle', 'DuplicateName');
         $barBundle = $this->getBundle(null, null, 'BarBundle', 'DuplicateName');
 
-        $kernel = $this->getKernel(array(), array($fooBundle, $barBundle));
+        $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
     }
 
@@ -762,7 +762,7 @@ EOF;
         // does not implement TerminableInterface
         $httpKernel = new TestKernel();
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->willReturn($httpKernel);
@@ -775,14 +775,14 @@ EOF;
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
             ->disableOriginalConstructor()
-            ->setMethods(array('terminate'))
+            ->setMethods(['terminate'])
             ->getMock();
 
         $httpKernelMock
             ->expects($this->once())
             ->method('terminate');
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->exactly(2))
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -882,7 +882,7 @@ EOF;
             $container->addCompilerPass(new ResettableServicePass());
             $container->register('one', ResettableService::class)
                 ->setPublic(true)
-                ->addTag('kernel.reset', array('method' => 'reset'));
+                ->addTag('kernel.reset', ['method' => 'reset']);
             $container->register('services_resetter', ServicesResetter::class)->setPublic(true);
         }, $httpKernelMock, 'resetting');
 
@@ -906,7 +906,7 @@ EOF;
      */
     public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
     {
-        $kernel = $this->getKernelForTest(array('initializeBundles'), true);
+        $kernel = $this->getKernelForTest(['initializeBundles'], true);
         $kernel->boot();
         $preReBoot = $kernel->getStartTime();
 
@@ -925,7 +925,7 @@ EOF;
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
-            ->setMethods(array('getPath', 'getParent', 'getName'))
+            ->setMethods(['getPath', 'getParent', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -964,14 +964,14 @@ EOF;
      *
      * @return Kernel
      */
-    protected function getKernel(array $methods = array(), array $bundles = array())
+    protected function getKernel(array $methods = [], array $bundles = [])
     {
         $methods[] = 'registerBundles';
 
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->setMethods($methods)
-            ->setConstructorArgs(array('test', false))
+            ->setConstructorArgs(['test', false])
             ->getMockForAbstractClass()
         ;
         $kernel->expects($this->any())
@@ -985,10 +985,10 @@ EOF;
         return $kernel;
     }
 
-    protected function getKernelForTest(array $methods = array(), $debug = false)
+    protected function getKernelForTest(array $methods = [], $debug = false)
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(array('test', $debug))
+            ->setConstructorArgs(['test', $debug])
             ->setMethods($methods)
             ->getMock();
         $p = new \ReflectionProperty($kernel, 'rootDir');
@@ -1030,7 +1030,7 @@ class CustomProjectDirKernel extends Kernel
 
     public function registerBundles()
     {
-        return array();
+        return [];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

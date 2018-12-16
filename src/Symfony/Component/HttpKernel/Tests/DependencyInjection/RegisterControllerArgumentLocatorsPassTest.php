@@ -32,7 +32,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testInvalidClass()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', NotFound::class)
             ->addTag('controller.service_arguments')
@@ -49,10 +49,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNoAction()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->addTag('controller.service_arguments', array('argument' => 'bar'))
+            ->addTag('controller.service_arguments', ['argument' => 'bar'])
         ;
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -66,10 +66,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNoArgument()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->addTag('controller.service_arguments', array('action' => 'fooAction'))
+            ->addTag('controller.service_arguments', ['action' => 'fooAction'])
         ;
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -83,10 +83,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNoService()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->addTag('controller.service_arguments', array('action' => 'fooAction', 'argument' => 'bar'))
+            ->addTag('controller.service_arguments', ['action' => 'fooAction', 'argument' => 'bar'])
         ;
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -100,10 +100,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testInvalidMethod()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->addTag('controller.service_arguments', array('action' => 'barAction', 'argument' => 'bar', 'id' => 'bar_service'))
+            ->addTag('controller.service_arguments', ['action' => 'barAction', 'argument' => 'bar', 'id' => 'bar_service'])
         ;
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -117,10 +117,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testInvalidArgument()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->addTag('controller.service_arguments', array('action' => 'fooAction', 'argument' => 'baz', 'id' => 'bar'))
+            ->addTag('controller.service_arguments', ['action' => 'fooAction', 'argument' => 'baz', 'id' => 'bar'])
         ;
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -130,7 +130,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testAllActions()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
             ->addTag('controller.service_arguments')
@@ -214,7 +214,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testExceptionOnNonExistentTypeHint()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', NonExistentClassController::class)
             ->addTag('controller.service_arguments');
@@ -230,7 +230,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testExceptionOnNonExistentTypeHintDifferentNamespace()
     {
         $container = new ContainerBuilder();
-        $container->register('argument_resolver.service')->addArgument(array());
+        $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', NonExistentClassDifferentNamespaceController::class)
             ->addTag('controller.service_arguments');
@@ -242,7 +242,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testNoExceptionOnNonExistentTypeHintOptionalArg()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', NonExistentClassOptionalController::class)
             ->addTag('controller.service_arguments');
@@ -272,7 +272,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testControllersAreMadePublic()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', ArgumentWithoutTypeController::class)
             ->setPublic(false)
@@ -290,10 +290,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testBindings($bindingName)
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('foo', RegisterTestController::class)
-            ->setBindings(array($bindingName => new Reference('foo')))
+            ->setBindings([$bindingName => new Reference('foo')])
             ->addTag('controller.service_arguments');
 
         $pass = new RegisterControllerArgumentLocatorsPass();
@@ -331,12 +331,12 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     public function testBindingsOnChildDefinitions()
     {
         $container = new ContainerBuilder();
-        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
 
         $container->register('parent', ArgumentWithoutTypeController::class);
 
         $container->setDefinition('child', (new ChildDefinition('parent'))
-            ->setBindings(array('$someArg' => new Reference('parent')))
+            ->setBindings(['$someArg' => new Reference('parent')])
             ->addTag('controller.service_arguments')
         );
 

@@ -141,13 +141,13 @@ class FormError implements \Serializable
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->message,
             $this->messageTemplate,
             $this->messageParameters,
             $this->messagePluralization,
             $this->cause,
-        ));
+        ]);
     }
 
     /**

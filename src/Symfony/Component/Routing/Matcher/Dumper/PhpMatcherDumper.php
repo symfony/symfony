@@ -30,7 +30,7 @@ class PhpMatcherDumper extends MatcherDumper
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = array();
+    private $expressionLanguageProviders = [];
 
     /**
      * Dumps a set of routes to a PHP class.
@@ -44,12 +44,12 @@ class PhpMatcherDumper extends MatcherDumper
      *
      * @return string A PHP class representing the matcher class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
-        $options = array_replace(array(
+        $options = array_replace([
             'class' => 'ProjectUrlMatcher',
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-        ), $options);
+        ], $options);
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);

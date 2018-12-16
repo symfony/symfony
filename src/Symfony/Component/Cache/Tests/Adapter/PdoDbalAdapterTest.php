@@ -43,6 +43,6 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        return new PdoAdapter(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)), '', $defaultLifetime);
+        return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }
 }

@@ -15,12 +15,12 @@ class LogoutTest extends WebTestCase
 {
     public function testSessionLessRememberMeLogout()
     {
-        $client = $this->createClient(array('test_case' => 'RememberMeLogout', 'root_config' => 'config.yml'));
+        $client = $this->createClient(['test_case' => 'RememberMeLogout', 'root_config' => 'config.yml']);
 
-        $client->request('POST', '/login', array(
+        $client->request('POST', '/login', [
             '_username' => 'johannes',
             '_password' => 'test',
-        ));
+        ]);
 
         $cookieJar = $client->getCookieJar();
         $cookieJar->expire(session_name());
@@ -52,9 +52,9 @@ class LogoutTest extends WebTestCase
 
     public function testAccessControlDoesNotApplyOnLogout()
     {
-        $client = $this->createClient(array('test_case' => 'LogoutAccess', 'root_config' => 'config.yml'));
+        $client = $this->createClient(['test_case' => 'LogoutAccess', 'root_config' => 'config.yml']);
 
-        $client->request('POST', '/login', array('_username' => 'johannes', '_password' => 'test'));
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
         $client->request('GET', '/logout');
 
         $this->assertRedirect($client->getResponse(), '/');

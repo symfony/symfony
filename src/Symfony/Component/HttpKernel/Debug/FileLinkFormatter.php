@@ -36,7 +36,7 @@ class FileLinkFormatter implements \Serializable
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !\is_array($fileLinkFormat)) {
             $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: \strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
+            $fileLinkFormat = [substr($f, 0, $i)] + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
         }
 
         $this->fileLinkFormat = $fileLinkFormat;
@@ -55,7 +55,7 @@ class FileLinkFormatter implements \Serializable
                 }
             }
 
-            return strtr($fmt[0], array('%f' => $file, '%l' => $line));
+            return strtr($fmt[0], ['%f' => $file, '%l' => $line]);
         }
 
         return false;
@@ -99,10 +99,10 @@ class FileLinkFormatter implements \Serializable
                     return;
                 }
 
-                return array(
+                return [
                     $request->getSchemeAndHttpHost().$request->getBasePath().$this->urlFormat,
                     $this->baseDir.\DIRECTORY_SEPARATOR, '',
-                );
+                ];
             }
         }
     }

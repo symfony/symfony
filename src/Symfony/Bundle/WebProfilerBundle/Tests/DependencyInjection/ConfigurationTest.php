@@ -24,7 +24,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration();
-        $config = $processor->processConfiguration($configuration, array($options));
+        $config = $processor->processConfiguration($configuration, [$options]);
 
         $this->assertEquals($results, $config);
     }

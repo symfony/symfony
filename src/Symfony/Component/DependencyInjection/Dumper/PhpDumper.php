@@ -57,7 +57,7 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $inlinedDefinitions;
     private $serviceCalls;
-    private $reservedVariables = array('instance', 'class', 'this');
+    private $reservedVariables = ['instance', 'class', 'this'];
     private $expressionLanguage;
     private $targetDirRegex;
     private $targetDirMaxMatches;
@@ -302,7 +302,7 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = array())
+    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = [])
     {
         $checkedNodes[$sourceId] = true;
         $currentPath[$sourceId] = $sourceId;
@@ -331,7 +331,7 @@ EOF;
         unset($currentPath[$sourceId]);
     }
 
-    private function connectCircularReferences($sourceId, &$currentPath, &$subPath = array())
+    private function connectCircularReferences($sourceId, &$currentPath, &$subPath = [])
     {
         $subPath[$sourceId] = $sourceId;
         $currentPath[$sourceId] = $sourceId;
@@ -387,7 +387,7 @@ EOF;
 
     private function generateProxyClasses()
     {
-        $alreadyGenerated = array();
+        $alreadyGenerated = [];
         $definitions = $this->container->getDefinitions();
         $strip = '' === $this->docStar && method_exists('Symfony\Component\HttpKernel\Kernel', 'stripComments');
         $proxyDumper = $this->getProxyDumper();
@@ -629,7 +629,7 @@ EOF;
         $this->variableCount = 0;
         $this->referenceVariables[$id] = new Variable('instance');
 
-        $return = array();
+        $return = [];
 
         if ($class = $definition->getClass()) {
             $class = $class instanceof Parameter ? '%'.$class.'%' : $this->container->resolveEnvPlaceholders($class);
@@ -686,7 +686,7 @@ EOF;
         }
 
         $this->serviceCalls = array();
-        $this->inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition), null, $this->serviceCalls);
+        $this->inlinedDefinitions = $this->getDefinitionsFromArguments([$definition], null, $this->serviceCalls);
 
         $code .= $this->addServiceInclude($id, $definition);
 
@@ -791,7 +791,7 @@ EOTXT
 
         $code = $this->addInlineVariables($id, $definition, $arguments, $forConstructor);
 
-        if ($arguments = array_filter(array($inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurator()))) {
+        if ($arguments = array_filter([$inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurator()])) {
             $isSimpleInstance = false;
         } elseif ($definition !== $inlineDef && 2 > $this->inlinedDefinitions[$inlineDef]) {
             return $code;
@@ -1251,7 +1251,7 @@ EOF;
 
         foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
             $definition = $this->container->getDefinition($id);
-            $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
+            $inlinedDefinitions = $this->getDefinitionsFromArguments([$definition]);
 
             foreach ($inlinedDefinitions as $def) {
                 if (\is_string($class = \is_array($factory = $def->getFactory()) && \is_string($factory[0]) ? $factory[0] : $def->getClass())) {
@@ -1570,7 +1570,7 @@ EOF;
                 $definitions[$argument] = 1 + $definitions[$argument];
             } else {
                 $definitions[$argument] = 1;
-                $arguments = array($argument->getArguments(), $argument->getFactory(), $argument->getProperties(), $argument->getMethodCalls(), $argument->getConfigurator());
+                $arguments = [$argument->getArguments(), $argument->getFactory(), $argument->getProperties(), $argument->getMethodCalls(), $argument->getConfigurator()];
                 $this->getDefinitionsFromArguments($arguments, $definitions, $calls);
             }
         }
@@ -1601,7 +1601,7 @@ EOF;
 
             return sprintf('array(%s)', implode(', ', $code));
         } elseif ($value instanceof ArgumentInterface) {
-            $scope = array($this->definitionVariables, $this->referenceVariables);
+            $scope = [$this->definitionVariables, $this->referenceVariables];
             $this->definitionVariables = $this->referenceVariables = null;
 
             try {
@@ -1619,14 +1619,14 @@ EOF;
                 }
 
                 if ($value instanceof IteratorArgument) {
-                    $operands = array(0);
-                    $code = array();
+                    $operands = [0];
+                    $code = [];
                     $code[] = 'new RewindableGenerator(function () {';
 
                     if (!$values = $value->getValues()) {
                         $code[] = '            return new \EmptyIterator();';
                     } else {
-                        $countCode = array();
+                        $countCode = [];
                         $countCode[] = 'function () {';
 
                         foreach ($values as $k => $v) {

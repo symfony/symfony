@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
 {
-    protected static $patterns = array();
+    protected static $patterns = [];
 
     /**
      * {@inheritdoc}
@@ -84,7 +84,7 @@ class MoneyType extends AbstractType
         $locale = \Locale::getDefault();
 
         if (!isset(self::$patterns[$locale])) {
-            self::$patterns[$locale] = array();
+            self::$patterns[$locale] = [];
         }
 
         if (!isset(self::$patterns[$locale][$currency])) {

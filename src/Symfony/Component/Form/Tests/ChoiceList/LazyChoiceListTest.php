@@ -137,11 +137,11 @@ class LazyChoiceListTest extends TestCase
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
-            ->with(array('a', 'b'))
+            ->with(['a', 'b'])
             ->will($this->returnValue('RESULT'));
 
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
     }
 
     public function testGetChoicesForValuesUsesLoadedList()

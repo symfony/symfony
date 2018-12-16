@@ -39,7 +39,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      * @param string $messageKey  The message or message key
      * @param array  $messageData Data to be passed into the translator
      */
-    public function setSafeMessage($messageKey, array $messageData = array())
+    public function setSafeMessage($messageKey, array $messageData = [])
     {
         $this->messageKey = $messageKey;
         $this->messageData = $messageData;
@@ -60,11 +60,11 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             parent::serialize(),
             $this->messageKey,
             $this->messageData,
-        ));
+        ]);
     }
 
     /**

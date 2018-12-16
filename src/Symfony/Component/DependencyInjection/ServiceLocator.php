@@ -94,7 +94,7 @@ class ServiceLocator implements PsrContainerInterface
         $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
-        $msg = array();
+        $msg = [];
         $msg[] = sprintf('Service "%s" not found:', $id);
 
         if (!$this->container) {

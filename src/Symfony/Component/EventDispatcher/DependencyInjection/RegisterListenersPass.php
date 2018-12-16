@@ -28,7 +28,7 @@ class RegisterListenersPass implements CompilerPassInterface
     protected $listenerTag;
     protected $subscriberTag;
 
-    private $hotPathEvents = array();
+    private $hotPathEvents = [];
     private $hotPathTagName;
 
     /**
@@ -102,14 +102,14 @@ class RegisterListenersPass implements CompilerPassInterface
             ExtractingEventDispatcher::$subscriber = $class;
             $extractingDispatcher->addSubscriber($extractingDispatcher);
             foreach ($extractingDispatcher->listeners as $args) {
-                $args[1] = array(new ServiceClosureArgument(new Reference($id)), $args[1]);
+                $args[1] = [new ServiceClosureArgument(new Reference($id)), $args[1]];
                 $definition->addMethodCall('addListener', $args);
 
                 if (isset($this->hotPathEvents[$args[0]])) {
                     $container->getDefinition($id)->addTag('container.hot_path');
                 }
             }
-            $extractingDispatcher->listeners = array();
+            $extractingDispatcher->listeners = [];
         }
     }
 }
@@ -119,18 +119,18 @@ class RegisterListenersPass implements CompilerPassInterface
  */
 class ExtractingEventDispatcher extends EventDispatcher implements EventSubscriberInterface
 {
-    public $listeners = array();
+    public $listeners = [];
 
     public static $subscriber;
 
     public function addListener($eventName, $listener, $priority = 0)
     {
-        $this->listeners[] = array($eventName, $listener[1], $priority);
+        $this->listeners[] = [$eventName, $listener[1], $priority];
     }
 
     public static function getSubscribedEvents()
     {
-        $callback = array(self::$subscriber, 'getSubscribedEvents');
+        $callback = [self::$subscriber, 'getSubscribedEvents'];
 
         return $callback();
     }

@@ -86,8 +86,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
         $this->normalizers = $normalizers;
 
-        $decoders = array();
-        $realEncoders = array();
+        $decoders = [];
+        $realEncoders = [];
         foreach ($encoders as $encoder) {
             if ($encoder instanceof SerializerAwareInterface) {
                 $encoder->setSerializer($this);
@@ -106,7 +106,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function serialize($data, $format, array $context = array())
+    final public function serialize($data, $format, array $context = [])
     {
         if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
@@ -122,7 +122,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function deserialize($data, $type, $format, array $context = array())
+    final public function deserialize($data, $type, $format, array $context = [])
     {
         if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
@@ -136,7 +136,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = array())
+    public function normalize($data, $format = null, array $context = [])
     {
         // If a normalizer supports the given data, use it
         if ($normalizer = $this->getNormalizer($data, $format, $context)) {
@@ -148,7 +148,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
         }
 
         if (\is_array($data) || $data instanceof \Traversable) {
-            $normalized = array();
+            $normalized = [];
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
             }
@@ -172,7 +172,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $type, $format = null, array $context = array())
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
@@ -267,7 +267,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, $format, array $context = array())
+    final public function encode($data, $format, array $context = [])
     {
         return $this->encoder->encode($data, $format, $context);
     }
@@ -275,7 +275,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    final public function decode($data, $format, array $context = array())
+    final public function decode($data, $format, array $context = [])
     {
         return $this->decoder->decode($data, $format, $context);
     }

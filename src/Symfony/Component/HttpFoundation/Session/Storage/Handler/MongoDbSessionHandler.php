@@ -83,12 +83,12 @@ class MongoDbSessionHandler extends AbstractSessionHandler
 
         $this->mongo = $mongo;
 
-        $this->options = array_merge(array(
+        $this->options = array_merge([
             'id_field' => '_id',
             'data_field' => 'data',
             'time_field' => 'time',
             'expiry_field' => 'expires_at',
-        ), $options);
+        ], $options);
     }
 
     /**

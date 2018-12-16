@@ -220,13 +220,13 @@ class EsiTest extends TestCase
         $response1 = new Response('foo');
         $response1->setStatusCode(404);
         $response2 = new Response('bar');
-        $cache = $this->getCache(Request::create('/'), array($response1, $response2));
+        $cache = $this->getCache(Request::create('/'), [$response1, $response2]);
         $this->assertEquals('bar', $esi->handle($cache, '/', '/alt', false));
     }
 
     protected function getCache($request, $response)
     {
-        $cache = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\HttpCache')->setMethods(array('getRequest', 'handle'))->disableOriginalConstructor()->getMock();
+        $cache = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpCache\HttpCache')->setMethods(['getRequest', 'handle'])->disableOriginalConstructor()->getMock();
         $cache->expects($this->any())
               ->method('getRequest')
               ->will($this->returnValue($request))

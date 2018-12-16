@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 class ArrayCache extends CacheProvider
 {
-    private $data = array();
+    private $data = [];
 
     protected function doFetch($id)
     {
@@ -40,7 +40,7 @@ class ArrayCache extends CacheProvider
 
     protected function doFlush()
     {
-        $this->data = array();
+        $this->data = [];
 
         return true;
     }

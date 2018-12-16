@@ -135,14 +135,14 @@ EOF
             ),
 
             'Group regardless of segments' => array(
-                array(
-                    array('/aaa-111/', 'a1'),
-                    array('/aaa-222/', 'a2'),
-                    array('/aaa-333/', 'a3'),
-                    array('/group-aa/', 'g1'),
-                    array('/group-bb/', 'g2'),
-                    array('/group-cc/', 'g3'),
-                ),
+                [
+                    ['/aaa-111/', 'a1'],
+                    ['/aaa-222/', 'a2'],
+                    ['/aaa-333/', 'a3'],
+                    ['/group-aa/', 'g1'],
+                    ['/group-bb/', 'g2'],
+                    ['/group-cc/', 'g3'],
+                ],
                 <<<EOF
 /aaa-
 -> /aaa-111 a1
@@ -159,7 +159,7 @@ EOF
 
     private function dumpCollection(StaticPrefixCollection $collection, $prefix = '')
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($collection->getItems() as $item) {
             if ($item instanceof StaticPrefixCollection) {

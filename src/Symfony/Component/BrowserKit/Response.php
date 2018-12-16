@@ -116,10 +116,10 @@ class Response
                     return \is_array($value) ? (\count($value) ? $value[0] : '') : $value;
                 }
 
-                return \is_array($value) ? $value : array($value);
+                return \is_array($value) ? $value : [$value];
             }
         }
 
-        return $first ? null : array();
+        return $first ? null : [];
     }
 }

@@ -43,11 +43,11 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
             $startTime = $request->server->get('REQUEST_TIME_FLOAT');
         }
 
-        $this->data = array(
+        $this->data = [
             'token' => $response->headers->get('X-Debug-Token'),
             'start_time' => $startTime * 1000,
-            'events' => array(),
-        );
+            'events' => [],
+        ];
     }
 
     /**

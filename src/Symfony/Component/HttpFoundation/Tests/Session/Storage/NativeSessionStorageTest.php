@@ -56,7 +56,7 @@ class NativeSessionStorageTest extends TestCase
     /**
      * @return NativeSessionStorage
      */
-    protected function getStorage(array $options = array())
+    protected function getStorage(array $options = [])
     {
         $storage = new NativeSessionStorage($options);
         $storage->registerBag(new AttributeBag());
@@ -188,10 +188,10 @@ class NativeSessionStorageTest extends TestCase
             $this->markTestSkipped('HHVM is not handled in this test case.');
         }
 
-        $options = array(
+        $options = [
             'url_rewriter.tags' => 'a=href',
             'cache_expire' => '200',
-        );
+        ];
 
         $this->getStorage($options);
 
@@ -272,9 +272,9 @@ class NativeSessionStorageTest extends TestCase
     public function testSetSessionOptionsOnceSessionStartedIsIgnored()
     {
         session_start();
-        $this->getStorage(array(
+        $this->getStorage([
             'name' => 'something-else',
-        ));
+        ]);
 
         // Assert no exception has been thrown by `getStorage()`
         $this->addToAssertionCount(1);

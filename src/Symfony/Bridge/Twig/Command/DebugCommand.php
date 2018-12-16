@@ -133,7 +133,7 @@ EOF
         $filter = $input->getArgument('filter');
 
         foreach ($types as $index => $type) {
-            $items = array();
+            $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity);

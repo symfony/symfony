@@ -271,7 +271,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function getLoaders()
     {
-        $loaders = array();
+        $loaders = [];
 
         foreach ($this->xmlMappings as $xmlMapping) {
             $loaders[] = new XmlFileLoader($xmlMapping);

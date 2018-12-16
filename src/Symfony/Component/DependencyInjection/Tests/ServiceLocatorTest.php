@@ -153,6 +153,6 @@ class SomeServiceSubscriber implements ServiceSubscriberinterface
 
     public static function getSubscribedServices()
     {
-        return array('bar' => 'stdClass');
+        return ['bar' => 'stdClass'];
     }
 }

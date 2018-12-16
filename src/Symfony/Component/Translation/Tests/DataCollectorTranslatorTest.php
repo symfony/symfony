@@ -83,9 +83,9 @@ class DataCollectorTranslatorTest extends TestCase
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foo (en)'), 'en');
-        $translator->addResource('array', array('bar' => 'bar (fr)'), 'fr');
-        $translator->addResource('array', array('bar_ru' => 'bar (ru)'), 'ru');
+        $translator->addResource('array', ['foo' => 'foo (en)'], 'en');
+        $translator->addResource('array', ['bar' => 'bar (fr)'], 'fr');
+        $translator->addResource('array', ['bar_ru' => 'bar (ru)'], 'ru');
 
         return new DataCollectorTranslator($translator);
     }

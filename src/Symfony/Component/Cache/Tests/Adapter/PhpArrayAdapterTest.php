@@ -74,22 +74,22 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     public function testStore()
     {
-        $arrayWithRefs = array();
+        $arrayWithRefs = [];
         $arrayWithRefs[0] = 123;
         $arrayWithRefs[1] = &$arrayWithRefs[0];
 
-        $object = (object) array(
+        $object = (object) [
             'foo' => 'bar',
             'foo2' => 'bar2',
-        );
+        ];
 
-        $expected = array(
+        $expected = [
             'null' => null,
             'serializedString' => serialize($object),
             'arrayWithRefs' => $arrayWithRefs,
             'object' => $object,
-            'arrayWithObject' => array('bar' => $object),
-        );
+            'arrayWithObject' => ['bar' => $object],
+        ];
 
         $adapter = $this->createCachePool();
         $adapter->warmUp($expected);

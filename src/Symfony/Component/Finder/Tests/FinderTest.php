@@ -65,7 +65,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
 
         symlink($this->toAbsolute('foo'), $this->toAbsolute('baz'));
-        $expected = $this->toAbsolute(array('baz/bar.tmp'));
+        $expected = $this->toAbsolute(['baz/bar.tmp']);
         $in = self::$tmpDir.'/baz/';
         try {
             $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
@@ -80,7 +80,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
 
-        $expected = $this->toAbsolute(array('foo/../foo/bar.tmp'));
+        $expected = $this->toAbsolute(['foo/../foo/bar.tmp']);
         $in = self::$tmpDir.'/foo/../foo/';
         $this->assertIterator($expected, $finder->in($in)->files()->getIterator());
     }
@@ -300,9 +300,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testInWithGlob()
     {
         $finder = $this->buildFinder();
-        $finder->in(array(__DIR__.'/Fixtures/*/B/C/', __DIR__.'/Fixtures/*/*/B/C/'))->getIterator();
+        $finder->in([__DIR__.'/Fixtures/*/B/C/', __DIR__.'/Fixtures/*/*/B/C/'])->getIterator();
 
-        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+        $this->assertIterator($this->toAbsoluteFixtures(['A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy']), $finder);
     }
 
     /**
@@ -317,9 +317,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testInWithGlobBrace()
     {
         $finder = $this->buildFinder();
-        $finder->in(array(__DIR__.'/Fixtures/{A,copy/A}/B/C'))->getIterator();
+        $finder->in([__DIR__.'/Fixtures/{A,copy/A}/B/C'])->getIterator();
 
-        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+        $this->assertIterator($this->toAbsoluteFixtures(['A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy']), $finder);
     }
 
     /**
@@ -498,7 +498,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ->directories()
             ->name('Fixtures')
             ->contains('abc');
-        $this->assertIterator(array(), $finder);
+        $this->assertIterator([], $finder);
     }
 
     public function testNotContainsOnDirectory()
@@ -508,7 +508,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ->directories()
             ->name('Fixtures')
             ->notContains('abc');
-        $this->assertIterator(array(), $finder);
+        $this->assertIterator([], $finder);
     }
 
     /**
@@ -519,10 +519,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testMultipleLocations()
     {
-        $locations = array(
+        $locations = [
             self::$tmpDir.'/',
             self::$tmpDir.'/toto/',
-        );
+        ];
 
         // it is expected that there are test.py test.php in the tmpDir
         $finder = new Finder();
@@ -544,18 +544,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testMultipleLocationsWithSubDirectories()
     {
-        $locations = array(
+        $locations = [
             __DIR__.'/Fixtures/one',
             self::$tmpDir.\DIRECTORY_SEPARATOR.'toto',
-        );
+        ];
 
         $finder = $this->buildFinder();
         $finder->in($locations)->depth('< 10')->name('*.neon');
 
-        $expected = array(
+        $expected = [
             __DIR__.'/Fixtures/one'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c.neon',
             __DIR__.'/Fixtures/one'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'d.neon',
-        );
+        ];
 
         $this->assertIterator($expected, $finder);
         $this->assertIteratorInForeach($expected, $finder);
@@ -622,26 +622,26 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function getTestPathData()
     {
         return array(
-            array('', '', array()),
-            array('/^A\/B\/C/', '/C$/',
-                array('A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat'),
-            ),
-            array('/^A\/B/', 'foobar',
-                array(
+            ['', '', []],
+            ['/^A\/B\/C/', '/C$/',
+                ['A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat'],
+            ],
+            ['/^A\/B/', 'foobar',
+                [
                     'A'.\DIRECTORY_SEPARATOR.'B',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'ab.dat',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
-                ),
-            ),
-            array('A/B/C', 'foobar',
-                array(
+                ],
+            ],
+            ['A/B/C', 'foobar',
+                [
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
                     'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat',
                     'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C',
                     'copy'.\DIRECTORY_SEPARATOR.'A'.\DIRECTORY_SEPARATOR.'B'.\DIRECTORY_SEPARATOR.'C'.\DIRECTORY_SEPARATOR.'abc.dat.copy',
-                ),
-            ),
+                ],
+            ],
             array('A/B', 'foobar',
                 array(
                     //dirs

@@ -64,7 +64,7 @@ class JsonDecode implements DecoderInterface
      *
      * @see http://php.net/json_decode json_decode
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         $context = $this->resolveContext($context);
 

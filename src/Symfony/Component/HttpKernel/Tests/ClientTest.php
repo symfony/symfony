@@ -70,7 +70,7 @@ class ClientTest extends TestCase
         $response->headers->setCookie($cookie2 = new Cookie('foo1', 'bar1', \DateTime::createFromFormat('j-M-Y H:i:s T', '15-Feb-2009 20:00:00 GMT')->format('U'), '/foo', 'http://example.com', true, true));
         $domResponse = $m->invoke($client, $response);
         $this->assertSame((string) $cookie1, $domResponse->getHeader('Set-Cookie'));
-        $this->assertSame(array((string) $cookie1, (string) $cookie2), $domResponse->getHeader('Set-Cookie', false));
+        $this->assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
     }
 
     public function testFilterResponseSupportsStreamedResponses()
@@ -131,9 +131,9 @@ class ClientTest extends TestCase
         $kernel = new TestHttpKernel();
         $client = new Client($kernel);
 
-        $file = array('tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE);
+        $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE];
 
-        $client->request('POST', '/', array(), array('foo' => $file));
+        $client->request('POST', '/', [], ['foo' => $file]);
 
         $files = $client->getRequest()->files->all();
 

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class OutputFormatter implements OutputFormatterInterface
 {
     private $decorated;
-    private $styles = array();
+    private $styles = [];
     private $styleStack;
 
     /**
@@ -169,7 +169,7 @@ class OutputFormatter implements OutputFormatterInterface
         $output .= $this->applyCurrentStyle(substr($message, $offset));
 
         if (false !== strpos($output, "\0")) {
-            return strtr($output, array("\0" => '\\', '\\<' => '<'));
+            return strtr($output, ["\0" => '\\', '\\<' => '<']);
         }
 
         return str_replace('\\<', '<', $output);

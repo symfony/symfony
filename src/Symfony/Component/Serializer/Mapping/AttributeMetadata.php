@@ -30,7 +30,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $groups = array();
+    public $groups = [];
 
     /**
      * @var int|null

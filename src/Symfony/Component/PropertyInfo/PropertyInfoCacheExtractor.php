@@ -24,7 +24,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
-    private $arrayCache = array();
+    private $arrayCache = [];
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
     {
@@ -35,49 +35,49 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = array())
+    public function isReadable($class, $property, array $context = [])
     {
-        return $this->extract('isReadable', array($class, $property, $context));
+        return $this->extract('isReadable', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = array())
+    public function isWritable($class, $property, array $context = [])
     {
-        return $this->extract('isWritable', array($class, $property, $context));
+        return $this->extract('isWritable', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = array())
+    public function getShortDescription($class, $property, array $context = [])
     {
-        return $this->extract('getShortDescription', array($class, $property, $context));
+        return $this->extract('getShortDescription', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = array())
+    public function getLongDescription($class, $property, array $context = [])
     {
-        return $this->extract('getLongDescription', array($class, $property, $context));
+        return $this->extract('getLongDescription', [$class, $property, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties($class, array $context = [])
     {
-        return $this->extract('getProperties', array($class, $context));
+        return $this->extract('getProperties', [$class, $context]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = [])
     {
-        return $this->extract('getTypes', array($class, $property, $context));
+        return $this->extract('getTypes', [$class, $property, $context]);
     }
 
     /**

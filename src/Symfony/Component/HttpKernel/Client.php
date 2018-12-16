@@ -39,7 +39,7 @@ class Client extends BaseClient
      * @param History             $history   A History instance to store the browser history
      * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
      */
-    public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(HttpKernelInterface $kernel, array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         // These class properties must be set before calling the parent constructor, as it may depend on it.
         $this->kernel = $kernel;

@@ -73,7 +73,7 @@ trait RedisTrait
      *
      * @return \Redis|\Predis\Client According to the "class" option
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function createConnection($dsn, array $options = [])
     {
         if (0 !== strpos($dsn, 'redis://')) {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://"', $dsn));
@@ -172,7 +172,7 @@ trait RedisTrait
         if ($ids) {
             $values = $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
-                    yield 'get' => array($id);
+                    yield 'get' => [$id];
                 }
             });
             foreach ($values as $id => $v) {
@@ -216,7 +216,7 @@ trait RedisTrait
                 return false;
             }
         } elseif ($this->redis instanceof \RedisArray) {
-            $hosts = array();
+            $hosts = [];
             foreach ($this->redis->_hosts() as $host) {
                 $hosts[] = $this->redis->_instance($host);
             }
@@ -291,9 +291,9 @@ trait RedisTrait
         $results = $this->pipeline(function () use ($serialized, $lifetime) {
             foreach ($serialized as $id => $value) {
                 if (0 >= $lifetime) {
-                    yield 'set' => array($id, $value);
+                    yield 'set' => [$id, $value];
                 } else {
-                    yield 'setEx' => array($id, $lifetime, $value);
+                    yield 'setEx' => [$id, $lifetime, $value];
                 }
             }
         });

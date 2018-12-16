@@ -28,14 +28,14 @@ class DebugClassLoaderTest extends TestCase
     {
         $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
-        spl_autoload_register(array($this->loader, 'loadClass'), true, true);
+        spl_autoload_register([$this->loader, 'loadClass'], true, true);
         DebugClassLoader::enable();
     }
 
     protected function tearDown()
     {
         DebugClassLoader::disable();
-        spl_autoload_unregister(array($this->loader, 'loadClass'));
+        spl_autoload_unregister([$this->loader, 'loadClass']);
         error_reporting($this->errorReporting);
     }
 
@@ -202,20 +202,20 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $xError = array(
+        $xError = [
             'type' => E_USER_DEPRECATED,
             'message' => 'The "Test\Symfony\Component\Debug\Tests\\'.$class.'" class '.$type.' "Symfony\Component\Debug\Tests\Fixtures\\'.$super.'" that is deprecated but this is a test deprecation notice.',
-        );
+        ];
 
         $this->assertSame($xError, $lastError);
     }
 
     public function provideDeprecatedSuper()
     {
-        return array(
-            array('DeprecatedInterfaceClass', 'DeprecatedInterface', 'implements'),
-            array('DeprecatedParentClass', 'DeprecatedClass', 'extends'),
-        );
+        return [
+            ['DeprecatedInterfaceClass', 'DeprecatedInterface', 'implements'],
+            ['DeprecatedParentClass', 'DeprecatedClass', 'extends'],
+        ];
     }
 
     public function testInterfaceExtendsDeprecatedInterface()
@@ -232,10 +232,10 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $xError = array(
+        $xError = [
             'type' => E_USER_NOTICE,
             'message' => '',
-        );
+        ];
 
         $this->assertSame($xError, $lastError);
     }
@@ -254,10 +254,10 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $xError = array(
+        $xError = [
             'type' => E_USER_NOTICE,
             'message' => '',
-        );
+        ];
 
         $this->assertSame($xError, $lastError);
     }
@@ -343,12 +343,12 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $this->assertSame(array('type' => E_USER_NOTICE, 'message' => ''), $lastError);
+        $this->assertSame(['type' => E_USER_NOTICE, 'message' => ''], $lastError);
     }
 
     public function testInternalsUse()
     {
-        $deprecations = array();
+        $deprecations = [];
         set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
         $e = error_reporting(E_USER_DEPRECATED);
 
@@ -376,7 +376,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array(), $deprecations);
+        $this->assertSame([], $deprecations);
     }
 }
 
@@ -388,7 +388,7 @@ class ClassLoader
 
     public function getClassMap()
     {
-        return array(__NAMESPACE__.'\Fixtures\NotPSR0bis' => __DIR__.'/Fixtures/notPsr0Bis.php');
+        return [__NAMESPACE__.'\Fixtures\NotPSR0bis' => __DIR__.'/Fixtures/notPsr0Bis.php'];
     }
 
     public function findFile($class)

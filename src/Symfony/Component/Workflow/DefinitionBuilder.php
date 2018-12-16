@@ -51,8 +51,8 @@ class DefinitionBuilder
      */
     public function reset()
     {
-        $this->places = array();
-        $this->transitions = array();
+        $this->places = [];
+        $this->transitions = [];
         $this->initialPlace = null;
 
         return $this;

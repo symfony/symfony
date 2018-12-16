@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
  */
 class Registry
 {
-    private $workflows = array();
+    private $workflows = [];
 
     /**
      * @param Workflow                        $workflow

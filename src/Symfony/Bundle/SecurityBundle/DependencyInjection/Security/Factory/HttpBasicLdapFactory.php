@@ -41,7 +41,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
         if (!empty($config['query_string'])) {
-            $definition->addMethodCall('setQueryString', array($config['query_string']));
+            $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }
 
         // listener

@@ -30,7 +30,7 @@ class ConsoleFormatter implements FormatterInterface
     const SIMPLE_FORMAT = "%datetime% %start_tag%%level_name%%end_tag% <comment>[%channel%]</> %message%%context%%extra%\n";
     const SIMPLE_DATE = 'H:i:s';
 
-    private static $levelColorMap = array(
+    private static $levelColorMap = [
         Logger::DEBUG => 'fg=white',
         Logger::INFO => 'fg=green',
         Logger::NOTICE => 'fg=blue',
@@ -39,7 +39,7 @@ class ConsoleFormatter implements FormatterInterface
         Logger::CRITICAL => 'fg=red',
         Logger::ALERT => 'fg=red',
         Logger::EMERGENCY => 'fg=white;bg=red',
-    );
+    ];
 
     private $options;
     private $cloner;
@@ -132,7 +132,7 @@ class ConsoleFormatter implements FormatterInterface
             $extra = '';
         }
 
-        $formatted = strtr($this->options['format'], array(
+        $formatted = strtr($this->options['format'], [
             '%datetime%' => $record['datetime']->format($this->options['date_format']),
             '%start_tag%' => sprintf('<%s>', $levelColor),
             '%level_name%' => sprintf('%-9s', $record['level_name']),
@@ -141,7 +141,7 @@ class ConsoleFormatter implements FormatterInterface
             '%message%' => $this->replacePlaceHolder($record)['message'],
             '%context%' => $context,
             '%extra%' => $extra,
-        ));
+        ]);
 
         return $formatted;
     }
@@ -167,7 +167,7 @@ class ConsoleFormatter implements FormatterInterface
 
         if ($isNested && !$v instanceof \DateTimeInterface) {
             $s->cut = -1;
-            $a = array();
+            $a = [];
         }
 
         return $a;
@@ -183,7 +183,7 @@ class ConsoleFormatter implements FormatterInterface
 
         $context = $record['context'];
 
-        $replacements = array();
+        $replacements = [];
         foreach ($context as $k => $v) {
             // Remove quotes added by the dumper around string.
             $v = trim($this->dumpData($v, false), '"');

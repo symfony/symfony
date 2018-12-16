@@ -36,8 +36,8 @@ class WebProcessorTest extends TestCase
 
     public function testUseRequestClientIp()
     {
-        Request::setTrustedProxies(array('192.168.0.1'), Request::HEADER_X_FORWARDED_ALL);
-        list($event, $server) = $this->createRequestEvent(array('X_FORWARDED_FOR' => '192.168.0.2'));
+        Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_ALL);
+        list($event, $server) = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
 
         $processor = new WebProcessor();
         $processor->onKernelRequest($event);
@@ -50,7 +50,7 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
 
-        Request::setTrustedProxies(array(), -1);
+        Request::setTrustedProxies([], -1);
     }
 
     public function testCanBeConstructedWithExtraFields()
@@ -61,7 +61,7 @@ class WebProcessorTest extends TestCase
 
         list($event, $server) = $this->createRequestEvent();
 
-        $processor = new WebProcessor(array('url', 'referrer'));
+        $processor = new WebProcessor(['url', 'referrer']);
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
@@ -100,7 +100,7 @@ class WebProcessorTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
 
-        return array($event, $server);
+        return [$event, $server];
     }
 
     /**
@@ -111,15 +111,15 @@ class WebProcessorTest extends TestCase
      */
     private function getRecord($level = Logger::WARNING, $message = 'test')
     {
-        return array(
+        return [
             'message' => $message,
-            'context' => array(),
+            'context' => [],
             'level' => $level,
             'level_name' => Logger::getLevelName($level),
             'channel' => 'test',
             'datetime' => new \DateTime(),
-            'extra' => array(),
-        );
+            'extra' => [],
+        ];
     }
 
     private function isExtraFieldsSupported()

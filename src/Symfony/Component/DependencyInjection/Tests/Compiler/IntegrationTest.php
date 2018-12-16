@@ -155,8 +155,8 @@ class IntegrationTest extends TestCase
         $expectedService = $container->getDefinition($expectedServiceId);
 
         // reset changes, we don't care if these differ
-        $actualService->setChanges(array());
-        $expectedService->setChanges(array());
+        $actualService->setChanges([]);
+        $expectedService->setChanges([]);
 
         $this->assertEquals($expectedService, $actualService);
     }
@@ -227,7 +227,7 @@ class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
     public static function getSubscribedServices()
     {
-        return array();
+        return [];
     }
 }
 

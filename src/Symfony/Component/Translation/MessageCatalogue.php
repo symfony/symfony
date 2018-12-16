@@ -19,9 +19,9 @@ use Symfony\Component\Translation\Exception\LogicException;
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
-    private $messages = array();
-    private $metadata = array();
-    private $resources = array();
+    private $messages = [];
+    private $metadata = [];
+    private $resources = [];
     private $locale;
     private $fallbackCatalogue;
     private $parent;
@@ -69,7 +69,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function set($id, $translation, $domain = 'messages')
     {
-        $this->add(array($id => $translation), $domain);
+        $this->add([$id => $translation], $domain);
     }
 
     /**
@@ -247,7 +247,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     public function deleteMetadata($key = '', $domain = 'messages')
     {
         if ('' == $domain) {
-            $this->metadata = array();
+            $this->metadata = [];
         } elseif ('' == $key) {
             unset($this->metadata[$domain]);
         } else {

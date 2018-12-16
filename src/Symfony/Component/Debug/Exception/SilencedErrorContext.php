@@ -56,12 +56,12 @@ class SilencedErrorContext implements \JsonSerializable
 
     public function JsonSerialize()
     {
-        return array(
+        return [
             'severity' => $this->severity,
             'file' => $this->file,
             'line' => $this->line,
             'trace' => $this->trace,
             'count' => $this->count,
-        );
+        ];
     }
 }

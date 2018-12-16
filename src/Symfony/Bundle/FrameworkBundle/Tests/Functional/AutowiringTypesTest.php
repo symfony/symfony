@@ -79,8 +79,8 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $autowiredServices->getCachePool());
     }
 
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
-        return parent::createKernel(array('test_case' => 'AutowiringTypes') + $options);
+        return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);
     }
 }

@@ -22,7 +22,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
 {
     public function testSessionCookie()
     {
-        $container = $this->createContainer(array('cookie_domain' => '.symfony.com.', 'cookie_secure' => true));
+        $container = $this->createContainer(['cookie_domain' => '.symfony.com.', 'cookie_secure' => true]);
 
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
@@ -37,7 +37,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
     public function testSessionNoDomain()
     {
-        $container = $this->createContainer(array('cookie_secure' => true));
+        $container = $this->createContainer(['cookie_secure' => true]);
 
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
@@ -52,7 +52,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
     public function testSessionNoSecure()
     {
-        $container = $this->createContainer(array('cookie_domain' => '.symfony.com.'));
+        $container = $this->createContainer(['cookie_domain' => '.symfony.com.']);
 
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
@@ -67,7 +67,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
 
     public function testSessionNoSecureAndNoDomain()
     {
-        $container = $this->createContainer(array());
+        $container = $this->createContainer([]);
 
         $utils = $container->get('security.http_utils');
         $request = Request::create('/', 'get');
@@ -99,7 +99,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
     private function createContainer($sessionStorageOptions)
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles_metadata', array());
+        $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.cache_dir', __DIR__);
         $container->setParameter('kernel.charset', 'UTF-8');
         $container->setParameter('kernel.container_class', 'cc');

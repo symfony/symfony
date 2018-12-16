@@ -506,7 +506,7 @@ class FrameworkExtension extends Extension
     {
         if (!$this->isConfigEnabled($container, $config)) {
             // this is needed for the WebProfiler to work even if the profiler is disabled
-            $container->setParameter('data_collector.templates', array());
+            $container->setParameter('data_collector.templates', []);
 
             return;
         }
@@ -627,7 +627,7 @@ class FrameworkExtension extends Extension
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $from, $to]);
                             $transitionDefinition->setPublic(false);
                             $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
                             $container->setDefinition($transitionId, $transitionDefinition);
@@ -717,7 +717,7 @@ class FrameworkExtension extends Extension
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);
                 $guard->setPrivate(true);
 
-                $guard->setArguments(array(
+                $guard->setArguments([
                     $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
                     new Reference('security.token_storage'),
@@ -725,9 +725,9 @@ class FrameworkExtension extends Extension
                     new Reference('security.authentication.trust_resolver'),
                     new Reference('security.role_hierarchy'),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ));
+                ]);
                 foreach ($guardsConfiguration as $eventName => $config) {
-                    $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                    $guard->addTag('kernel.event_listener', ['event' => $eventName, 'method' => 'onTransition']);
                 }
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
@@ -746,7 +746,7 @@ class FrameworkExtension extends Extension
             $container->register('debug.stopwatch', Stopwatch::class)
                 ->addArgument(true)
                 ->setPrivate(true)
-                ->addTag('kernel.reset', array('method' => 'reset'));
+                ->addTag('kernel.reset', ['method' => 'reset']);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 
@@ -920,11 +920,11 @@ class FrameworkExtension extends Extension
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
 
             $container->getDefinition('templating.loader.cache')
-                ->addTag('monolog.logger', array('channel' => 'templating'))
-                ->addMethodCall('setLogger', array($logger));
+                ->addTag('monolog.logger', ['channel' => 'templating'])
+                ->addMethodCall('setLogger', [$logger]);
             $container->getDefinition('templating.loader.chain')
-                ->addTag('monolog.logger', array('channel' => 'templating'))
-                ->addMethodCall('setLogger', array($logger));
+                ->addTag('monolog.logger', ['channel' => 'templating'])
+                ->addMethodCall('setLogger', [$logger]);
         }
 
         if (!empty($config['loaders'])) {
@@ -967,13 +967,13 @@ class FrameworkExtension extends Extension
         } else {
             $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
             foreach ($engines as $engine) {
-                $templateEngineDefinition->addMethodCall('addEngine', array($engine));
+                $templateEngineDefinition->addMethodCall('addEngine', [$engine]);
             }
             $container->setAlias('templating', 'templating.engine.delegating')->setPublic(true);
         }
 
         $container->getDefinition('fragment.renderer.hinclude')
-            ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+            ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
             ->replaceArgument(0, new Reference('templating'))
         ;
 
@@ -1043,7 +1043,7 @@ class FrameworkExtension extends Extension
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
-        $namedPackages = array();
+        $namedPackages = [];
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
@@ -1155,13 +1155,13 @@ class FrameworkExtension extends Extension
         $container->setAlias('translator', 'translator.default')->setPublic(true);
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
         $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
+        $translator->addMethodCall('setFallbackLocales', [$config['fallbacks']]);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
 
         // Discover translation directories
-        $dirs = array();
+        $dirs = [];
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
@@ -1205,7 +1205,7 @@ class FrameworkExtension extends Extension
 
         // Register translation resources
         if ($dirs) {
-            $files = array();
+            $files = [];
             $finder = Finder::create()
                 ->followLinks()
                 ->files()
@@ -1219,7 +1219,7 @@ class FrameworkExtension extends Extension
             foreach ($finder as $file) {
                 list(, $locale) = explode('.', $file->getBasename(), 3);
                 if (!isset($files[$locale])) {
-                    $files[$locale] = array();
+                    $files[$locale] = [];
                 }
 
                 $files[$locale][] = (string) $file;
@@ -1227,7 +1227,7 @@ class FrameworkExtension extends Extension
 
             $options = array_merge(
                 $translator->getArgument(4),
-                array('resource_files' => $files)
+                ['resource_files' => $files]
             );
 
             $translator->replaceArgument(4, $options);
@@ -1254,15 +1254,15 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
-        $files = array('xml' => array(), 'yml' => array());
+        $files = ['xml' => [], 'yml' => []];
         $this->registerValidatorMapping($container, $config, $files);
 
         if (!empty($files['xml'])) {
-            $validatorBuilder->addMethodCall('addXmlMappings', array($files['xml']));
+            $validatorBuilder->addMethodCall('addXmlMappings', [$files['xml']]);
         }
 
         if (!empty($files['yml'])) {
-            $validatorBuilder->addMethodCall('addYamlMappings', array($files['yml']));
+            $validatorBuilder->addMethodCall('addYamlMappings', [$files['yml']]);
         }
 
         $definition = $container->findDefinition('validator.email');
@@ -1273,12 +1273,12 @@ class FrameworkExtension extends Extension
                 throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
             }
 
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
+            $validatorBuilder->addMethodCall('enableAnnotationMapping', [new Reference('annotation_reader')]);
         }
 
         if (array_key_exists('static_method', $config) && $config['static_method']) {
             foreach ($config['static_method'] as $methodName) {
-                $validatorBuilder->addMethodCall('addMethodMapping', array($methodName));
+                $validatorBuilder->addMethodCall('addMethodMapping', [$methodName]);
             }
         }
 
@@ -1372,7 +1372,7 @@ class FrameworkExtension extends Extension
 
         if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
             $container->getDefinition('annotations.dummy_registry')
-                ->setMethodCalls(array(array('registerLoader', array('class_exists'))));
+                ->setMethodCalls([['registerLoader', ['class_exists']]]);
         }
 
         if ('none' !== $config['cache']) {
@@ -1481,7 +1481,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        $serializerLoaders = array();
+        $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
@@ -1497,7 +1497,7 @@ class FrameworkExtension extends Extension
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(\in_array($extension, array('yaml', 'yml')) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($path));
+            $definition = new Definition(\in_array($extension, ['yaml', 'yml']) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', [$path]);
             $definition->setPublic(false);
             $serializerLoaders[] = $definition;
         };
@@ -1543,10 +1543,10 @@ class FrameworkExtension extends Extension
         } elseif (!$container->getParameter('kernel.debug')) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
-                array(
+                [
                     new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
                     new Reference('serializer.mapping.cache.symfony'),
-                )
+                ]
             );
             $cacheMetadataFactory->setPublic(false);
             $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
@@ -1559,7 +1559,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
-            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', [new Reference($config['circular_reference_handler'])]);
         }
     }
 
@@ -1576,8 +1576,8 @@ class FrameworkExtension extends Extension
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->setPrivate(true);
-            $definition->addTag('property_info.description_extractor', array('priority' => -1000));
-            $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+            $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
+            $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
         }
     }
 
@@ -1591,7 +1591,7 @@ class FrameworkExtension extends Extension
             }
 
             // Generate stores
-            $storeDefinitions = array();
+            $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
                 switch (true) {
@@ -1605,15 +1605,15 @@ class FrameworkExtension extends Extension
                         if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
-                            $connectionDefinition->setArguments(array($storeDsn, array('lazy' => true)));
+                            $connectionDefinition->setFactory([AbstractAdapter::class, 'createConnection']);
+                            $connectionDefinition->setArguments([$storeDsn, ['lazy' => true]]);
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
                         $storeDefinition = new Definition(StoreInterface::class);
                         $storeDefinition->setPublic(false);
-                        $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
-                        $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
+                        $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
+                        $storeDefinition->setArguments([new Reference($connectionDefinitionId)]);
 
                         $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
@@ -1643,8 +1643,8 @@ class FrameworkExtension extends Extension
             // Generate services for lock instances
             $lockDefinition = new Definition(Lock::class);
             $lockDefinition->setPublic(false);
-            $lockDefinition->setFactory(array(new Reference('lock.'.$resourceName.'.factory'), 'createLock'));
-            $lockDefinition->setArguments(array($resourceName));
+            $lockDefinition->setFactory([new Reference('lock.'.$resourceName.'.factory'), 'createLock']);
+            $lockDefinition->setArguments([$resourceName]);
             $container->setDefinition('lock.'.$resourceName, $lockDefinition);
 
             // provide alias for default resource

@@ -23,7 +23,7 @@ class DebugCommandTest extends TestCase
     public function testDebugCommand()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array(), array('decorated' => false));
+        $ret = $tester->execute([], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Functions', trim($tester->getDisplay()));

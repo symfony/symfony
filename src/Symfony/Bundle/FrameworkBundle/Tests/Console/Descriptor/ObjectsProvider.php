@@ -31,60 +31,60 @@ class ObjectsProvider
             $collection1->add($name, $route);
         }
 
-        return array('route_collection_1' => $collection1);
+        return ['route_collection_1' => $collection1];
     }
 
     public static function getRoutes()
     {
-        return array(
+        return [
             'route_1' => new RouteStub(
                 '/hello/{name}',
-                array('name' => 'Joseph'),
-                array('name' => '[a-z]+'),
-                array('opt1' => 'val1', 'opt2' => 'val2'),
+                ['name' => 'Joseph'],
+                ['name' => '[a-z]+'],
+                ['opt1' => 'val1', 'opt2' => 'val2'],
                 'localhost',
-                array('http', 'https'),
-                array('get', 'head')
+                ['http', 'https'],
+                ['get', 'head']
             ),
             'route_2' => new RouteStub(
                 '/name/add',
-                array(),
-                array(),
-                array('opt1' => 'val1', 'opt2' => 'val2'),
+                [],
+                [],
+                ['opt1' => 'val1', 'opt2' => 'val2'],
                 'localhost',
-                array('http', 'https'),
-                array('put', 'post')
+                ['http', 'https'],
+                ['put', 'post']
             ),
-        );
+        ];
     }
 
     public static function getContainerParameters()
     {
-        return array(
-            'parameters_1' => new ParameterBag(array(
+        return [
+            'parameters_1' => new ParameterBag([
                 'integer' => 12,
                 'string' => 'Hello world!',
                 'boolean' => true,
-                'array' => array(12, 'Hello world!', true),
-            )),
-        );
+                'array' => [12, 'Hello world!', true],
+            ]),
+        ];
     }
 
     public static function getContainerParameter()
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('database_name', 'symfony');
-        $builder->setParameter('twig.form.resources', array(
+        $builder->setParameter('twig.form.resources', [
             'bootstrap_3_horizontal_layout.html.twig',
             'bootstrap_3_layout.html.twig',
             'form_div_layout.html.twig',
             'form_table_layout.html.twig',
-        ));
+        ]);
 
-        return array(
+        return [
             'parameter' => $builder,
             'array_parameter' => $builder,
-        );
+        ];
     }
 
     public static function getContainerBuilders()
@@ -93,7 +93,7 @@ class ObjectsProvider
         $builder1->setDefinitions(self::getContainerDefinitions());
         $builder1->setAliases(self::getContainerAliases());
 
-        return array('builder_1' => $builder1);
+        return ['builder_1' => $builder1];
     }
 
     public static function getContainerDefinitions()
@@ -150,20 +150,20 @@ class ObjectsProvider
         $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
-        return array('event_dispatcher_1' => $eventDispatcher);
+        return ['event_dispatcher_1' => $eventDispatcher];
     }
 
     public static function getCallables()
     {
-        $callables = array(
+        $callables = [
             'callable_1' => 'array_key_exists',
-            'callable_2' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'),
-            'callable_3' => array(new CallableClass(), 'method'),
+            'callable_2' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'],
+            'callable_3' => [new CallableClass(), 'method'],
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
-            'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
+            'callable_5' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'],
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
-        );
+        ];
 
         if (\PHP_VERSION_ID >= 70100) {
             $callables['callable_from_callable'] = \Closure::fromCallable(new CallableClass());
@@ -199,6 +199,6 @@ class RouteStub extends Route
 {
     public function compile()
     {
-        return new CompiledRoute('', '#PATH_REGEX#', array(), array(), '#HOST_REGEX#');
+        return new CompiledRoute('', '#PATH_REGEX#', [], [], '#HOST_REGEX#');
     }
 }

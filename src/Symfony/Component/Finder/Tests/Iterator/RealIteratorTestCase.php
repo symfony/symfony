@@ -88,7 +88,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         }
 
         if (\is_array($files)) {
-            $f = array();
+            $f = [];
             foreach ($files as $file) {
                 if (\is_array($file)) {
                     $f[] = self::toAbsolute($file);
@@ -109,7 +109,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
     protected static function toAbsoluteFixtures($files)
     {
-        $f = array();
+        $f = [];
         foreach ($files as $file) {
             $f[] = realpath(__DIR__.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.$file);
         }

@@ -22,7 +22,7 @@ class Cookie
      * Handles dates as defined by RFC 2616 section 3.3.1, and also some other
      * non-standard, but common formats.
      */
-    private static $dateFormats = array(
+    private static $dateFormats = [
         'D, d M Y H:i:s T',
         'D, d-M-y H:i:s T',
         'D, d-M-Y H:i:s T',
@@ -30,7 +30,7 @@ class Cookie
         'D, d-m-Y H:i:s T',
         'D M j G:i:s Y',
         'D M d H:i:s Y T',
-    );
+    ];
 
     protected $name;
     protected $value;

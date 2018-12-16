@@ -465,7 +465,7 @@ class AutowirePassTest extends TestCase
         $container->register(A::class);
         $container->register(Dunglas::class);
         $container->register('arg_no_type_hint', __NAMESPACE__.'\MultipleArguments')
-            ->setArguments(array(1 => 'foo'))
+            ->setArguments([1 => 'foo'])
             ->setAutowired(true);
 
         (new ResolveClassPass())->process($container);
@@ -562,7 +562,7 @@ class AutowirePassTest extends TestCase
 
         $definition = $container->getDefinition('foo');
         $this->assertEquals(
-            array('foo.txt'),
+            ['foo.txt'],
             $definition->getArguments()
         );
     }
@@ -579,7 +579,7 @@ class AutowirePassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
+            ->addMethodCall('setWithCallsConfigured', ['manual_arg1', 'manual_arg2'])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -616,7 +616,7 @@ class AutowirePassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('notASetter', array())
+            ->addMethodCall('notASetter', [])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -682,10 +682,10 @@ class AutowirePassTest extends TestCase
 
     public function getCreateResourceTests()
     {
-        return array(
-            array('IdenticalClassResource', true),
-            array('ClassChangedConstructorArgs', false),
-        );
+        return [
+            ['IdenticalClassResource', true],
+            ['ClassChangedConstructorArgs', false],
+        ];
     }
 
     public function testIgnoreServiceWithClassNotExisting()
@@ -805,14 +805,14 @@ class AutowirePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $foo = $container->register('foo', NotWireable::class)->setAutowired(true)
-            ->addMethodCall('setBar', array())
-            ->addMethodCall('setOptionalNotAutowireable', array())
-            ->addMethodCall('setOptionalNoTypeHint', array())
-            ->addMethodCall('setOptionalArgNoAutowireable', array())
+            ->addMethodCall('setBar', [])
+            ->addMethodCall('setOptionalNotAutowireable', [])
+            ->addMethodCall('setOptionalNoTypeHint', [])
+            ->addMethodCall('setOptionalArgNoAutowireable', [])
         ;
 
         if ($method) {
-            $foo->addMethodCall($method, array());
+            $foo->addMethodCall($method, []);
         }
 
         if (method_exists($this, 'expectException')) {
@@ -922,6 +922,6 @@ class AutowirePassTest extends TestCase
         $pass = new AutowirePass();
         $pass->process($container);
 
-        $this->assertSame(array(), $container->getDefinition('autowired')->getArguments());
+        $this->assertSame([], $container->getDefinition('autowired')->getArguments());
     }
 }

@@ -75,7 +75,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             ];
         } elseif (null === $token = $this->tokenStorage->getToken()) {
-            $this->data = array(
+            $this->data = [
                 'enabled' => true,
                 'authenticated' => false,
                 'impersonated' => false,
@@ -88,7 +88,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'roles' => [],
                 'inherited_roles' => [],
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
-            );
+            ];
         } else {
             $inheritedRoles = [];
             $assignedRoles = $token->getRoles();

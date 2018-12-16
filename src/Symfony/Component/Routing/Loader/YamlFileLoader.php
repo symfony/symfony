@@ -102,7 +102,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return \is_string($resource) && \in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true) && (!$type || 'yaml' === $type);
+        return \is_string($resource) && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);
     }
 
     /**
@@ -115,12 +115,12 @@ class YamlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, $name, array $config, $path)
     {
-        $defaults = isset($config['defaults']) ? $config['defaults'] : array();
-        $requirements = isset($config['requirements']) ? $config['requirements'] : array();
-        $options = isset($config['options']) ? $config['options'] : array();
+        $defaults = isset($config['defaults']) ? $config['defaults'] : [];
+        $requirements = isset($config['requirements']) ? $config['requirements'] : [];
+        $options = isset($config['options']) ? $config['options'] : [];
         $host = isset($config['host']) ? $config['host'] : '';
-        $schemes = isset($config['schemes']) ? $config['schemes'] : array();
-        $methods = isset($config['methods']) ? $config['methods'] : array();
+        $schemes = isset($config['schemes']) ? $config['schemes'] : [];
+        $methods = isset($config['methods']) ? $config['methods'] : [];
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
         if (isset($config['controller'])) {
@@ -144,9 +144,9 @@ class YamlFileLoader extends FileLoader
     {
         $type = isset($config['type']) ? $config['type'] : null;
         $prefix = isset($config['prefix']) ? $config['prefix'] : '';
-        $defaults = isset($config['defaults']) ? $config['defaults'] : array();
-        $requirements = isset($config['requirements']) ? $config['requirements'] : array();
-        $options = isset($config['options']) ? $config['options'] : array();
+        $defaults = isset($config['defaults']) ? $config['defaults'] : [];
+        $requirements = isset($config['requirements']) ? $config['requirements'] : [];
+        $options = isset($config['options']) ? $config['options'] : [];
         $host = isset($config['host']) ? $config['host'] : null;
         $condition = isset($config['condition']) ? $config['condition'] : null;
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;

@@ -33,11 +33,11 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->container->register('translator.data_collector', 'Symfony\Component\Translation\DataCollectorTranslator')
             ->setPublic(false)
             ->setDecoratedService('translator')
-            ->setArguments(array(new Reference('translator.data_collector.inner')))
+            ->setArguments([new Reference('translator.data_collector.inner')])
         ;
 
         $this->container->register('data_collector.translation', 'Symfony\Component\Translation\DataCollector\TranslationDataCollector')
-            ->setArguments(array(new Reference('translator.data_collector')))
+            ->setArguments([new Reference('translator.data_collector')])
         ;
     }
 
@@ -67,10 +67,10 @@ class DataCollectorTranslatorPassTest extends TestCase
 
     public function getImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
-        return array(
-            array('Symfony\Component\Translation\Translator'),
-            array('%translator_implementing_bag%'),
-        );
+        return [
+            ['Symfony\Component\Translation\Translator'],
+            ['%translator_implementing_bag%'],
+        ];
     }
 
     /**

@@ -144,7 +144,7 @@ EOPHP;
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
         $this->assertTrue($res->isFresh(0));
 
-        TestEventSubscriber::$subscribedEvents = array(123);
+        TestEventSubscriber::$subscribedEvents = [123];
         $this->assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
@@ -156,7 +156,7 @@ EOPHP;
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
         $this->assertTrue($res->isFresh(0));
 
-        TestServiceSubscriber::$subscribedServices = array(123);
+        TestServiceSubscriber::$subscribedServices = [123];
         $this->assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
@@ -170,7 +170,7 @@ interface DummyInterface
 
 class TestEventSubscriber implements EventSubscriberInterface
 {
-    public static $subscribedEvents = array();
+    public static $subscribedEvents = [];
 
     public static function getSubscribedEvents()
     {
@@ -180,7 +180,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 
 class TestServiceSubscriber implements ServiceSubscriberInterface
 {
-    public static $subscribedServices = array();
+    public static $subscribedServices = [];
 
     public static function getSubscribedServices()
     {

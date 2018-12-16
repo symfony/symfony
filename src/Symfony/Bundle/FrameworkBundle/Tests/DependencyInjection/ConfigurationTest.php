@@ -23,23 +23,23 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
+        $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
         $this->assertEquals(
-            array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
+            array_merge(['secret' => 's3cr3t', 'trusted_hosts' => []], self::getBundleDefaultConfig()),
             $config
         );
     }
 
     public function testDoNoDuplicateDefaultFormResources()
     {
-        $input = array('templating' => array(
-            'form' => array('resources' => array('FrameworkBundle:Form')),
-            'engines' => array('php'),
-        ));
+        $input = ['templating' => [
+            'form' => ['resources' => ['FrameworkBundle:Form']],
+            'engines' => ['php'],
+        ]];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array($input));
+        $config = $processor->processConfiguration(new Configuration(true), [$input]);
 
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }

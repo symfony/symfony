@@ -33,23 +33,23 @@ class CacheItemTest extends TestCase
 
     public function provideInvalidKey()
     {
-        return array(
-            array(''),
-            array('{'),
-            array('}'),
-            array('('),
-            array(')'),
-            array('/'),
-            array('\\'),
-            array('@'),
-            array(':'),
-            array(true),
-            array(null),
-            array(1),
-            array(1.1),
-            array(array(array())),
-            array(new \Exception('foo')),
-        );
+        return [
+            [''],
+            ['{'],
+            ['}'],
+            ['('],
+            [')'],
+            ['/'],
+            ['\\'],
+            ['@'],
+            [':'],
+            [true],
+            [null],
+            [1],
+            [1.1],
+            [[[]]],
+            [new \Exception('foo')],
+        ];
     }
 
     public function testTag()

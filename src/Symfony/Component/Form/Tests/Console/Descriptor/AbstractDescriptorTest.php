@@ -113,7 +113,7 @@ abstract class AbstractDescriptorTest extends TestCase
     private function getObjectDescription($object, array $options)
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, $options['decorated']);
-        $io = new SymfonyStyle(new ArrayInput(array()), $output);
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
 
         $this->getDescriptor()->describe($io, $object, $options);
 
@@ -140,11 +140,11 @@ class FooType extends AbstractType
             $foo = $options['foo'];
 
             return function (FormInterface $form) use ($foo) {
-                return $form->getConfig()->getCompound() ? array($foo) : $foo;
+                return $form->getConfig()->getCompound() ? [$foo] : $foo;
             };
         });
         $resolver->setAllowedTypes('foo', 'string');
-        $resolver->setAllowedValues('foo', array('bar', 'baz'));
+        $resolver->setAllowedValues('foo', ['bar', 'baz']);
         $resolver->setNormalizer('foo', function (Options $options, $value) {
             return (string) $value;
         });

@@ -21,7 +21,7 @@ class RouteTest extends TestCase
      */
     public function testInvalidRouteParameter()
     {
-        $route = new Route(array('foo' => 'bar'));
+        $route = new Route(['foo' => 'bar']);
     }
 
     /**

@@ -36,7 +36,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
                 $this->definition->addTag($name, $attributes);
             }
         }
-        $this->defaultTags = array();
+        $this->defaultTags = [];
     }
 
     /**

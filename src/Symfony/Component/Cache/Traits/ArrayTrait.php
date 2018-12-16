@@ -24,8 +24,8 @@ trait ArrayTrait
     use LoggerAwareTrait;
 
     private $storeSerialized;
-    private $values = array();
-    private $expiries = array();
+    private $values = [];
+    private $expiries = [];
 
     /**
      * Returns all cached values, with cache miss as null.
@@ -52,7 +52,7 @@ trait ArrayTrait
      */
     public function clear()
     {
-        $this->values = $this->expiries = array();
+        $this->values = $this->expiries = [];
 
         return true;
     }

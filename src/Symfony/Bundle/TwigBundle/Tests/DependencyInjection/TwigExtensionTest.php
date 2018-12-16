@@ -72,9 +72,9 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
-        if (\in_array($format, array('yml', 'php'))) {
+        if (\in_array($format, ['yml', 'php'])) {
             $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals(['key' => 'foo'], $calls[5][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
@@ -99,7 +99,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
+        $this->assertEquals([new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'], $options['autoescape']);
     }
 
     /**
@@ -139,7 +139,7 @@ class TwigExtensionTest extends TestCase
     public function testGlobalsWithDifferentTypesAndValues()
     {
         $globals = array(
-            'array' => array(),
+            'array' => [],
             'false' => false,
             'float' => 2.0,
             'integer' => 3,
@@ -265,7 +265,7 @@ class TwigExtensionTest extends TestCase
         $container->register('templating.name_parser', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
 
         $loader = $container->getDefinition('twig.runtime_loader');

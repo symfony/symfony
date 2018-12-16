@@ -18,7 +18,7 @@ class SortableIteratorTest extends RealIteratorTestCase
     public function testConstructor()
     {
         try {
-            new SortableIterator(new Iterator(array()), 'foobar');
+            new SortableIterator(new Iterator([]), 'foobar');
             $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
@@ -73,7 +73,7 @@ class SortableIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
-        $sortByName = array(
+        $sortByName = [
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -86,7 +86,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             'test.py',
             'toto',
             'toto/.git',
-        );
+        ];
 
         $sortByType = array(
             '.foo',

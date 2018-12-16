@@ -87,7 +87,7 @@ class CodeExtension extends AbstractExtension
      */
     public function formatArgs($args)
     {
-        $result = array();
+        $result = [];
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
                 $parts = explode('\\', $item[1]);
@@ -146,7 +146,7 @@ class CodeExtension extends AbstractExtension
             }, $code);
             $content = explode('<br />', $code);
 
-            $lines = array();
+            $lines = [];
             if (0 > $srcContext) {
                 $srcContext = \count($content);
             }
@@ -205,7 +205,7 @@ class CodeExtension extends AbstractExtension
     public function getFileLink($file, $line)
     {
         if ($fmt = $this->fileLinkFormat) {
-            return \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
         }
 
         return false;
@@ -224,7 +224,7 @@ class CodeExtension extends AbstractExtension
     public function formatLogMessage($message, array $context)
     {
         if ($context && false !== strpos($message, '{')) {
-            $replacements = array();
+            $replacements = [];
             foreach ($context as $key => $val) {
                 if (is_scalar($val)) {
                     $replacements['{'.$key.'}'] = $val;

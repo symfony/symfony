@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\Definition;
 class ServiceReferenceGraphNode
 {
     private $id;
-    private $inEdges = array();
-    private $outEdges = array();
+    private $inEdges = [];
+    private $outEdges = [];
     private $value;
 
     /**

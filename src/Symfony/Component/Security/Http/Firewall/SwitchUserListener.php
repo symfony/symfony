@@ -134,7 +134,7 @@ class SwitchUserListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', array('username' => $username));
+            $this->logger->info('Attempting to switch to user.', ['username' => $username]);
         }
 
         $user = $this->provider->loadUserByUsername($username);

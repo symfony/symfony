@@ -26,9 +26,9 @@ class ObjectRouteLoaderTest extends TestCase
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
 
-        $loader->loaderMap = array(
+        $loader->loaderMap = [
             'my_route_provider_service' => new RouteService($collection),
-        );
+        ];
 
         $actualRoutes = $loader->load(
             'my_route_provider_service:loadRoutes',

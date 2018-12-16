@@ -36,7 +36,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (null === $this->serializer) {
             throw new BadMethodCallException('Please set a serializer before calling denormalize()!');

@@ -34,8 +34,8 @@ class ResolveClassPassTest extends TestCase
 
     public function provideValidClassId()
     {
-        yield array('Acme\UnknownClass');
-        yield array(CaseSensitiveClass::class);
+        yield ['Acme\UnknownClass'];
+        yield [CaseSensitiveClass::class];
     }
 
     /**

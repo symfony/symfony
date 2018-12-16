@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerReference;
 class FragmentHandler
 {
     private $debug;
-    private $renderers = array();
+    private $renderers = [];
     private $requestStack;
 
     /**
@@ -70,7 +70,7 @@ class FragmentHandler
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \LogicException           when no master request is being handled
      */
-    public function render($uri, $renderer = 'inline', array $options = array())
+    public function render($uri, $renderer = 'inline', array $options = [])
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;

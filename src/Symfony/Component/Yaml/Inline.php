@@ -285,7 +285,7 @@ class Inline
     {
         // array
         if (($value || Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE & $flags) && !self::isHash($value)) {
-            $output = array();
+            $output = [];
             foreach ($value as $val) {
                 $output[] = self::dump($val, $flags);
             }
@@ -294,7 +294,7 @@ class Inline
         }
 
         // hash
-        $output = array();
+        $output = [];
         foreach ($value as $key => $val) {
             $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
@@ -437,8 +437,8 @@ class Inline
                     $value = self::parseMapping($sequence, $flags, $i, $references);
                     break;
                 default:
-                    $isQuoted = \in_array($sequence[$i], array('"', "'"));
-                    $value = self::parseScalar($sequence, $flags, array(',', ']'), $i, null === $tag, $references);
+                    $isQuoted = \in_array($sequence[$i], ['"', "'"]);
+                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
@@ -578,7 +578,7 @@ class Inline
                         }
                         break;
                     default:
-                        $value = self::parseScalar($mapping, $flags, array(',', '}'), $i, null === $tag, $references);
+                        $value = self::parseScalar($mapping, $flags, [',', '}'], $i, null === $tag, $references);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.

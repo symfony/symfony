@@ -75,7 +75,7 @@ class MongoDbSessionHandlerTest extends TestCase
      */
     public function testConstructorShouldThrowExceptionForMissingOptions()
     {
-        new MongoDbSessionHandler($this->mongo, array());
+        new MongoDbSessionHandler($this->mongo, []);
     }
 
     public function testOpenMethodAlwaysReturnTrue()
@@ -239,7 +239,7 @@ class MongoDbSessionHandlerTest extends TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $data = array();
+        $data = [];
 
         $methodName = phpversion('mongodb') ? 'updateOne' : 'update';
 

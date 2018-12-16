@@ -169,33 +169,33 @@ class RedirectControllerTest extends TestCase
 
     public function urlRedirectProvider()
     {
-        return array(
+        return [
             // Standard ports
-            array('http',  null, null,  'http',  80,   ''),
-            array('http',  80,   null,  'http',  80,   ''),
-            array('https', null, null,  'http',  80,   ''),
-            array('https', 80,   null,  'http',  80,   ''),
+            ['http',  null, null,  'http',  80,   ''],
+            ['http',  80,   null,  'http',  80,   ''],
+            ['https', null, null,  'http',  80,   ''],
+            ['https', 80,   null,  'http',  80,   ''],
 
-            array('http',  null,  null, 'https', 443,  ''),
-            array('http',  null,  443,  'https', 443,  ''),
-            array('https', null,  null, 'https', 443,  ''),
-            array('https', null,  443,  'https', 443,  ''),
+            ['http',  null,  null, 'https', 443,  ''],
+            ['http',  null,  443,  'https', 443,  ''],
+            ['https', null,  null, 'https', 443,  ''],
+            ['https', null,  443,  'https', 443,  ''],
 
             // Non-standard ports
-            array('http',  null,  null, 'http',  8080, ':8080'),
-            array('http',  4080,  null, 'http',  8080, ':4080'),
-            array('http',  80,    null, 'http',  8080, ''),
-            array('https', null,  null, 'http',  8080, ''),
-            array('https', null,  8443, 'http',  8080, ':8443'),
-            array('https', null,  443,  'http',  8080, ''),
+            ['http',  null,  null, 'http',  8080, ':8080'],
+            ['http',  4080,  null, 'http',  8080, ':4080'],
+            ['http',  80,    null, 'http',  8080, ''],
+            ['https', null,  null, 'http',  8080, ''],
+            ['https', null,  8443, 'http',  8080, ':8443'],
+            ['https', null,  443,  'http',  8080, ''],
 
-            array('https', null,  null, 'https', 8443, ':8443'),
-            array('https', null,  4443, 'https', 8443, ':4443'),
-            array('https', null,  443,  'https', 8443, ''),
-            array('http',  null,  null, 'https', 8443, ''),
-            array('http',  8080,  4443, 'https', 8443, ':8080'),
-            array('http',  80,    4443, 'https', 8443, ''),
-        );
+            ['https', null,  null, 'https', 8443, ':8443'],
+            ['https', null,  4443, 'https', 8443, ':4443'],
+            ['https', null,  443,  'https', 8443, ''],
+            ['http',  null,  null, 'https', 8443, ''],
+            ['http',  8080,  4443, 'https', 8443, ':8080'],
+            ['http',  80,    4443, 'https', 8443, ''],
+        ];
     }
 
     /**

@@ -158,7 +158,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     public function getCalledListeners()
     {
-        $called = array();
+        $called = [];
         foreach ($this->called as $eventName => $listeners) {
             foreach ($listeners as $listener) {
                 $called[$eventName.'.'.$listener->getPretty()] = $listener->getInfo($eventName);
@@ -177,14 +177,14 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $allListeners = $this->getListeners();
         } catch (\Exception $e) {
             if (null !== $this->logger) {
-                $this->logger->info('An exception was thrown while getting the uncalled listeners.', array('exception' => $e));
+                $this->logger->info('An exception was thrown while getting the uncalled listeners.', ['exception' => $e]);
             }
 
             // unable to retrieve the uncalled listeners
-            return array();
+            return [];
         }
 
-        $notCalled = array();
+        $notCalled = [];
         foreach ($allListeners as $eventName => $listeners) {
             foreach ($listeners as $listener) {
                 $called = false;
@@ -275,7 +275,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $this->dispatcher->addListener($eventName, $listener->getWrappedListener(), $priority);
 
             if (null !== $this->logger) {
-                $context = array('event' => $eventName, 'listener' => $listener->getPretty());
+                $context = ['event' => $eventName, 'listener' => $listener->getPretty()];
             }
 
             if ($listener->wasCalled()) {

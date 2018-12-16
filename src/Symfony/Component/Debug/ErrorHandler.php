@@ -48,7 +48,7 @@ use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
  */
 class ErrorHandler
 {
-    private $levels = array(
+    private $levels = [
         E_DEPRECATED => 'Deprecated',
         E_USER_DEPRECATED => 'User Deprecated',
         E_NOTICE => 'Notice',
@@ -64,25 +64,25 @@ class ErrorHandler
         E_PARSE => 'Parse Error',
         E_ERROR => 'Error',
         E_CORE_ERROR => 'Core Error',
-    );
+    ];
 
-    private $loggers = array(
-        E_DEPRECATED => array(null, LogLevel::INFO),
-        E_USER_DEPRECATED => array(null, LogLevel::INFO),
-        E_NOTICE => array(null, LogLevel::WARNING),
-        E_USER_NOTICE => array(null, LogLevel::WARNING),
-        E_STRICT => array(null, LogLevel::WARNING),
-        E_WARNING => array(null, LogLevel::WARNING),
-        E_USER_WARNING => array(null, LogLevel::WARNING),
-        E_COMPILE_WARNING => array(null, LogLevel::WARNING),
-        E_CORE_WARNING => array(null, LogLevel::WARNING),
-        E_USER_ERROR => array(null, LogLevel::CRITICAL),
-        E_RECOVERABLE_ERROR => array(null, LogLevel::CRITICAL),
-        E_COMPILE_ERROR => array(null, LogLevel::CRITICAL),
-        E_PARSE => array(null, LogLevel::CRITICAL),
-        E_ERROR => array(null, LogLevel::CRITICAL),
-        E_CORE_ERROR => array(null, LogLevel::CRITICAL),
-    );
+    private $loggers = [
+        E_DEPRECATED => [null, LogLevel::INFO],
+        E_USER_DEPRECATED => [null, LogLevel::INFO],
+        E_NOTICE => [null, LogLevel::WARNING],
+        E_USER_NOTICE => [null, LogLevel::WARNING],
+        E_STRICT => [null, LogLevel::WARNING],
+        E_WARNING => [null, LogLevel::WARNING],
+        E_USER_WARNING => [null, LogLevel::WARNING],
+        E_COMPILE_WARNING => [null, LogLevel::WARNING],
+        E_CORE_WARNING => [null, LogLevel::WARNING],
+        E_USER_ERROR => [null, LogLevel::CRITICAL],
+        E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
+        E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
+        E_PARSE => [null, LogLevel::CRITICAL],
+        E_ERROR => [null, LogLevel::CRITICAL],
+        E_CORE_ERROR => [null, LogLevel::CRITICAL],
+    ];
 
     private $thrownErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
     private $scopedErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
@@ -123,10 +123,10 @@ class ErrorHandler
             $handler = new static();
         }
 
-        if (null === $prev = set_error_handler(array($handler, 'handleError'))) {
+        if (null === $prev = set_error_handler([$handler, 'handleError'])) {
             restore_error_handler();
             // Specifying the error types earlier would expose us to https://bugs.php.net/63206
-            set_error_handler(array($handler, 'handleError'), $handler->thrownErrors | $handler->loggedErrors);
+            set_error_handler([$handler, 'handleError'], $handler->thrownErrors | $handler->loggedErrors);
             $handler->isRoot = true;
         }
 
@@ -140,12 +140,12 @@ class ErrorHandler
         } else {
             $handlerIsRegistered = true;
         }
-        if (\is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] instanceof self) {
+        if (\is_array($prev = set_exception_handler([$handler, 'handleException'])) && $prev[0] instanceof self) {
             restore_exception_handler();
             if (!$handlerIsRegistered) {
                 $handler = $prev[0];
             } elseif ($handler !== $prev[0] && $replace) {
-                set_exception_handler(array($handler, 'handleException'));
+                set_exception_handler([$handler, 'handleException']);
                 $p = $prev[0]->setExceptionHandler(null);
                 $handler->setExceptionHandler($p);
                 $prev[0]->setExceptionHandler($p);
@@ -178,12 +178,12 @@ class ErrorHandler
      */
     public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, $replace = false)
     {
-        $loggers = array();
+        $loggers = [];
 
         if (\is_array($levels)) {
             foreach ($levels as $type => $logLevel) {
                 if (empty($this->loggers[$type][0]) || $replace || $this->loggers[$type][0] === $this->bootstrappingLogger) {
-                    $loggers[$type] = array($logger, $logLevel);
+                    $loggers[$type] = [$logger, $logLevel];
                 }
             }
         } else {
@@ -214,14 +214,14 @@ class ErrorHandler
     {
         $prevLogged = $this->loggedErrors;
         $prev = $this->loggers;
-        $flush = array();
+        $flush = [];
 
         foreach ($loggers as $type => $log) {
             if (!isset($prev[$type])) {
                 throw new \InvalidArgumentException('Unknown error type: '.$type);
             }
             if (!\is_array($log)) {
-                $log = array($log);
+                $log = [$log];
             } elseif (!array_key_exists(0, $log)) {
                 throw new \InvalidArgumentException('No logger provided');
             }
@@ -358,9 +358,9 @@ class ErrorHandler
             if ($handler === $this) {
                 restore_error_handler();
                 if ($this->isRoot) {
-                    set_error_handler(array($this, 'handleError'), $this->thrownErrors | $this->loggedErrors);
+                    set_error_handler([$this, 'handleError'], $this->thrownErrors | $this->loggedErrors);
                 } else {
-                    set_error_handler(array($this, 'handleError'));
+                    set_error_handler([$this, 'handleError']);
                 }
             }
         }
@@ -612,7 +612,7 @@ class ErrorHandler
         }
 
         $handler = self::$reservedMemory = null;
-        $handlers = array();
+        $handlers = [];
         $previousHandler = null;
         $sameHandlerLimit = 10;
 
@@ -643,7 +643,7 @@ class ErrorHandler
             $handler[0]->setExceptionHandler($h);
         }
         $handler = $handler[0];
-        $handlers = array();
+        $handlers = [];
 
         if ($exit = null === $error) {
             $error = error_get_last();

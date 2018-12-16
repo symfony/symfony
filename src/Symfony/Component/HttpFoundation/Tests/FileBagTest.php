@@ -28,7 +28,7 @@ class FileBagTest extends TestCase
      */
     public function testFileMustBeAnArrayOrUploadedFile()
     {
-        new FileBag(array('file' => 'foo'));
+        new FileBag(['file' => 'foo']);
     }
 
     public function testShouldConvertsUploadedFiles()

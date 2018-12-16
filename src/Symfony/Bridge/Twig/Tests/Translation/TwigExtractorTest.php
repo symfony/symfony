@@ -105,11 +105,11 @@ class TwigExtractorTest extends TestCase
      */
     public function resourcesWithSyntaxErrorsProvider()
     {
-        return array(
-            array(__DIR__.'/../Fixtures'),
-            array(__DIR__.'/../Fixtures/extractor/syntax_error.twig'),
-            array(new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')),
-        );
+        return [
+            [__DIR__.'/../Fixtures'],
+            [__DIR__.'/../Fixtures/extractor/syntax_error.twig'],
+            [new \SplFileInfo(__DIR__.'/../Fixtures/extractor/syntax_error.twig')],
+        ];
     }
 
     /**
@@ -141,12 +141,12 @@ class TwigExtractorTest extends TestCase
     {
         $directory = __DIR__.'/../Fixtures/extractor/';
 
-        return array(
-            array($directory.'with_translations.html.twig'),
-            array(array($directory.'with_translations.html.twig')),
-            array(array(new \SplFileInfo($directory.'with_translations.html.twig'))),
-            array(new \ArrayObject(array($directory.'with_translations.html.twig'))),
-            array(new \ArrayObject(array(new \SplFileInfo($directory.'with_translations.html.twig')))),
-        );
+        return [
+            [$directory.'with_translations.html.twig'],
+            [[$directory.'with_translations.html.twig']],
+            [[new \SplFileInfo($directory.'with_translations.html.twig')]],
+            [new \ArrayObject([$directory.'with_translations.html.twig'])],
+            [new \ArrayObject([new \SplFileInfo($directory.'with_translations.html.twig')])],
+        ];
     }
 }

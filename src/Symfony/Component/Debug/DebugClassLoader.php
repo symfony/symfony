@@ -95,7 +95,7 @@ class DebugClassLoader
 
         foreach ($functions as $function) {
             if (!\is_array($function) || !$function[0] instanceof self) {
-                $function = array(new static($function), 'loadClass');
+                $function = [new static($function), 'loadClass'];
             }
 
             spl_autoload_register($function);
@@ -212,7 +212,7 @@ class DebugClassLoader
 
     public function checkAnnotations(\ReflectionClass $refl, $class)
     {
-        $deprecations = array();
+        $deprecations = [];
 
         // Don't trigger deprecations for classes in the same vendor
         if (2 > $len = 1 + (\strpos($class, '\\') ?: \strpos($class, '_'))) {
@@ -224,7 +224,7 @@ class DebugClassLoader
 
         // Detect annotations on the class
         if (false !== $doc = $refl->getDocComment()) {
-            foreach (array('final', 'deprecated', 'internal') as $annotation) {
+            foreach (['final', 'deprecated', 'internal'] as $annotation) {
                 if (false !== \strpos($doc, $annotation) && preg_match('#\n \* @'.$annotation.'(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
                     self::${$annotation}[$class] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
                 }
@@ -339,7 +339,7 @@ class DebugClassLoader
         if (0 === substr_compare($real, $tail, -$tailLen, $tailLen, true)
             && 0 !== substr_compare($real, $tail, -$tailLen, $tailLen, false)
         ) {
-            return array(substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1));
+            return [substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)];
         }
     }
 
@@ -369,7 +369,7 @@ class DebugClassLoader
                 $k = $kDir;
                 $i = \strlen($dir) - 1;
                 while (!isset(self::$darwinCache[$k])) {
-                    self::$darwinCache[$k] = array($dir, array());
+                    self::$darwinCache[$k] = [$dir, []];
                     self::$darwinCache[$dir] = &self::$darwinCache[$k];
 
                     while ('/' !== $dir[--$i]) {

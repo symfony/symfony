@@ -20,22 +20,22 @@ class TargetOperationTest extends AbstractOperationTest
     public function testGetMessagesFromSingleDomain()
     {
         $operation = $this->createOperation(
-            new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b'))),
-            new MessageCatalogue('en', array('messages' => array('a' => 'new_a', 'c' => 'new_c')))
+            new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
+            new MessageCatalogue('en', ['messages' => ['a' => 'new_a', 'c' => 'new_c']])
         );
 
         $this->assertEquals(
-            array('a' => 'old_a', 'c' => 'new_c'),
+            ['a' => 'old_a', 'c' => 'new_c'],
             $operation->getMessages('messages')
         );
 
         $this->assertEquals(
-            array('c' => 'new_c'),
+            ['c' => 'new_c'],
             $operation->getNewMessages('messages')
         );
 
         $this->assertEquals(
-            array('b' => 'old_b'),
+            ['b' => 'old_b'],
             $operation->getObsoleteMessages('messages')
         );
     }

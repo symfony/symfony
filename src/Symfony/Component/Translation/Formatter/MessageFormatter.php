@@ -31,7 +31,7 @@ class MessageFormatter implements MessageFormatterInterface, ChoiceMessageFormat
     /**
      * {@inheritdoc}
      */
-    public function format($message, $locale, array $parameters = array())
+    public function format($message, $locale, array $parameters = [])
     {
         return strtr($message, $parameters);
     }

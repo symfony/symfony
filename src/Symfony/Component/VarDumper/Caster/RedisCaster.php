@@ -20,11 +20,11 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class RedisCaster
 {
-    private static $serializer = array(
+    private static $serializer = [
         \Redis::SERIALIZER_NONE => 'NONE',
         \Redis::SERIALIZER_PHP => 'PHP',
         2 => 'IGBINARY', // Optional Redis::SERIALIZER_IGBINARY
-    );
+    ];
 
     public static function castRedis(\Redis $c, array $a, Stub $stub, $isNested)
     {

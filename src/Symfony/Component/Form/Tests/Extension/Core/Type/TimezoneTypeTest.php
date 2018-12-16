@@ -36,9 +36,9 @@ class TimezoneTypeTest extends BaseTypeTest
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'Africa/Kinshasa', $expectedData = 'Africa/Kinshasa')
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
-        ));
+        ]);
         $form->submit(null);
 
         $this->assertSame($emptyData, $form->getViewData());
@@ -48,7 +48,7 @@ class TimezoneTypeTest extends BaseTypeTest
 
     public function testDateTimeZoneInput()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), array('input' => 'datetimezone'));
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), ['input' => 'datetimezone']);
 
         $this->assertSame('America/New_York', $form->createView()->vars['value']);
 

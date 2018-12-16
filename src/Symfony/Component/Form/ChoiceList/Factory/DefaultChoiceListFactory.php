@@ -47,8 +47,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
-        $preferredViews = array();
-        $otherViews = array();
+        $preferredViews = [];
+        $otherViews = [];
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
@@ -157,8 +157,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add the contents of groups to new ChoiceGroupView instances
             if (\is_array($value)) {
-                $preferredViewsForGroup = array();
-                $otherViewsForGroup = array();
+                $preferredViewsForGroup = [];
+                $otherViewsForGroup = [];
 
                 self::addChoiceViewsGroupedBy(
                     $value,

@@ -4,26 +4,26 @@ $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
     'csrf_protection' => true,
-    'form' => array(
-        'csrf_protection' => array(
+    'form' => [
+        'csrf_protection' => [
             'field_name' => '_csrf',
-        ),
-    ),
+        ],
+    ],
     'http_method_override' => false,
-    'esi' => array(
+    'esi' => [
         'enabled' => true,
-    ),
-    'ssi' => array(
+    ],
+    'ssi' => [
         'enabled' => true,
-    ),
-    'profiler' => array(
+    ],
+    'profiler' => [
         'only_exceptions' => true,
         'enabled' => false,
-    ),
-    'router' => array(
+    ],
+    'router' => [
         'resource' => '%kernel.project_dir%/config/routing.xml',
         'type' => 'xml',
-    ),
+    ],
     'session' => array(
         'storage_id' => 'session.storage.native',
         'handler_id' => 'session.handler.native_file',

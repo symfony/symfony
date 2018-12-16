@@ -81,7 +81,7 @@ class FormType extends BaseType
         }
 
         $formConfig = $form->getConfig();
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
@@ -93,7 +93,7 @@ class FormType extends BaseType
             'method' => $formConfig->getMethod(),
             'action' => $formConfig->getAction(),
             'submitted' => $form->isSubmitted(),
-        ));
+        ]);
     }
 
     /**
@@ -136,7 +136,7 @@ class FormType extends BaseType
             }
 
             return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? array() : '';
+                return $form->getConfig()->getCompound() ? [] : '';
             };
         };
 
@@ -155,9 +155,9 @@ class FormType extends BaseType
 
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setDefined(array(
+        $resolver->setDefined([
             'data',
-        ));
+        ]);
 
         $resolver->setDefaults(array(
             'data_class' => $dataClass,

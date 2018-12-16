@@ -29,7 +29,7 @@ class SerializerTest extends WebTestCase
         $bar2->id = 2;
 
         $expected = new Foo();
-        $expected->bars = array($bar1, $bar2);
+        $expected->bars = [$bar1, $bar2];
 
         $this->assertEquals($expected, $result);
     }

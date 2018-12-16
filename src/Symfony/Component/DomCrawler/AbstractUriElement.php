@@ -144,7 +144,7 @@ abstract class AbstractUriElement
             $path .= '/';
         }
 
-        $output = array();
+        $output = [];
 
         foreach (explode('/', $path) as $segment) {
             if ('..' === $segment) {

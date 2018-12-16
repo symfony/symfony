@@ -26,11 +26,11 @@ class LocaleTest extends AbstractLocaleTest
      */
     public function testComposeLocale()
     {
-        $subtags = array(
+        $subtags = [
             'language' => 'pt',
             'script' => 'Latn',
             'region' => 'BR',
-        );
+        ];
         $this->call('composeLocale', $subtags);
     }
 
@@ -127,10 +127,10 @@ class LocaleTest extends AbstractLocaleTest
      */
     public function testLookup()
     {
-        $langtag = array(
+        $langtag = [
             'pt-Latn-BR',
             'pt-BR',
-        );
+        ];
         $this->call('lookup', $langtag, 'pt-BR-x-priv1');
     }
 

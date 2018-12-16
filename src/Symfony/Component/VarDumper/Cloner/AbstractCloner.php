@@ -213,7 +213,7 @@ abstract class AbstractCloner implements ClonerInterface
      */
     public function cloneVar($var, $filter = 0)
     {
-        $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) {
+        $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) {
             if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
                 // Cloner never dies
                 throw new \ErrorException($msg, 0, $type, $file, $line);
@@ -270,7 +270,7 @@ abstract class AbstractCloner implements ClonerInterface
             list($i, $parents, $hasDebugInfo) = $this->classInfo[$class];
         } else {
             $i = 2;
-            $parents = array(strtolower($class));
+            $parents = [strtolower($class)];
             $hasDebugInfo = method_exists($class, '__debugInfo');
 
             foreach (class_parents($class) as $p) {
@@ -283,7 +283,7 @@ abstract class AbstractCloner implements ClonerInterface
             }
             $parents[] = '*';
 
-            $this->classInfo[$class] = array($i, $parents, $hasDebugInfo);
+            $this->classInfo[$class] = [$i, $parents, $hasDebugInfo];
         }
 
         $a = Caster::castObject($obj, $class, $hasDebugInfo);
@@ -297,7 +297,7 @@ abstract class AbstractCloner implements ClonerInterface
                 }
             }
         } catch (\Exception $e) {
-            $a = array((Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠' => new ThrowingCasterException($e)) + $a;
+            $a = [(Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠' => new ThrowingCasterException($e)] + $a;
         }
 
         return $a;
@@ -313,7 +313,7 @@ abstract class AbstractCloner implements ClonerInterface
      */
     protected function castResource(Stub $stub, $isNested)
     {
-        $a = array();
+        $a = [];
         $res = $stub->value;
         $type = $stub->class;
 
@@ -324,7 +324,7 @@ abstract class AbstractCloner implements ClonerInterface
                 }
             }
         } catch (\Exception $e) {
-            $a = array((Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠' => new ThrowingCasterException($e)) + $a;
+            $a = [(Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠' => new ThrowingCasterException($e)] + $a;
         }
 
         return $a;

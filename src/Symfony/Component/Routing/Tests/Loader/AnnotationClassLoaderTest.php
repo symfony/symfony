@@ -52,15 +52,15 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
     public function provideTestSupportsChecksResource()
     {
-        return array(
-            array('class', true),
-            array('\fully\qualified\class\name', true),
-            array('namespaced\class\without\leading\slash', true),
-            array('ÿClassWithLegalSpecialCharacters', true),
-            array('5', false),
-            array('foo.foo', false),
-            array(null, false),
-        );
+        return [
+            ['class', true],
+            ['\fully\qualified\class\name', true],
+            ['namespaced\class\without\leading\slash', true],
+            ['ÿClassWithLegalSpecialCharacters', true],
+            ['5', false],
+            ['foo.foo', false],
+            [null, false],
+        ];
     }
 
     public function testSupportsChecksTypeIfSpecified()

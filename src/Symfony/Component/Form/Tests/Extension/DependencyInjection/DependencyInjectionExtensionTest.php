@@ -117,7 +117,7 @@ class DependencyInjectionExtensionTest extends TestCase
     public function testGetTypeGuesser()
     {
         $container = $this->createContainerMock();
-        $extension = new DependencyInjectionExtension($container, array(), array($this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()));
+        $extension = new DependencyInjectionExtension($container, [], [$this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()]);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }

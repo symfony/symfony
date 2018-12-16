@@ -184,7 +184,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : array()));
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -270,9 +270,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return null;
         }
 
-        return Request::create($this->context->getScheme().'://'.$this->context->getHost().$this->context->getBaseUrl().$pathinfo, $this->context->getMethod(), $this->context->getParameters(), array(), array(), array(
+        return Request::create($this->context->getScheme().'://'.$this->context->getHost().$this->context->getBaseUrl().$pathinfo, $this->context->getMethod(), $this->context->getParameters(), [], [], [
             'SCRIPT_FILENAME' => $this->context->getBaseUrl(),
             'SCRIPT_NAME' => $this->context->getBaseUrl(),
-        ));
+        ]);
     }
 }

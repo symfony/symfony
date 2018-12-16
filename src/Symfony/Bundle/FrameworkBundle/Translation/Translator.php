@@ -28,11 +28,11 @@ class Translator extends BaseTranslator implements WarmableInterface
     protected $container;
     protected $loaderIds;
 
-    protected $options = array(
+    protected $options = [
         'cache_dir' => null,
         'debug' => false,
-        'resource_files' => array(),
-    );
+        'resource_files' => [],
+    ];
 
     /**
      * @var array
@@ -45,7 +45,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @var array
      */
-    private $resources = array();
+    private $resources = [];
 
     /**
      * Constructor.
@@ -103,7 +103,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             return;
         }
 
-        $locales = array_merge($this->getFallbackLocales(), array($this->getLocale()), $this->resourceLocales);
+        $locales = array_merge($this->getFallbackLocales(), [$this->getLocale()], $this->resourceLocales);
         foreach (array_unique($locales) as $locale) {
             // reset catalogue in case it's already loaded during the dump of the other locales.
             if (isset($this->catalogues[$locale])) {

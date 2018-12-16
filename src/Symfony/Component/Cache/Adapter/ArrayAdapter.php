@@ -78,7 +78,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
             CacheItem::validateKey($key);

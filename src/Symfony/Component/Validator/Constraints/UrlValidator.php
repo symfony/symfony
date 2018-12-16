@@ -93,7 +93,7 @@ class UrlValidator extends ConstraintValidator
                 Url::CHECK_DNS_TYPE_SRV,
                 Url::CHECK_DNS_TYPE_TXT,
             ), true)) {
-                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), array('checkDNS'));
+                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), ['checkDNS']);
             }
 
             $host = parse_url($value, PHP_URL_HOST);

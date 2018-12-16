@@ -52,7 +52,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     {
         $formatter = $this->getDefaultDateFormatter();
 
-        $localtime = array(
+        $localtime = [
             'tm_sec' => 59,
             'tm_min' => 3,
             'tm_hour' => 15,
@@ -62,7 +62,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
             'tm_wday' => 0,
             'tm_yday' => 105,
             'tm_isdst' => 0,
-        );
+        ];
 
         try {
             $formatter->format($localtime);
@@ -89,7 +89,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     public function testFormatWithNonIntegerTimestamp()
     {
         $formatter = $this->getDefaultDateFormatter();
-        $formatter->format(array());
+        $formatter->format([]);
     }
 
     public function testGetErrorCode()

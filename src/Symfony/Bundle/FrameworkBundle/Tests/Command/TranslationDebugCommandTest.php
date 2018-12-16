@@ -25,24 +25,24 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugMissingMessages()
     {
-        $tester = $this->createCommandTester(array('foo' => 'foo'));
-        $tester->execute(array('locale' => 'en', 'bundle' => 'foo'));
+        $tester = $this->createCommandTester(['foo' => 'foo']);
+        $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
     }
 
     public function testDebugUnusedMessages()
     {
-        $tester = $this->createCommandTester(array(), array('foo' => 'foo'));
-        $tester->execute(array('locale' => 'en', 'bundle' => 'foo'));
+        $tester = $this->createCommandTester([], ['foo' => 'foo']);
+        $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
 
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
     public function testDebugFallbackMessages()
     {
-        $tester = $this->createCommandTester(array(), array('foo' => 'foo'));
-        $tester->execute(array('locale' => 'fr', 'bundle' => 'foo'));
+        $tester = $this->createCommandTester([], ['foo' => 'foo']);
+        $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
 
         $this->assertRegExp('/fallback/', $tester->getDisplay());
     }
@@ -50,15 +50,15 @@ class TranslationDebugCommandTest extends TestCase
     public function testNoDefinedMessages()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('locale' => 'fr', 'bundle' => 'test'));
+        $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
 
         $this->assertRegExp('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
     }
 
     public function testDebugDefaultDirectory()
     {
-        $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'));
-        $tester->execute(array('locale' => 'en'));
+        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
+        $tester->execute(['locale' => 'en']);
 
         $this->assertRegExp('/missing/', $tester->getDisplay());
         $this->assertRegExp('/unused/', $tester->getDisplay());
@@ -105,8 +105,8 @@ class TranslationDebugCommandTest extends TestCase
             ->with($this->equalTo('dir'))
             ->will($this->throwException(new \InvalidArgumentException()));
 
-        $tester = $this->createCommandTester(array(), array(), $kernel);
-        $tester->execute(array('locale' => 'en', 'bundle' => 'dir'));
+        $tester = $this->createCommandTester([], [], $kernel);
+        $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
     protected function setUp()
@@ -127,7 +127,7 @@ class TranslationDebugCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), $kernel = null)
+    private function createCommandTester($extractedMessages = [], $loadedMessages = [], $kernel = null)
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -136,7 +136,7 @@ class TranslationDebugCommandTest extends TestCase
         $translator
             ->expects($this->any())
             ->method('getFallbackLocales')
-            ->will($this->returnValue(array('en')));
+            ->will($this->returnValue(['en']));
 
         $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
         $extractor
@@ -159,15 +159,15 @@ class TranslationDebugCommandTest extends TestCase
             );
 
         if (null === $kernel) {
-            $returnValues = array(
-                array('foo', $this->getBundle($this->translationDir)),
-                array('test', $this->getBundle('test')),
-            );
+            $returnValues = [
+                ['foo', $this->getBundle($this->translationDir)],
+                ['test', $this->getBundle('test')],
+            ];
             if (HttpKernel\Kernel::VERSION_ID < 40000) {
-                $returnValues = array(
-                    array('foo', true, $this->getBundle($this->translationDir)),
-                    array('test', true, $this->getBundle('test')),
-                );
+                $returnValues = [
+                    ['foo', true, $this->getBundle($this->translationDir)],
+                    ['test', true, $this->getBundle('test')],
+                ];
             }
             $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
             $kernel

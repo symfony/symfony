@@ -33,7 +33,7 @@ class FlattenException
     private $file;
     private $line;
 
-    public static function create(\Exception $exception, $statusCode = null, array $headers = array())
+    public static function create(\Exception $exception, $statusCode = null, array $headers = [])
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -70,13 +70,13 @@ class FlattenException
 
     public function toArray()
     {
-        $exceptions = array();
-        foreach (array_merge(array($this), $this->getAllPrevious()) as $exception) {
-            $exceptions[] = array(
+        $exceptions = [];
+        foreach (array_merge([$this], $this->getAllPrevious()) as $exception) {
+            $exceptions[] = [
                 'message' => $exception->getMessage(),
                 'class' => $exception->getClass(),
                 'trace' => $exception->getTrace(),
-            );
+            ];
         }
 
         return $exceptions;
@@ -164,7 +164,7 @@ class FlattenException
 
     public function getAllPrevious()
     {
-        $exceptions = array();
+        $exceptions = [];
         $e = $this;
         while ($e = $e->getPrevious()) {
             $exceptions[] = $e;
@@ -185,8 +185,8 @@ class FlattenException
 
     public function setTrace($trace, $file, $line)
     {
-        $this->trace = array();
-        $this->trace[] = array(
+        $this->trace = [];
+        $this->trace[] = [
             'namespace' => '',
             'short_class' => '',
             'class' => '',
@@ -194,8 +194,8 @@ class FlattenException
             'function' => '',
             'file' => $file,
             'line' => $line,
-            'args' => array(),
-        );
+            'args' => [],
+        ];
         foreach ($trace as $entry) {
             $class = '';
             $namespace = '';

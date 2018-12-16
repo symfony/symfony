@@ -55,7 +55,7 @@ EODUMP;
 
         $stub = new Stub();
         $date = new \DateTime($time, new \DateTimeZone($timezone));
-        $cast = DateCaster::castDateTime($date, array('foo' => 'bar'), $stub, false, 0);
+        $cast = DateCaster::castDateTime($date, ['foo' => 'bar'], $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -83,18 +83,18 @@ EODUMP;
 
     public function provideDateTimes()
     {
-        return array(
-            array('2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'),
-            array('2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'),
-            array('2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'),
+        return [
+            ['2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'],
+            ['2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'],
+            ['2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'],
 
-            array('2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-        );
+            ['2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+        ];
     }
 
     /**
@@ -149,7 +149,7 @@ EODUMP;
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
 
-        $cast = DateCaster::castInterval($interval, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+        $cast = DateCaster::castInterval($interval, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -267,7 +267,7 @@ EODUMP;
         $timezone = new \DateTimeZone($timezone);
         $stub = new Stub();
 
-        $cast = DateCaster::castTimeZone($timezone, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+        $cast = DateCaster::castTimeZone($timezone, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -297,27 +297,27 @@ EODUMP;
     {
         $xRegion = \extension_loaded('intl') ? '%s' : '';
 
-        return array(
+        return [
             // type 1 (UTC offset)
-            array('-12:00', '-12:00', ''),
-            array('+00:00', '+00:00', ''),
-            array('+14:00', '+14:00', ''),
+            ['-12:00', '-12:00', ''],
+            ['+00:00', '+00:00', ''],
+            ['+14:00', '+14:00', ''],
 
             // type 2 (timezone abbreviation)
-            array('GMT', '+00:00', ''),
-            array('a', '+01:00', ''),
-            array('b', '+02:00', ''),
-            array('z', '+00:00', ''),
+            ['GMT', '+00:00', ''],
+            ['a', '+01:00', ''],
+            ['b', '+02:00', ''],
+            ['z', '+00:00', ''],
 
             // type 3 (timezone identifier)
-            array('Africa/Tunis', 'Africa/Tunis (%s:00)', $xRegion),
-            array('America/Panama', 'America/Panama (%s:00)', $xRegion),
-            array('Asia/Jerusalem', 'Asia/Jerusalem (%s:00)', $xRegion),
-            array('Atlantic/Canary', 'Atlantic/Canary (%s:00)', $xRegion),
-            array('Australia/Perth', 'Australia/Perth (%s:00)', $xRegion),
-            array('Europe/Zurich', 'Europe/Zurich (%s:00)', $xRegion),
-            array('Pacific/Tahiti', 'Pacific/Tahiti (%s:00)', $xRegion),
-        );
+            ['Africa/Tunis', 'Africa/Tunis (%s:00)', $xRegion],
+            ['America/Panama', 'America/Panama (%s:00)', $xRegion],
+            ['Asia/Jerusalem', 'Asia/Jerusalem (%s:00)', $xRegion],
+            ['Atlantic/Canary', 'Atlantic/Canary (%s:00)', $xRegion],
+            ['Australia/Perth', 'Australia/Perth (%s:00)', $xRegion],
+            ['Europe/Zurich', 'Europe/Zurich (%s:00)', $xRegion],
+            ['Pacific/Tahiti', 'Pacific/Tahiti (%s:00)', $xRegion],
+        ];
     }
 
     /**
@@ -352,7 +352,7 @@ EODUMP;
         $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
 
-        $cast = DateCaster::castPeriod($p, array(), $stub, false, 0);
+        $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [

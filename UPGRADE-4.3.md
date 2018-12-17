@@ -145,8 +145,17 @@ Security
    }
    ```
 
+ * Using `Argon2iPasswordEncoder` while only the `argon2id` algorithm is supported
+   is deprecated, use `Argon2idPasswordEncoder` instead
+
+SecurityBundle
+--------------
+
+ * Configuring encoders using `argon2i` as algorithm while only `argon2id` is
+   supported is deprecated, use `argon2id` instead
+
 TwigBridge
-==========
+----------
 
  * deprecated the `$requestStack` and `$requestContext` arguments of the 
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`

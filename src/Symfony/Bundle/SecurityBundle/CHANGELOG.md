@@ -8,6 +8,9 @@ CHANGELOG
    option is deprecated and will be disabled in Symfony 5.0. This affects to cookies
    with dashes in their names. For example, starting from Symfony 5.0, the `my-cookie`
    name will delete `my-cookie` (with a dash) instead of `my_cookie` (with an underscore).
+ * Deprecated configuring encoders using `argon2i` as algorithm while only `argon2id` is supported,
+   use `argon2id` instead
+ 
 
 4.2.0
 -----

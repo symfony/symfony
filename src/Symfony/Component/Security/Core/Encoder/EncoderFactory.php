@@ -117,6 +117,15 @@ class EncoderFactory implements EncoderFactoryInterface
                         $config['threads'],
                     ],
                 ];
+            case 'argon2id':
+                return [
+                    'class' => Argon2idPasswordEncoder::class,
+                    'arguments' => [
+                        $config['memory_cost'],
+                        $config['time_cost'],
+                        $config['threads'],
+                    ],
+                ];
         }
 
         return [

@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
@@ -313,7 +314,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     public function testEncodersWithLibsodium()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
+        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
 
@@ -359,6 +360,59 @@ abstract class CompleteConfigurationTest extends TestCase
             ],
             'JMS\FooBundle\Entity\User7' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+                'arguments' => [256, 1, 2],
+            ],
+        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
+    }
+
+    public function testEncodersWithArgon2id()
+    {
+        if (!Argon2idPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
+
+        $container = $this->getContainer('argon2id_encoder');
+
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ],
+            'JMS\FooBundle\Entity\User3' => [
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ],
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
+                'arguments' => [15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder',
                 'arguments' => [256, 1, 2],
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());

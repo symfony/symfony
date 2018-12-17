@@ -12,35 +12,30 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder;
 
-/**
- * @author Zan Baldwin <hello@zanbaldwin.com>
- */
-class Argon2iPasswordEncoderTest extends TestCase
+class Argon2idPasswordEncoderTest extends TestCase
 {
-    const PASSWORD = 'password';
-
     protected function setUp()
     {
-        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+        if (!Argon2idPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
     }
 
     public function testValidationWithConfig()
     {
-        $encoder = new Argon2iPasswordEncoder(8, 4, 1);
-        $result = $encoder->encodePassword(self::PASSWORD, null);
-        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, null));
+        $encoder = new Argon2idPasswordEncoder(8, 4, 1);
+        $result = $encoder->encodePassword('password', null);
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
     }
 
     public function testValidation()
     {
-        $encoder = new Argon2iPasswordEncoder();
-        $result = $encoder->encodePassword(self::PASSWORD, null);
-        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, null));
+        $encoder = new Argon2idPasswordEncoder();
+        $result = $encoder->encodePassword('password', null);
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', null));
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
     }
 
@@ -49,13 +44,13 @@ class Argon2iPasswordEncoderTest extends TestCase
      */
     public function testEncodePasswordLength()
     {
-        $encoder = new Argon2iPasswordEncoder();
+        $encoder = new Argon2idPasswordEncoder();
         $encoder->encodePassword(str_repeat('a', 4097), 'salt');
     }
 
     public function testCheckPasswordLength()
     {
-        $encoder = new Argon2iPasswordEncoder();
+        $encoder = new Argon2idPasswordEncoder();
         $result = $encoder->encodePassword(str_repeat('a', 4096), null);
         $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 4097), null));
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 4096), null));
@@ -63,8 +58,8 @@ class Argon2iPasswordEncoderTest extends TestCase
 
     public function testUserProvidedSaltIsNotUsed()
     {
-        $encoder = new Argon2iPasswordEncoder();
-        $result = $encoder->encodePassword(self::PASSWORD, 'salt');
-        $this->assertTrue($encoder->isPasswordValid($result, self::PASSWORD, 'anotherSalt'));
+        $encoder = new Argon2idPasswordEncoder();
+        $result = $encoder->encodePassword('password', 'salt');
+        $this->assertTrue($encoder->isPasswordValid($result, 'password', 'anotherSalt'));
     }
 }

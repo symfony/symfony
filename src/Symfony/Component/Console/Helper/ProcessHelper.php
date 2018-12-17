@@ -39,10 +39,7 @@ class ProcessHelper extends Helper
      */
     public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
-        if ($output instanceof ConsoleOutputInterface) {
-            $output = $output->getErrorOutput();
-        }
-
+        /** @var DebugFormatterHelper $formatter */
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         if ($cmd instanceof Process) {
@@ -80,6 +77,7 @@ class ProcessHelper extends Helper
         }
 
         if (!$process->isSuccessful() && null !== $error) {
+            $output = $this->getOutputForType(true, $output);
             $output->writeln(sprintf('<error>%s</error>', $this->escapeString($error)));
         }
 
@@ -126,14 +124,13 @@ class ProcessHelper extends Helper
      */
     public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null)
     {
-        if ($output instanceof ConsoleOutputInterface) {
-            $output = $output->getErrorOutput();
-        }
-
+        /** @var DebugFormatterHelper $formatter */
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
-            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
+            $isError = Process::ERR === $type;
+            $output = $this->getOutputForType($isError, $output);
+            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), $isError));
 
             if (null !== $callback) {
                 $callback($type, $buffer);
@@ -152,5 +149,18 @@ class ProcessHelper extends Helper
     public function getName()
     {
         return 'process';
+    }
+
+    private function getOutputForType(bool $isError, OutputInterface $output): OutputInterface
+    {
+        if (!$output instanceof ConsoleOutputInterface) {
+            return $output;
+        }
+
+        if ($isError) {
+            return $output->getErrorOutput();
+        }
+
+        return $output;
     }
 }

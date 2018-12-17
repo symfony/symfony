@@ -392,6 +392,8 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->text() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->text('my value'));
     }
 
     public function testHtml()
@@ -405,6 +407,8 @@ EOF
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->html() throws an \InvalidArgumentException if the node list is empty');
         }
+
+        $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->html('my value'));
     }
 
     public function testExtract()

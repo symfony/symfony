@@ -141,7 +141,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         if ('/' !== $pathinfo && $trimmedPathinfo === $pathinfo) {
                             goto not_baz4;
                         }
-                        if ('/' !== $pathinfo && preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        if ('/' !== $pathinfo && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         }
 
@@ -154,7 +154,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         if ('/' !== $pathinfo && $trimmedPathinfo === $pathinfo) {
                             goto not_baz5;
                         }
-                        if ('/' !== $pathinfo && preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        if ('/' !== $pathinfo && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         }
 
@@ -171,7 +171,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         if ('/' !== $pathinfo && $trimmedPathinfo === $pathinfo) {
                             goto not_bazbaz6;
                         }
-                        if ('/' !== $pathinfo && preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        if ('/' !== $pathinfo && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         }
 
@@ -189,7 +189,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         // foo1
                         if ($trimmedPathinfo === $pathinfo) {
                             // no-op
-                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         } elseif ('/' !== $pathinfo) {
                             goto not_foo1;
@@ -211,7 +211,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         // foo2
                         if ($trimmedPathinfo === $pathinfo) {
                             // no-op
-                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         } elseif ('/' !== $pathinfo) {
                             goto not_foo2;
@@ -227,7 +227,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         // foo3
                         if ($trimmedPathinfo === $pathinfo) {
                             // no-op
-                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         } elseif ('/' !== $pathinfo) {
                             goto not_foo3;
@@ -264,7 +264,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                         if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                             // no-op
-                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         } else {
                             $hasTrailingSlash = true;

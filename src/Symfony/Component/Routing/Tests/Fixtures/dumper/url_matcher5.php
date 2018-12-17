@@ -126,7 +126,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                         if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                             // no-op
-                        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                             $matches = $n;
                         } else {
                             $hasTrailingSlash = true;

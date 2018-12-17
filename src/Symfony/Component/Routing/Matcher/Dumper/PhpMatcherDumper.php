@@ -578,7 +578,7 @@ EOF
 
             if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                 // no-op
-            } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+            } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
                 $matches = $n;
             } else {
                 $hasTrailingSlash = true;
@@ -662,7 +662,7 @@ EOF
         if ('/' !== $pathinfo && $trimmedPathinfo === $pathinfo) {%s
             goto %s;
         }
-        if ('/' !== $pathinfo && preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+        if ('/' !== $pathinfo && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
             $matches = $n;
         }
 EOF;
@@ -671,7 +671,7 @@ EOF;
         $hasTrailingSlash = false;
         if ($trimmedPathinfo === $pathinfo) {
             // no-op
-        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
             $matches = $n;
         } else {
             $hasTrailingSlash = true;
@@ -687,7 +687,7 @@ EOF;
             $code .= <<<'EOF'
         if ($trimmedPathinfo === $pathinfo) {
             // no-op
-        } elseif (preg_match($regex, $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
             $matches = $n;
         } elseif ('/' !== $pathinfo) {
             goto %2$s;

@@ -738,20 +738,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('someFooBar', $container->getParameter('baz'));
     }
 
-    public function testFallbackEnv()
-    {
-        putenv('DUMMY_FOO=foo');
-
-        $container = new ContainerBuilder();
-        $container->setParameter('foo', '%env(DUMMY_FOO)%');
-        $container->setParameter('bar', 'bar%env(default:foo:DUMMY_BAR)%');
-
-        $container->compile(true);
-        putenv('DUMMY_FOO');
-
-        $this->assertSame('barfoo', $container->getParameter('bar'));
-    }
-
     public function testCastEnv()
     {
         $container = new ContainerBuilder();

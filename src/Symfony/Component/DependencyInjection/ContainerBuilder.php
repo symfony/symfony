@@ -1534,15 +1534,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $value;
         }
 
-        $envPlaceholders = $bag->getEnvPlaceholders();
-        if (isset($envPlaceholders[$name][$value])) {
-            $bag = new ParameterBag($bag->all());
-
-            return $bag->unescapeValue($bag->get("env($name)"));
-        }
-        foreach ($envPlaceholders as $env => $placeholders) {
+        foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
             if (isset($placeholders[$value])) {
-                return $this->getEnv($env);
+                $bag = new ParameterBag($bag->all());
+
+                return $bag->unescapeValue($bag->get("env($name)"));
             }
         }
 

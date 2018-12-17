@@ -15,7 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\ProcessHelper;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Symfony\Component\Process\Process;
 
 class ProcessHelperTest extends TestCase
@@ -47,6 +49,38 @@ class ProcessHelperTest extends TestCase
 
         $helper->run($output, array('php', '-r', 'echo 42;'), null, $callback);
         $this->assertTrue($executed);
+    }
+
+    public function testConsoleOutputUsesStderrForErrors()
+    {
+        $consoleOutput = $this->createMock(ConsoleOutputInterface::class);
+
+        $dummyOutput = new DummyOutput();
+        $consoleOutput->expects($this->once())->method('getErrorOutput')->willReturn($dummyOutput);
+
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
+        $helper->run($consoleOutput, ['php', '-r', 'exit 1;'], 'This did not work.');
+
+        $this->assertEquals($dummyOutput->fetch(), "This did not work.\n");
+    }
+
+    public function testConsoleOutputUsesStdoutForNormalOutput()
+    {
+        $consoleOutput = $this->createMock(ConsoleOutputInterface::class);
+
+        $consoleOutput->expects($this->never())->method('getErrorOutput');
+        $consoleOutput->method('getVerbosity')->willReturn(ConsoleOutputInterface::VERBOSITY_DEBUG);
+        $consoleOutput->method('isDebug')->willReturn(true);
+        $consoleOutput->expects($this->exactly(3))->method('write')
+            ->withConsecutive(
+                [$this->anything()],
+                ['<bg=black> </><bg=green;fg=white> OUT </> 42']
+            );
+
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
+        $helper->run($consoleOutput, ['php', '-r', 'echo 42;']);
     }
 
     public function provideCommandsAndOutput()

@@ -255,7 +255,7 @@ class OutputFormatterTest extends TestCase
             array('<comment>some comment</comment>', 'some comment', "\033[33msome comment\033[39m"),
             array('<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"),
             array('<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"),
-            array('<href=idea://open/?file=/path/somefile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/somefile.php&line=12\033\\some URL\033]8;;\033\\"),
+            array('<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"),
         );
     }
 

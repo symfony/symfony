@@ -209,7 +209,7 @@ EOF;
         foreach ($staticRoutes as $url => $routes) {
             $code .= self::export($url)." => array(\n";
             foreach ($routes as $name => list($route, $hasTrailingSlash)) {
-                $code .= $this->compileRoute($route, $name, !$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null, $hasTrailingSlash, $conditions);
+                $code .= $this->compileRoute($route, $name, !$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null, $hasTrailingSlash, false, $conditions);
             }
             $code .= "),\n";
         }
@@ -321,8 +321,9 @@ EOF;
                     if ($hasTrailingSlash = '/' !== $regex && '/' === $regex[-1]) {
                         $regex = substr($regex, 0, -1);
                     }
+                    $hasTrailingVar = (bool) preg_match('#\{\w+\}/?$#', $route->getPath());
 
-                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route, $hasTrailingSlash));
+                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route, $hasTrailingSlash, $hasTrailingVar));
                 }
 
                 $code .= $this->compileStaticPrefixCollection($tree, $state, 0, $conditions);
@@ -331,7 +332,7 @@ EOF;
                 $code .= "\n        .')'";
                 $state->regex .= ')';
             }
-            $rx = ")(?:/?)$}{$modifiers}";
+            $rx = ")/?$}{$modifiers}";
             $code .= "\n        .'{$rx}',";
             $state->regex .= $rx;
             $state->markTail = 0;
@@ -377,12 +378,12 @@ EOF;
                 continue;
             }
 
-            list($name, $regex, $vars, $route, $hasTrailingSlash) = $route;
+            list($name, $regex, $vars, $route, $hasTrailingSlash, $hasTrailingVar) = $route;
             $compiledRoute = $route->compile();
             $vars = array_merge($state->hostVars, $vars);
 
             if ($compiledRoute->getRegex() === $prevRegex) {
-                $state->routes = substr_replace($state->routes, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $conditions), -3, 0);
+                $state->routes = substr_replace($state->routes, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $hasTrailingVar, $conditions), -3, 0);
                 continue;
             }
 
@@ -393,7 +394,7 @@ EOF;
             $state->regex .= $rx;
 
             $prevRegex = $compiledRoute->getRegex();
-            $state->routes .= sprintf("%s => array(\n%s),\n", $state->mark, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $conditions));
+            $state->routes .= sprintf("%s => array(\n%s),\n", $state->mark, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $hasTrailingVar, $conditions));
         }
 
         return $code;
@@ -402,7 +403,7 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      */
-    private function compileRoute(Route $route, string $name, $vars, bool $hasTrailingSlash, array &$conditions): string
+    private function compileRoute(Route $route, string $name, $vars, bool $hasTrailingSlash, bool $hasTrailingVar, array &$conditions): string
     {
         $defaults = $route->getDefaults();
 
@@ -419,12 +420,13 @@ EOF;
         }
 
         return sprintf(
-            "    array(%s, %s, %s, %s, %s, %s),\n",
+            "    array(%s, %s, %s, %s, %s, %s, %s),\n",
             self::export(array('_route' => $name) + $defaults),
             self::export($vars),
             self::export(array_flip($route->getMethods()) ?: null),
             self::export(array_flip($route->getSchemes()) ?: null),
             self::export($hasTrailingSlash),
+            self::export($hasTrailingVar),
             $condition
         );
     }

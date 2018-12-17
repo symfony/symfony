@@ -22,12 +22,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         .'|(*:56)'
                     .')'
                 .')'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
         $this->dynamicRoutes = array(
             56 => array(
-                array(array('_route' => 'r1'), array('foo', 'foo'), null, null, false, null),
-                array(array('_route' => 'r2'), array('foo', 'foo'), null, null, false, null),
+                array(array('_route' => 'r1'), array('foo', 'foo'), null, null, false, true, null),
+                array(array('_route' => 'r2'), array('foo', 'foo'), null, null, false, true, null),
             ),
         );
     }

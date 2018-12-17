@@ -170,7 +170,7 @@ class ContextListener implements ListenerInterface
 
             try {
                 $refreshedUser = $provider->refreshUser($user);
-                $newToken = unserialize(serialize($token));
+                $newToken = clone $token;
                 $newToken->setUser($refreshedUser);
 
                 // tokens can be deauthenticated if the user has been changed.

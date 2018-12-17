@@ -182,7 +182,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenTheControllerIsAnObjectWithInvoke()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, new Controller());
+        $kernel = $this->getHttpKernel($dispatcher, new TestController());
 
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
@@ -198,7 +198,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenTheControllerIsAnArray()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, array(new Controller(), 'controller'));
+        $kernel = $this->getHttpKernel($dispatcher, array(new TestController(), 'controller'));
 
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
@@ -206,7 +206,7 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenTheControllerIsAStaticArray()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, array('Symfony\Component\HttpKernel\Tests\Controller', 'staticcontroller'));
+        $kernel = $this->getHttpKernel($dispatcher, array('Symfony\Component\HttpKernel\Tests\TestController', 'staticcontroller'));
 
         $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
     }
@@ -363,7 +363,7 @@ class HttpKernelTest extends TestCase
     }
 }
 
-class Controller
+class TestController
 {
     public function __invoke()
     {

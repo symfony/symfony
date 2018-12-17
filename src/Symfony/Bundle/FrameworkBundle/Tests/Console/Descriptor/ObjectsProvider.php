@@ -221,3 +221,24 @@ class ClassWithoutDocComment
 class ClassWithDocComment
 {
 }
+
+/**
+ * This is the first line of the description.
+ * This is the second line.
+ *
+ * This is the third and shouldn't be shown.
+ *
+ * @annot should not be parsed
+ */
+class ClassWithDocCommentOnMultipleLines
+{
+}
+
+/**
+ *Foo.
+ *
+ * @annot should not be parsed
+ */
+class ClassWithDocCommentWithoutInitialSpace
+{
+}

@@ -1,0 +1,253 @@
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-24T11:26:28Z
+
+I am not sure if the BC is allowed or if we should add an argument to control the behavior and deprecate (but this kinda defeats this change as goal seems to make this more developer friendly)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-24T12:13:33Z
+
+We shouldn't break BC, so a constructor argument to enable this behavior would be needed.
+Then there should be a similar argument to `BrowserKit\Client` so that this could be also enabled there. Before doing so, do we all agree returning `null` is the best for DX and we should move out of the exception?
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-24T13:04:39Z
+
+Here is a better proposal @nicolas-grekas to avoid BC as you suggested (way better), not sure about the new argument name.
+
+Now, for the `BrowserKit`, new PR or two commits same PR ?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-24T14:00:14Z
+
+We still have a bunch of other methods which fail for an empty node list.
+
+And btw, making return types nullable will not save you for doing a check to handle that case. Instead of checking whether the crawler is empty or no, you will have to check whether the value is `null`.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-24T14:01:48Z
+
+and regarding BC, this is still changing the contract of the class. Some code receiving a Crawler as argument will not control this boolean, and so would have to be updated to support the new signature as well. So this approach is still a BC break.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-24T14:15:18Z
+
+@stof looking at the original issue, it could also be empty, let's say an empty string, in this way it keeps the signature.
+Do you have any suggestions? Or do you propose to drop this change?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-24T14:16:30Z
+
+Well, returning the empty string is possible for these 2 methods. But then, we still cannot remove the exception from other methods (the ones returning an object for instance)
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-24T15:27:52Z
+
+A test fails but seems to be a travis problem with composer?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-25T07:49:05Z
+
+> Now, for the BrowserKit, new PR or two commits same PR ?
+
+@respinoza how would you leverage this new argument? Do you create your crawlers manually?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-09-25T09:09:09Z
+
+With `text()` and `html()` methods returning an empty string how can I tell the difference between an empty text and element not found?
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-25T09:14:06Z
+
+@jakzal the `count()` method still return the matches, so `0` for not found.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-25T09:24:27Z
+
+@nicolas-grekas we will have to pass it to the BrowserKit Client constructor and then pass it around in  https://github.com/symfony/browser-kit/blob/68f233bc3a0fb6b64f48ff6318038087b49a1639/Client.php#L516`
+
+Currently there is no way to inject a DomCrawler instance. This can also be solved by improving the DomCrawler/BrowserKit as follows
+
+* Add method to DomCrawler to create a new instance (similar like the current `createSubCrawler`method)
+* Add setter to pass the DomCrawler to the BrowserKit client
+* Get a fresh instance if we set a custom DomCrawler instance or create a new like we do right now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-25T09:30:08Z
+
+> Currently there is no way to inject a DomCrawler instance
+
+so let's allow it via a new constructor arg to BrowserKit's Client?
+should be in the same PR to make it complete (including the DI configuration)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-25T09:31:52Z
+
+> so let's allow it via a new constructor arg to BrowserKit's Client?
+
+hum, looks like a crawler *factory* would be needed, so now I get your proposal.
+I'd still prefer passing this factory as a constructor arg instead of a setter.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-25T09:40:25Z
+
+@nicolas-grekas having a factory will be way better. I will get on that.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-25T10:26:54Z
+
+I'm not sure passing a Crawler factory just to control this setting (which looks transitional) makes sense.
+
+Injecting a Crawler indeed does not make sense, as the Crawler holds some content, so it does not make sense to inject one that the Client would not know what is already in it.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-25T13:07:13Z
+
+@stof the current code in BrowserKit creates a new instance or null if the class doesn't exist. The factory will be called instead, behavior is the same (new instance on method call), we will just show to return a configured instance.
+Sub crawlers are created as usual.
+We won't reuse the crawler.
+I don't see a problem
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-25T14:44:58Z
+
+Well, the question is whether we need to create a concept of factory when the *only* meaningful configuration to be customized by the extension point is this boolean.
+
+Currently, this PR makes that setting a permanent option. It does not deprecate the old behavior. Is it intended ? Variable signatures based on an option are harder to use (as any code not creating the crawler could not rely on whether an exception could be thrown or no for empty crawlers, and so should keep handling the case throwing exceptions too, defeating this PR).
+If this becomes a deprecated API with a migration path, making people replace the whole instantiation of the crawler is too much:
+- it makes the migration harder as they have to duplicate the core logic in 99% of cases
+- it introduces an extension point that we then have to maintain even if we don't need it for the BC layer. We cannot remove it in 5.0 (as we cannot deprecate it in 4.x if using it is mandatory to avoid another deprecation).
+
+Thus, if the goal is to deprecate the old behavior, I think a constructor argument is the wrong way to opt-in for the new behavior: the code needing to deal with the new behavior (and so knowing whether it can opt-in or no) may not be the same than the code instantiating the crawler (and when using BrowserKit, that would mean the code instantiating the client, to configure it to configure the crawler creation...).
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-25T23:44:05Z
+
+I don't believe we want to get rid of the old behavior so there won't be any deprecation.
+
+I agree with your point on the variable signature. We could always have two new methods and get rid of the parameter.
+
+(No idea how to make those methods)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-09-26T16:09:05Z
+
+I really don't like having these two distinct behaviours in one class.
+
+I suggest we at least try to consider other ideas before proceeding this way.
+
+Some (imperfect) ideas below.
+
+1. Accept an optional default in the text/html methods `text($default = null)`. Drawback: Bc break
+
+2. Add new methods, like `textOrDefault($default)`. Drawback: yet another method on an already bloated interface.
+
+3. Crawler has lots of methods, but perhaps a decorator would be still a better option than a flag? Since we don't have an interface, we'd also need to extend the Crawler unfortunately:
+
+```php
+class GracefulCrawler extends Crawler
+{
+     // ...
+
+     public function text()
+     {
+        try {
+            $this->crawler->text()
+        } catch (\InvalidArgumentException $e) {
+            return '';
+        }
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-26T16:53:35Z
+
+@jakzal creating a decorator will be a pain:
+
+- adding any method is a BC break, unless we also provide a base class delegating all methods in DomCrawler itself and consider that a decorator must extend our own base class to be subject to BC. Otherwise, the newly introduced method would get called on the parent class rather than on the inner object
+- things become even more complex due to returning sub-crawlers from many methods
+- changing the signature in a decorator class is still breaking the contract for any code consuming a Crawler.
+
+At that point, it is much better to have this text extraction utility in your own code rather than in a crawler decorator.
+
+And regarding the discussion about BC, a configurable signature is a bigger BC break than a variable signature based on a new optional argument. A variable signature creates a BC break for child class (and the migration path is clear, with the possibility to trigger a deprecation). A configurable signature creates a BC break for consuming code (and with no way to warn them) due to the signature change (as they might not be the one controlling the contrustor-based opt-in).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-26T17:06:03Z
+
+Option 1. is possible, using func_get_arg() to prevent any BC break. We already did so in other places.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-29T02:39:48Z
+
+I added the argument to the function through `func_args` as discussed for option one.
+Looking at the related issues, I guess it will be a good idea to extend this to the `attr()` method?
+That one already has an argument, should still do a `func_args` and check for the second one?
+
+Also again not sure about the parameter name (naming things is hard), ideas welcome :sweat_smile:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-29T06:18:11Z
+
+@respinoza what about `$throw = true` :) then we can also apply it on `parents()` etc. maybe, returning an empty list in case throw=false.
+
+---------------------------------------------------------------------------
+
+by amer-flix at 2018-09-29T09:23:53Z
+
+Passing true for every method is also a hectic approach. It would have been better if we could somehow transfer this approach from the Crawler constructor.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-09-29T11:20:30Z
+
+A default value, rather than a boolean flag, would be more flexible.
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-09-29T14:48:56Z
+
+I would say no to a default value as we don't want to change the signature (return single), we could check it is a string but in practice is someone going to have another value than empty string?
+
+Maybe the idea of having new methods to handle this might be better.
+
+Any more ideas?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-29T22:23:01Z
+
+Yes, two :)
+1. name the new argument "$default" and return it if provided (and throw when not provided)
+2. do nothing and keep things as is
+
+---------------------------------------------------------------------------
+
+by respinoza at 2018-12-16T11:06:32Z
+
+@nicolas-grekas sorry for the delay, changes have been done and hopefully it can be included for 4.3

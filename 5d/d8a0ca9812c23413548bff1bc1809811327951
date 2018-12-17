@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-11T14:25:21Z
+
+Thanks for submitting! During the SymfonyCon hackday last Saturday, someone worked exactly on this - except that they opened no PR so the code might be lost :)
+
+Here are my suggestions:
+- consider this requirement for phpDocumentor as a bug - it's really broken to rely on it, DX wise
+- thus, rebase/retarget this for 4.2
+- let's completely remove the code path that uses phpDocumentor and parse inline ourselves - that's simple enough.
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2018-12-11T15:58:23Z
+
+Hi @nicolas-grekas,
+
+It was me during the SymfonyCon who started with this patch. Will apply your comments and update this PR. Thanks for your review!
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2018-12-12T09:45:12Z
+
+@ro0NL Your regex worked and made the tests pass (at least locally.) Thank You!
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2018-12-13T14:35:49Z
+
+@nicolas-grekas I don't now if it's necessary to add more tests. There were existing tests for the *old* implementation. We just changed the logic and IMO we just had to ensure that the tests should still pass
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-13T16:11:48Z
+
+we should add a test for
+
+```
+/**
+ * line1
+ * line2
+ *
+ * line 4
+ */
+```
+
+resulting in `line1 line2`
+
+and
+
+```
+/**
+ *oops
+ *
+ * @annot
+ */
+```
+
+resulting in `oops`
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2018-12-13T22:39:35Z
+
+@nicolas-grekas failing test is not related to this PR
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2018-12-17T09:01:41Z
+
+ping @nicolas-grekas , failing AppVeyor seems unrelated. Can we retrigger AppVeyor build?

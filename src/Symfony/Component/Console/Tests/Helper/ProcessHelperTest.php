@@ -59,8 +59,8 @@ class ProcessHelperTest extends TestCase
         $consoleOutput->expects($this->once())->method('getErrorOutput')->willReturn($dummyOutput);
 
         $helper = new ProcessHelper();
-        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
-        $helper->run($consoleOutput, ['php', '-r', 'exit 1;'], 'This did not work.');
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $helper->run($consoleOutput, array('php', '-r', 'exit 1;'), 'This did not work.');
 
         $this->assertEquals($dummyOutput->fetch(), "This did not work.\n");
     }
@@ -74,13 +74,13 @@ class ProcessHelperTest extends TestCase
         $consoleOutput->method('isDebug')->willReturn(true);
         $consoleOutput->expects($this->exactly(3))->method('write')
             ->withConsecutive(
-                [$this->anything()],
-                ['<bg=black> </><bg=green;fg=white> OUT </> 42']
+                array($this->anything()),
+                array('<bg=black> </><bg=green;fg=white> OUT </> 42')
             );
 
         $helper = new ProcessHelper();
-        $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
-        $helper->run($consoleOutput, ['php', '-r', 'echo 42;']);
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $helper->run($consoleOutput, array('php', '-r', 'echo 42;'));
     }
 
     public function provideCommandsAndOutput()

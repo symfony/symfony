@@ -1,0 +1,6 @@
+{
+    "name": "test-composer.json",
+    "extra": {
+        "public-dir": "test"
+    }
+}

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2018-12-08T17:09:00Z
+
+Instead of duplicating the public directory code, I feel like this could be put into a `PublicDirectory(ContainerInterface)` class.
+
+-- edit --
+Or even just `PublicDirectory(string projectRoot)`
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2018-12-08T17:28:02Z
+
+@nicholasruunu but in which namespace without adding additional requirements to the compoments?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-08T17:31:09Z
+
+I don't think it's worth adding a new class.
+
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2018-12-08T17:32:27Z
+
+@alexander-schranz @chalasr, True, nevermind.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-08T18:49:01Z
+
+it could be `%kernel.public_dir%`, but that be a new feature also
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2018-12-12T18:52:10Z
+
+@nicolas-grekas tests green now :)

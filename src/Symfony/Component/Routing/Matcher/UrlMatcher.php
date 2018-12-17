@@ -84,7 +84,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         $this->allow = $this->allowSchemes = array();
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
+        if ($ret = $this->matchCollection(rawurldecode($pathinfo) ?: '/', $this->routes)) {
             return $ret;
         }
 
@@ -134,49 +134,41 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         if ('HEAD' === $method = $this->context->getMethod()) {
             $method = 'GET';
         }
-        $supportsTrailingSlash = '/' !== $pathinfo && '' !== $pathinfo && $this instanceof RedirectableUrlMatcherInterface;
+        $supportsTrailingSlash = 'GET' === $method && $this instanceof RedirectableUrlMatcherInterface;
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
 
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();
-            $staticPrefix = $compiledRoute->getStaticPrefix();
+            $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
             $requiredMethods = $route->getMethods();
 
             // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' === $staticPrefix || 0 === strpos($pathinfo, $staticPrefix)) {
-                // no-op
-            } elseif (!$supportsTrailingSlash || ($requiredMethods && !\in_array('GET', $requiredMethods)) || 'GET' !== $method) {
-                continue;
-            } elseif ('/' === $staticPrefix[-1] && substr($staticPrefix, 0, -1) === $pathinfo) {
-                return $this->allow = $this->allowSchemes = array();
-            } elseif ('/' === $pathinfo[-1] && substr($pathinfo, 0, -1) === $staticPrefix) {
-                return $this->allow = $this->allowSchemes = array();
-            } else {
+            if ('' !== $staticPrefix && 0 !== strpos($trimmedPathinfo, $staticPrefix)) {
                 continue;
             }
             $regex = $compiledRoute->getRegex();
 
-            if ($supportsTrailingSlash) {
-                $pos = strrpos($regex, '$');
-                $hasTrailingSlash = '/' === $regex[$pos - 1];
-                $regex = substr_replace($regex, '/?$', $pos - $hasTrailingSlash, 1 + $hasTrailingSlash);
-            }
+            $pos = strrpos($regex, '$');
+            $hasTrailingSlash = '/' === $regex[$pos - 1];
+            $regex = substr_replace($regex, '/?$', $pos - $hasTrailingSlash, 1 + $hasTrailingSlash);
 
             if (!preg_match($regex, $pathinfo, $matches)) {
                 continue;
             }
 
-            if ($supportsTrailingSlash) {
-                if ('/' === $pathinfo[-1]) {
-                    if (preg_match($regex, substr($pathinfo, 0, -1), $m)) {
-                        $matches = $m;
-                    } else {
-                        $hasTrailingSlash = true;
-                    }
+            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar = preg_match('#\{\w+\}/?$#', $route->getPath())) {
+                // no-op
+            } elseif (preg_match($regex, $trimmedPathinfo, $m)) {
+                $matches = $m;
+            } else {
+                $hasTrailingSlash = true;
+            }
+
+            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                    return $this->allow = $this->allowSchemes = array();
                 }
-                if ($hasTrailingSlash !== ('/' === $pathinfo[-1])) {
-                    if ((!$requiredMethods || \in_array('GET', $requiredMethods)) && 'GET' === $method) {
-                        return $this->allow = $this->allowSchemes = array();
-                    }
+                if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                     continue;
                 }
             }

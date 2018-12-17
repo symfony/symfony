@@ -709,6 +709,16 @@ class UrlMatcherTest extends TestCase
 
         $matcher = $this->getUrlMatcher($coll);
         $this->assertSame(array('_route' => 'b'), $matcher->match('/bar/'));
+
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/dav/{foo<.*>?}', array(), array(), array(), '', array(), array('GET', 'OPTIONS')));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'OPTIONS'));
+        $expected = array(
+            '_route' => 'a',
+            'foo' => 'files/bar',
+        );
+        $this->assertEquals($expected, $matcher->match('/dav/files/bar/'));
     }
 
     public function testSlashAndVerbPrecedence()

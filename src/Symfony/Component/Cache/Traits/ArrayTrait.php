@@ -113,7 +113,7 @@ trait ArrayTrait
         }
     }
 
-    private function freeze($value)
+    private function freeze($value, $key)
     {
         if (null === $value) {
             return 'N;';

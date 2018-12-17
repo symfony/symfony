@@ -17,9 +17,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->matchHost = true;
         $this->staticRoutes = array(
             '/' => array(
-                array(array('_route' => 'a'), '#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', null, null, false, null),
-                array(array('_route' => 'c'), '#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', null, null, false, null),
-                array(array('_route' => 'b'), 'd.c.b.a', null, null, false, null),
+                array(array('_route' => 'a'), '#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', null, null, false, false, null),
+                array(array('_route' => 'c'), '#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', null, null, false, false, null),
+                array(array('_route' => 'b'), 'd.c.b.a', null, null, false, false, null),
             ),
         );
     }

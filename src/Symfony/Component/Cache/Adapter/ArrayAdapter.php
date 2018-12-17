@@ -124,7 +124,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+        if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
             return false;
         }
         if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {

@@ -204,11 +204,17 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber = new class() implements ServiceSubscriberInterface {
             public static function getSubscribedServices()
             {
-                return array('some.service' => 'stdClass');
+                return array(
+                    'some.service' => 'stdClass',
+                    'some_service' => 'stdClass',
+                    'another_service' => 'stdClass',
+                );
             }
         };
         $container->register('some.service', 'stdClass');
         $container->setAlias('stdClass $someService', 'some.service');
+        $container->setAlias('stdClass $some_service', 'some.service');
+        $container->setAlias('stdClass $anotherService', 'some.service');
         $container->register('foo', \get_class($subscriber))
             ->addMethodCall('setContainer', array(new Reference(PsrContainerInterface::class)))
             ->addTag('container.service_subscriber');
@@ -221,6 +227,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
         $expected = array(
             'some.service' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'some.service')),
+            'some_service' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'some_service')),
+            'another_service' => new ServiceClosureArgument(new TypedReference('stdClass', 'stdClass', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, 'anotherService')),
         );
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
 
@@ -228,6 +236,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
 
         $expected = array(
             'some.service' => new ServiceClosureArgument(new TypedReference('some.service', 'stdClass')),
+            'some_service' => new ServiceClosureArgument(new TypedReference('stdClass $some_service', 'stdClass')),
+            'another_service' => new ServiceClosureArgument(new TypedReference('stdClass $anotherService', 'stdClass')),
         );
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }

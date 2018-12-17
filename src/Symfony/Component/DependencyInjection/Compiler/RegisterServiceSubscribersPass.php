@@ -91,6 +91,11 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $name = null;
             }
 
+            if (null !== $name && !$this->container->has($name) && !$this->container->has($type.' $'.$name)) {
+                $camelCaseName = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name))));
+                $name = $this->container->has($type.' $'.$camelCaseName) ? $camelCaseName : $name;
+            }
+
             $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $name);
             unset($serviceMap[$key]);
         }

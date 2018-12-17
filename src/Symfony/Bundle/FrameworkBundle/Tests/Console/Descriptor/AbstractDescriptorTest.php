@@ -195,6 +195,22 @@ abstract class AbstractDescriptorTest extends TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getCallables());
     }
 
+    /** @dataProvider getClassDescriptionTestData */
+    public function testGetClassDecription($object, $expectedDescription)
+    {
+        $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
+    }
+
+    public function getClassDescriptionTestData()
+    {
+        return array(
+            array(ClassWithDocCommentOnMultipleLines::class, 'This is the first line of the description. This is the second line.'),
+            array(ClassWithDocCommentWithoutInitialSpace::class, 'Foo.'),
+            array(ClassWithoutDocComment::class, ''),
+            array(ClassWithDocComment::class, 'This is a class with a doc comment.'),
+        );
+    }
+
     abstract protected function getDescriptor();
 
     abstract protected function getFormat();

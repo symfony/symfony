@@ -1700,7 +1700,7 @@ class Request
             $requestUri = $this->server->get('REQUEST_URI');
 
             // HTTP proxy reqs setup request URI with scheme and host [and port] + the URL path, only use URL path
-            $uriComponents = parse_url($requestUri);
+            $uriComponents = parse_url($this->getSchemeAndHttpHost().$requestUri);
 
             if (isset($uriComponents['path'])) {
                 $requestUri = $uriComponents['path'];

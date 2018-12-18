@@ -269,13 +269,3 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         return $event;
     }
 }
-
-class TraceableAdapterEvent
-{
-    public $name;
-    public $start;
-    public $end;
-    public $result;
-    public $hits = 0;
-    public $misses = 0;
-}

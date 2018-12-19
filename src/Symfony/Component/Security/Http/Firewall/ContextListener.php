@@ -164,11 +164,21 @@ class ContextListener implements ListenerInterface
         $userDeauthenticated = false;
 
         foreach ($this->userProviders as $provider) {
+            
+            $providerClass = \get_class($provider);
             if (!$provider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', \get_class($provider), UserProviderInterface::class));
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', $providerClass, UserProviderInterface::class));
             }
 
             try {
+                $userClass = \get_classs($user);
+                if( !$provider->supportsClass($userClass) )
+                {
+                    throw new UnsupportedUserException(
+                        sprintf('Instances of "%s" are not supported by %s.', $userClass, $providerClass)
+                    );
+                }
+                
                 $refreshedUser = $provider->refreshUser($user);
                 $newToken = clone $token;
                 $newToken->setUser($refreshedUser);
@@ -178,7 +188,7 @@ class ContextListener implements ListenerInterface
                     $userDeauthenticated = true;
 
                     if (null !== $this->logger) {
-                        $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => \get_class($provider)));
+                        $this->logger->debug('Cannot refresh token because user has changed.', array('username' => $refreshedUser->getUsername(), 'provider' => $providerClass));
                     }
 
                     continue;
@@ -187,7 +197,7 @@ class ContextListener implements ListenerInterface
                 $token->setUser($refreshedUser);
 
                 if (null !== $this->logger) {
-                    $context = array('provider' => \get_class($provider), 'username' => $refreshedUser->getUsername());
+                    $context = array('provider' => $providerClass, 'username' => $refreshedUser->getUsername());
 
                     foreach ($token->getRoles() as $role) {
                         if ($role instanceof SwitchUserRole) {
@@ -204,7 +214,7 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $e) {
                 if (null !== $this->logger) {
-                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => \get_class($provider)));
+                    $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => $providerClass));
                 }
 
                 $userNotFoundByProvider = true;
@@ -223,7 +233,7 @@ class ContextListener implements ListenerInterface
             return null;
         }
 
-        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', \get_class($user)));
+        throw new \RuntimeException(sprintf('There is no user provider for user "%s".', $userClass));
     }
 
     private function safelyUnserialize($serializedToken)

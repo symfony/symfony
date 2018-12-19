@@ -34,6 +34,7 @@ abstract class AdapterTestCase extends CachePoolTest
         }
 
         $cache = $this->createCachePool();
+        $cache->clear();
 
         $value = mt_rand();
 

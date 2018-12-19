@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by seclu at 2018-12-18T14:19:52Z
+
+@nicolas-grekas out of curiosity, could you provide a description why it fixes the thing?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-18T14:30:05Z
+
+@seclu see what @strider2038 provided in the linked issue #29643.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-12-18T15:24:45Z
+
+@seclu it does not create an exception with its stack trace in the constructor anymore. the stack trace was the one retaining references to other stuff.

@@ -4,6 +4,7 @@ CHANGELOG
 4.2.0
 -----
 
+* added a `supportsClass()` check prior to `refreshUser()` for each user provider
 * added the `is_granted()` function in security expressions
 * deprecated the `has_role()` function in security expressions, use `is_granted()` instead
 * Passing custom class names to the

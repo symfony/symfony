@@ -171,7 +171,7 @@ class ContextListener implements ListenerInterface
             }
 
             try {
-                $userClass = \get_classs($user);
+                $userClass = \get_class($user);
                 if( !$provider->supportsClass($userClass) )
                 {
                     throw new UnsupportedUserException(

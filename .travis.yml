@@ -11,6 +11,7 @@ addons:
         - language-pack-fr-base
         - ldap-utils
         - slapd
+        - libsasl2-dev
 
 env:
     global:
@@ -23,10 +24,10 @@ matrix:
           sudo: required
           group: edge
         - php: 5.5
-          env: php_extra="5.6 7.0"
-        - php: 7.1
-          env: deps=high
+          env: php_extra="5.6 7.0 7.1"
         - php: 7.2
+          env: deps=high
+        - php: 7.3
           env: deps=low
     fast_finish: true
 
@@ -43,6 +44,12 @@ services:
     - docker
 
 before_install:
+    - |
+      # Enable Sury ppa
+      sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
+      sudo add-apt-repository -y ppa:ondrej/php
+      sudo apt update
+
     - |
       # Start Redis cluster
       docker pull grokzen/redis-cluster:4.0.8
@@ -149,7 +156,6 @@ before_install:
           echo hhvm.jit = 0 >> $INI
           echo apc.enable_cli = 1 >> $INI
           echo extension = redis.so >> $INI
-          echo extension = memcached.so >> $INI
           if [[ $PHP = 5.* ]]; then
               echo extension = memcache.so >> $INI
               echo extension = mongo.so >> $INI
@@ -174,15 +180,38 @@ before_install:
           elif [[ $PHP = 7.* ]]; then
               if ! php --ri sodium > /dev/null; then
                   # install libsodium
-                  sudo add-apt-repository ppa:ondrej/php -y
-                  sudo apt-get update -q
                   sudo apt-get install libsodium-dev -y
                   tfold ext.libsodium tpecl libsodium sodium.so $INI
               fi
 
-              tfold ext.apcu tpecl apcu-5.1.6 apcu.so $INI
+              tfold ext.apcu tpecl apcu-5.1.16 apcu.so $INI
               tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
           fi
+
+          if [[ $PHP == 7.3 ]]; then
+              # System libmemcached is missing sasl
+              LIBMEMCACHED_VERSION=1.0.18
+              wget "https://launchpad.net/libmemcached/1.0/${LIBMEMCACHED_VERSION}/+download/libmemcached-${LIBMEMCACHED_VERSION}.tar.gz" -O libmemcached-${LIBMEMCACHED_VERSION}.tar.gz
+              tar xvfz libmemcached-${LIBMEMCACHED_VERSION}.tar.gz
+              cd "libmemcached-${LIBMEMCACHED_VERSION}"
+              mkdir -p /opt/libmemcached/${LIBMEMCACHED_VERSION}
+              ./configure --prefix="/opt/libmemcached/${LIBMEMCACHED_VERSION}" LDFLAGS="-lpthread"
+              make
+              make install
+              cd -
+
+              EXTMEMCACHED_VERSION=3.1.3
+              wget https://pecl.php.net/get/memcached-${EXTMEMCACHED_VERSION}.tgz
+              tar xzvf memcached-${EXTMEMCACHED_VERSION}.tgz
+              cd memcached-${EXTMEMCACHED_VERSION}
+              phpize
+              ./configure --with-libmemcached-dir=/opt/libmemcached/${LIBMEMCACHED_VERSION}
+              make
+              sudo make install
+              cd -
+          fi
+
+          echo extension = memcached.so >> $INI
       done
 
     - |

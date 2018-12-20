@@ -179,6 +179,8 @@ class NativeSessionStorageTest extends TestCase
             $gco['cookie_'.$key] = $value;
         }
 
+        unset($gco['cookie_samesite']);
+
         $this->assertEquals($options, $gco);
     }
 

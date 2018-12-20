@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-15T10:42:29Z
+
+Problem with this is that link will be now inaccessible for users not using terminal which supports hyperlinks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-19T21:05:51Z
+
+@ostrolucky true. I think that's fine personally: most common terminals handle the links already and windows didn't make it clickable anyway.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-12-19T21:58:41Z
+
+yeah not a big deal in this one case, it's really minor inconvenience

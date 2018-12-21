@@ -670,13 +670,17 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string $filename The file to be written to
-     * @param string $content  The data to write into the file
+     * @param string          $filename The file to be written to
+     * @param string|resource $content  The data to write into the file
      *
      * @throws IOException if the file cannot be written to
      */
     public function dumpFile($filename, $content)
     {
+        if (\is_array($content)) {
+            @trigger_error(sprintf('Calling "%s()" with an array in the $content argument is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $dir = \dirname($filename);
 
         if (!is_dir($dir)) {
@@ -703,13 +707,17 @@ class Filesystem
     /**
      * Appends content to an existing file.
      *
-     * @param string $filename The file to which to append content
-     * @param string $content  The content to append
+     * @param string          $filename The file to which to append content
+     * @param string|resource $content  The content to append
      *
      * @throws IOException If the file is not writable
      */
     public function appendToFile($filename, $content)
     {
+        if (\is_array($content)) {
+            @trigger_error(sprintf('Calling "%s()" with an array in the $content argument is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $dir = \dirname($filename);
 
         if (!is_dir($dir)) {

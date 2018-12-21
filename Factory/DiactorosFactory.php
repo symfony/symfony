@@ -144,7 +144,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
         }
 
         $headers = $symfonyResponse->headers->all();
-        if (!isset($headers['Set-Cookie']) && !isset($headers['set-sookie'])) {
+        if (!isset($headers['Set-Cookie']) && !isset($headers['set-cookie'])) {
             $cookies = $symfonyResponse->headers->getCookies();
             if (!empty($cookies)) {
                 $headers['Set-Cookie'] = array();

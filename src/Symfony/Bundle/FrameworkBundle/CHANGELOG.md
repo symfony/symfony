@@ -5,7 +5,8 @@ CHANGELOG
 -----
 
  * Added `ControllerTrait::isFormValid()`
-
+ * Added support for injecting console application as container service
+ 
 4.2.0
 -----
 

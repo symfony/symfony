@@ -43,6 +43,9 @@
         <service id="kernel" synthetic="true" public="true" />
         <service id="Symfony\Component\HttpKernel\KernelInterface" alias="kernel" />
 
+        <service id="application" synthetic="true" public="true" />
+        <service id="Symfony\Component\Console\Application" alias="application" />
+
         <service id="filesystem" class="Symfony\Component\Filesystem\Filesystem" public="true" />
         <service id="Symfony\Component\Filesystem\Filesystem" alias="filesystem" />
 

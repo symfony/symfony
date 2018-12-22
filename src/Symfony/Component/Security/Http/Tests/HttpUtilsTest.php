@@ -200,7 +200,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/')
-            ->will($this->throwException(new ResourceNotFoundException()))
+            ->willThrowException(new ResourceNotFoundException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -215,7 +215,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->throwException(new MethodNotAllowedException(array())))
+            ->willThrowException(new MethodNotAllowedException(array()))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -260,7 +260,7 @@ class HttpUtilsTest extends TestCase
         $urlMatcher
             ->expects($this->any())
             ->method('match')
-            ->will($this->throwException(new \RuntimeException()))
+            ->willThrowException(new \RuntimeException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);

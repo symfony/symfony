@@ -48,7 +48,7 @@ class UserAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->throwException(new UsernameNotFoundException()))
+                 ->willThrowException(new UsernameNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -62,7 +62,7 @@ class UserAuthenticationProviderTest extends TestCase
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
                  ->method('retrieveUser')
-                 ->will($this->throwException(new UsernameNotFoundException()))
+                 ->willThrowException(new UsernameNotFoundException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -90,7 +90,7 @@ class UserAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPreAuth')
-                    ->will($this->throwException(new CredentialsExpiredException()))
+                    ->willThrowException(new CredentialsExpiredException())
         ;
 
         $provider = $this->getProvider($userChecker);
@@ -110,7 +110,7 @@ class UserAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
-                    ->will($this->throwException(new AccountExpiredException()))
+                    ->willThrowException(new AccountExpiredException())
         ;
 
         $provider = $this->getProvider($userChecker);
@@ -135,7 +135,7 @@ class UserAuthenticationProviderTest extends TestCase
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
-                 ->will($this->throwException(new BadCredentialsException()))
+                 ->willThrowException(new BadCredentialsException())
         ;
 
         $provider->authenticate($this->getSupportedToken());
@@ -154,7 +154,7 @@ class UserAuthenticationProviderTest extends TestCase
         ;
         $provider->expects($this->once())
                  ->method('checkAuthentication')
-                 ->will($this->throwException(new BadCredentialsException('Foo')))
+                 ->willThrowException(new BadCredentialsException('Foo'))
         ;
 
         $provider->authenticate($this->getSupportedToken());

@@ -34,7 +34,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
             ->method('checkPreAuth')
-            ->will($this->throwException(new DisabledException()));
+            ->willThrowException(new DisabledException());
 
         $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
         $authenticator->expects($this->once())
@@ -61,7 +61,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
             ->method('checkPostAuth')
-            ->will($this->throwException(new LockedException()));
+            ->willThrowException(new LockedException());
 
         $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
         $authenticator->expects($this->once())

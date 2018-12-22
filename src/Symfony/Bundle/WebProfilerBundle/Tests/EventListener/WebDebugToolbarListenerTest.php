@@ -252,7 +252,7 @@ class WebDebugToolbarListenerTest extends TestCase
             ->expects($this->once())
             ->method('generate')
             ->with('_profiler', array('token' => 'xxxxxxxx'))
-            ->will($this->throwException(new \Exception('foo')))
+            ->willThrowException(new \Exception('foo'))
         ;
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -273,7 +273,7 @@ class WebDebugToolbarListenerTest extends TestCase
             ->expects($this->once())
             ->method('generate')
             ->with('_profiler', array('token' => 'xxxxxxxx'))
-            ->will($this->throwException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline")))
+            ->willThrowException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline"))
         ;
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);

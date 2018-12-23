@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by azjezz at 2018-12-22T19:22:39Z
+
+@xabbuh this class is deprecated in `4.2` so there's no need to deprecate the method.

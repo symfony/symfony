@@ -49,7 +49,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->will($this->throwException(new UsernameNotFoundException('user not found')))
+            ->willThrowException(new UsernameNotFoundException('user not found'))
         ;
 
         $this->assertNull($service->autoLogin($request));

@@ -183,7 +183,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
-            ->will($this->throwException($authException));
+            ->willThrowException($authException);
 
         // this is not called
         $this->authenticationManager

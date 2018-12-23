@@ -967,7 +967,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->expects($this->once())
             ->method('doRun')
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
 
@@ -1006,7 +1006,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->expects($this->once())
             ->method('doRun')
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
 

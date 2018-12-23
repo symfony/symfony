@@ -90,7 +90,7 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->will($this->throwException($exception))
+            ->willThrowException($exception)
         ;
 
         $event = $this->getGetResponseEvent();
@@ -132,7 +132,7 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->will($this->throwException($exception))
+            ->willThrowException($exception)
         ;
 
         $event = $this->getGetResponseEvent();
@@ -159,7 +159,7 @@ class RememberMeListenerTest extends TestCase
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->will($this->throwException($exception))
+            ->willThrowException($exception)
         ;
 
         $service

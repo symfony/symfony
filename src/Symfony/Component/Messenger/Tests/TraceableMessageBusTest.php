@@ -59,7 +59,7 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($message)->will($this->throwException($exception = new \RuntimeException('Meh.')));
+        $bus->expects($this->once())->method('dispatch')->with($message)->willThrowException($exception = new \RuntimeException('Meh.'));
 
         $traceableBus = new TraceableMessageBus($bus);
 

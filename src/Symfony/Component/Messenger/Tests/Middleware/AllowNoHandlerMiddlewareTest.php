@@ -32,7 +32,7 @@ class AllowNoHandlerMiddlewareTest extends TestCase
     public function testItCatchesTheNoHandlerException()
     {
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->will($this->throwException(new NoHandlerForMessageException()));
+        $next->expects($this->once())->method('__invoke')->willThrowException(new NoHandlerForMessageException());
 
         $middleware = new AllowNoHandlerMiddleware();
 
@@ -46,7 +46,7 @@ class AllowNoHandlerMiddlewareTest extends TestCase
     public function testItDoesNotCatchOtherExceptions()
     {
         $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $next->expects($this->once())->method('__invoke')->will($this->throwException(new \RuntimeException('Something went wrong.')));
+        $next->expects($this->once())->method('__invoke')->willThrowException(new \RuntimeException('Something went wrong.'));
 
         $middleware = new AllowNoHandlerMiddleware();
         $middleware->handle(new DummyMessage('Hey'), $next);

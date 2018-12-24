@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by royklutman at 2018-12-18T09:57:06Z
+
+@ro0NL @stof There are way more occurrences of using the `for`-loop instead of the `attributes`-block, would you like me to make a separate PR for those? Or just leave them as-is?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-18T10:24:27Z
+
+IMHO it qualifies a bugfix, and should be fixed on 3.4 and up if applicable. But i believe the template structure changed meanwhile (for bootstrap), so it might need some addiotional PRs as well .
+
+---------------------------------------------------------------------------
+
+by royklutman at 2018-12-19T19:59:20Z
+
+Created a PR for 3.4 replacing the for-loops with the attributes-blocks, see referenced PR above.

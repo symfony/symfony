@@ -117,14 +117,14 @@ TXT
                         'line' => 30,
                         'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                         'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
-                    )
+                    ),
                 ),
                 <<<TXT
 %A
   source   \033]8;;phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30\033\CliDescriptorTest.php on line 30\033]8;;\033%A
 %A
 TXT
-                , true
+                , true,
             );
         }
 

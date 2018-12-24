@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2018-12-15T13:48:11Z
+
+I'm afraid this won't work in most cases: we deep copy bindings in the loaders (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Loader/YamlFileLoader.php#L523). So instead we need to store bindings id and check against this list in the pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-17T16:48:49Z
+
+@GuilhemN thanks for the review! Updated.

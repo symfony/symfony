@@ -88,9 +88,6 @@ Received from client #1
   source   CliDescriptorTest.php on line 30                                                
   file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
  -------- -------------------------------------------------------------------------------- 
-
-Open source in your IDE/browser:
-phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30
 TXT
         );
 

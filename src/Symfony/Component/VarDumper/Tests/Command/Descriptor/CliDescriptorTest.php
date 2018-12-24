@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Command\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Command\Descriptor\CliDescriptor;
@@ -35,9 +36,10 @@ class CliDescriptorTest extends TestCase
     /**
      * @dataProvider provideContext
      */
-    public function testDescribe(array $context, string $expectedOutput)
+    public function testDescribe(array $context, string $expectedOutput, bool $decorated = false)
     {
         $output = new BufferedOutput();
+        $output->setDecorated($decorated);
         $descriptor = new CliDescriptor(new CliDumper(function ($s) {
             return $s;
         }));
@@ -79,7 +81,8 @@ TXT
                     'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
                 ),
             ),
-            <<<TXT
+            method_exists(OutputFormatterStyle::class, 'setHref') ?
+                <<<TXT
 Received from client #1
 -----------------------
 
@@ -88,8 +91,42 @@ Received from client #1
   source   CliDescriptorTest.php on line 30                                                
   file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
  -------- -------------------------------------------------------------------------------- 
+
+TXT
+                :
+                <<<TXT
+Received from client #1
+-----------------------
+
+ -------- -------------------------------------------------------------------------------- 
+  date     Fri, 14 Dec 2018 16:17:48 +0000                                                 
+  source   CliDescriptorTest.php on line 30                                                
+  file     src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
+ -------- -------------------------------------------------------------------------------- 
+
+Open source in your IDE/browser:
+phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30
 TXT
         );
+
+        if (method_exists(OutputFormatterStyle::class, 'setHref')) {
+            yield 'source with hyperlink' => array(
+                array(
+                    'source' => array(
+                        'name' => 'CliDescriptorTest.php',
+                        'line' => 30,
+                        'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
+                        'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
+                    )
+                ),
+                <<<TXT
+%A
+  source   \033]8;;phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30\033\CliDescriptorTest.php on line 30\033]8;;\033%A
+%A
+TXT
+                , true
+            );
+        }
 
         yield 'cli' => array(
             array(

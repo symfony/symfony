@@ -22,6 +22,7 @@
     },
     "require-dev": {
         "ext-iconv": "*",
+        "symfony/console": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "twig/twig": "~1.34|~2.4"
     },

@@ -68,7 +68,7 @@ class FilesystemLoaderTest extends TestCase
         $locator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->throwException(new \InvalidArgumentException('Unable to find template "NonExistent".')))
+            ->willThrowException(new \InvalidArgumentException('Unable to find template "NonExistent".'))
         ;
 
         $loader = new FilesystemLoader($locator, $parser);

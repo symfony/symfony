@@ -57,7 +57,7 @@ class HtmlDescriptor implements DumpDescriptorInterface
         $sourceDescription = '';
         if (isset($context['source'])) {
             $source = $context['source'];
-            $projectDir = $source['project_dir'];
+            $projectDir = $source['project_dir'] ?? null;
             $sourceDescription = sprintf('%s on line %d', $source['name'], $source['line']);
             if (isset($source['file_link'])) {
                 $sourceDescription = sprintf('<a href="%s">%s</a>', $source['file_link'], $sourceDescription);

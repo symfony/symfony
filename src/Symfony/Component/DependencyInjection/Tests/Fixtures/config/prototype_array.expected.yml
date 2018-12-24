@@ -4,15 +4,6 @@ services:
         class: Symfony\Component\DependencyInjection\ContainerInterface
         public: true
         synthetic: true
-    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo:
-        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
-        public: true
-        tags:
-            - { name: foo }
-            - { name: baz }
-        deprecated: '%service_id%'
-        arguments: [1]
-        factory: f
     Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar
         public: true
@@ -21,5 +12,14 @@ services:
             - { name: baz }
         deprecated: '%service_id%'
         lazy: true
+        arguments: [1]
+        factory: f
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo
+        public: true
+        tags:
+            - { name: foo }
+            - { name: baz }
+        deprecated: '%service_id%'
         arguments: [1]
         factory: f

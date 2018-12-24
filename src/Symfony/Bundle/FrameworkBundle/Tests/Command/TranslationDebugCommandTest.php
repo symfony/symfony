@@ -123,7 +123,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo('dir'))
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array(), array(), $kernel);
         $tester->execute(array('locale' => 'en', 'bundle' => 'dir'));

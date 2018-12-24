@@ -31,8 +31,8 @@ class PhpFilesCache extends AbstractCache implements PruneableInterface
         self::$startTime = self::$startTime ?? $_SERVER['REQUEST_TIME'] ?? time();
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);
-
-        $e = new \Exception();
-        $this->includeHandler = function () use ($e) { throw $e; };
+        $this->includeHandler = static function ($type, $msg, $file, $line) {
+            throw new \ErrorException($msg, 0, $type, $file, $line);
+        };
     }
 }

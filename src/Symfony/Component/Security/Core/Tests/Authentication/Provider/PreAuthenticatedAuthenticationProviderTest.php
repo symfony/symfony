@@ -85,7 +85,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
                     ->method('checkPostAuth')
-                    ->will($this->throwException(new LockedException()))
+                    ->willThrowException(new LockedException())
         ;
 
         $provider = $this->getProvider($user, $userChecker);

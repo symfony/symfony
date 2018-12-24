@@ -73,7 +73,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->will($this->throwException(new ConnectionException()))
+            ->willThrowException(new ConnectionException())
         ;
         $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 

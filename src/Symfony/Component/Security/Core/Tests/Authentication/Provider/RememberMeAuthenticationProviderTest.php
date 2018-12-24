@@ -57,7 +57,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
             ->method('checkPreAuth')
-            ->will($this->throwException(new DisabledException()));
+            ->willThrowException(new DisabledException());
 
         $provider = $this->getProvider($userChecker);
 

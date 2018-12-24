@@ -60,7 +60,7 @@ class TemplateLocatorTest extends TestCase
         $fileLocator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->throwException(new \InvalidArgumentException($errorMessage)))
+            ->willThrowException(new \InvalidArgumentException($errorMessage))
         ;
 
         $locator = new TemplateLocator($fileLocator);

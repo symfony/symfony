@@ -620,7 +620,7 @@ class SimpleFormTest extends AbstractFormTest
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
             ->method('reverseTransform')
-            ->will($this->throwException(new TransformationFailedException()));
+            ->willThrowException(new TransformationFailedException());
 
         $form = $this->getBuilder()
             ->addViewTransformer($transformer)
@@ -636,7 +636,7 @@ class SimpleFormTest extends AbstractFormTest
         $transformer = $this->getDataTransformer();
         $transformer->expects($this->once())
             ->method('reverseTransform')
-            ->will($this->throwException(new TransformationFailedException()));
+            ->willThrowException(new TransformationFailedException());
 
         $form = $this->getBuilder()
             ->addModelTransformer($transformer)

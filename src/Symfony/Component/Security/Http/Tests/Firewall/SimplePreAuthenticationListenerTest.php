@@ -75,7 +75,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->equalTo($this->token))
-            ->will($this->throwException($exception))
+            ->willThrowException($exception)
         ;
 
         $this->tokenStorage->expects($this->once())

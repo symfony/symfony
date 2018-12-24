@@ -80,7 +80,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $engine->expects($this->once())
             ->method('exists')
             ->with('default')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
 
         // only default
         $strategy = new HIncludeFragmentRenderer($engine);
@@ -93,7 +93,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $engine->expects($this->once())
             ->method('exists')
             ->with('loading...')
-            ->will($this->throwException(new \RuntimeException()));
+            ->willThrowException(new \RuntimeException());
 
         // only default
         $strategy = new HIncludeFragmentRenderer($engine);

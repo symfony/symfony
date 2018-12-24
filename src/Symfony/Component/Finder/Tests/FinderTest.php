@@ -1209,7 +1209,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         // restore original permissions
         chmod($testDir, 0777);
-        clearstatcache($testDir);
+        clearstatcache(true, $testDir);
 
         if ($couldRead) {
             $this->markTestSkipped('could read test files while test requires unreadable');
@@ -1248,7 +1248,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
         // restore original permissions
         chmod($testDir, 0777);
-        clearstatcache($testDir);
+        clearstatcache(true, $testDir);
 
         if ($couldRead) {
             $this->markTestSkipped('could read test files while test requires unreadable');

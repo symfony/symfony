@@ -148,7 +148,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->throwException(new ResourceBundleNotFoundException()));
+            ->willThrowException(new ResourceBundleNotFoundException());
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
@@ -166,7 +166,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->throwException(new ResourceBundleNotFoundException()));
+            ->willThrowException(new ResourceBundleNotFoundException());
 
         $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam'), false);
     }

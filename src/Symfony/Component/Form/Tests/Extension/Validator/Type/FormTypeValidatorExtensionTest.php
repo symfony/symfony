@@ -56,14 +56,6 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
     }
 
-    public function testValidatorInterface()
-    {
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
-
-        $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
-        $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
-    }
-
     public function testGroupSequenceWithConstraintsOption()
     {
         $form = Forms::createFormFactoryBuilder()

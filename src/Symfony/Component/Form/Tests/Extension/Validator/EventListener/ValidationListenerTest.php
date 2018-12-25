@@ -159,12 +159,4 @@ class ValidationListenerTest extends TestCase
 
         $this->listener->validateForm(new FormEvent($form, null));
     }
-
-    public function testValidatorInterface()
-    {
-        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
-
-        $listener = new ValidationListener($validator, $this->violationMapper);
-        $this->assertAttributeSame($validator, 'validator', $listener);
-    }
 }

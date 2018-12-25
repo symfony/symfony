@@ -20,20 +20,44 @@ class NodeDefinitionTest extends TestCase
 {
     public function testDefaultPathSeparatorIsDot()
     {
-        $node = $this->getMockForAbstractClass(NodeDefinition::class, array('foo'));
+        $node = new class('foo') extends NodeDefinition
+        {
+            public function getPathSeparator()
+            {
+                return $this->pathSeparator;
+            }
 
-        $this->assertAttributeSame('.', 'pathSeparator', $node);
+            protected function createNode()
+            {
+            }
+        };
+
+        $this->assertSame('.', $node->getPathSeparator());
     }
 
     public function testSetPathSeparatorChangesChildren()
     {
-        $node = new ArrayNodeDefinition('foo');
-        $scalar = new ScalarNodeDefinition('bar');
-        $node->append($scalar);
+        $arrayNode = new class('foo') extends ArrayNodeDefinition
+        {
+            public function getPathSeparator()
+            {
+                return $this->pathSeparator;
+            }
+        };
 
-        $node->setPathSeparator('/');
+        $scalarNode = new class('foo') extends ScalarNodeDefinition
+        {
+            public function getPathSeparator()
+            {
+                return $this->pathSeparator;
+            }
+        };
 
-        $this->assertAttributeSame('/', 'pathSeparator', $node);
-        $this->assertAttributeSame('/', 'pathSeparator', $scalar);
+        $arrayNode->append($scalarNode);
+
+        $arrayNode->setPathSeparator('/');
+
+        $this->assertSame('/', $arrayNode->getPathSeparator());
+        $this->assertSame('/', $scalarNode->getPathSeparator());
     }
 }

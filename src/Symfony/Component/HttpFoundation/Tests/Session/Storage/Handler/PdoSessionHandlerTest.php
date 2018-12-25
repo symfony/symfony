@@ -324,14 +324,21 @@ class PdoSessionHandlerTest extends TestCase
     {
         $storage = new PdoSessionHandler($url);
 
-        $this->assertAttributeEquals($expectedDsn, 'dsn', $storage);
+        $dsnProperty = new \ReflectionProperty($storage, 'dsn');
+        $dsnProperty->setAccessible(true);
+
+        $this->assertSame($expectedDsn, $dsnProperty->getValue($storage));
 
         if (null !== $expectedUser) {
-            $this->assertAttributeEquals($expectedUser, 'username', $storage);
+            $userProperty = new \ReflectionProperty($storage, 'username');
+            $userProperty->setAccessible(true);
+            $this->assertSame($expectedUser, $userProperty->getValue($storage));
         }
 
         if (null !== $expectedPassword) {
-            $this->assertAttributeEquals($expectedPassword, 'password', $storage);
+            $passwordProperty = new \ReflectionProperty($storage, 'password');
+            $passwordProperty->setAccessible(true);
+            $this->assertSame($expectedPassword, $passwordProperty->getValue($storage));
         }
     }
 

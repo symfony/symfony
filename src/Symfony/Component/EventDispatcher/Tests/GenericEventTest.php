@@ -61,14 +61,14 @@ class GenericEventTest extends TestCase
     public function testSetArguments()
     {
         $result = $this->event->setArguments(array('foo' => 'bar'));
-        $this->assertAttributeSame(array('foo' => 'bar'), 'arguments', $this->event);
+        $this->assertSame('bar', $this->event->getArgument('foo'));
         $this->assertSame($this->event, $result);
     }
 
     public function testSetArgument()
     {
         $result = $this->event->setArgument('foo2', 'bar2');
-        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
+        $this->assertSame('bar2', $this->event->getArgument('foo2'));
         $this->assertEquals($this->event, $result);
     }
 
@@ -99,13 +99,13 @@ class GenericEventTest extends TestCase
     public function testOffsetSet()
     {
         $this->event['foo2'] = 'bar2';
-        $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
+        $this->assertSame(array('name' => 'Event', 'foo2' => 'bar2'), $this->event->getArguments());
     }
 
     public function testOffsetUnset()
     {
         unset($this->event['name']);
-        $this->assertAttributeSame(array(), 'arguments', $this->event);
+        $this->assertSame(array(), $this->event->getArguments());
     }
 
     public function testOffsetIsset()

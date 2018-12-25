@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `block_prefix` option to `BaseType`.
+
 4.2.0
 -----
 

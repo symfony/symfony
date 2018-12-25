@@ -8,6 +8,7 @@
             "attr",
             "auto_initialize",
             "block_name",
+            "block_prefix",
             "by_reference",
             "compound",
             "data",

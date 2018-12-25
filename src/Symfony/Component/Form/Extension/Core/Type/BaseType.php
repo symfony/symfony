@@ -79,6 +79,9 @@ abstract class BaseType extends AbstractType
         for ($type = $form->getConfig()->getType(); null !== $type; $type = $type->getParent()) {
             array_unshift($blockPrefixes, $type->getBlockPrefix());
         }
+        if (null !== $options['block_prefix']) {
+            $blockPrefixes[] = $options['block_prefix'];
+        }
         $blockPrefixes[] = $uniqueBlockPrefix;
 
         $view->vars = array_replace($view->vars, array(
@@ -111,6 +114,7 @@ abstract class BaseType extends AbstractType
     {
         $resolver->setDefaults(array(
             'block_name' => null,
+            'block_prefix' => null,
             'disabled' => false,
             'label' => null,
             'label_format' => null,
@@ -119,6 +123,7 @@ abstract class BaseType extends AbstractType
             'auto_initialize' => true,
         ));
 
+        $resolver->setAllowedTypes('block_prefix', array('null', 'string'));
         $resolver->setAllowedTypes('attr', 'array');
     }
 }

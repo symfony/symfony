@@ -97,7 +97,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
                   array($this->equalTo(self::PARENT_CLASS)),
                   array($this->equalTo(self::INTERFACE_A_CLASS))
               )
-              ->will($this->returnValue(false));
+              ->willReturn(false);
         $cache->expects($this->exactly(2))
               ->method('write')
               ->withConsecutive(
@@ -177,7 +177,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
         $cache->expects($this->any())
             ->method('read')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
         $metadata->addConstraint(new Callback(function () {}));

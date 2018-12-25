@@ -148,7 +148,7 @@ class RouterListenerTest extends TestCase
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo($log), $this->equalTo($parameters));
+            ->with($log, $parameters);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('http://localhost/');

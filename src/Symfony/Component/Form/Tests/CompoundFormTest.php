@@ -75,7 +75,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo(null));
+            ->with(null);
 
         $this->form->submit(array('firstName' => null), false);
     }
@@ -88,7 +88,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo(null));
+            ->with(null);
 
         $this->form->submit(array());
     }
@@ -126,7 +126,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo('foo'), false);
+            ->with('foo', false);
 
         $this->form->submit(array('firstName' => 'foo'), false);
     }

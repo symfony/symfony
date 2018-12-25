@@ -24,7 +24,7 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
@@ -32,8 +32,8 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foo'))
-            ->will($this->returnValue($account = $this->getAccount()))
+            ->with('foo')
+            ->willReturn($account = $this->getAccount())
         ;
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
@@ -49,7 +49,7 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
@@ -57,7 +57,7 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
@@ -134,7 +134,7 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->will($this->returnValue(false))
         ;
 
@@ -142,7 +142,7 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->will($this->returnValue(true))
         ;
 
@@ -156,7 +156,7 @@ class ChainUserProviderTest extends TestCase
         $provider1
             ->expects($this->once())
             ->method('supportsClass')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->will($this->returnValue(false))
         ;
 
@@ -164,7 +164,7 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('supportsClass')
-            ->with($this->equalTo('foo'))
+            ->with('foo')
             ->will($this->returnValue(false))
         ;
 

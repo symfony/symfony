@@ -541,7 +541,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $helperSet = new HelperSet(array(new FormatterHelper()));
         $dialog->setHelperSet($helperSet);
 
-        $output->expects($this->once())->method('writeln')->with($this->equalTo($outputShown));
+        $output->expects($this->once())->method('writeln')->with($outputShown);
 
         $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output, $question);

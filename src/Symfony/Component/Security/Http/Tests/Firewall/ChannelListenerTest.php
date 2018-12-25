@@ -30,7 +30,7 @@ class ChannelListenerTest extends TestCase
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue(array(array(), 'http')))
         ;
 
@@ -68,7 +68,7 @@ class ChannelListenerTest extends TestCase
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue(array(array(), 'https')))
         ;
 
@@ -108,7 +108,7 @@ class ChannelListenerTest extends TestCase
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue(array(array(), 'https')))
         ;
 
@@ -116,7 +116,7 @@ class ChannelListenerTest extends TestCase
         $entryPoint
             ->expects($this->once())
             ->method('start')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue($response))
         ;
 
@@ -129,7 +129,7 @@ class ChannelListenerTest extends TestCase
         $event
             ->expects($this->once())
             ->method('setResponse')
-            ->with($this->equalTo($response))
+            ->with($response)
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);
@@ -151,7 +151,7 @@ class ChannelListenerTest extends TestCase
         $accessMap
             ->expects($this->any())
             ->method('getPatterns')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue(array(array(), 'http')))
         ;
 
@@ -159,7 +159,7 @@ class ChannelListenerTest extends TestCase
         $entryPoint
             ->expects($this->once())
             ->method('start')
-            ->with($this->equalTo($request))
+            ->with($request)
             ->will($this->returnValue($response))
         ;
 
@@ -172,7 +172,7 @@ class ChannelListenerTest extends TestCase
         $event
             ->expects($this->once())
             ->method('setResponse')
-            ->with($this->equalTo($response))
+            ->with($response)
         ;
 
         $listener = new ChannelListener($accessMap, $entryPoint);

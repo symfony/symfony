@@ -81,8 +81,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $registry->expects($this->any())
                  ->method('getManager')
-                 ->with($this->equalTo(self::EM_NAME))
-                 ->will($this->returnValue($em));
+                 ->with(self::EM_NAME)
+                 ->willReturn($em);
 
         return $registry;
     }

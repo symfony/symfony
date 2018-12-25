@@ -71,8 +71,8 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
-            ->will($this->returnValue($url));
+            ->with($route, $expectedAttributes)
+            ->willReturn($url);
 
         $controller = new RedirectController($router);
 

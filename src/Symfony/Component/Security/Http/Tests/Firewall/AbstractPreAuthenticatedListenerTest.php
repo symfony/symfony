@@ -36,7 +36,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with($token)
         ;
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
@@ -44,7 +44,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken'))
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
 
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
@@ -55,13 +55,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener->handle($event);
@@ -219,7 +219,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo(null))
+            ->with(null)
         ;
 
         $exception = new AuthenticationException('Authentication failed.');

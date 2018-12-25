@@ -117,8 +117,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('deleteTokenBySeries')
-            ->with($this->equalTo('fooseries'))
-            ->will($this->returnValue(null))
+            ->with('fooseries')
+            ->willReturn(null)
         ;
 
         try {
@@ -140,8 +140,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->with($this->equalTo('fooseries'))
-            ->will($this->returnValue(new PersistentToken('fooclass', 'username', 'fooseries', 'foovalue', new \DateTime('yesterday'))))
+            ->with('fooseries')
+            ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', 'foovalue', new \DateTime('yesterday')))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -162,8 +162,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foouser'))
-            ->will($this->returnValue($user))
+            ->with('foouser')
+            ->willReturn($user)
         ;
 
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => false, 'httponly' => false, 'always_remember_me' => true, 'lifetime' => 3600));
@@ -174,8 +174,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->with($this->equalTo('fooseries'))
-            ->will($this->returnValue(new PersistentToken('fooclass', 'foouser', 'fooseries', 'foovalue', new \DateTime())))
+            ->with('fooseries')
+            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'foovalue', new \DateTime()))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -199,8 +199,8 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $tokenProvider
             ->expects($this->once())
             ->method('deleteTokenBySeries')
-            ->with($this->equalTo('fooseries'))
-            ->will($this->returnValue(null))
+            ->with('fooseries')
+            ->willReturn(null)
         ;
         $service->setTokenProvider($tokenProvider);
 

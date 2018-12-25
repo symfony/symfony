@@ -73,8 +73,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foouser'))
-            ->will($this->returnValue($user))
+            ->with('foouser')
+            ->willReturn($user)
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -92,14 +92,14 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo('foouser'))
-            ->will($this->returnValue($user))
+            ->with('foouser')
+            ->willReturn($user)
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -129,8 +129,8 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->with($this->equalTo($username))
-            ->will($this->returnValue($user))
+            ->with($username)
+            ->willReturn($user)
         ;
 
         $service = $this->getService($userProvider, array('name' => 'foo', 'always_remember_me' => true, 'lifetime' => 3600));

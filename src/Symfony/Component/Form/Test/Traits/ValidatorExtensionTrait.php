@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Test\Traits;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -18,6 +19,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 trait ValidatorExtensionTrait
 {
+    /**
+     * @var MockObject|ValidatorInterface
+     */
     protected $validator;
 
     protected function getValidatorExtension()

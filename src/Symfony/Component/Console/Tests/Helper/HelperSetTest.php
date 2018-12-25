@@ -119,7 +119,7 @@ class HelperSetTest extends TestCase
         if ($helperset) {
             $mock_helper->expects($this->any())
                 ->method('setHelperSet')
-                ->with($this->equalTo($helperset));
+                ->with($helperset);
         }
 
         return $mock_helper;

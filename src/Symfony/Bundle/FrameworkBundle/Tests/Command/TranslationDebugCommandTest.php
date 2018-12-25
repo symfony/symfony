@@ -84,7 +84,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
-            ->with($this->equalTo($this->translationDir))
+            ->with($this->translationDir)
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'), $kernel);
@@ -102,7 +102,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
-            ->with($this->equalTo('dir'))
+            ->with('dir')
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array(), array(), $kernel);

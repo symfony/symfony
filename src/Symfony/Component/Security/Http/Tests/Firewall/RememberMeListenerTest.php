@@ -202,7 +202,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with($token)
         ;
 
         $manager
@@ -241,7 +241,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with($token)
         ;
 
         $manager
@@ -306,7 +306,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with($token)
         ;
 
         $manager
@@ -369,7 +369,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo($token))
+            ->with($token)
         ;
 
         $manager

@@ -36,7 +36,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->once())
             ->method('setLocale')
-            ->with($this->equalTo('fr'));
+            ->with('fr');
 
         $event = new GetResponseEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -51,7 +51,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')
-            ->with($this->equalTo('en'));
+            ->with('en');
 
         $event = new GetResponseEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
@@ -62,7 +62,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->once())
             ->method('setLocale')
-            ->with($this->equalTo('fr'));
+            ->with('fr');
 
         $this->setMasterRequest($this->createRequest('fr'));
         $event = new FinishRequestEvent($this->createHttpKernel(), $this->createRequest('de'), HttpKernelInterface::SUB_REQUEST);
@@ -88,7 +88,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')
-            ->with($this->equalTo('en'));
+            ->with('en');
 
         $this->setMasterRequest($this->createRequest('fr'));
         $event = new FinishRequestEvent($this->createHttpKernel(), $this->createRequest('de'), HttpKernelInterface::SUB_REQUEST);

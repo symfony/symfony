@@ -50,8 +50,8 @@ class GuardAuthenticationListenerTest extends TestCase
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
-            ->with($this->equalTo($this->request))
-            ->will($this->returnValue($credentials));
+            ->with($this->request)
+            ->willReturn($credentials);
 
         // a clone of the token that should be created internally
         $uniqueGuardKey = 'my_firewall_0';
@@ -60,8 +60,8 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->authenticationManager
             ->expects($this->once())
             ->method('authenticate')
-            ->with($this->equalTo($nonAuthedToken))
-            ->will($this->returnValue($authenticateToken));
+            ->with($nonAuthedToken)
+            ->willReturn($authenticateToken);
 
         $this->guardAuthenticatorHandler
             ->expects($this->once())
@@ -133,18 +133,18 @@ class GuardAuthenticationListenerTest extends TestCase
         $authenticator
             ->expects($this->once())
             ->method('supports')
-            ->with($this->equalTo($this->request))
+            ->with($this->request)
             ->willReturn(true);
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
-            ->with($this->equalTo($this->request))
-            ->will($this->returnValue(array('username' => 'anything_not_empty')));
+            ->with($this->request)
+            ->willReturn(array('username' => 'anything_not_empty'));
 
         $this->authenticationManager
             ->expects($this->once())
             ->method('authenticate')
-            ->will($this->returnValue($authenticateToken));
+            ->willReturn($authenticateToken);
 
         $successResponse = new Response('Success!');
         $this->guardAuthenticatorHandler

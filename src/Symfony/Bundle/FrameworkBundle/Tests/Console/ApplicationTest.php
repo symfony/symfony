@@ -205,8 +205,8 @@ class ApplicationTest extends TestCase
             $container
                 ->expects($this->atLeastOnce())
                 ->method('get')
-                ->with($this->equalTo('event_dispatcher'))
-                ->will($this->returnValue($dispatcher));
+                ->with('event_dispatcher')
+                ->willReturn($dispatcher);
         }
 
         $container

@@ -42,8 +42,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->with($this->equalTo($form))
-            ->will($this->returnValue(new ConstraintViolationList()));
+            ->with($form)
+            ->willReturn(new ConstraintViolationList());
 
         // specific data is irrelevant
         $form->submit(array());

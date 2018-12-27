@@ -90,7 +90,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     protected function createRepositoryMock()
     {
         $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->setMethods(array('findByCustom', 'find', 'findAll', 'findOneBy', 'findBy', 'getClassName'))
             ->getMock()
         ;
 
@@ -119,7 +118,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ;
         $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
             ->setConstructorArgs(array($reflParser, 'property-name'))
-            ->setMethods(array('getValue'))
             ->getMock()
         ;
         $refl

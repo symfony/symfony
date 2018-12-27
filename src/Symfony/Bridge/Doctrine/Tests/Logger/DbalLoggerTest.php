@@ -24,7 +24,7 @@ class DbalLoggerTest extends TestCase
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 
         $dbalLogger = $this
-            ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
+            ->getMockBuilder(DbalLogger::class)
             ->setConstructorArgs(array($logger, null))
             ->getMock()
         ;

@@ -54,7 +54,6 @@ class ClientTest extends WebTestCase
     private function getKernelMock()
     {
         $mock = $this->getMockBuilder($this->getKernelClass())
-            ->setMethods(array('shutdown', 'boot', 'handle'))
             ->disableOriginalConstructor()
             ->getMock();
 

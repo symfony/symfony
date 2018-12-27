@@ -286,7 +286,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->setMethods(array('getSession', 'isXmlHttpRequest', 'getRequestFormat'))->disableOriginalConstructor()->getMock();
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->getMock();
         $request->expects($this->any())
             ->method('isXmlHttpRequest')
             ->will($this->returnValue($isXmlHttpRequest));

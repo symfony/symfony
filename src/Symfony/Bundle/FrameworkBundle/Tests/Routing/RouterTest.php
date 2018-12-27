@@ -251,7 +251,7 @@ class RouterTest extends TestCase
             ->will($this->returnValue($routes))
         ;
 
-        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(array('get'))->getMock();
+        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->getMock();
 
         $sc
             ->expects($this->once())

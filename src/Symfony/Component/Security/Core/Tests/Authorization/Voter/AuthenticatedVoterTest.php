@@ -65,7 +65,7 @@ class AuthenticatedVoterTest extends TestCase
         if ('fully' === $authenticated) {
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         } elseif ('remembered' === $authenticated) {
-            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(array('setPersistent'))->disableOriginalConstructor()->getMock();
+            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->disableOriginalConstructor()->getMock();
         } else {
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(array('', ''))->getMock();
         }

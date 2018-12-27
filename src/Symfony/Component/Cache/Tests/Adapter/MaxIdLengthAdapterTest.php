@@ -20,7 +20,6 @@ class MaxIdLengthAdapterTest extends TestCase
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs(array(str_repeat('-', 10)))
-            ->setMethods(array('doHave', 'doFetch', 'doDelete', 'doSave', 'doClear'))
             ->getMock();
 
         $cache->expects($this->exactly(2))

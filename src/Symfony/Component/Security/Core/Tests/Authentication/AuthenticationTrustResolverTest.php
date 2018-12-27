@@ -58,7 +58,7 @@ class AuthenticationTrustResolverTest extends TestCase
 
     protected function getRememberMeToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(array('setPersistent'))->disableOriginalConstructor()->getMock();
+        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->disableOriginalConstructor()->getMock();
     }
 
     protected function getResolver()

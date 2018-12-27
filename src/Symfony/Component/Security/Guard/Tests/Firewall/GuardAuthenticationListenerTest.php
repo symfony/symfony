@@ -434,7 +434,6 @@ class GuardAuthenticationListenerTest extends TestCase
 
         $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
             ->getMock();
         $this->event
             ->expects($this->any())

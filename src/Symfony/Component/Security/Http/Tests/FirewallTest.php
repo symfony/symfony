@@ -70,7 +70,6 @@ class FirewallTest extends TestCase
         ;
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
-            ->setMethods(array('hasResponse'))
             ->setConstructorArgs(array(
                 $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
                 $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock(),

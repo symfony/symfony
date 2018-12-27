@@ -39,12 +39,10 @@ class TemplatePathsCacheWarmerTest extends TestCase
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
-            ->setMethods(array('findAllTemplates'))
             ->getMock();
 
         $this->fileLocator = $this
             ->getMockBuilder(FileLocator::class)
-            ->setMethods(array('locate'))
             ->setConstructorArgs(array('/path/to/fallback'))
             ->getMock();
 

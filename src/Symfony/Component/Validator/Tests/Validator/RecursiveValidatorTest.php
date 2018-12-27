@@ -56,7 +56,6 @@ class RecursiveValidatorTest extends AbstractTest
         $validator = $this
             ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()
-            ->setMethods(array('startContext'))
             ->getMock();
         $validator
             ->expects($this->once())
@@ -90,7 +89,6 @@ class RecursiveValidatorTest extends AbstractTest
         $validator = $this
             ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()
-            ->setMethods(array('startContext'))
             ->getMock();
         $validator
             ->expects($this->once())

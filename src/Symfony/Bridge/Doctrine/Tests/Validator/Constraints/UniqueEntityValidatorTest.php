@@ -89,11 +89,10 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
     protected function createRepositoryMock()
     {
-        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+        return $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->setMethods(array('findByCustom', 'find', 'findAll', 'findOneBy', 'findBy', 'getClassName'))
             ->getMock()
         ;
-
-        return $repository;
     }
 
     protected function createEntityManagerMock($repositoryMock)

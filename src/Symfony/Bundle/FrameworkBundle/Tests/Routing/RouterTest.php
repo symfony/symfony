@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -251,13 +252,8 @@ class RouterTest extends TestCase
             ->will($this->returnValue($routes))
         ;
 
-        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->getMock();
-
-        $sc
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($loader))
-        ;
+        $sc = new Container();
+        $sc->set('routing.loader', $loader);
 
         return $sc;
     }

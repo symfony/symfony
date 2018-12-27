@@ -109,11 +109,9 @@ TXT
         , $output);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDebugInvalidFormType()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->createCommandTester()->execute(array('class' => 'test'));
     }
 

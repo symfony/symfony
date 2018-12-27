@@ -388,11 +388,9 @@ EOF;
         $this->assertEquals($expected, $kernel->serialize());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLocateResourceThrowsExceptionWhenNameIsNotValid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getKernel()->locateResource('Foo');
     }
 
@@ -404,17 +402,12 @@ EOF;
         $this->getKernel()->locateResource('@FooBundle/../bar');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLocateResourceThrowsExceptionWhenBundleDoesNotExist()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getKernel()->locateResource('@FooBundle/config/routing.xml');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLocateResourceThrowsExceptionWhenResourceDoesNotExist()
     {
         $kernel = $this->getKernel(array('getBundle'));
@@ -424,6 +417,7 @@ EOF;
             ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
         ;
 
+        $this->expectException(\InvalidArgumentException::class);
         $kernel->locateResource('@Bundle1Bundle/config/routing.xml');
     }
 

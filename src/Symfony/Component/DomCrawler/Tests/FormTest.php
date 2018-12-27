@@ -714,21 +714,17 @@ class FormTest extends TestCase
         $registry->remove('[t:dbt%3adate;]data_daterange_enddate_value');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
         $registry = new FormFieldRegistry();
+        $this->expectException(\InvalidArgumentException::class);
         $registry->get('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
     {
         $registry = new FormFieldRegistry();
+        $this->expectException(\InvalidArgumentException::class);
         $registry->set('foo', null);
     }
 
@@ -804,27 +800,21 @@ class FormTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot set value on a compound field "foo[bar]".
-     */
     public function testFormRegistrySetValueOnCompoundField()
     {
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[bar][baz]'));
-
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set value on a compound field "foo[bar]".');
         $registry->set('foo[bar]', 'fbb');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unreachable field "0"
-     */
     public function testFormRegistrySetArrayOnNotCompoundField()
     {
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('bar'));
-
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unreachable field "0"');
         $registry->set('bar', array('baz'));
     }
 

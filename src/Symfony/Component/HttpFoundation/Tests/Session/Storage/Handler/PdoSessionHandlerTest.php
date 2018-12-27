@@ -48,15 +48,13 @@ class PdoSessionHandlerTest extends TestCase
         return $pdo;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testWrongPdoErrMode()
     {
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $storage = new PdoSessionHandler($pdo);
+        $this->expectException(\InvalidArgumentException::class);
+        new PdoSessionHandler($pdo);
     }
 
     /**

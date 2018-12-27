@@ -72,12 +72,11 @@ class NativeSessionStorageTest extends TestCase
         $this->assertSame($bag, $storage->getBag($bag->getName()));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRegisterBagException()
     {
         $storage = $this->getStorage();
+
+        $this->expectException(\InvalidArgumentException::class);
         $storage->getBag('non_existing');
     }
 
@@ -199,12 +198,11 @@ class NativeSessionStorageTest extends TestCase
         $this->assertSame('200', ini_get('session.cache_expire'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetSaveHandlerException()
     {
         $storage = $this->getStorage();
+
+        $this->expectException(\InvalidArgumentException::class);
         $storage->setSaveHandler(new \stdClass());
     }
 

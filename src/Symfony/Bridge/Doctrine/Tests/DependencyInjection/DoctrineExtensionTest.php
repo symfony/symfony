@@ -49,9 +49,6 @@ class DoctrineExtensionTest extends TestCase
             }));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
         $emConfigs = array(
@@ -72,6 +69,7 @@ class DoctrineExtensionTest extends TestCase
         $method = $reflection->getMethod('fixManagersAutoMappings');
         $method->setAccessible(true);
 
+        $this->expectException(\LogicException::class);
         $method->invoke($this->extension, $emConfigs, $bundles);
     }
 
@@ -238,10 +236,6 @@ class DoctrineExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias('doctrine.orm.default_metadata_cache'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "unrecognized_type" is an unrecognized Doctrine cache driver.
-     */
     public function testUnrecognizedCacheDriverException()
     {
         $cacheName = 'metadata_cache';
@@ -253,6 +247,8 @@ class DoctrineExtensionTest extends TestCase
             ),
         );
 
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"unrecognized_type" is an unrecognized Doctrine cache driver.');
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 

@@ -22,19 +22,15 @@ class BCryptPasswordEncoderTest extends TestCase
     const PASSWORD = 'password';
     const VALID_COST = '04';
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCostBelowRange()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new BCryptPasswordEncoder(3);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCostAboveRange()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new BCryptPasswordEncoder(32);
     }
 

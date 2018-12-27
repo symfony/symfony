@@ -96,27 +96,21 @@ class InputOptionTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testEmptyNameIsInvalid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new InputOption('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDoubleDashNameIsInvalid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new InputOption('--');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSingleDashOptionIsInvalid()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new InputOption('foo', '-');
     }
 

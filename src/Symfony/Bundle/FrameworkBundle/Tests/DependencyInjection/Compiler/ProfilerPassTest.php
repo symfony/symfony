@@ -24,8 +24,6 @@ class ProfilerPassTest extends TestCase
      * Thus, a fully-valid tag looks something like this:
      *
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testTemplateNoIdThrowsException()
     {
@@ -35,6 +33,8 @@ class ProfilerPassTest extends TestCase
             ->addTag('data_collector', array('template' => 'foo'));
 
         $profilerPass = new ProfilerPass();
+
+        $this->expectException(\InvalidArgumentException::class);
         $profilerPass->process($builder);
     }
 

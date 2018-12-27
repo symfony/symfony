@@ -149,13 +149,14 @@ class PhpDumperTest extends TestCase
 
     /**
      * @dataProvider provideInvalidParameters
-     * @expectedException \InvalidArgumentException
      */
     public function testExportParameters($parameters)
     {
         $container = new ContainerBuilder(new ParameterBag($parameters));
         $container->compile();
         $dumper = new PhpDumper($container);
+
+        $this->expectException(\InvalidArgumentException::class);
         $dumper->dump();
     }
 

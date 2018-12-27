@@ -26,19 +26,15 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader = $this->getClassLoader($this->reader);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadMissingClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->loader->load('MissingClass');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadAbstractClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\AbstractClass');
     }
 

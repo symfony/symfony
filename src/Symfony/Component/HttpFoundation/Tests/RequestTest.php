@@ -1919,21 +1919,22 @@ class RequestTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
      */
     public function testSetTrustedProxiesInvalidHeaderName()
     {
         Request::create('http://example.com/');
+
+        $this->expectException(\InvalidArgumentException::class);
         Request::setTrustedHeaderName('bogus name', 'X_MY_FOR');
     }
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
      */
     public function testGetTrustedProxiesInvalidHeaderName()
     {
         Request::create('http://example.com/');
+        $this->expectException(\InvalidArgumentException::class);
         Request::getTrustedHeaderName('bogus name');
     }
 

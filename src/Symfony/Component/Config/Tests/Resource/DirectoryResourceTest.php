@@ -63,13 +63,11 @@ class DirectoryResourceTest extends TestCase
         $this->assertEquals('bar', $resource->getPattern());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The directory ".*" does not exist./
-     */
     public function testResourceDoesNotExist()
     {
-        $resource = new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/The directory ".*" does not exist./');
+        new DirectoryResource('/____foo/foobar'.mt_rand(1, 999999));
     }
 
     public function testIsFresh()

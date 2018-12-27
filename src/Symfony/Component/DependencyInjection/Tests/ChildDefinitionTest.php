@@ -90,13 +90,11 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(array('index_0' => 'foo'), $def->getArguments());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
         $def = new ChildDefinition('foo');
 
+        $this->expectException(\InvalidArgumentException::class);
         $def->replaceArgument('0', 'foo');
     }
 

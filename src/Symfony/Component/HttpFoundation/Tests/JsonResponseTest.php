@@ -214,20 +214,16 @@ class JsonResponseTest extends TestCase
         $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetCallbackInvalidIdentifier()
     {
         $response = new JsonResponse('foo');
+        $this->expectException(\InvalidArgumentException::class);
         $response->setCallback('+invalid');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSetContent()
     {
+        $this->expectException(\InvalidArgumentException::class);
         JsonResponse::create("\xB1\x31");
     }
 

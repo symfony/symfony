@@ -29,11 +29,9 @@ class GuessTest extends TestCase
         $this->assertSame($guess3, Guess::getBestGuess(array($guess1, $guess2, $guess3)));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGuessExpectsValidConfidence()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new TestGuess(5);
     }
 }

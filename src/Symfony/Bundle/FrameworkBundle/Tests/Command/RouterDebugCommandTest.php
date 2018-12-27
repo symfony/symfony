@@ -39,11 +39,9 @@ class RouterDebugCommandTest extends TestCase
         $this->assertContains('Route Name   | foo', $tester->getDisplay());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDebugInvalidRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->createCommandTester()->execute(array('name' => 'test'));
     }
 

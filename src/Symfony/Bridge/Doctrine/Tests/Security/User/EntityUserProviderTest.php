@@ -167,9 +167,6 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByUsername('name');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
         $repository = $this->getMockBuilder('\Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
@@ -179,6 +176,7 @@ class EntityUserProviderTest extends TestCase
             'Symfony\Bridge\Doctrine\Tests\Fixtures\User'
         );
 
+        $this->expectException(\InvalidArgumentException::class);
         $provider->loadUserByUsername('name');
     }
 

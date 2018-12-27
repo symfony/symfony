@@ -92,13 +92,12 @@ class DefinitionDecoratorTest extends TestCase
         $this->assertEquals(array('index_0' => 'foo'), $def->getArguments());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
+
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
         $def = new DefinitionDecorator('foo');
 
+        $this->expectException(\InvalidArgumentException::class);
         $def->replaceArgument('0', 'foo');
     }
 

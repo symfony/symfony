@@ -59,12 +59,10 @@ class NativeFileSessionHandlerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructException()
     {
-        $handler = new NativeFileSessionHandler('something;invalid;with;too-many-args');
+        $this->expectException(\InvalidArgumentException::class);
+        new NativeFileSessionHandler('something;invalid;with;too-many-args');
     }
 
     public function testConstructDefault()

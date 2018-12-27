@@ -94,9 +94,6 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDebugInvalidDirectory()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
@@ -106,6 +103,8 @@ class TranslationDebugCommandTest extends TestCase
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array(), array(), $kernel);
+
+        $this->expectException(\InvalidArgumentException::class);
         $tester->execute(array('locale' => 'en', 'bundle' => 'dir'));
     }
 

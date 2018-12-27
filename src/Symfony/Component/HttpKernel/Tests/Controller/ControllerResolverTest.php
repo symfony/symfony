@@ -90,15 +90,14 @@ class ControllerResolverTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', $controller);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', new \stdClass());
+
+        $this->expectException(\InvalidArgumentException::class);
         $resolver->getController($request);
     }
 

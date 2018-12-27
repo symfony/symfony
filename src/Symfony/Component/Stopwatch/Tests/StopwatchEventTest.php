@@ -154,11 +154,9 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals(0, $event->getStartTime(), '', self::DELTA);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidOriginThrowsAnException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new StopwatchEvent('abc');
     }
 

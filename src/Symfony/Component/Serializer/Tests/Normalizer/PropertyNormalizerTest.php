@@ -132,15 +132,13 @@ class PropertyNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUncallableCallbacks()
     {
         $this->normalizer->setCallbacks(array('bar' => null));
 
         $obj = new PropertyConstructorDummy('baz', 'quux');
 
+        $this->expectException(\InvalidArgumentException::class);
         $this->normalizer->normalize($obj, 'any');
     }
 

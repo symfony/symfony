@@ -24,19 +24,15 @@ use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
 
 class AuthenticationProviderManagerTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAuthenticateWithoutProviders()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new AuthenticationProviderManager(array());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAuthenticateWithProvidersWithIncorrectInterface()
     {
+        $this->expectException(\InvalidArgumentException::class);
         (new AuthenticationProviderManager(array(
             new \stdClass(),
         )))->authenticate($this->getMockBuilder(TokenInterface::class)->getMock());

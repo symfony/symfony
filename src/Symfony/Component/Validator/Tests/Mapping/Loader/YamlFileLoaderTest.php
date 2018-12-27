@@ -40,13 +40,13 @@ class YamlFileLoaderTest extends TestCase
 
     /**
      * @dataProvider provideInvalidYamlFiles
-     * @expectedException \InvalidArgumentException
      */
     public function testInvalidYamlFiles($path)
     {
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
 
+        $this->expectException(\InvalidArgumentException::class);
         $loader->loadClassMetadata($metadata);
     }
 

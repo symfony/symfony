@@ -53,13 +53,12 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testProcessWithInvalidAlias()
     {
         $container = new ContainerBuilder();
         $container->setAlias('a_alias', 'a');
+
+        $this->expectException(\InvalidArgumentException::class);
         $this->process($container);
     }
 

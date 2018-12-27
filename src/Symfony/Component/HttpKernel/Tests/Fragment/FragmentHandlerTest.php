@@ -36,22 +36,18 @@ class FragmentHandlerTest extends TestCase
         ;
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRenderWhenRendererDoesNotExist()
     {
         $handler = new FragmentHandler($this->requestStack);
+        $this->expectException(\InvalidArgumentException::class);
         $handler->render('/', 'foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRenderWithUnknownRenderer()
     {
         $handler = $this->getHandler($this->returnValue(new Response('foo')));
 
+        $this->expectException(\InvalidArgumentException::class);
         $handler->render('/', 'bar');
     }
 

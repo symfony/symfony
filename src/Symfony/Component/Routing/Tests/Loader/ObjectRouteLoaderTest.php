@@ -41,12 +41,12 @@ class ObjectRouteLoaderTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider getBadResourceStrings
      */
     public function testExceptionWithoutSyntax($resourceString)
     {
         $loader = new ObjectRouteLoaderForTest();
+        $this->expectException(\InvalidArgumentException::class);
         $loader->load($resourceString);
     }
 

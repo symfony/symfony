@@ -46,11 +46,9 @@ class BasePasswordEncoderTest extends TestCase
         $this->assertEquals('password', $this->invokeMergePasswordAndSalt('password', ''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testMergePasswordAndSaltWithException()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->invokeMergePasswordAndSalt('password', '{foo}');
     }
 

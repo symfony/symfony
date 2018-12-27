@@ -27,14 +27,11 @@ class LinkTest extends TestCase
         new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithAnInvalidCurrentUri()
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
-
+        $this->expectException(\InvalidArgumentException::class);
         new Link($dom->getElementsByTagName('a')->item(0), 'example.com');
     }
 

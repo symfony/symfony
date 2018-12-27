@@ -167,7 +167,6 @@ class ArgumentResolverTest extends TestCase
 
     /**
      * @requires PHP 5.6
-     * @expectedException \InvalidArgumentException
      */
     public function testGetVariadicArgumentsWithoutArrayInRequest()
     {
@@ -176,12 +175,12 @@ class ArgumentResolverTest extends TestCase
         $request->attributes->set('bar', 'foo');
         $controller = array(new VariadicController(), 'action');
 
+        $this->expectException(\InvalidArgumentException::class);
         self::$resolver->getArguments($request, $controller);
     }
 
     /**
      * @requires PHP 5.6
-     * @expectedException \InvalidArgumentException
      */
     public function testGetArgumentWithoutArray()
     {
@@ -196,6 +195,8 @@ class ArgumentResolverTest extends TestCase
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
         $controller = array($this, 'controllerWithFooAndDefaultBar');
+
+        $this->expectException(\InvalidArgumentException::class);
         $resolver->getArguments($request, $controller);
     }
 

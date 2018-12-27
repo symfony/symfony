@@ -124,13 +124,14 @@ class PhpEngineTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
      * @dataProvider forbiddenParameterNames
      */
     public function testRenderForbiddenParameter($name)
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', 'bar');
+
+        $this->expectException(\InvalidArgumentException::class);
         $engine->render('foo.php', array($name => 'foo'));
     }
 

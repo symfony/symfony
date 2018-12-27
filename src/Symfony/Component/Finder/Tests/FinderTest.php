@@ -288,12 +288,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($expected, $iterator);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInWithNonExistentDirectory()
     {
         $finder = new Finder();
+        $this->expectException(\InvalidArgumentException::class);
         $finder->in('foobar');
     }
 
@@ -305,12 +303,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInWithNonDirectoryGlob()
     {
         $finder = new Finder();
+        $this->expectException(\InvalidArgumentException::class);
         $finder->in(__DIR__.'/Fixtures/A/a*');
     }
 

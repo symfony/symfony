@@ -302,15 +302,13 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUncallableCallbacks()
     {
         $this->normalizer->setCallbacks(array('bar' => null));
 
         $obj = new GetConstructorDummy('baz', 'quux', true);
 
+        $this->expectException(\InvalidArgumentException::class);
         $this->normalizer->normalize($obj, 'any');
     }
 

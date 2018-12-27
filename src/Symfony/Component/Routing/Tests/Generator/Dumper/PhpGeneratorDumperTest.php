@@ -115,9 +115,6 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDumpWithoutRoutes()
     {
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
@@ -125,6 +122,7 @@ class PhpGeneratorDumperTest extends TestCase
 
         $projectUrlGenerator = new \WithoutRoutesUrlGenerator(new RequestContext('/app.php'));
 
+        $this->expectException(\InvalidArgumentException::class);
         $projectUrlGenerator->generate('Test', array());
     }
 

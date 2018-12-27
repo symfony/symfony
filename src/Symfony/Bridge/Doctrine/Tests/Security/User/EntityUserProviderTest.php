@@ -196,7 +196,6 @@ class EntityUserProviderTest extends TestCase
     private function getObjectManager($repository)
     {
         $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
-            ->setMethods(array('getClassMetadata', 'getRepository'))
             ->getMockForAbstractClass();
         $em->expects($this->any())
             ->method('getRepository')

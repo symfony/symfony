@@ -32,13 +32,6 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension = $this
             ->getMockBuilder('Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension')
-            ->setMethods(array(
-                'getMappingResourceConfigDirectory',
-                'getObjectManagerElementName',
-                'getMappingObjectDefaultName',
-                'getMappingResourceExtension',
-                'load',
-            ))
             ->getMock()
         ;
 

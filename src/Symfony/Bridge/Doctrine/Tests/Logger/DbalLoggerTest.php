@@ -26,7 +26,6 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
             ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
             ->getMock()
         ;
 
@@ -58,7 +57,6 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
             ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
             ->getMock()
         ;
 
@@ -81,7 +79,6 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
             ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
             ->getMock()
         ;
 
@@ -112,7 +109,6 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
             ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
             ->getMock()
         ;
 
@@ -140,7 +136,6 @@ class DbalLoggerTest extends TestCase
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
             ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
             ->getMock()
         ;
 

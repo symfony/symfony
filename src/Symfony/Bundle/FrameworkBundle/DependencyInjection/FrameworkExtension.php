@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -223,6 +224,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('test.client.history')->setPrivate(true);
             $container->getDefinition('test.client.cookiejar')->setPrivate(true);
             $container->getDefinition('test.session.listener')->setPrivate(true);
+
+            if (!class_exists(Client::class)) {
+                $container->removeDefinition('test.client');
+            }
         }
 
         if ($this->isConfigEnabled($container, $config['session'])) {

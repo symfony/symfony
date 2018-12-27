@@ -50,6 +50,8 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string[]|null            $mutatorPrefixes
      * @param string[]|null            $accessorPrefixes
      * @param string[]|null            $arrayMutatorPrefixes
+     *
+     * @throws \LogicException When "phpdocumentor/reflection-docblock" package is not installed.
      */
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {

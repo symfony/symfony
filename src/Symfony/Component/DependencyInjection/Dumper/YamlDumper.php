@@ -42,6 +42,8 @@ class YamlDumper extends Dumper
      * Dumps the service container as an YAML string.
      *
      * @return string A YAML string representing of the service container
+     *
+     * @throws LogicException When Symfony Yaml Component is not installed.
      */
     public function dump(array $options = array())
     {

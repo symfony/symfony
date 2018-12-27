@@ -27,7 +27,7 @@ class AnnotationFileLoader extends FileLoader
     protected $loader;
 
     /**
-     * @throws \RuntimeException
+     * @throws \LogicException When PHP Tokenizer extension is not installed.
      */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {

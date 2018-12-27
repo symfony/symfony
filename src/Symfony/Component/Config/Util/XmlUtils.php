@@ -42,7 +42,7 @@ class XmlUtils
      *
      * @throws XmlParsingException When parsing of XML file returns error
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
-     * @throws \RuntimeException   When DOM extension is missing
+     * @throws \LogicException     When DOM extension is missing
      */
     public static function parse($content, $schemaOrCallable = null)
     {

@@ -795,7 +795,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return AdapterInterface
      *
-     * @throws RuntimeException When the Cache Component isn't available
+     * @throws \LogicException When the Symfony Cache Component isn't available
      */
     public static function createCache($namespace, $defaultLifetime, $version, LoggerInterface $logger = null)
     {

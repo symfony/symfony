@@ -31,6 +31,9 @@ trait LockableTrait
      * Locks a command.
      *
      * @return bool
+     *
+     * @throws LogicException When Symfony Lock Component is not installed
+     *                        or when a lock is already in place.
      */
     private function lock($name = null, $blocking = false)
     {

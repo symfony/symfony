@@ -113,7 +113,7 @@ abstract class Client
      *
      * @param bool $insulated Whether to insulate the requests or not
      *
-     * @throws \RuntimeException When Symfony Process Component is not installed
+     * @throws \LogicException When Symfony Process Component is not installed
      */
     public function insulate($insulated = true)
     {

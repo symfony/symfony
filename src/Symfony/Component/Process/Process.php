@@ -135,7 +135,7 @@ class Process implements \IteratorAggregate
      * @param mixed|null     $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
-     * @throws RuntimeException When proc_open is not installed
+     * @throws LogicException When proc_open is not installed
      */
     public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {

@@ -42,6 +42,13 @@ class Serializer implements SerializerInterface
         $this->context = $context;
     }
 
+    /**
+     * Create a new Transport Serializer.
+     *
+     * @return self
+     *
+     * @throws LogicException When Symfony Serializer Component is not installed.
+     */
     public static function create(): self
     {
         if (!class_exists(SymfonySerializer::class)) {

@@ -1175,7 +1175,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @throws \RuntimeException If the CssSelector Component is not available
+     * @throws \LogicException If the CssSelector Component is not available
      */
     private function createCssSelectorConverter(): CssSelectorConverter
     {

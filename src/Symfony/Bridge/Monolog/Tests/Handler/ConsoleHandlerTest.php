@@ -57,21 +57,9 @@ class ConsoleHandlerTest extends TestCase
             '->isHandling returns correct value depending on console verbosity and log level'
         );
 
-        // check that the handler actually outputs the record if it handles it
-        $levelName = Logger::getLevelName($level);
-        $levelName = sprintf('%-9s', $levelName);
-
-        $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->getMock();
+        $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $realOutput->setVerbosity($verbosity);
-        if ($realOutput->isDebug()) {
-            $log = "16:21:54 $levelName [app] My info message\n";
-        } else {
-            $log = "16:21:54 $levelName [app] My info message\n";
-        }
-        $realOutput
-            ->expects($isHandling ? $this->once() : $this->never())
-            ->method('doWrite')
-            ->with($log, false);
+
         $handler = new ConsoleHandler($realOutput, true, $map);
 
         $infoRecord = array(

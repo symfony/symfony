@@ -21,7 +21,7 @@ class DbalLoggerTest extends TestCase
      */
     public function testLog($sql, $params, $logParams)
     {
-        $logger = $this->getMockBuilder(\Psr\Log\LoggerInterface::class)->getMock();
+        $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
         $logger->expects($this->once())->method('debug')->with($sql, $logParams);
 
         $dbalLogger = new DbalLogger($logger);

@@ -225,16 +225,10 @@ class Exporter
         }
 
         if (\is_array($value)) {
-            $j = -1;
             $code = '';
             foreach ($value as $k => $v) {
                 $code .= $subIndent;
-                if (!\is_int($k) || 1 !== $k - $j) {
-                    $code .= self::export($k, $subIndent).' => ';
-                }
-                if (\is_int($k)) {
-                    $j = $k;
-                }
+                $code .= self::export($k, $subIndent).' => ';
                 $code .= self::export($v, $subIndent).",\n";
             }
 

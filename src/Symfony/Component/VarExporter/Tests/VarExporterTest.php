@@ -120,6 +120,7 @@ class VarExporterTest extends TestCase
         $value[1] = $value;
 
         yield 'array-object' => array('array-object', $value);
+        yield 'array-numeric-indices' => array('array-numeric-indices', array(0 => 'a', 1 => 'b', 2 => 'c', 10 => 'd'), true);
 
         yield 'array-iterator' => array('array-iterator', new \ArrayIterator(array(123), 1));
         yield 'array-object-custom' => array('array-object-custom', new MyArrayObject(array(234)));

@@ -108,25 +108,25 @@ class VarExporterTest extends TestCase
 
     public function provideExport()
     {
-        yield array('multiline-string', array("\0\0\r\nA" => "B\rC\n\n"), true);
+        yield 'multiline-string' => array('multiline-string', array("\0\0\r\nA" => "B\rC\n\n"), true);
 
-        yield array('bool', true, true);
-        yield array('simple-array', array(123, array('abc')), true);
-        yield array('datetime', \DateTime::createFromFormat('U', 0));
+        yield 'bool' => array('bool', true, true);
+        yield 'simple-array' => array('simple-array', array(123, array('abc')), true);
+        yield 'datetime' => array('datetime', \DateTime::createFromFormat('U', 0));
 
         $value = new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
 
-        yield array('array-object', $value);
+        yield 'array-object' => array('array-object', $value);
 
-        yield array('array-iterator', new \ArrayIterator(array(123), 1));
-        yield array('array-object-custom', new MyArrayObject(array(234)));
+        yield 'array-iterator' => array('array-iterator', new \ArrayIterator(array(123), 1));
+        yield 'array-object-custom' => array('array-object-custom', new MyArrayObject(array(234)));
 
         $value = new MySerializable();
 
-        yield array('serializable', array($value, $value));
+        yield 'serializable' => array('serializable', array($value, $value));
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -134,33 +134,33 @@ class VarExporterTest extends TestCase
         $value->sub->bis = 123;
         $value->sub->baz = 123;
 
-        yield array('wakeup', $value);
+        yield 'wakeup' => array('wakeup', $value);
 
-        yield array('clone', array(new MyCloneable(), new MyNotCloneable()));
+        yield 'clone' => array('clone', array(new MyCloneable(), new MyNotCloneable()));
 
-        yield array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)));
+        yield 'private' => array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)));
 
         $value = new \SplObjectStorage();
         $value[new \stdClass()] = 345;
 
-        yield array('spl-object-storage', $value);
+        yield 'spl-object-storage' => array('spl-object-storage', $value);
 
-        yield array('incomplete-class', unserialize('O:20:"SomeNotExistingClass":0:{}'));
+        yield 'incomplete-class' => array('incomplete-class', unserialize('O:20:"SomeNotExistingClass":0:{}'));
 
         $value = array((object) array());
         $value[1] = &$value[0];
         $value[2] = $value[0];
 
-        yield array('hard-references', $value);
+        yield 'hard-references' => array('hard-references', $value);
 
         $value = array();
         $value[0] = &$value;
 
-        yield array('hard-references-recursive', $value);
+        yield 'hard-references-recursive' => array('hard-references-recursive', $value);
 
         static $value = array(123);
 
-        yield array('external-references', array(&$value), true);
+        yield 'external-references' => array('external-references', array(&$value), true);
 
         unset($value);
 
@@ -174,28 +174,28 @@ class VarExporterTest extends TestCase
         $rl->setAccessible(true);
         $rl->setValue($value, 234);
 
-        yield array('error', $value);
+        yield 'error' => array('error', $value);
 
-        yield array('var-on-sleep', new GoodNight());
+        yield 'var-on-sleep' => array('var-on-sleep', new GoodNight());
 
         $value = new FinalError(false);
         $rt->setValue($value, array());
         $rl->setValue($value, 123);
 
-        yield array('final-error', $value);
+        yield 'final-error' => array('final-error', $value);
 
-        yield array('final-array-iterator', new FinalArrayIterator());
+        yield 'final-array-iterator' => array('final-array-iterator', new FinalArrayIterator());
 
-        yield array('final-stdclass', new FinalStdClass());
+        yield 'final-stdclass' => array('final-stdclass', new FinalStdClass());
 
         $value = new MyWakeup();
         $value->bis = new \ReflectionClass($value);
 
-        yield array('wakeup-refl', $value);
+        yield 'wakeup-refl' => array('wakeup-refl', $value);
 
-        yield array('abstract-parent', new ConcreteClass());
+        yield 'abstract-parent' => array('abstract-parent', new ConcreteClass());
 
-        yield array('foo-serializable', new FooSerializable('bar'));
+        yield 'foo-serializable' => array('foo-serializable', new FooSerializable('bar'));
     }
 }
 

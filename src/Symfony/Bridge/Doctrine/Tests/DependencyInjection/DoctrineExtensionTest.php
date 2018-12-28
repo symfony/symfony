@@ -64,7 +64,7 @@ class DoctrineExtensionTest extends TestCase
         );
 
         $bundles = array(
-            'FristBundle' => 'My\FristBundle',
+            'FirstBundle' => 'My\FirstBundle',
             'SecondBundle' => 'My\SecondBundle',
         );
 
@@ -98,7 +98,7 @@ class DoctrineExtensionTest extends TestCase
                 array(),
                 array(
                     'mappings' => array(
-                        'FristBundle' => array(
+                        'FirstBundle' => array(
                             'mapping' => true,
                             'is_bundle' => true,
                         ),
@@ -132,7 +132,7 @@ class DoctrineExtensionTest extends TestCase
                 ),
                 array(
                     'mappings' => array(
-                        'FristBundle' => array(
+                        'FirstBundle' => array(
                             'mapping' => true,
                             'is_bundle' => true,
                         ),
@@ -153,7 +153,7 @@ class DoctrineExtensionTest extends TestCase
         );
 
         $bundles = array(
-            'FristBundle' => 'My\FristBundle',
+            'FirstBundle' => 'My\FirstBundle',
             'SecondBundle' => 'My\SecondBundle',
         );
 

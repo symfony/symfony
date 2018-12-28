@@ -43,10 +43,6 @@ class Serializer implements SerializerInterface
     }
 
     /**
-     * Create a new Transport Serializer.
-     *
-     * @return self
-     *
      * @throws LogicException when Symfony Serializer Component is not installed
      */
     public static function create(): self

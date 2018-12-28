@@ -8,8 +8,8 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     null,
     [],
     [
-        $o[0],
-        $o[1],
+        0 => $o[0],
+        1 => $o[1],
     ],
     []
 );

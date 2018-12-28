@@ -8,10 +8,10 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'Symfony\\Component\\VarExporter\\Tests\\AbstractClass' => [
             'foo' => [
-                123,
+                0 => 123,
             ],
             'bar' => [
-                234,
+                0 => 234,
             ],
         ],
     ],

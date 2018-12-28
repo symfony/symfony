@@ -9,9 +9,9 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'SplObjectStorage' => [
             "\0" => [
-                [
-                    $o[1],
-                    345,
+                0 => [
+                    0 => $o[1],
+                    1 => 345,
                 ],
             ],
         ],

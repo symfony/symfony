@@ -9,18 +9,18 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'ArrayObject' => [
             "\0" => [
-                [
-                    [
-                        1,
-                        $o[0],
+                0 => [
+                    0 => [
+                        0 => 1,
+                        1 => $o[0],
                     ],
-                    0,
+                    1 => 0,
                 ],
             ],
         ],
         'stdClass' => [
             'foo' => [
-                $o[1],
+                0 => $o[1],
             ],
         ],
     ],

@@ -8,7 +8,7 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'stdClass' => [
             'good' => [
-                'night',
+                0 => 'night',
             ],
         ],
     ],

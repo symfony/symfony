@@ -8,11 +8,11 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'ArrayObject' => [
             "\0" => [
-                [
-                    [
-                        234,
+                0 => [
+                    0 => [
+                        0 => 234,
                     ],
-                    1,
+                    1 => 1,
                 ],
             ],
         ],

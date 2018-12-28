@@ -9,18 +9,18 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'Symfony\\Component\\VarExporter\\Tests\\MyPrivateValue' => [
             'prot' => [
-                123,
-                123,
+                0 => 123,
+                1 => 123,
             ],
             'priv' => [
-                234,
-                234,
+                0 => 234,
+                1 => 234,
             ],
         ],
     ],
     [
-        $o[0],
-        $o[1],
+        0 => $o[0],
+        1 => $o[1],
     ],
     []
 );

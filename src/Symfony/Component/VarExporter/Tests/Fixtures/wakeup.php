@@ -9,8 +9,8 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'stdClass' => [
             'sub' => [
-                $o[1],
-                123,
+                0 => $o[1],
+                1 => 123,
             ],
             'baz' => [
                 1 => 123,
@@ -20,6 +20,6 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     $o[0],
     [
         1 => 1,
-        0,
+        2 => 0,
     ]
 );

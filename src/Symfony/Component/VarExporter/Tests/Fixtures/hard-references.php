@@ -10,9 +10,9 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     ],
     [],
     [
-        &$r[1],
-        &$r[1],
-        $o[0],
+        0 => &$r[1],
+        1 => &$r[1],
+        2 => $o[0],
     ],
     []
 );

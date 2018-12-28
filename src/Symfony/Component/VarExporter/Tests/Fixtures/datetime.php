@@ -8,13 +8,13 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'stdClass' => [
             'date' => [
-                '1970-01-01 00:00:00.000000',
+                0 => '1970-01-01 00:00:00.000000',
             ],
             'timezone_type' => [
-                1,
+                0 => 1,
             ],
             'timezone' => [
-                '+00:00',
+                0 => '+00:00',
             ],
         ],
     ],

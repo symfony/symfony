@@ -8,15 +8,15 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
     [
         'TypeError' => [
             'file' => [
-                \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
+                0 => \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
             ],
             'line' => [
-                234,
+                0 => 234,
             ],
         ],
         'Error' => [
             'trace' => [
-                [
+                0 => [
                     'file' => \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
                     'line' => 123,
                 ],

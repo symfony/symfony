@@ -47,7 +47,7 @@ class Serializer implements SerializerInterface
      *
      * @return self
      *
-     * @throws LogicException When Symfony Serializer Component is not installed.
+     * @throws LogicException when Symfony Serializer Component is not installed
      */
     public static function create(): self
     {

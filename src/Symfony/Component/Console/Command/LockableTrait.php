@@ -32,8 +32,8 @@ trait LockableTrait
      *
      * @return bool
      *
-     * @throws LogicException When Symfony Lock Component is not installed
-     *                        or when a lock is already in place.
+     * @throws LogicException when Symfony Lock Component is not installed
+     *                        or when a lock is already in place
      */
     private function lock($name = null, $blocking = false)
     {

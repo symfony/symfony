@@ -21,16 +21,21 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 class CliDescriptorTest extends TestCase
 {
     private static $timezone;
+    private static $prevTerminalEmulator;
 
     public static function setUpBeforeClass()
     {
         self::$timezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
+
+        self::$prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
+        putenv('TERMINAL_EMULATOR');
     }
 
     public static function tearDownAfterClass()
     {
         date_default_timezone_set(self::$timezone);
+        putenv('TERMINAL_EMULATOR'.(self::$prevTerminalEmulator ? '='.self::$prevTerminalEmulator : ''));
     }
 
     /**

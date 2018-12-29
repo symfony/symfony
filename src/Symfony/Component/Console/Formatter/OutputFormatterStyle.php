@@ -54,6 +54,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     private $background;
     private $href;
     private $options = array();
+    private $handlesHrefGracefully;
 
     /**
      * Initializes output formatter style.
@@ -185,6 +186,10 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $setCodes = array();
         $unsetCodes = array();
 
+        if (null === $this->handlesHrefGracefully) {
+            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR');
+        }
+
         if (null !== $this->foreground) {
             $setCodes[] = $this->foreground['set'];
             $unsetCodes[] = $this->foreground['unset'];
@@ -199,7 +204,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             $unsetCodes[] = $option['unset'];
         }
 
-        if (null !== $this->href) {
+        if (null !== $this->href && $this->handlesHrefGracefully) {
             $text = "\033]8;;$this->href\033\\$text\033]8;;\033\\";
         }
 

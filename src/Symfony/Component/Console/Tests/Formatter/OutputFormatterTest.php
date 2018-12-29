@@ -241,10 +241,17 @@ class OutputFormatterTest extends TestCase
     /**
      * @dataProvider provideDecoratedAndNonDecoratedOutput
      */
-    public function testNotDecoratedFormatter(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput)
+    public function testNotDecoratedFormatter(string $input, string $expectedNonDecoratedOutput, string $expectedDecoratedOutput, string $terminalEmulator = 'foo')
     {
-        $this->assertEquals($expectedDecoratedOutput, (new OutputFormatter(true))->format($input));
-        $this->assertEquals($expectedNonDecoratedOutput, (new OutputFormatter(false))->format($input));
+        $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
+        putenv('TERMINAL_EMULATOR='.$terminalEmulator);
+
+        try {
+            $this->assertEquals($expectedDecoratedOutput, (new OutputFormatter(true))->format($input));
+            $this->assertEquals($expectedNonDecoratedOutput, (new OutputFormatter(false))->format($input));
+        } finally {
+            putenv('TERMINAL_EMULATOR'.($prevTerminalEmulator ? "=$prevTerminalEmulator" : ''));
+        }
     }
 
     public function provideDecoratedAndNonDecoratedOutput()
@@ -256,6 +263,7 @@ class OutputFormatterTest extends TestCase
             array('<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"),
             array('<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"),
             array('<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"),
+            array('<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', 'JetBrains-JediTerm'),
         );
     }
 

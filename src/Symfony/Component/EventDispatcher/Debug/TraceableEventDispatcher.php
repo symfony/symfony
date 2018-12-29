@@ -221,7 +221,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     public function reset()
     {
-        $this->callStack = array();
+        $this->callStack = null;
     }
 
     /**

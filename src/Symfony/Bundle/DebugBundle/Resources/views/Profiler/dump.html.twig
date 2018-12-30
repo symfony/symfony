@@ -37,6 +37,11 @@
     <span class="label {{ collector.dumpsCount == 0 ? 'disabled' }}">
         <span class="icon">{{ include('@Debug/Profiler/icon.svg') }}</span>
         <strong>Debug</strong>
+        {% if collector.dumpsCount > 0 %}
+            <span class="count">
+                <span>{{ collector.dumpsCount }}</span>
+            </span>
+        {% endif %}
     </span>
 {% endblock %}
 

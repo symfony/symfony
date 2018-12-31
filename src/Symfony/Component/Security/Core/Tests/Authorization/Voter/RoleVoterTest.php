@@ -54,7 +54,7 @@ class RoleVoterTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->once())
               ->method('getRoles')
-              ->will($this->returnValue($roles));
+              ->willReturn($roles);
 
         return $token;
     }

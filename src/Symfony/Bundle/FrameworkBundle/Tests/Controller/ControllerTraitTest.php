@@ -42,9 +42,9 @@ abstract class ControllerTraitTest extends TestCase
         $requestStack->push($request);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
-        }));
+        });
 
         $container = new Container();
         $container->set('request_stack', $requestStack);
@@ -109,7 +109,7 @@ abstract class ControllerTraitTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $container = new Container();
         $container->set('security.token_storage', $tokenStorage);
@@ -136,7 +136,7 @@ abstract class ControllerTraitTest extends TestCase
             ->expects($this->once())
             ->method('serialize')
             ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
-            ->will($this->returnValue('[]'));
+            ->willReturn('[]');
 
         $container->set('serializer', $serializer);
 
@@ -157,7 +157,7 @@ abstract class ControllerTraitTest extends TestCase
             ->expects($this->once())
             ->method('serialize')
             ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
-            ->will($this->returnValue('[]'));
+            ->willReturn('[]');
 
         $container->set('serializer', $serializer);
 

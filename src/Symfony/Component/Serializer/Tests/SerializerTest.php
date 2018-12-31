@@ -384,14 +384,14 @@ class SerializerTest extends TestCase
         $example = new AbstractDummyFirstChild('foo-value', 'bar-value');
 
         $loaderMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
-        $loaderMock->method('hasMetadataFor')->will($this->returnValueMap(array(
+        $loaderMock->method('hasMetadataFor')->willReturnMap(array(
             array(
                 AbstractDummy::class,
                 true,
             ),
-        )));
+        ));
 
-        $loaderMock->method('getMetadataFor')->will($this->returnValueMap(array(
+        $loaderMock->method('getMetadataFor')->willReturnMap(array(
             array(
                 AbstractDummy::class,
                 new ClassMetadata(
@@ -402,7 +402,7 @@ class SerializerTest extends TestCase
                     ))
                 ),
             ),
-        )));
+        ));
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
         $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));

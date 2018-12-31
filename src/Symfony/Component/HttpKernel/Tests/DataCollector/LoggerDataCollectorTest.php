@@ -27,8 +27,8 @@ class LoggerDataCollectorTest extends TestCase
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
             ->setMethods(array('countErrors', 'getLogs', 'clear'))
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->will($this->returnValue('foo'));
-        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue(array()));
+        $logger->expects($this->once())->method('countErrors')->willReturn('foo');
+        $logger->expects($this->exactly(2))->method('getLogs')->willReturn(array());
 
         $c = new LoggerDataCollector($logger, __DIR__.'/');
         $c->lateCollect();
@@ -56,7 +56,7 @@ class LoggerDataCollectorTest extends TestCase
             ->setMethods(array('countErrors', 'getLogs', 'clear'))
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->with(null);
-        $logger->expects($this->exactly(2))->method('getLogs')->with(null)->will($this->returnValue(array()));
+        $logger->expects($this->exactly(2))->method('getLogs')->with(null)->willReturn(array());
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
@@ -77,7 +77,7 @@ class LoggerDataCollectorTest extends TestCase
             ->setMethods(array('countErrors', 'getLogs', 'clear'))
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->with($subRequest);
-        $logger->expects($this->exactly(2))->method('getLogs')->with($subRequest)->will($this->returnValue(array()));
+        $logger->expects($this->exactly(2))->method('getLogs')->with($subRequest)->willReturn(array());
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
@@ -94,8 +94,8 @@ class LoggerDataCollectorTest extends TestCase
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
             ->setMethods(array('countErrors', 'getLogs', 'clear'))
             ->getMock();
-        $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
-        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
+        $logger->expects($this->once())->method('countErrors')->willReturn($nb);
+        $logger->expects($this->exactly(2))->method('getLogs')->willReturn($logs);
 
         $c = new LoggerDataCollector($logger);
         $c->lateCollect();

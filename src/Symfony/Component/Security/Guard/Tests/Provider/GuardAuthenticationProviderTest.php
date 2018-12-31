@@ -61,18 +61,18 @@ class GuardAuthenticationProviderTest extends TestCase
         $authenticatorB->expects($this->once())
             ->method('getUser')
             ->with($enteredCredentials, $this->userProvider)
-            ->will($this->returnValue($mockedUser));
+            ->willReturn($mockedUser);
         // checkCredentials is called
         $authenticatorB->expects($this->once())
             ->method('checkCredentials')
             ->with($enteredCredentials, $mockedUser)
             // authentication works!
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $authedToken = $this->getMockBuilder(TokenInterface::class)->getMock();
         $authenticatorB->expects($this->once())
             ->method('createAuthenticatedToken')
             ->with($mockedUser, $providerKey)
-            ->will($this->returnValue($authedToken));
+            ->willReturn($authedToken);
 
         // user checker should be called
         $this->userChecker->expects($this->once())
@@ -109,12 +109,12 @@ class GuardAuthenticationProviderTest extends TestCase
         $mockedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $authenticator->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($mockedUser));
+            ->willReturn($mockedUser);
         // checkCredentials is called
         $authenticator->expects($this->once())
             ->method('checkCredentials')
             // authentication fails :(
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $provider = new GuardAuthenticationProvider(array($authenticator), $this->userProvider, $providerKey, $this->userChecker);
         $provider->authenticate($this->preAuthenticationToken);

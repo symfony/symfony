@@ -627,19 +627,19 @@ EOF;
         $bundle
             ->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(null === $bundleName ? \get_class($bundle) : $bundleName))
+            ->willReturn(null === $bundleName ? \get_class($bundle) : $bundleName)
         ;
 
         $bundle
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue($dir))
+            ->willReturn($dir)
         ;
 
         $bundle
             ->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue($parent))
+            ->willReturn($parent)
         ;
 
         return $bundle;
@@ -665,7 +665,7 @@ EOF;
         ;
         $kernel->expects($this->any())
             ->method('registerBundles')
-            ->will($this->returnValue($bundles))
+            ->willReturn($bundles)
         ;
         $p = new \ReflectionProperty($kernel, 'rootDir');
         $p->setAccessible(true);

@@ -132,17 +132,17 @@ class AbstractFactoryTest extends TestCase
         $factory
             ->expects($this->once())
             ->method('createAuthProvider')
-            ->will($this->returnValue('auth_provider'))
+            ->willReturn('auth_provider')
         ;
         $factory
             ->expects($this->atLeastOnce())
             ->method('getListenerId')
-            ->will($this->returnValue('abstract_listener'))
+            ->willReturn('abstract_listener')
         ;
         $factory
             ->expects($this->any())
             ->method('getKey')
-            ->will($this->returnValue('abstract_factory'))
+            ->willReturn('abstract_factory')
         ;
 
         $container = new ContainerBuilder();

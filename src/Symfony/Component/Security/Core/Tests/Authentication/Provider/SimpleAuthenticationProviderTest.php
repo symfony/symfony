@@ -32,7 +32,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
@@ -42,7 +42,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $provider = $this->getProvider($authenticator, null, $userChecker);
 
@@ -59,7 +59,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
@@ -69,7 +69,7 @@ class SimpleAuthenticationProviderTest extends TestCase
         $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $provider = $this->getProvider($authenticator, null, $userChecker);
 
@@ -81,11 +81,11 @@ class SimpleAuthenticationProviderTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue('string-user'));
+            ->willReturn('string-user');
         $authenticator = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface')->getMock();
         $authenticator->expects($this->once())
             ->method('authenticateToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $this->assertSame($token, $this->getProvider($authenticator, null, new UserChecker())->authenticate($token));
     }

@@ -658,11 +658,11 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $validator->expects($this->any())
             ->method('inContext')
             ->with($context)
-            ->will($this->returnValue($contextualValidator));
+            ->willReturn($contextualValidator);
 
         $context->expects($this->any())
             ->method('getValidator')
-            ->will($this->returnValue($validator));
+            ->willReturn($validator);
 
         return $context;
     }

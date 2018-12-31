@@ -239,8 +239,8 @@ class ApplicationTest extends TestCase
             $container
                 ->expects($this->atLeastOnce())
                 ->method('get')
-                ->with($this->equalTo('event_dispatcher'))
-                ->will($this->returnValue($dispatcher));
+                ->with('event_dispatcher')
+                ->willReturn($dispatcher);
         }
 
         $container
@@ -261,12 +261,12 @@ class ApplicationTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue($bundles))
+            ->willReturn($bundles)
         ;
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($container))
+            ->willReturn($container)
         ;
 
         return $kernel;
@@ -278,9 +278,9 @@ class ApplicationTest extends TestCase
         $bundle
             ->expects($this->once())
             ->method('registerCommands')
-            ->will($this->returnCallback(function (Application $application) use ($commands) {
+            ->willReturnCallback(function (Application $application) use ($commands) {
                 $application->addCommands($commands);
-            }))
+            })
         ;
 
         return $bundle;

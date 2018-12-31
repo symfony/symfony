@@ -93,8 +93,8 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')
             ->with(
-                $this->equalTo('Receiver stopped due to maximum count of {count} exceeded'),
-                $this->equalTo(array('count' => 1))
+                'Receiver stopped due to maximum count of {count} exceeded',
+                array('count' => 1)
             );
 
         $maximumCountReceiver = new StopWhenMessageCountIsExceededReceiver($decoratedReceiver, 1, $logger);

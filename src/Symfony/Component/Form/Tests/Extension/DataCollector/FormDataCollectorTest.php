@@ -84,29 +84,29 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($this->form)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($this->childForm)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         $this->dataExtractor->expects($this->at(2))
             ->method('extractDefaultData')
             ->with($this->form)
-            ->will($this->returnValue(array('default_data' => 'foo')));
+            ->willReturn(array('default_data' => 'foo'));
         $this->dataExtractor->expects($this->at(3))
             ->method('extractDefaultData')
             ->with($this->childForm)
-            ->will($this->returnValue(array('default_data' => 'bar')));
+            ->willReturn(array('default_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(4))
             ->method('extractSubmittedData')
             ->with($this->form)
-            ->will($this->returnValue(array('submitted_data' => 'foo')));
+            ->willReturn(array('submitted_data' => 'foo'));
         $this->dataExtractor->expects($this->at(5))
             ->method('extractSubmittedData')
             ->with($this->childForm)
-            ->will($this->returnValue(array('submitted_data' => 'bar')));
+            ->willReturn(array('submitted_data' => 'bar'));
 
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->collectDefaultData($this->form);
@@ -150,11 +150,11 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($form1)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($form2)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         $this->dataCollector->collectConfiguration($form1);
         $this->dataCollector->collectConfiguration($form2);
@@ -200,12 +200,12 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($this->form)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
 
         $this->dataExtractor->expects($this->at(1))
             ->method('extractDefaultData')
             ->with($this->form)
-            ->will($this->returnValue(array('default_data' => 'foo')));
+            ->willReturn(array('default_data' => 'foo'));
 
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
@@ -272,39 +272,39 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($this->form)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($this->childForm)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         $this->dataExtractor->expects($this->at(2))
             ->method('extractDefaultData')
             ->with($this->form)
-            ->will($this->returnValue(array('default_data' => 'foo')));
+            ->willReturn(array('default_data' => 'foo'));
         $this->dataExtractor->expects($this->at(3))
             ->method('extractDefaultData')
             ->with($this->childForm)
-            ->will($this->returnValue(array('default_data' => 'bar')));
+            ->willReturn(array('default_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(4))
             ->method('extractSubmittedData')
             ->with($this->form)
-            ->will($this->returnValue(array('submitted_data' => 'foo')));
+            ->willReturn(array('submitted_data' => 'foo'));
         $this->dataExtractor->expects($this->at(5))
             ->method('extractSubmittedData')
             ->with($this->childForm)
-            ->will($this->returnValue(array('submitted_data' => 'bar')));
+            ->willReturn(array('submitted_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(6))
             ->method('extractViewVariables')
             ->with($this->view)
-            ->will($this->returnValue(array('view_vars' => 'foo')));
+            ->willReturn(array('view_vars' => 'foo'));
 
         $this->dataExtractor->expects($this->at(7))
             ->method('extractViewVariables')
             ->with($this->childView)
-            ->will($this->returnValue(array('view_vars' => 'bar')));
+            ->willReturn(array('view_vars' => 'bar'));
 
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->collectDefaultData($this->form);
@@ -365,76 +365,76 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($form1)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($child1)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         $this->dataExtractor->expects($this->at(2))
             ->method('extractDefaultData')
             ->with($form1)
-            ->will($this->returnValue(array('default_data' => 'foo')));
+            ->willReturn(array('default_data' => 'foo'));
         $this->dataExtractor->expects($this->at(3))
             ->method('extractDefaultData')
             ->with($child1)
-            ->will($this->returnValue(array('default_data' => 'bar')));
+            ->willReturn(array('default_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(4))
             ->method('extractSubmittedData')
             ->with($form1)
-            ->will($this->returnValue(array('submitted_data' => 'foo')));
+            ->willReturn(array('submitted_data' => 'foo'));
         $this->dataExtractor->expects($this->at(5))
             ->method('extractSubmittedData')
             ->with($child1)
-            ->will($this->returnValue(array('submitted_data' => 'bar')));
+            ->willReturn(array('submitted_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(6))
             ->method('extractViewVariables')
             ->with($form1View)
-            ->will($this->returnValue(array('view_vars' => 'foo')));
+            ->willReturn(array('view_vars' => 'foo'));
 
         $this->dataExtractor->expects($this->at(7))
             ->method('extractViewVariables')
             ->with($child1View)
-            ->will($this->returnValue(array('view_vars' => $child1View->vars)));
+            ->willReturn(array('view_vars' => $child1View->vars));
 
         $this->dataExtractor->expects($this->at(8))
             ->method('extractConfiguration')
             ->with($form2)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(9))
             ->method('extractConfiguration')
             ->with($child1)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         $this->dataExtractor->expects($this->at(10))
             ->method('extractDefaultData')
             ->with($form2)
-            ->will($this->returnValue(array('default_data' => 'foo')));
+            ->willReturn(array('default_data' => 'foo'));
         $this->dataExtractor->expects($this->at(11))
             ->method('extractDefaultData')
             ->with($child1)
-            ->will($this->returnValue(array('default_data' => 'bar')));
+            ->willReturn(array('default_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(12))
             ->method('extractSubmittedData')
             ->with($form2)
-            ->will($this->returnValue(array('submitted_data' => 'foo')));
+            ->willReturn(array('submitted_data' => 'foo'));
         $this->dataExtractor->expects($this->at(13))
             ->method('extractSubmittedData')
             ->with($child1)
-            ->will($this->returnValue(array('submitted_data' => 'bar')));
+            ->willReturn(array('submitted_data' => 'bar'));
 
         $this->dataExtractor->expects($this->at(14))
             ->method('extractViewVariables')
             ->with($form2View)
-            ->will($this->returnValue(array('view_vars' => 'foo')));
+            ->willReturn(array('view_vars' => 'foo'));
 
         $this->dataExtractor->expects($this->at(15))
             ->method('extractViewVariables')
             ->with($child1View)
-            ->will($this->returnValue(array('view_vars' => $child1View->vars)));
+            ->willReturn(array('view_vars' => $child1View->vars));
 
         $this->dataCollector->collectConfiguration($form1);
         $this->dataCollector->collectDefaultData($form1);
@@ -518,11 +518,11 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($this->form)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($this->childForm)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         // explicitly call collectConfiguration(), since $this->childForm is not
         // contained in the form tree
@@ -566,11 +566,11 @@ class FormDataCollectorTest extends TestCase
         $this->dataExtractor->expects($this->at(0))
             ->method('extractConfiguration')
             ->with($this->form)
-            ->will($this->returnValue(array('config' => 'foo')));
+            ->willReturn(array('config' => 'foo'));
         $this->dataExtractor->expects($this->at(1))
             ->method('extractConfiguration')
             ->with($this->childForm)
-            ->will($this->returnValue(array('config' => 'bar')));
+            ->willReturn(array('config' => 'bar'));
 
         // explicitly call collectConfiguration(), since $this->childForm is not
         // contained in the form tree
@@ -611,22 +611,22 @@ class FormDataCollectorTest extends TestCase
         $form1->add($childForm1);
         $this->dataExtractor
              ->method('extractConfiguration')
-             ->will($this->returnValue(array()));
+             ->willReturn(array());
         $this->dataExtractor
              ->method('extractDefaultData')
-             ->will($this->returnValue(array()));
+             ->willReturn(array());
         $this->dataExtractor->expects($this->at(4))
             ->method('extractSubmittedData')
             ->with($form1)
-            ->will($this->returnValue(array('errors' => array('foo'))));
+            ->willReturn(array('errors' => array('foo')));
         $this->dataExtractor->expects($this->at(5))
             ->method('extractSubmittedData')
             ->with($childForm1)
-            ->will($this->returnValue(array('errors' => array('bar', 'bam'))));
+            ->willReturn(array('errors' => array('bar', 'bam')));
         $this->dataExtractor->expects($this->at(8))
             ->method('extractSubmittedData')
             ->with($form2)
-            ->will($this->returnValue(array('errors' => array('baz'))));
+            ->willReturn(array('errors' => array('baz')));
 
         $this->dataCollector->collectSubmittedData($form1);
 
@@ -653,30 +653,30 @@ class FormDataCollectorTest extends TestCase
 
         $this->dataExtractor
             ->method('extractConfiguration')
-            ->will($this->returnValue(array()));
+            ->willReturn(array());
         $this->dataExtractor
             ->method('extractDefaultData')
-            ->will($this->returnValue(array()));
+            ->willReturn(array());
         $this->dataExtractor->expects($this->at(10))
             ->method('extractSubmittedData')
             ->with($this->form)
-            ->will($this->returnValue(array('errors' => array())));
+            ->willReturn(array('errors' => array()));
         $this->dataExtractor->expects($this->at(11))
             ->method('extractSubmittedData')
             ->with($child1Form)
-            ->will($this->returnValue(array('errors' => array())));
+            ->willReturn(array('errors' => array()));
         $this->dataExtractor->expects($this->at(12))
             ->method('extractSubmittedData')
             ->with($child11Form)
-            ->will($this->returnValue(array('errors' => array('foo'))));
+            ->willReturn(array('errors' => array('foo')));
         $this->dataExtractor->expects($this->at(13))
             ->method('extractSubmittedData')
             ->with($child2Form)
-            ->will($this->returnValue(array('errors' => array())));
+            ->willReturn(array('errors' => array()));
         $this->dataExtractor->expects($this->at(14))
             ->method('extractSubmittedData')
             ->with($child21Form)
-            ->will($this->returnValue(array('errors' => array())));
+            ->willReturn(array('errors' => array()));
 
         $this->dataCollector->collectSubmittedData($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
@@ -701,14 +701,14 @@ class FormDataCollectorTest extends TestCase
 
         $this->dataExtractor->expects($this->any())
             ->method('extractConfiguration')
-            ->will($this->returnValue(array()));
+            ->willReturn(array());
         $this->dataExtractor->expects($this->any())
             ->method('extractDefaultData')
-            ->will($this->returnValue(array()));
+            ->willReturn(array());
         $this->dataExtractor->expects($this->any())
             ->method('extractSubmittedData')
             ->with($form)
-            ->will($this->returnValue(array('errors' => array('baz'))));
+            ->willReturn(array('errors' => array('baz')));
 
         $this->dataCollector->buildPreliminaryFormTree($form);
         $this->dataCollector->collectSubmittedData($form);

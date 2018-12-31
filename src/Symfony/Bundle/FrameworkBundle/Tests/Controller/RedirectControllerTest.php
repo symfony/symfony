@@ -73,8 +73,8 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
-            ->will($this->returnValue($url));
+            ->with($route, $expectedAttributes)
+            ->willReturn($url);
 
         $controller = new RedirectController($router);
 
@@ -247,7 +247,7 @@ class RedirectControllerTest extends TestCase
         $request->query = new ParameterBag(array('base' => 'zaza'));
         $request->attributes = new ParameterBag(array('_route_params' => array('base2' => 'zaza')));
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zaza&base2=zaza'))->with('/test', array('base' => 'zaza', 'base2' => 'zaza'), UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('/test?base=zaza&base2=zaza')->with('/test', array('base' => 'zaza', 'base2' => 'zaza'), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
         $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zaza&base2=zaza');
@@ -264,7 +264,7 @@ class RedirectControllerTest extends TestCase
         $request->query = new ParameterBag(array('base' => 'zaza'));
         $request->attributes = new ParameterBag(array('_route_params' => array('base' => 'zouzou')));
         $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zouzou'))->with('/test', array('base' => 'zouzou'), UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlGenerator->expects($this->once())->method('generate')->willReturn('/test?base=zouzou')->with('/test', array('base' => 'zouzou'), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $controller = new RedirectController($urlGenerator);
         $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zouzou');
@@ -276,23 +276,23 @@ class RedirectControllerTest extends TestCase
         $request
             ->expects($this->any())
             ->method('getScheme')
-            ->will($this->returnValue($scheme));
+            ->willReturn($scheme);
         $request
             ->expects($this->any())
             ->method('getHost')
-            ->will($this->returnValue($host));
+            ->willReturn($host);
         $request
             ->expects($this->any())
             ->method('getPort')
-            ->will($this->returnValue($port));
+            ->willReturn($port);
         $request
             ->expects($this->any())
             ->method('getBaseUrl')
-            ->will($this->returnValue($baseUrl));
+            ->willReturn($baseUrl);
         $request
             ->expects($this->any())
             ->method('getQueryString')
-            ->will($this->returnValue($queryString));
+            ->willReturn($queryString);
 
         return $request;
     }

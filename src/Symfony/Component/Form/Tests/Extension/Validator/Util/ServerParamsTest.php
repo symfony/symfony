@@ -33,7 +33,7 @@ class ServerParamsTest extends TestCase
     {
         $request = Request::create('http://foo', 'GET', array(), array(), array(), array('CONTENT_LENGTH' => 1024));
         $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(array('getCurrentRequest'))->getMock();
-        $requestStack->expects($this->once())->method('getCurrentRequest')->will($this->returnValue($request));
+        $requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
         $serverParams = new ServerParams($requestStack);
 
         $this->assertEquals(1024, $serverParams->getContentLength());
@@ -46,7 +46,7 @@ class ServerParamsTest extends TestCase
         $serverParams
             ->expects($this->any())
             ->method('getNormalizedIniPostMaxSize')
-            ->will($this->returnValue(strtoupper($size)));
+            ->willReturn(strtoupper($size));
 
         $this->assertEquals($bytes, $serverParams->getPostMaxSize());
     }

@@ -25,7 +25,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 
         $translator->expects($this->any())
             ->method('trans')
-            ->with($this->equalTo('old max {{ max }}!'))
+            ->with('old max {{ max }}!')
             ->willReturn('translated max {{ max }}!');
 
         $extension = new UploadValidatorExtension($translator);

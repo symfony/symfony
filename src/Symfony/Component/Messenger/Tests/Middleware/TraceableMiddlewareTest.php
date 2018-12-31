@@ -34,9 +34,9 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $middleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
-            ->will($this->returnCallback(function ($envelope, StackInterface $stack) {
+            ->willReturnCallback(function ($envelope, StackInterface $stack) {
                 return $stack->next()->handle($envelope, $stack);
-            }))
+            })
         ;
 
         $stopwatch = $this->createMock(Stopwatch::class);

@@ -313,7 +313,7 @@ class HttpKernelTest extends TestCase
         $request = new Request();
 
         $stack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(array('push', 'pop'))->getMock();
-        $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
+        $stack->expects($this->at(0))->method('push')->with($request);
         $stack->expects($this->at(1))->method('pop');
 
         $dispatcher = new EventDispatcher();
@@ -354,13 +354,13 @@ class HttpKernelTest extends TestCase
         $controllerResolver
             ->expects($this->any())
             ->method('getController')
-            ->will($this->returnValue($controller));
+            ->willReturn($controller);
 
         $argumentResolver = $this->getMockBuilder(ArgumentResolverInterface::class)->getMock();
         $argumentResolver
             ->expects($this->any())
             ->method('getArguments')
-            ->will($this->returnValue($arguments));
+            ->willReturn($arguments);
 
         return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver);
     }

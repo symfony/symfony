@@ -91,7 +91,7 @@ class DelegatingEngineTest extends TestCase
         $engine->expects($this->once())
             ->method('supports')
             ->with($template)
-            ->will($this->returnValue($supports));
+            ->willReturn($supports);
 
         return $engine;
     }
@@ -103,7 +103,7 @@ class DelegatingEngineTest extends TestCase
         $engine->expects($this->once())
             ->method('supports')
             ->with($template)
-            ->will($this->returnValue($supports));
+            ->willReturn($supports);
 
         return $engine;
     }
@@ -117,7 +117,7 @@ class DelegatingEngineTest extends TestCase
             $container->expects($this->at($i++))
                 ->method('get')
                 ->with($id)
-                ->will($this->returnValue($service));
+                ->willReturn($service);
         }
 
         return $container;

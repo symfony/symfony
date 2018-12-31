@@ -246,7 +246,7 @@ class FormBuilderTest extends TestCase
 
         $mock->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $mock;
     }

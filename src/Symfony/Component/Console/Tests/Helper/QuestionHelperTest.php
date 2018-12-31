@@ -541,7 +541,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $helperSet = new HelperSet(array(new FormatterHelper()));
         $dialog->setHelperSet($helperSet);
 
-        $output->expects($this->once())->method('writeln')->with($this->equalTo($outputShown));
+        $output->expects($this->once())->method('writeln')->with($outputShown);
 
         $question = new ChoiceQuestion($question, $possibleChoices, 'foo');
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output, $question);
@@ -636,7 +636,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $mock = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
-            ->will($this->returnValue($interactive));
+            ->willReturn($interactive);
 
         return $mock;
     }

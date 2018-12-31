@@ -56,7 +56,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(self::TEST_CLASS)
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
         $this->guesser = new ValidatorTypeGuesser($this->metadataFactory);
     }
 

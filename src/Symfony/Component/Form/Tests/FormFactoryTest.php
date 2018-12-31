@@ -58,10 +58,10 @@ class FormFactoryTest extends TestCase
 
         $this->registry->expects($this->any())
             ->method('getTypeGuesser')
-            ->will($this->returnValue(new FormTypeGuesserChain(array(
+            ->willReturn(new FormTypeGuesserChain(array(
                 $this->guesser1,
                 $this->guesser2,
-            ))));
+            )));
     }
 
     public function testCreateNamedBuilderWithTypeName()
@@ -73,7 +73,7 @@ class FormFactoryTest extends TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with('type')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -82,7 +82,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
+            ->willReturn($resolvedOptions);
 
         $resolvedType->expects($this->once())
             ->method('buildForm')
@@ -101,7 +101,7 @@ class FormFactoryTest extends TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with('type')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -110,7 +110,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
+            ->willReturn($resolvedOptions);
 
         $resolvedType->expects($this->once())
             ->method('buildForm')
@@ -128,7 +128,7 @@ class FormFactoryTest extends TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with('type')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -137,7 +137,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
+            ->willReturn($resolvedOptions);
 
         $resolvedType->expects($this->once())
             ->method('buildForm')
@@ -181,16 +181,16 @@ class FormFactoryTest extends TestCase
         $this->registry->expects($this->any())
             ->method('getType')
             ->with('TYPE')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
             ->with($this->factory, 'TYPE_PREFIX', $options)
-            ->will($this->returnValue($this->builder));
+            ->willReturn($this->builder);
 
         $this->builder->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
+            ->willReturn($resolvedOptions);
 
         $resolvedType->expects($this->once())
             ->method('buildForm')
@@ -198,7 +198,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue('FORM'));
+            ->willReturn('FORM');
 
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
     }
@@ -212,7 +212,7 @@ class FormFactoryTest extends TestCase
         $this->registry->expects($this->once())
             ->method('getType')
             ->with('type')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
 
         $resolvedType->expects($this->once())
             ->method('createBuilder')
@@ -221,7 +221,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->any())
             ->method('getOptions')
-            ->will($this->returnValue($resolvedOptions));
+            ->willReturn($resolvedOptions);
 
         $resolvedType->expects($this->once())
             ->method('buildForm')
@@ -229,7 +229,7 @@ class FormFactoryTest extends TestCase
 
         $this->builder->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue('FORM'));
+            ->willReturn('FORM');
 
         $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
     }
@@ -245,7 +245,7 @@ class FormFactoryTest extends TestCase
         $factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array())
-            ->will($this->returnValue('builderInstance'));
+            ->willReturn('builderInstance');
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
 
@@ -257,20 +257,20 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new TypeGuess(
+            ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\TextType',
                 array('attr' => array('maxlength' => 10)),
                 Guess::MEDIUM_CONFIDENCE
-            )));
+            ));
 
         $this->guesser2->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new TypeGuess(
+            ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\PasswordType',
                 array('attr' => array('maxlength' => 7)),
                 Guess::HIGH_CONFIDENCE
-            )));
+            ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -289,7 +289,7 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -308,11 +308,11 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessType')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new TypeGuess(
+            ->willReturn(new TypeGuess(
                 'Symfony\Component\Form\Extension\Core\Type\TextType',
                 array('attr' => array('class' => 'foo', 'maxlength' => 10)),
                 Guess::MEDIUM_CONFIDENCE
-            )));
+            ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -336,18 +336,18 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessMaxLength')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     15,
                     Guess::MEDIUM_CONFIDENCE
-                )));
+                ));
 
         $this->guesser2->expects($this->once())
             ->method('guessMaxLength')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     20,
                     Guess::HIGH_CONFIDENCE
-                )));
+                ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -369,18 +369,18 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessMaxLength')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                 20,
                 Guess::HIGH_CONFIDENCE
-            )));
+            ));
 
         $this->guesser2->expects($this->once())
             ->method('guessPattern')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                 '.{5,}',
                 Guess::HIGH_CONFIDENCE
-            )));
+            ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -404,18 +404,18 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessRequired')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     true,
                     Guess::MEDIUM_CONFIDENCE
-                )));
+                ));
 
         $this->guesser2->expects($this->once())
             ->method('guessRequired')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     false,
                     Guess::HIGH_CONFIDENCE
-                )));
+                ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 
@@ -437,18 +437,18 @@ class FormFactoryTest extends TestCase
         $this->guesser1->expects($this->once())
             ->method('guessPattern')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     '[a-z]',
                     Guess::MEDIUM_CONFIDENCE
-                )));
+                ));
 
         $this->guesser2->expects($this->once())
             ->method('guessPattern')
             ->with('Application\Author', 'firstName')
-            ->will($this->returnValue(new ValueGuess(
+            ->willReturn(new ValueGuess(
                     '[a-zA-Z]',
                     Guess::HIGH_CONFIDENCE
-                )));
+                ));
 
         $factory = $this->getMockFactory(array('createNamedBuilder'));
 

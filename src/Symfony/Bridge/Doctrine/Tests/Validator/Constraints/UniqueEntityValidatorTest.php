@@ -81,8 +81,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $registry->expects($this->any())
                  ->method('getManager')
-                 ->with($this->equalTo(self::EM_NAME))
-                 ->will($this->returnValue($em));
+                 ->with(self::EM_NAME)
+                 ->willReturn($em);
 
         return $registry;
     }
@@ -104,14 +104,14 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ;
         $em->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($repositoryMock))
+            ->willReturn($repositoryMock)
         ;
 
         $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')->getMock();
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
             ->disableOriginalConstructor()
@@ -125,12 +125,12 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $refl
             ->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $classMetadata->reflFields = array('name' => $refl);
         $em->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValue($classMetadata))
+            ->willReturn($classMetadata)
         ;
 
         return $em;

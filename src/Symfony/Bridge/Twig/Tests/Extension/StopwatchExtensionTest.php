@@ -63,11 +63,11 @@ class StopwatchExtensionTest extends TestCase
         foreach ($events as $eventName) {
             $stopwatch->expects($this->at(++$i))
                 ->method('start')
-                ->with($this->equalTo($eventName), 'template')
+                ->with($eventName, 'template')
             ;
             $stopwatch->expects($this->at(++$i))
                 ->method('stop')
-                ->with($this->equalTo($eventName))
+                ->with($eventName)
             ;
         }
 

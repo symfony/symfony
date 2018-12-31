@@ -112,14 +112,14 @@ class TemplateManagerTest extends TestCase
 
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')
-            ->will($this->returnValue('loadedTemplate'));
+            ->willReturn('loadedTemplate');
 
         if (interface_exists('Twig\Loader\SourceContextLoaderInterface')) {
             $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
         } else {
             $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
         }
-        $this->twigEnvironment->expects($this->any())->method('getLoader')->will($this->returnValue($loader));
+        $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
 
         return $this->twigEnvironment;
     }

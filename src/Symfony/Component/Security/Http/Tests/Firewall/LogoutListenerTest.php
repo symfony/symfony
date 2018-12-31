@@ -189,7 +189,7 @@ class LogoutListenerTest extends TestCase
 
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request = new Request()));
+            ->willReturn($request = new Request());
 
         return array($event, $request);
     }

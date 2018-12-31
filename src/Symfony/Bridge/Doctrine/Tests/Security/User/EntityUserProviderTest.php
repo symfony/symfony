@@ -187,8 +187,8 @@ class EntityUserProviderTest extends TestCase
         $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $manager->expects($this->any())
             ->method('getManager')
-            ->with($this->equalTo($name))
-            ->will($this->returnValue($em));
+            ->with($name)
+            ->willReturn($em);
 
         return $manager;
     }

@@ -128,11 +128,11 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
         $car->expects($this->any())
             ->method('getStructure')
-            ->will($this->returnValue($structure));
+            ->willReturn($structure);
 
         $structure->expects($this->at(0))
             ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
+            ->willReturn($axesBefore);
         $structure->expects($this->at(1))
             ->method('removeAxis')
             ->with('fourth');
@@ -158,7 +158,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
         $car->expects($this->any())
             ->method('getAxes')
-            ->will($this->returnValue($axesBefore));
+            ->willReturn($axesBefore);
 
         $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }

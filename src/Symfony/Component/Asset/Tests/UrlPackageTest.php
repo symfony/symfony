@@ -107,7 +107,7 @@ class UrlPackageTest extends TestCase
     private function getContext($secure)
     {
         $context = $this->getMockBuilder('Symfony\Component\Asset\Context\ContextInterface')->getMock();
-        $context->expects($this->any())->method('isSecure')->will($this->returnValue($secure));
+        $context->expects($this->any())->method('isSecure')->willReturn($secure);
 
         return $context;
     }

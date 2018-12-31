@@ -75,7 +75,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo(null));
+            ->with(null);
 
         $this->form->submit(array('firstName' => null), false);
     }
@@ -88,7 +88,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo(null));
+            ->with(null);
 
         $this->form->submit(array());
     }
@@ -126,7 +126,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->with($this->equalTo('foo'), false);
+            ->with('foo', false);
 
         $this->form->submit(array('firstName' => 'foo'), false);
     }
@@ -148,7 +148,7 @@ class CompoundFormTest extends AbstractFormTest
         $child = $this->getMockForm();
         $child->expects($this->once())
             ->method('isEmpty')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->form->setData(null);
         $this->form->add($child);
@@ -409,10 +409,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('setData')
-            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+            ->willReturnCallback(function () use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
-            }));
+            });
 
         $childToBeRemoved->expects($this->never())
             ->method('setData');
@@ -443,10 +443,10 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapDataToForms')
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
-            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
+            ->willReturnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
-            }));
+            });
 
         $form->setData('foo');
     }
@@ -464,10 +464,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $child->expects($this->once())
             ->method('submit')
-            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+            ->willReturnCallback(function () use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
-            }));
+            });
 
         $childToBeRemoved->expects($this->never())
             ->method('submit');
@@ -570,10 +570,10 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapFormsToData')
             ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
-            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
+            ->willReturnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(array('name' => $child), iterator_to_array($iterator));
-            }));
+            });
 
         $form->submit(array(
             'name' => 'Bernhard',
@@ -904,30 +904,30 @@ class CompoundFormTest extends AbstractFormTest
         // First create the view
         $type->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($view));
+            ->willReturn($view);
 
         // Then build it for the form itself
         $type->expects($this->once())
             ->method('buildView')
             ->with($view, $this->form, $options)
-            ->will($this->returnCallback($assertChildViewsEqual(array())));
+            ->willReturnCallback($assertChildViewsEqual(array()));
 
         // Then add the first child form
         $field1->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($field1View));
+            ->willReturn($field1View);
 
         // Then the second child form
         $field2->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($field2View));
+            ->willReturn($field2View);
 
         // Again build the view for the form itself. This time the child views
         // exist.
         $type->expects($this->once())
             ->method('finishView')
             ->with($view, $this->form, $options)
-            ->will($this->returnCallback($assertChildViewsEqual(array('foo' => $field1View, 'bar' => $field2View))));
+            ->willReturnCallback($assertChildViewsEqual(array('foo' => $field1View, 'bar' => $field2View)));
 
         $this->assertSame($view, $this->form->createView());
     }
@@ -946,7 +946,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $button->expects($this->any())
             ->method('isClicked')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $parentForm = $this->getBuilder('parent')->getForm();
         $nestedForm = $this->getBuilder('nested')->getForm();
@@ -968,7 +968,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $button->expects($this->any())
             ->method('isClicked')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->form->add($button);
         $this->form->submit(array());
@@ -987,7 +987,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $nestedForm->expects($this->any())
             ->method('getClickedButton')
-            ->will($this->returnValue($button));
+            ->willReturn($button);
 
         $this->form->add($nestedForm);
         $this->form->submit(array());
@@ -1006,7 +1006,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $parentForm->expects($this->any())
             ->method('getClickedButton')
-            ->will($this->returnValue($button));
+            ->willReturn($button);
 
         $this->form->setParent($parentForm);
         $this->form->submit(array());

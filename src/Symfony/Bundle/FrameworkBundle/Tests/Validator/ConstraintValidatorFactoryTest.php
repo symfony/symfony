@@ -68,7 +68,7 @@ class ConstraintValidatorFactoryTest extends TestCase
         $constraint
             ->expects($this->exactly(2))
             ->method('validatedBy')
-            ->will($this->returnValue('Fully\\Qualified\\ConstraintValidator\\Class\\Name'));
+            ->willReturn('Fully\\Qualified\\ConstraintValidator\\Class\\Name');
 
         $factory = new ConstraintValidatorFactory(new Container());
         $factory->getInstance($constraint);

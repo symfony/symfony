@@ -27,7 +27,7 @@ class FirewallTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('register')
-            ->with($this->equalTo($dispatcher))
+            ->with($dispatcher)
         ;
 
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
@@ -36,8 +36,8 @@ class FirewallTest extends TestCase
         $map
             ->expects($this->once())
             ->method('getListeners')
-            ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array(), $listener)))
+            ->with($request)
+            ->willReturn(array(array(), $listener))
         ;
 
         $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
@@ -66,7 +66,7 @@ class FirewallTest extends TestCase
         $map
             ->expects($this->once())
             ->method('getListeners')
-            ->will($this->returnValue(array(array($first, $second), null)))
+            ->willReturn(array(array($first, $second), null))
         ;
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
@@ -81,7 +81,7 @@ class FirewallTest extends TestCase
         $event
             ->expects($this->at(0))
             ->method('hasResponse')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $firewall = new Firewall($map, $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock());

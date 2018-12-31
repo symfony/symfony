@@ -82,7 +82,7 @@ class RouterDebugCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection));
+            ->willReturn($routeCollection);
 
         return $router;
     }
@@ -93,13 +93,13 @@ class RouterDebugCommandTest extends TestCase
         $container
             ->expects($this->atLeastOnce())
             ->method('has')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 if ('console.command_loader' === $id) {
                     return false;
                 }
 
                 return true;
-            }))
+            })
         ;
         $container
             ->expects($this->any())

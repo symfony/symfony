@@ -41,7 +41,7 @@ class SessionAuthenticationStrategyTest extends TestCase
     public function testSessionIsMigrated()
     {
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
-        $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
+        $session->expects($this->once())->method('migrate')->with(true);
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
         $strategy->onAuthentication($this->getRequest($session), $this->getToken());
@@ -61,7 +61,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
         if (null !== $session) {
-            $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
+            $request->expects($this->any())->method('getSession')->willReturn($session);
         }
 
         return $request;

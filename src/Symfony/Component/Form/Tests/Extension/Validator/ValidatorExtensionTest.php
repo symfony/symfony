@@ -29,7 +29,7 @@ class ValidatorExtensionTest extends TestCase
         $validator->expects($this->once())
             ->method('getMetadataFor')
             ->with($this->identicalTo('Symfony\Component\Form\Form'))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         // Verify that the constraints are added
         $metadata->expects($this->once())

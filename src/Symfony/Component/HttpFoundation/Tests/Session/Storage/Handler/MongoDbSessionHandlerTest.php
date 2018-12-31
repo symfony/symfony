@@ -95,7 +95,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         // defining the timeout before the actual method call
         // allows to test for "greater than" values in the $criteria
@@ -143,7 +143,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $data = array();
 
@@ -197,7 +197,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $data = array();
 
@@ -237,7 +237,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $data = array();
 
@@ -266,7 +266,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $methodName = phpversion('mongodb') ? 'deleteOne' : 'remove';
 
@@ -284,7 +284,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->mongo->expects($this->once())
             ->method('selectCollection')
             ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->willReturn($collection);
 
         $methodName = phpversion('mongodb') ? 'deleteMany' : 'remove';
 

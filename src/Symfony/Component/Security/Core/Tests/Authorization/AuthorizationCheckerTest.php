@@ -83,7 +83,7 @@ class AuthorizationCheckerTest extends TestCase
         $token
             ->expects($this->once())
             ->method('isAuthenticated')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->accessDecisionManager
             ->expects($this->once())

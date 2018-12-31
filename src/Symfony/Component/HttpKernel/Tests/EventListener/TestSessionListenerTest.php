@@ -47,7 +47,7 @@ class TestSessionListenerTest extends TestCase
         $this->session = $this->getSession();
         $this->listener->expects($this->any())
              ->method('getSession')
-             ->will($this->returnValue($this->session));
+             ->willReturn($this->session);
     }
 
     public function testShouldSaveMasterRequestSession()
@@ -214,7 +214,7 @@ class TestSessionListenerTest extends TestCase
             ->getMock();
 
         // set return value for getName()
-        $mock->expects($this->any())->method('getName')->will($this->returnValue('MOCKSESSID'));
+        $mock->expects($this->any())->method('getName')->willReturn('MOCKSESSID');
 
         return $mock;
     }

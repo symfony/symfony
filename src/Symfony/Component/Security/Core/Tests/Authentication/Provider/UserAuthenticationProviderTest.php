@@ -165,7 +165,7 @@ class UserAuthenticationProviderTest extends TestCase
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->once())
              ->method('getRoles')
-             ->will($this->returnValue(array('ROLE_FOO')))
+             ->willReturn(array('ROLE_FOO'))
         ;
 
         $provider = $this->getProvider();
@@ -199,7 +199,7 @@ class UserAuthenticationProviderTest extends TestCase
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->once())
              ->method('getRoles')
-             ->will($this->returnValue(array('ROLE_FOO')))
+             ->willReturn(array('ROLE_FOO'))
         ;
 
         $provider = $this->getProvider();
@@ -236,7 +236,7 @@ class UserAuthenticationProviderTest extends TestCase
         $mock
             ->expects($this->any())
             ->method('getProviderKey')
-            ->will($this->returnValue('key'))
+            ->willReturn('key')
         ;
 
         $mock->setAttributes(array('foo' => 'bar'));

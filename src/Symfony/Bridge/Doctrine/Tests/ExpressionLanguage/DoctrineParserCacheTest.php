@@ -26,7 +26,7 @@ class DoctrineParserCacheTest extends TestCase
 
         $doctrineCacheMock->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue('bar'));
+            ->willReturn('bar');
 
         $result = $parserCache->fetch('foo');
 
@@ -41,7 +41,7 @@ class DoctrineParserCacheTest extends TestCase
         $doctrineCacheMock
             ->expects($this->once())
             ->method('fetch')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertNull($parserCache->fetch(''));
     }

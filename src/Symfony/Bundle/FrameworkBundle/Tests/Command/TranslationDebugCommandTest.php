@@ -84,7 +84,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
-            ->with($this->equalTo($this->translationDir))
+            ->with($this->translationDir)
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'), $kernel);
@@ -102,7 +102,7 @@ class TranslationDebugCommandTest extends TestCase
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
-            ->with($this->equalTo('dir'))
+            ->with('dir')
             ->willThrowException(new \InvalidArgumentException());
 
         $tester = $this->createCommandTester(array(), array(), $kernel);
@@ -136,26 +136,26 @@ class TranslationDebugCommandTest extends TestCase
         $translator
             ->expects($this->any())
             ->method('getFallbackLocales')
-            ->will($this->returnValue(array('en')));
+            ->willReturn(array('en'));
 
         $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
         $extractor
             ->expects($this->any())
             ->method('extract')
-            ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages) {
+            ->willReturnCallback(
+                function ($path, $catalogue) use ($extractedMessages) {
                     $catalogue->add($extractedMessages);
-                })
+                }
             );
 
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Reader\TranslationReader')->getMock();
         $loader
             ->expects($this->any())
             ->method('read')
-            ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
+            ->willReturnCallback(
+                function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
-                })
+                }
             );
 
         if (null === $kernel) {
@@ -173,7 +173,7 @@ class TranslationDebugCommandTest extends TestCase
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
-                ->will($this->returnValueMap($returnValues));
+                ->willReturnMap($returnValues);
         }
 
         $kernel
@@ -214,23 +214,23 @@ class TranslationDebugCommandTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue(array()));
+            ->willReturn(array());
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnValueMap(array(
+            ->willReturnMap(array(
                 array('translation.extractor', 1, $extractor),
                 array('translation.reader', 1, $loader),
                 array('translator', 1, $translator),
                 array('kernel', 1, $kernel),
-            )));
+            ));
 
         $kernel
             ->expects($this->any())
             ->method('getContainer')
-            ->will($this->returnValue($container));
+            ->willReturn($container);
 
         $command = new TranslationDebugCommand();
         $command->setContainer($container);
@@ -250,7 +250,7 @@ class TranslationDebugCommandTest extends TestCase
         $bundle
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue($path))
+            ->willReturn($path)
         ;
 
         return $bundle;

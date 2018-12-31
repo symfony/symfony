@@ -47,12 +47,12 @@ class DigestAuthenticationListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
         $tokenStorage
             ->expects($this->once())
             ->method('setToken')
-            ->with($this->equalTo(new UsernamePasswordToken($user, $password, $providerKey)))
+            ->with(new UsernamePasswordToken($user, $password, $providerKey))
         ;
 
         $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
@@ -64,7 +64,7 @@ class DigestAuthenticationListenerTest extends TestCase
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener->handle($event);

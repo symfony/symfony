@@ -67,11 +67,11 @@ class PropertyPathMapperTest extends TestCase
 
         $form->expects($this->any())
             ->method('isSynchronized')
-            ->will($this->returnValue($synchronized));
+            ->willReturn($synchronized);
 
         $form->expects($this->any())
             ->method('isSubmitted')
-            ->will($this->returnValue($submitted));
+            ->willReturn($submitted);
 
         return $form;
     }
@@ -85,7 +85,7 @@ class PropertyPathMapperTest extends TestCase
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(true);
@@ -108,7 +108,7 @@ class PropertyPathMapperTest extends TestCase
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(false);
@@ -253,7 +253,7 @@ class PropertyPathMapperTest extends TestCase
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+            ->willReturn($engine);
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');

@@ -254,20 +254,20 @@ class RememberMeListenerTest extends TestCase
         $session
             ->expects($this->once())
             ->method('isStarted')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')->getMock();
         $request
             ->expects($this->once())
             ->method('hasSession')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $request
             ->expects($this->once())
             ->method('getSession')
-            ->will($this->returnValue($session))
+            ->willReturn($session)
         ;
 
         $event = $this->getGetResponseEvent();
@@ -319,7 +319,7 @@ class RememberMeListenerTest extends TestCase
         $session
             ->expects($this->once())
             ->method('isStarted')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $session
             ->expects($this->once())
@@ -330,13 +330,13 @@ class RememberMeListenerTest extends TestCase
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session))
+            ->willReturn($session)
         ;
 
         $event = $this->getGetResponseEvent();

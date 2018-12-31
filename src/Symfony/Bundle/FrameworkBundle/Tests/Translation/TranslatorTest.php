@@ -147,7 +147,7 @@ class TranslatorTest extends TestCase
             ->expects($this->once())
             ->method('getParameter')
             ->with('kernel.default_locale')
-            ->will($this->returnValue('en'))
+            ->willReturn('en')
         ;
         $translator = new Translator($container, new MessageFormatter());
 
@@ -357,53 +357,53 @@ class TranslatorTest extends TestCase
         $loader
             ->expects($this->at(0))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array(
+            ->willReturn($this->getCatalogue('fr', array(
                 'foo' => 'foo (FR)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(1))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('en', array(
+            ->willReturn($this->getCatalogue('en', array(
                 'foo' => 'foo (EN)',
                 'bar' => 'bar (EN)',
                 'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(2))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('es', array(
+            ->willReturn($this->getCatalogue('es', array(
                 'foobar' => 'foobar (ES)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(3))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('pt-PT', array(
+            ->willReturn($this->getCatalogue('pt-PT', array(
                 'foobarfoo' => 'foobarfoo (PT-PT)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(4))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('pt_BR', array(
+            ->willReturn($this->getCatalogue('pt_BR', array(
                 'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(5))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr.UTF-8', array(
+            ->willReturn($this->getCatalogue('fr.UTF-8', array(
                 'foobarbaz' => 'foobarbaz (fr.UTF-8)',
-            ))))
+            )))
         ;
         $loader
             ->expects($this->at(6))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('sr@latin', array(
+            ->willReturn($this->getCatalogue('sr@latin', array(
                 'foobarbax' => 'foobarbax (sr@latin)',
-            ))))
+            )))
         ;
 
         return $loader;
@@ -415,7 +415,7 @@ class TranslatorTest extends TestCase
         $container
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $container;

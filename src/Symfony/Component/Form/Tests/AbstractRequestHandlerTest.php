@@ -376,18 +376,18 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')->getMock();
         $config->expects($this->any())
             ->method('getMethod')
-            ->will($this->returnValue($method));
+            ->willReturn($method);
         $config->expects($this->any())
             ->method('getCompound')
-            ->will($this->returnValue($compound));
+            ->willReturn($compound);
 
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $form->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         $form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         return $form;
     }

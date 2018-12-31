@@ -34,12 +34,12 @@ class ChainEncoderTest extends TestCase
 
         $this->encoder1
             ->method('supportsEncoding')
-            ->will($this->returnValueMap(array(
+            ->willReturnMap(array(
                 array(self::FORMAT_1, array(), true),
                 array(self::FORMAT_2, array(), false),
                 array(self::FORMAT_3, array(), false),
                 array(self::FORMAT_3, array('foo' => 'bar'), true),
-            )));
+            ));
 
         $this->encoder2 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')
@@ -47,11 +47,11 @@ class ChainEncoderTest extends TestCase
 
         $this->encoder2
             ->method('supportsEncoding')
-            ->will($this->returnValueMap(array(
+            ->willReturnMap(array(
                 array(self::FORMAT_1, array(), false),
                 array(self::FORMAT_2, array(), true),
                 array(self::FORMAT_3, array(), false),
-            )));
+            ));
 
         $this->chainEncoder = new ChainEncoder(array($this->encoder1, $this->encoder2));
     }

@@ -39,7 +39,7 @@ class BundleTest extends TestCase
     {
         $cmd = new FooCommand();
         $app = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
-        $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
+        $app->expects($this->once())->method('add')->with($cmd);
 
         $bundle = new ExtensionPresentBundle();
         $bundle->registerCommands($app);

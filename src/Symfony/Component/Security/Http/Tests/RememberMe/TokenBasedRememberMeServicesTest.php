@@ -67,7 +67,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider
@@ -92,7 +92,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider
@@ -117,12 +117,12 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->will($this->returnValue(array('ROLE_FOO')))
+            ->willReturn(array('ROLE_FOO'))
         ;
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
 
         $userProvider = $this->getProvider();
@@ -191,7 +191,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
 
         $cookies = $response->headers->getCookies();
@@ -214,17 +214,17 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getPassword')
-            ->will($this->returnValue('foopass'))
+            ->willReturn('foopass')
         ;
         $user
             ->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('foouser'))
+            ->willReturn('foouser')
         ;
         $token
             ->expects($this->atLeastOnce())
             ->method('getUser')
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $cookies = $response->headers->getCookies();
@@ -277,7 +277,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $provider
             ->expects($this->any())
             ->method('supportsClass')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         return $provider;

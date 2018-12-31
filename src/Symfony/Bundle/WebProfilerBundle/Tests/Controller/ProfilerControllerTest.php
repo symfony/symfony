@@ -97,11 +97,11 @@ class ProfilerControllerTest extends TestCase
         $profiler
             ->expects($this->exactly(2))
             ->method('loadProfile')
-            ->will($this->returnCallback(function ($token) {
+            ->willReturnCallback(function ($token) {
                 if ('found' == $token) {
                     return new Profile($token);
                 }
-            }))
+            })
         ;
 
         $controller = $this->createController($profiler, $twig, $withCsp);
@@ -149,7 +149,7 @@ class ProfilerControllerTest extends TestCase
         $profiler
             ->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($tokens));
+            ->willReturn($tokens);
 
         $request = Request::create('/_profiler/empty/search/results', 'GET', array(
             'limit' => 2,
@@ -160,7 +160,7 @@ class ProfilerControllerTest extends TestCase
 
         $twig->expects($this->once())
             ->method('render')
-            ->with($this->stringEndsWith('results.html.twig'), $this->equalTo(array(
+            ->with($this->stringEndsWith('results.html.twig'), array(
                 'token' => 'empty',
                 'profile' => null,
                 'tokens' => $tokens,
@@ -173,7 +173,7 @@ class ProfilerControllerTest extends TestCase
                 'limit' => 2,
                 'panel' => null,
                 'request' => $request,
-            )));
+            ));
 
         $response = $controller->searchResultsAction($request, 'empty');
         $this->assertEquals(200, $response->getStatusCode());

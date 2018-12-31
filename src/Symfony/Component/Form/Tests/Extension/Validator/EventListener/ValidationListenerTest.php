@@ -99,7 +99,7 @@ class ValidationListenerTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(array($violation)));
+            ->willReturn(array($violation));
 
         $this->violationMapper->expects($this->once())
             ->method('mapViolation')
@@ -115,7 +115,7 @@ class ValidationListenerTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(array($violation)));
+            ->willReturn(array($violation));
 
         $this->violationMapper->expects($this->once())
             ->method('mapViolation')
@@ -151,7 +151,7 @@ class ValidationListenerTest extends TestCase
         $this->validator
             ->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(new ConstraintViolationList()));
+            ->willReturn(new ConstraintViolationList());
 
         $this->violationMapper
             ->expects($this->never())

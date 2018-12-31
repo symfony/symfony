@@ -90,7 +90,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->getMock();
         $token->expects($this->any())
             ->method('getProviderKey')
-            ->will($this->returnValue($tokenProviderKey));
+            ->willReturn($tokenProviderKey);
 
         $this->tokenStorage->expects($this->never())
             ->method('setToken')

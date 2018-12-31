@@ -67,10 +67,10 @@ class ContainerParametersResourceCheckerTest extends TestCase
                     array($this->equalTo('locales')),
                     array($this->equalTo('default_locale'))
                 )
-                ->will($this->returnValueMap(array(
+                ->willReturnMap(array(
                     array('locales', array('fr', 'en')),
                     array('default_locale', 'fr'),
-                )))
+                ))
             ;
         }, true);
     }

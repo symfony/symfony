@@ -44,9 +44,9 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension->expects($this->any())
             ->method('getObjectManagerElementName')
-            ->will($this->returnCallback(function ($name) {
+            ->willReturnCallback(function ($name) {
                 return 'doctrine.orm.'.$name;
-            }));
+            });
     }
 
     /**

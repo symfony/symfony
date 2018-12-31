@@ -45,7 +45,7 @@ class AccessMapTest extends TestCase
         $requestMatcher = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
             ->method('matches')->with($request)
-            ->will($this->returnValue($matches));
+            ->willReturn($matches);
 
         return $requestMatcher;
     }

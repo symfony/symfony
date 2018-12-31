@@ -200,7 +200,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
         $generator->expects($this->any())
             ->method('generate')
-            ->will($this->returnValue($value));
+            ->willReturn($value);
 
         return $generator;
     }

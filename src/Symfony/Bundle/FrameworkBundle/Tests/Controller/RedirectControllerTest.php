@@ -71,8 +71,8 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
-            ->will($this->returnValue($url));
+            ->with($route, $expectedAttributes)
+            ->willReturn($url);
 
         $controller = new RedirectController($router);
 
@@ -250,23 +250,23 @@ class RedirectControllerTest extends TestCase
         $request
             ->expects($this->any())
             ->method('getScheme')
-            ->will($this->returnValue($scheme));
+            ->willReturn($scheme);
         $request
             ->expects($this->any())
             ->method('getHost')
-            ->will($this->returnValue($host));
+            ->willReturn($host);
         $request
             ->expects($this->any())
             ->method('getPort')
-            ->will($this->returnValue($port));
+            ->willReturn($port);
         $request
             ->expects($this->any())
             ->method('getBaseUrl')
-            ->will($this->returnValue($baseUrl));
+            ->willReturn($baseUrl);
         $request
             ->expects($this->any())
             ->method('getQueryString')
-            ->will($this->returnValue($queryString));
+            ->willReturn($queryString);
 
         return $request;
     }
@@ -287,25 +287,25 @@ class RedirectControllerTest extends TestCase
             $container
                 ->expects($this->once())
                 ->method('hasParameter')
-                ->with($this->equalTo('request_listener.http_port'))
-                ->will($this->returnValue(true));
+                ->with('request_listener.http_port')
+                ->willReturn(true);
             $container
                 ->expects($this->once())
                 ->method('getParameter')
-                ->with($this->equalTo('request_listener.http_port'))
-                ->will($this->returnValue($httpPort));
+                ->with('request_listener.http_port')
+                ->willReturn($httpPort);
         }
         if (null !== $httpsPort) {
             $container
                 ->expects($this->once())
                 ->method('hasParameter')
-                ->with($this->equalTo('request_listener.https_port'))
-                ->will($this->returnValue(true));
+                ->with('request_listener.https_port')
+                ->willReturn(true);
             $container
                 ->expects($this->once())
                 ->method('getParameter')
-                ->with($this->equalTo('request_listener.https_port'))
-                ->will($this->returnValue($httpsPort));
+                ->with('request_listener.https_port')
+                ->willReturn($httpsPort);
         }
 
         $controller = new RedirectController();

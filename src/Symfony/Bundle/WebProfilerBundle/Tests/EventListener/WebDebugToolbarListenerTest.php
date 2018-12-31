@@ -289,10 +289,10 @@ class WebDebugToolbarListenerTest extends TestCase
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->setMethods(array('getSession', 'isXmlHttpRequest', 'getRequestFormat'))->disableOriginalConstructor()->getMock();
         $request->expects($this->any())
             ->method('isXmlHttpRequest')
-            ->will($this->returnValue($isXmlHttpRequest));
+            ->willReturn($isXmlHttpRequest);
         $request->expects($this->any())
             ->method('getRequestFormat')
-            ->will($this->returnValue($requestFormat));
+            ->willReturn($requestFormat);
 
         $request->headers = new HeaderBag();
 
@@ -300,7 +300,7 @@ class WebDebugToolbarListenerTest extends TestCase
             $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
             $request->expects($this->any())
                 ->method('getSession')
-                ->will($this->returnValue($session));
+                ->willReturn($session);
         }
 
         return $request;
@@ -311,7 +311,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $templating = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $templating->expects($this->any())
             ->method('render')
-            ->will($this->returnValue($render));
+            ->willReturn($render);
 
         return $templating;
     }

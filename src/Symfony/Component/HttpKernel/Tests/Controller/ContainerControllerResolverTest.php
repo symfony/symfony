@@ -122,19 +122,19 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->at(0))
             ->method('has')
             ->with(ImpossibleConstructController::class)
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $container->expects($this->at(1))
             ->method('has')
             ->with(ImpossibleConstructController::class)
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(array(ImpossibleConstructController::class => true)))
+            ->willReturn(array(ImpossibleConstructController::class => true))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -189,13 +189,13 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->at(0))
             ->method('has')
             ->with('app.my_controller')
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(array('app.my_controller' => true)))
+            ->willReturn(array('app.my_controller' => true))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -215,12 +215,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with('app.my_controller')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $container->expects($this->once())
             ->method('get')
             ->with('app.my_controller')
-            ->will($this->returnValue(new ImpossibleConstructController('toto', 'controller')))
+            ->willReturn(new ImpossibleConstructController('toto', 'controller'))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);

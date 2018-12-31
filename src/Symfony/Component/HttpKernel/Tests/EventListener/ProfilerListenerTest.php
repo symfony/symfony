@@ -37,7 +37,7 @@ class ProfilerListenerTest extends TestCase
 
         $profiler->expects($this->once())
             ->method('collect')
-            ->will($this->returnValue($profile));
+            ->willReturn($profile);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
 

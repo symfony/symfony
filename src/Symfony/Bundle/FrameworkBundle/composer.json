@@ -39,7 +39,7 @@
         "symfony/css-selector": "~2.8|~3.0|~4.0",
         "symfony/dom-crawler": "~2.8|~3.0|~4.0",
         "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/form": "~3.4|~4.0",
+        "symfony/form": "^3.4.22|~4.1.11|^4.2.3",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "symfony/process": "~2.8|~3.0|~4.0",
         "symfony/security-core": "~3.2|~4.0",

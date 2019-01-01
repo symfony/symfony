@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-24T08:56:07Z
+
+@rpkamp ok for you?
+Would it be possible to add a test case?
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-12-24T21:49:47Z
+
+LGTM
+
+Although indeed an added test that proves the issue exists (and servers to prevent regressions) would be good :+1:

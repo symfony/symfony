@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-01T13:14:45Z
+
+From the [PHP documentation](http://php.net/manual/en/language.types.array.php):
+
+> The key is optional. If it is not specified, PHP will use the increment of the largest previously used integer key.
+
+---------------------------------------------------------------------------
+
+by simPod at 2019-01-01T15:50:16Z
+
+Seems that it works 👍

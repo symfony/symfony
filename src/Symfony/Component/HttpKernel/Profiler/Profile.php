@@ -49,8 +49,6 @@ class Profile
     }
 
     /**
-     * Sets the token.
-     *
      * @param string $token The token
      */
     public function setToken($token)
@@ -59,8 +57,6 @@ class Profile
     }
 
     /**
-     * Gets the token.
-     *
      * @return string The token
      */
     public function getToken()
@@ -69,7 +65,7 @@ class Profile
     }
 
     /**
-     * Sets the parent token.
+     * @param self
      */
     public function setParent(self $parent)
     {
@@ -77,8 +73,6 @@ class Profile
     }
 
     /**
-     * Returns the parent profile.
-     *
      * @return self
      */
     public function getParent()
@@ -87,8 +81,6 @@ class Profile
     }
 
     /**
-     * Returns the parent token.
-     *
      * @return string|null The parent token
      */
     public function getParentToken()
@@ -97,8 +89,6 @@ class Profile
     }
 
     /**
-     * Returns the IP.
-     *
      * @return string The IP
      */
     public function getIp()
@@ -107,8 +97,6 @@ class Profile
     }
 
     /**
-     * Sets the IP.
-     *
      * @param string $ip
      */
     public function setIp($ip)
@@ -117,8 +105,6 @@ class Profile
     }
 
     /**
-     * Returns the request method.
-     *
      * @return string The request method
      */
     public function getMethod()
@@ -126,14 +112,15 @@ class Profile
         return $this->method;
     }
 
+    /**
+     * @param string $method The request method
+     */
     public function setMethod($method)
     {
         $this->method = $method;
     }
 
     /**
-     * Returns the URL.
-     *
      * @return string The URL
      */
     public function getUrl()
@@ -142,8 +129,6 @@ class Profile
     }
 
     /**
-     * Sets the URL.
-     *
      * @param string $url
      */
     public function setUrl($url)
@@ -152,8 +137,6 @@ class Profile
     }
 
     /**
-     * Returns the time.
-     *
      * @return int The time
      */
     public function getTime()
@@ -190,8 +173,6 @@ class Profile
     }
 
     /**
-     * Finds children profilers.
-     *
      * @return self[]
      */
     public function getChildren()
@@ -200,8 +181,6 @@ class Profile
     }
 
     /**
-     * Sets children profiler.
-     *
      * @param Profile[] $children
      */
     public function setChildren(array $children)

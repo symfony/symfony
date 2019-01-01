@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by gmponos at 2018-12-28T18:26:43Z
+
+> while bumping to phpunit5
+
+haven't bumped PHPUnit version..
+
+> there are many opportunities to improve the code (eg $this in closure, and polyfills that we could remove, see "Legacy" namespace
+
+it's not that I don't want to help.. but I am not sure about which changes and what you are thinking exactly.. so we might have a lot going back and forth discussion.. I suggest to have these changes on other PRs..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-28T18:27:31Z
+
+phpunit 5 is for php56 :disappointed:
+
+>  I suggest to have these changes on other PRs..
+
+works for me!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-12-29T15:59:50Z
+
+The `Legacy` namespace should stay around for a while, but some simplifications seem indeed possible: https://3v4l.org/MmG7J I'm working on a PR right now.

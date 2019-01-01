@@ -232,7 +232,7 @@ class Exporter
                 if (!\is_int($k) || 1 !== $k - $j) {
                     $code .= self::export($k, $subIndent).' => ';
                 }
-                if (\is_int($k)) {
+                if (\is_int($k) && $k > $j) {
                     $j = $k;
                 }
                 $code .= self::export($v, $subIndent).",\n";

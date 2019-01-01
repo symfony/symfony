@@ -112,6 +112,7 @@ class VarExporterTest extends TestCase
 
         yield array('bool', true, true);
         yield array('simple-array', array(123, array('abc')), true);
+        yield array('partially-indexed-array', array(5 => true, 1 => true, 2 => true, 6 => true), true);
         yield array('datetime', \DateTime::createFromFormat('U', 0));
 
         $value = new \ArrayObject();

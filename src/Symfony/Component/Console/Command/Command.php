@@ -533,6 +533,7 @@ class Command
     public function getProcessedHelp()
     {
         $name = $this->name;
+        $isSingleCommand = $this->application && $this->application->isSingleCommand();
 
         $placeholders = array(
             '%command.name%',
@@ -540,7 +541,7 @@ class Command
         );
         $replacements = array(
             $name,
-            $_SERVER['PHP_SELF'].' '.$name,
+            $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());

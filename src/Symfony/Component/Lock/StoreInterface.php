@@ -43,7 +43,7 @@ interface StoreInterface
      *
      * If the store does not support this feature it should throw a NotSupportedException.
      *
-     * @param float $ttl amount of second to keep the lock in the store
+     * @param float $ttl amount of seconds to keep the lock in the store
      *
      * @throws LockConflictedException
      * @throws NotSupportedException

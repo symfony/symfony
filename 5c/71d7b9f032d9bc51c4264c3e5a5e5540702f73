@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-15T18:06:12Z
+
+Thanks for submitting. Looks like a new feature to me, it should target master.
+
+---------------------------------------------------------------------------
+
+by codedmonkey at 2018-12-18T12:11:09Z
+
+I disagree because it seems to be a bug fix that could apply to 3.4 as well, but I'm glad to have it fixed either way.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-18T12:45:36Z
+
+@codedmonkey PR body says the command name _can_ be omitted which means that specifying it does not break, it's just useless, right?
+If so, we are not fixing a bad suggestion but trying to enhance a correct one, hence this does not qualify as a bug fix.
+
+---------------------------------------------------------------------------
+
+by codedmonkey at 2018-12-18T22:45:26Z
+
+No a console command definitely can't start with an optional argument that may or may not need to be to removed. Apologies if my wording caused any confusing but calling `php bin/echo echo <text>` definitely isn't the same as `php bin/echo <text>` for a single command application. The command name _must_ be ommitted.

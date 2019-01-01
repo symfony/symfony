@@ -72,10 +72,7 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertCount(4, $refs);
     }
 
-    /**
-     * Test that in debug mode, voters are correctly decorated.
-     */
-    public function testThatVotersAreDecoratedInDebugMode(): void
+    public function testThatVotersAreTraceableInDebugMode(): void
     {
         $container = new ContainerBuilder();
 
@@ -96,21 +93,18 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
 
         $def1 = $container->getDefinition('debug.security.voter.voter1');
-        $this->assertEquals(array('voter1', null, 0), $def1->getDecoratedService(), 'voter1: wrong return from getDecoratedService');
-        $this->assertEquals(new Reference('debug.security.voter.voter1.inner'), $def1->getArgument(0), 'voter1: wrong decorator argument');
+        $this->assertNull($def1->getDecoratedService(), 'voter1: should not be decorated');
+        $this->assertEquals(new Reference('voter1'), $def1->getArgument(0), 'voter1: wrong argument');
 
         $def2 = $container->getDefinition('debug.security.voter.voter2');
-        $this->assertEquals(array('voter2', null, 0), $def2->getDecoratedService(), 'voter2: wrong return from getDecoratedService');
-        $this->assertEquals(new Reference('debug.security.voter.voter2.inner'), $def2->getArgument(0), 'voter2: wrong decorator argument');
+        $this->assertNull($def2->getDecoratedService(), 'voter2: should not be decorated');
+        $this->assertEquals(new Reference('voter2'), $def2->getArgument(0), 'voter2: wrong argument');
 
         $voters = $container->findTaggedServiceIds('security.voter');
         $this->assertCount(2, $voters, 'Incorrect count of voters');
     }
 
-    /**
-     * Test that voters are not decorated if the application is not in debug mode.
-     */
-    public function testThatVotersAreNotDecoratedWithoutDebugMode(): void
+    public function testThatVotersAreNotTraceableWithoutDebugMode(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -130,8 +124,8 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
 
-        $this->assertFalse($container->has('debug.security.voter.voter1'), 'voter1 should not be decorated');
-        $this->assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be decorated');
+        $this->assertFalse($container->has('debug.security.voter.voter1'), 'voter1 should not be traced');
+        $this->assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be traced');
     }
 
     /**

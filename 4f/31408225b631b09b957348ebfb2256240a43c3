@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-12-29T11:47:04Z
+
+Does it make sense to add a test which ensures that the original voter class can be retrieved from the compiled container?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-29T12:21:52Z
+
+updated test to check voters are NOT decorated

@@ -7,6 +7,7 @@ CHANGELOG
  * Added guard `is_valid()` method support.
  * Added support for `Event::getWorkflowName()` for "announce" events.
  * Added `workflow.completed` events which are fired after a transition is completed.
+ * Added `guard_listener` configuration option along with `workflow.guard_listener` parameter.
 
 3.3.0
 -----

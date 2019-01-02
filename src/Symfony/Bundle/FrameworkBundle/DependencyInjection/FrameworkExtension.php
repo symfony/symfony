@@ -719,7 +719,11 @@ class FrameworkExtension extends Extension
                     throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
                 }
 
-                $guard = new Definition(Workflow\EventListener\GuardListener::class);
+                $guardListener = isset($workflow['guard_listener'])
+                    ? $workflow['guard_listener']
+                    : $container->getParameter('workflow.guard_listener');
+
+                $guard = new Definition($guardListener);
                 $guard->setPrivate(true);
 
                 $guard->setArguments(array(

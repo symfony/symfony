@@ -558,9 +558,7 @@ class FrameworkExtension extends Extension
             $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
 
             // Create places
-            $places = array_map(function (array $place) {
-                return $place['name'];
-            }, $workflow['places']);
+            $places = array_column($workflow['places'], 'name');
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);

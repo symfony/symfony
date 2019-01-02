@@ -62,9 +62,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         });
 
         // Keep the messages clones only
-        $this->data['messages'] = array_map(function (array $item): Data {
-            return $item[0];
-        }, $messages);
+        $this->data['messages'] = array_column($messages, 0);
     }
 
     /**

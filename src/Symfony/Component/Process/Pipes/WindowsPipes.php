@@ -145,6 +145,8 @@ class WindowsPipes extends AbstractPipes
             if (isset($data[0])) {
                 $this->readBytes[$type] += \strlen($data);
                 $read[$type] = $data;
+            } elseif (\strlen($data) !== 0) {
+                throw new \LogicException(sprintf('Wait what? $data is %s', $data));
             }
             if ($close) {
                 ftruncate($fileHandle, 0);

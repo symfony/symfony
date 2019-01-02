@@ -517,6 +517,117 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage The form is already submitted, use $form->isValid() directly.
+     */
+    public function testIsFormValidWhenAlreadySubmitted()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push($request = new Request());
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+        $form
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true)
+        ;
+
+        $controller->isFormValid($form);
+    }
+
+    public function testIsFormValidWhenInvalid()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push($request = new Request());
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+        $form
+            ->expects($this->at(0))
+            ->method('isSubmitted')
+            ->willReturn(false)
+        ;
+        $form
+            ->expects($this->once())
+            ->method('handleRequest')
+            ->with($request)
+            ->willReturn($form)
+        ;
+        $form
+            ->expects($this->at(2))
+            ->method('isSubmitted')
+            ->willReturn(false)
+        ;
+
+        $this->assertFalse($controller->isFormValid($form));
+    }
+
+    public function testIsFormValidWhenValid()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push($request = new Request());
+
+        $container = new Container();
+        $container->set('request_stack', $requestStack);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+        $form
+            ->expects($this->at(0))
+            ->method('isSubmitted')
+            ->willReturn(false)
+        ;
+        $form
+            ->expects($this->once())
+            ->method('handleRequest')
+            ->with($request)
+            ->willReturn($form)
+        ;
+        $form
+            ->expects($this->at(2))
+            ->method('isSubmitted')
+            ->willReturn(true)
+        ;
+        $form
+            ->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true)
+        ;
+
+        $this->assertTrue($controller->isFormValid($form));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You must pass a request as second argument because the request stack is empty.
+     */
+    public function testIsFormValidWhenRequestStackIsEmpty()
+    {
+        $container = new Container();
+        $container->set('request_stack', new RequestStack());
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+
+        $this->assertTrue($controller->isFormValid($form));
+    }
+
     public function testGetDoctrine()
     {
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
@@ -569,5 +680,6 @@ trait TestControllerTrait
         createFormBuilder as public;
         getDoctrine as public;
         addLink as public;
+        isFormValid as public;
     }
 }

@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
+   be mandatory in 5.0.
  * Added `ControllerTrait::isFormValid()`
 
 4.2.0

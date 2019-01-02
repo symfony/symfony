@@ -127,6 +127,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * The project dir argument of the constructor of `AssetsInstallCommand` is required.
+
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
 

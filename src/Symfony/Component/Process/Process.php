@@ -460,6 +460,12 @@ class Process implements \IteratorAggregate
                 if (3 !== $type) {
                     $ready = $callback(self::STDOUT === $type ? self::OUT : self::ERR, $data) || $ready;
                 } elseif (!isset($this->fallbackStatus['signaled'])) {
+                    if ('\\' === \DIRECTORY_SEPARATOR && !is_numeric($data)) {
+                        throw new \UnexpectedValueException(sprintf(
+                            'Expected a string, got "%s" instead',
+                            $data
+                        ));
+                    }
                     $this->fallbackStatus['exitcode'] = (int) $data;
                 }
             }

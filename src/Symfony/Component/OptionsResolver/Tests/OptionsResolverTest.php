@@ -2181,9 +2181,9 @@ class OptionsResolverTest extends TestCase
                     ->setRequired(array('dbname', 'host'))
                     ->setDefaults(array(
                         'port' => 3306,
-                        'slaves' => function (OptionsResolver $resolver) {
+                        'replicas' => function (OptionsResolver $resolver) {
                             $resolver->setDefaults(array(
-                                'host' => 'slave1',
+                                'host' => 'replica1',
                                 'port' => 3306,
                             ));
                         },
@@ -2196,14 +2196,14 @@ class OptionsResolverTest extends TestCase
                 'dbname' => 'test',
                 'host' => 'localhost',
                 'port' => null,
-                'slaves' => array('host' => 'slave2'),
+                'replicas' => array('host' => 'replica2'),
             ),
         ));
         $expectedOptions = array(
             'name' => 'custom',
             'database' => array(
                 'port' => null,
-                'slaves' => array('port' => 3306, 'host' => 'slave2'),
+                'replicas' => array('port' => 3306, 'host' => 'replica2'),
                 'dbname' => 'test',
                 'host' => 'localhost',
             ),
@@ -2332,7 +2332,7 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfCyclicDependencyBetweenSameNestedOption()
     {
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
-            $resolver->setDefault('slaves', $parent['database']);
+            $resolver->setDefault('replicas', $parent['database']);
         });
         $this->resolver->resolve();
     }
@@ -2375,9 +2375,9 @@ class OptionsResolverTest extends TestCase
     public function testFailsIfCyclicDependencyBetweenNestedOptions()
     {
         $this->resolver->setDefault('database', function (OptionsResolver $resolver, Options $parent) {
-            $resolver->setDefault('host', $parent['slave']['host']);
+            $resolver->setDefault('host', $parent['replica']['host']);
         });
-        $this->resolver->setDefault('slave', function (OptionsResolver $resolver, Options $parent) {
+        $this->resolver->setDefault('replica', function (OptionsResolver $resolver, Options $parent) {
             $resolver->setDefault('host', $parent['database']['host']);
         });
         $this->resolver->resolve();
@@ -2418,12 +2418,12 @@ class OptionsResolverTest extends TestCase
             'ip' => null,
             'database' => function (OptionsResolver $resolver, Options $parent) {
                 $resolver->setDefault('host', $parent['ip']);
-                $resolver->setDefault('master_slave', function (OptionsResolver $resolver, Options $parent) {
+                $resolver->setDefault('primary_replica', function (OptionsResolver $resolver, Options $parent) {
                     $resolver->setDefault('host', $parent['host']);
                 });
             },
-            'secondary_slave' => function (Options $options) {
-                return $options['database']['master_slave']['host'];
+            'secondary_replica' => function (Options $options) {
+                return $options['database']['primary_replica']['host'];
             },
         ));
         $actualOptions = $this->resolver->resolve(array('ip' => '127.0.0.1'));
@@ -2431,9 +2431,9 @@ class OptionsResolverTest extends TestCase
             'ip' => '127.0.0.1',
             'database' => array(
                 'host' => '127.0.0.1',
-                'master_slave' => array('host' => '127.0.0.1'),
+                'primary_replica' => array('host' => '127.0.0.1'),
             ),
-            'secondary_slave' => '127.0.0.1',
+            'secondary_replica' => '127.0.0.1',
         );
         $this->assertSame($expectedOptions, $actualOptions);
     }

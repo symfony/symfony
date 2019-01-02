@@ -1,0 +1,194 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-16T22:12:10Z
+
+Hmm, I’m not sure. The form code in a controller suffers from 2 issues: it *is* a bit verbose, but more importantly, the flow confuses beginners (especially since we typically put both the GET and POST in one controller). By making people do ‘if $form->isSubmitted() && $form->isValid()’, it made things more clear, but uglier.
+
+In other words, I’d like to solve this issue, but I don’t think this is it. Perhaps changing the recommendation to split forms into 2 different controllers but adding some shortcuts (if needed) to help with this is a better thing to investigate. Also, see what other libs do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T15:21:55Z
+
+shall we close then?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-04T18:07:35Z
+
+Unless @lyrixx has some counter argument, +1 for closing
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-05T17:22:30Z
+
+Actually, I like this PR. It makes usage of form simpler.
+
+And doing 2 controller for handling a form is wrong IMHO because it leads to code duplication.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-05T19:22:35Z
+
+I'm always in favor of simplifying things and making code as concise as possible ... but I don't like this proposal for two reasons:
+
+* It introduces an alternative way to do something. That requires documenting, teaching and learning the new way. That's why I only like alternative ways when the new way is 10x better than the older one. (See https://github.com/symfony/symfony-docs/issues/8159 for an example of a new feature introduced as an alternative way of doing something ... but we don't even document it because it's not that great and explaining it complicates things).
+* It hides a lot of things. The new way is just `->isFormValid()` ... but internally you are processing/handling the form, checking if it was submitted or not, etc.)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-07T16:15:46Z
+
+> It introduces an alternative way to do something. That requires documenting, teaching and learning the new way.
+
+It's not an alternative way, it's a shortcut. This is really different. All method in this trait are shortcut. And they are here just to ease our life.
+
+> That's why I only like alternative ways when the new way is 10x better than the older one
+
+indeed, it's not 10x better, it's 2.6x better
+<details>
+<summary>proof</summary>
+
+```php
+$before = strlen('$form->handleRequest($request)->isSubmitted() && $form->isValid()');
+
+$after = strlen('$this->formIsValid($form)');
+
+dump($before/$after);
+```
+
+</details>
+
+> It hides a lot of things.
+
+Indeed. That's not the primary goal, but it's a side effect.
+Writing the same line again and again is really boring.
+And it's the same for the [`forward`](https://github.com/symfony/symfony/blob/89d1b65037172bfb8bc4de1eeb438cd5c8de80da/src/Symfony/Bundle/FrameworkBundle/Controller/ControllerTrait.php#L83-L91) for example
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-07T19:12:24Z
+
+Hmm, I just don’t like it. It’s shorter, but way less clear. From training, I already need to explain how handleRequest() only handles the request in submit. But at least it’s mostly descriptive.
+
+I can’t think of a better alternative. It really does need to be descriptive and short. Maybe:
+
+if ($this->submit($form) && $form->isValid())
+
+... where the submit() method would call $form->handleRequest() and then return $form->isSubmitted() ?
+
+---------------------------------------------------------------------------
+
+by gharlan at 2018-02-07T19:21:44Z
+
+```php
+if ($this->isFormSubmittedAndValid($form)) { }
+```
+?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-07T19:28:06Z
+
+I still want some line that looks like we’re doing an action (i.e. submitting the form). That looks like we’re simply checking something. That’s why I suggested $this->submit(). It’s still *in* the if statement, but hopefully looks like we’re *doing* something, not just checking :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-08T10:03:53Z
+
+There are too many :-1: from the core team. I have to close this PR
+But I would be very happy if someone find an easy (short) solution to submit + validate form.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-23T16:28:58Z
+
+@lyrixx Can you reopen so we can reconsider this PR given the comments in #27638?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-09-25T11:58:28Z
+
+@xabbuh Done :white_check_mark:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T12:09:49Z
+
+Not sure why discussion on #27638 would influence the decision on this PR. I don't have any strong opinion on the matter (even if I prefer explicitness whenever possible). Let's do a vote in the core team and take a decision once and for all:
+
+1/ Merge as is
+2/ Acknowledge that we need to find a "shortcurt" but not the one in this PR
+3/ Close this PR and the issue
+
+/cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-10-10T16:27:51Z
+
+3/ due to https://github.com/symfony/symfony/issues/27638#issuecomment-398658201
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-11T08:43:58Z
+
+1/  of course. Even If I love when things are explicit, when code are really repetitive (dealing with form is really common), we need a shortcut. About the comment linked by @Tobion: It's totally valid. May be we can add a check in the trait: if the form is already submitted => throw an exception
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-11T10:26:19Z
+
+Controller methods constitutes one of the main entrypoint for beginners. Considering the given reviews and https://github.com/symfony/symfony/issues/27638#issuecomment-398658201, I fear this could be more confusing than helpful. /3
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-11T12:03:25Z
+
+About the comment, we can do this:
+
+```php
+/**
+ * Handles request and check form validity.
+ *
+ * @final
+ */
+protected function isFormValid(FormInterface $form, Request $request = null): bool
+{
+    if (!$request) {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+    }
+    if (!$request) {
+        throw new \LogicException('You must pass a request as second argument because the request stack was empty.');
+    }
+    if ($form->isSubmitted()) {
+        throw new \LogicException('The form is already submitted, use $form->isValid() directly');
+    }
+
+    return $form->handleRequest($request)->isSubmitted() && $form->isValid();
+}
+```
+
+And it solves all issues, isn't ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-11T13:26:44Z
+
+@lyrixx proposal looks interesting.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-14T00:20:51Z
+
+I have rebased and added the check  (`$form->isSubmitted()`)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-12T10:04:46Z
+
+given this some more thought, i think using the base controller as a one-size-fits-all solution is a dead-end eventually. It does too much IMHO, and only enables multiple ways of doing things.
+
+While valid by design, i hope long-term we'd strive for standalone solutions, e.g. #29574 instead of approaches like this PR or #28875.
+
+my2cnt :)

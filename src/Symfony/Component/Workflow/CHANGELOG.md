@@ -8,6 +8,7 @@ CHANGELOG
  * Added support for `Event::getWorkflowName()` for "announce" events.
  * Added `workflow.completed` events which are fired after a transition is completed.
  * Added `guard_listener` configuration option along with `workflow.guard_listener` parameter.
+ * Added inheritance to `GuardListener`.
 
 3.3.0
 -----

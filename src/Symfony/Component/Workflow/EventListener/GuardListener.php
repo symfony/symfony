@@ -24,13 +24,13 @@ use Symfony\Component\Workflow\Exception\InvalidTokenConfigurationException;
  */
 class GuardListener
 {
-    private $configuration;
-    private $expressionLanguage;
-    private $tokenStorage;
-    private $authorizationChecker;
-    private $trustResolver;
-    private $roleHierarchy;
-    private $validator;
+    protected $configuration;
+    protected $expressionLanguage;
+    protected $tokenStorage;
+    protected $authorizationChecker;
+    protected $trustResolver;
+    protected $roleHierarchy;
+    protected $validator;
 
     public function __construct(array $configuration, ExpressionLanguage $expressionLanguage, TokenStorageInterface $tokenStorage, AuthorizationCheckerInterface $authorizationChecker, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null, ValidatorInterface $validator = null)
     {
@@ -62,7 +62,7 @@ class GuardListener
         }
     }
 
-    private function validateGuardExpression(GuardEvent $event, $expression)
+    protected function validateGuardExpression(GuardEvent $event, $expression)
     {
         if (!$this->expressionLanguage->evaluate($expression, $this->getVariables($event))) {
             $event->setBlocked(true);
@@ -70,7 +70,7 @@ class GuardListener
     }
 
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
-    private function getVariables(GuardEvent $event)
+    protected function getVariables(GuardEvent $event)
     {
         $token = $this->tokenStorage->getToken();
 

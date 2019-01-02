@@ -14,7 +14,6 @@ $outputs = array(
     'Second iteration output',
     'One more iteration output',
     'This took more time',
-    'This one was sooooo slow',
 );
 
 $iterationTime = 10000;

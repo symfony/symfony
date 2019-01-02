@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-26T08:46:31Z
+
+Should target 3.4 now.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-11-26T09:43:26Z
+
+Seems that a final 2.8 release is coming? (Just has another PR merged.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-26T10:10:37Z
+
+Yes, but since this is going to be the final one, we shouldn't merge behavior changes that have even a slight breaking potential. So it's safer for 3.4 now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-12-10T04:27:47Z
+
+As there is a potential BC break, this should be done in master.

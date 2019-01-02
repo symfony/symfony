@@ -94,7 +94,7 @@ EOT
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!$targetArg) {
-            $targetArg = $this->getPublicDirectory($this->getContainer());
+            $targetArg = $this->getPublicDirectory($kernel->getContainer());
         }
 
         if (!is_dir($targetArg)) {

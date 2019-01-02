@@ -46,7 +46,7 @@ class AddRequestFormatsListenerTest extends TestCase
     public function testRegisteredEvent()
     {
         $this->assertEquals(
-            array(KernelEvents::REQUEST => array('onKernelRequest', 1)),
+            array(KernelEvents::REQUEST => array('onKernelRequest', 100)),
             AddRequestFormatsListener::getSubscribedEvents()
         );
     }

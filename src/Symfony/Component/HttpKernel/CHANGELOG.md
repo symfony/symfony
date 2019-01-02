@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
+
 4.2.0
 -----
 

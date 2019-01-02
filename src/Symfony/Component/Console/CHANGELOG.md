@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for hyperlinks
+ * added `ProgressBar::iterate()` method that simplify updating the progress bar when iterating
 
 4.2.0
 -----

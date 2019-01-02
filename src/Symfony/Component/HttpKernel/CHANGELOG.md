@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
+ * made `Symfony\Component\HttpKernel\EventListenerLocaleListener` set the default locale early
 
 4.2.0
 -----

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-12-20T17:50:21Z
+
+This can be closed as this feature is supported by the annotation reader already, just remove the quotes :).
+
+```php
+ /**
+     * @var string
+     *
+     * @Assert\Choice(choices=App\Constants::AVAILABLE_STATES)
+     */
+    private $state;
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-12-20T18:02:56Z
+
+@HeahDude Do you meant `@Assert\Choice(choices=App\Constants::AVAILABLE_STATES)`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-12-20T18:04:58Z
+
+yes x).
+
+---------------------------------------------------------------------------
+
+by nikophil at 2018-12-21T09:11:17Z
+
+yeah indeed, you're right, and i 've learnt something new :)
+will we keep the new wildcard `choices` i've added, or should i close the PR ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-12-21T09:33:17Z
+
+I'm 👍 for supporting a default choices implode, as long as we don't change the default message for both BC and let it opt-in performance wise.
+
+---------------------------------------------------------------------------
+
+by nikophil at 2018-12-21T09:37:31Z
+
+i've updated the PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-12-27T11:04:32Z
+
+@nikophil Can you please update the PR title and description to match the recent changes (they will be part of the git history)?
+
+---------------------------------------------------------------------------
+
+by nikophil at 2018-12-27T11:08:03Z
+
+done :+1:

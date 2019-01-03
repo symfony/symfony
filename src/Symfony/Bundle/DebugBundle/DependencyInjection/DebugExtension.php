@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
  * DebugExtension.
@@ -41,6 +42,11 @@ class DebugExtension extends Extension
             ->addMethodCall('setMaxItems', array($config['max_items']))
             ->addMethodCall('setMinDepth', array($config['min_depth']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
+
+        if (method_exists(HtmlDumper::class, 'setTheme') && 'dark' !== $config['theme']) {
+            $container->getDefinition('var_dumper.html_dumper')
+                ->addMethodCall('setTheme', array($config['theme']));
+        }
 
         if (null === $config['dump_destination']) {
             $container->getDefinition('var_dumper.command.server_dump')

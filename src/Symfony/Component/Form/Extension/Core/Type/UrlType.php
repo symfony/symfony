@@ -35,7 +35,10 @@ class UrlType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['type'] = $options['default_protocol'] ? 'text' : 'url';
+        if ($options['default_protocol']) {
+            $view->vars['attr']['inputmode'] = 'url';
+            $view->vars['type'] = 'text';
+        }
     }
 
     /**

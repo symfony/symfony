@@ -12,11 +12,12 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choice_translation_domain   empty_data           attr                      csrf_protection        
   choice_value                error_bubbling       auto_initialize           csrf_token_id          
   choices                     trim                 block_name                csrf_token_manager     
-  expanded                                         by_reference                                     
-  group_by                                         data                                             
-  multiple                                         disabled                                         
-  placeholder                                      help                                             
-  preferred_choices                                help_attr                                        
+  expanded                                         block_prefix                                     
+  group_by                                         by_reference                                     
+  multiple                                         data                                             
+  placeholder                                      disabled                                         
+  preferred_choices                                help                                             
+                                                   help_attr                                        
                                                    inherit_data                                     
                                                    label                                            
                                                    label_attr                                       

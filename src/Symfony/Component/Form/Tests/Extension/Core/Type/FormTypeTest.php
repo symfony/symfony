@@ -639,4 +639,16 @@ class FormTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull(array(), array(), array());
     }
+
+    public function testPassBlockPrefixToViewWithParent()
+    {
+        $view = $this->factory->createNamedBuilder('parent', static::TESTED_TYPE)
+            ->add('child', $this->getTestedType(), array(
+                'block_prefix' => 'child',
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertSame(array('form', 'child', '_parent_child'), $view['child']->vars['block_prefixes']);
+    }
 }

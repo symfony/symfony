@@ -146,6 +146,7 @@ class ProcessTest extends TestCase
         });
         $this->assertTrue($result);
         $this->assertLessThan(20, microtime(true) - $start);
+        $this->assertStringStartsWith("First iteration output\nSecond iteration output\nOne more", $p->getOutput());
         $this->assertStringStartsWith("First iteration output\nSecond iteration output\nOne more", $completeOutput);
         $p->stop();
     }

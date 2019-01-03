@@ -29,6 +29,25 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class BicValidator extends ConstraintValidator
 {
+    private const BIC_COUNTRY_TO_IBAN_COUNTRY_MAP = array(
+        // Reference: https://www.ecbs.org/iban/france-bank-account-number.html
+        'GF' => 'FR', // French Guiana
+        'PF' => 'FR', // French Polynesia
+        'TF' => 'FR', // French Southern Territories
+        'GP' => 'FR', // Guadeloupe
+        'MQ' => 'FR', // Martinique
+        'YT' => 'FR', // Mayotte
+        'NC' => 'FR', // New Caledonia
+        'RE' => 'FR', // Reunion
+        'PM' => 'FR', // Saint Pierre and Miquelon
+        'WF' => 'FR', // Wallis and Futuna Islands
+        // Reference: https://www.ecbs.org/iban/united-kingdom-uk-bank-account-number.html
+        'JE' => 'GB', // Jersey
+        'IM' => 'GB', // Isle of Man
+        'GG' => 'GB', // Guernsey
+        'VG' => 'GB', // British Virgin Islands
+    );
+
     private $propertyAccessor;
 
     public function __construct(PropertyAccessor $propertyAccessor = null)
@@ -126,7 +145,7 @@ class BicValidator extends ConstraintValidator
             return;
         }
         $ibanCountryCode = substr($iban, 0, 2);
-        if (ctype_alpha($ibanCountryCode) && substr($canonicalize, 4, 2) !== $ibanCountryCode) {
+        if (ctype_alpha($ibanCountryCode) && !$this->bicAndIbanCountriesMatch(substr($canonicalize, 4, 2), $ibanCountryCode)) {
             $this->context->buildViolation($constraint->ibanMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setParameter('{{ iban }}', $iban)
@@ -145,5 +164,10 @@ class BicValidator extends ConstraintValidator
         }
 
         return $this->propertyAccessor;
+    }
+
+    private function bicAndIbanCountriesMatch(string $bicCountryCode, string $ibanCountryCode): bool
+    {
+        return $ibanCountryCode === $bicCountryCode || $ibanCountryCode === (self::BIC_COUNTRY_TO_IBAN_COUNTRY_MAP[$bicCountryCode] ?? null);
     }
 }

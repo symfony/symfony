@@ -221,6 +221,41 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             array('DEUTAT2lxxx', Bic::INVALID_CASE_ERROR),
         );
     }
+
+    /**
+     * @dataProvider getValidBicSpecialCases
+     *
+     * Some territories have their own ISO country code but can use another country code
+     * for IBAN accounts. Example: "French Guiana" (country code "GF") can use FR too.
+     */
+    public function testValidBicSpecialCases(string $bic, string $iban)
+    {
+        $constraint = new Bic(array('iban' => $iban));
+        $this->validator->validate($bic, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidBicSpecialCases()
+    {
+        // FR related special cases
+        yield array('BNPAGFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAPFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPATFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAGPGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAMQGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAYTGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPANCGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAREGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAPMGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAWFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+
+        // GB related special cases
+        yield array('BARCJESA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCIMSA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCGGSA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCVGSA', 'GB12 CPBK 0892 9965 0449 911');
+    }
 }
 
 class BicComparisonTestClass

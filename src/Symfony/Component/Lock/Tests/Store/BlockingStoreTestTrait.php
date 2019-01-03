@@ -38,7 +38,7 @@ trait BlockingStoreTestTrait
      */
     public function testBlockingLocks()
     {
-        // Amount a microsecond used to order async actions
+        // Amount of microseconds we should wait without slowing things down too much
         $clockDelay = 50000;
 
         $key = new Key(uniqid(__METHOD__, true));

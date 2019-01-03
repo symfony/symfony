@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FullStack;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -190,6 +191,10 @@ class FrameworkExtension extends Extension
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
+
+            if (!class_exists(Client::class)) {
+                $container->removeDefinition('test.client');
+            }
         }
 
         if ($this->isConfigEnabled($container, $config['session'])) {

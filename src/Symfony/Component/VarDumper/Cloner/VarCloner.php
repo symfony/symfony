@@ -30,8 +30,8 @@ class VarCloner extends AbstractCloner
         $queue = array(array($var));    // This breadth-first queue is the return value
         $indexedArrays = array();       // Map of queue indexes that hold numerically indexed arrays
         $hardRefs = array();            // Map of original zval ids to stub objects
-        $objRefs = array();             // Map of original object handles to their stub object couterpart
-        $resRefs = array();             // Map of original resource handles to their stub object couterpart
+        $objRefs = array();             // Map of original object handles to their stub object counterpart
+        $resRefs = array();             // Map of original resource handles to their stub object counterpart
         $values = array();              // Map of stub objects' ids to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;

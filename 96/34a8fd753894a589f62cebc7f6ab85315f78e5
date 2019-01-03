@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-01T18:28:31Z
+
+Something went bad when merging, can you re-push your work here? Sorry about that.
+
+---------------------------------------------------------------------------
+
+by dem3trio at 2019-01-01T23:17:07Z
+
+I've made a _git push --force_ it's that enough? If you need anything else, tell me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-02T09:50:01Z
+
+It's not enough. You need to execute `git rebase origin/master` as this will remove the merge commits.
+
+---------------------------------------------------------------------------
+
+by dem3trio at 2019-01-02T22:35:05Z
+
+created new origin "sf" (symfony/symfony)
+`git pull sf master`
+`git push origin master`
+`git checkout add_html_dumper_theme_config_option`
+`git rebase origin/master`
+and `git push --force`
+
+I hope i've done well this time

@@ -62,30 +62,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         return hash('sha256', $namespace.':'.serialize($value));
     }
 
-    /**
-     * Flattens an array into the given output variable.
-     *
-     * @param array $array  The array to flatten
-     * @param array $output The flattened output
-     *
-     * @internal
-     */
-    private static function flatten(array $array, &$output)
-    {
-        if (null === $output) {
-            $output = array();
-        }
-
-        foreach ($array as $key => $value) {
-            if (\is_array($value)) {
-                self::flatten($value, $output);
-                continue;
-            }
-
-            $output[$key] = $value;
-        }
-    }
-
     public function __construct(ChoiceListFactoryInterface $decoratedFactory)
     {
         $this->decoratedFactory = $decoratedFactory;
@@ -113,12 +89,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // The value is not validated on purpose. The decorated factory may
         // decide which values to accept and which not.
 
-        // We ignore the choice groups for caching. If two choice lists are
-        // requested with the same choices, but a different grouping, the same
-        // choice list is returned.
-        self::flatten($choices, $flatChoices);
-
-        $hash = self::generateHash(array($flatChoices, $value), 'fromChoices');
+        $hash = self::generateHash(array($choices, $value), 'fromChoices');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);

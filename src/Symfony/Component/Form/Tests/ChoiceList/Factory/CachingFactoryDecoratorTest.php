@@ -64,19 +64,24 @@ class CachingFactoryDecoratorTest extends TestCase
         $this->assertSame($list, $this->factory->createListFromChoices($choices2));
     }
 
-    public function testCreateFromChoicesFlattensChoices()
+    public function testCreateFromChoicesGroupedChoices()
     {
         $choices1 = array('key' => array('A' => 'a'));
         $choices2 = array('A' => 'a');
-        $list = new \stdClass();
+        $list1 = new \stdClass();
+        $list2 = new \stdClass();
 
-        $this->decoratedFactory->expects($this->once())
+        $this->decoratedFactory->expects($this->at(0))
             ->method('createListFromChoices')
             ->with($choices1)
-            ->will($this->returnValue($list));
+            ->will($this->returnValue($list1));
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromChoices')
+            ->with($choices2)
+            ->will($this->returnValue($list2));
 
-        $this->assertSame($list, $this->factory->createListFromChoices($choices1));
-        $this->assertSame($list, $this->factory->createListFromChoices($choices2));
+        $this->assertSame($list1, $this->factory->createListFromChoices($choices1));
+        $this->assertSame($list2, $this->factory->createListFromChoices($choices2));
     }
 
     /**

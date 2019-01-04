@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Firehed at 2019-01-03T18:54:16Z
+
+I prefer that approach too. Changed :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-01-04T04:47:37Z
+
+Rebased on 3.4. Note to mergers: patch needs to be moved to `TesterTrait` starting from 4.1.

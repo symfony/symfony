@@ -155,7 +155,7 @@ class ObjectsProvider
 
     public static function getCallables()
     {
-        $callables = array(
+        return array(
             'callable_1' => 'array_key_exists',
             'callable_2' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'),
             'callable_3' => array(new CallableClass(), 'method'),
@@ -163,13 +163,8 @@ class ObjectsProvider
             'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
+            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
         );
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $callables['callable_from_callable'] = \Closure::fromCallable(new CallableClass());
-        }
-
-        return $callables;
     }
 }
 

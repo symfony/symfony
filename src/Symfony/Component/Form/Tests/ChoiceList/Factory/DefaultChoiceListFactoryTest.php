@@ -443,7 +443,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             array($this->obj2, $this->obj3),
             null, // label
             null, // index
-            array() // ignored
+            null  // group
         );
 
         $this->assertFlatView($view);

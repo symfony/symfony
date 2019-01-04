@@ -30,21 +30,16 @@ class WrappedListenerTest extends TestCase
 
     public function provideListenersToDescribe()
     {
-        $listeners = array(
+        return array(
             array(new FooListener(), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::__invoke'),
             array(array(new FooListener(), 'listen'), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'),
             array(array('Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'),
             array('var_dump', 'var_dump'),
             array(function () {}, 'closure'),
+            array(\Closure::fromCallable(array(new FooListener(), 'listen')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'),
+            array(\Closure::fromCallable(array('Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'),
+            array(\Closure::fromCallable(function () {}), 'closure'),
         );
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $listeners[] = array(\Closure::fromCallable(array(new FooListener(), 'listen')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen');
-            $listeners[] = array(\Closure::fromCallable(array('Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic');
-            $listeners[] = array(\Closure::fromCallable(function () {}), 'closure');
-        }
-
-        return $listeners;
     }
 }
 

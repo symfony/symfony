@@ -69,7 +69,7 @@ abstract class AbstractCloner implements ClonerInterface
         'DOMProcessingInstruction' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castProcessingInstruction'],
         'DOMXPath' => ['Symfony\Component\VarDumper\Caster\DOMCaster', 'castXPath'],
 
-        'XmlReader' => ['Symfony\Component\VarDumper\Caster\XmlReaderCaster', 'castXmlReader'],
+        'XMLReader' => ['Symfony\Component\VarDumper\Caster\XmlReaderCaster', 'castXmlReader'],
 
         'ErrorException' => ['Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castErrorException'],
         'Exception' => ['Symfony\Component\VarDumper\Caster\ExceptionCaster', 'castException'],
@@ -177,7 +177,7 @@ abstract class AbstractCloner implements ClonerInterface
     public function addCasters(array $casters)
     {
         foreach ($casters as $type => $callback) {
-            $closure = &$this->casters['' === $type || ':' === $type[0] ? $type : strtolower($type)][];
+            $closure = &$this->casters[$type][];
             $closure = $callback instanceof \Closure ? $callback : static function (...$args) use ($callback, &$closure) {
                 return ($closure = \Closure::fromCallable($callback))(...$args);
             };
@@ -282,15 +282,15 @@ abstract class AbstractCloner implements ClonerInterface
             list($i, $parents, $hasDebugInfo) = $this->classInfo[$class];
         } else {
             $i = 2;
-            $parents = [strtolower($class)];
+            $parents = [$class];
             $hasDebugInfo = method_exists($class, '__debugInfo');
 
             foreach (class_parents($class) as $p) {
-                $parents[] = strtolower($p);
+                $parents[] = $p;
                 ++$i;
             }
             foreach (class_implements($class) as $p) {
-                $parents[] = strtolower($p);
+                $parents[] = $p;
                 ++$i;
             }
             $parents[] = '*';

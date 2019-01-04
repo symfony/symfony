@@ -42,6 +42,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
             'resolve' => array('string'),
             'default' => array('bool', 'int', 'float', 'string', 'array'),
             'string' => array('string'),
+            'trim' => array('string'),
         );
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());

@@ -16,7 +16,7 @@ array_shift($dirs);
 $mergeBase = trim(shell_exec(sprintf('git merge-base "%s" HEAD', array_shift($dirs))));
 
 $packages = array();
-$flags = \PHP_VERSION_ID >= 50400 ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
+$flags = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
 foreach ($dirs as $k => $dir) {
     if (!system("git diff --name-only $mergeBase -- $dir", $exitStatus)) {

@@ -62,7 +62,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      */
     public function close()
     {
-        return true;
+        return $this->memcached->quit();
     }
 
     /**

@@ -63,6 +63,12 @@ class MemcachedSessionHandlerTest extends TestCase
 
     public function testCloseSession()
     {
+        $this->memcached
+            ->expects($this->once())
+            ->method('quit')
+            ->will($this->returnValue(true))
+        ;
+
         $this->assertTrue($this->storage->close());
     }
 

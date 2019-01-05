@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-09T17:25:49Z
+
+Please rebase+retarget for 3.4 - then you'll need to make the code compatible with PHP 5.5.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-12T17:54:23Z
+
+Status: needs work

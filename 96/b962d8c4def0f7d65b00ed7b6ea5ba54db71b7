@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-05T10:16:00Z
+
+The terminating dot is already contained in `$access[self::ACCESS_NAME]` (see https://github.com/symfony/symfony/blob/v4.1.9/src/Symfony/Component/PropertyAccess/PropertyAccessor.php#L471, https://github.com/symfony/symfony/blob/v4.1.9/src/Symfony/Component/PropertyAccess/PropertyAccessor.php#L646 and https://github.com/symfony/symfony/blob/v4.1.9/src/Symfony/Component/PropertyAccess/PropertyAccessor.php#L656).

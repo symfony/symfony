@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-10-17T09:59:21Z
+
+No, the idea of `@method` on an interface is to trigger whenever a concrete class implementing the interface does **not** implement the method (directly or inherited from a parent class, we don't care).
+The idea is to be able to add the method as an actual interface method in the next major.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-17T10:01:04Z
+
+And only interface-level annotations should be considered IMO. Class-level `@method` annotation should not trigger deprecations when not being added in a child class, as such annotations are meant to document magic methods implement through `__call`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-17T10:38:30Z
+
+I've updated the regex for `@method` specific due newlines, and perhaps some future optimizing.
+
+See https://regex101.com/r/Jw5R11/1 i think this is sufficient to move forward.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-17T12:00:06Z
+
+This is fun :) I think i got to the tricky part, so last commit needs review :) deprecations so far:
+
+```
+array(7) {
+  [0] =>
+  string(173) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "sameLineInterfaceMethod()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [1] =>
+  string(181) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "sameLineInterfaceMethodNoBraces()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [2] =>
+  string(172) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "newLineInterfaceMethod()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [3] =>
+  string(180) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "newLineInterfaceMethodNoBraces()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [4] =>
+  string(172) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "invalidInterfaceMethod()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [5] =>
+  string(180) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement "invalidInterfaceMethodNoBraces()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface""
+  [6] =>
+  string(165) ""Test\Symfony\Component\Debug\Tests\ExtendsVirtual" should implement "subInterfaceMethod()" per contract "Symfony\Component\Debug\Tests\Fixtures\VirtualSubInterface""
+}
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-17T12:08:33Z
+
+The issue is with `sameLineInterfaceMethodNoBraces`, it triggers for `ExtendsVirtualParent` but is declared on `ExtendsVirtual`. I think we should skip if the parent is abstract/not-final so the current behavior is actually expected. Correct?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-17T12:55:05Z
+
+abstract classes should be excluded from this check, as it is fine for them to provide incomplete implementations of an interface (a child class extending them would complain about the missing method).
+not-final is irrelevant here. If you implement the interface in a concrete class, we must warn if you don't implement the extra method, otherwise adding the method in the interface would break the code.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-17T14:20:08Z
+
+> abstract classes should be excluded from this check, as it is fine for them to provide incomplete implementations of an interface
+
+I think it works correct now :tada:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-17T15:56:39Z
+
+https://github.com/nrk/predis/blob/v1.1/src/ClientInterface.php#L27 makes test fail, something wrong with description parsing but more important, it made me discover we should skip the deprecration if `__call` is declared :)
+
+edit: ready!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-18T07:24:43Z
+
+From https://github.com/phpDocumentor/phpDocumentor2/pull/1855 i discovered we might be able to support `static` virtual methods as well.
+
+Do we want to include it in this PR? Support it even?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-18T07:29:30Z
+
+Turns out it's supported as of phpdoc3 (https://github.com/phpDocumentor/phpDocumentor2/blob/v3.0.0-alpha1/docs/references/phpdoc/tags/method.rst)
+
+I haven tested phpstorm yet, but if it works we might want to have a future proof implementation. IF virtual statics are worth it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-18T07:52:12Z
+
+It's a few keystrokes away, isn't it? Let's do it :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-19T09:43:34Z
+
+https://regex101.com/r/XLHqy5/3/ i made this :D
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-20T06:37:32Z
+
+Ready :)
+
+Status: needs review

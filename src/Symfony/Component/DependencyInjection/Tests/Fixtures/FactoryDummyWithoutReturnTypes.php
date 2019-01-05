@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-use Symfony\Component\DependencyInjection\Definition;
-
-class TestDefinition1 extends Definition
+class FactoryDummyWithoutReturnTypes
 {
+    public function createTestDefinition1()
+    {
+    }
 }

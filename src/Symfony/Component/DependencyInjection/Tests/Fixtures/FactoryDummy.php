@@ -33,10 +33,6 @@ class FactoryDummy extends FactoryParent
     public static function createParent(): parent
     {
     }
-
-    public function createTestDefinition1()
-    {
-    }
 }
 
 class FactoryParent

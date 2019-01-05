@@ -119,7 +119,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1": method "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy::create()" has no argument named "$notFound". Check your service definition.
+     * @expectedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1": method "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy::createTestDefinition1()" has no argument named "$notFound". Check your service definition.
      */
     public function testCorrectMethodReportedInException()
     {
@@ -128,7 +128,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $container->register(FactoryDummy::class, FactoryDummy::class);
 
         $definition = $container->register(TestDefinition1::class, TestDefinition1::class);
-        $definition->setFactory(array(FactoryDummy::class, 'create'));
+        $definition->setFactory(array(FactoryDummy::class, 'createTestDefinition1'));
         $definition->setArguments(array('$notFound' => '123'));
 
         $pass = new ResolveNamedArgumentsPass();

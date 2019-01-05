@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-25T21:08:05Z
+
+Hi Zan, I'm not sure I get what this fixes? From the description, I feel like this is just a different way to achieve the same. Can you give some more hints please? Thanks :)
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2018-12-25T21:12:43Z
+
+Sorry, I should have given an example!
+If a URI contained a fragment, the resulting signed URL would have resulted in the hash query parameter appended to the URI string (after the fragment), instead of being placed in the query string part of the URL. For example:
+
+Before: `http://example.com/path?foo=bar#fragment&_hash=$HASH`
+
+After: `http://example.com/path?foo=bar&_hash=$HASH#fragment`

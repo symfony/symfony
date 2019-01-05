@@ -31,8 +31,8 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
             $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType')
                 ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
                 ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-                ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
-                    'choices' => array('male' => 'Male', 'female' => 'Female'),
+                ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
+                    'choices' => array('red' => 'Red', 'blue' => 'Blue'),
                     'required' => false,
                 ))
                 ->add('age', 'Symfony\Component\Form\Extension\Core\Type\NumberType')

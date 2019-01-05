@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by alquerci at 2018-12-09T20:42:38Z
+
+All code review notes answered by a code modification and the branch has been rebased and squashed.
+
+---------------------------------------------------------------------------
+
+by danijelk at 2018-12-12T15:54:56Z
+
+Maybe extract the if( empty $requestUri string ) to jump over the if/else, unless you actually want to send an empty string into parse_url()? Just micro optimizations. I tested it with our setup and it worked well.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2018-12-12T16:17:59Z
+
+@danijelk Thank you for your feedback.
+
+On the majority of cases `REQUEST_URI` starts with a slash. The `parse_url()` usage is just to handle an edge case.
+
+Your idea is good in order to skip null and empty strings. However, it is a bit overkill regarding the occurrence of this case while `parse_url()` return an empty path without an huge performance impact.
+
+So to keep the code simple (as we cannot use here an early return) I think that this micro optimization adds useless complexity.
+
+@nicolas-grekas Do you think that we can turn this PR as `Reviewed` status?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-12T17:57:24Z
+
+Is there a way to keep existing tests the same?
+When tests change too much it raises a red flag because it means a regression is possible.
+Please reduce the diff to the strict minimum to ease the work of reviewers.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2018-12-12T18:48:59Z
+
+> Is there a way to keep existing tests the same?
+
+Yes for sure. I can revert them.
+
+@nicolas-grekas FYI: Tests has been refactored on this commit 95e9fe0fa00a2b35bd09e6e25f8a0e0d1b5da13d then squashed.
+
+Its tests has been added on #29256.
+
+cc @thomasbisignani
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-18T07:02:23Z
+
+@Dylan-DutchAndBold it's not: see how many tests this "solution" breaks.
+
+---------------------------------------------------------------------------
+
+by Dylan-DutchAndBold at 2018-12-18T07:34:36Z
+
+> @Dylan-DutchAndBold it's not: see how many tests this "solution" breaks.
+
+You're right, missed that, didn't get what you meant by your original comment at first.

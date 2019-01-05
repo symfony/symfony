@@ -49,6 +49,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 if (null === $parameters) {
                     $r = $this->getReflectionMethod($value, $method);
                     $class = $r instanceof \ReflectionMethod ? $r->class : $this->currentId;
+                    $method = $r->getName();
                     $parameters = $r->getParameters();
                 }
 

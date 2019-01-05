@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-04T20:34:24Z
+
+ensures that #29738 works with scalar type hints added in Symfony 4 too

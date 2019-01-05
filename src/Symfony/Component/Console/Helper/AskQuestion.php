@@ -33,6 +33,7 @@ class AskQuestion
     protected $output;
     protected $question;
     protected $inputStream;
+    protected $formatter;
     private static $shell;
     private static $stty;
 
@@ -46,6 +47,7 @@ class AskQuestion
         $this->output = $output;
         $this->question = $question;
         $this->inputStream = STDIN;
+        $this->formatter = new Formatter();
 
         if ($this->input instanceof StreamableInputInterface && $stream = $this->input->getStream()) {
             $this->inputStream = $stream;
@@ -58,6 +60,11 @@ class AskQuestion
     public static function disableStty()
     {
         self::$stty = false;
+    }
+
+    public function setFormatter(FormatterInterface $formatter)
+    {
+        $this->formatter = $formatter;
     }
 
     public function ask()
@@ -165,9 +172,7 @@ class AskQuestion
      */
     protected function writeError(\Exception $error)
     {
-        $formatter = new FormatterHelper();
-
-        $message = $formatter->formatBlock($error->getMessage(), 'error');
+        $message = $this->formatter->formatBlock($error->getMessage(), 'error');
 
         $this->output->writeln($message);
     }

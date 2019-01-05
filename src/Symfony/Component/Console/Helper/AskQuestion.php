@@ -151,7 +151,7 @@ class AskQuestion
         $message = $this->question->getQuestion();
 
         if ($this->question instanceof ChoiceQuestion) {
-            $maxWidth = max(array_map(array($this, 'strlen'), array_keys($this->question->getChoices())));
+            $maxWidth = max(array_map(array($this->formatter, 'strlen'), array_keys($this->question->getChoices())));
 
             $messages = (array) $this->question->getQuestion();
             foreach ($this->question->getChoices() as $key => $value) {

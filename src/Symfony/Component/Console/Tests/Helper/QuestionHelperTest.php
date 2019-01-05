@@ -759,18 +759,3 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         return 0 === $exitcode;
     }
 }
-
-class AutocompleteValues implements \IteratorAggregate
-{
-    private $values;
-
-    public function __construct(array $values)
-    {
-        $this->values = $values;
-    }
-
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->values);
-    }
-}

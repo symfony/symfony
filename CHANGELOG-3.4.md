@@ -7,6 +7,34 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.21 (2019-01-06)
+
+ * bug #29494 [HttpFoundation] Fix request uri when it starts with double slashes (alquerci)
+ * bug #29679 [HttpKernel] Correctly Render Signed URIs Containing Fragments (zanbaldwin)
+ * bug #29754 Ensure final input of CommandTester works with default (Firehed)
+ * bug #29695 [Form] Do not ignore the choice groups for caching (vudaltsov)
+ * bug #29738 [Intl] handle null date and time types (xabbuh)
+ * bug #29704 [FrameworkBundle] improve errors in tests missing the BrowserKit component (xabbuh)
+ * bug #29617 [Console] Add specific replacement for help text in single command applications (codedmonkey)
+ * bug #29714 [Event Dispatcher] fixed 29703: TraceableEventDispatcher reset() callStack to null (mlievertz)
+ * bug #29597 [DI] fix reporting bindings on overriden services as unused (nicolas-grekas)
+ * bug #29639 [Yaml] detect circular references (xabbuh)
+ * bug #29411 [EventDispatcher] Revers event tracing order (ro0NL)
+ * bug #29533 Fixed public directory when configured in composer.json (alexander-schranz)
+ * bug #29619 [Console] OutputFormatter: move strtolower to createStyleFromString (ogizanagi)
+ * bug #29621 [Security] Prefer clone() over unserialize(serialize()) for user refreshment (chalasr)
+ * bug #29587 [Debug] ignore underscore vs backslash namespaces in DebugClassLoader (nicolas-grekas)
+ * bug #29584 [FrameworkBundle] fix describing routes with no controllers (nicolas-grekas)
+ * bug #29582 [DI] move RegisterServiceSubscribersPass before DecoratorServicePass (kbond)
+ * bug #29527 [TwigBridge][Form] Prevent multiple rendering of form collection prototypes (Shoplifter)
+ * bug #29571 [Yaml] ensures that the mb_internal_encoding is reset to its initial value (Jörn Lang)
+ * bug #29513 [Hackday][Serializer] Deserialization ignores argument type hint from phpdoc for array in constructor argument (karser)
+ * bug #29323 [Security] defer log message in guard authenticator (eschultz-magix)
+ * bug #29531 [Validator] Added IBAN format for Vatican City State (raulfraile)
+ * bug #29307 [Form] Filter arrays out of scalar form types (nicolas-grekas)
+ * bug #29500 [Form] filter out invalid Intl values (xabbuh)
+ * bug #29499 [Validator] Fixed grouped composite constraints (HeahDude)
+
 * 3.4.20 (2018-12-06)
 
  * security #cve-2018-19790 [Security\Http] detect bad redirect targets using backslashes (xabbuh)

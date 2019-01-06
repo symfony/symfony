@@ -44,6 +44,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'resolve' => 'string',
             'default' => 'bool|int|float|string|array',
             'string' => 'string',
+            'trim' => 'string',
         );
     }
 
@@ -192,6 +193,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('csv' === $prefix) {
             return str_getcsv($env);
+        }
+
+        if ('trim' === $prefix) {
+            return trim($env);
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));

@@ -233,6 +233,19 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
+    public function testGetEnvTrim()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('trim', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return " hello\n";
+        });
+
+        $this->assertSame('hello', $result);
+    }
+
     /**
      * @dataProvider validJson
      */

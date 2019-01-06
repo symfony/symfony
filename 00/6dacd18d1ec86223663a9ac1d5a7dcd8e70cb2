@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-03T15:15:52Z
+
+Does this really work?
+`lateCollect` gathers data to be serialized.
+`getCompilerLogs` is called in another request by the profiler.
+To me, this PR improves performance by *not* saving logs, which is not what you want I fear.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-03T15:19:38Z
+
+It worked for me when I added this in the lageCollect() method:
+
+```php
+$this->data['compiler_logs_filepath'] = $this->containerPathPrefix.'Compiler.log';
+```
+
+Otherwise `$this->containerPathPrefix` is always null outside lateCollect() and we cannot get the log messages.
+
+But of course it's not enough that this works for me. We need more people to confirm us that this is working for them too. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-03T15:28:28Z
+
+OK, got it! What this does is share the same log file for all profiles, instead of snapshotting them per profiler. Works for me! (but tests are failing ;) )
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-03T15:55:33Z
+
+I've fixed tests ... but I'm not sure it's the right fix.

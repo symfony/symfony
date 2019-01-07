@@ -2180,6 +2180,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="text"]
     [@name="name"]
     [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
+    [@inputmode="url"]
 '
         );
     }

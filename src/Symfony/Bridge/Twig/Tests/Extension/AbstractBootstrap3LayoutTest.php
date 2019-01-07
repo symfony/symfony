@@ -2396,6 +2396,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@name="name"]
     [@class="my&class form-control"]
     [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
+    [@inputmode="url"]
 '
         );
     }

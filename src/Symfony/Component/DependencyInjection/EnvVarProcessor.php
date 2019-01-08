@@ -41,6 +41,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'int' => 'int',
             'json' => 'array',
             'key' => 'bool|int|float|string|array',
+            'nullable' => 'bool|int|float|string|array',
             'resolve' => 'string',
             'default' => 'bool|int|float|string|array',
             'string' => 'string',
@@ -193,6 +194,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('csv' === $prefix) {
             return str_getcsv($env);
+        }
+
+        if ('nullable' === $prefix) {
+            return '' === $env ? null : $env;
         }
 
         if ('trim' === $prefix) {

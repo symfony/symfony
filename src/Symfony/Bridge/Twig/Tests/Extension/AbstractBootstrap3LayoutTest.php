@@ -2388,7 +2388,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testUrlWithDefaultProtocol()
     {
         $url = 'http://www.google.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, array('default_protocol' => 'http'));
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
 '/input
@@ -2404,9 +2404,9 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     public function testUrlWithoutDefaultProtocol()
     {
         $url = 'http://www.google.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, array('default_protocol' => null));
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/input
     [@type="url"]
     [@name="name"]

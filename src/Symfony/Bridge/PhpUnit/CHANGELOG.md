@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `ClassExistsMock`
+ * bumped PHP version from 5.3.3 to 5.5.9 
+
 4.1.0
 -----
 

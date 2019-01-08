@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -67,8 +67,8 @@ class MessengerPassTest extends TestCase
         $this->assertSame(HandlersLocator::class, $handlersLocatorDefinition->getClass());
         $this->assertEquals(
             array(
-                DummyMessage::class => new Reference("messenger.handlers.$busId.".DummyMessage::class),
-                SecondMessage::class => new Reference("messenger.handlers.$busId.".SecondMessage::class),
+                DummyMessage::class => new IteratorArgument(array(new Reference(DummyHandler::class))),
+                SecondMessage::class => new IteratorArgument(array(new Reference(MissingArgumentTypeHandler::class))),
             ),
             $handlersLocatorDefinition->getArgument(0)
         );
@@ -107,8 +107,8 @@ class MessengerPassTest extends TestCase
         $this->assertSame(HandlersLocator::class, $commandBusHandlersLocatorDefinition->getClass());
         $this->assertEquals(
             array(
-                MultipleBusesMessage::class => new Reference("messenger.handlers.$commandBusId.".MultipleBusesMessage::class),
-                DummyCommand::class => new Reference("messenger.handlers.$commandBusId.".DummyCommand::class),
+                MultipleBusesMessage::class => new IteratorArgument(array(new Reference(MultipleBusesMessageHandler::class))),
+                DummyCommand::class => new IteratorArgument(array(new Reference(DummyCommandHandler::class))),
             ),
             $commandBusHandlersLocatorDefinition->getArgument(0)
         );
@@ -117,8 +117,8 @@ class MessengerPassTest extends TestCase
         $this->assertSame(HandlersLocator::class, $queryBusHandlersLocatorDefinition->getClass());
         $this->assertEquals(
             array(
-                DummyQuery::class => new Reference("messenger.handlers.$queryBusId.".DummyQuery::class),
-                MultipleBusesMessage::class => new Reference("messenger.handlers.$queryBusId.".MultipleBusesMessage::class),
+                DummyQuery::class => new IteratorArgument(array(new Reference(DummyQueryHandler::class))),
+                MultipleBusesMessage::class => new IteratorArgument(array(new Reference(MultipleBusesMessageHandler::class))),
             ),
             $queryBusHandlersLocatorDefinition->getArgument(0)
         );
@@ -155,13 +155,10 @@ class MessengerPassTest extends TestCase
         $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
 
         $this->assertArrayHasKey(DummyMessage::class, $handlersMapping);
-        $this->assertEquals(new Reference("messenger.handlers.$busId.".DummyMessage::class), $handlersMapping[DummyMessage::class]);
+        $this->assertEquals(new IteratorArgument(array(new Reference(HandlerWithMultipleMessages::class))), $handlersMapping[DummyMessage::class]);
 
         $this->assertArrayHasKey(SecondMessage::class, $handlersMapping);
-        $handlersDefinition = $container->getDefinition($handlersMapping[SecondMessage::class]);
-
-        $this->assertSame(RewindableGenerator::class, $handlersDefinition->getClass());
-        $this->assertEquals(array(new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class)), $handlersDefinition->getArgument(0)[0]);
+        $this->assertEquals(new IteratorArgument(array(new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class))), $handlersMapping[SecondMessage::class]);
     }
 
     public function testGetClassesAndMethodsAndPrioritiesFromTheSubscriber()
@@ -183,13 +180,13 @@ class MessengerPassTest extends TestCase
         $this->assertArrayHasKey(DummyMessage::class, $handlersMapping);
         $this->assertArrayHasKey(SecondMessage::class, $handlersMapping);
 
-        $dummyHandlerReference = $container->getDefinition($handlersMapping[DummyMessage::class])->getArgument(0)[0][0];
+        $dummyHandlerReference = $handlersMapping[DummyMessage::class]->getValues()[0];
         $dummyHandlerDefinition = $container->getDefinition($dummyHandlerReference);
         $this->assertSame('callable', $dummyHandlerDefinition->getClass());
         $this->assertEquals(array(new Reference(HandlerMappingMethods::class), 'dummyMethod'), $dummyHandlerDefinition->getArgument(0));
         $this->assertSame(array('Closure', 'fromCallable'), $dummyHandlerDefinition->getFactory());
 
-        $secondHandlerReference = $container->getDefinition($handlersMapping[SecondMessage::class])->getArgument(0)[0][1];
+        $secondHandlerReference = $handlersMapping[SecondMessage::class]->getValues()[1];
         $secondHandlerDefinition = $container->getDefinition($secondHandlerReference);
         $this->assertSame(PrioritizedHandler::class, $secondHandlerDefinition->getClass());
     }
@@ -281,11 +278,11 @@ class MessengerPassTest extends TestCase
         $handlersMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
 
         $this->assertArrayHasKey(DummyMessage::class, $handlersMapping);
-        $firstReference = $container->getDefinition($handlersMapping[DummyMessage::class])->getArgument(0)[0][0];
+        $firstReference = $handlersMapping[DummyMessage::class]->getValues()[0];
         $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'dummyMethod'), $container->getDefinition($firstReference)->getArgument(0));
 
         $this->assertArrayHasKey(SecondMessage::class, $handlersMapping);
-        $secondReference = $container->getDefinition($handlersMapping[SecondMessage::class])->getArgument(0)[0][0];
+        $secondReference = $handlersMapping[SecondMessage::class]->getValues()[0];
         $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'secondMessage'), $container->getDefinition($secondReference)->getArgument(0));
     }
 
@@ -304,13 +301,13 @@ class MessengerPassTest extends TestCase
         $eventsHandlerMapping = $container->getDefinition($eventsBusId.'.messenger.handlers_locator')->getArgument(0);
 
         $this->assertEquals(array(DummyMessage::class), array_keys($eventsHandlerMapping));
-        $firstReference = $container->getDefinition($eventsHandlerMapping[DummyMessage::class])->getArgument(0)[0][0];
+        $firstReference = $eventsHandlerMapping[DummyMessage::class]->getValues()[0];
         $this->assertEquals(array(new Reference(HandlerOnSpecificBuses::class), 'dummyMethodForEvents'), $container->getDefinition($firstReference)->getArgument(0));
 
         $commandsHandlerMapping = $container->getDefinition($commandsBusId.'.messenger.handlers_locator')->getArgument(0);
 
         $this->assertEquals(array(DummyMessage::class), array_keys($commandsHandlerMapping));
-        $firstReference = $container->getDefinition($commandsHandlerMapping[DummyMessage::class])->getArgument(0)[0][0];
+        $firstReference = $commandsHandlerMapping[DummyMessage::class]->getValues()[0];
         $this->assertEquals(array(new Reference(HandlerOnSpecificBuses::class), 'dummyMethodForCommands'), $container->getDefinition($firstReference)->getArgument(0));
     }
 

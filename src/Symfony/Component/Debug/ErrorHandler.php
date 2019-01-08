@@ -45,6 +45,8 @@ use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @final since Symfony 4.3
  */
 class ErrorHandler
 {
@@ -560,7 +562,7 @@ class ErrorHandler
         $this->exceptionHandler = null;
         try {
             if (null !== $exceptionHandler) {
-                return \call_user_func($exceptionHandler, $exception);
+                return $exceptionHandler($exception);
             }
             $handlerException = $handlerException ?: $exception;
         } catch (\Throwable $handlerException) {

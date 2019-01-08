@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * TranslatorInterface.
@@ -20,7 +21,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
  *
  * @deprecated since Symfony 4.2, use Symfony\Contracts\Translation\TranslatorInterface instead
  */
-interface TranslatorInterface
+interface TranslatorInterface extends LocaleAwareInterface
 {
     /**
      * Translates the given message.
@@ -40,7 +41,7 @@ interface TranslatorInterface
      * Translates the given choice message by choosing a translation according to a number.
      *
      * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param int         $number     The number to use to find the indice of the message
+     * @param int         $number     The number to use to find the index of the message
      * @param array       $parameters An array of parameters for the message
      * @param string|null $domain     The domain for the message or null to use the default
      * @param string|null $locale     The locale or null to use the default

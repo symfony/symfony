@@ -743,7 +743,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $fs->dumpFile($dir.$file, $code);
             @chmod($dir.$file, 0666 & ~umask());
         }
-        @unlink(\dirname($dir.$file).'.legacy');
+        $legacyFile = \dirname($dir.$file).'.legacy';
+        if (file_exists($legacyFile)) {
+            @unlink($legacyFile);
+        }
 
         $cache->write($rootCode, $container->getResources());
     }

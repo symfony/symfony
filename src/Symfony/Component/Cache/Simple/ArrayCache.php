@@ -129,7 +129,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         $expiry = 0 < $ttl ? microtime(true) + $ttl : PHP_INT_MAX;
 
         foreach ($valuesArray as $key => $value) {
-            if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+            if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
                 return false;
             }
             $this->values[$key] = $value;

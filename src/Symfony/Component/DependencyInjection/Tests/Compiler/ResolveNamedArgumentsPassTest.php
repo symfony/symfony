@@ -16,9 +16,11 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummyWithoutReturnTypes;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsVariadicsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -103,12 +105,31 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "__construct()" has no argument named "$notFound". Check your service definition.
      */
     public function testArgumentNotFound()
     {
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
+        $definition->setArguments(array('$notFound' => '123'));
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1": method "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummyWithoutReturnTypes::createTestDefinition1()" has no argument named "$notFound". Check your service definition.
+     */
+    public function testCorrectMethodReportedInException()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(FactoryDummyWithoutReturnTypes::class, FactoryDummyWithoutReturnTypes::class);
+
+        $definition = $container->register(TestDefinition1::class, TestDefinition1::class);
+        $definition->setFactory(array(FactoryDummyWithoutReturnTypes::class, 'createTestDefinition1'));
         $definition->setArguments(array('$notFound' => '123'));
 
         $pass = new ResolveNamedArgumentsPass();

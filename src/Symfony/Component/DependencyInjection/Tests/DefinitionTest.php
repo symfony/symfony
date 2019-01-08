@@ -375,7 +375,7 @@ class DefinitionTest extends TestCase
     public function testAddError()
     {
         $def = new Definition('stdClass');
-        $this->assertEmpty($def->getErrors());
+        $this->assertFalse($def->hasErrors());
         $def->addError('First error');
         $def->addError('Second error');
         $this->assertSame(array('First error', 'Second error'), $def->getErrors());

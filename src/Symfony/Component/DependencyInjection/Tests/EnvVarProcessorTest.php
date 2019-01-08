@@ -233,6 +233,19 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
+    public function testGetEnvTrim()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('trim', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return " hello\n";
+        });
+
+        $this->assertSame('hello', $result);
+    }
+
     /**
      * @dataProvider validJson
      */
@@ -317,7 +330,7 @@ class EnvVarProcessorTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Invalid configuration: env var "key:foo" does not contain a key specifier.
+     * @expectedExceptionMessage Invalid env "key:foo": a key specifier should be provided.
      */
     public function testGetEnvKeyInvalidKey()
     {
@@ -355,7 +368,7 @@ class EnvVarProcessorTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvNotFoundException
      * @expectedExceptionMessage Key "index" not found in
      * @dataProvider invalidArrayValues
      */

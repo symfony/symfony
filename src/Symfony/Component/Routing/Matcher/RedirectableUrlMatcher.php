@@ -44,11 +44,11 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
                 } finally {
                     $this->context->setScheme($scheme);
                 }
-            } elseif ('/' === $pathinfo) {
+            } elseif ('/' === $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/') {
                 throw $e;
             } else {
                 try {
-                    $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+                    $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
                     $ret = parent::match($pathinfo);
 
                     return $this->redirect($pathinfo, $ret['_route'] ?? null) + $ret;

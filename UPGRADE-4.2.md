@@ -68,6 +68,7 @@ Finder
 Form
 ----
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
    extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
 
@@ -199,7 +200,10 @@ Messenger
 ---------
 
  * The `MiddlewareInterface::handle()` and `SenderInterface::send()` methods must now return an `Envelope` instance.
- * The return value of handlers is ignored. If you used to return a value, e.g in query bus handlers, you can either:
+ * The return value of handlers isn't forwarded anymore by middleware and buses. 
+   If you used to return a value, e.g in query bus handlers, you can either:
+    - get the result from the `HandledStamp` in the envelope returned by the bus.
+    - use the `HandleTrait` to leverage a message bus, expecting a single, synchronous message handling and returning its result.
     - make your `Query` mutable to allow setting & getting a result:
       ```php
       // When dispatching:
@@ -209,15 +213,6 @@ Messenger
       // In your handler:
       $query->setResult($yourResult);
       ```
-    - define a callable on your `Query` to be called in your handler:
-      ```php
-      // When dispatching:
-      $bus->dispatch(new Query([$this, 'onResult']));
-
-      // In your handler:
-      $query->executeCallback($yourResult);
-      ```
-
  * The `EnvelopeAwareInterface` was removed and the `MiddlewareInterface::handle()` method now requires an `Envelope` object
    as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
    If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.  
@@ -291,6 +286,23 @@ Messenger
    ```
  * The `EncoderInterface` and `DecoderInterface` interfaces have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
    Each interface method have been merged untouched into the `Serializer` interface, so you can simply merge your two implementations together and implement the new interface.
+ * The `HandlerLocator` class was replaced with `Symfony\Component\Messenger\Handler\HandlersLocator`.
+
+   Before:
+   ```php
+   new HandlerLocator([
+        YourMessage::class => $handlerCallable,
+   ]);
+   ```
+
+   After:
+   ```php
+   new HandlersLocator([
+        YourMessage::class => [
+            $handlerCallable,
+        ]
+   ]);
+   ```
 
 Monolog
 -------
@@ -370,6 +382,7 @@ TwigBundle
 Validator
 ---------
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `checkMX` and `checkHost` options of the `Email` constraint are deprecated
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final

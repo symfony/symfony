@@ -283,6 +283,55 @@ class RequestTest extends TestCase
         $this->assertEquals('http://test.com/foo', $request->getUri());
     }
 
+    /**
+     * @dataProvider getRequestUriData
+     */
+    public function testGetRequestUri($serverRequestUri, $expected, $message)
+    {
+        $request = new Request();
+        $request->server->add(array(
+            'REQUEST_URI' => $serverRequestUri,
+
+            // For having http://test.com
+            'SERVER_NAME' => 'test.com',
+            'SERVER_PORT' => 80,
+        ));
+
+        $this->assertSame($expected, $request->getRequestUri(), $message);
+        $this->assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
+    }
+
+    public function getRequestUriData()
+    {
+        $message = 'Do not modify the path.';
+        yield array('/foo', '/foo', $message);
+        yield array('//bar/foo', '//bar/foo', $message);
+        yield array('///bar/foo', '///bar/foo', $message);
+
+        $message = 'Handle when the scheme, host are on REQUEST_URI.';
+        yield array('http://test.com/foo?bar=baz', '/foo?bar=baz', $message);
+
+        $message = 'Handle when the scheme, host and port are on REQUEST_URI.';
+        yield array('http://test.com:80/foo', '/foo', $message);
+        yield array('https://test.com:8080/foo', '/foo', $message);
+        yield array('https://test.com:443/foo', '/foo', $message);
+
+        $message = 'Fragment should not be included in the URI';
+        yield array('http://test.com/foo#bar', '/foo', $message);
+        yield array('/foo#bar', '/foo', $message);
+    }
+
+    public function testGetRequestUriWithoutRequiredHeader()
+    {
+        $expected = '';
+
+        $request = new Request();
+
+        $message = 'Fallback to empty URI when headers are missing.';
+        $this->assertSame($expected, $request->getRequestUri(), $message);
+        $this->assertSame($expected, $request->server->get('REQUEST_URI'), 'Normalize the request URI.');
+    }
+
     public function testCreateCheckPrecedence()
     {
         // server is used by default

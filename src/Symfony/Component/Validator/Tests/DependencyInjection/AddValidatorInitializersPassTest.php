@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
@@ -72,7 +73,7 @@ class AddValidatorInitializersPassTest extends TestCase
     }
 }
 
-class TestTranslator implements TranslatorInterface
+class TestTranslator implements TranslatorInterface, LocaleAwareInterface
 {
     use TranslatorTrait;
 }

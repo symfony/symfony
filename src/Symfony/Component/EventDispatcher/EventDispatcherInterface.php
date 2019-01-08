@@ -23,11 +23,11 @@ interface EventDispatcherInterface
     /**
      * Dispatches an event to all registered listeners.
      *
-     * @param string $eventName The name of the event to dispatch. The name of
-     *                          the event is the name of the method that is
-     *                          invoked on listeners.
-     * @param Event  $event     The event to pass to the event handlers/listeners
-     *                          If not supplied, an empty Event instance is created
+     * @param string     $eventName The name of the event to dispatch. The name of
+     *                              the event is the name of the method that is
+     *                              invoked on listeners.
+     * @param Event|null $event     The event to pass to the event handlers/listeners
+     *                              If not supplied, an empty Event instance is created
      *
      * @return Event
      */
@@ -46,7 +46,7 @@ interface EventDispatcherInterface
     /**
      * Adds an event subscriber.
      *
-     * The subscriber is asked for all the events he is
+     * The subscriber is asked for all the events it is
      * interested in and added as a listener for these events.
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);
@@ -64,7 +64,7 @@ interface EventDispatcherInterface
     /**
      * Gets the listeners of a specific event or all listeners sorted by descending priority.
      *
-     * @param string $eventName The name of the event
+     * @param string|null $eventName The name of the event
      *
      * @return array The event listeners for the specified event, or all event listeners by event name
      */
@@ -85,7 +85,7 @@ interface EventDispatcherInterface
     /**
      * Checks whether an event has any registered listeners.
      *
-     * @param string $eventName The name of the event
+     * @param string|null $eventName The name of the event
      *
      * @return bool true if the specified event has any listeners, false otherwise
      */

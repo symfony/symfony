@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
@@ -18,6 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Serializer\Serializer;
 
 class ConfigurationTest extends TestCase
 {
@@ -267,7 +269,7 @@ class ConfigurationTest extends TestCase
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
-                'default_pdo_provider' => 'doctrine.dbal.default_connection',
+                'default_pdo_provider' => class_exists(Connection::class) ? 'database_connection' : null,
             ),
             'workflows' => array(
                 'enabled' => false,
@@ -293,7 +295,7 @@ class ConfigurationTest extends TestCase
                 'routing' => array(),
                 'transports' => array(),
                 'serializer' => array(
-                    'id' => 'messenger.transport.symfony_serializer',
+                    'id' => !class_exists(FullStack::class) && class_exists(Serializer::class) ? 'messenger.transport.symfony_serializer' : null,
                     'format' => 'json',
                     'context' => array(),
                 ),

@@ -397,6 +397,27 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/index.mobile.html', $generator->generate('test', array('page' => 'index', '_format' => 'mobile.html')));
     }
 
+    public function testImportantVariable()
+    {
+        $routes = $this->getRoutes('test', (new Route('/{page}.{!_format}'))->addDefaults(array('_format' => 'mobile.html')));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/index.xml', $generator->generate('test', array('page' => 'index', '_format' => 'xml')));
+        $this->assertSame('/app.php/index.mobile.html', $generator->generate('test', array('page' => 'index', '_format' => 'mobile.html')));
+        $this->assertSame('/app.php/index.mobile.html', $generator->generate('test', array('page' => 'index')));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
+     */
+    public function testImportantVariableWithNoDefault()
+    {
+        $routes = $this->getRoutes('test', new Route('/{page}.{!_format}'));
+        $generator = $this->getGenerator($routes);
+
+        $generator->generate('test', array('page' => 'index'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
      */

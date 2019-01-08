@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
@@ -332,7 +333,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $translator = $this->translator;
 
         if (null === $translator) {
-            $translator = new class() implements TranslatorInterface {
+            $translator = new class() implements TranslatorInterface, LocaleAwareInterface {
                 use TranslatorTrait;
             };
             // Force the locale to be 'en' when no translator is provided rather than relying on the Intl default locale

@@ -94,7 +94,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $data = array();
         $stack = array();
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = $this->objectClassResolver ? \call_user_func($this->objectClassResolver, $object) : \get_class($object);
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
         $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER] ?? $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
 
@@ -106,7 +106,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
             if ($maxDepthReached) {
-                $attributeValue = \call_user_func($maxDepthHandler, $attributeValue, $object, $attribute, $format, $context);
+                $attributeValue = $maxDepthHandler($attributeValue, $object, $attribute, $format, $context);
             }
 
             /**
@@ -168,7 +168,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes($object, $format = null, array $context)
     {
-        $class = $this->objectClassResolver ? \call_user_func($this->objectClassResolver, $object) : \get_class($object);
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
@@ -363,7 +363,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return (float) $data;
             }
 
-            if (\call_user_func('is_'.$builtinType, $data)) {
+            if (('is_'.$builtinType)($data)) {
                 return $data;
             }
         }
@@ -373,6 +373,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), \gettype($data)));
+    }
+
+    /**
+     * @internal
+     */
+    protected function denormalizeParameter(\ReflectionClass $class, \ReflectionParameter $parameter, $parameterName, $parameterData, array $context, $format = null)
+    {
+        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($class->getName(), $parameterName)) {
+            return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
+        }
+
+        return $this->validateAndDenormalize($class->getName(), $parameterName, $parameterData, $format, $context);
     }
 
     /**

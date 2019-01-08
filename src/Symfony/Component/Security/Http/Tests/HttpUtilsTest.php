@@ -54,12 +54,26 @@ class HttpUtilsTest extends TestCase
         $this->assertTrue($response->isRedirect('http://localhost/blog'));
     }
 
-    public function testCreateRedirectResponseWithBadRequestsDomain()
+    /**
+     * @dataProvider badRequestDomainUrls
+     */
+    public function testCreateRedirectResponseWithBadRequestsDomain($url)
     {
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
-        $response = $utils->createRedirectResponse($this->getRequest(), 'http://pirate.net/foo');
+        $response = $utils->createRedirectResponse($this->getRequest(), $url);
 
         $this->assertTrue($response->isRedirect('http://localhost/'));
+    }
+
+    public function badRequestDomainUrls()
+    {
+        return array(
+            array('http://pirate.net/foo'),
+            array('http:\\\\pirate.net/foo'),
+            array('http:/\\pirate.net/foo'),
+            array('http:\\/pirate.net/foo'),
+            array('http://////pirate.net/foo'),
+        );
     }
 
     public function testCreateRedirectResponseWithProtocolRelativeTarget()
@@ -186,7 +200,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/')
-            ->will($this->throwException(new ResourceNotFoundException()))
+            ->willThrowException(new ResourceNotFoundException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -201,7 +215,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->throwException(new MethodNotAllowedException(array())))
+            ->willThrowException(new MethodNotAllowedException(array()))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -246,7 +260,7 @@ class HttpUtilsTest extends TestCase
         $urlMatcher
             ->expects($this->any())
             ->method('match')
-            ->will($this->throwException(new \RuntimeException()))
+            ->willThrowException(new \RuntimeException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);

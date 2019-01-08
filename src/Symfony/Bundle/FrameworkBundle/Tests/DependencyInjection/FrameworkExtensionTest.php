@@ -258,10 +258,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('attach', $transitionsMetadataCall[0]);
         $params = $transitionsMetadataCall[1];
         $this->assertCount(2, $params);
-        $this->assertInstanceOf(Definition::class, $params[0]);
-        $this->assertSame(Workflow\Transition::class, $params[0]->getClass());
-        $this->assertSame(array('submit', 'start', 'travis'), $params[0]->getArguments());
-        $this->assertSame(array('title' => 'transition submit title'), $params[1]);
+        $this->assertInstanceOf(Reference::class, $params[0]);
+        $this->assertSame('state_machine.pull_request.transition.0', (string) $params[0]);
 
         $serviceMarkingStoreWorkflowDefinition = $container->getDefinition('workflow.service_marking_store_workflow');
         /** @var Reference $markingStoreRef */
@@ -653,10 +651,11 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(1));
+        $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals(array(
             'amqp' => new Reference('messenger.transport.amqp'),
             'audit' => new Reference('audit'),
-        ), $container->getDefinition('messenger.senders.'.DummyMessage::class)->getArgument(0)[0]->getValues());
+        ), $sendersMapping[DummyMessage::class]->getValues());
     }
 
     /**

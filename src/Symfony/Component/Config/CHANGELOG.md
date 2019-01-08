@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
+
 4.2.0
 -----
 

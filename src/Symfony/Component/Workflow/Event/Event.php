@@ -35,7 +35,7 @@ class Event extends BaseEvent
      * @param Transition        $transition
      * @param WorkflowInterface $workflow
      */
-    public function __construct($subject, Marking $marking, Transition $transition, $workflow = null)
+    public function __construct($subject, Marking $marking, Transition $transition = null, $workflow = null)
     {
         $this->subject = $subject;
         $this->marking = $marking;

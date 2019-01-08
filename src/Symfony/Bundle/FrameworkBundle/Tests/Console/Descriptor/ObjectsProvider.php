@@ -163,7 +163,7 @@ class ObjectsProvider
 
     public static function getCallables()
     {
-        $callables = array(
+        return array(
             'callable_1' => 'array_key_exists',
             'callable_2' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'),
             'callable_3' => array(new CallableClass(), 'method'),
@@ -171,13 +171,8 @@ class ObjectsProvider
             'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
+            'callable_from_callable' => \Closure::fromCallable(new CallableClass()),
         );
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $callables['callable_from_callable'] = \Closure::fromCallable(new CallableClass());
-        }
-
-        return $callables;
     }
 }
 
@@ -219,5 +214,26 @@ class ClassWithoutDocComment
  * This is a class with a doc comment.
  */
 class ClassWithDocComment
+{
+}
+
+/**
+ * This is the first line of the description.
+ * This is the second line.
+ *
+ * This is the third and shouldn't be shown.
+ *
+ * @annot should not be parsed
+ */
+class ClassWithDocCommentOnMultipleLines
+{
+}
+
+/**
+ *Foo.
+ *
+ * @annot should not be parsed
+ */
+class ClassWithDocCommentWithoutInitialSpace
 {
 }

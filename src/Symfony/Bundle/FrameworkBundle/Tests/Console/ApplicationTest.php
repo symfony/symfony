@@ -204,6 +204,7 @@ class ApplicationTest extends TestCase
         $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel->expects($this->once())->method('boot');
         $kernel
             ->method('getBundles')
             ->willReturn(array($this->createBundleMock(
@@ -256,6 +257,7 @@ class ApplicationTest extends TestCase
         ;
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel->expects($this->once())->method('boot');
         $kernel
             ->expects($this->any())
             ->method('getBundles')

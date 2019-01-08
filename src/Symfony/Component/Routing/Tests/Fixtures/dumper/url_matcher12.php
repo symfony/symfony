@@ -32,15 +32,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             .')'
                         .')'
                     .')'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
         $this->dynamicRoutes = array(
-            27 => array(array(array('_route' => 'r1'), array('foo'), null, null, false, null)),
-            38 => array(array(array('_route' => 'r10'), array('foo'), null, null, false, null)),
-            46 => array(array(array('_route' => 'r100'), array('foo'), null, null, false, null)),
-            59 => array(array(array('_route' => 'r2'), array('foo'), null, null, false, null)),
-            70 => array(array(array('_route' => 'r20'), array('foo'), null, null, false, null)),
-            78 => array(array(array('_route' => 'r200'), array('foo'), null, null, false, null)),
+            27 => array(array(array('_route' => 'r1'), array('foo'), null, null, false, false, null)),
+            38 => array(array(array('_route' => 'r10'), array('foo'), null, null, false, false, null)),
+            46 => array(array(array('_route' => 'r100'), array('foo'), null, null, false, false, null)),
+            59 => array(array(array('_route' => 'r2'), array('foo'), null, null, false, false, null)),
+            70 => array(array(array('_route' => 'r20'), array('foo'), null, null, false, false, null)),
+            78 => array(array(array('_route' => 'r200'), array('foo'), null, null, false, false, null)),
         );
     }
 }

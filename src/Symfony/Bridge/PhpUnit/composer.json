@@ -16,9 +16,9 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
+        "php": ">=5.5.9 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
         "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "suggest": {
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader",

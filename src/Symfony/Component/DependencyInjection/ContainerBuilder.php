@@ -124,6 +124,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $removedIds = array();
 
+    private $removedBindingIds = array();
+
     private static $internalTypes = array(
         'int' => true,
         'float' => true,
@@ -500,7 +502,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a compiled container is not allowed.', $id));
         }
 
-        unset($this->definitions[$id], $this->aliasDefinitions[$id], $this->removedIds[$id]);
+        $this->removeId($id);
+        unset($this->removedIds[$id]);
 
         parent::set($id, $service);
     }
@@ -513,8 +516,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function removeDefinition($id)
     {
         if (isset($this->definitions[$id = (string) $id])) {
-            unset($this->definitions[$id]);
-            $this->removedIds[$id] = true;
+            $this->removeId($id);
         }
     }
 
@@ -592,7 +594,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw $e;
         }
 
-        if ($e = $definition->getErrors()) {
+        if ($definition->hasErrors() && $e = $definition->getErrors()) {
             throw new RuntimeException(reset($e));
         }
 
@@ -836,7 +838,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
         }
 
-        unset($this->definitions[$alias], $this->removedIds[$alias]);
+        $this->removeId($alias);
+        unset($this->removedIds[$alias]);
 
         return $this->aliasDefinitions[$alias] = $id;
     }
@@ -849,8 +852,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function removeAlias($alias)
     {
         if (isset($this->aliasDefinitions[$alias = (string) $alias])) {
-            unset($this->aliasDefinitions[$alias]);
-            $this->removedIds[$alias] = true;
+            $this->removeId($alias);
         }
     }
 
@@ -979,7 +981,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $id = (string) $id;
 
-        unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
+        $this->removeId($id);
+        unset($this->removedIds[$id]);
 
         return $this->definitions[$id] = $definition;
     }
@@ -1162,7 +1165,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', \get_class($service)));
             }
 
-            \call_user_func($callable, $service);
+            $callable($service);
         }
 
         return $service;
@@ -1509,6 +1512,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Gets removed binding ids.
+     *
+     * @return array
+     *
+     * @internal
+     */
+    public function getRemovedBindingIds()
+    {
+        return $this->removedBindingIds;
+    }
+
+    /**
      * Computes a reasonably unique hash of a value.
      *
      * @param mixed $value A serializable value
@@ -1534,11 +1549,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $value;
         }
 
-        foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
-            if (isset($placeholders[$value])) {
-                $bag = new ParameterBag($bag->all());
+        $envPlaceholders = $bag->getEnvPlaceholders();
+        if (isset($envPlaceholders[$name][$value])) {
+            $bag = new ParameterBag($bag->all());
 
-                return $bag->unescapeValue($bag->get("env($name)"));
+            return $bag->unescapeValue($bag->get("env($name)"));
+        }
+        foreach ($envPlaceholders as $env => $placeholders) {
+            if (isset($placeholders[$value])) {
+                return $this->getEnv($env);
             }
         }
 
@@ -1611,5 +1630,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return false;
+    }
+
+    private function removeId($id)
+    {
+        $this->removedIds[$id] = true;
+        unset($this->aliasDefinitions[$id]);
+
+        if (!isset($this->definitions[$id])) {
+            return;
+        }
+
+        foreach ($this->definitions[$id]->getBindings() as $binding) {
+            list(, $identifier) = $binding->getValues();
+            $this->removedBindingIds[$identifier] = true;
+        }
+
+        unset($this->definitions[$id]);
     }
 }

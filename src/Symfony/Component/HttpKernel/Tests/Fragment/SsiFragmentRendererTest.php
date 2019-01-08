@@ -51,7 +51,7 @@ class SsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', array(), array());
 
         $this->assertEquals(
-            '<!--#include virtual="/_fragment?_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller&_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D" -->',
+            '<!--#include virtual="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->',
             $strategy->render($reference, $request, array('alt' => $altReference))->getContent()
         );
     }

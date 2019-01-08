@@ -15,16 +15,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $this->context = $context;
         $this->staticRoutes = array(
-            '/rootprefix/test' => array(array(array('_route' => 'static'), null, null, null, false, null)),
-            '/with-condition' => array(array(array('_route' => 'with-condition'), null, null, null, false, -1)),
+            '/rootprefix/test' => array(array(array('_route' => 'static'), null, null, null, false, false, null)),
+            '/with-condition' => array(array(array('_route' => 'with-condition'), null, null, null, false, false, -1)),
         );
         $this->regexpList = array(
             0 => '{^(?'
                     .'|/rootprefix/([^/]++)(*:27)'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
         $this->dynamicRoutes = array(
-            27 => array(array(array('_route' => 'dynamic'), array('var'), null, null, false, null)),
+            27 => array(array(array('_route' => 'dynamic'), array('var'), null, null, false, true, null)),
         );
         $this->checkCondition = static function ($condition, $context, $request) {
             switch ($condition) {

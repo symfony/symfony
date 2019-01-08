@@ -29,6 +29,8 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
 {
     use ProxyTrait;
 
+    private const METADATA_EXPIRY_OFFSET = 1527506807;
+
     private $createCacheItem;
     private $cacheItemPrototype;
 
@@ -58,7 +60,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
             }
             $this->createCacheItem = $createCacheItem;
 
-            return $createCacheItem($key, $value, $allowInt);
+            return $createCacheItem($key, null, $allowInt)->set($value);
         };
     }
 
@@ -147,8 +149,29 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         }
         $values = array();
 
+        if (!$this->pool instanceof AdapterInterface) {
+            foreach ($items as $key => $item) {
+                $values[$key] = $item->isHit() ? $item->get() : $default;
+            }
+
+            return $value;
+        }
+
         foreach ($items as $key => $item) {
-            $values[$key] = $item->isHit() ? $item->get() : $default;
+            if (!$item->isHit()) {
+                $values[$key] = $default;
+                continue;
+            }
+            $values[$key] = $item->get();
+
+            if (!$metadata = $item->getMetadata()) {
+                continue;
+            }
+            unset($metadata[CacheItem::METADATA_TAGS]);
+
+            if ($metadata) {
+                $values[$key] = array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $values[$key]);
+            }
         }
 
         return $values;

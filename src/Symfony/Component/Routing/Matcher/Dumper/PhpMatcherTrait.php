@@ -54,8 +54,8 @@ trait PhpMatcherTrait
             } finally {
                 $this->context->setScheme($scheme);
             }
-        } elseif ('/' !== $pathinfo) {
-            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+        } elseif ('/' !== $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/') {
+            $pathinfo = $trimmedPathinfo === $pathinfo ? $pathinfo.'/' : $trimmedPathinfo;
             if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
                 return $this->redirect($pathinfo, $ret['_route']) + $ret;
             }
@@ -67,13 +67,13 @@ trait PhpMatcherTrait
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
+    private function doMatch(string $pathinfo, array &$allow = array(), array &$allowSchemes = array()): array
     {
         $allow = $allowSchemes = array();
-        $pathinfo = rawurldecode($rawPathinfo) ?: '/';
+        $pathinfo = rawurldecode($pathinfo) ?: '/';
+        $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
-        $trimmedPathinfo = '/' !== $pathinfo && '/' === $pathinfo[-1] ? substr($pathinfo, 0, -1) : $pathinfo;
 
         if ($this->matchHost) {
             $host = strtolower($context->getHost());
@@ -82,17 +82,17 @@ trait PhpMatcherTrait
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
         }
+        $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
-        foreach ($this->staticRoutes[$trimmedPathinfo] ?? array() as list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $condition)) {
+        foreach ($this->staticRoutes[$trimmedPathinfo] ?? array() as list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition)) {
             if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
                 continue;
             }
 
-            if ('/' === $pathinfo || $hasTrailingSlash === ('/' === $pathinfo[-1])) {
-                // no-op
-            } elseif ($this instanceof RedirectableUrlMatcherInterface) {
-                return null;
-            } else {
+            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                    return $allow = $allowSchemes = array();
+                }
                 continue;
             }
 
@@ -125,17 +125,26 @@ trait PhpMatcherTrait
 
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
-                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $condition)) {
+                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition)) {
                     if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
                         continue;
                     }
 
-                    if ('/' === $pathinfo || $hasTrailingSlash === ('/' === $pathinfo[-1])) {
+                    if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                         // no-op
-                    } elseif ($this instanceof RedirectableUrlMatcherInterface) {
-                        return null;
+                    } elseif (preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        $matches = $n;
                     } else {
-                        continue;
+                        $hasTrailingSlash = true;
+                    }
+
+                    if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                        if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                            return $allow = $allowSchemes = array();
+                        }
+                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
+                            continue;
+                        }
                     }
 
                     foreach ($vars as $i => $v) {
@@ -168,6 +177,6 @@ trait PhpMatcherTrait
             throw new NoConfigurationException();
         }
 
-        return null;
+        return array();
     }
 }

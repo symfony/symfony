@@ -176,7 +176,10 @@ abstract class AbstractCloner implements ClonerInterface
     public function addCasters(array $casters)
     {
         foreach ($casters as $type => $callback) {
-            $this->casters[strtolower($type)][] = \is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
+            $closure = &$this->casters[strtolower($type)][];
+            $closure = $callback instanceof \Closure ? $callback : static function (...$args) use ($callback, &$closure) {
+                return ($closure = \Closure::fromCallable($callback))(...$args);
+            };
         }
     }
 
@@ -228,7 +231,7 @@ abstract class AbstractCloner implements ClonerInterface
             }
 
             if ($this->prevErrorHandler) {
-                return \call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+                return ($this->prevErrorHandler)($type, $msg, $file, $line, $context);
             }
 
             return false;

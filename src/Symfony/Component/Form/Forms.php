@@ -26,8 +26,8 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *         ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
  *         ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
  *         ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
- *         ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
- *             'choices' => array('Male' => 'm', 'Female' => 'f'),
+ *         ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
+ *             'choices' => array('Red' => 'r', 'Blue' => 'b'),
  *         ))
  *         ->getForm();
  *

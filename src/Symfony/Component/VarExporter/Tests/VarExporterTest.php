@@ -112,6 +112,7 @@ class VarExporterTest extends TestCase
 
         yield array('bool', true, true);
         yield array('simple-array', array(123, array('abc')), true);
+        yield array('partially-indexed-array', array(5 => true, 1 => true, 2 => true, 6 => true), true);
         yield array('datetime', \DateTime::createFromFormat('U', 0));
 
         $value = new \ArrayObject();
@@ -192,6 +193,10 @@ class VarExporterTest extends TestCase
         $value->bis = new \ReflectionClass($value);
 
         yield array('wakeup-refl', $value);
+
+        yield array('abstract-parent', new ConcreteClass());
+
+        yield array('foo-serializable', new FooSerializable('bar'));
     }
 }
 
@@ -318,5 +323,50 @@ final class FinalStdClass extends \stdClass
     public function __clone()
     {
         throw new \BadMethodCallException('Should not be called.');
+    }
+}
+
+abstract class AbstractClass
+{
+    protected $foo;
+    private $bar;
+
+    protected function setBar($bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class ConcreteClass extends AbstractClass
+{
+    public function __construct()
+    {
+        $this->foo = 123;
+        $this->setBar(234);
+    }
+}
+
+class FooSerializable implements \Serializable
+{
+    private $foo;
+
+    public function __construct(string $foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function getFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function serialize(): string
+    {
+        return serialize(array($this->getFoo()));
+    }
+
+    public function unserialize($str)
+    {
+        list($this->foo) = unserialize($str);
     }
 }

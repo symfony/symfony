@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
-use phpDocumentor\Reflection\DocBlockFactory;
-use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -292,22 +290,17 @@ abstract class Descriptor implements DescriptorInterface
      */
     public static function getClassDescription(string $class, string &$resolvedClass = null): string
     {
-        $resolvedClass = null;
-
-        if (!interface_exists(DocBlockFactoryInterface::class)) {
-            return '';
-        }
-
+        $resolvedClass = $class;
         try {
             $r = new \ReflectionClass($class);
             $resolvedClass = $r->name;
 
             if ($docComment = $r->getDocComment()) {
-                return DocBlockFactory::createInstance()
-                    ->create($docComment)
-                    ->getSummary();
+                $docComment = preg_split('#\n\s*\*\s*[\n@]#', substr($docComment, 3, -2), 2)[0];
+
+                return trim(preg_replace('#\s*\n\s*\*\s*#', ' ', $docComment));
             }
-        } catch (\ReflectionException | \InvalidArgumentException $e) {
+        } catch (\ReflectionException $e) {
         }
 
         return '';

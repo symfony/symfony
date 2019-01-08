@@ -193,6 +193,11 @@ class MemcachedAdapterTest extends AdapterTestCase
         );
     }
 
+    public function testClear()
+    {
+        $this->assertTrue($this->createCachePool()->clear());
+    }
+
     public function testMultiServerDsn()
     {
         $dsn = 'memcached:?host[localhost]&host[localhost:12345]&host[/some/memcached.sock:]=3';

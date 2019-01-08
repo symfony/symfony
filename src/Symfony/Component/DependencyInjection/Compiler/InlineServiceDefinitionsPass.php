@@ -160,15 +160,19 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      */
     private function isInlineableDefinition($id, Definition $definition)
     {
-        if ($definition->getErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
+        if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
             return false;
         }
 
         if (!$definition->isShared()) {
+            if (!$this->graph->hasNode($id)) {
+                return true;
+            }
+
             foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
                 $srcId = $edge->getSourceNode()->getId();
                 $this->connectedIds[$srcId] = true;
-                if ($edge->isWeak()) {
+                if ($edge->isWeak() || $edge->isLazy()) {
                     return false;
                 }
             }
@@ -191,10 +195,12 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
         $srcIds = array();
         $srcCount = 0;
+        $isReferencedByConstructor = false;
         foreach ($this->graph->getNode($id)->getInEdges() as $edge) {
+            $isReferencedByConstructor = $isReferencedByConstructor || $edge->isReferencedByConstructor();
             $srcId = $edge->getSourceNode()->getId();
             $this->connectedIds[$srcId] = true;
-            if ($edge->isWeak()) {
+            if ($edge->isWeak() || $edge->isLazy()) {
                 return false;
             }
             $srcIds[$srcId] = true;
@@ -208,6 +214,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
 
         if ($srcCount > 1 && \is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
+            return false;
+        }
+
+        if ($isReferencedByConstructor && $this->container->getDefinition($srcId)->isLazy() && ($definition->getProperties() || $definition->getMethodCalls() || $definition->getConfigurator())) {
             return false;
         }
 

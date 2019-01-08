@@ -17,18 +17,18 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->regexpList = array(
             0 => '{^(?'
                     .'|/(a)(*:11)'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
             11 => '{^(?'
                     .'|/(.)(*:22)'
-                .')(?:/?)$}sDu',
+                .')/?$}sDu',
             22 => '{^(?'
                     .'|/(.)(*:33)'
-                .')(?:/?)$}sD',
+                .')/?$}sD',
         );
         $this->dynamicRoutes = array(
-            11 => array(array(array('_route' => 'a'), array('a'), null, null, false, null)),
-            22 => array(array(array('_route' => 'b'), array('a'), null, null, false, null)),
-            33 => array(array(array('_route' => 'c'), array('a'), null, null, false, null)),
+            11 => array(array(array('_route' => 'a'), array('a'), null, null, false, true, null)),
+            22 => array(array(array('_route' => 'b'), array('a'), null, null, false, true, null)),
+            33 => array(array(array('_route' => 'c'), array('a'), null, null, false, true, null)),
         );
     }
 }

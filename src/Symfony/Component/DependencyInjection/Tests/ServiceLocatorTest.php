@@ -61,6 +61,20 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
         $subscriber->getFoo();
     }
 
+    /**
+     * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage Service "foo" not found: even though it exists in the app's container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.
+     */
+    public function testGetThrowsServiceNotFoundException()
+    {
+        $container = new Container();
+        $container->set('foo', new \stdClass());
+
+        $locator = new ServiceLocator(array());
+        $locator = $locator->withContext('foo', $container);
+        $locator->get('foo');
+    }
+
     public function testInvoke()
     {
         $locator = $this->getServiceLocator(array(

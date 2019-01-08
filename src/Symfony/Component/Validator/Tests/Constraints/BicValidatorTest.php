@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BicValidatorTest extends ConstraintValidatorTestCase
@@ -34,6 +35,113 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('', new Bic());
 
         $this->assertNoViolation();
+    }
+
+    public function testValidComparisonToPropertyPath()
+    {
+        $constraint = new Bic(array('ibanPropertyPath' => 'value'));
+
+        $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
+
+        $this->setObject($object);
+
+        $this->validator->validate('SOGEFRPP', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidComparisonToPropertyPathOnArray()
+    {
+        $constraint = new Bic(array('ibanPropertyPath' => '[root][value]'));
+
+        $this->setObject(array('root' => array('value' => 'FR14 2004 1010 0505 0001 3M02 606')));
+
+        $this->validator->validate('SOGEFRPP', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidComparisonToPropertyPath()
+    {
+        $constraint = new Bic(array('ibanPropertyPath' => 'value'));
+        $constraint->ibanMessage = 'Constraint Message';
+
+        $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
+
+        $this->setObject($object);
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '"UNCRIT2B912"')
+            ->setParameter('{{ iban }}', 'FR14 2004 1010 0505 0001 3M02 606')
+            ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidComparisonToValue()
+    {
+        $constraint = new Bic(array('iban' => 'FR14 2004 1010 0505 0001 3M02 606'));
+        $constraint->ibanMessage = 'Constraint Message';
+
+        $this->validator->validate('SOGEFRPP', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidComparisonToValue()
+    {
+        $constraint = new Bic(array('iban' => 'FR14 2004 1010 0505 0001 3M02 606'));
+        $constraint->ibanMessage = 'Constraint Message';
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
+
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', '"UNCRIT2B912"')
+            ->setParameter('{{ iban }}', 'FR14 2004 1010 0505 0001 3M02 606')
+            ->setCode(Bic::INVALID_IBAN_COUNTRY_CODE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNoViolationOnNullObjectWithPropertyPath()
+    {
+        $constraint = new Bic(array('ibanPropertyPath' => 'propertyPath'));
+
+        $this->setObject(null);
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedExceptionMessage The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time
+     */
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    {
+        new Bic(array(
+            'iban' => 'value',
+            'ibanPropertyPath' => 'propertyPath',
+        ));
+    }
+
+    public function testInvalidValuePath()
+    {
+        $constraint = new Bic(array('ibanPropertyPath' => 'foo'));
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(ConstraintDefinitionException::class);
+            $this->expectExceptionMessage(sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        } else {
+            $this->setExpectedException(ConstraintDefinitionException::class, sprintf('Invalid property path "foo" provided to "%s" constraint', \get_class($constraint)));
+        }
+
+        $object = new BicComparisonTestClass(5);
+
+        $this->setObject($object);
+
+        $this->validator->validate('UNCRIT2B912', $constraint);
     }
 
     /**
@@ -112,5 +220,60 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             array('DeutAT2LXXX', Bic::INVALID_CASE_ERROR),
             array('DEUTAT2lxxx', Bic::INVALID_CASE_ERROR),
         );
+    }
+
+    /**
+     * @dataProvider getValidBicSpecialCases
+     *
+     * Some territories have their own ISO country code but can use another country code
+     * for IBAN accounts. Example: "French Guiana" (country code "GF") can use FR too.
+     */
+    public function testValidBicSpecialCases(string $bic, string $iban)
+    {
+        $constraint = new Bic(array('iban' => $iban));
+        $this->validator->validate($bic, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidBicSpecialCases()
+    {
+        // FR related special cases
+        yield array('BNPAGFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAPFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPATFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAGPGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAMQGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAYTGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPANCGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAREGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAPMGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield array('BNPAWFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+
+        // GB related special cases
+        yield array('BARCJESA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCIMSA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCGGSA', 'GB12 CPBK 0892 9965 0449 911');
+        yield array('BARCVGSA', 'GB12 CPBK 0892 9965 0449 911');
+    }
+}
+
+class BicComparisonTestClass
+{
+    protected $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
     }
 }

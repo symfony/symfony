@@ -327,6 +327,28 @@ trait ControllerTrait
     }
 
     /**
+     * Handles request and check form validity.
+     *
+     * @final
+     */
+    protected function isFormValid(FormInterface $form, Request $request = null): bool
+    {
+        if ($form->isSubmitted()) {
+            throw new \LogicException('The form is already submitted, use $form->isValid() directly.');
+        }
+
+        if (!$request) {
+            $request = $this->container->get('request_stack')->getCurrentRequest();
+        }
+
+        if (!$request) {
+            throw new \LogicException('You must pass a request as second argument because the request stack is empty.');
+        }
+
+        return $form->handleRequest($request)->isSubmitted() && $form->isValid();
+    }
+
+    /**
      * Shortcut to return the Doctrine Registry service.
      *
      * @throws \LogicException If DoctrineBundle is not available

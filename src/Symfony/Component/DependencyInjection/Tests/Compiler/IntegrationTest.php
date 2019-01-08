@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * This class tests the integration of the different compiler passes.
@@ -120,6 +121,21 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
+    public function testCanDecorateServiceSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ServiceSubscriberStub::class)
+            ->addTag('container.service_subscriber')
+            ->setPublic(true);
+
+        $container->register(DecoratedServiceSubscriber::class)
+            ->setDecoratedService(ServiceSubscriberStub::class);
+
+        $container->compile();
+
+        $this->assertInstanceOf(DecoratedServiceSubscriber::class, $container->get(ServiceSubscriberStub::class));
+    }
+
     /**
      * @dataProvider getYamlCompileTests
      */
@@ -218,6 +234,18 @@ class IntegrationTest extends TestCase
             $container,
         );
     }
+}
+
+class ServiceSubscriberStub implements ServiceSubscriberInterface
+{
+    public static function getSubscribedServices()
+    {
+        return array();
+    }
+}
+
+class DecoratedServiceSubscriber
+{
 }
 
 class IntegrationTestStub extends IntegrationTestStubParent

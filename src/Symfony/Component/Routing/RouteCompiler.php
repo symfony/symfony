@@ -111,7 +111,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('#\{!?\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
             $varName = substr($match[0][0], 1, -1);
             // get all static text preceding the current variable
@@ -184,6 +184,9 @@ class RouteCompiler implements RouteCompilerInterface
             }
 
             $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);
+            if ('!' === $varName[0]) {
+                $varName = substr($varName, 1);
+            }
             $variables[] = $varName;
         }
 
@@ -283,6 +286,10 @@ class RouteCompiler implements RouteCompilerInterface
             // Text tokens
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
+            if ('variable' === $token[0] && '!' === $token[3][0]) {
+                $token[3] = substr($token[3], 1);
+            }
+
             // Variable tokens
             if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required

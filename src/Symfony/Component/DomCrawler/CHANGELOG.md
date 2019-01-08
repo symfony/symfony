@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+* Added return of element name (`_name`) in `extract()` method.
+* Added ability to return a default value in `text()` and `html()` instead of throwing an exception when node is empty.
+
 4.2.0
 -----
 

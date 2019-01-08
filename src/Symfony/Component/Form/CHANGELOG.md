@@ -3,7 +3,10 @@ CHANGELOG
 
 4.3.0
 -----
-  * The `ValidatorTypeGuesser` can now guess the type of accepted files and out it into the FileType
+
+ * The `ValidatorTypeGuesser` can now guess the type of accepted files and out it into the FileType
+ * added `block_prefix` option to `BaseType`.
+ 
 4.2.0
 -----
 

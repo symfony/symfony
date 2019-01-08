@@ -559,7 +559,7 @@ class ContainerBuilderTest extends TestCase
         $config->setDefinition('baz', new Definition('BazClass'));
         $config->setAlias('alias_for_foo', 'foo');
         $container->merge($config);
-        $this->assertEquals(array('service_container', 'foo', 'bar', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
+        $this->assertEquals(array('foo', 'bar', 'service_container', 'baz'), array_keys($container->getDefinitions()), '->merge() merges definitions already defined ones');
 
         $aliases = $container->getAliases();
         $this->assertArrayHasKey('alias_for_foo', $aliases);
@@ -736,6 +736,20 @@ class ContainerBuilderTest extends TestCase
         putenv('DUMMY_BAR');
 
         $this->assertSame('someFooBar', $container->getParameter('baz'));
+    }
+
+    public function testFallbackEnv()
+    {
+        putenv('DUMMY_FOO=foo');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%env(DUMMY_FOO)%');
+        $container->setParameter('bar', 'bar%env(default:foo:DUMMY_BAR)%');
+
+        $container->compile(true);
+        putenv('DUMMY_FOO');
+
+        $this->assertSame('barfoo', $container->getParameter('bar'));
     }
 
     public function testCastEnv()

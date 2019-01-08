@@ -65,6 +65,21 @@ class ExecutableFinderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testFindWithNullAsDefault()
+    {
+        if (ini_get('open_basedir')) {
+            $this->markTestSkipped('Cannot test when open_basedir is set');
+        }
+
+        $this->setPath('');
+
+        $finder = new ExecutableFinder();
+
+        $result = $finder->find('foo');
+
+        $this->assertNull($result);
+    }
+
     public function testFindWithExtraDirs()
     {
         if (ini_get('open_basedir')) {

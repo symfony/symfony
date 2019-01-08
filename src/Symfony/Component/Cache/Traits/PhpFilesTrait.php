@@ -54,7 +54,11 @@ trait PhpFilesTrait
         set_error_handler($this->includeHandler);
         try {
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-                list($expiresAt) = include $file;
+                try {
+                    list($expiresAt) = include $file;
+                } catch (\ErrorException $e) {
+                    $expiresAt = $time;
+                }
 
                 if ($time >= $expiresAt) {
                     $pruned = $this->doUnlink($file) && !file_exists($file) && $pruned;
@@ -111,7 +115,7 @@ trait PhpFilesTrait
                     if ($now >= $expiresAt) {
                         unset($this->values[$id], $missingIds[$k]);
                     }
-                } catch (\Exception $e) {
+                } catch (\ErrorException $e) {
                     unset($missingIds[$k]);
                 }
             }
@@ -137,6 +141,8 @@ trait PhpFilesTrait
         try {
             $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
             list($expiresAt, $value) = include $file;
+        } catch (\ErrorException $e) {
+            return false;
         } finally {
             restore_error_handler();
         }

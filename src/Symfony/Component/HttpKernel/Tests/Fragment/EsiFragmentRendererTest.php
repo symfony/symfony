@@ -60,7 +60,7 @@ class EsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', array(), array());
 
         $this->assertEquals(
-            '<esi:include src="/_fragment?_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller&_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D" alt="/_fragment?_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller&_hash=iPJEdRoUpGrM1ztqByiorpfMPtiW%2FOWwdH1DBUXHhEc%3D" />',
+            '<esi:include src="/_fragment?_hash=Jz1P8NErmhKTeI6onI1EdAXTB85359MY3RIk5mSJ60w%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="/_fragment?_hash=iPJEdRoUpGrM1ztqByiorpfMPtiW%2FOWwdH1DBUXHhEc%3D&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />',
             $strategy->render($reference, $request, array('alt' => $altReference))->getContent()
         );
     }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added support for hyperlinks
+
 4.2.0
 -----
 

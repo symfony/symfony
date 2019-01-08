@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-4.3.0
------
-
- * Added `ControllerTrait::isFormValid()`
-
 4.2.0
 -----
 

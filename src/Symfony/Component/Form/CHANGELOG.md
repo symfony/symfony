@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+  * The `ValidatorTypeGuesser` can now guess the type of accepted files and out it into the FileType
 4.2.0
 -----
 

@@ -86,7 +86,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 4.2.0-BETA1 (2018-11-03)
 
- * feature #29327 [Validator] Specify attributes of fileType thanks to validatorTypeGuesser
  * feature #28622 [VarDumper] add caster for Memcached (jschaedl)
  * feature #29042 [DI] use filter_var() instead of XmlUtils::phpize() in EnvVarProcessor (nicolas-grekas)
  * feature #29047 Revert "[HttpFoundation] Adds getAcceptableFormats() method for Request" (Tobion)

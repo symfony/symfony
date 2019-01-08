@@ -452,7 +452,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #26009 [SecurityBundle] Allow remember-me factory creation when multiple user providers are configured. (iisisrael)
  * bug #26010 [CssSelector] For AND operator, the left operand should have parentheses, not only right operand (Arnaud CHASSEUX)
  * bug #26000 Fixed issue #25985 (KevinFrantz)
- * bug #25996 Don't show wanna-be-private services as public in debug:container (chalasr)
+ * bug #25996 Don't show want to-be-private services as public in debug:container (chalasr)
  * bug #25914 [HttpKernel] collect extension information as late as possible (xabbuh)
  * bug #25981 [DI] Fix tracking of source class changes for lazy-proxies (nicolas-grekas)
  * bug #25971 [Debug] Fix bad registration of exception handler, leading to mem leak (nicolas-grekas)

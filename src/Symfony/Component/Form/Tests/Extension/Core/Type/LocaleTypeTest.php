@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Validator\Constraints\Locale;
 
 class LocaleTypeTest extends BaseTypeTest
 {
@@ -51,5 +52,16 @@ class LocaleTypeTest extends BaseTypeTest
         $type = new LocaleType();
 
         $this->assertSame([], $type->loadChoicesForValues(['foo']));
+    }
+
+    public function testInvalidLocaleMessage()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+
+        $form->submit('nonexistent-locale');
+
+        $localeConstraint = new Locale();
+
+        $this->assertSame($localeConstraint->message, $form->getErrors()->current()->getMessage());
     }
 }

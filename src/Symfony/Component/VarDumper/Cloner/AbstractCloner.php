@@ -136,6 +136,7 @@ abstract class AbstractCloner implements ClonerInterface
         ':pgsql result' => array('Symfony\Component\VarDumper\Caster\PgSqlCaster', 'castResult'),
         ':process' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castProcess'),
         ':stream' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'),
+        ':OpenSSL X.509' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castOpensslX509'),
         ':persistent stream' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStream'),
         ':stream-context' => array('Symfony\Component\VarDumper\Caster\ResourceCaster', 'castStreamContext'),
         ':xml' => array('Symfony\Component\VarDumper\Caster\XmlResourceCaster', 'castXml'),
@@ -176,7 +177,7 @@ abstract class AbstractCloner implements ClonerInterface
     public function addCasters(array $casters)
     {
         foreach ($casters as $type => $callback) {
-            $closure = &$this->casters[strtolower($type)][];
+            $closure = &$this->casters['' === $type || ':' === $type[0] ? $type : strtolower($type)][];
             $closure = $callback instanceof \Closure ? $callback : static function (...$args) use ($callback, &$closure) {
                 return ($closure = \Closure::fromCallable($callback))(...$args);
             };

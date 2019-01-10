@@ -133,6 +133,7 @@ class Finder implements \IteratorAggregate, \Countable
      *   $finder->date('>= 2005-10-15');
      *
      * @param string $date A date range string
+     * @param string $timeType The time type to compare
      *
      * @return $this
      *
@@ -140,9 +141,9 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
-    public function date($date)
+    public function date($date, string $timeType = Comparator\DateComparator::TIME_TYPE_MODIFIED)
     {
-        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_MODIFIED);
+        $this->dates[] = new Comparator\DateComparator($date, $timeType);
 
         return $this;
     }
@@ -175,7 +176,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function dateAccessed($date)
     {
-        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_ACCESSED);
+        $this->date($date, Comparator\DateComparator::TIME_TYPE_ACCESSED);
 
         return $this;
     }
@@ -207,7 +208,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function dateChanged($date)
     {
-        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_CHANGED);
+        $this->date($date, Comparator\DateComparator::TIME_TYPE_CHANGED);
 
         return $this;
     }

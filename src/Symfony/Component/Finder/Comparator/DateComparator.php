@@ -24,12 +24,6 @@ class DateComparator extends Comparator
 
     private $timeType;
 
-    /**
-     * @param string $test     A comparison string
-     * @param string $timeType The type of file time to compare
-     *
-     * @throws \InvalidArgumentException If the test is not understood
-     */
     public function __construct(string $test, string $timeType = self::TIME_TYPE_MODIFIED)
     {
         if (!preg_match('#^\s*(==|!=|[<>]=?|after|since|before|until)?\s*(.+?)\s*$#i', $test, $matches)) {
@@ -57,9 +51,6 @@ class DateComparator extends Comparator
         $this->setTarget($target);
     }
 
-    /**
-     * @return string
-     */
     public function getTimeType(): string
     {
         return $this->timeType;

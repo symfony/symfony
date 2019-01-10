@@ -42,9 +42,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value for both internal processing and
- * storage in the object. In these cases you simply need to set a view
- * transformer to convert between formats (2) and (3). You can do this by
- * calling addViewTransformer().
+ * storage in the object. In these cases you need to set a view transformer
+ * to convert between formats (2) and (3). You can do this by calling
+ * addViewTransformer().
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
@@ -88,7 +88,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @var FormError[] An array of FormError instances
      */
-    private $errors = array();
+    private $errors = [];
 
     /**
      * Whether this form was submitted.
@@ -130,7 +130,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @var array
      */
-    private $extraData = array();
+    private $extraData = [];
 
     /**
      * Returns the transformation failure generated during submission, if any.
@@ -507,7 +507,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Initialize errors in the very beginning so that we don't lose any
         // errors added during listeners
-        $this->errors = array();
+        $this->errors = [];
 
         // Obviously, a disabled form should not change its data upon submission.
         if ($this->isDisabled()) {
@@ -532,9 +532,11 @@ class Form implements \IteratorAggregate, FormInterface
             $submittedData = null;
         } elseif (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
-        } elseif (!$this->config->getOption('allow_file_upload') && $this->config->getRequestHandler()->isFileUpload($submittedData)) {
-            $submittedData = null;
-            $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
+        } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
+            if (!$this->config->getOption('allow_file_upload')) {
+                $submittedData = null;
+                $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
+            }
         } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
@@ -564,7 +566,7 @@ class Form implements \IteratorAggregate, FormInterface
             // (think of empty collection forms)
             if ($this->config->getCompound()) {
                 if (null === $submittedData) {
-                    $submittedData = array();
+                    $submittedData = [];
                 }
 
                 if (!\is_array($submittedData)) {
@@ -572,7 +574,7 @@ class Form implements \IteratorAggregate, FormInterface
                 }
 
                 foreach ($this->children as $name => $child) {
-                    $isSubmitted = array_key_exists($name, $submittedData);
+                    $isSubmitted = \array_key_exists($name, $submittedData);
 
                     if ($isSubmitted || $clearMissing) {
                         $child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
@@ -814,7 +816,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form');
@@ -877,7 +879,7 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
-            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child->getName() => $child)));
+            $iterator = new InheritDataAwareIterator(new \ArrayIterator([$child->getName() => $child]));
             $iterator = new \RecursiveIteratorIterator($iterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $iterator);
         }

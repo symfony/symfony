@@ -33,9 +33,9 @@ class DebugAutowiringCommand extends ContainerDebugCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('search', InputArgument::OPTIONAL, 'A search filter'),
-            ))
+            ])
             ->setDescription('Lists classes/interfaces you can use for autowiring')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all classes and interfaces that
@@ -62,7 +62,7 @@ EOF
 
         $builder = $this->getContainerBuilder();
         $serviceIds = $builder->getServiceIds();
-        $serviceIds = array_filter($serviceIds, array($this, 'filterToServiceTypes'));
+        $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
         if ($search = $input->getArgument('search')) {
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($search) {
@@ -84,14 +84,14 @@ EOF
             $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
         $io->newLine();
-        $tableRows = array();
+        $tableRows = [];
         foreach ($serviceIds as $serviceId) {
-            $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $serviceId));
+            $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $serviceId)];
             if ($builder->hasAlias($serviceId)) {
-                $tableRows[] = array(sprintf('    alias to %s', $builder->getAlias($serviceId)));
+                $tableRows[] = [sprintf('    alias to %s', $builder->getAlias($serviceId))];
             }
         }
 
-        $io->table(array(), $tableRows);
+        $io->table([], $tableRows);
     }
 }

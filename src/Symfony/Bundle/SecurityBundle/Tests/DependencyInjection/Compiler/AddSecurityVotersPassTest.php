@@ -29,7 +29,7 @@ class AddSecurityVotersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
+            ->addArgument([])
         ;
 
         $compilerPass = new AddSecurityVotersPass();
@@ -41,7 +41,7 @@ class AddSecurityVotersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
+            ->addArgument([])
         ;
         $container
             ->register('no_prio_service', Voter::class)
@@ -49,15 +49,15 @@ class AddSecurityVotersPassTest extends TestCase
         ;
         $container
             ->register('lowest_prio_service', Voter::class)
-            ->addTag('security.voter', array('priority' => 100))
+            ->addTag('security.voter', ['priority' => 100])
         ;
         $container
             ->register('highest_prio_service', Voter::class)
-            ->addTag('security.voter', array('priority' => 200))
+            ->addTag('security.voter', ['priority' => 200])
         ;
         $container
             ->register('zero_prio_service', Voter::class)
-            ->addTag('security.voter', array('priority' => 0))
+            ->addTag('security.voter', ['priority' => 0])
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
@@ -78,7 +78,7 @@ class AddSecurityVotersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
+            ->addArgument([])
         ;
         $container
             ->register('without_interface', VoterWithoutInterface::class)
@@ -111,7 +111,7 @@ class AddSecurityVotersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
+            ->addArgument([])
         ;
         $container
             ->register('without_method', 'stdClass')

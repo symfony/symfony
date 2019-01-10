@@ -94,7 +94,7 @@ class ExceptionListenerTest extends TestCase
     public function provider()
     {
         if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            return array(array(null, null));
+            return [[null, null]];
         }
 
         $request = new Request();
@@ -102,9 +102,9 @@ class ExceptionListenerTest extends TestCase
         $event = new GetResponseForExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
         $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
 
-        return array(
-            array($event, $event2),
-        );
+        return [
+            [$event, $event2],
+        ];
     }
 
     public function testSubRequestFormat()
@@ -142,7 +142,7 @@ class ExceptionListenerTest extends TestCase
         $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
         $dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
 
-        $response = new Response('', 200, array('content-security-policy' => "style-src 'self'"));
+        $response = new Response('', 200, ['content-security-policy' => "style-src 'self'"]);
         $this->assertTrue($response->headers->has('content-security-policy'));
 
         $event = new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);

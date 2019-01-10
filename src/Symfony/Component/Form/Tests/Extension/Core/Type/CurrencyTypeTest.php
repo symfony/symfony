@@ -50,6 +50,6 @@ class CurrencyTypeTest extends BaseTypeTest
     {
         $type = new CurrencyType();
 
-        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

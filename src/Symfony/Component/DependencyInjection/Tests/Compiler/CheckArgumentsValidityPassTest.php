@@ -24,20 +24,20 @@ class CheckArgumentsValidityPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
-        $definition->setArguments(array(null, 1, 'a'));
-        $definition->setMethodCalls(array(
-            array('bar', array('a', 'b')),
-            array('baz', array('c', 'd')),
-        ));
+        $definition->setArguments([null, 1, 'a']);
+        $definition->setMethodCalls([
+            ['bar', ['a', 'b']],
+            ['baz', ['c', 'd']],
+        ]);
 
         $pass = new CheckArgumentsValidityPass();
         $pass->process($container);
 
-        $this->assertEquals(array(null, 1, 'a'), $container->getDefinition('foo')->getArguments());
-        $this->assertEquals(array(
-            array('bar', array('a', 'b')),
-            array('baz', array('c', 'd')),
-        ), $container->getDefinition('foo')->getMethodCalls());
+        $this->assertEquals([null, 1, 'a'], $container->getDefinition('foo')->getArguments());
+        $this->assertEquals([
+            ['bar', ['a', 'b']],
+            ['baz', ['c', 'd']],
+        ], $container->getDefinition('foo')->getMethodCalls());
     }
 
     /**
@@ -57,19 +57,19 @@ class CheckArgumentsValidityPassTest extends TestCase
 
     public function definitionProvider()
     {
-        return array(
-            array(array(null, 'a' => 'a'), array()),
-            array(array(1 => 1), array()),
-            array(array(), array(array('baz', array(null, 'a' => 'a')))),
-            array(array(), array(array('baz', array(1 => 1)))),
-        );
+        return [
+            [[null, 'a' => 'a'], []],
+            [[1 => 1], []],
+            [[], [['baz', [null, 'a' => 'a']]]],
+            [[], [['baz', [1 => 1]]]],
+        ];
     }
 
     public function testNoException()
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
-        $definition->setArguments(array(null, 'a' => 'a'));
+        $definition->setArguments([null, 'a' => 'a']);
 
         $pass = new CheckArgumentsValidityPass(false);
         $pass->process($container);

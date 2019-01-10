@@ -90,10 +90,10 @@ EOTXT
         if (\defined('HHVM_VERSION_ID')) {
             $this->markTestSkipped('Not for HHVM.');
         }
-        $var = array(
+        $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
             (new \ReflectionMethod(__CLASS__, 'tearDownAfterClass'))->getClosure(),
-        );
+        ];
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -251,7 +251,7 @@ array:2 [
 EODUMP;
 
         $r = new \ReflectionGenerator($generator);
-        $this->assertDumpMatchesFormat($expectedDump, array($r, $r->getExecutingGenerator()));
+        $this->assertDumpMatchesFormat($expectedDump, [$r, $r->getExecutingGenerator()]);
 
         foreach ($generator as $v) {
         }

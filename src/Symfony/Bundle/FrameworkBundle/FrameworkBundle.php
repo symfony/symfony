@@ -84,13 +84,13 @@ class FrameworkBundle extends Bundle
     {
         parent::build($container);
 
-        $hotPathEvents = array(
+        $hotPathEvents = [
             KernelEvents::REQUEST,
             KernelEvents::CONTROLLER,
             KernelEvents::CONTROLLER_ARGUMENTS,
             KernelEvents::RESPONSE,
             KernelEvents::FINISH_REQUEST,
-        );
+        ];
 
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
@@ -101,7 +101,7 @@ class FrameworkBundle extends Bundle
         // but as late as possible to get resolved parameters
         $container->addCompilerPass((new RegisterListenersPass())->setHotPathEvents($hotPathEvents), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new TemplatingPass());
-        $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class, PassConfig::TYPE_BEFORE_REMOVING);
+        $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class, PassConfig::TYPE_BEFORE_REMOVING);

@@ -21,9 +21,9 @@ class TestAppKernel extends Kernel
 {
     public function registerBundles()
     {
-        return array(
+        return [
             new FrameworkBundle(),
-        );
+        ];
     }
 
     public function setRootDir($rootDir)

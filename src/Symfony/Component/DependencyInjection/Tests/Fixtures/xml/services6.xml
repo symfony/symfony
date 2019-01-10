@@ -61,5 +61,9 @@
     </service>
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="false" />
+    <service id="0" class="FooClass" />
+    <service id="1" class="FooClass">
+      <argument type="service" id="0" />
+    </service>
   </services>
 </container>

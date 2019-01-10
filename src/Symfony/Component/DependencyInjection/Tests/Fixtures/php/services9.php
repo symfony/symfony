@@ -17,19 +17,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         parent::__construct(new ParameterBag($this->getDefaultParameters()));
-        $this->normalizedIds = array(
+        $this->normalizedIds = [
             'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
             'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
-        );
-        $this->syntheticIds = array(
+        ];
+        $this->syntheticIds = [
             'request' => true,
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'configurator_service' => 'getConfiguratorServiceService',
@@ -56,21 +56,21 @@ class ProjectServiceContainer extends Container
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
             'tagged_iterator_foo' => 'getTaggedIteratorFooService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'configurator_service' => true,
             'configurator_service_simple' => true,
             'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
             'tagged_iterator_foo' => true,
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'Psr\\Container\\ContainerInterface' => 'service_container',
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => 'service_container',
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
-        );
+        ];
     }
 
     /**
@@ -204,11 +204,11 @@ class ProjectServiceContainer extends Container
     {
         $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'};
 
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, [$this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')], true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
-        $instance->qux = array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
+        $instance->qux = [$this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo')];
         $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->getBarService()) && false ?: '_'});
         $instance->initialize();
         sc_configure($instance);
@@ -223,9 +223,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo_BazService()
     {
-        $this->services['foo.baz'] = $instance = \call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
+        $this->services['foo.baz'] = $instance = \call_user_func([$this->getParameter('baz_class'), 'getInstance']);
 
-        \call_user_func(array($this->getParameter('baz_class'), 'configureStatic1'), $instance);
+        \call_user_func([$this->getParameter('baz_class'), 'configureStatic1'], $instance);
 
         return $instance;
     }
@@ -434,10 +434,10 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
-        );
+        ];
     }
 }

@@ -32,7 +32,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $b = $container
             ->register('b')
-            ->addMethodCall('setA', array($ref2 = new Reference('a')))
+            ->addMethodCall('setA', [$ref2 = new Reference('a')])
         ;
 
         $c = $container
@@ -48,7 +48,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $e = $container
             ->register('e')
-            ->setConfigurator(array($ref6 = new Reference('b'), 'methodName'))
+            ->setConfigurator([$ref6 = new Reference('b'), 'methodName'])
         ;
 
         $graph = $this->process($container);
@@ -94,7 +94,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $container
             ->register('c')
             ->addArgument($ref1 = new Reference('a'))
-            ->addArgument(new IteratorArgument(array($ref2 = new Reference('b'))))
+            ->addArgument(new IteratorArgument([$ref2 = new Reference('b')]))
         ;
 
         $graph = $this->process($container);
@@ -119,7 +119,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $container
             ->register('b')
-            ->addArgument(new Definition(null, array($ref = new Reference('a'))))
+            ->addArgument(new Definition(null, [$ref = new Reference('a')]))
         ;
 
         $graph = $this->process($container);
@@ -138,7 +138,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $container
             ->register('b')
-            ->addArgument(new IteratorArgument(array($ref = new Reference('a'))))
+            ->addArgument(new IteratorArgument([$ref = new Reference('a')]))
         ;
 
         $graph = $this->process($container);
@@ -156,7 +156,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         ;
 
         $factory = new Definition();
-        $factory->setFactory(array(new Reference('a'), 'a'));
+        $factory->setFactory([new Reference('a'), 'a']);
 
         $container
             ->register('b')
@@ -178,8 +178,8 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         ;
         $container
             ->register('b')
-            ->addArgument(new Definition(null, array($ref1 = new Reference('a'))))
-            ->addArgument(new Definition(null, array($ref2 = new Reference('a'))))
+            ->addArgument(new Definition(null, [$ref1 = new Reference('a')]))
+            ->addArgument(new Definition(null, [$ref2 = new Reference('a')]))
         ;
 
         $graph = $this->process($container);
@@ -193,11 +193,11 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $container
             ->register('foo', 'stdClass')
-            ->setFactory(array('stdClass', 'getInstance'));
+            ->setFactory(['stdClass', 'getInstance']);
 
         $container
             ->register('bar', 'stdClass')
-            ->setFactory(array(new Reference('foo'), 'getInstance'));
+            ->setFactory([new Reference('foo'), 'getInstance']);
 
         $graph = $this->process($container);
 
@@ -207,7 +207,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
     protected function process(ContainerBuilder $container)
     {
-        $pass = new RepeatedPass(array(new AnalyzeServiceReferencesPass()));
+        $pass = new RepeatedPass([new AnalyzeServiceReferencesPass()]);
         $pass->process($container);
 
         return $container->getCompiler()->getServiceReferenceGraph();

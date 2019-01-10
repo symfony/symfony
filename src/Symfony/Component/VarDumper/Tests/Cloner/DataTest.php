@@ -21,9 +21,9 @@ class DataTest extends TestCase
 {
     public function testBasicData()
     {
-        $values = array(1 => 123, 4.5, 'abc', null, false);
+        $values = [1 => 123, 4.5, 'abc', null, false];
         $data = $this->cloneVar($values);
-        $clonedValues = array();
+        $clonedValues = [];
 
         $this->assertInstanceOf(Data::class, $data);
         $this->assertCount(\count($values), $data);
@@ -62,7 +62,7 @@ class DataTest extends TestCase
 
     public function testArray()
     {
-        $values = array(array(), array(123));
+        $values = [[], [123]];
         $data = $this->cloneVar($values);
 
         $this->assertSame($values, $data->getValue(true));
@@ -83,7 +83,7 @@ class DataTest extends TestCase
 
     public function testStub()
     {
-        $data = $this->cloneVar(array(new ClassStub('stdClass')));
+        $data = $this->cloneVar([new ClassStub('stdClass')]);
         $data = $data[0];
 
         $this->assertSame('string', $data->getType());
@@ -93,15 +93,15 @@ class DataTest extends TestCase
 
     public function testHardRefs()
     {
-        $values = array(array());
+        $values = [[]];
         $values[1] = &$values[0];
         $values[2][0] = &$values[2];
 
         $data = $this->cloneVar($values);
 
-        $this->assertSame(array(), $data[0]->getValue());
-        $this->assertSame(array(), $data[1]->getValue());
-        $this->assertEquals(array($data[2]->getValue()), $data[2]->getValue(true));
+        $this->assertSame([], $data[0]->getValue());
+        $this->assertSame([], $data[1]->getValue());
+        $this->assertEquals([$data[2]->getValue()], $data[2]->getValue(true));
 
         $this->assertSame('array (count=3)', (string) $data);
     }

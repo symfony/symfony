@@ -121,10 +121,10 @@ class Collection implements CollectionInterface
 
     private function cleanupAttributes(array $entry)
     {
-        $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + array(
+        $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
                 'count' => null,
                 'dn' => null,
-            ));
+            ]);
         array_walk($attributes, function (&$value) {
             unset($value['count']);
         });

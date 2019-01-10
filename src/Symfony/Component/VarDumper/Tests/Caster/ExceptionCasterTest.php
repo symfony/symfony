@@ -36,7 +36,7 @@ class ExceptionCasterTest extends TestCase
 
     public function testDefaultSettings()
     {
-        $ref = array('foo');
+        $ref = ['foo'];
         $e = $this->getTestException('foo', $ref);
 
         $expectedDump = <<<'EODUMP'
@@ -57,7 +57,7 @@ Exception {
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
-        $this->assertSame(array('foo'), $ref);
+        $this->assertSame(['foo'], $ref);
     }
 
     public function testSeek()
@@ -166,19 +166,19 @@ EODUMP;
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';
 
-        $f = array(
-            new FrameStub(array(
+        $f = [
+            new FrameStub([
                 'file' => \dirname(__DIR__).'/Fixtures/Twig.php',
                 'line' => 20,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
-            )),
-            new FrameStub(array(
+            ]),
+            new FrameStub([
                 'file' => \dirname(__DIR__).'/Fixtures/Twig.php',
                 'line' => 21,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
                 'object' => new \__TwigTemplate_VarDumperFixture_u75a09(null, __FILE__),
-            )),
-        );
+            ]),
+        ];
 
         $expectedDump = <<<'EODUMP'
 array:2 [

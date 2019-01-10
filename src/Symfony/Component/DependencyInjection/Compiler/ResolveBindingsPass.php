@@ -25,17 +25,15 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class ResolveBindingsPass extends AbstractRecursivePass
 {
-    private $usedBindings = array();
-    private $unusedBindings = array();
-    private $errorMessages = array();
+    private $usedBindings = [];
+    private $unusedBindings = [];
+    private $errorMessages = [];
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->usedBindings = $container->getRemovedBindingIds();
-
         try {
             parent::process($container);
 
@@ -50,9 +48,9 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 throw new InvalidArgumentException($message);
             }
         } finally {
-            $this->usedBindings = array();
-            $this->unusedBindings = array();
-            $this->errorMessages = array();
+            $this->usedBindings = [];
+            $this->unusedBindings = [];
+            $this->errorMessages = [];
         }
     }
 
@@ -82,7 +80,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 $this->usedBindings[$bindingId] = true;
                 unset($this->unusedBindings[$bindingId]);
             } elseif (!isset($this->usedBindings[$bindingId])) {
-                $this->unusedBindings[$bindingId] = array($key, $this->currentId);
+                $this->unusedBindings[$bindingId] = [$key, $this->currentId];
             }
 
             if (isset($key[0]) && '$' === $key[0]) {
@@ -102,7 +100,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
 
         try {
             if ($constructor = $this->getConstructor($value, false)) {
-                $calls[] = array($constructor, $value->getArguments());
+                $calls[] = [$constructor, $value->getArguments()];
             }
         } catch (RuntimeException $e) {
             $this->errorMessages[] = $e->getMessage();
@@ -121,11 +119,11 @@ class ResolveBindingsPass extends AbstractRecursivePass
             }
 
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
-                if (array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
+                if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
                     continue;
                 }
 
-                if (array_key_exists('$'.$parameter->name, $bindings)) {
+                if (\array_key_exists('$'.$parameter->name, $bindings)) {
                     $arguments[$key] = $this->getBindingValue($bindings['$'.$parameter->name]);
 
                     continue;

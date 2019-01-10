@@ -32,13 +32,13 @@ class DoctrineExtensionTest extends TestCase
 
         $this->extension = $this
             ->getMockBuilder('Symfony\Bridge\Doctrine\DependencyInjection\AbstractDoctrineExtension')
-            ->setMethods(array(
+            ->setMethods([
                 'getMappingResourceConfigDirectory',
                 'getObjectManagerElementName',
                 'getMappingObjectDefaultName',
                 'getMappingResourceExtension',
                 'load',
-            ))
+            ])
             ->getMock()
         ;
 
@@ -54,19 +54,19 @@ class DoctrineExtensionTest extends TestCase
      */
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
-        $emConfigs = array(
-            'em1' => array(
+        $emConfigs = [
+            'em1' => [
                 'auto_mapping' => true,
-            ),
-            'em2' => array(
+            ],
+            'em2' => [
                 'auto_mapping' => true,
-            ),
-        );
+            ],
+        ];
 
-        $bundles = array(
+        $bundles = [
             'FirstBundle' => 'My\FirstBundle',
             'SecondBundle' => 'My\SecondBundle',
-        );
+        ];
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
@@ -77,69 +77,69 @@ class DoctrineExtensionTest extends TestCase
 
     public function getAutomappingData()
     {
-        return array(
-            array(
-                array( // no auto mapping on em1
+        return [
+            [
+                [ // no auto mapping on em1
                     'auto_mapping' => false,
-                ),
-                array( // no auto mapping on em2
+                ],
+                [ // no auto mapping on em2
                     'auto_mapping' => false,
-                ),
-                array(),
-                array(),
-            ),
-            array(
-                array( // no auto mapping on em1
+                ],
+                [],
+                [],
+            ],
+            [
+                [ // no auto mapping on em1
                     'auto_mapping' => false,
-                ),
-                array( // auto mapping enabled on em2
+                ],
+                [ // auto mapping enabled on em2
                     'auto_mapping' => true,
-                ),
-                array(),
-                array(
-                    'mappings' => array(
-                        'FirstBundle' => array(
+                ],
+                [],
+                [
+                    'mappings' => [
+                        'FirstBundle' => [
                             'mapping' => true,
                             'is_bundle' => true,
-                        ),
-                        'SecondBundle' => array(
+                        ],
+                        'SecondBundle' => [
                             'mapping' => true,
                             'is_bundle' => true,
-                        ),
-                    ),
-                ),
-            ),
-            array(
-                array( // no auto mapping on em1, but it defines SecondBundle as own
+                        ],
+                    ],
+                ],
+            ],
+            [
+                [ // no auto mapping on em1, but it defines SecondBundle as own
                     'auto_mapping' => false,
-                    'mappings' => array(
-                        'SecondBundle' => array(
+                    'mappings' => [
+                        'SecondBundle' => [
                             'mapping' => true,
                             'is_bundle' => true,
-                        ),
-                    ),
-                ),
-                array( // auto mapping enabled on em2
+                        ],
+                    ],
+                ],
+                [ // auto mapping enabled on em2
                     'auto_mapping' => true,
-                ),
-                array(
-                    'mappings' => array(
-                        'SecondBundle' => array(
+                ],
+                [
+                    'mappings' => [
+                        'SecondBundle' => [
                             'mapping' => true,
                             'is_bundle' => true,
-                        ),
-                    ),
-                ),
-                array(
-                    'mappings' => array(
-                        'FirstBundle' => array(
+                        ],
+                    ],
+                ],
+                [
+                    'mappings' => [
+                        'FirstBundle' => [
                             'mapping' => true,
                             'is_bundle' => true,
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -147,15 +147,15 @@ class DoctrineExtensionTest extends TestCase
      */
     public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2)
     {
-        $emConfigs = array(
+        $emConfigs = [
             'em1' => $originalEm1,
             'em2' => $originalEm2,
-        );
+        ];
 
-        $bundles = array(
+        $bundles = [
             'FirstBundle' => 'My\FirstBundle',
             'SecondBundle' => 'My\SecondBundle',
-        );
+        ];
 
         $reflection = new \ReflectionClass(\get_class($this->extension));
         $method = $reflection->getMethod('fixManagersAutoMappings');
@@ -163,27 +163,27 @@ class DoctrineExtensionTest extends TestCase
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
-        $this->assertEquals($newEmConfigs['em1'], array_merge(array(
+        $this->assertEquals($newEmConfigs['em1'], array_merge([
             'auto_mapping' => false,
-        ), $expectedEm1));
-        $this->assertEquals($newEmConfigs['em2'], array_merge(array(
+        ], $expectedEm1));
+        $this->assertEquals($newEmConfigs['em2'], array_merge([
             'auto_mapping' => false,
-        ), $expectedEm2));
+        ], $expectedEm2));
     }
 
     public function providerBasicDrivers()
     {
-        return array(
-            array('doctrine.orm.cache.apc.class',       array('type' => 'apc')),
-            array('doctrine.orm.cache.apcu.class',      array('type' => 'apcu')),
-            array('doctrine.orm.cache.array.class',     array('type' => 'array')),
-            array('doctrine.orm.cache.xcache.class',    array('type' => 'xcache')),
-            array('doctrine.orm.cache.wincache.class',  array('type' => 'wincache')),
-            array('doctrine.orm.cache.zenddata.class',  array('type' => 'zenddata')),
-            array('doctrine.orm.cache.redis.class',     array('type' => 'redis'),     array('setRedis')),
-            array('doctrine.orm.cache.memcache.class',  array('type' => 'memcache'),  array('setMemcache')),
-            array('doctrine.orm.cache.memcached.class', array('type' => 'memcached'), array('setMemcached')),
-        );
+        return [
+            ['doctrine.orm.cache.apc.class',       ['type' => 'apc']],
+            ['doctrine.orm.cache.apcu.class',      ['type' => 'apcu']],
+            ['doctrine.orm.cache.array.class',     ['type' => 'array']],
+            ['doctrine.orm.cache.xcache.class',    ['type' => 'xcache']],
+            ['doctrine.orm.cache.wincache.class', ['type' => 'wincache']],
+            ['doctrine.orm.cache.zenddata.class', ['type' => 'zenddata']],
+            ['doctrine.orm.cache.redis.class',     ['type' => 'redis'],     ['setRedis']],
+            ['doctrine.orm.cache.memcache.class', ['type' => 'memcache'], ['setMemcache']],
+            ['doctrine.orm.cache.memcached.class', ['type' => 'memcached'], ['setMemcached']],
+        ];
     }
 
     /**
@@ -192,14 +192,14 @@ class DoctrineExtensionTest extends TestCase
      *
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = [])
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';
-        $objectManager = array(
+        $objectManager = [
             'name' => 'default',
             'metadata_cache_driver' => $config,
-        );
+        ];
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
 
@@ -223,13 +223,13 @@ class DoctrineExtensionTest extends TestCase
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
         $definition = new Definition('%doctrine.orm.cache.apc.class%');
-        $objectManager = array(
+        $objectManager = [
             'name' => 'default',
-            'metadata_cache_driver' => array(
+            'metadata_cache_driver' => [
                 'type' => 'service',
                 'id' => 'service_driver',
-            ),
-        );
+            ],
+        ];
 
         $container->setDefinition('service_driver', $definition);
 
@@ -246,12 +246,12 @@ class DoctrineExtensionTest extends TestCase
     {
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
-        $objectManager = array(
+        $objectManager = [
             'name' => 'default',
-            'metadata_cache_driver' => array(
+            'metadata_cache_driver' => [
                 'type' => 'unrecognized_type',
-            ),
-        );
+            ],
+        ];
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
@@ -262,21 +262,21 @@ class DoctrineExtensionTest extends TestCase
 
         $method->setAccessible(true);
 
-        $method->invokeArgs($this->extension, array($objectManager, $container, $cacheName));
+        $method->invokeArgs($this->extension, [$objectManager, $container, $cacheName]);
     }
 
     /**
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    protected function createContainer(array $data = array())
+    protected function createContainer(array $data = [])
     {
-        return new ContainerBuilder(new ParameterBag(array_merge(array(
-            'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+        return new ContainerBuilder(new ParameterBag(array_merge([
+            'kernel.bundles' => ['FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'],
             'kernel.cache_dir' => __DIR__,
             'kernel.debug' => false,
             'kernel.environment' => 'test',
             'kernel.name' => 'kernel',
             'kernel.root_dir' => __DIR__,
-        ), $data)));
+        ], $data)));
     }
 }

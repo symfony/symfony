@@ -25,7 +25,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 class TemplateNameParser extends BaseTemplateNameParser
 {
     protected $kernel;
-    protected $cache = array();
+    protected $cache = [];
 
     public function __construct(KernelInterface $kernel)
     {

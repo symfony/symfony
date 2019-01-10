@@ -87,7 +87,7 @@ class TemplateManager
      */
     public function getNames(Profile $profile)
     {
-        $templates = array();
+        $templates = [];
 
         foreach ($this->templates as $arguments) {
             if (null === $arguments) {

@@ -19,13 +19,13 @@ class ConfigurationTest extends TestCase
 {
     public function testDoNoDuplicateDefaultFormResources()
     {
-        $input = array(
-            'form_themes' => array('form_div_layout.html.twig'),
-        );
+        $input = [
+            'form_themes' => ['form_div_layout.html.twig'],
+        ];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array($input));
+        $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertEquals(array('form_div_layout.html.twig'), $config['form_themes']);
+        $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
     }
 }

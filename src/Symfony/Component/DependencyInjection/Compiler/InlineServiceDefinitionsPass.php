@@ -23,8 +23,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
-    private $cloningIds = array();
-    private $inlinedServiceIds = array();
+    private $cloningIds = [];
+    private $inlinedServiceIds = [];
 
     /**
      * {@inheritdoc}
@@ -126,7 +126,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             return false;
         }
 
-        $ids = array();
+        $ids = [];
         $isReferencedByConstructor = false;
         foreach ($graph->getNode($id)->getInEdges() as $edge) {
             $isReferencedByConstructor = $isReferencedByConstructor || $edge->isReferencedByConstructor();
@@ -145,10 +145,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
 
         if (\count($ids) > 1 && \is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
-            return false;
-        }
-
-        if ($isReferencedByConstructor && $this->container->getDefinition($ids[0])->isLazy() && ($definition->getProperties() || $definition->getMethodCalls() || $definition->getConfigurator())) {
             return false;
         }
 

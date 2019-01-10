@@ -261,7 +261,7 @@ class DaoAuthenticationProviderTest extends TestCase
 
     protected function getSupportedToken()
     {
-        $mock = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\UsernamePasswordToken')->setMethods(array('getCredentials', 'getUser', 'getProviderKey'))->disableOriginalConstructor()->getMock();
+        $mock = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\UsernamePasswordToken')->setMethods(['getCredentials', 'getUser', 'getProviderKey'])->disableOriginalConstructor()->getMock();
         $mock
             ->expects($this->any())
             ->method('getProviderKey')

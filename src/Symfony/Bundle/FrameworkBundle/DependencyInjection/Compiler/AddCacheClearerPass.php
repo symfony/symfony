@@ -35,7 +35,7 @@ class AddCacheClearerPass implements CompilerPassInterface
             return;
         }
 
-        $clearers = array();
+        $clearers = [];
         foreach ($container->findTaggedServiceIds('kernel.cache_clearer', true) as $id => $attributes) {
             $clearers[] = new Reference($id);
         }

@@ -25,11 +25,11 @@ class WorkflowExtensionTest extends TestCase
 
     protected function setUp()
     {
-        $places = array('ordered', 'waiting_for_payment', 'processed');
-        $transitions = array(
+        $places = ['ordered', 'waiting_for_payment', 'processed'];
+        $transitions = [
             new Transition('t1', 'ordered', 'waiting_for_payment'),
             new Transition('t2', 'waiting_for_payment', 'processed'),
-        );
+        ];
         $definition = new Definition($places, $transitions);
         $workflow = new Workflow($definition);
 
@@ -42,7 +42,7 @@ class WorkflowExtensionTest extends TestCase
     public function testCanTransition()
     {
         $subject = new \stdClass();
-        $subject->marking = array();
+        $subject->marking = [];
 
         $this->assertTrue($this->extension->canTransition($subject, 't1'));
         $this->assertFalse($this->extension->canTransition($subject, 't2'));
@@ -51,7 +51,7 @@ class WorkflowExtensionTest extends TestCase
     public function testGetEnabledTransitions()
     {
         $subject = new \stdClass();
-        $subject->marking = array();
+        $subject->marking = [];
 
         $transitions = $this->extension->getEnabledTransitions($subject);
 
@@ -63,8 +63,8 @@ class WorkflowExtensionTest extends TestCase
     public function testHasMarkedPlace()
     {
         $subject = new \stdClass();
-        $subject->marking = array();
-        $subject->marking = array('ordered' => 1, 'waiting_for_payment' => 1);
+        $subject->marking = [];
+        $subject->marking = ['ordered' => 1, 'waiting_for_payment' => 1];
 
         $this->assertTrue($this->extension->hasMarkedPlace($subject, 'ordered'));
         $this->assertTrue($this->extension->hasMarkedPlace($subject, 'waiting_for_payment'));
@@ -74,10 +74,10 @@ class WorkflowExtensionTest extends TestCase
     public function testGetMarkedPlaces()
     {
         $subject = new \stdClass();
-        $subject->marking = array();
-        $subject->marking = array('ordered' => 1, 'waiting_for_payment' => 1);
+        $subject->marking = [];
+        $subject->marking = ['ordered' => 1, 'waiting_for_payment' => 1];
 
-        $this->assertSame(array('ordered', 'waiting_for_payment'), $this->extension->getMarkedPlaces($subject));
+        $this->assertSame(['ordered', 'waiting_for_payment'], $this->extension->getMarkedPlaces($subject));
         $this->assertSame($subject->marking, $this->extension->getMarkedPlaces($subject, false));
     }
 }

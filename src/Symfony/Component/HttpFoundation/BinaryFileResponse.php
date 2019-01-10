@@ -44,7 +44,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
      */
-    public function __construct($file, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
+    public function __construct($file, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         parent::__construct(null, $status, $headers);
 
@@ -66,7 +66,7 @@ class BinaryFileResponse extends Response
      *
      * @return static
      */
-    public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
+    public static function create($file = null, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         return new static($file, $status, $headers, $public, $contentDisposition, $autoEtag, $autoLastModified);
     }
@@ -239,7 +239,7 @@ class BinaryFileResponse extends Response
             if (!$request->headers->has('If-Range') || $this->hasValidIfRangeHeader($request->headers->get('If-Range'))) {
                 $range = $request->headers->get('Range');
 
-                list($start, $end) = explode('-', substr($range, 6), 2) + array(0);
+                list($start, $end) = explode('-', substr($range, 6), 2) + [0];
 
                 $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 
@@ -305,7 +305,7 @@ class BinaryFileResponse extends Response
         fclose($out);
         fclose($file);
 
-        if ($this->deleteFileAfterSend) {
+        if ($this->deleteFileAfterSend && file_exists($this->file->getPathname())) {
             unlink($this->file->getPathname());
         }
 

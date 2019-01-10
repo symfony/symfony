@@ -25,8 +25,8 @@ class DoctrineCaster
 {
     public static function castCommonProxy(CommonProxy $proxy, array $a, Stub $stub, $isNested)
     {
-        foreach (array('__cloner__', '__initializer__') as $k) {
-            if (array_key_exists($k, $a)) {
+        foreach (['__cloner__', '__initializer__'] as $k) {
+            if (\array_key_exists($k, $a)) {
                 unset($a[$k]);
                 ++$stub->cut;
             }
@@ -37,8 +37,8 @@ class DoctrineCaster
 
     public static function castOrmProxy(OrmProxy $proxy, array $a, Stub $stub, $isNested)
     {
-        foreach (array('_entityPersister', '_identifier') as $k) {
-            if (array_key_exists($k = "\0Doctrine\\ORM\\Proxy\\Proxy\0".$k, $a)) {
+        foreach (['_entityPersister', '_identifier'] as $k) {
+            if (\array_key_exists($k = "\0Doctrine\\ORM\\Proxy\\Proxy\0".$k, $a)) {
                 unset($a[$k]);
                 ++$stub->cut;
             }
@@ -49,8 +49,8 @@ class DoctrineCaster
 
     public static function castPersistentCollection(PersistentCollection $coll, array $a, Stub $stub, $isNested)
     {
-        foreach (array('snapshot', 'association', 'typeClass') as $k) {
-            if (array_key_exists($k = "\0Doctrine\\ORM\\PersistentCollection\0".$k, $a)) {
+        foreach (['snapshot', 'association', 'typeClass'] as $k) {
+            if (\array_key_exists($k = "\0Doctrine\\ORM\\PersistentCollection\0".$k, $a)) {
                 $a[$k] = new CutStub($a[$k]);
             }
         }

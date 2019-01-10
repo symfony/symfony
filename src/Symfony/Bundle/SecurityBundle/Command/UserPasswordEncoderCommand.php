@@ -39,7 +39,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
     private $encoderFactory;
     private $userClasses;
 
-    public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = array())
+    public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = [])
     {
         if (null === $encoderFactory) {
             @trigger_error(sprintf('Passing null as the first argument of "%s()" is deprecated since Symfony 3.3 and support for it will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
@@ -152,14 +152,14 @@ EOF
 
         $encodedPassword = $encoder->encodePassword($password, $salt);
 
-        $rows = array(
-            array('Encoder used', \get_class($encoder)),
-            array('Encoded password', $encodedPassword),
-        );
+        $rows = [
+            ['Encoder used', \get_class($encoder)],
+            ['Encoded password', $encodedPassword],
+        ];
         if (!$emptySalt) {
-            $rows[] = array('Generated salt', $salt);
+            $rows[] = ['Generated salt', $salt];
         }
-        $io->table(array('Key', 'Value'), $rows);
+        $io->table(['Key', 'Value'], $rows);
 
         if (!$emptySalt) {
             $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));

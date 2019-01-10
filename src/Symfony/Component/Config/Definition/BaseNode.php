@@ -25,13 +25,13 @@ abstract class BaseNode implements NodeInterface
 {
     protected $name;
     protected $parent;
-    protected $normalizationClosures = array();
-    protected $finalValidationClosures = array();
+    protected $normalizationClosures = [];
+    protected $finalValidationClosures = [];
     protected $allowOverwrite = true;
     protected $required = false;
     protected $deprecationMessage = null;
-    protected $equivalentValues = array();
-    protected $attributes = array();
+    protected $equivalentValues = [];
+    protected $attributes = [];
 
     /**
      * @param string|null        $name   The name of the node
@@ -127,7 +127,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function addEquivalentValue($originalValue, $equivalentValue)
     {
-        $this->equivalentValues[] = array($originalValue, $equivalentValue);
+        $this->equivalentValues[] = [$originalValue, $equivalentValue];
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getDeprecationMessage($node, $path)
     {
-        return strtr($this->deprecationMessage, array('%node%' => $node, '%path%' => $path));
+        return strtr($this->deprecationMessage, ['%node%' => $node, '%path%' => $path]);
     }
 
     /**

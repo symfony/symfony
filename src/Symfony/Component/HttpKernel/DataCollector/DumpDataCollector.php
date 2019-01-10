@@ -49,12 +49,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->dumperIsInjected = null !== $dumper;
 
         // All clones share these properties by reference:
-        $this->rootRefs = array(
+        $this->rootRefs = [
             &$this->data,
             &$this->dataCount,
             &$this->isCollected,
             &$this->clonesCount,
-        );
+        ];
     }
 
     public function __clone()
@@ -103,7 +103,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
                             if ($src) {
                                 $src = explode("\n", $src);
-                                $fileExcerpt = array();
+                                $fileExcerpt = [];
 
                                 for ($i = max($line - 3, 1), $max = min($line + 3, \count($src)); $i <= $max; ++$i) {
                                     $fileExcerpt[] = '<li'.($i === $line ? ' class="selected"' : '').'><code>'.$this->htmlEncode($src[$i - 1]).'</code></li>';
@@ -153,7 +153,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         ) {
             if ($response->headers->has('Content-Type') && false !== strpos($response->headers->get('Content-Type'), 'html')) {
                 $this->dumper = new HtmlDumper('php://output', $this->charset);
-                $this->dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+                $this->dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $this->dumper = new CliDumper('php://output', $this->charset);
             }
@@ -169,7 +169,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if ($this->stopwatch) {
             $this->stopwatch->reset();
         }
-        $this->data = array();
+        $this->data = [];
         $this->dataCount = 0;
         $this->isCollected = true;
         $this->clonesCount = 0;
@@ -185,7 +185,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->data[] = $this->fileLinkFormat;
         $this->data[] = $this->charset;
         $ser = serialize($this->data);
-        $this->data = array();
+        $this->data = [];
         $this->dataCount = 0;
         $this->isCollected = true;
         if (!$this->dumperIsInjected) {
@@ -197,7 +197,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function unserialize($data)
     {
-        parent::unserialize($data);
+        $this->data = unserialize($data);
         $charset = array_pop($this->data);
         $fileLinkFormat = array_pop($this->data);
         $this->dataCount = \count($this->data);
@@ -215,11 +215,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         if ('html' === $format) {
             $dumper = new HtmlDumper($data, $this->charset);
-            $dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+            $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
         } else {
             throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
         }
-        $dumps = array();
+        $dumps = [];
 
         foreach ($this->data as $dump) {
             $dumper->dump($dump['data']->withMaxDepth($maxDepthLimit)->withMaxItemsPerDepth($maxItemsPerDepth));
@@ -250,9 +250,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 --$i;
             }
 
-            if (!\in_array(\PHP_SAPI, array('cli', 'phpdbg'), true) && stripos($h[$i], 'html')) {
+            if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && stripos($h[$i], 'html')) {
                 $this->dumper = new HtmlDumper('php://output', $this->charset);
-                $this->dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+                $this->dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
             } else {
                 $this->dumper = new CliDumper('php://output', $this->charset);
             }
@@ -262,7 +262,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $this->doDump($dump['data'], $dump['name'], $dump['file'], $dump['line']);
             }
 
-            $this->data = array();
+            $this->data = [];
             $this->dataCount = 0;
         }
     }
@@ -276,7 +276,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $s = $this->style('meta', '%s');
                         $f = strip_tags($this->style('', $file));
                         $name = strip_tags($this->style('', $name));
-                        if ($fmt && $link = \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line)) {
+                        if ($fmt && $link = \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line)) {
                             $name = sprintf('<a href="%s" title="%s">'.$s.'</a>', strip_tags($this->style('', $link)), $f, $name);
                         } else {
                             $name = sprintf('<abbr title="%s">'.$s.'</abbr>', $f, $name);

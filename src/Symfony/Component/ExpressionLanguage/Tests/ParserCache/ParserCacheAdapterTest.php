@@ -47,7 +47,7 @@ class ParserCacheAdapterTest extends TestCase
         $poolMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
         $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $key = 'key';
-        $value = new ParsedExpression('1 + 1', new Node(array(), array()));
+        $value = new ParsedExpression('1 + 1', new Node([], []));
         $parserCacheAdapter = new ParserCacheAdapter($poolMock);
 
         $poolMock
@@ -112,7 +112,7 @@ class ParserCacheAdapterTest extends TestCase
     public function testDeleteItems()
     {
         $poolMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
-        $keys = array('key');
+        $keys = ['key'];
         $parserCacheAdapter = new ParserCacheAdapter($poolMock);
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(\BadMethodCallException::class);
 

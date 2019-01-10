@@ -22,14 +22,14 @@ class DateIntervalNormalizerTest extends TestCase
 
     public function dataProviderISO()
     {
-        $data = array(
-            array('P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'),
-            array('P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'),
-            array('P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'),
-            array('P%yY%mM%dDT%hH%iM', 'P10Y2M3DT16H5M', 'P10Y2M3DT16H5M'),
-            array('P%yY%mM%dDT%hH', 'P10Y2M3DT16H', 'P10Y2M3DT16H'),
-            array('P%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'),
-        );
+        $data = [
+            ['P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'],
+            ['P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'],
+            ['P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'],
+            ['P%yY%mM%dDT%hH%iM', 'P10Y2M3DT16H5M', 'P10Y2M3DT16H5M'],
+            ['P%yY%mM%dDT%hH', 'P10Y2M3DT16H', 'P10Y2M3DT16H'],
+            ['P%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
+        ];
 
         return $data;
     }
@@ -50,7 +50,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testNormalizeUsingFormatPassedInContext($format, $output, $input)
     {
-        $this->assertEquals($output, $this->normalizer->normalize(new \DateInterval($input), null, array(DateIntervalNormalizer::FORMAT_KEY => $format)));
+        $this->assertEquals($output, $this->normalizer->normalize(new \DateInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -86,7 +86,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeUsingFormatPassedInContext($format, $input, $output)
     {
-        $this->assertDateIntervalEquals(new \DateInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => $format)));
+        $this->assertDateIntervalEquals(new \DateInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
     /**
@@ -127,7 +127,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     public function testDenormalizeFormatMismatchThrowsException()
     {
-        $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD'));
+        $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD']);
     }
 
     private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)

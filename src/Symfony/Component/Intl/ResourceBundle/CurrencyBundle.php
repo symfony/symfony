@@ -73,7 +73,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 
@@ -109,7 +109,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 }

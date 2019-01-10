@@ -36,7 +36,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (null === $this->serializer) {
             throw new BadMethodCallException('Please set a serializer before calling denormalize()!');
@@ -66,9 +66,9 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null/*, array $context = []*/)
     {
-        $context = \func_num_args() > 3 ? func_get_arg(3) : array();
+        $context = \func_num_args() > 3 ? func_get_arg(3) : [];
 
         return '[]' === substr($type, -2)
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);

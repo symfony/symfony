@@ -32,7 +32,7 @@ class RedisProxy
     {
         $this->ready ?: $this->ready = $this->initializer->__invoke($this->redis);
 
-        return \call_user_func_array(array($this->redis, $method), $args);
+        return \call_user_func_array([$this->redis, $method], $args);
     }
 
     public function hscan($strKey, &$iIterator, $strPattern = null, $iCount = null)

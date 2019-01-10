@@ -65,13 +65,13 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
         foreach ($taggedSubscribers as $taggedSubscriber) {
             list($id, $tag) = $taggedSubscriber;
-            $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
+            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
                 }
 
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', array(new Reference($id)));
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventSubscriber', [new Reference($id)]);
             }
         }
     }
@@ -88,7 +88,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Doctrine event listener "%s" must specify the "event" attribute.', $id));
             }
 
-            $connections = isset($tag['connection']) ? array($tag['connection']) : array_keys($this->connections);
+            $connections = isset($tag['connection']) ? [$tag['connection']] : array_keys($this->connections);
             foreach ($connections as $con) {
                 if (!isset($this->connections[$con])) {
                     throw new RuntimeException(sprintf('The Doctrine connection "%s" referenced in service "%s" does not exist. Available connections names: %s', $con, $id, implode(', ', array_keys($this->connections))));
@@ -99,7 +99,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                 }
 
                 // we add one call per event per service so we have the correct order
-                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', array(array($tag['event']), $lazy ? $id : new Reference($id)));
+                $this->getEventManagerDef($container, $con)->addMethodCall('addEventListener', [[$tag['event']], $lazy ? $id : new Reference($id)]);
             }
         }
     }
@@ -130,12 +130,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      */
     private function findAndSortTags($tagName, ContainerBuilder $container)
     {
-        $sortedTags = array();
+        $sortedTags = [];
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tags) {
             foreach ($tags as $attributes) {
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedTags[$priority][] = array($serviceId, $attributes);
+                $sortedTags[$priority][] = [$serviceId, $attributes];
             }
         }
 

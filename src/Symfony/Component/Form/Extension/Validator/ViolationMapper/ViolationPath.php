@@ -23,17 +23,17 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * @var array
      */
-    private $elements = array();
+    private $elements = [];
 
     /**
      * @var array
      */
-    private $isIndex = array();
+    private $isIndex = [];
 
     /**
      * @var array
      */
-    private $mapsForm = array();
+    private $mapsForm = [];
 
     /**
      * @var string

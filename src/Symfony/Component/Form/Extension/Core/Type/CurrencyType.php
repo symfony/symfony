@@ -36,7 +36,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 if ($options['choices']) {
                     @trigger_error(sprintf('Using the "choices" option in %s has been deprecated since Symfony 3.3 and will be ignored in 4.0. Override the "choice_loader" option instead or set it to null.', __CLASS__), E_USER_DEPRECATED);
@@ -47,7 +47,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
                 return $this;
             },
             'choice_translation_domain' => false,
-        ));
+        ]);
     }
 
     /**
@@ -86,7 +86,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $values = array_filter($values);
         if (empty($values)) {
-            return array();
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -100,7 +100,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $choices = array_filter($choices);
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // If no callable is set, choices are the same as values

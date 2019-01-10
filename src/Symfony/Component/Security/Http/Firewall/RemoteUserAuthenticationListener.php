@@ -44,6 +44,6 @@ class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
             throw new BadCredentialsException(sprintf('User key was not found: %s', $this->userKey));
         }
 
-        return array($request->server->get($this->userKey), null);
+        return [$request->server->get($this->userKey), null];
     }
 }

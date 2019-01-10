@@ -172,7 +172,7 @@ class Workflow
      */
     public function getEnabledTransitions($subject)
     {
-        $enabled = array();
+        $enabled = [];
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {

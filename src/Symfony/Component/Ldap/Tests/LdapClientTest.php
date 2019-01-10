@@ -59,9 +59,9 @@ class LdapClientTest extends LdapTestCase
         $this->ldap
             ->expects($this->once())
             ->method('query')
-            ->with('foo', 'bar', array('baz'))
+            ->with('foo', 'bar', ['baz'])
         ;
-        $this->client->query('foo', 'bar', array('baz'));
+        $this->client->query('foo', 'bar', ['baz']);
     }
 
     public function testLdapFind()
@@ -70,18 +70,18 @@ class LdapClientTest extends LdapTestCase
         $collection
             ->expects($this->once())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator(array(
-                new Entry('cn=qux,dc=foo,dc=com', array(
-                    'cn' => array('qux'),
-                    'dc' => array('com', 'foo'),
-                    'givenName' => array('Qux'),
-                )),
-                new Entry('cn=baz,dc=foo,dc=com', array(
-                    'cn' => array('baz'),
-                    'dc' => array('com', 'foo'),
-                    'givenName' => array('Baz'),
-                )),
-            ))))
+            ->will($this->returnValue(new \ArrayIterator([
+                new Entry('cn=qux,dc=foo,dc=com', [
+                    'cn' => ['qux'],
+                    'dc' => ['com', 'foo'],
+                    'givenName' => ['Qux'],
+                ]),
+                new Entry('cn=baz,dc=foo,dc=com', [
+                    'cn' => ['baz'],
+                    'dc' => ['com', 'foo'],
+                    'givenName' => ['Baz'],
+                ]),
+            ])))
         ;
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
@@ -92,53 +92,53 @@ class LdapClientTest extends LdapTestCase
         $this->ldap
             ->expects($this->once())
             ->method('query')
-            ->with('dc=foo,dc=com', 'bar', array('filter' => 'baz'))
+            ->with('dc=foo,dc=com', 'bar', ['filter' => 'baz'])
             ->willReturn($query)
         ;
 
-        $expected = array(
+        $expected = [
             'count' => 2,
-            0 => array(
+            0 => [
                 'count' => 3,
                 0 => 'cn',
-                'cn' => array(
+                'cn' => [
                     'count' => 1,
                     0 => 'qux',
-                ),
+                ],
                 1 => 'dc',
-                'dc' => array(
+                'dc' => [
                     'count' => 2,
                     0 => 'com',
                     1 => 'foo',
-                ),
+                ],
                 2 => 'givenname',
-                'givenname' => array(
+                'givenname' => [
                     'count' => 1,
                     0 => 'Qux',
-                ),
+                ],
                 'dn' => 'cn=qux,dc=foo,dc=com',
-            ),
-            1 => array(
+            ],
+            1 => [
                 'count' => 3,
                 0 => 'cn',
-                'cn' => array(
+                'cn' => [
                     'count' => 1,
                     0 => 'baz',
-                ),
+                ],
                 1 => 'dc',
-                'dc' => array(
+                'dc' => [
                     'count' => 2,
                     0 => 'com',
                     1 => 'foo',
-                ),
+                ],
                 2 => 'givenname',
-                'givenname' => array(
+                'givenname' => [
                     'count' => 1,
                     0 => 'Baz',
-                ),
+                ],
                 'dn' => 'cn=baz,dc=foo,dc=com',
-            ),
-        );
+            ],
+        ];
         $this->assertEquals($expected, $this->client->find('dc=foo,dc=com', 'bar', 'baz'));
     }
 
@@ -151,7 +151,7 @@ class LdapClientTest extends LdapTestCase
         $reflMethod = $reflObj->getMethod('normalizeConfig');
         $reflMethod->setAccessible(true);
         array_unshift($args, $this->client);
-        $this->assertEquals($expected, \call_user_func_array(array($reflMethod, 'invoke'), $args));
+        $this->assertEquals($expected, \call_user_func_array([$reflMethod, 'invoke'], $args));
     }
 
     /**
@@ -167,7 +167,7 @@ class LdapClientTest extends LdapTestCase
 
         $con = @ldap_connect($config['host'], $config['port']);
         @ldap_bind($con, 'cn=admin,dc=symfony,dc=com', 'symfony');
-        $search = @ldap_search($con, 'dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array('*'));
+        $search = @ldap_search($con, 'dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', ['*']);
         $expected = @ldap_get_entries($con, $search);
 
         $this->assertSame($expected, $result);
@@ -175,55 +175,55 @@ class LdapClientTest extends LdapTestCase
 
     public function provideConfig()
     {
-        return array(
-            array(
-                array('localhost', 389, 3, true, false, false),
-                array(
+        return [
+            [
+                ['localhost', 389, 3, true, false, false],
+                [
                     'host' => 'localhost',
                     'port' => 389,
                     'encryption' => 'ssl',
-                    'options' => array(
+                    'options' => [
                         'protocol_version' => 3,
                         'referrals' => false,
-                    ),
-                ),
-            ),
-            array(
-                array('localhost', 389, 3, false, true, false),
-                array(
+                    ],
+                ],
+            ],
+            [
+                ['localhost', 389, 3, false, true, false],
+                [
                     'host' => 'localhost',
                     'port' => 389,
                     'encryption' => 'tls',
-                    'options' => array(
+                    'options' => [
                         'protocol_version' => 3,
                         'referrals' => false,
-                    ),
-                ),
-            ),
-            array(
-                array('localhost', 389, 3, false, false, false),
-                array(
+                    ],
+                ],
+            ],
+            [
+                ['localhost', 389, 3, false, false, false],
+                [
                     'host' => 'localhost',
                     'port' => 389,
                     'encryption' => 'none',
-                    'options' => array(
+                    'options' => [
                         'protocol_version' => 3,
                         'referrals' => false,
-                    ),
-                ),
-            ),
-            array(
-                array('localhost', 389, 3, false, false, false),
-                array(
+                    ],
+                ],
+            ],
+            [
+                ['localhost', 389, 3, false, false, false],
+                [
                     'host' => 'localhost',
                     'port' => 389,
                     'encryption' => 'none',
-                    'options' => array(
+                    'options' => [
                         'protocol_version' => 3,
                         'referrals' => false,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
     }
 }

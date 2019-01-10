@@ -54,7 +54,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'router' => '?'.RouterInterface::class,
             'request_stack' => '?'.RequestStack::class,
             'http_kernel' => '?'.HttpKernelInterface::class,
@@ -67,6 +67,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
-        );
+        ];
     }
 }

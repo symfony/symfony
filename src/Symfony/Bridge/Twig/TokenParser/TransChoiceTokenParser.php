@@ -38,7 +38,7 @@ class TransChoiceTokenParser extends TransTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = new ArrayExpression(array(), $lineno);
+        $vars = new ArrayExpression([], $lineno);
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
@@ -65,10 +65,10 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+        $body = $this->parser->subparse([$this, 'decideTransChoiceFork'], true);
 
         if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
-            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext()->getName());
+            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
         }
 
         $stream->expect(Token::BLOCK_END_TYPE);
@@ -78,7 +78,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
     public function decideTransChoiceFork($token)
     {
-        return $token->test(array('endtranschoice'));
+        return $token->test(['endtranschoice']);
     }
 
     /**

@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Router as BaseRouter;
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
     private $container;
-    private $collectedParameters = array();
+    private $collectedParameters = [];
 
     /**
      * @param ContainerInterface $container A ContainerInterface instance
@@ -38,7 +38,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * @param array              $options   An array of options
      * @param RequestContext     $context   The context
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
+    public function __construct(ContainerInterface $container, $resource, array $options = [], RequestContext $context = null)
     {
         $this->container = $container;
 
@@ -99,13 +99,13 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
 
-            $schemes = array();
+            $schemes = [];
             foreach ($route->getSchemes() as $scheme) {
                 $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
             }
             $route->setSchemes($schemes);
 
-            $methods = array();
+            $methods = [];
             foreach ($route->getMethods() as $method) {
                 $methods = array_merge($methods, explode('|', $this->resolve($method)));
             }
@@ -170,8 +170,8 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'routing.loader' => LoaderInterface::class,
-        );
+        ];
     }
 }

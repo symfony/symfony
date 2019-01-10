@@ -49,7 +49,7 @@ class FormExtensionTest extends TestCase
         $twigRenderer->expects($this->once())
             ->method('setEnvironment');
 
-        yield array($twigRenderer, $twigRenderer);
+        yield [$twigRenderer, $twigRenderer];
 
         $twigRenderer = $this->getMockBuilder(TwigRendererInterface::class)->getMock();
         $twigRenderer->expects($this->once())
@@ -61,7 +61,7 @@ class FormExtensionTest extends TestCase
             ->with('service_id')
             ->willReturn($twigRenderer);
 
-        yield array(array($container, 'service_id'), $twigRenderer);
+        yield [[$container, 'service_id'], $twigRenderer];
 
         $formRenderer = $this->getMockBuilder(FormRendererInterface::class)->getMock();
 
@@ -71,6 +71,6 @@ class FormExtensionTest extends TestCase
             ->with('service_id')
             ->willReturn($formRenderer);
 
-        yield array(array($container, 'service_id'), $formRenderer);
+        yield [[$container, 'service_id'], $formRenderer];
     }
 }

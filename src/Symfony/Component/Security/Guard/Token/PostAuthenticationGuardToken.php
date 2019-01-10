@@ -58,7 +58,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function getCredentials()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -76,7 +76,9 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function serialize()
     {
-        return serialize(array($this->providerKey, parent::serialize()));
+        $serialized = [$this->providerKey, parent::serialize(true)];
+
+        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
     }
 
     /**
@@ -84,7 +86,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function unserialize($serialized)
     {
-        list($this->providerKey, $parentStr) = unserialize($serialized);
+        list($this->providerKey, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

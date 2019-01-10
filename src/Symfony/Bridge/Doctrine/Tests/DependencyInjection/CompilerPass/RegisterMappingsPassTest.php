@@ -16,17 +16,17 @@ class RegisterMappingsPassTest extends TestCase
     public function testNoDriverParmeterException()
     {
         $container = $this->createBuilder();
-        $this->process($container, array(
+        $this->process($container, [
             'manager.param.one',
             'manager.param.two',
-        ));
+        ]);
     }
 
     private function process(ContainerBuilder $container, array $managerParamNames)
     {
         $pass = new ConcreteMappingsPass(
             new Definition('\stdClass'),
-            array(),
+            [],
             $managerParamNames,
             'some.%s.metadata_driver'
         );

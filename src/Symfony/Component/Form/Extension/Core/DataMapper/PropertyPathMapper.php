@@ -35,7 +35,7 @@ class PropertyPathMapper implements DataMapperInterface
      */
     public function mapDataToForms($data, $forms)
     {
-        $empty = null === $data || array() === $data;
+        $empty = null === $data || [] === $data;
 
         if (!$empty && !\is_array($data) && !\is_object($data)) {
             throw new UnexpectedTypeException($data, 'object, array or empty');

@@ -23,12 +23,12 @@ class DumpNode extends Node
 
     public function __construct($varPrefix, Node $values = null, $lineno, $tag = null)
     {
-        $nodes = array();
+        $nodes = [];
         if (null !== $values) {
             $nodes['values'] = $values;
         }
 
-        parent::__construct($nodes, array(), $lineno, $tag);
+        parent::__construct($nodes, [], $lineno, $tag);
         $this->varPrefix = $varPrefix;
     }
 
@@ -44,7 +44,7 @@ class DumpNode extends Node
         if (!$this->hasNode('values')) {
             // remove embedded templates (macros) from the context
             $compiler
-                ->write(sprintf('$%svars = array();'."\n", $this->varPrefix))
+                ->write(sprintf('$%svars = [];'."\n", $this->varPrefix))
                 ->write(sprintf('foreach ($context as $%1$skey => $%1$sval) {'."\n", $this->varPrefix))
                 ->indent()
                 ->write(sprintf('if (!$%sval instanceof \Twig\Template) {'."\n", $this->varPrefix))
@@ -65,7 +65,7 @@ class DumpNode extends Node
         } else {
             $compiler
                 ->addDebugInfo($this)
-                ->write('\Symfony\Component\VarDumper\VarDumper::dump(array('."\n")
+                ->write('\Symfony\Component\VarDumper\VarDumper::dump(['."\n")
                 ->indent();
             foreach ($values as $node) {
                 $compiler->write('');
@@ -80,7 +80,7 @@ class DumpNode extends Node
             }
             $compiler
                 ->outdent()
-                ->write("));\n");
+                ->write("]);\n");
         }
 
         $compiler

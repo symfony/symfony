@@ -55,10 +55,10 @@ class CheckDefinitionValidityPassTest extends TestCase
     public function testValidTags()
     {
         $container = new ContainerBuilder();
-        $container->register('a', 'class')->addTag('foo', array('bar' => 'baz'));
-        $container->register('b', 'class')->addTag('foo', array('bar' => null));
-        $container->register('c', 'class')->addTag('foo', array('bar' => 1));
-        $container->register('d', 'class')->addTag('foo', array('bar' => 1.1));
+        $container->register('a', 'class')->addTag('foo', ['bar' => 'baz']);
+        $container->register('b', 'class')->addTag('foo', ['bar' => null]);
+        $container->register('c', 'class')->addTag('foo', ['bar' => 1]);
+        $container->register('d', 'class')->addTag('foo', ['bar' => 1.1]);
 
         $this->process($container);
 
@@ -71,7 +71,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     public function testInvalidTags()
     {
         $container = new ContainerBuilder();
-        $container->register('a', 'class')->addTag('foo', array('bar' => array('baz' => 'baz')));
+        $container->register('a', 'class')->addTag('foo', ['bar' => ['baz' => 'baz']]);
 
         $this->process($container);
     }

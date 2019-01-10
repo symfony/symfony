@@ -95,13 +95,13 @@ class XliffFileLoader implements LoaderInterface
 
             $catalogue->set((string) $source, $target, $domain);
 
-            $metadata = array();
+            $metadata = [];
             if ($notes = $this->parseNotesMetadata($translation->note, $encoding)) {
                 $metadata['notes'] = $notes;
             }
 
             if (isset($translation->target) && $translation->target->attributes()) {
-                $metadata['target-attributes'] = array();
+                $metadata['target-attributes'] = [];
                 foreach ($translation->target->attributes() as $key => $value) {
                     $metadata['target-attributes'][$key] = (string) $value;
                 }
@@ -137,18 +137,18 @@ class XliffFileLoader implements LoaderInterface
 
                 $catalogue->set((string) $source, $target, $domain);
 
-                $metadata = array();
+                $metadata = [];
                 if (isset($segment->target) && $segment->target->attributes()) {
-                    $metadata['target-attributes'] = array();
+                    $metadata['target-attributes'] = [];
                     foreach ($segment->target->attributes() as $key => $value) {
                         $metadata['target-attributes'][$key] = (string) $value;
                     }
                 }
 
                 if (isset($unit->notes)) {
-                    $metadata['notes'] = array();
+                    $metadata['notes'] = [];
                     foreach ($unit->notes->note as $noteNode) {
-                        $note = array();
+                        $note = [];
                         foreach ($noteNode->attributes() as $key => $value) {
                             $note[$key] = (string) $value;
                         }
@@ -262,7 +262,7 @@ class XliffFileLoader implements LoaderInterface
      */
     private function getXmlErrors($internalErrors)
     {
-        $errors = array();
+        $errors = [];
         foreach (libxml_get_errors() as $error) {
             $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
@@ -321,7 +321,7 @@ class XliffFileLoader implements LoaderInterface
      */
     private function parseNotesMetadata(\SimpleXMLElement $noteElement = null, $encoding = null)
     {
-        $notes = array();
+        $notes = [];
 
         if (null === $noteElement) {
             return $notes;
@@ -330,7 +330,7 @@ class XliffFileLoader implements LoaderInterface
         /** @var \SimpleXMLElement $xmlNote */
         foreach ($noteElement as $xmlNote) {
             $noteAttributes = $xmlNote->attributes();
-            $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));
+            $note = ['content' => $this->utf8ToCharset((string) $xmlNote, $encoding)];
             if (isset($noteAttributes['priority'])) {
                 $note['priority'] = (int) $noteAttributes['priority'];
             }

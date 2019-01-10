@@ -45,13 +45,13 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 
     public function attributeProvider()
     {
-        return array(
-            array('coop_tilleuls', 'coopTilleuls', true),
-            array('_kevin_dunglas', '_kevinDunglas', true),
-            array('this_is_a_test', 'thisIsATest', true),
-            array('coop_tilleuls', 'CoopTilleuls', false),
-            array('_kevin_dunglas', '_kevinDunglas', false),
-            array('this_is_a_test', 'ThisIsATest', false),
-        );
+        return [
+            ['coop_tilleuls', 'coopTilleuls', true],
+            ['_kevin_dunglas', '_kevinDunglas', true],
+            ['this_is_a_test', 'thisIsATest', true],
+            ['coop_tilleuls', 'CoopTilleuls', false],
+            ['_kevin_dunglas', '_kevinDunglas', false],
+            ['this_is_a_test', 'ThisIsATest', false],
+        ];
     }
 }

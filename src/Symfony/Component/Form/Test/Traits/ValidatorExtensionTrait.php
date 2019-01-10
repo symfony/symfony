@@ -18,8 +18,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 trait ValidatorExtensionTrait
 {
+    /**
+     * @var ValidatorInterface|null
+     */
     protected $validator;
 
+    /**
+     * @return ValidatorExtension
+     */
     protected function getValidatorExtension()
     {
         if (!interface_exists(ValidatorInterface::class)) {
@@ -31,9 +37,9 @@ trait ValidatorExtensionTrait
         }
 
         $this->validator = $this->getMockBuilder(ValidatorInterface::class)->getMock();
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->setMethods(array('addPropertyConstraint'))->getMock();
+        $metadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->setMethods(['addPropertyConstraint'])->getMock();
         $this->validator->expects($this->any())->method('getMetadataFor')->will($this->returnValue($metadata));
-        $this->validator->expects($this->any())->method('validate')->will($this->returnValue(array()));
+        $this->validator->expects($this->any())->method('validate')->will($this->returnValue([]));
 
         return new ValidatorExtension($this->validator);
     }

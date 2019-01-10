@@ -27,13 +27,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {
-    private static $allowedTypes = array('array', 'bool', 'float', 'int', 'string');
+    private static $allowedTypes = ['array', 'bool', 'float', 'int', 'string'];
 
     public function process(ContainerBuilder $container)
     {
         $bag = $container->getParameterBag();
-        $types = array();
-        $processors = array();
+        $types = [];
+        $processors = [];
         foreach ($container->findTaggedServiceIds('container.env_var_processor') as $id => $tags) {
             if (!$r = $container->getReflectionClass($class = $container->getDefinition($id)->getClass())) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
@@ -58,7 +58,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
         if ($processors) {
             $container->register('container.env_var_processors_locator', ServiceLocator::class)
                 ->setPublic(true)
-                ->setArguments(array($processors))
+                ->setArguments([$processors])
             ;
         }
     }

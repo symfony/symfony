@@ -65,9 +65,9 @@ class UserLoginType extends AbstractType
                 $event->getForm()->addError(new FormError($error->getMessage()));
             }
 
-            $event->setData(array_replace((array) $event->getData(), array(
+            $event->setData(array_replace((array) $event->getData(), [
                 'username' => $request->getSession()->get(Security::LAST_USERNAME),
-            )));
+            ]));
         });
     }
 
@@ -80,8 +80,8 @@ class UserLoginType extends AbstractType
          * listener in order for the CSRF token to validate successfully.
          */
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'csrf_token_id' => 'authenticate',
-        ));
+        ]);
     }
 }

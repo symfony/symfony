@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -30,6 +31,8 @@ interface ConstraintValidatorInterface
      *
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
+     *
+     * @throws UnexpectedTypeException If the constraint or the value is incompatible (causes an unrecoverable error)
      */
     public function validate($value, Constraint $constraint);
 }

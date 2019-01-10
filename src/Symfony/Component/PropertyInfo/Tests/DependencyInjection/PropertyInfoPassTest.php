@@ -26,44 +26,44 @@ class PropertyInfoPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $definition = $container->register('property_info')->setArguments(array(null, null, null, null));
-        $container->register('n2')->addTag($tag, array('priority' => 100));
-        $container->register('n1')->addTag($tag, array('priority' => 200));
+        $definition = $container->register('property_info')->setArguments([null, null, null, null]);
+        $container->register('n2')->addTag($tag, ['priority' => 100]);
+        $container->register('n1')->addTag($tag, ['priority' => 200]);
         $container->register('n3')->addTag($tag);
 
         $propertyInfoPass = new PropertyInfoPass();
         $propertyInfoPass->process($container);
 
-        $expected = new IteratorArgument(array(
+        $expected = new IteratorArgument([
             new Reference('n1'),
             new Reference('n2'),
             new Reference('n3'),
-        ));
+        ]);
         $this->assertEquals($expected, $definition->getArgument($index));
     }
 
     public function provideTags()
     {
-        return array(
-            array(0, 'property_info.list_extractor'),
-            array(1, 'property_info.type_extractor'),
-            array(2, 'property_info.description_extractor'),
-            array(3, 'property_info.access_extractor'),
-        );
+        return [
+            [0, 'property_info.list_extractor'],
+            [1, 'property_info.type_extractor'],
+            [2, 'property_info.description_extractor'],
+            [3, 'property_info.access_extractor'],
+        ];
     }
 
     public function testReturningEmptyArrayWhenNoService()
     {
         $container = new ContainerBuilder();
         $propertyInfoExtractorDefinition = $container->register('property_info')
-            ->setArguments(array(array(), array(), array(), array()));
+            ->setArguments([[], [], [], []]);
 
         $propertyInfoPass = new PropertyInfoPass();
         $propertyInfoPass->process($container);
 
-        $this->assertEquals(new IteratorArgument(array()), $propertyInfoExtractorDefinition->getArgument(0));
-        $this->assertEquals(new IteratorArgument(array()), $propertyInfoExtractorDefinition->getArgument(1));
-        $this->assertEquals(new IteratorArgument(array()), $propertyInfoExtractorDefinition->getArgument(2));
-        $this->assertEquals(new IteratorArgument(array()), $propertyInfoExtractorDefinition->getArgument(3));
+        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(0));
+        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(1));
+        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(2));
+        $this->assertEquals(new IteratorArgument([]), $propertyInfoExtractorDefinition->getArgument(3));
     }
 }

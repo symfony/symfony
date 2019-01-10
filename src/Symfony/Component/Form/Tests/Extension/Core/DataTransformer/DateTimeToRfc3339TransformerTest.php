@@ -45,14 +45,14 @@ class DateTimeToRfc3339TransformerTest extends TestCase
 
     public function allProvider()
     {
-        return array(
-            array('UTC', 'UTC', '2010-02-03 04:05:06 UTC', '2010-02-03T04:05:06Z'),
-            array('UTC', 'UTC', null, ''),
-            array('America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:06 America/New_York', '2010-02-03T17:05:06+08:00'),
-            array('America/New_York', 'Asia/Hong_Kong', null, ''),
-            array('UTC', 'Asia/Hong_Kong', '2010-02-03 04:05:06 UTC', '2010-02-03T12:05:06+08:00'),
-            array('America/New_York', 'UTC', '2010-02-03 04:05:06 America/New_York', '2010-02-03T09:05:06Z'),
-        );
+        return [
+            ['UTC', 'UTC', '2010-02-03 04:05:06 UTC', '2010-02-03T04:05:06Z'],
+            ['UTC', 'UTC', null, ''],
+            ['America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:06 America/New_York', '2010-02-03T17:05:06+08:00'],
+            ['America/New_York', 'Asia/Hong_Kong', null, ''],
+            ['UTC', 'Asia/Hong_Kong', '2010-02-03 04:05:06 UTC', '2010-02-03T12:05:06+08:00'],
+            ['America/New_York', 'UTC', '2010-02-03 04:05:06 America/New_York', '2010-02-03T09:05:06Z'],
+        ];
     }
 
     public function transformProvider()
@@ -62,13 +62,13 @@ class DateTimeToRfc3339TransformerTest extends TestCase
 
     public function reverseTransformProvider()
     {
-        return array_merge($this->allProvider(), array(
+        return array_merge($this->allProvider(), [
             // format without seconds, as appears in some browsers
-            array('UTC', 'UTC', '2010-02-03 04:05:00 UTC', '2010-02-03T04:05Z'),
-            array('America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:00 America/New_York', '2010-02-03T17:05+08:00'),
-            array('Europe/Amsterdam', 'Europe/Amsterdam', '2013-08-21 10:30:00 Europe/Amsterdam', '2013-08-21T08:30:00Z'),
-            array('UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'),
-        ));
+            ['UTC', 'UTC', '2010-02-03 04:05:00 UTC', '2010-02-03T04:05Z'],
+            ['America/New_York', 'Asia/Hong_Kong', '2010-02-03 04:05:00 America/New_York', '2010-02-03T17:05+08:00'],
+            ['Europe/Amsterdam', 'Europe/Amsterdam', '2013-08-21 10:30:00 Europe/Amsterdam', '2013-08-21T08:30:00Z'],
+            ['UTC', 'UTC', '2018-10-03T10:00:00.000Z', '2018-10-03T10:00:00.000Z'],
+        ]);
     }
 
     /**
@@ -146,13 +146,13 @@ class DateTimeToRfc3339TransformerTest extends TestCase
 
     public function invalidDateStringProvider()
     {
-        return array(
-            'invalid month' => array('2010-2010-01'),
-            'invalid day' => array('2010-10-2010'),
-            'no date' => array('x'),
-            'cookie format' => array('Saturday, 01-May-2010 04:05:00 Z'),
-            'RFC 822 format' => array('Sat, 01 May 10 04:05:00 +0000'),
-            'RSS format' => array('Sat, 01 May 2010 04:05:00 +0000'),
-        );
+        return [
+            'invalid month' => ['2010-2010-01'],
+            'invalid day' => ['2010-10-2010'],
+            'no date' => ['x'],
+            'cookie format' => ['Saturday, 01-May-2010 04:05:00 Z'],
+            'RFC 822 format' => ['Sat, 01 May 10 04:05:00 +0000'],
+            'RSS format' => ['Sat, 01 May 2010 04:05:00 +0000'],
+        ];
     }
 }

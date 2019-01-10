@@ -81,12 +81,12 @@ class RouterDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
-            ))
+            ])
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> displays the configured routes:
@@ -122,24 +122,24 @@ EOF
 
             $callable = $this->extractCallable($route);
 
-            $helper->describe($io, $route, array(
+            $helper->describe($io, $route, [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
                 'output' => $io,
                 'callable' => $callable,
-            ));
+            ]);
         } else {
             foreach ($routes as $route) {
                 $this->convertController($route);
             }
 
-            $helper->describe($io, $routes, array(
+            $helper->describe($io, $routes, [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
                 'output' => $io,
-            ));
+            ]);
         }
     }
 

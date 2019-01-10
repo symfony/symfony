@@ -28,7 +28,7 @@ abstract class AbstractConfigurator
     public function __call($method, $args)
     {
         if (method_exists($this, 'set'.$method)) {
-            return \call_user_func_array(array($this, 'set'.$method), $args);
+            return \call_user_func_array([$this, 'set'.$method], $args);
         }
 
         throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', \get_class($this), $method));

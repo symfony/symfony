@@ -33,12 +33,12 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
         }
 
         $calls = $value->getMethodCalls();
-        $calls[] = array('__construct', $value->getArguments());
+        $calls[] = ['__construct', $value->getArguments()];
 
         foreach ($calls as $i => $call) {
             list($method, $arguments) = $call;
             $parameters = null;
-            $resolvedArguments = array();
+            $resolvedArguments = [];
 
             foreach ($arguments as $key => $argument) {
                 if (\is_int($key)) {
@@ -71,7 +71,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 $typeFound = false;
                 foreach ($parameters as $j => $p) {
-                    if (!array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
+                    if (!\array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
                         $resolvedArguments[$j] = $argument;
                         $typeFound = true;
                     }

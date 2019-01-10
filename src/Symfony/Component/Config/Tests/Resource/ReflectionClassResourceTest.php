@@ -71,7 +71,7 @@ class ReflectionClassResourceTest extends TestCase
 /* 2*/  {
 /* 3*/      const FOO = 123;
 /* 4*/
-/* 5*/      public $pub = array();
+/* 5*/      public $pub = [];
 /* 6*/
 /* 7*/      protected $prot;
 /* 8*/
@@ -79,7 +79,7 @@ class ReflectionClassResourceTest extends TestCase
 /*10*/
 /*11*/      public function pub($arg = null) {}
 /*12*/
-/*13*/      protected function prot($a = array()) {}
+/*13*/      protected function prot($a = []) {}
 /*14*/
 /*15*/      private function priv() {}
 /*16*/  }
@@ -110,33 +110,33 @@ EOPHP;
 
     public function provideHashedSignature()
     {
-        yield array(0, 0, "// line change\n\n");
-        yield array(1, 0, '/** class docblock */');
-        yield array(1, 1, 'abstract class %s');
-        yield array(1, 1, 'final class %s');
-        yield array(1, 1, 'class %s extends Exception');
-        yield array(1, 1, 'class %s implements '.DummyInterface::class);
-        yield array(1, 3, 'const FOO = 456;');
-        yield array(1, 3, 'const BAR = 123;');
-        yield array(1, 4, '/** pub docblock */');
-        yield array(1, 5, 'protected $pub = array();');
-        yield array(1, 5, 'public $pub = array(123);');
-        yield array(1, 6, '/** prot docblock */');
-        yield array(1, 7, 'private $prot;');
-        yield array(0, 8, '/** priv docblock */');
-        yield array(0, 9, 'private $priv = 123;');
-        yield array(1, 10, '/** pub docblock */');
+        yield [0, 0, "// line change\n\n"];
+        yield [1, 0, '/** class docblock */'];
+        yield [1, 1, 'abstract class %s'];
+        yield [1, 1, 'final class %s'];
+        yield [1, 1, 'class %s extends Exception'];
+        yield [1, 1, 'class %s implements '.DummyInterface::class];
+        yield [1, 3, 'const FOO = 456;'];
+        yield [1, 3, 'const BAR = 123;'];
+        yield [1, 4, '/** pub docblock */'];
+        yield [1, 5, 'protected $pub = [];'];
+        yield [1, 5, 'public $pub = [123];'];
+        yield [1, 6, '/** prot docblock */'];
+        yield [1, 7, 'private $prot;'];
+        yield [0, 8, '/** priv docblock */'];
+        yield [0, 9, 'private $priv = 123;'];
+        yield [1, 10, '/** pub docblock */'];
         if (\PHP_VERSION_ID >= 50600) {
-            yield array(1, 11, 'public function pub(...$arg) {}');
+            yield [1, 11, 'public function pub(...$arg) {}'];
         }
         if (\PHP_VERSION_ID >= 70000) {
-            yield array(1, 11, 'public function pub($arg = null): Foo {}');
+            yield [1, 11, 'public function pub($arg = null): Foo {}'];
         }
-        yield array(0, 11, "public function pub(\$arg = null) {\nreturn 123;\n}");
-        yield array(1, 12, '/** prot docblock */');
-        yield array(1, 13, 'protected function prot($a = array(123)) {}');
-        yield array(0, 14, '/** priv docblock */');
-        yield array(0, 15, '');
+        yield [0, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
+        yield [1, 12, '/** prot docblock */'];
+        yield [1, 13, 'protected function prot($a = [123]) {}'];
+        yield [0, 14, '/** priv docblock */'];
+        yield [0, 15, ''];
     }
 
     public function testEventSubscriber()
@@ -144,7 +144,7 @@ EOPHP;
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
         $this->assertTrue($res->isFresh(0));
 
-        TestEventSubscriber::$subscribedEvents = array(123);
+        TestEventSubscriber::$subscribedEvents = [123];
         $this->assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
@@ -156,7 +156,7 @@ EOPHP;
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
         $this->assertTrue($res->isFresh(0));
 
-        TestServiceSubscriber::$subscribedServices = array(123);
+        TestServiceSubscriber::$subscribedServices = [123];
         $this->assertFalse($res->isFresh(0));
 
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
@@ -170,7 +170,7 @@ interface DummyInterface
 
 class TestEventSubscriber implements EventSubscriberInterface
 {
-    public static $subscribedEvents = array();
+    public static $subscribedEvents = [];
 
     public static function getSubscribedEvents()
     {
@@ -180,7 +180,7 @@ class TestEventSubscriber implements EventSubscriberInterface
 
 class TestServiceSubscriber implements ServiceSubscriberInterface
 {
-    public static $subscribedServices = array();
+    public static $subscribedServices = [];
 
     public static function getSubscribedServices()
     {

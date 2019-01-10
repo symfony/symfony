@@ -40,7 +40,7 @@ class RegionDataProvider
 
     public function getRegions()
     {
-        return $this->reader->readEntry($this->path, 'meta', array('Regions'));
+        return $this->reader->readEntry($this->path, 'meta', ['Regions']);
     }
 
     public function getName($region, $displayLocale = null)
@@ -49,7 +49,7 @@ class RegionDataProvider
             $displayLocale = Locale::getDefault();
         }
 
-        return $this->reader->readEntry($this->path, $displayLocale, array('Names', $region));
+        return $this->reader->readEntry($this->path, $displayLocale, ['Names', $region]);
     }
 
     public function getNames($displayLocale = null)
@@ -58,7 +58,7 @@ class RegionDataProvider
             $displayLocale = Locale::getDefault();
         }
 
-        $names = $this->reader->readEntry($this->path, $displayLocale, array('Names'));
+        $names = $this->reader->readEntry($this->path, $displayLocale, ['Names']);
 
         if ($names instanceof \Traversable) {
             $names = iterator_to_array($names);

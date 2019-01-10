@@ -45,21 +45,21 @@ class CacheCollectorPass implements CompilerPassInterface
             $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
             $recorder->setTags($definition->getTags());
             $recorder->setPublic($definition->isPublic());
-            $recorder->setArguments(array(new Reference($innerId = $id.'.recorder_inner')));
+            $recorder->setArguments([new Reference($innerId = $id.'.recorder_inner')]);
 
-            $definition->setTags(array());
+            $definition->setTags([]);
             $definition->setPublic(false);
 
             if (method_exists($definition, 'getAutowiringTypes') && $types = $definition->getAutowiringTypes(false)) {
                 $recorder->setAutowiringTypes($types);
-                $definition->setAutowiringTypes(array());
+                $definition->setAutowiringTypes([]);
             }
 
             $container->setDefinition($innerId, $definition);
             $container->setDefinition($id, $recorder);
 
             // Tell the collector to add the new instance
-            $collectorDefinition->addMethodCall('addInstance', array($id, new Reference($id)));
+            $collectorDefinition->addMethodCall('addInstance', [$id, new Reference($id)]);
             $collectorDefinition->setPublic(false);
         }
     }

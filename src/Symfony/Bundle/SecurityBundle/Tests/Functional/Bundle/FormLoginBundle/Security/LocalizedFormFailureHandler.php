@@ -29,6 +29,6 @@ class LocalizedFormFailureHandler implements AuthenticationFailureHandlerInterfa
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new RedirectResponse($this->router->generate('localized_login_path', array(), UrlGeneratorInterface::ABSOLUTE_URL));
+        return new RedirectResponse($this->router->generate('localized_login_path', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 }

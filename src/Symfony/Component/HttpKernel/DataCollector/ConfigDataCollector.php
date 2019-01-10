@@ -54,7 +54,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->data = array(
+        $this->data = [
             'app_name' => $this->name,
             'app_version' => $this->version,
             'token' => $response->headers->get('X-Debug-Token'),
@@ -70,9 +70,9 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'xdebug_enabled' => \extension_loaded('xdebug'),
             'apcu_enabled' => \extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN),
             'zend_opcache_enabled' => \extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN),
-            'bundles' => array(),
+            'bundles' => [],
             'sapi_name' => \PHP_SAPI,
-        );
+        ];
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
@@ -98,7 +98,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      */
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
     public function lateCollect()

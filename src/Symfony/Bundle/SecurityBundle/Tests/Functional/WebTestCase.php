@@ -49,7 +49,7 @@ class WebTestCase extends BaseWebTestCase
         return 'Symfony\Bundle\SecurityBundle\Tests\Functional\app\AppKernel';
     }
 
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
         $class = self::getKernelClass();
 
@@ -62,7 +62,7 @@ class WebTestCase extends BaseWebTestCase
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
             isset($options['environment']) ? $options['environment'] : strtolower(static::getVarDir().$options['test_case']),
-            isset($options['debug']) ? $options['debug'] : true
+            isset($options['debug']) ? $options['debug'] : false
         );
     }
 

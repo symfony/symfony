@@ -31,12 +31,12 @@ class PhpGeneratorDumper extends GeneratorDumper
      *
      * @return string A PHP class representing the generator class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
-        $options = array_merge(array(
+        $options = array_merge([
             'class' => 'ProjectUrlGenerator',
             'base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-        ), $options);
+        ], $options);
 
         return <<<EOF
 <?php
@@ -76,11 +76,11 @@ EOF;
      */
     private function generateDeclaredRoutes()
     {
-        $routes = "array(\n";
+        $routes = "[\n";
         foreach ($this->getRoutes()->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
-            $properties = array();
+            $properties = [];
             $properties[] = $compiledRoute->getVariables();
             $properties[] = $route->getDefaults();
             $properties[] = $route->getRequirements();
@@ -90,7 +90,7 @@ EOF;
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
-        $routes .= '    )';
+        $routes .= '    ]';
 
         return $routes;
     }
@@ -103,7 +103,7 @@ EOF;
     private function generateGenerateMethod()
     {
         return <<<'EOF'
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
     {
         if (!isset(self::$declaredRoutes[$name])) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));

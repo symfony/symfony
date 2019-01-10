@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
 /**
  * Transforms between an integer and a localized number with grouping
  * (each thousand) and comma separators.
@@ -40,8 +42,22 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
      */
     public function reverseTransform($value)
     {
+        $decimalSeparator = $this->getNumberFormatter()->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+
+        if (\is_string($value) && false !== strpos($value, $decimalSeparator)) {
+            throw new TransformationFailedException(sprintf('The value "%s" is not a valid integer.', $value));
+        }
+
         $result = parent::reverseTransform($value);
 
         return null !== $result ? (int) $result : null;
+    }
+
+    /**
+     * @internal
+     */
+    protected function castParsedValue($value)
+    {
+        return $value;
     }
 }

@@ -24,7 +24,7 @@ namespace Symfony\Component\ClassLoader;
  */
 class Psr4ClassLoader
 {
-    private $prefixes = array();
+    private $prefixes = [];
 
     /**
      * @param string $prefix
@@ -34,7 +34,7 @@ class Psr4ClassLoader
     {
         $prefix = trim($prefix, '\\').'\\';
         $baseDir = rtrim($baseDir, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR;
-        $this->prefixes[] = array($prefix, $baseDir);
+        $this->prefixes[] = [$prefix, $baseDir];
     }
 
     /**
@@ -81,7 +81,7 @@ class Psr4ClassLoader
      */
     public function register($prepend = false)
     {
-        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+        spl_autoload_register([$this, 'loadClass'], true, $prepend);
     }
 
     /**
@@ -89,6 +89,6 @@ class Psr4ClassLoader
      */
     public function unregister()
     {
-        spl_autoload_unregister(array($this, 'loadClass'));
+        spl_autoload_unregister([$this, 'loadClass']);
     }
 }

@@ -73,7 +73,7 @@ class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableIn
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         if ($this->namespaceLen) {
             foreach ($keys as $i => $key) {

@@ -33,7 +33,7 @@ trait PdoTrait
     private $timeCol = 'item_time';
     private $username = '';
     private $password = '';
-    private $connectionOptions = array();
+    private $connectionOptions = [];
     private $namespace;
 
     private function init($connOrDsn, $namespace, $defaultLifetime, array $options)
@@ -85,24 +85,24 @@ trait PdoTrait
         $conn = $this->getConnection();
 
         if ($conn instanceof Connection) {
-            $types = array(
+            $types = [
                 'mysql' => 'binary',
                 'sqlite' => 'text',
                 'pgsql' => 'string',
                 'oci' => 'string',
                 'sqlsrv' => 'string',
-            );
+            ];
             if (!isset($types[$this->driver])) {
                 throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
             }
 
             $schema = new Schema();
             $table = $schema->createTable($this->table);
-            $table->addColumn($this->idCol, $types[$this->driver], array('length' => 255));
-            $table->addColumn($this->dataCol, 'blob', array('length' => 16777215));
-            $table->addColumn($this->lifetimeCol, 'integer', array('unsigned' => true, 'notnull' => false));
-            $table->addColumn($this->timeCol, 'integer', array('unsigned' => true));
-            $table->setPrimaryKey(array($this->idCol));
+            $table->addColumn($this->idCol, $types[$this->driver], ['length' => 255]);
+            $table->addColumn($this->dataCol, 'blob', ['length' => 16777215]);
+            $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
+            $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
+            $table->setPrimaryKey([$this->idCol]);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
                 $conn->exec($sql);
@@ -166,7 +166,7 @@ trait PdoTrait
     protected function doFetch(array $ids)
     {
         $now = time();
-        $expired = array();
+        $expired = [];
 
         $sql = str_pad('', (\count($ids) << 1) - 1, '?,');
         $sql = "SELECT $this->idCol, CASE WHEN $this->lifetimeCol IS NULL OR $this->lifetimeCol + $this->timeCol > ? THEN $this->dataCol ELSE NULL END FROM $this->table WHERE $this->idCol IN ($sql)";
@@ -252,8 +252,8 @@ trait PdoTrait
      */
     protected function doSave(array $values, $lifetime)
     {
-        $serialized = array();
-        $failed = array();
+        $serialized = [];
+        $failed = [];
 
         foreach ($values as $id => $value) {
             try {

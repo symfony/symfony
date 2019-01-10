@@ -28,10 +28,10 @@ class YamlExtension extends AbstractExtension
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('yaml_encode', array($this, 'encode')),
-            new TwigFilter('yaml_dump', array($this, 'dump')),
-        );
+        return [
+            new TwigFilter('yaml_encode', [$this, 'encode']),
+            new TwigFilter('yaml_dump', [$this, 'dump']),
+        ];
     }
 
     public function encode($input, $inline = 0, $dumpObjects = 0)

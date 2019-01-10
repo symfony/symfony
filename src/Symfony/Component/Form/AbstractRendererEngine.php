@@ -24,11 +24,11 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     const CACHE_KEY_VAR = 'cache_key';
 
     protected $defaultThemes;
-    protected $themes = array();
-    protected $useDefaultThemes = array();
-    protected $resources = array();
+    protected $themes = [];
+    protected $useDefaultThemes = [];
+    protected $resources = [];
 
-    private $resourceHierarchyLevels = array();
+    private $resourceHierarchyLevels = [];
 
     /**
      * Creates a new renderer engine.
@@ -36,7 +36,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      * @param array $defaultThemes The default themes. The type of these
      *                             themes is open to the implementation.
      */
-    public function __construct(array $defaultThemes = array())
+    public function __construct(array $defaultThemes = [])
     {
         $this->defaultThemes = $defaultThemes;
     }
@@ -49,7 +49,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         // Do not cast, as casting turns objects into arrays of properties
-        $this->themes[$cacheKey] = \is_array($themes) ? $themes : array($themes);
+        $this->themes[$cacheKey] = \is_array($themes) ? $themes : [$themes];
 
         $args = \func_get_args();
         $this->useDefaultThemes[$cacheKey] = isset($args[2]) ? (bool) $args[2] : true;

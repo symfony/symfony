@@ -23,25 +23,25 @@ class ConfigurationTest extends TestCase
     public function testDefaultConfig()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
+        $config = $processor->processConfiguration(new Configuration(true), [['secret' => 's3cr3t']]);
 
         $this->assertEquals(
-            array_merge(array('secret' => 's3cr3t', 'trusted_hosts' => array()), self::getBundleDefaultConfig()),
+            array_merge(['secret' => 's3cr3t', 'trusted_hosts' => []], self::getBundleDefaultConfig()),
             $config
         );
     }
 
     public function testDoNoDuplicateDefaultFormResources()
     {
-        $input = array('templating' => array(
-            'form' => array('resources' => array('FrameworkBundle:Form')),
-            'engines' => array('php'),
-        ));
+        $input = ['templating' => [
+            'form' => ['resources' => ['FrameworkBundle:Form']],
+            'engines' => ['php'],
+        ]];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), array($input));
+        $config = $processor->processConfiguration(new Configuration(true), [$input]);
 
-        $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
+        $this->assertEquals(['FrameworkBundle:Form'], $config['templating']['form']['resources']);
     }
 
     /**
@@ -52,7 +52,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(array('trusted_proxies' => null)));
+        $processor->processConfiguration($configuration, [['trusted_proxies' => null]]);
     }
 
     /**
@@ -63,7 +63,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(array('trusted_proxies' => array())));
+        $processor->processConfiguration($configuration, [['trusted_proxies' => []]]);
     }
 
     /**
@@ -74,7 +74,7 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(array('trusted_proxies' => array('127.0.0.1'))));
+        $processor->processConfiguration($configuration, [['trusted_proxies' => ['127.0.0.1']]]);
     }
 
     /**
@@ -86,7 +86,7 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(
             new Configuration(true),
-            array(array('session' => array('name' => $sessionName)))
+            [['session' => ['name' => $sessionName]]]
         );
 
         $this->assertEquals($sessionName, $config['session']['name']);
@@ -94,12 +94,12 @@ class ConfigurationTest extends TestCase
 
     public function getTestValidSessionName()
     {
-        return array(
-            array(null),
-            array('PHPSESSID'),
-            array('a&b'),
-            array(',_-!@#$%^*(){}:<>/?'),
-        );
+        return [
+            [null],
+            ['PHPSESSID'],
+            ['a&b'],
+            [',_-!@#$%^*(){}:<>/?'],
+        ];
     }
 
     /**
@@ -111,20 +111,20 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $processor->processConfiguration(
             new Configuration(true),
-            array(array('session' => array('name' => $sessionName)))
+            [['session' => ['name' => $sessionName]]]
         );
     }
 
     public function getTestInvalidSessionName()
     {
-        return array(
-            array('a.b'),
-            array('a['),
-            array('a[]'),
-            array('a[b]'),
-            array('a=b'),
-            array('a+b'),
-        );
+        return [
+            ['a.b'],
+            ['a['],
+            ['a[]'],
+            ['a[b]'],
+            ['a=b'],
+            ['a+b'],
+        ];
     }
 
     /**
@@ -135,27 +135,27 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, array(array(
+        $config = $processor->processConfiguration($configuration, [[
             'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
-        )));
+        ]]);
 
         $this->assertEquals($processedProxies, $config['trusted_proxies']);
     }
 
     public function getTestValidTrustedProxiesData()
     {
-        return array(
-            array(array('127.0.0.1'), array('127.0.0.1')),
-            array(array('::1'), array('::1')),
-            array(array('127.0.0.1', '::1'), array('127.0.0.1', '::1')),
-            array(null, array()),
-            array(false, array()),
-            array(array(), array()),
-            array(array('10.0.0.0/8'), array('10.0.0.0/8')),
-            array(array('::ffff:0:0/96'), array('::ffff:0:0/96')),
-            array(array('0.0.0.0/0'), array('0.0.0.0/0')),
-        );
+        return [
+            [['127.0.0.1'], ['127.0.0.1']],
+            [['::1'], ['::1']],
+            [['127.0.0.1', '::1'], ['127.0.0.1', '::1']],
+            [null, []],
+            [false, []],
+            [[], []],
+            [['10.0.0.0/8'], ['10.0.0.0/8']],
+            [['::ffff:0:0/96'], ['::ffff:0:0/96']],
+            [['0.0.0.0/0'], ['0.0.0.0/0']],
+        ];
     }
 
     /**
@@ -166,12 +166,12 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(
-            array(
+        $processor->processConfiguration($configuration, [
+            [
                 'secret' => 's3cr3t',
                 'trusted_proxies' => 'Not an IP address',
-            ),
-        ));
+            ],
+        ]);
     }
 
     /**
@@ -183,32 +183,61 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
 
-        $processor->processConfiguration($configuration, array(
-            array(
+        $processor->processConfiguration($configuration, [
+            [
                 'secret' => 's3cr3t',
-                'trusted_proxies' => array('Not an IP address'),
-            ),
-        ));
+                'trusted_proxies' => ['Not an IP address'],
+            ],
+        ]);
     }
 
     public function testAssetsCanBeEnabled()
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+        $config = $processor->processConfiguration($configuration, [['assets' => null]]);
 
-        $defaultConfig = array(
+        $defaultConfig = [
             'enabled' => true,
             'version_strategy' => null,
             'version' => null,
             'version_format' => '%%s?%%s',
             'base_path' => '',
-            'base_urls' => array(),
-            'packages' => array(),
+            'base_urls' => [],
+            'packages' => [],
             'json_manifest_path' => null,
-        );
+        ];
 
         $this->assertEquals($defaultConfig, $config['assets']);
+    }
+
+    /**
+     * @dataProvider provideValidAssetsPackageNameConfigurationTests
+     */
+    public function testValidAssetsPackageNameConfiguration($packageName)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'assets' => [
+                    'packages' => [
+                        $packageName => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey($packageName, $config['assets']['packages']);
+    }
+
+    public function provideValidAssetsPackageNameConfigurationTests()
+    {
+        return [
+            ['foobar'],
+            ['foo-bar'],
+            ['foo_bar'],
+        ];
     }
 
     /**
@@ -225,125 +254,125 @@ class ConfigurationTest extends TestCase
 
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $processor->processConfiguration($configuration, array(
-                array(
+        $processor->processConfiguration($configuration, [
+                [
                     'assets' => $assetConfig,
-                ),
-            ));
+                ],
+            ]);
     }
 
     public function provideInvalidAssetConfigurationTests()
     {
         // helper to turn config into embedded package config
         $createPackageConfig = function (array $packageConfig) {
-            return array(
+            return [
                 'base_urls' => '//example.com',
                 'version' => 1,
-                'packages' => array(
+                'packages' => [
                     'foo' => $packageConfig,
-                ),
-            );
+                ],
+            ];
         };
 
-        $config = array(
+        $config = [
             'version' => 1,
             'version_strategy' => 'foo',
-        );
-        yield array($config, 'You cannot use both "version_strategy" and "version" at the same time under "assets".');
-        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "version" at the same time under "assets" packages.');
+        ];
+        yield [$config, 'You cannot use both "version_strategy" and "version" at the same time under "assets".'];
+        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "version" at the same time under "assets" packages.'];
 
-        $config = array(
+        $config = [
             'json_manifest_path' => '/foo.json',
             'version_strategy' => 'foo',
-        );
-        yield array($config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".');
-        yield array($createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.');
+        ];
+        yield [$config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".'];
+        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.'];
 
-        $config = array(
+        $config = [
             'json_manifest_path' => '/foo.json',
             'version' => '1',
-        );
-        yield array($config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".');
-        yield array($createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.');
+        ];
+        yield [$config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".'];
+        yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
     }
 
     protected static function getBundleDefaultConfig()
     {
-        return array(
+        return [
             'http_method_override' => true,
-            'trusted_proxies' => array(),
+            'trusted_proxies' => [],
             'ide' => null,
             'default_locale' => 'en',
-            'csrf_protection' => array(
+            'csrf_protection' => [
                 'enabled' => false,
-            ),
-            'form' => array(
+            ],
+            'form' => [
                 'enabled' => !class_exists(FullStack::class),
-                'csrf_protection' => array(
+                'csrf_protection' => [
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
-                ),
-            ),
-            'esi' => array('enabled' => false),
-            'ssi' => array('enabled' => false),
-            'fragments' => array(
+                ],
+            ],
+            'esi' => ['enabled' => false],
+            'ssi' => ['enabled' => false],
+            'fragments' => [
                 'enabled' => false,
                 'path' => '/_fragment',
-            ),
-            'profiler' => array(
+            ],
+            'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
                 'only_master_requests' => false,
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
-                'matcher' => array(
+                'matcher' => [
                     'enabled' => false,
-                    'ips' => array(),
-                ),
-            ),
-            'translator' => array(
+                    'ips' => [],
+                ],
+            ],
+            'translator' => [
                 'enabled' => !class_exists(FullStack::class),
-                'fallbacks' => array('en'),
+                'fallbacks' => ['en'],
                 'logging' => true,
                 'formatter' => 'translator.formatter.default',
-                'paths' => array(),
+                'paths' => [],
                 'default_path' => '%kernel.project_dir%/translations',
-            ),
-            'validation' => array(
+            ],
+            'validation' => [
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
-                'static_method' => array('loadValidatorMetadata'),
+                'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'strict_email' => false,
-                'mapping' => array(
-                    'paths' => array(),
-                ),
-            ),
-            'annotations' => array(
+                'mapping' => [
+                    'paths' => [],
+                ],
+            ],
+            'annotations' => [
                 'cache' => 'php_array',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,
                 'enabled' => true,
-            ),
-            'serializer' => array(
+            ],
+            'serializer' => [
                 'enabled' => !class_exists(FullStack::class),
                 'enable_annotations' => !class_exists(FullStack::class),
-                'mapping' => array('paths' => array()),
-            ),
-            'property_access' => array(
+                'mapping' => ['paths' => []],
+            ],
+            'property_access' => [
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
-            ),
-            'property_info' => array(
+            ],
+            'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
-            ),
-            'router' => array(
+            ],
+            'router' => [
                 'enabled' => false,
                 'http_port' => 80,
                 'https_port' => 443,
                 'strict_requirements' => true,
-            ),
-            'session' => array(
+            ],
+            'session' => [
                 'enabled' => false,
                 'storage_id' => 'session.storage.native',
                 'handler_id' => 'session.handler.native_file',
@@ -352,57 +381,57 @@ class ConfigurationTest extends TestCase
                 'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => '0',
                 'use_strict_mode' => true,
-            ),
-            'request' => array(
+            ],
+            'request' => [
                 'enabled' => false,
-                'formats' => array(),
-            ),
-            'templating' => array(
+                'formats' => [],
+            ],
+            'templating' => [
                 'enabled' => false,
                 'hinclude_default_template' => null,
-                'form' => array(
-                    'resources' => array('FrameworkBundle:Form'),
-                ),
-                'engines' => array(),
-                'loaders' => array(),
-            ),
-            'assets' => array(
+                'form' => [
+                    'resources' => ['FrameworkBundle:Form'],
+                ],
+                'engines' => [],
+                'loaders' => [],
+            ],
+            'assets' => [
                 'enabled' => !class_exists(FullStack::class),
                 'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',
                 'base_path' => '',
-                'base_urls' => array(),
-                'packages' => array(),
+                'base_urls' => [],
+                'packages' => [],
                 'json_manifest_path' => null,
-            ),
-            'cache' => array(
-                'pools' => array(),
+            ],
+            'cache' => [
+                'pools' => [],
                 'app' => 'cache.adapter.filesystem',
                 'system' => 'cache.adapter.system',
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
                 'default_memcached_provider' => 'memcached://localhost',
-            ),
-            'workflows' => array(
+            ],
+            'workflows' => [
                 'enabled' => false,
-                'workflows' => array(),
-            ),
-            'php_errors' => array(
+                'workflows' => [],
+            ],
+            'php_errors' => [
                 'log' => true,
                 'throw' => true,
-            ),
-            'web_link' => array(
+            ],
+            'web_link' => [
                 'enabled' => !class_exists(FullStack::class),
-            ),
-            'lock' => array(
+            ],
+            'lock' => [
                 'enabled' => !class_exists(FullStack::class),
-                'resources' => array(
-                    'default' => array(
+                'resources' => [
+                    'default' => [
                         class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock',
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
     }
 }

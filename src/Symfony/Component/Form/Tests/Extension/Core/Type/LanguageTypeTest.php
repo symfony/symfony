@@ -60,6 +60,6 @@ class LanguageTypeTest extends BaseTypeTest
     {
         $type = new LanguageType();
 
-        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

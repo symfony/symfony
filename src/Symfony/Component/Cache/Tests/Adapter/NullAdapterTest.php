@@ -43,7 +43,7 @@ class NullAdapterTest extends TestCase
     {
         $adapter = $this->createCachePool();
 
-        $keys = array('foo', 'bar', 'baz', 'biz');
+        $keys = ['foo', 'bar', 'baz', 'biz'];
 
         /** @var CacheItemInterface[] $items */
         $items = $adapter->getItems($keys);
@@ -89,7 +89,7 @@ class NullAdapterTest extends TestCase
 
     public function testDeleteItems()
     {
-        $this->assertTrue($this->createCachePool()->deleteItems(array('key', 'foo', 'bar')));
+        $this->assertTrue($this->createCachePool()->deleteItems(['key', 'foo', 'bar']));
     }
 
     public function testSave()

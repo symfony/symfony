@@ -39,7 +39,7 @@ class CacheLoaderTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Storing template in cache.', array('name' => 'index'));
+            ->with('Storing template in cache.', ['name' => 'index']);
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
 
@@ -47,7 +47,7 @@ class CacheLoaderTest extends TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Fetching template from cache.', array('name' => 'index'));
+            ->with('Fetching template from cache.', ['name' => 'index']);
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
     }

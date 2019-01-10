@@ -26,7 +26,7 @@ trait AbstractTrait
     private $namespace;
     private $namespaceVersion = '';
     private $versioningIsEnabled = false;
-    private $deferred = array();
+    private $deferred = [];
 
     /**
      * @var int|null The maximum length to enforce for identifiers or null when no limit applies
@@ -93,7 +93,7 @@ trait AbstractTrait
         try {
             return $this->doHave($id);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', ['key' => $key, 'exception' => $e]);
 
             return false;
         }
@@ -104,15 +104,15 @@ trait AbstractTrait
      */
     public function clear()
     {
-        $this->deferred = array();
+        $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
             $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), ':', 5);
             try {
-                $cleared = $this->doSave(array('@'.$this->namespace => $namespaceVersion), 0);
+                $cleared = $this->doSave(['@'.$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
                 $cleared = false;
             }
-            if ($cleared = true === $cleared || array() === $cleared) {
+            if ($cleared = true === $cleared || [] === $cleared) {
                 $this->namespaceVersion = $namespaceVersion;
             }
         }
@@ -120,7 +120,7 @@ trait AbstractTrait
         try {
             return $this->doClear($this->namespace) || $cleared;
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to clear the cache', array('exception' => $e));
+            CacheItem::log($this->logger, 'Failed to clear the cache', ['exception' => $e]);
 
             return false;
         }
@@ -131,7 +131,7 @@ trait AbstractTrait
      */
     public function deleteItem($key)
     {
-        return $this->deleteItems(array($key));
+        return $this->deleteItems([$key]);
     }
 
     /**
@@ -139,7 +139,7 @@ trait AbstractTrait
      */
     public function deleteItems(array $keys)
     {
-        $ids = array();
+        $ids = [];
 
         foreach ($keys as $key) {
             $ids[$key] = $this->getId($key);
@@ -159,12 +159,12 @@ trait AbstractTrait
         foreach ($ids as $key => $id) {
             try {
                 $e = null;
-                if ($this->doDelete(array($id))) {
+                if ($this->doDelete([$id])) {
                     continue;
                 }
             } catch (\Exception $e) {
             }
-            CacheItem::log($this->logger, 'Failed to delete key "{key}"', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to delete key "{key}"', ['key' => $key, 'exception' => $e]);
             $ok = false;
         }
 
@@ -237,12 +237,12 @@ trait AbstractTrait
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->namespaceVersion = '1:';
             try {
-                foreach ($this->doFetch(array('@'.$this->namespace)) as $v) {
+                foreach ($this->doFetch(['@'.$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
                 if ('1:' === $this->namespaceVersion) {
                     $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), ':', 5);
-                    $this->doSave(array('@'.$this->namespace => $this->namespaceVersion), 0);
+                    $this->doSave(['@'.$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
             }

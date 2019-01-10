@@ -24,7 +24,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
+        $container->register('parent', 'foo')->setArguments(['moo', 'b'])->setProperty('foo', 'moo');
         $container->setDefinition('child', new ChildDefinition('parent'))
             ->replaceArgument(0, 'a')
             ->setProperty('foo', 'bar')
@@ -36,8 +36,8 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $def = $container->getDefinition('child');
         $this->assertNotInstanceOf(ChildDefinition::class, $def);
         $this->assertEquals('bar', $def->getClass());
-        $this->assertEquals(array('a', 'b'), $def->getArguments());
-        $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
+        $this->assertEquals(['a', 'b'], $def->getArguments());
+        $this->assertEquals(['foo' => 'bar'], $def->getProperties());
     }
 
     public function testProcessAppendsMethodCallsAlways()
@@ -46,21 +46,21 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container
             ->register('parent')
-            ->addMethodCall('foo', array('bar'))
+            ->addMethodCall('foo', ['bar'])
         ;
 
         $container
             ->setDefinition('child', new ChildDefinition('parent'))
-            ->addMethodCall('bar', array('foo'))
+            ->addMethodCall('bar', ['foo'])
         ;
 
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertEquals(array(
-            array('foo', array('bar')),
-            array('bar', array('foo')),
-        ), $def->getMethodCalls());
+        $this->assertEquals([
+            ['foo', ['bar']],
+            ['bar', ['foo']],
+        ], $def->getMethodCalls());
     }
 
     public function testProcessDoesNotCopyAbstract()
@@ -117,7 +117,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertEquals(array(), $def->getTags());
+        $this->assertEquals([], $def->getTags());
     }
 
     public function testProcessDoesNotCopyDecoratedService()
@@ -164,7 +164,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $container
             ->register('parent', 'foo')
-            ->setArguments(array('foo', 'bar', 'c'))
+            ->setArguments(['foo', 'bar', 'c'])
         ;
 
         $container
@@ -180,7 +180,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child2');
-        $this->assertEquals(array('a', 'b', 'c'), $def->getArguments());
+        $this->assertEquals(['a', 'b', 'c'], $def->getArguments());
         $this->assertEquals('foo', $def->getClass());
     }
 
@@ -253,10 +253,10 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $container->register('parent', 'parentClass');
         $container->register('sibling', 'siblingClass')
             ->setConfigurator(new ChildDefinition('parent'), 'foo')
-            ->setFactory(array(new ChildDefinition('parent'), 'foo'))
+            ->setFactory([new ChildDefinition('parent'), 'foo'])
             ->addArgument(new ChildDefinition('parent'))
             ->setProperty('prop', new ChildDefinition('parent'))
-            ->addMethodCall('meth', array(new ChildDefinition('parent')))
+            ->addMethodCall('meth', [new ChildDefinition('parent')])
         ;
 
         $this->process($container);
@@ -294,7 +294,7 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(array('foo', 'foo_inner', 5), $container->getDefinition('child1')->getDecoratedService());
+        $this->assertEquals(['foo', 'foo_inner', 5], $container->getDefinition('child1')->getDecoratedService());
     }
 
     public function testDecoratedServiceCopiesDeprecatedStatusFromParent()
@@ -347,10 +347,10 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
         $this->process($container);
 
         $childDef = $container->getDefinition('child');
-        $this->assertEquals(array('Foo', 'Bar'), $childDef->getAutowiringTypes());
+        $this->assertEquals(['Foo', 'Bar'], $childDef->getAutowiringTypes());
 
         $parentDef = $container->getDefinition('parent');
-        $this->assertSame(array('Foo'), $parentDef->getAutowiringTypes());
+        $this->assertSame(['Foo'], $parentDef->getAutowiringTypes());
     }
 
     public function testProcessResolvesAliases()
@@ -371,17 +371,17 @@ class ResolveDefinitionTemplatesPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent', 'ParentClass')->setArguments(array(0));
-        $container->setDefinition('child', (new ChildDefinition('parent'))->setArguments(array(
+        $container->register('parent', 'ParentClass')->setArguments([0]);
+        $container->setDefinition('child', (new ChildDefinition('parent'))->setArguments([
             1,
             'index_0' => 2,
             'foo' => 3,
-        )));
+        ]));
 
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
+        $this->assertSame([2, 1, 'foo' => 3], $def->getArguments());
     }
 
     public function testSetAutoconfiguredOnServiceIsParent()

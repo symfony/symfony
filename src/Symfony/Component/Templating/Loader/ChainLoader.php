@@ -21,12 +21,12 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class ChainLoader extends Loader
 {
-    protected $loaders = array();
+    protected $loaders = [];
 
     /**
      * @param LoaderInterface[] $loaders An array of loader instances
      */
-    public function __construct(array $loaders = array())
+    public function __construct(array $loaders = [])
     {
         foreach ($loaders as $loader) {
             $this->addLoader($loader);

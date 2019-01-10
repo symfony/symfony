@@ -21,7 +21,7 @@ class RequestStack
     /**
      * @var Request[]
      */
-    private $requests = array();
+    private $requests = [];
 
     /**
      * Pushes a Request on the stack.

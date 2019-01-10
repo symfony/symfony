@@ -34,17 +34,17 @@ class FormErrorIteratorTest extends TestCase
             null,
             new EventDispatcher(),
             $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock(),
-            array()
+            []
         );
 
         $form = $formBuilder->getForm();
 
-        $cause = new ConstraintViolation('Error 1!', null, array(), null, '', null, null, 'code1');
-        $form->addError(new FormError('Error 1!', null, array(), null, $cause));
-        $cause = new ConstraintViolation('Error 2!', null, array(), null, '', null, null, 'code1');
-        $form->addError(new FormError('Error 2!', null, array(), null, $cause));
-        $cause = new ConstraintViolation('Error 3!', null, array(), null, '', null, null, 'code2');
-        $form->addError(new FormError('Error 3!', null, array(), null, $cause));
+        $cause = new ConstraintViolation('Error 1!', null, [], null, '', null, null, 'code1');
+        $form->addError(new FormError('Error 1!', null, [], null, $cause));
+        $cause = new ConstraintViolation('Error 2!', null, [], null, '', null, null, 'code1');
+        $form->addError(new FormError('Error 2!', null, [], null, $cause));
+        $cause = new ConstraintViolation('Error 3!', null, [], null, '', null, null, 'code2');
+        $form->addError(new FormError('Error 3!', null, [], null, $cause));
         $formErrors = $form->getErrors();
 
         $specificFormErrors = $formErrors->findByCodes($code);
@@ -54,10 +54,10 @@ class FormErrorIteratorTest extends TestCase
 
     public function findByCodesProvider()
     {
-        return array(
-            array('code1', 2),
-            array(array('code1', 'code2'), 3),
-            array('code3', 0),
-        );
+        return [
+            ['code1', 2],
+            [['code1', 'code2'], 3],
+            ['code3', 0],
+        ];
     }
 }

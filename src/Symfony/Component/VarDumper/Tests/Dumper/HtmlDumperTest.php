@@ -32,13 +32,13 @@ class HtmlDumperTest extends TestCase
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
         $cloner = new VarCloner();
-        $cloner->addCasters(array(
+        $cloner->addCasters([
             ':stream' => function ($res, $a) {
                 unset($a['uri'], $a['wrapper_data']);
 
                 return $a;
             },
-        ));
+        ]);
         $data = $cloner->cloneVar($var);
 
         ob_start();

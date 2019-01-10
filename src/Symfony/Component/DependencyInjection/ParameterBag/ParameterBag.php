@@ -22,15 +22,15 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ParameterBag implements ParameterBagInterface
 {
-    protected $parameters = array();
+    protected $parameters = [];
     protected $resolved = false;
 
-    private $normalizedNames = array();
+    private $normalizedNames = [];
 
     /**
      * @param array $parameters An array of parameters
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $parameters = [])
     {
         $this->add($parameters);
     }
@@ -40,7 +40,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function clear()
     {
-        $this->parameters = array();
+        $this->parameters = [];
     }
 
     /**
@@ -70,12 +70,12 @@ class ParameterBag implements ParameterBagInterface
     {
         $name = $this->normalizeName($name);
 
-        if (!array_key_exists($name, $this->parameters)) {
+        if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
                 throw new ParameterNotFoundException($name);
             }
 
-            $alternatives = array();
+            $alternatives = [];
             foreach ($this->parameters as $key => $parameterValue) {
                 $lev = levenshtein($name, $key);
                 if ($lev <= \strlen($name) / 3 || false !== strpos($key, $name)) {
@@ -121,7 +121,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function has($name)
     {
-        return array_key_exists($this->normalizeName($name), $this->parameters);
+        return \array_key_exists($this->normalizeName($name), $this->parameters);
     }
 
     /**
@@ -143,7 +143,7 @@ class ParameterBag implements ParameterBagInterface
             return;
         }
 
-        $parameters = array();
+        $parameters = [];
         foreach ($this->parameters as $key => $value) {
             try {
                 $value = $this->resolveValue($value);
@@ -171,10 +171,10 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveValue($value, array $resolving = array())
+    public function resolveValue($value, array $resolving = [])
     {
         if (\is_array($value)) {
-            $args = array();
+            $args = [];
             foreach ($value as $k => $v) {
                 $args[\is_string($k) ? $this->resolveValue($k, $resolving) : $k] = $this->resolveValue($v, $resolving);
             }
@@ -201,7 +201,7 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveString($value, array $resolving = array())
+    public function resolveString($value, array $resolving = [])
     {
         // we do this to deal with non string values (Boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying
@@ -259,7 +259,7 @@ class ParameterBag implements ParameterBagInterface
         }
 
         if (\is_array($value)) {
-            $result = array();
+            $result = [];
             foreach ($value as $k => $v) {
                 $result[$k] = $this->escapeValue($v);
             }
@@ -280,7 +280,7 @@ class ParameterBag implements ParameterBagInterface
         }
 
         if (\is_array($value)) {
-            $result = array();
+            $result = [];
             foreach ($value as $k => $v) {
                 $result[$k] = $this->unescapeValue($v);
             }

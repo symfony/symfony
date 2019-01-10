@@ -26,16 +26,16 @@ class DebugClassLoader
 {
     private $classLoader;
     private $isFinder;
-    private $loaded = array();
+    private $loaded = [];
     private static $caseCheck;
-    private static $checkedClasses = array();
-    private static $final = array();
-    private static $finalMethods = array();
-    private static $deprecated = array();
-    private static $internal = array();
-    private static $internalMethods = array();
-    private static $php7Reserved = array('int' => 1, 'float' => 1, 'bool' => 1, 'string' => 1, 'true' => 1, 'false' => 1, 'null' => 1);
-    private static $darwinCache = array('/' => array('/', array()));
+    private static $checkedClasses = [];
+    private static $final = [];
+    private static $finalMethods = [];
+    private static $deprecated = [];
+    private static $internal = [];
+    private static $internalMethods = [];
+    private static $php7Reserved = ['int' => 1, 'float' => 1, 'bool' => 1, 'string' => 1, 'true' => 1, 'false' => 1, 'null' => 1];
+    private static $darwinCache = ['/' => ['/', []]];
 
     public function __construct(callable $classLoader)
     {
@@ -95,7 +95,7 @@ class DebugClassLoader
 
         foreach ($functions as $function) {
             if (!\is_array($function) || !$function[0] instanceof self) {
-                $function = array(new static($function), 'loadClass');
+                $function = [new static($function), 'loadClass'];
             }
 
             spl_autoload_register($function);
@@ -122,6 +122,14 @@ class DebugClassLoader
 
             spl_autoload_register($function);
         }
+    }
+
+    /**
+     * @return string|null
+     */
+    public function findFile($class)
+    {
+        return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
     }
 
     /**
@@ -212,7 +220,7 @@ class DebugClassLoader
 
     public function checkAnnotations(\ReflectionClass $refl, $class)
     {
-        $deprecations = array();
+        $deprecations = [];
 
         // Don't trigger deprecations for classes in the same vendor
         if (2 > $len = 1 + (\strpos($class, '\\') ?: \strpos($class, '_'))) {
@@ -224,9 +232,9 @@ class DebugClassLoader
 
         // Detect annotations on the class
         if (false !== $doc = $refl->getDocComment()) {
-            foreach (array('final', 'deprecated', 'internal') as $annotation) {
-                if (false !== \strpos($doc, $annotation) && preg_match('#\n \* @'.$annotation.'(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $doc, $notice)) {
-                    self::${$annotation}[$class] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+            foreach (['final', 'deprecated', 'internal'] as $annotation) {
+                if (false !== \strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
+                    self::${$annotation}[$class] = isset($notice[1]) ? preg_replace('#\.?\r?\n( \*)? *(?= |\r?\n|$)#', '', $notice[1]) : '';
                 }
             }
         }
@@ -266,10 +274,10 @@ class DebugClassLoader
         }
 
         // Inherit @final and @internal annotations for methods
-        self::$finalMethods[$class] = array();
-        self::$internalMethods[$class] = array();
+        self::$finalMethods[$class] = [];
+        self::$internalMethods[$class] = [];
         foreach ($parentAndOwnInterfaces as $use) {
-            foreach (array('finalMethods', 'internalMethods') as $property) {
+            foreach (['finalMethods', 'internalMethods'] as $property) {
                 if (isset(self::${$property}[$use])) {
                     self::${$property}[$class] = self::${$property}[$class] ? self::${$property}[$use] + self::${$property}[$class] : self::${$property}[$use];
                 }
@@ -298,10 +306,10 @@ class DebugClassLoader
                 continue;
             }
 
-            foreach (array('final', 'internal') as $annotation) {
+            foreach (['final', 'internal'] as $annotation) {
                 if (false !== \strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
-                    $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-                    self::${$annotation.'Methods'}[$class][$method->name] = array($class, $message);
+                    $message = isset($notice[1]) ? preg_replace('#\.?\r?\n( \*)? *(?= |\r?\n|$)#', '', $notice[1]) : '';
+                    self::${$annotation.'Methods'}[$class][$method->name] = [$class, $message];
                 }
             }
         }
@@ -339,7 +347,7 @@ class DebugClassLoader
         if (0 === substr_compare($real, $tail, -$tailLen, $tailLen, true)
             && 0 !== substr_compare($real, $tail, -$tailLen, $tailLen, false)
         ) {
-            return array(substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1));
+            return [substr($tail, -$tailLen + 1), substr($real, -$tailLen + 1), substr($real, 0, -$tailLen + 1)];
         }
     }
 
@@ -369,7 +377,7 @@ class DebugClassLoader
                 $k = $kDir;
                 $i = \strlen($dir) - 1;
                 while (!isset(self::$darwinCache[$k])) {
-                    self::$darwinCache[$k] = array($dir, array());
+                    self::$darwinCache[$k] = [$dir, []];
                     self::$darwinCache[$dir] = &self::$darwinCache[$k];
 
                     while ('/' !== $dir[--$i]) {
@@ -381,6 +389,11 @@ class DebugClassLoader
         }
 
         $dirFiles = self::$darwinCache[$kDir][1];
+
+        if (!isset($dirFiles[$file]) && ') : eval()\'d code' === substr($file, -17)) {
+            // Get the file name from "file_name.php(123) : eval()'d code"
+            $file = substr($file, 0, strrpos($file, '(', -17));
+        }
 
         if (isset($dirFiles[$file])) {
             return $real .= $dirFiles[$file];

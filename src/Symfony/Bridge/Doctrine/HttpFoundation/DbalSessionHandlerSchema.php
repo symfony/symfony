@@ -44,6 +44,6 @@ final class DbalSessionHandlerSchema extends Schema
         $table->addColumn('sess_id', 'string');
         $table->addColumn('sess_data', 'text')->setNotNull(true);
         $table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);
-        $table->setPrimaryKey(array('sess_id'));
+        $table->setPrimaryKey(['sess_id']);
     }
 }

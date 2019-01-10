@@ -36,7 +36,7 @@ class PreAuthenticationGuardToken extends AbstractToken implements GuardTokenInt
         $this->credentials = $credentials;
         $this->guardProviderKey = $guardProviderKey;
 
-        parent::__construct(array());
+        parent::__construct([]);
 
         // never authenticated
         parent::setAuthenticated(false);

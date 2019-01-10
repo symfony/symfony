@@ -77,7 +77,7 @@ class ContainerControllerResolver extends ControllerResolver
 
         $service = $this->container->get($controller);
         if (null !== $method) {
-            return array($service, $method);
+            return [$service, $method];
         }
 
         if (!method_exists($service, '__invoke')) {

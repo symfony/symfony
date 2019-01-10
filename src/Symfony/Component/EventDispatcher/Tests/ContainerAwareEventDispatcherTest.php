@@ -44,7 +44,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent']);
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -100,8 +100,8 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 5);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'), 10);
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent'], 5);
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent'], 10);
 
         $dispatcher->dispatch('onEvent', $event);
     }
@@ -116,7 +116,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent']);
 
         $service
             ->expects($this->once())
@@ -139,7 +139,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent']);
 
         $listeners = $dispatcher->getListeners();
 
@@ -156,10 +156,10 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent']);
 
         $dispatcher->dispatch('onEvent', new Event());
-        $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
+        $dispatcher->removeListener('onEvent', [$container->get('service.listener'), 'onEvent']);
         $this->assertFalse($dispatcher->hasListeners('onEvent'));
     }
 
@@ -171,9 +171,9 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
         $container->set('service.listener', $service);
 
         $dispatcher = new ContainerAwareEventDispatcher($container);
-        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', ['service.listener', 'onEvent']);
 
-        $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
+        $dispatcher->removeListener('onEvent', [$container->get('service.listener'), 'onEvent']);
         $this->assertFalse($dispatcher->hasListeners('onEvent'));
     }
 }
@@ -189,11 +189,11 @@ class SubscriberService implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'onEvent' => 'onEvent',
-            'onEventWithPriority' => array('onEventWithPriority', 10),
-            'onEventNested' => array(array('onEventNested')),
-        );
+            'onEventWithPriority' => ['onEventWithPriority', 10],
+            'onEventNested' => [['onEventNested']],
+        ];
     }
 
     public function onEvent(Event $e)

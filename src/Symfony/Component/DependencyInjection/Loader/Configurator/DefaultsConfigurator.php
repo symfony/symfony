@@ -37,7 +37,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
      *
      * @throws InvalidArgumentException when an invalid tag name or attribute is provided
      */
-    final public function tag($name, array $attributes = array())
+    final public function tag($name, array $attributes = [])
     {
         if (!\is_string($name) || '' === $name) {
             throw new InvalidArgumentException('The tag name in "_defaults" must be a non-empty string.');

@@ -255,17 +255,17 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     private function resetGlobals()
     {
-        return array(
+        return [
             'path' => '',
-            'requirements' => array(),
-            'options' => array(),
-            'defaults' => array(),
-            'schemes' => array(),
-            'methods' => array(),
+            'requirements' => [],
+            'options' => [],
+            'defaults' => [],
+            'schemes' => [],
+            'methods' => [],
             'host' => '',
             'condition' => '',
             'name' => '',
-        );
+        ];
     }
 
     protected function createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition)

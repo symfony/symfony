@@ -24,9 +24,9 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
 {
     private $messageKey;
 
-    private $messageData = array();
+    private $messageData = [];
 
-    public function __construct($message = '', array $messageData = array(), $code = 0, \Exception $previous = null)
+    public function __construct($message = '', array $messageData = [], $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
 
@@ -39,7 +39,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      * @param string $messageKey  The message or message key
      * @param array  $messageData Data to be passed into the translator
      */
-    public function setSafeMessage($messageKey, array $messageData = array())
+    public function setSafeMessage($messageKey, array $messageData = [])
     {
         $this->messageKey = $messageKey;
         $this->messageData = $messageData;
@@ -60,11 +60,9 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      */
     public function serialize()
     {
-        return serialize(array(
-            parent::serialize(),
-            $this->messageKey,
-            $this->messageData,
-        ));
+        $serialized = [parent::serialize(true), $this->messageKey, $this->messageData];
+
+        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
     }
 
     /**
@@ -72,7 +70,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      */
     public function unserialize($str)
     {
-        list($parentData, $this->messageKey, $this->messageData) = unserialize($str);
+        list($parentData, $this->messageKey, $this->messageData) = \is_array($str) ? $str : unserialize($str);
 
         parent::unserialize($parentData);
     }

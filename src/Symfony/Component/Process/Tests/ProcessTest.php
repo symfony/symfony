@@ -115,7 +115,7 @@ class ProcessTest extends TestCase
      */
     public function testStopWithTimeoutIsActuallyWorking()
     {
-        $p = $this->getProcess(array(self::$phpBin, __DIR__.'/NonStopableProcess.php', 30));
+        $p = $this->getProcess([self::$phpBin, __DIR__.'/NonStopableProcess.php', 30]);
         $p->start();
 
         while (false === strpos($p->getOutput(), 'received')) {
@@ -276,10 +276,10 @@ class ProcessTest extends TestCase
 
     public function provideInvalidInputValues()
     {
-        return array(
-            array(array()),
-            array(new NonStringifiable()),
-        );
+        return [
+            [[]],
+            [new NonStringifiable()],
+        ];
     }
 
     /**
@@ -294,25 +294,25 @@ class ProcessTest extends TestCase
 
     public function provideInputValues()
     {
-        return array(
-            array(null, null),
-            array('24.5', 24.5),
-            array('input data', 'input data'),
-        );
+        return [
+            [null, null],
+            ['24.5', 24.5],
+            ['input data', 'input data'],
+        ];
     }
 
     public function chainedCommandsOutputProvider()
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            return array(
-                array("2 \r\n2\r\n", '&&', '2'),
-            );
+            return [
+                ["2 \r\n2\r\n", '&&', '2'],
+            ];
         }
 
-        return array(
-            array("1\n1\n", ';', '1'),
-            array("2\n2\n", '&&', '2'),
-        );
+        return [
+            ["1\n1\n", ';', '1'],
+            ["2\n2\n", '&&', '2'],
+        ];
     }
 
     /**
@@ -381,7 +381,7 @@ class ProcessTest extends TestCase
 
         $p->start();
 
-        foreach (array('foo', 'bar') as $s) {
+        foreach (['foo', 'bar'] as $s) {
             while (false === strpos($p->$getOutput(), $s)) {
                 usleep(1000);
             }
@@ -397,10 +397,10 @@ class ProcessTest extends TestCase
 
     public function provideIncrementalOutput()
     {
-        return array(
-            array('getOutput', 'getIncrementalOutput', 'php://stdout'),
-            array('getErrorOutput', 'getIncrementalErrorOutput', 'php://stderr'),
-        );
+        return [
+            ['getOutput', 'getIncrementalOutput', 'php://stdout'],
+            ['getErrorOutput', 'getIncrementalErrorOutput', 'php://stderr'],
+        ];
     }
 
     public function testGetOutput()
@@ -907,7 +907,7 @@ class ProcessTest extends TestCase
      */
     public function testSignal()
     {
-        $process = $this->getProcess(array(self::$phpBin, __DIR__.'/SignalListener.php'));
+        $process = $this->getProcess([self::$phpBin, __DIR__.'/SignalListener.php']);
         $process->start();
 
         while (false === strpos($process->getOutput(), 'Caught')) {
@@ -969,13 +969,13 @@ class ProcessTest extends TestCase
 
     public function provideMethodsThatNeedARunningProcess()
     {
-        return array(
-            array('getOutput'),
-            array('getIncrementalOutput'),
-            array('getErrorOutput'),
-            array('getIncrementalErrorOutput'),
-            array('wait'),
-        );
+        return [
+            ['getOutput'],
+            ['getIncrementalOutput'],
+            ['getErrorOutput'],
+            ['getIncrementalErrorOutput'],
+            ['wait'],
+        ];
     }
 
     /**
@@ -1000,12 +1000,12 @@ class ProcessTest extends TestCase
 
     public function provideMethodsThatNeedATerminatedProcess()
     {
-        return array(
-            array('hasBeenSignaled'),
-            array('getTermSignal'),
-            array('hasBeenStopped'),
-            array('getStopSignal'),
-        );
+        return [
+            ['hasBeenSignaled'],
+            ['getTermSignal'],
+            ['hasBeenStopped'],
+            ['getStopSignal'],
+        ];
     }
 
     /**
@@ -1032,10 +1032,10 @@ class ProcessTest extends TestCase
 
     public function provideWrongSignal()
     {
-        return array(
-            array(-4),
-            array('Céphalopodes'),
-        );
+        return [
+            [-4],
+            ['Céphalopodes'],
+        ];
     }
 
     public function testDisableOutputDisablesTheOutput()
@@ -1125,12 +1125,12 @@ class ProcessTest extends TestCase
 
     public function provideOutputFetchingMethods()
     {
-        return array(
-            array('getOutput'),
-            array('getIncrementalOutput'),
-            array('getErrorOutput'),
-            array('getIncrementalErrorOutput'),
-        );
+        return [
+            ['getOutput'],
+            ['getIncrementalOutput'],
+            ['getErrorOutput'],
+            ['getIncrementalErrorOutput'],
+        ];
     }
 
     public function testStopTerminatesProcessCleanly()
@@ -1162,32 +1162,32 @@ class ProcessTest extends TestCase
 
     public function responsesCodeProvider()
     {
-        return array(
+        return [
             //expected output / getter / code to execute
-            //array(1,'getExitCode','exit(1);'),
-            //array(true,'isSuccessful','exit();'),
-            array('output', 'getOutput', 'echo \'output\';'),
-        );
+            //[1,'getExitCode','exit(1);'],
+            //[true,'isSuccessful','exit();'],
+            ['output', 'getOutput', 'echo \'output\';'],
+        ];
     }
 
     public function pipesCodeProvider()
     {
-        $variations = array(
+        $variations = [
             'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
             'include \''.__DIR__.'/PipeStdinInStdoutStdErrStreamSelect.php\';',
-        );
+        ];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             // Avoid XL buffers on Windows because of https://bugs.php.net/bug.php?id=65650
-            $sizes = array(1, 2, 4, 8);
+            $sizes = [1, 2, 4, 8];
         } else {
-            $sizes = array(1, 16, 64, 1024, 4096);
+            $sizes = [1, 16, 64, 1024, 4096];
         }
 
-        $codes = array();
+        $codes = [];
         foreach ($sizes as $size) {
             foreach ($variations as $code) {
-                $codes[] = array($code, $size);
+                $codes[] = [$code, $size];
             }
         }
 
@@ -1215,10 +1215,10 @@ class ProcessTest extends TestCase
 
     public function provideVariousIncrementals()
     {
-        return array(
-            array('php://stdout', 'getIncrementalOutput'),
-            array('php://stderr', 'getIncrementalErrorOutput'),
-        );
+        return [
+            ['php://stdout', 'getIncrementalOutput'],
+            ['php://stderr', 'getIncrementalErrorOutput'],
+        ];
     }
 
     public function testIteratorInput()
@@ -1323,32 +1323,32 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('fwrite(STDOUT, 123); fwrite(STDERR, 234); flush(); usleep(10000); fwrite(STDOUT, fread(STDIN, 3)); fwrite(STDERR, 456);');
         $process->setInput($input);
         $process->start();
-        $output = array();
+        $output = [];
 
         foreach ($process as $type => $data) {
-            $output[] = array($type, $data);
+            $output[] = [$type, $data];
             break;
         }
-        $expectedOutput = array(
-            array($process::OUT, '123'),
-        );
+        $expectedOutput = [
+            [$process::OUT, '123'],
+        ];
         $this->assertSame($expectedOutput, $output);
 
         $input->write(345);
 
         foreach ($process as $type => $data) {
-            $output[] = array($type, $data);
+            $output[] = [$type, $data];
         }
 
         $this->assertSame('', $process->getOutput());
         $this->assertFalse($process->isRunning());
 
-        $expectedOutput = array(
-            array($process::OUT, '123'),
-            array($process::ERR, '234'),
-            array($process::OUT, '345'),
-            array($process::ERR, '456'),
-        );
+        $expectedOutput = [
+            [$process::OUT, '123'],
+            [$process::ERR, '234'],
+            [$process::OUT, '345'],
+            [$process::ERR, '456'],
+        ];
         $this->assertSame($expectedOutput, $output);
     }
 
@@ -1359,32 +1359,32 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('fwrite(STDOUT, fread(STDIN, 3));');
         $process->setInput($input);
         $process->start();
-        $output = array();
+        $output = [];
 
         foreach ($process->getIterator($process::ITER_NON_BLOCKING | $process::ITER_KEEP_OUTPUT) as $type => $data) {
-            $output[] = array($type, $data);
+            $output[] = [$type, $data];
             break;
         }
-        $expectedOutput = array(
-            array($process::OUT, ''),
-        );
+        $expectedOutput = [
+            [$process::OUT, ''],
+        ];
         $this->assertSame($expectedOutput, $output);
 
         $input->write(123);
 
         foreach ($process->getIterator($process::ITER_NON_BLOCKING | $process::ITER_KEEP_OUTPUT) as $type => $data) {
             if ('' !== $data) {
-                $output[] = array($type, $data);
+                $output[] = [$type, $data];
             }
         }
 
         $this->assertSame('123', $process->getOutput());
         $this->assertFalse($process->isRunning());
 
-        $expectedOutput = array(
-            array($process::OUT, ''),
-            array($process::OUT, '123'),
-        );
+        $expectedOutput = [
+            [$process::OUT, ''],
+            [$process::OUT, '123'],
+        ];
         $this->assertSame($expectedOutput, $output);
     }
 
@@ -1406,7 +1406,7 @@ class ProcessTest extends TestCase
     public function testSetBadEnv()
     {
         $process = $this->getProcess('echo hello');
-        $process->setEnv(array('bad%%' => '123'));
+        $process->setEnv(['bad%%' => '123']);
         $process->inheritEnvironmentVariables(true);
 
         $process->run();
@@ -1420,7 +1420,7 @@ class ProcessTest extends TestCase
         putenv('existing_var=foo');
         $_ENV['existing_var'] = 'foo';
         $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
-        $process->setEnv(array('existing_var' => 'bar', 'new_test_var' => 'foo'));
+        $process->setEnv(['existing_var' => 'bar', 'new_test_var' => 'foo']);
         $process->inheritEnvironmentVariables();
 
         $process->run();
@@ -1435,14 +1435,14 @@ class ProcessTest extends TestCase
 
     public function testEnvIsInherited()
     {
-        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ', 'EMPTY' => ''));
+        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, ['BAR' => 'BAZ', 'EMPTY' => '']);
 
         putenv('FOO=BAR');
         $_ENV['FOO'] = 'BAR';
 
         $process->run();
 
-        $expected = array('BAR' => 'BAZ', 'EMPTY' => '', 'FOO' => 'BAR');
+        $expected = ['BAR' => 'BAZ', 'EMPTY' => '', 'FOO' => 'BAR'];
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
 
         $this->assertEquals($expected, $env);
@@ -1456,7 +1456,7 @@ class ProcessTest extends TestCase
      */
     public function testInheritEnvDisabled()
     {
-        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ'));
+        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, ['BAR' => 'BAZ']);
 
         putenv('FOO=BAR');
         $_ENV['FOO'] = 'BAR';
@@ -1466,7 +1466,7 @@ class ProcessTest extends TestCase
 
         $process->run();
 
-        $expected = array('BAR' => 'BAZ', 'FOO' => 'BAR');
+        $expected = ['BAR' => 'BAZ', 'FOO' => 'BAR'];
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
         unset($expected['FOO']);
 
@@ -1478,7 +1478,7 @@ class ProcessTest extends TestCase
 
     public function testGetCommandLine()
     {
-        $p = new Process(array('/usr/bin/php'));
+        $p = new Process(['/usr/bin/php']);
 
         $expected = '\\' === \DIRECTORY_SEPARATOR ? '"/usr/bin/php"' : "'/usr/bin/php'";
         $this->assertSame($expected, $p->getCommandLine());
@@ -1489,7 +1489,7 @@ class ProcessTest extends TestCase
      */
     public function testEscapeArgument($arg)
     {
-        $p = new Process(array(self::$phpBin, '-r', 'echo $argv[1];', $arg));
+        $p = new Process([self::$phpBin, '-r', 'echo $argv[1];', $arg]);
         $p->run();
 
         $this->assertSame((string) $arg, $p->getOutput());
@@ -1501,7 +1501,7 @@ class ProcessTest extends TestCase
      */
     public function testEscapeArgumentWhenInheritEnvDisabled($arg)
     {
-        $p = new Process(array(self::$phpBin, '-r', 'echo $argv[1];', $arg), null, array('BAR' => 'BAZ'));
+        $p = new Process([self::$phpBin, '-r', 'echo $argv[1];', $arg], null, ['BAR' => 'BAZ']);
         $p->inheritEnvironmentVariables(false);
         $p->run();
 
@@ -1528,24 +1528,24 @@ EOTXT;
 
     public function provideEscapeArgument()
     {
-        yield array('a"b%c%');
-        yield array('a"b^c^');
-        yield array("a\nb'c");
-        yield array('a^b c!');
-        yield array("a!b\tc");
-        yield array('a\\\\"\\"');
-        yield array('éÉèÈàÀöä');
-        yield array(null);
-        yield array(1);
-        yield array(1.1);
+        yield ['a"b%c%'];
+        yield ['a"b^c^'];
+        yield ["a\nb'c"];
+        yield ['a^b c!'];
+        yield ["a!b\tc"];
+        yield ['a\\\\"\\"'];
+        yield ['éÉèÈàÀöä'];
+        yield [null];
+        yield [1];
+        yield [1.1];
     }
 
     public function testEnvArgument()
     {
-        $env = array('FOO' => 'Foo', 'BAR' => 'Bar');
+        $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];
         $cmd = '\\' === \DIRECTORY_SEPARATOR ? 'echo !FOO! !BAR! !BAZ!' : 'echo $FOO $BAR $BAZ';
         $p = new Process($cmd, null, $env);
-        $p->run(null, array('BAR' => 'baR', 'BAZ' => 'baZ'));
+        $p->run(null, ['BAR' => 'baR', 'BAZ' => 'baZ']);
 
         $this->assertSame('Foo baR baZ', rtrim($p->getOutput()));
         $this->assertSame($env, $p->getEnv());
@@ -1593,7 +1593,7 @@ EOTXT;
      */
     private function getProcessForCode($code, $cwd = null, array $env = null, $input = null, $timeout = 60)
     {
-        return $this->getProcess(array(self::$phpBin, '-r', $code), $cwd, $env, $input, $timeout);
+        return $this->getProcess([self::$phpBin, '-r', $code], $cwd, $env, $input, $timeout);
     }
 
     private function skipIfNotEnhancedSigchild($expectException = true)

@@ -48,7 +48,7 @@ class ExtendedChoiceTypeTest extends TestCase
             ->getFormFactory()
         ;
 
-        $choices = $factory->create($type, null, array('choice_loader' => null))->createView()->vars['choices'];
+        $choices = $factory->create($type, null, ['choice_loader' => null])->createView()->vars['choices'];
 
         $this->assertCount(2, $choices);
         $this->assertSame('A', $choices[0]->label);
@@ -78,10 +78,10 @@ class ExtendedChoiceTypeTest extends TestCase
 
     public function provideTestedTypes()
     {
-        yield array(CountryTypeTest::TESTED_TYPE);
-        yield array(CurrencyTypeTest::TESTED_TYPE);
-        yield array(LanguageTypeTest::TESTED_TYPE);
-        yield array(LocaleTypeTest::TESTED_TYPE);
-        yield array(TimezoneTypeTest::TESTED_TYPE);
+        yield [CountryTypeTest::TESTED_TYPE];
+        yield [CurrencyTypeTest::TESTED_TYPE];
+        yield [LanguageTypeTest::TESTED_TYPE];
+        yield [LocaleTypeTest::TESTED_TYPE];
+        yield [TimezoneTypeTest::TESTED_TYPE];
     }
 }

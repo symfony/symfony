@@ -18,7 +18,7 @@ namespace Symfony\Component\BrowserKit;
  */
 class CookieJar
 {
-    protected $cookieJar = array();
+    protected $cookieJar = [];
 
     public function set(Cookie $cookie)
     {
@@ -84,7 +84,7 @@ class CookieJar
             // this should never happen but it allows for a better BC
             $domains = array_keys($this->cookieJar);
         } else {
-            $domains = array($domain);
+            $domains = [$domain];
         }
 
         foreach ($domains as $domain) {
@@ -105,7 +105,7 @@ class CookieJar
      */
     public function clear()
     {
-        $this->cookieJar = array();
+        $this->cookieJar = [];
     }
 
     /**
@@ -116,7 +116,7 @@ class CookieJar
      */
     public function updateFromSetCookie(array $setCookies, $uri = null)
     {
-        $cookies = array();
+        $cookies = [];
 
         foreach ($setCookies as $cookie) {
             foreach (explode(',', $cookie) as $i => $part) {
@@ -157,7 +157,7 @@ class CookieJar
     {
         $this->flushExpiredCookies();
 
-        $flattenedCookies = array();
+        $flattenedCookies = [];
         foreach ($this->cookieJar as $path) {
             foreach ($path as $cookies) {
                 foreach ($cookies as $cookie) {
@@ -181,8 +181,8 @@ class CookieJar
     {
         $this->flushExpiredCookies();
 
-        $parts = array_replace(array('path' => '/'), parse_url($uri));
-        $cookies = array();
+        $parts = array_replace(['path' => '/'], parse_url($uri));
+        $cookies = [];
         foreach ($this->cookieJar as $domain => $pathCookies) {
             if ($domain) {
                 $domain = '.'.ltrim($domain, '.');

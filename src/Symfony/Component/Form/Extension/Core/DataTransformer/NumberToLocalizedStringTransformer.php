@@ -78,6 +78,11 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     private $scale;
 
+    /**
+     * @param int|null  $scale
+     * @param bool|null $grouping
+     * @param int|null  $roundingMode
+     */
     public function __construct($scale = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
         if (null === $grouping) {
@@ -121,7 +126,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         // Convert non-breaking and narrow non-breaking spaces to normal ones
-        $value = str_replace(array("\xc2\xa0", "\xe2\x80\xaf"), ' ', $value);
+        $value = str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
 
         return $value;
     }
@@ -146,7 +151,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return;
         }
 
-        if (\in_array($value, array('NaN', 'NAN', 'nan'), true)) {
+        if (\in_array($value, ['NaN', 'NAN', 'nan'], true)) {
             throw new TransformationFailedException('"NaN" is not a valid number');
         }
 
@@ -181,9 +186,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('I don\'t have a clear idea what infinity looks like');
         }
 
-        if (\is_int($result) && $result === (int) $float = (float) $result) {
-            $result = $float;
-        }
+        $result = $this->castParsedValue($result);
 
         if (false !== $encoding = mb_detect_encoding($value, null, true)) {
             $length = mb_strlen($value, $encoding);
@@ -226,6 +229,18 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
 
         return $formatter;
+    }
+
+    /**
+     * @internal
+     */
+    protected function castParsedValue($value)
+    {
+        if (\is_int($value) && $value === (int) $float = (float) $value) {
+            return $float;
+        }
+
+        return $value;
     }
 
     /**

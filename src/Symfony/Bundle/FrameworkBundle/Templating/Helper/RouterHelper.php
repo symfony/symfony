@@ -39,7 +39,7 @@ class RouterHelper extends Helper
      *
      * @see UrlGeneratorInterface
      */
-    public function path($name, $parameters = array(), $relative = false)
+    public function path($name, $parameters = [], $relative = false)
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
@@ -55,7 +55,7 @@ class RouterHelper extends Helper
      *
      * @see UrlGeneratorInterface
      */
-    public function url($name, $parameters = array(), $schemeRelative = false)
+    public function url($name, $parameters = [], $schemeRelative = false)
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }

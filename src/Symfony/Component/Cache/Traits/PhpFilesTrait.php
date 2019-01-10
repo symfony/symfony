@@ -67,7 +67,7 @@ trait PhpFilesTrait
      */
     protected function doFetch(array $ids)
     {
-        $values = array();
+        $values = [];
         $now = time();
 
         if ($this->zendDetectUnicode) {
@@ -109,7 +109,7 @@ trait PhpFilesTrait
      */
     protected function doHave($id)
     {
-        return (bool) $this->doFetch(array($id));
+        return (bool) $this->doFetch([$id]);
     }
 
     /**
@@ -118,7 +118,7 @@ trait PhpFilesTrait
     protected function doSave(array $values, $lifetime)
     {
         $ok = true;
-        $data = array($lifetime ? time() + $lifetime : PHP_INT_MAX, '');
+        $data = [$lifetime ? time() + $lifetime : PHP_INT_MAX, ''];
         $allowCompile = 'cli' !== \PHP_SAPI || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN);
 
         foreach ($values as $key => $value) {

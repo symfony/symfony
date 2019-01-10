@@ -26,9 +26,9 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *         ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
  *         ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
  *         ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
- *         ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
- *             'choices' => array('Red' => 'r', 'Blue' => 'b'),
- *         ))
+ *         ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
+ *             'choices' => ['Red' => 'r', 'Blue' => 'b'],
+ *         ])
  *         ->getForm();
  *
  * You can also add custom extensions to the form factory:
@@ -68,9 +68,9 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *     use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
  *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new TemplatingExtension($engine, null, array(
+ *         ->addExtension(new TemplatingExtension($engine, null, [
  *             'FrameworkBundle:Form',
- *         )))
+ *         ]))
  *         ->getFormFactory();
  *
  * The next example shows how to include the "<table>" layout:
@@ -78,10 +78,10 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *     use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
  *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new TemplatingExtension($engine, null, array(
+ *         ->addExtension(new TemplatingExtension($engine, null, [
  *             'FrameworkBundle:Form',
  *             'FrameworkBundle:FormTable',
- *         )))
+ *         ]))
  *         ->getFormFactory();
  *
  * @author Bernhard Schussek <bschussek@gmail.com>

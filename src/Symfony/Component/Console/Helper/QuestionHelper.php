@@ -166,7 +166,7 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted.');
                 }
                 $ret = trim($ret);
             }
@@ -191,7 +191,7 @@ class QuestionHelper extends Helper
         $message = $question->getQuestion();
 
         if ($question instanceof ChoiceQuestion) {
-            $maxWidth = max(array_map(array($this, 'strlen'), array_keys($question->getChoices())));
+            $maxWidth = max(array_map([$this, 'strlen'], array_keys($question->getChoices())));
 
             $messages = (array) $question->getQuestion();
             foreach ($question->getChoices() as $key => $value) {
@@ -252,8 +252,10 @@ class QuestionHelper extends Helper
         while (!feof($inputStream)) {
             $c = fread($inputStream, 1);
 
-            // Backspace Character
-            if ("\177" === $c) {
+            // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
+            if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
+                throw new RuntimeException('Aborted.');
+            } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
                     // Move cursor backwards
@@ -306,6 +308,10 @@ class QuestionHelper extends Helper
 
                 continue;
             } else {
+                if ("\x80" <= $c) {
+                    $c .= fread($inputStream, ["\xC0" => 1, "\xD0" => 1, "\xE0" => 2, "\xF0" => 3][$c & "\xF0"]);
+                }
+
                 $output->write($c);
                 $ret .= $c;
                 ++$i;
@@ -380,7 +386,7 @@ class QuestionHelper extends Helper
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new RuntimeException('Aborted');
+                throw new RuntimeException('Aborted.');
             }
 
             $value = trim($value);
@@ -448,7 +454,7 @@ class QuestionHelper extends Helper
         if (file_exists('/usr/bin/env')) {
             // handle other OSs with bash/zsh/ksh/csh if available to hide the answer
             $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
-            foreach (array('bash', 'zsh', 'ksh', 'csh') as $sh) {
+            foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
                 if ('OK' === rtrim(shell_exec(sprintf($test, $sh)))) {
                     self::$shell = $sh;
                     break;

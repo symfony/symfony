@@ -35,7 +35,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     public function transform($array)
     {
         if (null === $array) {
-            return array();
+            return [];
         }
 
         if (!\is_array($array)) {
@@ -55,7 +55,7 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     public function reverseTransform($array)
     {
         if (null === $array) {
-            return array();
+            return [];
         }
 
         if (!\is_array($array)) {

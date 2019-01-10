@@ -65,10 +65,10 @@ class TwigExtension extends Extension
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {
                     if (\is_array($value) && isset($value['key'])) {
-                        $configs[$key]['globals'][$name] = array(
+                        $configs[$key]['globals'][$name] = [
                             'key' => $name,
                             'value' => $value,
-                        );
+                        ];
                     }
                 }
             }
@@ -96,9 +96,9 @@ class TwigExtension extends Extension
         // register user-configured paths
         foreach ($config['paths'] as $path => $namespace) {
             if (!$namespace) {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path]);
             } else {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
             }
         }
 
@@ -113,29 +113,29 @@ class TwigExtension extends Extension
 
             foreach ($bundle['children'] as $child) {
                 foreach ($bundleHierarchy[$child]['paths'] as $path) {
-                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
                 }
             }
 
             foreach ($bundle['paths'] as $path) {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
             }
 
             // add exclusive namespace for root bundles only
             // to override a bundle template that also extends itself
             if (\count($bundle['paths']) > 0 && 0 === \count($bundle['parents'])) {
                 // the last path must be the bundle views directory
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array(end($bundle['paths']), '!'.$namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [end($bundle['paths']), '!'.$namespace]);
             }
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
         }
         $container->addResource(new FileExistenceResource($dir));
 
         if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']))) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
         }
         $container->addResource(new FileExistenceResource($dir));
 
@@ -143,9 +143,9 @@ class TwigExtension extends Extension
             $def = $container->getDefinition('twig');
             foreach ($config['globals'] as $key => $global) {
                 if (isset($global['type']) && 'service' === $global['type']) {
-                    $def->addMethodCall('addGlobal', array($key, new Reference($global['id'])));
+                    $def->addMethodCall('addGlobal', [$key, new Reference($global['id'])]);
                 } else {
-                    $def->addMethodCall('addGlobal', array($key, $global['value']));
+                    $def->addMethodCall('addGlobal', [$key, $global['value']]);
                 }
             }
         }
@@ -157,7 +157,7 @@ class TwigExtension extends Extension
         );
 
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
-            $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
+            $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
         }
         unset($config['autoescape_service'], $config['autoescape_service_method']);
 
@@ -175,7 +175,7 @@ class TwigExtension extends Extension
         }
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Twig_Environment',
                 'Twig_Extension',
                 'Twig_Extension_Core',
@@ -184,21 +184,21 @@ class TwigExtension extends Extension
                 'Twig_LoaderInterface',
                 'Twig_Markup',
                 'Twig_Template',
-            ));
+            ]);
         }
     }
 
     private function getBundleHierarchy(ContainerBuilder $container, array $config)
     {
-        $bundleHierarchy = array();
+        $bundleHierarchy = [];
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if (!array_key_exists($name, $bundleHierarchy)) {
-                $bundleHierarchy[$name] = array(
-                    'paths' => array(),
-                    'parents' => array(),
-                    'children' => array(),
-                );
+            if (!\array_key_exists($name, $bundleHierarchy)) {
+                $bundleHierarchy[$name] = [
+                    'paths' => [],
+                    'parents' => [],
+                    'children' => [],
+                ];
             }
 
             if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
@@ -222,19 +222,19 @@ class TwigExtension extends Extension
 
             $bundleHierarchy[$name]['parents'][] = $bundle['parent'];
 
-            if (!array_key_exists($bundle['parent'], $bundleHierarchy)) {
-                $bundleHierarchy[$bundle['parent']] = array(
-                    'paths' => array(),
-                    'parents' => array(),
-                    'children' => array(),
-                );
+            if (!\array_key_exists($bundle['parent'], $bundleHierarchy)) {
+                $bundleHierarchy[$bundle['parent']] = [
+                    'paths' => [],
+                    'parents' => [],
+                    'children' => [],
+                ];
             }
 
-            $bundleHierarchy[$bundle['parent']]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$bundle['parent']]['children']);
+            $bundleHierarchy[$bundle['parent']]['children'] = array_merge($bundleHierarchy[$name]['children'], [$name], $bundleHierarchy[$bundle['parent']]['children']);
 
             foreach ($bundleHierarchy[$bundle['parent']]['parents'] as $parent) {
                 $bundleHierarchy[$name]['parents'][] = $parent;
-                $bundleHierarchy[$parent]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$parent]['children']);
+                $bundleHierarchy[$parent]['children'] = array_merge($bundleHierarchy[$name]['children'], [$name], $bundleHierarchy[$parent]['children']);
             }
 
             foreach ($bundleHierarchy[$name]['children'] as $child) {

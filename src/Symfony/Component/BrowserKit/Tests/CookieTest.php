@@ -41,16 +41,16 @@ class CookieTest extends TestCase
 
     public function getTestsForToFromString()
     {
-        return array(
-            array('foo=bar; path=/'),
-            array('foo=bar; path=/foo'),
-            array('foo=bar; domain=google.com; path=/'),
-            array('foo=bar; domain=example.com; path=/; secure', 'https://example.com/'),
-            array('foo=bar; path=/; httponly'),
-            array('foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'),
-            array('foo=bar=baz; path=/'),
-            array('foo=bar%3Dbaz; path=/'),
-        );
+        return [
+            ['foo=bar; path=/'],
+            ['foo=bar; path=/foo'],
+            ['foo=bar; domain=google.com; path=/'],
+            ['foo=bar; domain=example.com; path=/; secure', 'https://example.com/'],
+            ['foo=bar; path=/; httponly'],
+            ['foo=bar; domain=google.com; path=/foo; secure; httponly', 'https://google.com/'],
+            ['foo=bar=baz; path=/'],
+            ['foo=bar%3Dbaz; path=/'],
+        ];
     }
 
     public function testFromStringIgnoreSecureFlag()
@@ -69,16 +69,16 @@ class CookieTest extends TestCase
 
     public function getExpireCookieStrings()
     {
-        return array(
-            array('foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31-07-2020 08:49:37 GMT'),
-            array('foo=bar; expires=Fri, 31-07-20 08:49:37 GMT'),
-            array('foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'),
-            array('foo=bar; expires=Fri Jul 31 08:49:37 2020'),
-            array('foo=bar; expires=\'Fri Jul 31 08:49:37 2020\''),
-            array('foo=bar; expires=Friday July 31st 2020, 08:49:37 GMT'),
-        );
+        return [
+            ['foo=bar; expires=Fri, 31-Jul-2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31 Jul 2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31-07-2020 08:49:37 GMT'],
+            ['foo=bar; expires=Fri, 31-07-20 08:49:37 GMT'],
+            ['foo=bar; expires=Friday, 31-Jul-20 08:49:37 GMT'],
+            ['foo=bar; expires=Fri Jul 31 08:49:37 2020'],
+            ['foo=bar; expires=\'Fri Jul 31 08:49:37 2020\''],
+            ['foo=bar; expires=Friday July 31st 2020, 08:49:37 GMT'],
+        ];
     }
 
     public function testFromStringWithCapitalization()

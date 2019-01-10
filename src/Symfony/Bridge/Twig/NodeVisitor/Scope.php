@@ -17,7 +17,7 @@ namespace Symfony\Bridge\Twig\NodeVisitor;
 class Scope
 {
     private $parent;
-    private $data = array();
+    private $data = [];
     private $left = false;
 
     public function __construct(self $parent = null)
@@ -77,7 +77,7 @@ class Scope
      */
     public function has($key)
     {
-        if (array_key_exists($key, $this->data)) {
+        if (\array_key_exists($key, $this->data)) {
             return true;
         }
 
@@ -98,7 +98,7 @@ class Scope
      */
     public function get($key, $default = null)
     {
-        if (array_key_exists($key, $this->data)) {
+        if (\array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
 

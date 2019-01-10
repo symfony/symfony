@@ -35,7 +35,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class UrlPackage extends Package
 {
-    private $baseUrls = array();
+    private $baseUrls = [];
     private $sslPackage;
 
     /**
@@ -125,7 +125,7 @@ class UrlPackage extends Package
 
     private function getSslUrls($urls)
     {
-        $sslUrls = array();
+        $sslUrls = [];
         foreach ($urls as $url) {
             if ('https://' === substr($url, 0, 8) || '//' === substr($url, 0, 2)) {
                 $sslUrls[] = $url;

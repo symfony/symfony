@@ -47,7 +47,7 @@ class ConstraintValidatorFactory extends ContainerConstraintValidatorFactory
     protected $container;
     protected $validators;
 
-    public function __construct(ContainerInterface $container, array $validators = array())
+    public function __construct(ContainerInterface $container, array $validators = [])
     {
         parent::__construct($container);
 

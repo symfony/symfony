@@ -1,17 +1,17 @@
 <?php
 
-$container->loadFromExtension('security', array(
-    'providers' => array(
-        'default' => array(
-            'memory' => array(
-                'users' => array('foo' => array('password' => 'foo', 'roles' => 'ROLE_USER')),
-            ),
-        ),
-    ),
-    'firewalls' => array(
-        'main' => array(
-            'form_login' => array('provider' => 'default'),
+$container->loadFromExtension('security', [
+    'providers' => [
+        'default' => [
+            'memory' => [
+                'users' => ['foo' => ['password' => 'foo', 'roles' => 'ROLE_USER']],
+            ],
+        ],
+    ],
+    'firewalls' => [
+        'main' => [
+            'form_login' => ['provider' => 'default'],
             'logout_on_user_change' => true,
-        ),
-    ),
-));
+        ],
+    ],
+]);

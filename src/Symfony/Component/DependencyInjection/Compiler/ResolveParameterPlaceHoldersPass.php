@@ -42,7 +42,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
         try {
             parent::process($container);
 
-            $aliases = array();
+            $aliases = [];
             foreach ($container->getAliases() as $name => $target) {
                 $this->currentId = $name;
                 $aliases[$this->bag->resolveValue($name)] = $target;

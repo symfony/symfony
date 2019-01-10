@@ -12,25 +12,25 @@ class ObjectToPopulateTraitTest extends TestCase
 
     public function testExtractObjectToPopulateReturnsNullWhenKeyIsMissing()
     {
-        $object = $this->extractObjectToPopulate(ProxyDummy::class, array());
+        $object = $this->extractObjectToPopulate(ProxyDummy::class, []);
 
         $this->assertNull($object);
     }
 
     public function testExtractObjectToPopulateReturnsNullWhenNonObjectIsProvided()
     {
-        $object = $this->extractObjectToPopulate(ProxyDummy::class, array(
+        $object = $this->extractObjectToPopulate(ProxyDummy::class, [
             'object_to_populate' => 'not an object',
-        ));
+        ]);
 
         $this->assertNull($object);
     }
 
     public function testExtractObjectToPopulateReturnsNullWhenTheClassIsNotAnInstanceOfTheProvidedClass()
     {
-        $object = $this->extractObjectToPopulate(ProxyDummy::class, array(
+        $object = $this->extractObjectToPopulate(ProxyDummy::class, [
             'object_to_populate' => new \stdClass(),
-        ));
+        ]);
 
         $this->assertNull($object);
     }
@@ -38,9 +38,9 @@ class ObjectToPopulateTraitTest extends TestCase
     public function testExtractObjectToPopulateReturnsObjectWhenEverythingChecksOut()
     {
         $expected = new ProxyDummy();
-        $object = $this->extractObjectToPopulate(ProxyDummy::class, array(
+        $object = $this->extractObjectToPopulate(ProxyDummy::class, [
             'object_to_populate' => $expected,
-        ));
+        ]);
 
         $this->assertSame($expected, $object);
     }

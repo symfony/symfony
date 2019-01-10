@@ -57,7 +57,7 @@ class FirewallContext
     {
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::getListeners/getExceptionListener() instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
-        return array($this->getListeners(), $this->getExceptionListener(), $this->getLogoutListener());
+        return [$this->getListeners(), $this->getExceptionListener(), $this->getLogoutListener()];
     }
 
     /**

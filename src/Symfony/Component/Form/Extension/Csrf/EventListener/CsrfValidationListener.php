@@ -35,9 +35,9 @@ class CsrfValidationListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::PRE_SUBMIT => 'preSubmit',
-        );
+        ];
     }
 
     public function __construct($fieldName, CsrfTokenManagerInterface $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null, ServerParams $serverParams = null)
@@ -59,11 +59,11 @@ class CsrfValidationListener implements EventSubscriberInterface
         if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();
 
-            if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
+            if (!isset($data[$this->fieldName]) || !\is_string($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {
-                    $errorMessage = $this->translator->trans($errorMessage, array(), $this->translationDomain);
+                    $errorMessage = $this->translator->trans($errorMessage, [], $this->translationDomain);
                 }
 
                 $form->addError(new FormError($errorMessage));

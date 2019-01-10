@@ -22,8 +22,8 @@ use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
  */
 class ArrayNode extends BaseNode implements PrototypeNodeInterface
 {
-    protected $xmlRemappings = array();
-    protected $children = array();
+    protected $xmlRemappings = [];
+    protected $children = [];
     protected $allowFalse = false;
     protected $allowNewKeys = true;
     protected $addIfNotSet = false;
@@ -56,10 +56,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             return $value;
         }
 
-        $normalized = array();
+        $normalized = [];
 
         foreach ($value as $k => $v) {
-            if (false !== strpos($k, '-') && false === strpos($k, '_') && !array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
+            if (false !== strpos($k, '-') && false === strpos($k, '_') && !\array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
                 $normalized[$normalizedKey] = $v;
             } else {
                 $normalized[$k] = $v;
@@ -82,7 +82,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the xml remappings that should be performed.
      *
-     * @param array $remappings An array of the form array(array(string, string))
+     * @param array $remappings An array of the form [[string, string]]
      */
     public function setXmlRemappings(array $remappings)
     {
@@ -92,7 +92,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Gets the xml remappings that should be performed.
      *
-     * @return array an array of the form array(array(string, string))
+     * @return array an array of the form [[string, string]]
      */
     public function getXmlRemappings()
     {
@@ -177,7 +177,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             throw new \RuntimeException(sprintf('The node at path "%s" has no default value.', $this->getPath()));
         }
 
-        $defaults = array();
+        $defaults = [];
         foreach ($this->children as $name => $child) {
             if ($child->hasDefaultValue()) {
                 $defaults[$name] = $child->getDefaultValue();
@@ -223,7 +223,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         foreach ($this->children as $name => $child) {
-            if (!array_key_exists($name, $value)) {
+            if (!\array_key_exists($name, $value)) {
                 if ($child->isRequired()) {
                     $ex = new InvalidConfigurationException(sprintf('The child node "%s" at path "%s" must be configured.', $name, $this->getPath()));
                     $ex->setPath($this->getPath());
@@ -289,7 +289,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         $value = $this->remapXml($value);
 
-        $normalized = array();
+        $normalized = [];
         foreach ($value as $name => $val) {
             if (isset($this->children[$name])) {
                 try {
@@ -359,7 +359,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
         foreach ($rightSide as $k => $v) {
             // no conflict
-            if (!array_key_exists($k, $leftSide)) {
+            if (!\array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
                     $ex = new InvalidConfigurationException(sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file. If you are trying to overwrite an element, make sure you redefine it with the same name.', $this->getPath()));
                     $ex->setPath($this->getPath());

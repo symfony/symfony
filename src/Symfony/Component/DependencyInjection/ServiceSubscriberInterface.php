@@ -33,16 +33,16 @@ interface ServiceSubscriberInterface
      *
      * For mandatory dependencies:
      *
-     *  * array('logger' => 'Psr\Log\LoggerInterface') means the objects use the "logger" name
+     *  * ['logger' => 'Psr\Log\LoggerInterface'] means the objects use the "logger" name
      *    internally to fetch a service which must implement Psr\Log\LoggerInterface.
-     *  * array('Psr\Log\LoggerInterface') is a shortcut for
-     *  * array('Psr\Log\LoggerInterface' => 'Psr\Log\LoggerInterface')
+     *  * ['Psr\Log\LoggerInterface'] is a shortcut for
+     *  * ['Psr\Log\LoggerInterface' => 'Psr\Log\LoggerInterface']
      *
      * otherwise:
      *
-     *  * array('logger' => '?Psr\Log\LoggerInterface') denotes an optional dependency
-     *  * array('?Psr\Log\LoggerInterface') is a shortcut for
-     *  * array('Psr\Log\LoggerInterface' => '?Psr\Log\LoggerInterface')
+     *  * ['logger' => '?Psr\Log\LoggerInterface'] denotes an optional dependency
+     *  * ['?Psr\Log\LoggerInterface'] is a shortcut for
+     *  * ['Psr\Log\LoggerInterface' => '?Psr\Log\LoggerInterface']
      *
      * @return array The required service types, optionally keyed by service names
      */

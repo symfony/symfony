@@ -273,7 +273,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
 
         if (\is_array($var)) {
-            $a = array();
+            $a = [];
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }

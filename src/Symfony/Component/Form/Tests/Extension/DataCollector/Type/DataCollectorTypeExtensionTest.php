@@ -44,6 +44,6 @@ class DataCollectorTypeExtensionTest extends TestCase
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Symfony\Component\Form\Extension\DataCollector\EventListener\DataCollectorListener'));
 
-        $this->extension->buildForm($builder, array());
+        $this->extension->buildForm($builder, []);
     }
 }

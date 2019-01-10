@@ -22,8 +22,8 @@ class AnonymousTokenTest extends TestCase
         $token = new AnonymousToken('foo', 'bar');
         $this->assertTrue($token->isAuthenticated());
 
-        $token = new AnonymousToken('foo', 'bar', array('ROLE_FOO'));
-        $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
+        $token = new AnonymousToken('foo', 'bar', ['ROLE_FOO']);
+        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
     }
 
     public function testGetKey()

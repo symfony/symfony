@@ -27,7 +27,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     private $translator;
 
-    private $messages = array();
+    private $messages = [];
 
     /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
@@ -44,7 +44,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
         $trans = $this->translator->trans($id, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters);
@@ -55,7 +55,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
         $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters, $number);
@@ -98,7 +98,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             return $this->translator->getFallbackLocales();
         }
 
-        return array();
+        return [];
     }
 
     /**
@@ -106,7 +106,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function __call($method, $args)
     {
-        return \call_user_func_array(array($this->translator, $method), $args);
+        return \call_user_func_array([$this->translator, $method], $args);
     }
 
     /**
@@ -125,7 +125,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      * @param array|null  $parameters
      * @param int|null    $number
      */
-    private function collectMessage($locale, $domain, $id, $translation, $parameters = array(), $number = null)
+    private function collectMessage($locale, $domain, $id, $translation, $parameters = [], $number = null)
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -152,7 +152,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             $state = self::MESSAGE_MISSING;
         }
 
-        $this->messages[] = array(
+        $this->messages[] = [
             'locale' => $locale,
             'domain' => $domain,
             'id' => $id,
@@ -160,6 +160,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             'parameters' => $parameters,
             'transChoiceNumber' => $number,
             'state' => $state,
-        );
+        ];
     }
 }

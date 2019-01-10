@@ -93,14 +93,14 @@ class GlobalVariablesTest extends TestCase
         $std = new \stdClass();
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
 
-        return array(
-            array($user, $user),
-            array($std, $std),
-            array($token, $token),
-            array('Anon.', null),
-            array(null, null),
-            array(10, null),
-            array(true, null),
-        );
+        return [
+            [$user, $user],
+            [$std, $std],
+            [$token, $token],
+            ['Anon.', null],
+            [null, null],
+            [10, null],
+            [true, null],
+        ];
     }
 }

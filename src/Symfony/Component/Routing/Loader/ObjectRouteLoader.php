@@ -62,7 +62,7 @@ abstract class ObjectRouteLoader extends Loader
             throw new \BadMethodCallException(sprintf('Method "%s" not found on "%s" when importing routing resource "%s"', $method, \get_class($loaderObject), $resource));
         }
 
-        $routeCollection = \call_user_func(array($loaderObject, $method), $this);
+        $routeCollection = \call_user_func([$loaderObject, $method], $this);
 
         if (!$routeCollection instanceof RouteCollection) {
             $type = \is_object($routeCollection) ? \get_class($routeCollection) : \gettype($routeCollection);

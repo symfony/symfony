@@ -21,8 +21,7 @@
         "php": ">=5.3.3"
     },
     "suggest": {
-        "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader",
-        "ext-zip": "Zip support is required when using bin/simple-phpunit"
+        "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"

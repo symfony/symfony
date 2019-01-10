@@ -46,7 +46,7 @@ class CombinedStoreTest extends AbstractStoreTest
             self::markTestSkipped($e->getMessage());
         }
 
-        return new CombinedStore(array(new RedisStore($redis)), new UnanimousStrategy());
+        return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -64,7 +64,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $this->store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
 
-        $this->store = new CombinedStore(array($this->store1, $this->store2), $this->strategy);
+        $this->store = new CombinedStore([$this->store1, $this->store2], $this->strategy);
     }
 
     /**
@@ -269,7 +269,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
 
-        $store = new CombinedStore(array($store1, $store2), $this->strategy);
+        $store = new CombinedStore([$store1, $store2], $this->strategy);
 
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);

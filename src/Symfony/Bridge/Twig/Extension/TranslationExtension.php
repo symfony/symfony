@@ -48,10 +48,10 @@ class TranslationExtension extends AbstractExtension
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('trans', array($this, 'trans')),
-            new TwigFilter('transchoice', array($this, 'transchoice')),
-        );
+        return [
+            new TwigFilter('trans', [$this, 'trans']),
+            new TwigFilter('transchoice', [$this, 'transchoice']),
+        ];
     }
 
     /**
@@ -61,7 +61,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
 
@@ -72,7 +72,7 @@ class TranslationExtension extends AbstractExtension
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
-        );
+        ];
     }
 
     /**
@@ -80,7 +80,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getNodeVisitors()
     {
-        return array($this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor());
+        return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
     public function getTranslationNodeVisitor()
@@ -88,7 +88,7 @@ class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = array(), $domain = null, $locale = null)
+    public function trans($message, array $arguments = [], $domain = null, $locale = null)
     {
         if (null === $this->translator) {
             return strtr($message, $arguments);
@@ -97,13 +97,13 @@ class TranslationExtension extends AbstractExtension
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
-    public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
+    public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
     {
         if (null === $this->translator) {
             return strtr($message, $arguments);
         }
 
-        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+        return $this->translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
     }
 
     /**

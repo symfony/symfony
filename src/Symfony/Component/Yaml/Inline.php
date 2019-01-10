@@ -63,7 +63,7 @@ class Inline
      *
      * @throws ParseException
      */
-    public static function parse($value, $flags = 0, $references = array())
+    public static function parse($value, $flags = 0, $references = [])
     {
         if (\is_bool($flags)) {
             @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
@@ -93,7 +93,7 @@ class Inline
             if (\func_num_args() >= 5) {
                 $references = func_get_arg(4);
             } else {
-                $references = array();
+                $references = [];
             }
         }
 
@@ -285,7 +285,7 @@ class Inline
     {
         // array
         if (($value || Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE & $flags) && !self::isHash($value)) {
-            $output = array();
+            $output = [];
             foreach ($value as $val) {
                 $output[] = self::dump($val, $flags);
             }
@@ -294,7 +294,7 @@ class Inline
         }
 
         // hash
-        $output = array();
+        $output = [];
         foreach ($value as $key => $val) {
             $output[] = sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
@@ -318,9 +318,9 @@ class Inline
      *
      * @internal
      */
-    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array(), $legacyOmittedKeySupport = false)
+    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = [], $legacyOmittedKeySupport = false)
     {
-        if (\in_array($scalar[$i], array('"', "'"))) {
+        if (\in_array($scalar[$i], ['"', "'"])) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
 
@@ -409,9 +409,9 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseSequence($sequence, $flags, &$i = 0, $references = array())
+    private static function parseSequence($sequence, $flags, &$i = 0, $references = [])
     {
-        $output = array();
+        $output = [];
         $len = \strlen($sequence);
         ++$i;
 
@@ -437,8 +437,8 @@ class Inline
                     $value = self::parseMapping($sequence, $flags, $i, $references);
                     break;
                 default:
-                    $isQuoted = \in_array($sequence[$i], array('"', "'"));
-                    $value = self::parseScalar($sequence, $flags, array(',', ']'), $i, null === $tag, $references);
+                    $isQuoted = \in_array($sequence[$i], ['"', "'"]);
+                    $value = self::parseScalar($sequence, $flags, [',', ']'], $i, null === $tag, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
@@ -478,9 +478,9 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseMapping($mapping, $flags, &$i = 0, $references = array())
+    private static function parseMapping($mapping, $flags, &$i = 0, $references = [])
     {
-        $output = array();
+        $output = [];
         $len = \strlen($mapping);
         ++$i;
         $allowOverwrite = false;
@@ -501,8 +501,8 @@ class Inline
             }
 
             // key
-            $isKeyQuoted = \in_array($mapping[$i], array('"', "'"), true);
-            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false, array(), true);
+            $isKeyQuoted = \in_array($mapping[$i], ['"', "'"], true);
+            $key = self::parseScalar($mapping, $flags, [':', ' '], $i, false, [], true);
 
             if (':' !== $key && false === $i = strpos($mapping, ':', $i)) {
                 break;
@@ -520,7 +520,7 @@ class Inline
                 }
             }
 
-            if (':' !== $key && !$isKeyQuoted && (!isset($mapping[$i + 1]) || !\in_array($mapping[$i + 1], array(' ', ',', '[', ']', '{', '}'), true))) {
+            if (':' !== $key && !$isKeyQuoted && (!isset($mapping[$i + 1]) || !\in_array($mapping[$i + 1], [' ', ',', '[', ']', '{', '}'], true))) {
                 @trigger_error(self::getDeprecationMessage('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since Symfony 3.2 and will throw a ParseException in 4.0.'), E_USER_DEPRECATED);
             }
 
@@ -578,7 +578,7 @@ class Inline
                         }
                         break;
                     default:
-                        $value = self::parseScalar($mapping, $flags, array(',', '}'), $i, null === $tag, $references);
+                        $value = self::parseScalar($mapping, $flags, [',', '}'], $i, null === $tag, $references);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
@@ -616,7 +616,7 @@ class Inline
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar($scalar, $flags, $references = array())
+    private static function evaluateScalar($scalar, $flags, $references = [])
     {
         $scalar = trim($scalar);
         $scalarLower = strtolower($scalar);
@@ -633,7 +633,7 @@ class Inline
                 throw new ParseException('A reference must contain at least one character.', self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
-            if (!array_key_exists($value, $references)) {
+            if (!\array_key_exists($value, $references)) {
                 throw new ParseException(sprintf('Reference "%s" does not exist.', $value), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
             }
 
@@ -766,7 +766,7 @@ class Inline
                             @trigger_error(self::getDeprecationMessage('Using the comma as a group separator for floats is deprecated since Symfony 3.2 and will be removed in 4.0.'), E_USER_DEPRECATED);
                         }
 
-                        return (float) str_replace(array(',', '_'), '', $scalar);
+                        return (float) str_replace([',', '_'], '', $scalar);
                     case Parser::preg_match(self::getTimestampRegex(), $scalar):
                         if (Yaml::PARSE_DATETIME & $flags) {
                             // When no timezone is provided in the parsed date, YAML spec says we must assume UTC.
@@ -805,7 +805,7 @@ class Inline
         $nextOffset += strspn($value, ' ', $nextOffset);
 
         // Is followed by a scalar
-        if ((!isset($value[$nextOffset]) || !\in_array($value[$nextOffset], array('[', '{'), true)) && 'tagged' !== $tag) {
+        if ((!isset($value[$nextOffset]) || !\in_array($value[$nextOffset], ['[', '{'], true)) && 'tagged' !== $tag) {
             // Manage non-whitelisted scalars in {@link self::evaluateScalar()}
             return;
         }

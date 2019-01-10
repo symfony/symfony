@@ -28,7 +28,7 @@ class RuntimeLoaderPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('twig.runtime_loader');
-        $mapping = array();
+        $mapping = [];
         foreach ($container->findTaggedServiceIds('twig.runtime', true) as $id => $attributes) {
             $def = $container->getDefinition($id);
             $mapping[$def->getClass()] = new Reference($id);

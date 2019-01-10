@@ -22,16 +22,16 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
  */
 class AccessMap implements AccessMapInterface
 {
-    private $map = array();
+    private $map = [];
 
     /**
      * @param RequestMatcherInterface $requestMatcher A RequestMatcherInterface instance
      * @param array                   $attributes     An array of attributes to pass to the access decision manager (like roles)
      * @param string|null             $channel        The channel to enforce (http, https, or null)
      */
-    public function add(RequestMatcherInterface $requestMatcher, array $attributes = array(), $channel = null)
+    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], $channel = null)
     {
-        $this->map[] = array($requestMatcher, $attributes, $channel);
+        $this->map[] = [$requestMatcher, $attributes, $channel];
     }
 
     /**
@@ -41,10 +41,10 @@ class AccessMap implements AccessMapInterface
     {
         foreach ($this->map as $elements) {
             if (null === $elements[0] || $elements[0]->matches($request)) {
-                return array($elements[1], $elements[2]);
+                return [$elements[1], $elements[2]];
             }
         }
 
-        return array(null, null);
+        return [null, null];
     }
 }

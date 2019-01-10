@@ -21,24 +21,24 @@ class LoggerDataCollectorTest extends TestCase
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
-            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue('foo'));
-        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue(array()));
+        $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue([]));
 
         $c = new LoggerDataCollector($logger, __DIR__.'/');
         $c->lateCollect();
         $compilerLogs = $c->getCompilerLogs()->getValue('message');
 
-        $this->assertSame(array(
-            array('message' => 'Removed service "Psr\Container\ContainerInterface"; reason: private alias.'),
-            array('message' => 'Removed service "Symfony\Component\DependencyInjection\ContainerInterface"; reason: private alias.'),
-        ), $compilerLogs['Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass']);
+        $this->assertSame([
+            ['message' => 'Removed service "Psr\Container\ContainerInterface"; reason: private alias.'],
+            ['message' => 'Removed service "Symfony\Component\DependencyInjection\ContainerInterface"; reason: private alias.'],
+        ], $compilerLogs['Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass']);
 
-        $this->assertSame(array(
-            array('message' => 'Some custom logging message'),
-            array('message' => 'With ending :'),
-        ), $compilerLogs['Unknown Compiler Pass']);
+        $this->assertSame([
+            ['message' => 'Some custom logging message'],
+            ['message' => 'With ending :'],
+        ], $compilerLogs['Unknown Compiler Pass']);
     }
 
     /**
@@ -48,7 +48,7 @@ class LoggerDataCollectorTest extends TestCase
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
-            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
         $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
@@ -62,7 +62,7 @@ class LoggerDataCollectorTest extends TestCase
         $logs = array_map(function ($v) {
             if (isset($v['context']['exception'])) {
                 $e = &$v['context']['exception'];
-                $e = isset($e["\0*\0message"]) ? array($e["\0*\0message"], $e["\0*\0severity"]) : array($e["\0Symfony\Component\Debug\Exception\SilencedErrorContext\0severity"]);
+                $e = isset($e["\0*\0message"]) ? [$e["\0*\0message"], $e["\0*\0severity"]] : [$e["\0Symfony\Component\Debug\Exception\SilencedErrorContext\0severity"]];
             }
 
             return $v;
@@ -80,7 +80,7 @@ class LoggerDataCollectorTest extends TestCase
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
-            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('clear');
 
@@ -90,55 +90,55 @@ class LoggerDataCollectorTest extends TestCase
 
     public function getCollectTestData()
     {
-        yield 'simple log' => array(
+        yield 'simple log' => [
             1,
-            array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
-            array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            [['message' => 'foo', 'context' => [], 'priority' => 100, 'priorityName' => 'DEBUG']],
+            [['message' => 'foo', 'context' => [], 'priority' => 100, 'priorityName' => 'DEBUG']],
             0,
             0,
-        );
+        ];
 
-        yield 'log with a context' => array(
+        yield 'log with a context' => [
             1,
-            array(array('message' => 'foo', 'context' => array('foo' => 'bar'), 'priority' => 100, 'priorityName' => 'DEBUG')),
-            array(array('message' => 'foo', 'context' => array('foo' => 'bar'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            [['message' => 'foo', 'context' => ['foo' => 'bar'], 'priority' => 100, 'priorityName' => 'DEBUG']],
+            [['message' => 'foo', 'context' => ['foo' => 'bar'], 'priority' => 100, 'priorityName' => 'DEBUG']],
             0,
             0,
-        );
+        ];
 
         if (!class_exists(SilencedErrorContext::class)) {
             return;
         }
 
-        yield 'logs with some deprecations' => array(
+        yield 'logs with some deprecations' => [
             1,
-            array(
-                array('message' => 'foo3', 'context' => array('exception' => new \ErrorException('warning', 0, E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo', 'context' => array('exception' => new \ErrorException('deprecated', 0, E_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo2', 'context' => array('exception' => new \ErrorException('deprecated', 0, E_USER_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-            ),
-            array(
-                array('message' => 'foo3', 'context' => array('exception' => array('warning', E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo', 'context' => array('exception' => array('deprecated', E_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
-                array('message' => 'foo2', 'context' => array('exception' => array('deprecated', E_USER_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
-            ),
+            [
+                ['message' => 'foo3', 'context' => ['exception' => new \ErrorException('warning', 0, E_USER_WARNING)], 'priority' => 100, 'priorityName' => 'DEBUG'],
+                ['message' => 'foo', 'context' => ['exception' => new \ErrorException('deprecated', 0, E_DEPRECATED)], 'priority' => 100, 'priorityName' => 'DEBUG'],
+                ['message' => 'foo2', 'context' => ['exception' => new \ErrorException('deprecated', 0, E_USER_DEPRECATED)], 'priority' => 100, 'priorityName' => 'DEBUG'],
+            ],
+            [
+                ['message' => 'foo3', 'context' => ['exception' => ['warning', E_USER_WARNING]], 'priority' => 100, 'priorityName' => 'DEBUG'],
+                ['message' => 'foo', 'context' => ['exception' => ['deprecated', E_DEPRECATED]], 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false],
+                ['message' => 'foo2', 'context' => ['exception' => ['deprecated', E_USER_DEPRECATED]], 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false],
+            ],
             2,
             0,
-            array(100 => array('count' => 3, 'name' => 'DEBUG')),
-        );
+            [100 => ['count' => 3, 'name' => 'DEBUG']],
+        ];
 
-        yield 'logs with some silent errors' => array(
+        yield 'logs with some silent errors' => [
             1,
-            array(
-                array('message' => 'foo3', 'context' => array('exception' => new \ErrorException('warning', 0, E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo3', 'context' => array('exception' => new SilencedErrorContext(E_USER_WARNING, __FILE__, __LINE__)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-            ),
-            array(
-                array('message' => 'foo3', 'context' => array('exception' => array('warning', E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo3', 'context' => array('exception' => array(E_USER_WARNING)), 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => true),
-            ),
+            [
+                ['message' => 'foo3', 'context' => ['exception' => new \ErrorException('warning', 0, E_USER_WARNING)], 'priority' => 100, 'priorityName' => 'DEBUG'],
+                ['message' => 'foo3', 'context' => ['exception' => new SilencedErrorContext(E_USER_WARNING, __FILE__, __LINE__)], 'priority' => 100, 'priorityName' => 'DEBUG'],
+            ],
+            [
+                ['message' => 'foo3', 'context' => ['exception' => ['warning', E_USER_WARNING]], 'priority' => 100, 'priorityName' => 'DEBUG'],
+                ['message' => 'foo3', 'context' => ['exception' => [E_USER_WARNING]], 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => true],
+            ],
             0,
             1,
-        );
+        ];
     }
 }

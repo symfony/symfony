@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 
@@ -35,8 +36,9 @@ interface NormalizerInterface
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular
      *                                    reference handler can fix it
      * @throws LogicException             Occurs when the normalizer is not called in an expected context
+     * @throws ExceptionInterface         Occurs for all the other cases of errors
      */
-    public function normalize($object, $format = null, array $context = array());
+    public function normalize($object, $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for normalization by this normalizer.

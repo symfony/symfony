@@ -37,7 +37,7 @@ class FormLoginLdapFactory extends FormLoginFactory
         ;
 
         if (!empty($config['query_string'])) {
-            $definition->addMethodCall('setQueryString', array($config['query_string']));
+            $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }
 
         return $provider;

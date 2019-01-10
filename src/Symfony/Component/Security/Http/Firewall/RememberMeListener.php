@@ -77,7 +77,7 @@ class RememberMeListener implements ListenerInterface
                 $this->logger->warning(
                     'The token storage was not populated with remember-me token as the'
                    .' RememberMeServices was not able to create a token from the remember'
-                   .' me information.', array('exception' => $e)
+                   .' me information.', ['exception' => $e]
                 );
             }
 
@@ -110,7 +110,7 @@ class RememberMeListener implements ListenerInterface
                 $this->logger->warning(
                     'The token storage was not populated with remember-me token as the'
                    .' AuthenticationManager rejected the AuthenticationToken returned'
-                   .' by the RememberMeServices.', array('exception' => $e)
+                   .' by the RememberMeServices.', ['exception' => $e]
                 );
             }
 

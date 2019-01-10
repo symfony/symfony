@@ -24,7 +24,7 @@ class ServerLogHandler extends AbstractHandler
     private $context;
     private $socket;
 
-    public function __construct($host, $level = Logger::DEBUG, $bubble = true, $context = array())
+    public function __construct($host, $level = Logger::DEBUG, $bubble = true, $context = [])
     {
         parent::__construct($level, $bubble);
 
@@ -108,7 +108,7 @@ class ServerLogHandler extends AbstractHandler
 
         $recordFormatted = $this->getFormatter()->format($record);
 
-        foreach (array('log_uuid', 'uuid', 'uid') as $key) {
+        foreach (['log_uuid', 'uuid', 'uid'] as $key) {
             if (isset($record['extra'][$key])) {
                 $recordFormatted['log_id'] = $record['extra'][$key];
                 break;

@@ -1,28 +1,28 @@
 <?php
 
-$container->loadFromExtension('security', array(
-    'providers' => array(
-        'default' => array(
-            'memory' => array(
-                'users' => array(
-                    'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
-                ),
-            ),
-        ),
-    ),
-    'firewalls' => array(
-        'simple' => array('pattern' => '/login', 'security' => false),
-        'secure' => array(
+$container->loadFromExtension('security', [
+    'providers' => [
+        'default' => [
+            'memory' => [
+                'users' => [
+                    'foo' => ['password' => 'foo', 'roles' => 'ROLE_USER'],
+                ],
+            ],
+        ],
+    ],
+    'firewalls' => [
+        'simple' => ['pattern' => '/login', 'security' => false],
+        'secure' => [
             'stateless' => true,
             'http_basic' => true,
             'form_login' => true,
             'anonymous' => true,
-            'switch_user' => array('stateless' => true),
+            'switch_user' => ['stateless' => true],
             'x509' => true,
             'remote_user' => true,
             'logout' => true,
-            'remember_me' => array('secret' => 'TheSecret'),
+            'remember_me' => ['secret' => 'TheSecret'],
             'user_checker' => null,
-        ),
-    ),
-));
+        ],
+    ],
+]);

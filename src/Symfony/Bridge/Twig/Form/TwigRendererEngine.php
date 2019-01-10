@@ -31,7 +31,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     private $template;
 
-    public function __construct(array $defaultThemes = array(), Environment $environment = null)
+    public function __construct(array $defaultThemes = [], Environment $environment = null)
     {
         if (null === $environment) {
             @trigger_error(sprintf('Not passing a Twig Environment as the second argument for "%s" constructor is deprecated since Symfony 3.2 and won\'t be possible in 4.0.', static::class), E_USER_DEPRECATED);
@@ -58,7 +58,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -187,7 +187,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
-        $context = $this->environment->mergeGlobals(array());
+        $context = $this->environment->mergeGlobals([]);
 
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid

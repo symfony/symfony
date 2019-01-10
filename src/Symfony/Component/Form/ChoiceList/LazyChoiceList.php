@@ -32,7 +32,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * The callable creating string values for each choice.
      *
-     * If null, choices are simply cast to strings.
+     * If null, choices are cast to strings.
      *
      * @var callable|null
      */

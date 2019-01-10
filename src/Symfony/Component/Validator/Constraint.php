@@ -49,7 +49,7 @@ abstract class Constraint
     /**
      * Maps error codes to the names of their constants.
      */
-    protected static $errorNames = array();
+    protected static $errorNames = [];
 
     /**
      * Domain-specific data attached to a constraint.
@@ -105,7 +105,7 @@ abstract class Constraint
      */
     public function __construct($options = null)
     {
-        $invalidOptions = array();
+        $invalidOptions = [];
         $missingOptions = array_flip((array) $this->getRequiredOptions());
         $knownOptions = get_object_vars($this);
 
@@ -122,7 +122,7 @@ abstract class Constraint
         }
         if ($options && \is_array($options) && \is_string(key($options))) {
             foreach ($options as $option => $value) {
-                if (array_key_exists($option, $knownOptions)) {
+                if (\array_key_exists($option, $knownOptions)) {
                     $this->$option = $value;
                     unset($missingOptions[$option]);
                 } else {
@@ -136,7 +136,7 @@ abstract class Constraint
                 throw new ConstraintDefinitionException(sprintf('No default option is configured for constraint %s', \get_class($this)));
             }
 
-            if (array_key_exists($option, $knownOptions)) {
+            if (\array_key_exists($option, $knownOptions)) {
                 $this->$option = $options;
                 unset($missingOptions[$option]);
             } else {
@@ -173,7 +173,7 @@ abstract class Constraint
             return;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, \get_class($this)), array($option));
+        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, \get_class($this)), [$option]);
     }
 
     /**
@@ -194,12 +194,12 @@ abstract class Constraint
     public function __get($option)
     {
         if ('groups' === $option) {
-            $this->groups = array(self::DEFAULT_GROUP);
+            $this->groups = [self::DEFAULT_GROUP];
 
             return $this->groups;
         }
 
-        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, \get_class($this)), array($option));
+        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, \get_class($this)), [$option]);
     }
 
     /**
@@ -248,7 +248,7 @@ abstract class Constraint
      */
     public function getRequiredOptions()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -284,9 +284,7 @@ abstract class Constraint
      *
      * @return array The properties to serialize
      *
-     * @internal This method may be replaced by an implementation of
-     *           {@link \Serializable} in the future. Please don't use or
-     *           overwrite it.
+     * @internal
      */
     public function __sleep()
     {

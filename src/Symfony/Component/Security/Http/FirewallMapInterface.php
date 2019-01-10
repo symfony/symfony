@@ -30,7 +30,7 @@ interface FirewallMapInterface
      * If there is no exception listener, the second element of the outer array
      * must be null.
      *
-     * @return array of the format array(array(AuthenticationListener), ExceptionListener)
+     * @return array of the format [[AuthenticationListener], ExceptionListener]
      */
     public function getListeners(Request $request);
 }

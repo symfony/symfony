@@ -71,8 +71,8 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'router' => RouterInterface::class,
-        );
+        ];
     }
 }

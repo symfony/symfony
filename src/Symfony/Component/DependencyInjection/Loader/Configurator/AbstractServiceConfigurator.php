@@ -18,9 +18,9 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
 {
     protected $parent;
     protected $id;
-    private $defaultTags = array();
+    private $defaultTags = [];
 
-    public function __construct(ServicesConfigurator $parent, Definition $definition, $id = null, array $defaultTags = array())
+    public function __construct(ServicesConfigurator $parent, Definition $definition, $id = null, array $defaultTags = [])
     {
         $this->parent = $parent;
         $this->definition = $definition;
@@ -36,7 +36,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
                 $this->definition->addTag($name, $attributes);
             }
         }
-        $this->defaultTags = array();
+        $this->defaultTags = [];
     }
 
     /**

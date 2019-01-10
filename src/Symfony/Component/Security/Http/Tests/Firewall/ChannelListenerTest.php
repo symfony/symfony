@@ -31,7 +31,7 @@ class ChannelListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array(), 'http')))
+            ->will($this->returnValue([[], 'http']))
         ;
 
         $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
@@ -69,7 +69,7 @@ class ChannelListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array(), 'https')))
+            ->will($this->returnValue([[], 'https']))
         ;
 
         $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
@@ -109,7 +109,7 @@ class ChannelListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array(), 'https')))
+            ->will($this->returnValue([[], 'https']))
         ;
 
         $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
@@ -152,7 +152,7 @@ class ChannelListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array(), 'http')))
+            ->will($this->returnValue([[], 'http']))
         ;
 
         $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();

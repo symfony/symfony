@@ -23,7 +23,7 @@ class DebugCommandTest extends TestCase
     public function testDebugCommand()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array(), array('decorated' => false));
+        $ret = $tester->execute([], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Functions', trim($tester->getDisplay()));
@@ -33,12 +33,12 @@ class DebugCommandTest extends TestCase
     {
         // these paths aren't realistic,
         // they're configured to force the line separator
-        $tester = $this->createCommandTester(array(
-            'Acme' => array('extractor', 'extractor'),
-            '!Acme' => array('extractor', 'extractor'),
-            FilesystemLoader::MAIN_NAMESPACE => array('extractor', 'extractor'),
-        ));
-        $ret = $tester->execute(array(), array('decorated' => false));
+        $tester = $this->createCommandTester([
+            'Acme' => ['extractor', 'extractor'],
+            '!Acme' => ['extractor', 'extractor'],
+            FilesystemLoader::MAIN_NAMESPACE => ['extractor', 'extractor'],
+        ]);
+        $ret = $tester->execute([], ['decorated' => false]);
         $ds = \DIRECTORY_SEPARATOR;
         $loaderPaths = <<<TXT
 Loader Paths
@@ -62,9 +62,9 @@ TXT;
         $this->assertContains($loaderPaths, trim($tester->getDisplay(true)));
     }
 
-    private function createCommandTester(array $paths = array())
+    private function createCommandTester(array $paths = [])
     {
-        $filesystemLoader = new FilesystemLoader(array(), \dirname(__DIR__).'/Fixtures');
+        $filesystemLoader = new FilesystemLoader([], \dirname(__DIR__).'/Fixtures');
         foreach ($paths as $namespace => $relDirs) {
             foreach ($relDirs as $relDir) {
                 $filesystemLoader->addPath($relDir, $namespace);

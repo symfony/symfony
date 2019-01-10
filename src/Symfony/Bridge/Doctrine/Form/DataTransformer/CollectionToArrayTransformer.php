@@ -31,7 +31,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     public function transform($collection)
     {
         if (null === $collection) {
-            return array();
+            return [];
         }
 
         // For cases when the collection getter returns $collection->toArray()
@@ -57,7 +57,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
     public function reverseTransform($array)
     {
         if ('' === $array || null === $array) {
-            $array = array();
+            $array = [];
         } else {
             $array = (array) $array;
         }

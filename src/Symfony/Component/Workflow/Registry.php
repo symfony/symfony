@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
  */
 class Registry
 {
-    private $workflows = array();
+    private $workflows = [];
 
     /**
      * @param Workflow                        $workflow
@@ -35,7 +35,7 @@ class Registry
             $supportStrategy = new ClassInstanceSupportStrategy($supportStrategy);
         }
 
-        $this->workflows[] = array($workflow, $supportStrategy);
+        $this->workflows[] = [$workflow, $supportStrategy];
     }
 
     /**

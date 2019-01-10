@@ -33,22 +33,22 @@ class SubRequestHandler
         $trustedHeaderSet = Request::getTrustedHeaderSet();
         if (\method_exists(Request::class, 'getTrustedHeaderName')) {
             Request::setTrustedProxies($trustedProxies, -1);
-            $trustedHeaders = array(
+            $trustedHeaders = [
                 Request::HEADER_FORWARDED => Request::getTrustedHeaderName(Request::HEADER_FORWARDED, false),
                 Request::HEADER_X_FORWARDED_FOR => Request::getTrustedHeaderName(Request::HEADER_X_FORWARDED_FOR, false),
                 Request::HEADER_X_FORWARDED_HOST => Request::getTrustedHeaderName(Request::HEADER_X_FORWARDED_HOST, false),
                 Request::HEADER_X_FORWARDED_PROTO => Request::getTrustedHeaderName(Request::HEADER_X_FORWARDED_PROTO, false),
                 Request::HEADER_X_FORWARDED_PORT => Request::getTrustedHeaderName(Request::HEADER_X_FORWARDED_PORT, false),
-            );
+            ];
             Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
         } else {
-            $trustedHeaders = array(
+            $trustedHeaders = [
                 Request::HEADER_FORWARDED => 'FORWARDED',
                 Request::HEADER_X_FORWARDED_FOR => 'X_FORWARDED_FOR',
                 Request::HEADER_X_FORWARDED_HOST => 'X_FORWARDED_HOST',
                 Request::HEADER_X_FORWARDED_PROTO => 'X_FORWARDED_PROTO',
                 Request::HEADER_X_FORWARDED_PORT => 'X_FORWARDED_PORT',
-            );
+            ];
         }
 
         // remove untrusted values
@@ -63,8 +63,8 @@ class SubRequestHandler
         }
 
         // compute trusted values, taking any trusted proxies into account
-        $trustedIps = array();
-        $trustedValues = array();
+        $trustedIps = [];
+        $trustedValues = [];
         foreach (array_reverse($request->getClientIps()) as $ip) {
             $trustedIps[] = $ip;
             $trustedValues[] = sprintf('for="%s"', $ip);
@@ -95,7 +95,7 @@ class SubRequestHandler
 
         // ensure 127.0.0.1 is set as trusted proxy
         if (!IpUtils::checkIp('127.0.0.1', $trustedProxies)) {
-            Request::setTrustedProxies(array_merge($trustedProxies, array('127.0.0.1')), Request::getTrustedHeaderSet());
+            Request::setTrustedProxies(array_merge($trustedProxies, ['127.0.0.1']), Request::getTrustedHeaderSet());
         }
 
         try {

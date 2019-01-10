@@ -29,6 +29,6 @@ class UnusedTagsPassTest extends TestCase
 
         $pass->process($container);
 
-        $this->assertSame(array(sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)), $container->getCompiler()->getLog());
+        $this->assertSame([sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)], $container->getCompiler()->getLog());
     }
 }

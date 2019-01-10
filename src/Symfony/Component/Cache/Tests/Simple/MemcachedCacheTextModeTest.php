@@ -18,7 +18,7 @@ class MemcachedCacheTextModeTest extends MemcachedCacheTest
 {
     public function createSimpleCache($defaultLifetime = 0)
     {
-        $client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
+        $client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]);
 
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }

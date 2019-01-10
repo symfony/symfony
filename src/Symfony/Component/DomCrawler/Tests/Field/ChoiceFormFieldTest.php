@@ -25,7 +25,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input or a select');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'text'));
+        $node = $this->createNode('input', '', ['type' => 'text']);
         try {
             $field = new ChoiceFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is an input with a type different from checkbox or radio');
@@ -36,12 +36,12 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testGetType()
     {
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $this->assertEquals('radio', $field->getType(), '->getType() returns radio for radio buttons');
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $this->assertEquals('checkbox', $field->getType(), '->getType() returns radio for a checkbox');
@@ -54,12 +54,12 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testIsMultiple()
     {
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $this->assertFalse($field->isMultiple(), '->isMultiple() returns false for radio buttons');
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $this->assertFalse($field->isMultiple(), '->isMultiple() returns false for checkboxes');
@@ -69,12 +69,12 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
         $this->assertFalse($field->isMultiple(), '->isMultiple() returns false for selects without the multiple attribute');
 
-        $node = $this->createNode('select', '', array('multiple' => 'multiple'));
+        $node = $this->createNode('select', '', ['multiple' => 'multiple']);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->isMultiple(), '->isMultiple() returns true for selects with the multiple attribute');
 
-        $node = $this->createNode('select', '', array('multiple' => ''));
+        $node = $this->createNode('select', '', ['multiple' => '']);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->isMultiple(), '->isMultiple() returns true for selects with an empty multiple attribute');
@@ -82,14 +82,14 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testSelects()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true for selects');
         $this->assertEquals('foo', $field->getValue(), '->getValue() returns the first option if none are selected');
         $this->assertFalse($field->isMultiple(), '->isMultiple() returns false when no multiple attribute is defined');
 
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => true));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => true]);
         $field = new ChoiceFormField($node);
 
         $this->assertEquals('bar', $field->getValue(), '->getValue() returns the selected option');
@@ -105,7 +105,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
 
         try {
-            $field->setValue(array('foobar'));
+            $field->setValue(['foobar']);
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is an array');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is an array');
@@ -114,7 +114,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testSelectWithEmptyBooleanAttribute()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => true), array(), '');
+        $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');
         $field = new ChoiceFormField($node);
 
         $this->assertEquals('bar', $field->getValue());
@@ -122,7 +122,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testSelectIsDisabled()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => true), array('disabled' => 'disabled'));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => true], ['disabled' => 'disabled']);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->isDisabled(), '->isDisabled() returns true for selects with a disabled attribute');
@@ -130,27 +130,27 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testMultipleSelects()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false], ['multiple' => 'multiple']);
         $field = new ChoiceFormField($node);
 
-        $this->assertEquals(array(), $field->getValue(), '->setValue() returns an empty array if multiple is true and no option is selected');
+        $this->assertEquals([], $field->getValue(), '->setValue() returns an empty array if multiple is true and no option is selected');
 
         $field->setValue('foo');
-        $this->assertEquals(array('foo'), $field->getValue(), '->setValue() returns an array of options if multiple is true');
+        $this->assertEquals(['foo'], $field->getValue(), '->setValue() returns an array of options if multiple is true');
 
         $field->setValue('bar');
-        $this->assertEquals(array('bar'), $field->getValue(), '->setValue() returns an array of options if multiple is true');
+        $this->assertEquals(['bar'], $field->getValue(), '->setValue() returns an array of options if multiple is true');
 
-        $field->setValue(array('foo', 'bar'));
-        $this->assertEquals(array('foo', 'bar'), $field->getValue(), '->setValue() returns an array of options if multiple is true');
+        $field->setValue(['foo', 'bar']);
+        $this->assertEquals(['foo', 'bar'], $field->getValue(), '->setValue() returns an array of options if multiple is true');
 
-        $node = $this->createSelectNode(array('foo' => true, 'bar' => true), array('multiple' => 'multiple'));
+        $node = $this->createSelectNode(['foo' => true, 'bar' => true], ['multiple' => 'multiple']);
         $field = new ChoiceFormField($node);
 
-        $this->assertEquals(array('foo', 'bar'), $field->getValue(), '->getValue() returns the selected options');
+        $this->assertEquals(['foo', 'bar'], $field->getValue(), '->getValue() returns the selected options');
 
         try {
-            $field->setValue(array('foobar'));
+            $field->setValue(['foobar']);
             $this->fail('->setValue() throws an \InvalidArgumentException if the value is not one of the options');
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue(true, '->setValue() throws an \InvalidArgumentException if the value is not one of the options');
@@ -159,18 +159,18 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testRadioButtons()
     {
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'bar'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'bar']);
         $field->addChoice($node);
 
         $this->assertFalse($field->hasValue(), '->hasValue() returns false when no radio button is selected');
         $this->assertNull($field->getValue(), '->getValue() returns null if no radio button is selected');
         $this->assertFalse($field->isMultiple(), '->isMultiple() returns false for radio buttons');
 
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'bar', 'checked' => 'checked'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'bar', 'checked' => 'checked']);
         $field->addChoice($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true when a radio button is selected');
@@ -189,9 +189,9 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testRadioButtonsWithEmptyBooleanAttribute()
     {
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'bar', 'checked' => ''));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'bar', 'checked' => '']);
         $field->addChoice($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true when a radio button is selected');
@@ -200,11 +200,11 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testRadioButtonIsDisabled()
     {
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo', 'disabled' => 'disabled'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo', 'disabled' => 'disabled']);
         $field = new ChoiceFormField($node);
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'bar'));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'bar']);
         $field->addChoice($node);
-        $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'baz', 'disabled' => ''));
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'baz', 'disabled' => '']);
         $field->addChoice($node);
 
         $field->select('foo');
@@ -222,7 +222,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testCheckboxes()
     {
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name']);
         $field = new ChoiceFormField($node);
 
         $this->assertFalse($field->hasValue(), '->hasValue() returns false when the checkbox is not checked');
@@ -235,18 +235,18 @@ class ChoiceFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->initialize() throws a \LogicException for checkboxes');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'checked' => 'checked']);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true when the checkbox is checked');
         $this->assertEquals('on', $field->getValue(), '->getValue() returns 1 if the checkbox is checked and has no value attribute');
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'checked' => 'checked', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $this->assertEquals('foo', $field->getValue(), '->getValue() returns the value attribute if the checkbox is checked');
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked', 'value' => 'foo'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'checked' => 'checked', 'value' => 'foo']);
         $field = new ChoiceFormField($node);
 
         $field->setValue(false);
@@ -265,7 +265,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testCheckboxWithEmptyBooleanAttribute()
     {
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'value' => 'foo', 'checked' => ''));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'value' => 'foo', 'checked' => '']);
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->hasValue(), '->hasValue() returns true when the checkbox is checked');
@@ -274,7 +274,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testTick()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
 
         try {
@@ -284,7 +284,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->tick() throws a \LogicException for select boxes');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name']);
         $field = new ChoiceFormField($node);
         $field->tick();
         $this->assertEquals('on', $field->getValue(), '->tick() ticks checkboxes');
@@ -292,7 +292,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testUntick()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
 
         try {
@@ -302,7 +302,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->untick() throws a \LogicException for select boxes');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'checked' => 'checked']);
         $field = new ChoiceFormField($node);
         $field->untick();
         $this->assertNull($field->getValue(), '->untick() unticks checkboxes');
@@ -310,14 +310,14 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testSelect()
     {
-        $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'checked' => 'checked']);
         $field = new ChoiceFormField($node);
         $field->select(true);
         $this->assertEquals('on', $field->getValue(), '->select() changes the value of the field');
         $field->select(false);
         $this->assertNull($field->getValue(), '->select() changes the value of the field');
 
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
         $field->select('foo');
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
@@ -325,11 +325,11 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testOptionWithNoValue()
     {
-        $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNodeWithEmptyOption(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
         $this->assertEquals('foo', $field->getValue());
 
-        $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => true));
+        $node = $this->createSelectNodeWithEmptyOption(['foo' => false, 'bar' => true]);
         $field = new ChoiceFormField($node);
         $this->assertEquals('bar', $field->getValue());
         $field->select('foo');
@@ -338,28 +338,28 @@ class ChoiceFormFieldTest extends FormFieldTestCase
 
     public function testDisableValidation()
     {
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
         $field = new ChoiceFormField($node);
         $field->disableValidation();
         $field->setValue('foobar');
         $this->assertEquals('foobar', $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
 
-        $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false], ['multiple' => 'multiple']);
         $field = new ChoiceFormField($node);
         $field->disableValidation();
-        $field->setValue(array('foobar'));
-        $this->assertEquals(array('foobar'), $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
+        $field->setValue(['foobar']);
+        $this->assertEquals(['foobar'], $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
     }
 
     public function testSelectWithEmptyValue()
     {
-        $node = $this->createSelectNodeWithEmptyOption(array('' => true, 'Female' => false, 'Male' => false));
+        $node = $this->createSelectNodeWithEmptyOption(['' => true, 'Female' => false, 'Male' => false]);
         $field = new ChoiceFormField($node);
 
         $this->assertSame('', $field->getValue());
     }
 
-    protected function createSelectNode($options, $attributes = array(), $selectedAttrText = 'selected')
+    protected function createSelectNode($options, $attributes = [], $selectedAttrText = 'selected')
     {
         $document = new \DOMDocument();
         $node = $document->createElement('select');
@@ -381,7 +381,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         return $node;
     }
 
-    protected function createSelectNodeWithEmptyOption($options, $attributes = array())
+    protected function createSelectNodeWithEmptyOption($options, $attributes = [])
     {
         $document = new \DOMDocument();
         $node = $document->createElement('select');

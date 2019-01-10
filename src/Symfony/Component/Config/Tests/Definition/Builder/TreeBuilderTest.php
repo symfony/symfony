@@ -119,7 +119,7 @@ class TreeBuilderTest extends TestCase
         $builder = new TreeBuilder();
 
         $builder->root('test')
-            ->example(array('key' => 'value'))
+            ->example(['key' => 'value'])
             ->children()
                 ->node('child', 'variable')->info('child info')->defaultValue('default')->example('example')
             ->end()

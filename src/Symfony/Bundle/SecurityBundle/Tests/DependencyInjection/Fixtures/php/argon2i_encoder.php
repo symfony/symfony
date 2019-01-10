@@ -1,19 +1,19 @@
 <?php
 
-$container->loadFromExtension('security', array(
-    'encoders' => array(
-        'JMS\FooBundle\Entity\User7' => array(
+$container->loadFromExtension('security', [
+    'encoders' => [
+        'JMS\FooBundle\Entity\User7' => [
             'algorithm' => 'argon2i',
-        ),
-    ),
-    'providers' => array(
-        'default' => array('id' => 'foo'),
-    ),
-    'firewalls' => array(
-        'main' => array(
+        ],
+    ],
+    'providers' => [
+        'default' => ['id' => 'foo'],
+    ],
+    'firewalls' => [
+        'main' => [
             'form_login' => false,
             'http_basic' => null,
             'logout_on_user_change' => true,
-        ),
-    ),
-));
+        ],
+    ],
+]);

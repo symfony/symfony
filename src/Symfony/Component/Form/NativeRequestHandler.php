@@ -26,13 +26,13 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * The allowed keys of the $_FILES array.
      */
-    private static $fileKeys = array(
+    private static $fileKeys = [
         'error',
         'name',
         'size',
         'tmp_name',
         'type',
-    );
+    ];
 
     public function __construct(ServerParams $params = null)
     {
@@ -80,13 +80,13 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $form->addError(new FormError(
                     \call_user_func($form->getConfig()->getOption('upload_max_size_message')),
                     null,
-                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
+                    ['{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()]
                 ));
 
                 return;
             }
 
-            $fixedFiles = array();
+            $fixedFiles = [];
             foreach ($_FILES as $fileKey => $file) {
                 $fixedFiles[$fileKey] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
             }
@@ -94,10 +94,10 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $params = $_POST;
                 $files = $fixedFiles;
-            } elseif (array_key_exists($name, $_POST) || array_key_exists($name, $fixedFiles)) {
-                $default = $form->getConfig()->getCompound() ? array() : null;
-                $params = array_key_exists($name, $_POST) ? $_POST[$name] : $default;
-                $files = array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
+            } elseif (\array_key_exists($name, $_POST) || \array_key_exists($name, $fixedFiles)) {
+                $default = $form->getConfig()->getCompound() ? [] : null;
+                $params = \array_key_exists($name, $_POST) ? $_POST[$name] : $default;
+                $files = \array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
             } else {
                 // Don't submit the form if it is not present in the request
                 return;
@@ -113,6 +113,10 @@ class NativeRequestHandler implements RequestHandlerInterface
         // Don't auto-submit the form unless at least one field is present.
         if ('' === $name && \count(array_intersect_key($data, $form->all())) <= 0) {
             return;
+        }
+
+        if (\is_array($data) && \array_key_exists('_method', $data) && $method === $data['_method'] && !$form->has('_method')) {
+            unset($data['_method']);
         }
 
         $form->submit($data, 'PATCH' !== $method);
@@ -183,13 +187,13 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         foreach ($data['name'] as $key => $name) {
-            $files[$key] = self::fixPhpFilesArray(array(
+            $files[$key] = self::fixPhpFilesArray([
                 'error' => $data['error'][$key],
                 'name' => $name,
                 'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
                 'size' => $data['size'][$key],
-            ));
+            ]);
         }
 
         return $files;

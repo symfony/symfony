@@ -20,18 +20,18 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class UnaryNode extends Node
 {
-    private static $operators = array(
+    private static $operators = [
         '!' => '!',
         'not' => '!',
         '+' => '+',
         '-' => '-',
-    );
+    ];
 
     public function __construct($operator, Node $node)
     {
         parent::__construct(
-            array('node' => $node),
-            array('operator' => $operator)
+            ['node' => $node],
+            ['operator' => $operator]
         );
     }
 
@@ -61,6 +61,6 @@ class UnaryNode extends Node
 
     public function toArray()
     {
-        return array('(', $this->attributes['operator'].' ', $this->nodes['node'], ')');
+        return ['(', $this->attributes['operator'].' ', $this->nodes['node'], ')'];
     }
 }

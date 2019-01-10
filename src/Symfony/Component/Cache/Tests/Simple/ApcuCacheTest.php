@@ -15,11 +15,11 @@ use Symfony\Component\Cache\Simple\ApcuCache;
 
 class ApcuCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',
         'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
-    );
+    ];
 
     public function createSimpleCache($defaultLifetime = 0)
     {

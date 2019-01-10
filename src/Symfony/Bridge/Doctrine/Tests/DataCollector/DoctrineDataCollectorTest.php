@@ -22,27 +22,27 @@ class DoctrineDataCollectorTest extends TestCase
 {
     public function testCollectConnections()
     {
-        $c = $this->createCollector(array());
+        $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
-        $this->assertEquals(array('default' => 'doctrine.dbal.default_connection'), $c->getConnections());
+        $this->assertEquals(['default' => 'doctrine.dbal.default_connection'], $c->getConnections());
     }
 
     public function testCollectManagers()
     {
-        $c = $this->createCollector(array());
+        $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
-        $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $c->getManagers());
+        $this->assertEquals(['default' => 'doctrine.orm.default_entity_manager'], $c->getManagers());
     }
 
     public function testCollectQueryCount()
     {
-        $c = $this->createCollector(array());
+        $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
         $this->assertEquals(0, $c->getQueryCount());
 
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 0),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 0],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $this->assertEquals(1, $c->getQueryCount());
@@ -50,21 +50,21 @@ class DoctrineDataCollectorTest extends TestCase
 
     public function testCollectTime()
     {
-        $c = $this->createCollector(array());
+        $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
         $this->assertEquals(0, $c->getTime());
 
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $this->assertEquals(1, $c->getTime());
 
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
-            array('sql' => 'SELECT * FROM table2', 'params' => array(), 'types' => array(), 'executionMS' => 2),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
+            ['sql' => 'SELECT * FROM table2', 'params' => [], 'types' => [], 'executionMS' => 2],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $this->assertEquals(3, $c->getTime());
@@ -75,9 +75,9 @@ class DoctrineDataCollectorTest extends TestCase
      */
     public function testCollectQueries($param, $types, $expected, $explainable)
     {
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => [$param], 'types' => $types, 'executionMS' => 1],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
 
@@ -88,32 +88,32 @@ class DoctrineDataCollectorTest extends TestCase
 
     public function testCollectQueryWithNoParams()
     {
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
-            array('sql' => 'SELECT * FROM table1', 'params' => null, 'types' => null, 'executionMS' => 1),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
+            ['sql' => 'SELECT * FROM table1', 'params' => null, 'types' => null, 'executionMS' => 1],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
 
         $collectedQueries = $c->getQueries();
-        $this->assertEquals(array(), $collectedQueries['default'][0]['params']);
+        $this->assertEquals([], $collectedQueries['default'][0]['params']);
         $this->assertTrue($collectedQueries['default'][0]['explainable']);
-        $this->assertEquals(array(), $collectedQueries['default'][1]['params']);
+        $this->assertEquals([], $collectedQueries['default'][1]['params']);
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
     public function testReset()
     {
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
 
         $c->reset();
         $c->collect(new Request(), new Response());
 
-        $this->assertEquals(array('default' => array()), $c->getQueries());
+        $this->assertEquals(['default' => []], $c->getQueries());
     }
 
     /**
@@ -121,9 +121,9 @@ class DoctrineDataCollectorTest extends TestCase
      */
     public function testSerialization($param, $types, $expected, $explainable)
     {
-        $queries = array(
-            array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),
-        );
+        $queries = [
+            ['sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => [$param], 'types' => $types, 'executionMS' => 1],
+        ];
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $c = unserialize(serialize($c));
@@ -135,25 +135,25 @@ class DoctrineDataCollectorTest extends TestCase
 
     public function paramProvider()
     {
-        $tests = array(
-            array('some value', array(), 'some value', true),
-            array(1, array(), 1, true),
-            array(true, array(), true, true),
-            array(null, array(), null, true),
-            array(new \DateTime('2011-09-11'), array('date'), '2011-09-11', true),
-            array(fopen(__FILE__, 'r'), array(), 'Resource(stream)', false),
-            array(new \stdClass(), array(), 'Object(stdClass)', false),
-            array(
+        $tests = [
+            ['some value', [], 'some value', true],
+            [1, [], 1, true],
+            [true, [], true, true],
+            [null, [], null, true],
+            [new \DateTime('2011-09-11'), ['date'], '2011-09-11', true],
+            [fopen(__FILE__, 'r'), [], 'Resource(stream)', false],
+            [new \stdClass(), [], 'Object(stdClass)', false],
+            [
                 new StringRepresentableClass(),
-                array(),
+                [],
                 'Object(Symfony\Bridge\Doctrine\Tests\DataCollector\StringRepresentableClass): "string representation"',
                 false,
-            ),
-        );
+            ],
+        ];
 
         if (version_compare(Version::VERSION, '2.6', '>=')) {
-            $tests[] = array('this is not a date', array('date'), 'this is not a date', false);
-            $tests[] = array(new \stdClass(), array('date'), 'Object(stdClass)', false);
+            $tests[] = ['this is not a date', ['date'], 'this is not a date', false];
+            $tests[] = [new \stdClass(), ['date'], 'Object(stdClass)', false];
         }
 
         return $tests;
@@ -172,11 +172,11 @@ class DoctrineDataCollectorTest extends TestCase
         $registry
             ->expects($this->any())
             ->method('getConnectionNames')
-            ->will($this->returnValue(array('default' => 'doctrine.dbal.default_connection')));
+            ->will($this->returnValue(['default' => 'doctrine.dbal.default_connection']));
         $registry
             ->expects($this->any())
             ->method('getManagerNames')
-            ->will($this->returnValue(array('default' => 'doctrine.orm.default_entity_manager')));
+            ->will($this->returnValue(['default' => 'doctrine.orm.default_entity_manager']));
         $registry->expects($this->any())
             ->method('getConnection')
             ->will($this->returnValue($connection));

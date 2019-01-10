@@ -21,7 +21,7 @@ abstract class CacheTestCase extends SimpleCacheTest
     {
         parent::setUp();
 
-        if (!array_key_exists('testPrune', $this->skippedTests) && !$this->createSimpleCache() instanceof PruneableInterface) {
+        if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createSimpleCache() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
     }
@@ -32,7 +32,7 @@ abstract class CacheTestCase extends SimpleCacheTest
             return parent::validKeys();
         }
 
-        return array_merge(parent::validKeys(), array(array("a\0b")));
+        return array_merge(parent::validKeys(), [["a\0b"]]);
     }
 
     public function testDefaultLifeTime()
@@ -68,9 +68,9 @@ abstract class CacheTestCase extends SimpleCacheTest
 
         $this->assertNull($cache->get('foo'));
 
-        $cache->setMultiple(array('foo' => new NotUnserializable()));
+        $cache->setMultiple(['foo' => new NotUnserializable()]);
 
-        foreach ($cache->getMultiple(array('foo')) as $value) {
+        foreach ($cache->getMultiple(['foo']) as $value) {
         }
         $this->assertNull($value);
 

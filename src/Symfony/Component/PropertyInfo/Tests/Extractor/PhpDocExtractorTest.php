@@ -50,7 +50,7 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractTypesWithCustomPrefixes($property, array $type = null)
     {
-        $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
+        $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
         $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
@@ -60,130 +60,130 @@ class PhpDocExtractorTest extends TestCase
      */
     public function testExtractTypesWithNoPrefixes($property, array $type = null)
     {
-        $noPrefixExtractor = new PhpDocExtractor(null, array(), array(), array());
+        $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
         $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesProvider()
     {
-        return array(
-            array('foo', null, 'Short description.', 'Long description.'),
-            array('bar', array(new Type(Type::BUILTIN_TYPE_STRING)), 'This is bar', null),
-            array('baz', array(new Type(Type::BUILTIN_TYPE_INT)), 'Should be used.', null),
-            array('foo2', array(new Type(Type::BUILTIN_TYPE_FLOAT)), null, null),
-            array('foo3', array(new Type(Type::BUILTIN_TYPE_CALLABLE)), null, null),
-            array('foo4', array(new Type(Type::BUILTIN_TYPE_NULL)), null, null),
-            array('foo5', null, null, null),
-            array(
+        return [
+            ['foo', null, 'Short description.', 'Long description.'],
+            ['bar', [new Type(Type::BUILTIN_TYPE_STRING)], 'This is bar', null],
+            ['baz', [new Type(Type::BUILTIN_TYPE_INT)], 'Should be used.', null],
+            ['foo2', [new Type(Type::BUILTIN_TYPE_FLOAT)], null, null],
+            ['foo3', [new Type(Type::BUILTIN_TYPE_CALLABLE)], null, null],
+            ['foo4', [new Type(Type::BUILTIN_TYPE_NULL)], null, null],
+            ['foo5', null, null, null],
+            [
                 'files',
-                array(
+                [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'SplFileInfo')),
                     new Type(Type::BUILTIN_TYPE_RESOURCE),
-                ),
+                ],
                 null,
                 null,
-            ),
-            array('bal', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')), null, null),
-            array('parent', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')), null, null),
-            array('collection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('nestedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))), null, null),
-            array('mixedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)), null, null),
-            array('a', array(new Type(Type::BUILTIN_TYPE_INT)), 'A.', null),
-            array('b', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')), 'B.', null),
-            array('c', array(new Type(Type::BUILTIN_TYPE_BOOL, true)), null, null),
-            array('d', array(new Type(Type::BUILTIN_TYPE_BOOL)), null, null),
-            array('e', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))), null, null),
-            array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
-            array('h', array(new Type(Type::BUILTIN_TYPE_STRING, true)), null, null),
-            array('i', array(new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)), null, null),
-            array('j', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')), null, null),
-            array('donotexist', null, null, null),
-            array('staticGetter', null, null, null),
-            array('staticSetter', null, null, null),
-            array('emptyVar', null, null, null),
-        );
+            ],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
+            ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
+            ['a', [new Type(Type::BUILTIN_TYPE_INT)], 'A.', null],
+            ['b', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], 'B.', null],
+            ['c', [new Type(Type::BUILTIN_TYPE_BOOL, true)], null, null],
+            ['d', [new Type(Type::BUILTIN_TYPE_BOOL)], null, null],
+            ['e', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))], null, null],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
+            ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
+            ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['donotexist', null, null, null],
+            ['staticGetter', null, null, null],
+            ['staticSetter', null, null, null],
+            ['emptyVar', null, null, null],
+        ];
     }
 
     public function typesWithCustomPrefixesProvider()
     {
-        return array(
-            array('foo', null, 'Short description.', 'Long description.'),
-            array('bar', array(new Type(Type::BUILTIN_TYPE_STRING)), 'This is bar', null),
-            array('baz', array(new Type(Type::BUILTIN_TYPE_INT)), 'Should be used.', null),
-            array('foo2', array(new Type(Type::BUILTIN_TYPE_FLOAT)), null, null),
-            array('foo3', array(new Type(Type::BUILTIN_TYPE_CALLABLE)), null, null),
-            array('foo4', array(new Type(Type::BUILTIN_TYPE_NULL)), null, null),
-            array('foo5', null, null, null),
-            array(
+        return [
+            ['foo', null, 'Short description.', 'Long description.'],
+            ['bar', [new Type(Type::BUILTIN_TYPE_STRING)], 'This is bar', null],
+            ['baz', [new Type(Type::BUILTIN_TYPE_INT)], 'Should be used.', null],
+            ['foo2', [new Type(Type::BUILTIN_TYPE_FLOAT)], null, null],
+            ['foo3', [new Type(Type::BUILTIN_TYPE_CALLABLE)], null, null],
+            ['foo4', [new Type(Type::BUILTIN_TYPE_NULL)], null, null],
+            ['foo5', null, null, null],
+            [
                 'files',
-                array(
+                [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'SplFileInfo')),
                     new Type(Type::BUILTIN_TYPE_RESOURCE),
-                ),
+                ],
                 null,
                 null,
-            ),
-            array('bal', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')), null, null),
-            array('parent', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')), null, null),
-            array('collection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('nestedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))), null, null),
-            array('mixedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)), null, null),
-            array('a', null, 'A.', null),
-            array('b', null, 'B.', null),
-            array('c', array(new Type(Type::BUILTIN_TYPE_BOOL, true)), null, null),
-            array('d', array(new Type(Type::BUILTIN_TYPE_BOOL)), null, null),
-            array('e', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))), null, null),
-            array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
-            array('h', array(new Type(Type::BUILTIN_TYPE_STRING, true)), null, null),
-            array('i', array(new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)), null, null),
-            array('j', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')), null, null),
-            array('donotexist', null, null, null),
-            array('staticGetter', null, null, null),
-            array('staticSetter', null, null, null),
-        );
+            ],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
+            ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
+            ['a', null, 'A.', null],
+            ['b', null, 'B.', null],
+            ['c', [new Type(Type::BUILTIN_TYPE_BOOL, true)], null, null],
+            ['d', [new Type(Type::BUILTIN_TYPE_BOOL)], null, null],
+            ['e', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))], null, null],
+            ['f', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
+            ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
+            ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['donotexist', null, null, null],
+            ['staticGetter', null, null, null],
+            ['staticSetter', null, null, null],
+        ];
     }
 
     public function typesWithNoPrefixesProvider()
     {
-        return array(
-            array('foo', null, 'Short description.', 'Long description.'),
-            array('bar', array(new Type(Type::BUILTIN_TYPE_STRING)), 'This is bar', null),
-            array('baz', array(new Type(Type::BUILTIN_TYPE_INT)), 'Should be used.', null),
-            array('foo2', array(new Type(Type::BUILTIN_TYPE_FLOAT)), null, null),
-            array('foo3', array(new Type(Type::BUILTIN_TYPE_CALLABLE)), null, null),
-            array('foo4', array(new Type(Type::BUILTIN_TYPE_NULL)), null, null),
-            array('foo5', null, null, null),
-            array(
+        return [
+            ['foo', null, 'Short description.', 'Long description.'],
+            ['bar', [new Type(Type::BUILTIN_TYPE_STRING)], 'This is bar', null],
+            ['baz', [new Type(Type::BUILTIN_TYPE_INT)], 'Should be used.', null],
+            ['foo2', [new Type(Type::BUILTIN_TYPE_FLOAT)], null, null],
+            ['foo3', [new Type(Type::BUILTIN_TYPE_CALLABLE)], null, null],
+            ['foo4', [new Type(Type::BUILTIN_TYPE_NULL)], null, null],
+            ['foo5', null, null, null],
+            [
                 'files',
-                array(
+                [
                     new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'SplFileInfo')),
                     new Type(Type::BUILTIN_TYPE_RESOURCE),
-                ),
+                ],
                 null,
                 null,
-            ),
-            array('bal', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')), null, null),
-            array('parent', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')), null, null),
-            array('collection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('nestedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))), null, null),
-            array('mixedCollection', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)), null, null),
-            array('a', null, 'A.', null),
-            array('b', null, 'B.', null),
-            array('c', null, null, null),
-            array('d', null, null, null),
-            array('e', null, null, null),
-            array('f', null, null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
-            array('h', array(new Type(Type::BUILTIN_TYPE_STRING, true)), null, null),
-            array('i', array(new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)), null, null),
-            array('j', array(new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')), null, null),
-            array('donotexist', null, null, null),
-            array('staticGetter', null, null, null),
-            array('staticSetter', null, null, null),
-        );
+            ],
+            ['bal', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')], null, null],
+            ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy')], null, null],
+            ['collection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))], null, null],
+            ['nestedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING, false)))], null, null],
+            ['mixedCollection', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, null)], null, null],
+            ['a', null, 'A.', null],
+            ['b', null, 'B.', null],
+            ['c', null, null, null],
+            ['d', null, null, null],
+            ['e', null, null, null],
+            ['f', null, null, null],
+            ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)], 'Nullable array.', null],
+            ['h', [new Type(Type::BUILTIN_TYPE_STRING, true)], null, null],
+            ['i', [new Type(Type::BUILTIN_TYPE_STRING, true), new Type(Type::BUILTIN_TYPE_INT, true)], null, null],
+            ['j', [new Type(Type::BUILTIN_TYPE_OBJECT, true, 'DateTime')], null, null],
+            ['donotexist', null, null, null],
+            ['staticGetter', null, null, null],
+            ['staticSetter', null, null, null],
+        ];
     }
 
     public function testReturnNullOnEmptyDocBlock()
@@ -193,17 +193,17 @@ class PhpDocExtractorTest extends TestCase
 
     public function dockBlockFallbackTypesProvider()
     {
-        return array(
-            'pub' => array(
-                'pub', array(new Type(Type::BUILTIN_TYPE_STRING)),
-            ),
-            'protAcc' => array(
-                'protAcc', array(new Type(Type::BUILTIN_TYPE_INT)),
-            ),
-            'protMut' => array(
-                'protMut', array(new Type(Type::BUILTIN_TYPE_BOOL)),
-            ),
-        );
+        return [
+            'pub' => [
+                'pub', [new Type(Type::BUILTIN_TYPE_STRING)],
+            ],
+            'protAcc' => [
+                'protAcc', [new Type(Type::BUILTIN_TYPE_INT)],
+            ],
+            'protMut' => [
+                'protMut', [new Type(Type::BUILTIN_TYPE_BOOL)],
+            ],
+        ];
     }
 
     /**

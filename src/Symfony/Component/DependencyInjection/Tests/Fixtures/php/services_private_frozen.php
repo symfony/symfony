@@ -17,30 +17,30 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
-        $this->methodMap = array(
+        $this->services = [];
+        $this->methodMap = [
             'bar_service' => 'getBarServiceService',
             'baz_service' => 'getBazServiceService',
             'foo_service' => 'getFooServiceService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'baz_service' => true,
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'baz_service' => true,
-        );
+        ];
     }
 
     public function compile()

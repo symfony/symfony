@@ -22,36 +22,36 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
 {
     public function dataProviderISO()
     {
-        $data = array(
-            array('P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'),
-            array('P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'),
-            array('P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'),
-            array('P%yY%mM%dDT%hH%iM', 'P10Y2M3DT16H5M', 'P10Y2M3DT16H5M'),
-            array('P%yY%mM%dDT%hH', 'P10Y2M3DT16H', 'P10Y2M3DT16H'),
-            array('P%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'),
-        );
+        $data = [
+            ['P%YY%MM%DDT%HH%IM%SS', 'P00Y00M00DT00H00M00S', 'PT0S'],
+            ['P%yY%mM%dDT%hH%iM%sS', 'P0Y0M0DT0H0M0S', 'PT0S'],
+            ['P%yY%mM%dDT%hH%iM%sS', 'P10Y2M3DT16H5M6S', 'P10Y2M3DT16H5M6S'],
+            ['P%yY%mM%dDT%hH%iM', 'P10Y2M3DT16H5M', 'P10Y2M3DT16H5M'],
+            ['P%yY%mM%dDT%hH', 'P10Y2M3DT16H', 'P10Y2M3DT16H'],
+            ['P%yY%mM%dD', 'P10Y2M3D', 'P10Y2M3DT0H'],
+        ];
 
         return $data;
     }
 
     public function dataProviderDate()
     {
-        $data = array(
-            array(
+        $data = [
+            [
                 '%y years %m months %d days %h hours %i minutes %s seconds',
                 '10 years 2 months 3 days 16 hours 5 minutes 6 seconds',
                 'P10Y2M3DT16H5M6S',
-            ),
-            array(
+            ],
+            [
                 '%y years %m months %d days %h hours %i minutes',
                 '10 years 2 months 3 days 16 hours 5 minutes',
                 'P10Y2M3DT16H5M',
-            ),
-            array('%y years %m months %d days %h hours', '10 years 2 months 3 days 16 hours', 'P10Y2M3DT16H'),
-            array('%y years %m months %d days', '10 years 2 months 3 days', 'P10Y2M3D'),
-            array('%y years %m months', '10 years 2 months', 'P10Y2M'),
-            array('%y year', '1 year', 'P1Y'),
-        );
+            ],
+            ['%y years %m months %d days %h hours', '10 years 2 months 3 days 16 hours', 'P10Y2M3DT16H'],
+            ['%y years %m months %d days', '10 years 2 months 3 days', 'P10Y2M3D'],
+            ['%y years %m months', '10 years 2 months', 'P10Y2M'],
+            ['%y year', '1 year', 'P1Y'],
+        ];
 
         return $data;
     }

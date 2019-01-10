@@ -42,9 +42,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testLabelIsNotRenderedWhenSetToFalse()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => false,
-        ));
+        ]);
         $html = $this->renderRow($form->createView());
 
         $this->assertMatchesXpath($html,
@@ -194,11 +194,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array('a', 'b'), array(
+        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', ['a', 'b'], [
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        ));
+        ]);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr[./td/input[@type="text"][@value="a"]]
@@ -212,11 +212,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testEmptyCollection()
     {
-        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+        $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', [], [
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        ));
+        ]);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [./tr[@style="display: none"][./td[@colspan="2"]/input[@type="hidden"][@id="names__token"]]]
     [count(./tr[./td/input])=1]
@@ -234,10 +234,10 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        $html = $this->renderForm($view, array(
+        $html = $this->renderForm($view, [
             'id' => 'my&id',
-            'attr' => array('class' => 'my&class'),
-        ));
+            'attr' => ['class' => 'my&class'],
+        ]);
 
         $this->assertMatchesXpath($html,
 '/form
@@ -284,7 +284,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             ->getForm()
             ->createView();
 
-        $this->assertWidgetMatchesXpath($view, array(),
+        $this->assertWidgetMatchesXpath($view, [],
 '/table
     [
         ./tr
@@ -317,14 +317,14 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add($this->factory
-                ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array('error_bubbling' => false))
+                ->createNamedBuilder('child', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, ['error_bubbling' => false])
                 ->add('grandChild', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             )
             ->getForm();
 
         $form->get('child')->addError(new FormError('[trans]Error![/trans]'));
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr/td/ul[./li[.="[trans]Error![/trans]"]]
@@ -349,7 +349,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
             )
             ->getForm();
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr[@style="display: none"]
@@ -365,11 +365,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeated()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', [
             'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-        ));
+        ]);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr
@@ -399,13 +399,13 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testRepeatedWithCustomOptions()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', [
             'type' => 'Symfony\Component\Form\Extension\Core\Type\PasswordType',
-            'first_options' => array('label' => 'Test', 'required' => false),
-            'second_options' => array('label' => 'Test2'),
-        ));
+            'first_options' => ['label' => 'Test', 'required' => false],
+            'second_options' => ['label' => 'Test2'],
+        ]);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr
@@ -439,11 +439,11 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
      */
     public function testCollectionRowWithCustomBlock()
     {
-        $collection = array('one', 'two', 'three');
+        $collection = ['one', 'two', 'three'];
         $form = $this->factory->createNamedBuilder('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', $collection)
             ->getForm();
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/table
     [
         ./tr[./td/label[.="Custom label: [trans]0[/trans]"]]
@@ -470,7 +470,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         // Insert the start tag, the end tag should be rendered by the helper
         // Unfortunately this is not valid HTML, because the surrounding table
         // tag is missing. If someone renders a form with table layout
-        // manually, she should call form_rest() explicitly within the <table>
+        // manually, they should call form_rest() explicitly within the <table>
         // tag.
         $this->assertMatchesXpath('<form>'.$html,
 '/form
@@ -503,16 +503,16 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->renderWidget($view['field1']);
 
         // Rest should only contain field2, but isn't rendered
-        $html = $this->renderEnd($view, array('render_rest' => false));
+        $html = $this->renderEnd($view, ['render_rest' => false]);
 
         $this->assertEquals('</form>', $html);
     }
 
     public function testWidgetContainerAttributes()
     {
-        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
-            'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
-        ));
+        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'attr' => ['class' => 'foobar', 'data-foo' => 'bar'],
+        ]);
 
         $form->add('text', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
@@ -524,9 +524,9 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 
     public function testWidgetContainerAttributeNameRepeatedIfTrue()
     {
-        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
-            'attr' => array('foo' => true),
-        ));
+        $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'attr' => ['foo' => true],
+        ]);
 
         $html = $this->renderWidget($form->createView());
 

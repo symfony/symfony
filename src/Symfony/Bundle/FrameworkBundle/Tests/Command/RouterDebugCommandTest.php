@@ -24,7 +24,7 @@ class RouterDebugCommandTest extends TestCase
     public function testDebugAllRoutes()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => null), array('decorated' => false));
+        $ret = $tester->execute(['name' => null], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Name   Method   Scheme   Host   Path', $tester->getDisplay());
@@ -33,7 +33,7 @@ class RouterDebugCommandTest extends TestCase
     public function testDebugSingleRoute()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'foo'), array('decorated' => false));
+        $ret = $tester->execute(['name' => 'foo'], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Route Name   | foo', $tester->getDisplay());
@@ -44,7 +44,7 @@ class RouterDebugCommandTest extends TestCase
      */
     public function testDebugInvalidRoute()
     {
-        $this->createCommandTester()->execute(array('name' => 'test'));
+        $this->createCommandTester()->execute(['name' => 'test']);
     }
 
     /**
@@ -58,7 +58,7 @@ class RouterDebugCommandTest extends TestCase
 
         $tester = new CommandTester($application->find('debug:router'));
 
-        $tester->execute(array());
+        $tester->execute([]);
 
         $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
     }
@@ -117,7 +117,7 @@ class RouterDebugCommandTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundles')
-            ->willReturn(array())
+            ->willReturn([])
         ;
 
         return $kernel;

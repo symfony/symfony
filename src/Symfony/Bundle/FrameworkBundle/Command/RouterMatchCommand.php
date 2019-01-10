@@ -78,12 +78,12 @@ class RouterMatchCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('path_info', InputArgument::REQUIRED, 'A path info'),
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Sets the HTTP method'),
                 new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'Sets the URI scheme (usually http or https)'),
                 new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Sets the URI host'),
-            ))
+            ])
             ->setDescription('Helps debug routes by simulating a path info match')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> shows which routes match a given request and which don't and for what reason:
@@ -136,7 +136,7 @@ EOF
                 $io->success(sprintf('Route "%s" matches', $trace['name']));
 
                 $routerDebugCommand = $this->getApplication()->find('debug:router');
-                $routerDebugCommand->run(new ArrayInput(array('name' => $trace['name'])), $output);
+                $routerDebugCommand->run(new ArrayInput(['name' => $trace['name']]), $output);
 
                 $matches = true;
             } elseif ($input->getOption('verbose')) {

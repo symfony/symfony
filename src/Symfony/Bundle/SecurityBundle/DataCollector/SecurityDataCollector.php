@@ -60,7 +60,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         if (null === $this->tokenStorage) {
-            $this->data = array(
+            $this->data = [
                 'enabled' => false,
                 'authenticated' => false,
                 'impersonated' => false,
@@ -70,12 +70,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
-                'roles' => array(),
-                'inherited_roles' => array(),
+                'roles' => [],
+                'inherited_roles' => [],
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
-            );
+            ];
         } elseif (null === $token = $this->tokenStorage->getToken()) {
-            $this->data = array(
+            $this->data = [
                 'enabled' => true,
                 'authenticated' => false,
                 'impersonated' => false,
@@ -85,12 +85,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
-                'roles' => array(),
-                'inherited_roles' => array(),
+                'roles' => [],
+                'inherited_roles' => [],
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
-            );
+            ];
         } else {
-            $inheritedRoles = array();
+            $inheritedRoles = [];
             $assignedRoles = $token->getRoles();
 
             $impersonatorUser = null;
@@ -127,7 +127,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 return $role->getRole();
             };
 
-            $this->data = array(
+            $this->data = [
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
                 'impersonated' => null !== $impersonatorUser,
@@ -140,7 +140,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 'roles' => array_map($extractRoles, $assignedRoles),
                 'inherited_roles' => array_unique(array_map($extractRoles, $inheritedRoles)),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
-            );
+            ];
         }
 
         // collect voters and access decision manager information
@@ -152,9 +152,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 $this->data['voters'][] = $this->hasVarDumper ? new ClassStub(\get_class($voter)) : \get_class($voter);
             }
         } else {
-            $this->data['access_decision_log'] = array();
+            $this->data['access_decision_log'] = [];
             $this->data['voter_strategy'] = 'unknown';
-            $this->data['voters'] = array();
+            $this->data['voters'] = [];
         }
 
         // collect firewall context information
@@ -162,7 +162,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         if ($this->firewallMap instanceof FirewallMap) {
             $firewallConfig = $this->firewallMap->getFirewallConfig($request);
             if (null !== $firewallConfig) {
-                $this->data['firewall'] = array(
+                $this->data['firewall'] = [
                     'name' => $firewallConfig->getName(),
                     'allows_anonymous' => $firewallConfig->allowsAnonymous(),
                     'request_matcher' => $firewallConfig->getRequestMatcher(),
@@ -175,7 +175,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
                     'user_checker' => $firewallConfig->getUserChecker(),
                     'listeners' => $firewallConfig->getListeners(),
-                );
+                ];
 
                 // generate exit impersonation path from current request
                 if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
@@ -189,7 +189,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         }
 
         // collect firewall listeners information
-        $this->data['listeners'] = array();
+        $this->data['listeners'] = [];
         if ($this->firewall) {
             $this->data['listeners'] = $this->firewall->getWrappedListeners();
         }
@@ -200,7 +200,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      */
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
     public function lateCollect()

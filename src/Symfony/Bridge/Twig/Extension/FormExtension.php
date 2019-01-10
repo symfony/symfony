@@ -65,10 +65,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             // {% form_theme form "SomeBundle::widgets.twig" %}
             new FormThemeTokenParser(),
-        );
+        ];
     }
 
     /**
@@ -76,17 +76,17 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('form_widget', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_errors', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_label', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_row', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_rest', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_start', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('form_end', null, array('node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => array('html'))),
-            new TwigFunction('csrf_token', array('Symfony\Component\Form\FormRenderer', 'renderCsrfToken')),
-        );
+        return [
+            new TwigFunction('form_widget', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_errors', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_label', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_row', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_rest', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_start', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('form_end', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
+            new TwigFunction('csrf_token', ['Symfony\Component\Form\FormRenderer', 'renderCsrfToken']),
+        ];
     }
 
     /**
@@ -94,10 +94,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('humanize', array('Symfony\Component\Form\FormRenderer', 'humanize')),
-            new TwigFilter('form_encode_currency', array('Symfony\Component\Form\FormRenderer', 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
-        );
+        return [
+            new TwigFilter('humanize', ['Symfony\Component\Form\FormRenderer', 'humanize']),
+            new TwigFilter('form_encode_currency', ['Symfony\Component\Form\FormRenderer', 'encodeCurrency'], ['is_safe' => ['html'], 'needs_environment' => true]),
+        ];
     }
 
     /**
@@ -105,10 +105,10 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
      */
     public function getTests()
     {
-        return array(
+        return [
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
             new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
-        );
+        ];
     }
 
     /**

@@ -34,11 +34,11 @@ class ElementParserTest extends TestCase
 
     public function getParseTestData()
     {
-        return array(
-            array('*', 'Element[*]'),
-            array('testel', 'Element[testel]'),
-            array('testns|*', 'Element[testns|*]'),
-            array('testns|testel', 'Element[testns|testel]'),
-        );
+        return [
+            ['*', 'Element[*]'],
+            ['testel', 'Element[testel]'],
+            ['testns|*', 'Element[testns|*]'],
+            ['testns|testel', 'Element[testns|testel]'],
+        ];
     }
 }

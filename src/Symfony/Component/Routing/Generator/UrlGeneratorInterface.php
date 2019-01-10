@@ -82,5 +82,5 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH);
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH);
 }

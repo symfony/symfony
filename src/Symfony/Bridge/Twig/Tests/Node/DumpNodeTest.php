@@ -29,7 +29,7 @@ class DumpNodeTest extends TestCase
 
         $expected = <<<'EOTXT'
 if ($this->env->isDebug()) {
-    $barvars = array();
+    $barvars = [];
     foreach ($context as $barkey => $barval) {
         if (!$barval instanceof \Twig\Template) {
             $barvars[$barkey] = $barval;
@@ -53,7 +53,7 @@ EOTXT;
 
         $expected = <<<'EOTXT'
     if ($this->env->isDebug()) {
-        $barvars = array();
+        $barvars = [];
         foreach ($context as $barkey => $barval) {
             if (!$barval instanceof \Twig\Template) {
                 $barvars[$barkey] = $barval;
@@ -105,10 +105,10 @@ EOTXT;
         $expected = <<<'EOTXT'
 if ($this->env->isDebug()) {
     // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump(array(
+    \Symfony\Component\VarDumper\VarDumper::dump([
         "foo" => %foo%,
         "bar" => %bar%,
-    ));
+    ]);
 }
 
 EOTXT;

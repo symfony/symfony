@@ -154,7 +154,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                 $values[$key] = $item->isHit() ? $item->get() : $default;
             }
 
-            return $value;
+            return $values;
         }
 
         foreach ($items as $key => $item) {

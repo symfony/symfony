@@ -111,22 +111,4 @@ class ResolveBindingsPassTest extends TestCase
 
         $this->assertEquals(array(array('setDefaultLocale', array('fr'))), $definition->getMethodCalls());
     }
-
-    public function testOverriddenBindings()
-    {
-        $container = new ContainerBuilder();
-
-        $binding = new BoundArgument('bar');
-
-        $container->register('foo', 'stdClass')
-            ->setBindings(array('$foo' => clone $binding));
-        $container->register('bar', 'stdClass')
-            ->setBindings(array('$foo' => clone $binding));
-
-        $container->register('foo', 'stdClass');
-
-        (new ResolveBindingsPass())->process($container);
-
-        $this->assertInstanceOf('stdClass', $container->get('foo'));
-    }
 }

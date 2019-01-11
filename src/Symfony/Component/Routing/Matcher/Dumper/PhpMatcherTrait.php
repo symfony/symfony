@@ -84,7 +84,7 @@ trait PhpMatcherTrait
         }
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
-        foreach ($this->staticRoutes[$trimmedPathinfo] ?? array() as list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition)) {
+        foreach ($this->staticRoutes[$trimmedPathinfo] ?? array() as list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $condition)) {
             if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
                 continue;
             }

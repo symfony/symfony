@@ -58,7 +58,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'widget\', ["foo" => "bar"])',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -78,7 +78,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["label" => "my label"])',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -168,7 +168,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar"])',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -194,7 +194,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in argument"])',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -225,7 +225,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -262,7 +262,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())

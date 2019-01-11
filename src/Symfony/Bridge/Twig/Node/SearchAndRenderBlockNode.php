@@ -100,7 +100,7 @@ class SearchAndRenderBlockNode extends FunctionExpression
                         // If not, add it to the array at runtime.
                         $compiler->raw('(twig_test_empty($_label_ = ');
                         $compiler->subcompile($label);
-                        $compiler->raw(') ? array() : array("label" => $_label_))');
+                        $compiler->raw(') ? [] : ["label" => $_label_])');
                     }
                 }
             }

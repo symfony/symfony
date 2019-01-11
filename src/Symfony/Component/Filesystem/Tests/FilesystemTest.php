@@ -1384,7 +1384,7 @@ class FilesystemTest extends FilesystemTestCase
         file_put_contents($file1, 'FILE1');
         file_put_contents($file2, 'FILE2');
 
-        $targetPath = $sourcePath . 'target' . \DIRECTORY_SEPARATOR;
+        $targetPath = $sourcePath.'target'.\DIRECTORY_SEPARATOR;
 
         $this->filesystem->mirror($sourcePath, $targetPath);
 
@@ -1394,7 +1394,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileEquals($file1, $targetPath.'directory'.\DIRECTORY_SEPARATOR.'file1');
         $this->assertFileEquals($file2, $targetPath.'file2');
 
-        $this->assertFalse(file_exists($targetPath.'target'));
+        $this->assertFileNotExists($targetPath.'target');
     }
 
     /**

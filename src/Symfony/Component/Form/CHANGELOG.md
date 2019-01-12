@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `block_prefix` option to `BaseType`.
+ * added `help_html` option to display the `help` text as HTML.
 
 4.2.0
 -----

@@ -18,6 +18,7 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   placeholder                                      disabled                                         
   preferred_choices                                help                                             
                                                    help_attr                                        
+                                                   help_html                                        
                                                    inherit_data                                     
                                                    label                                            
                                                    label_attr                                       

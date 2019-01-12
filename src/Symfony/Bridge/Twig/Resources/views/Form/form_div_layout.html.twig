@@ -294,9 +294,17 @@
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
         <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if translation_domain is same as(false) -%}
-                {{- help -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help -}}
+                {%- else -%}
+                    {{- help|raw -}}
+                {%- endif -%}
             {%- else -%}
-                {{- help|trans({}, translation_domain) -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans({}, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans({}, translation_domain)|raw -}}
+                {%- endif -%}
             {%- endif -%}
         </p>
     {%- endif -%}

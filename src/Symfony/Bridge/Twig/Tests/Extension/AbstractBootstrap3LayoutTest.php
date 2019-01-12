@@ -140,6 +140,89 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testHelpHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+'
+        );
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    /b
+    [.="text"]
+', 0
+        );
+    }
+
+    public function testHelpHtmlIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+            'help_html' => false,
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+'
+        );
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    /b
+    [.="text"]
+', 0
+        );
+    }
+
+    public function testHelpHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+            'help_html' => true,
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+', 0
+        );
+
+        $this->assertMatchesXpath($html,
+            '/span
+    [@id="name_help"]
+    [@class="help-block"]
+    /b
+    [.="text"]
+'
+        );
+    }
+
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');

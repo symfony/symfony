@@ -97,12 +97,12 @@ _MSG_;
     public function testInvalidDoubleCurlyBraces()
     {
         $this->expectException(InvalidArgumentException::class);
-        (new IntlFormatter)->formatIntl('Too many tags (add {{ limit }} tags or less)', 'en');
+        (new IntlFormatter())->formatIntl('Too many tags (add {{ limit }} tags or less)', 'en');
     }
 
     public function testValidDoubleCurlyBraces()
     {
-        $message = (new IntlFormatter)->formatIntl('Too {{ count }} many tags (add {{ limit }} tags or less)', 'en', array(
+        $message = (new IntlFormatter())->formatIntl('Too {{ count }} many tags (add {{ limit }} tags or less)', 'en', array(
             '{{ limit }}' => 4,
             '{{ count }}' => 3,
         ));

@@ -93,4 +93,20 @@ _MSG_;
         $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', array('%name%' => 'Fab')));
         $this->assertSame('Hello Fab', $formatter->formatIntl('Hello {name}', 'en', array('{{ name }}' => 'Fab')));
     }
+
+    public function testInvalidDoubleCurlyBraces()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        (new IntlFormatter)->formatIntl('Too many tags (add {{ limit }} tags or less)', 'en');
+    }
+
+    public function testValidDoubleCurlyBraces()
+    {
+        $message = (new IntlFormatter)->formatIntl('Too {{ count }} many tags (add {{ limit }} tags or less)', 'en', array(
+            '{{ limit }}' => 4,
+            '{{ count }}' => 3,
+        ));
+
+        $this->assertEquals('Too 3 many tags (add 4 tags or less)', $message);
+    }
 }

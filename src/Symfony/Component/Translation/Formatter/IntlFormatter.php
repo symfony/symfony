@@ -28,6 +28,12 @@ class IntlFormatter implements IntlFormatterInterface
      */
     public function formatIntl(string $message, string $locale, array $parameters = array()): string
     {
+        foreach ($parameters as $key => $value) {
+            if ('{{' === substr($key, 0, 2)) {
+                $message = str_replace($key, $value, $message);
+            }
+        }
+
         if (!$formatter = $this->cache[$locale][$message] ?? null) {
             if (!($this->hasMessageFormatter ?? $this->hasMessageFormatter = class_exists(\MessageFormatter::class))) {
                 throw new LogicException('Cannot parse message translation: please install the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.');

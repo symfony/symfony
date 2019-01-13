@@ -271,9 +271,6 @@ final class Dotenv
                         throw $this->createFormatException('Missing quote to end the value');
                     }
                 }
-                if ("\n" === $this->data[$this->cursor]) {
-                    throw $this->createFormatException('Missing quote to end the value');
-                }
                 ++$this->cursor;
                 $value = str_replace(array('\\"', '\r', '\n'), array('"', "\r", "\n"), $value);
                 $resolvedValue = $value;

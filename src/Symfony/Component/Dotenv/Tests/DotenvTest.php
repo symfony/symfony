@@ -40,8 +40,14 @@ class DotenvTest extends TestCase
             array('FOO', "Missing = in the environment variable declaration in \".env\" at line 1.\n...FOO...\n     ^ line 1 offset 3"),
             array('FOO="foo', "Missing quote to end the value in \".env\" at line 1.\n...FOO=\"foo...\n          ^ line 1 offset 8"),
             array('FOO=\'foo', "Missing quote to end the value in \".env\" at line 1.\n...FOO='foo...\n          ^ line 1 offset 8"),
+            array('FOO=\'foo'."\n", "Missing quote to end the value in \".env\" at line 1.\n...FOO='foo\\n...\n          ^ line 1 offset 8"),
             array('export FOO', "Unable to unset an environment variable in \".env\" at line 1.\n...export FOO...\n            ^ line 1 offset 10"),
             array('FOO=${FOO', "Unclosed braces on variable expansion in \".env\" at line 1.\n...FOO=\${FOO...\n           ^ line 1 offset 9"),
+            array('FOO= BAR', "Whitespace are not supported before the value in \".env\" at line 1.\n...FOO= BAR...\n      ^ line 1 offset 4"),
+            array('Стасян', "Invalid character in variable name in \".env\" at line 1.\n...Стасян...\n  ^ line 1 offset 0"),
+            array('FOO!', "Missing = in the environment variable declaration in \".env\" at line 1.\n...FOO!...\n     ^ line 1 offset 3"),
+            array('FOO=$(echo foo', "Missing closing parenthesis. in \".env\" at line 1.\n...FOO=$(echo foo...\n                ^ line 1 offset 14"),
+            array('FOO=$(echo foo'."\n", "Missing closing parenthesis. in \".env\" at line 1.\n...FOO=$(echo foo\\n...\n                ^ line 1 offset 14"),
         );
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -64,6 +70,7 @@ class DotenvTest extends TestCase
     {
         putenv('LOCAL=local');
         $_ENV['REMOTE'] = 'remote';
+        $_SERVER['SERVERVAR'] = 'servervar';
 
         $tests = array(
             // backslashes
@@ -150,6 +157,7 @@ class DotenvTest extends TestCase
             array('FOO=" $ "', array('FOO' => ' $ ')),
             array('BAR=$LOCAL', array('BAR' => 'local')),
             array('BAR=$REMOTE', array('BAR' => 'remote')),
+            array('BAR=$SERVERVAR', array('BAR' => 'servervar')),
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 
@@ -222,6 +230,7 @@ class DotenvTest extends TestCase
 
         // .env.local
 
+        $_SERVER['TEST_APP_ENV'] = 'local';
         file_put_contents("$path.local", 'FOO=localBAR');
         (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('localBAR', getenv('FOO'));

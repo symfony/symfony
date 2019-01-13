@@ -13,6 +13,10 @@
             <tag name="monolog.logger" channel="console" />
         </service>
 
+        <service id="console.suggest_missing_package_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <service id="console.command.about" class="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
             <tag name="console.command" command="about" />
         </service>

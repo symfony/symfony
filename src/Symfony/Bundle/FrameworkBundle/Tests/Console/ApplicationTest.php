@@ -12,8 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -224,6 +227,34 @@ class ApplicationTest extends TestCase
         $display = explode('Lists commands', $tester->getDisplay());
 
         $this->assertContains(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
+    }
+
+    public function testSuggestingPackagesWithExactMatch()
+    {
+        $result = $this->createEventForSuggestingPackages('server:dump', []);
+        $this->assertRegExp('/You may be looking for a command provided by/', $result);
+    }
+
+    public function testSuggestingPackagesWithPartialMatchAndNoAlternatives()
+    {
+        $result = $this->createEventForSuggestingPackages('server', []);
+        $this->assertRegExp('/You may be looking for a command provided by/', $result);
+    }
+
+    public function testSuggestingPackagesWithPartialMatchAndAlternatives()
+    {
+        $result = $this->createEventForSuggestingPackages('server', ['server:run']);
+        $this->assertNotRegExp('/You may be looking for a command provided by/', $result);
+    }
+
+    private function createEventForSuggestingPackages(string $command, array $alternatives = []): string
+    {
+        $error = new CommandNotFoundException('', $alternatives);
+        $event = new ConsoleErrorEvent(new ArrayInput([$command]), new NullOutput(), $error);
+        $subscriber = new SuggestMissingPackageSubscriber();
+        $subscriber->onConsoleError($event);
+
+        return $event->getError()->getMessage();
     }
 
     private function getKernel(array $bundles, $useDispatcher = false)

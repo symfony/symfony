@@ -937,7 +937,28 @@ UPGRADE FROM 2.x to 3.0
        validation:
            cache: validator.mapping.cache.doctrine.apc
    ```
+   
+### HttpFoundation
 
+ * The precedence of parameters returned from `Request::get()` changed from "GET, PATH, BODY" to "PATH, GET, BODY"
+
+ * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+
+ * Removed the feature that allowed finding deep items in `ParameterBag::get()`.
+   This may affect you when getting parameters from the `Request` class:
+
+   Before:
+
+   ```php
+   $request->query->get('foo[bar]', null, true);
+   ```
+
+   After:
+
+   ```php
+   $request->query->get('foo')['bar'];
+   ```
+   
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
@@ -989,6 +1010,19 @@ UPGRADE FROM 2.x to 3.0
    | `Locale::getDisplayLocales()` | `Intl::getLocaleBundle()->getLocaleNames()`
    | `Locale::getLocales()` | `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
 
+### Monolog Bridge
+
+ * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.
+
+### Process
+
+ * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
+   `Process::setInput()` and `Process::getInput()` that works the same way.
+ * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+ 
 ### PropertyAccess
 
  * Renamed `PropertyAccess::getPropertyAccessor` to `createPropertyAccessor`.
@@ -1293,6 +1327,10 @@ UPGRADE FROM 2.x to 3.0
  * The `Symfony\Component\Serializer\Exception\Exception` interface was removed
    in favor of the new `Symfony\Component\Serializer\Exception\ExceptionInterface`.
 
+### Swiftmailer Bridge
+
+ * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
+ 
 ### Translator
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
@@ -1866,6 +1904,22 @@ UPGRADE FROM 2.x to 3.0
    $translator->setLocale('en');
    ```
 
+### WebProfiler
+
+ * The `profiler:import` and `profiler:export` commands have been removed.
+
+ * All the profiler storages different than `FileProfilerStorage` have been
+   removed. The removed classes are:
+
+    - `Symfony\Component\HttpKernel\Profiler\BaseMemcacheProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\PdoProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage`
+    - `Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage`
+
 ### Yaml
 
  * Using a colon in an unquoted mapping value leads to a `ParseException`.
@@ -1899,63 +1953,3 @@ UPGRADE FROM 2.x to 3.0
    ```php
    Yaml::parse(file_get_contents($fileName));
    ```
-
-### WebProfiler
-
- * The `profiler:import` and `profiler:export` commands have been removed.
-
- * All the profiler storages different than `FileProfilerStorage` have been
-   removed. The removed classes are:
-
-    - `Symfony\Component\HttpKernel\Profiler\BaseMemcacheProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\MemcacheProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\MongoDbProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\MysqlProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\PdoProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage`
-    - `Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage`
-
-### Process
-
- * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
-   `Process::setInput()` and `Process::getInput()` that works the same way.
- * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
-
-### Monolog Bridge
-
- * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.
-
-### Swiftmailer Bridge
-
- * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
-
-### HttpFoundation
-
- * The precedence of parameters returned from `Request::get()` changed from "GET, PATH, BODY" to "PATH, GET, BODY"
-
- * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
-
- * Removed the feature that allowed finding deep items in `ParameterBag::get()`.
-   This may affect you when getting parameters from the `Request` class:
-
-   Before:
-
-   ```php
-   $request->query->get('foo[bar]', null, true);
-   ```
-
-   After:
-
-   ```php
-   $request->query->get('foo')['bar'];
-   ```
-### Monolog Bridge
-
- * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
- * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.

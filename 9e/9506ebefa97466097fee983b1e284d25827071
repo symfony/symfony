@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-08T21:44:53Z
+
+> This attribute is currently ignored by XliffFileLoader.
+
+does it mean we have a spec violation? should we consider this a bug?
+
+---------------------------------------------------------------------------
+
+by eternoendless at 2018-11-08T22:00:51Z
+
+> does it means we have spec violation?
+
+I guess it depends on where you draw the line regarding the scope of XliffFileLoader and MessageCatalogue. Is it just about loading the translatables and making them available for the Translator? Then it's not a bug.
+
+In my opinion, loading metadata like `notes` is a "nice to have" that actually goes beyond the scope of MessageCatalogue. It could be considered a "leak" of vendor-specific (Xliff in this case) data into MessageCatalogue. In the end I don't think it hurts, albeit for a little overhead when reading the files and a small increase in the catalogue's memory footprint.
+
+---------------------------------------------------------------------------
+
+by eternoendless at 2019-01-07T10:43:26Z
+
+Comment and rebase done 👍
+
+I see that on the changelog, notes are under released versions. Should I add 4.3.0? Should I only add the note with no title?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-07T11:06:20Z
+
+this should go in 4.3.0, yes

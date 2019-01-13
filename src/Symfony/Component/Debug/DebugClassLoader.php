@@ -124,6 +124,11 @@ class DebugClassLoader
         }
     }
 
+    public function findFile($class): ?string
+    {
+        return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
+    }
+
     /**
      * Loads the given class or interface.
      *

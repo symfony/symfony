@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-01-10T09:07:55Z
+
+It could be considered as a bug fix as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-10T09:14:20Z
+
+Is it common to use DebugClassLoader within Drupal?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-01-10T10:05:43Z
+
+> Is it common to use DebugClassLoader within Drupal?
+
+I don't know. I want to use it. A lot of people might currently use it and have not detected this problem because the incriminated class (`ClassFinder`) is only used in one core module.
+
+But I don't want this PR to be treated as a request for Drupal. I will report the bad implementation to Drupal issues. It just gonna take forever before getting fixed.
+
+The Debug component is here for a better DX. So it just seems logical to try our best in the `DebugClassLoader` to handle as many cases as possible when they don't overcomplicate things too much or have impacts on the added behaviors.
+
+WDYT of my proposition to try to proxify every wrapped class loader methods ?

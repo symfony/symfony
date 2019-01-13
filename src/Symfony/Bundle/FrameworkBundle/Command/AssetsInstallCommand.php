@@ -42,12 +42,18 @@ class AssetsInstallCommand extends Command
     protected static $defaultName = 'assets:install';
 
     private $filesystem;
+    private $projectDir;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(Filesystem $filesystem, string $projectDir = null)
     {
         parent::__construct();
 
+        if (null === $projectDir) {
+            @trigger_error(sprintf('Not passing the project directory to the constructor of %s is deprecated since Symfony 4.3 and will not be supported in 5.0.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $this->filesystem = $filesystem;
+        $this->projectDir = $projectDir;
     }
 
     /**
@@ -260,11 +266,11 @@ EOT
     {
         $defaultPublicDir = 'public';
 
-        if (!$container->hasParameter('kernel.project_dir')) {
+        if (null === $this->projectDir && !$container->hasParameter('kernel.project_dir')) {
             return $defaultPublicDir;
         }
 
-        $composerFilePath = $container->getParameter('kernel.project_dir').'/composer.json';
+        $composerFilePath = ($this->projectDir ?? $container->getParameter('kernel.project_dir')).'/composer.json';
 
         if (!file_exists($composerFilePath)) {
             return $defaultPublicDir;

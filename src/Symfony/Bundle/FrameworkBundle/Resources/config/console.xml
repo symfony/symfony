@@ -19,6 +19,7 @@
 
         <service id="console.command.assets_install" class="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
             <argument type="service" id="filesystem" />
+            <argument>%kernel.project_dir%</argument>
             <tag name="console.command" command="assets:install" />
         </service>
 

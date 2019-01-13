@@ -161,7 +161,7 @@ final class Dotenv
         }
 
         if (' ' === $this->data[$this->cursor] || "\t" === $this->data[$this->cursor]) {
-            throw $this->createFormatException('Whitespace are not supported after the variable name');
+            throw $this->createFormatException('Whitespace characters are not supported after the variable name');
         }
 
         if ('=' !== $this->data[$this->cursor]) {

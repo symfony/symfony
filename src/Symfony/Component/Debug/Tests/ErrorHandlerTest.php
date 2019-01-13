@@ -12,10 +12,13 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
+use Symfony\Component\Debug\Tests\Fixtures\LoggerThatSetAnErrorHandler;
 
 /**
  * ErrorHandlerTest.
@@ -321,6 +324,8 @@ class ErrorHandlerTest extends TestCase
         $handler = new ErrorHandler();
         $handler->setDefaultLogger($logger);
         @$handler->handleError(E_USER_DEPRECATED, 'Foo deprecation', __FILE__, __LINE__, []);
+
+        restore_error_handler();
     }
 
     /**
@@ -582,5 +587,44 @@ class ErrorHandlerTest extends TestCase
         });
 
         $handler->handleException(new \Exception());
+    }
+
+    /**
+     * @dataProvider errorHandlerIsNotLostWhenLoggingProvider
+     */
+    public function testErrorHandlerIsNotLostWhenLogging($customErrorHandlerHasBeenPreviouslyDefined, LoggerInterface $logger)
+    {
+        try {
+            if ($customErrorHandlerHasBeenPreviouslyDefined) {
+                set_error_handler('count');
+            }
+
+            $handler = ErrorHandler::register();
+            $handler->setDefaultLogger($logger);
+
+            @trigger_error('foo', E_USER_DEPRECATED);
+            @trigger_error('bar', E_USER_DEPRECATED);
+
+            $this->assertSame([$handler, 'handleError'], set_error_handler('var_dump'));
+
+            restore_error_handler();
+
+            if ($customErrorHandlerHasBeenPreviouslyDefined) {
+                restore_error_handler();
+            }
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
+    public function errorHandlerIsNotLostWhenLoggingProvider()
+    {
+        return [
+            [false, new NullLogger()],
+            [true, new NullLogger()],
+            [false, new LoggerThatSetAnErrorHandler()],
+            [true, new LoggerThatSetAnErrorHandler()],
+        ];
     }
 }

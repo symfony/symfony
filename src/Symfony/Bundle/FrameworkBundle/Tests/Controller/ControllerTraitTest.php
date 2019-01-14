@@ -569,6 +569,5 @@ trait TestControllerTrait
         createFormBuilder as public;
         getDoctrine as public;
         addLink as public;
-        isFormValid as public;
     }
 }

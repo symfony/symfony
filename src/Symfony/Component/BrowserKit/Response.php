@@ -45,10 +45,10 @@ class Response
         $headers = '';
         foreach ($this->headers as $name => $value) {
             if (\is_string($value)) {
-                $headers .= $this->buildHeader($name, $value);
+                $headers .= sprintf("%s: %s\n", $name, $value);
             } else {
                 foreach ($value as $headerValue) {
-                    $headers .= $this->buildHeader($name, $headerValue);
+                    $headers .= sprintf("%s: %s\n", $name, $headerValue);
                 }
             }
         }
@@ -63,9 +63,13 @@ class Response
      * @param string $value The header value
      *
      * @return string The built header line
+     *
+     * @deprecated since Symfony 4.3
      */
     protected function buildHeader($name, $value)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+
         return sprintf("%s: %s\n", $name, $value);
     }
 

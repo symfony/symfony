@@ -4,6 +4,7 @@ UPGRADE FROM 4.x to 5.0
 BrowserKit
 ----------
 
+ * Removed `Response::buildHeader()`
  * Removed `Response::getStatus()`, use `Response::getStatusCode()` instead
  * The `Client::submit()` method has a new `$serverParameters` argument.
 

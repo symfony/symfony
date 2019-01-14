@@ -197,7 +197,7 @@ class BinaryFileResponse extends Response
         $this->offset = 0;
         $this->maxlen = -1;
 
-        if (false === $fileSize = $this->file->getSize()) {
+        if (!$this->file->isFile() || false === $fileSize = $this->file->getSize()) {
             return $this;
         }
         $this->headers->set('Content-Length', $fileSize);

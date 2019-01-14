@@ -13,7 +13,9 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface as DeprecatedMimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
@@ -36,10 +38,22 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      */
     private $mimeTypeGuesser;
 
-    public function __construct(MimeTypeGuesserInterface $mimeTypeGuesser = null)
+    /**
+     * @param MimeTypeGuesserInterface
+     */
+    public function __construct($mimeTypeGuesser = null)
     {
-        if (null === $mimeTypeGuesser && class_exists('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser')) {
-            $mimeTypeGuesser = MimeTypeGuesser::getInstance();
+        if ($mimeTypeGuesser instanceof DeprecatedMimeTypeGuesserInterface) {
+            @trigger_error(sprintf('Passing a %s to "%s()" is deprecated since Symfony 4.3, pass a %s instead.', DeprecatedMimeTypeGuesserInterface::class, __METHOD__, MimeTypeGuesserInterface::class), E_USER_DEPRECATED);
+        } elseif (null === $mimeTypeGuesser) {
+            if (class_exists(MimeTypes::class)) {
+                $mimeTypeGuesser = MimeTypes::getDefault();
+            } else {
+                @trigger_error(sprintf('Passing null to "%s()" without symfony/mime installed is deprecated since Symfony 4.3, install symfony/mime.', DeprecatedMimeTypeGuesserInterface::class, __METHOD__), E_USER_DEPRECATED);
+                $mimeTypeGuesser = MimeTypeGuesser::getInstance();
+            }
+        } elseif (!$mimeTypeGuesser instanceof MimeTypes) {
+            throw new \InvalidArgumentException(sprintf('Argument 1 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, MimeTypes::class, \is_object($mimeTypeGuesser) ? \get_class($mimeTypeGuesser) : \gettype($mimeTypeGuesser)));
         }
 
         $this->mimeTypeGuesser = $mimeTypeGuesser;
@@ -140,7 +154,9 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
             return $object->getMimeType();
         }
 
-        if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
+        if ($this->mimeTypeGuesser instanceof DeprecatedMimeTypeGuesserInterface && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
+            return $mimeType;
+        } elseif ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guessMimeType($object->getPathname())) {
             return $mimeType;
         }
 

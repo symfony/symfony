@@ -13,8 +13,7 @@ namespace Symfony\Component\HttpFoundation\File;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A file in the file system.
@@ -50,12 +49,12 @@ class File extends \SplFileInfo
      *
      * @return string|null The guessed extension or null if it cannot be guessed
      *
-     * @see ExtensionGuesser
+     * @see MimeTypes
      * @see getMimeType()
      */
     public function guessExtension()
     {
-        return ExtensionGuesser::getInstance()->guess($this->getMimeType());
+        return MimeTypes::getDefault()->getExtensions($this->getMimeType())[0] ?? null;
     }
 
     /**
@@ -67,11 +66,11 @@ class File extends \SplFileInfo
      *
      * @return string|null The guessed mime type (e.g. "application/pdf")
      *
-     * @see MimeTypeGuesser
+     * @see MimeTypes
      */
     public function getMimeType()
     {
-        return MimeTypeGuesser::getInstance()->guess($this->getPathname());
+        return MimeTypes::getDefault()->guessMimeType($this->getPathname());
     }
 
     /**

@@ -17,11 +17,10 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
  * @requires extension fileinfo
+ * @group legacy
  */
 class MimeTypeTest extends TestCase
 {
-    protected $path;
-
     public function testGuessImageWithoutExtension()
     {
         $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));

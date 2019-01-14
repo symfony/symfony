@@ -73,6 +73,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
@@ -310,6 +312,10 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
         ]);
 
+        if (class_exists(MimeTypes::class)) {
+            $loader->load('mime_type.xml');
+        }
+
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command');
         $container->registerForAutoconfiguration(ResourceCheckerInterface::class)
@@ -374,6 +380,8 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(TransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
+        $container->registerForAutoconfiguration(MimeTypeGuesserInterface::class)
+            ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
 

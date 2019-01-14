@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\Mime\FileinfoMimeTypeGuesser as NewFileinfoMimeTypeGuesser;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" instead.', FileinfoMimeTypeGuesser::class, NewFileinfoMimeTypeGuesser::class), E_USER_DEPRECATED);
 
 /**
  * Guesses the mime type using the PECL extension FileInfo.

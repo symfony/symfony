@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddMimeTypeGuesserPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
@@ -72,6 +73,11 @@ class FrameworkBundle extends Bundle
         if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
             Request::setTrustedHosts($trustedHosts);
         }
+
+        if ($this->container->has('mime_types')) {
+            $mt = $this->container->get('mime_types');
+            $mt->setDefault($mt);
+        }
     }
 
     public function build(ContainerBuilder $container)
@@ -118,6 +124,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ResettableServicePass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new AddMimeTypeGuesserPass());
         $this->addCompilerPassIfExists($container, MessengerPass::class);
 
         if ($container->getParameter('kernel.debug')) {

@@ -42,6 +42,7 @@
         </service>
 
         <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <argument type="service" id="mime_types" on-invalid="null" />
             <!-- Run before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-920" />
         </service>

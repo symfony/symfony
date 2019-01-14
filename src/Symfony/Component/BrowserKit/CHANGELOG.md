@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Marked `Response` final.
+ * Deprecated `Response::buildHeader()`
+ * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
+
 4.2.0
 -----
 

@@ -60,7 +60,7 @@ abstract class ControllerTraitTest extends TestCase
     public function testGetUser()
     {
         $user = new User('user', 'pass');
-        $token = new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'));
+        $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
 
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
@@ -122,7 +122,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer(new Container());
 
-        $response = $controller->json(array());
+        $response = $controller->json([]);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
@@ -135,7 +135,7 @@ abstract class ControllerTraitTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
+            ->with([], 'json', ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS])
             ->will($this->returnValue('[]'));
 
         $container->set('serializer', $serializer);
@@ -143,7 +143,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->json(array());
+        $response = $controller->json([]);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
@@ -156,7 +156,7 @@ abstract class ControllerTraitTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
+            ->with([], 'json', ['json_encode_options' => 0, 'other' => 'context'])
             ->will($this->returnValue('[]'));
 
         $container->set('serializer', $serializer);
@@ -164,7 +164,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
+        $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
         $response->setEncodingOptions(JSON_FORCE_OBJECT);
@@ -389,7 +389,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller->setContainer($container);
         $controller->addFlash('foo', 'bar');
 
-        $this->assertSame(array('bar'), $flashBag->get('foo'));
+        $this->assertSame(['bar'], $flashBag->get('foo'));
     }
 
     public function testCreateAccessDeniedException()
@@ -515,117 +515,6 @@ abstract class ControllerTraitTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The form is already submitted, use $form->isValid() directly.
-     */
-    public function testIsFormValidWhenAlreadySubmitted()
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push($request = new Request());
-
-        $container = new Container();
-        $container->set('request_stack', $requestStack);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
-        $form
-            ->expects($this->once())
-            ->method('isSubmitted')
-            ->willReturn(true)
-        ;
-
-        $controller->isFormValid($form);
-    }
-
-    public function testIsFormValidWhenInvalid()
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push($request = new Request());
-
-        $container = new Container();
-        $container->set('request_stack', $requestStack);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
-        $form
-            ->expects($this->at(0))
-            ->method('isSubmitted')
-            ->willReturn(false)
-        ;
-        $form
-            ->expects($this->once())
-            ->method('handleRequest')
-            ->with($request)
-            ->willReturn($form)
-        ;
-        $form
-            ->expects($this->at(2))
-            ->method('isSubmitted')
-            ->willReturn(false)
-        ;
-
-        $this->assertFalse($controller->isFormValid($form));
-    }
-
-    public function testIsFormValidWhenValid()
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push($request = new Request());
-
-        $container = new Container();
-        $container->set('request_stack', $requestStack);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
-        $form
-            ->expects($this->at(0))
-            ->method('isSubmitted')
-            ->willReturn(false)
-        ;
-        $form
-            ->expects($this->once())
-            ->method('handleRequest')
-            ->with($request)
-            ->willReturn($form)
-        ;
-        $form
-            ->expects($this->at(2))
-            ->method('isSubmitted')
-            ->willReturn(true)
-        ;
-        $form
-            ->expects($this->once())
-            ->method('isValid')
-            ->willReturn(true)
-        ;
-
-        $this->assertTrue($controller->isFormValid($form));
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage You must pass a request as second argument because the request stack is empty.
-     */
-    public function testIsFormValidWhenRequestStackIsEmpty()
-    {
-        $container = new Container();
-        $container->set('request_stack', new RequestStack());
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
-
-        $this->assertTrue($controller->isFormValid($form));
     }
 
     public function testGetDoctrine()

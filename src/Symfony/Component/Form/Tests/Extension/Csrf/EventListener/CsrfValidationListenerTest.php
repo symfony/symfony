@@ -64,6 +64,16 @@ class CsrfValidationListenerTest extends TestCase
         $this->assertSame($data, $event->getData());
     }
 
+    public function testArrayCsrfToken()
+    {
+        $event = new FormEvent($this->form, ['csrf' => []]);
+
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');
+        $validation->preSubmit($event);
+
+        $this->assertNotEmpty($this->form->getErrors());
+    }
+
     public function testMaxPostSizeExceeded()
     {
         $serverParams = $this

@@ -72,7 +72,7 @@ class TransChoiceTokenParser extends TransTokenParser
         $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
 
         if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
-            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext()->getName());
+            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
         }
 
         $stream->expect(Token::BLOCK_END_TYPE);

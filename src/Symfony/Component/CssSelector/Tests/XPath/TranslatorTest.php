@@ -12,7 +12,6 @@
 namespace Symfony\Component\CssSelector\Tests\XPath;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\CssSelector\Exception\ExpressionErrorException;
 use Symfony\Component\CssSelector\Node\ElementNode;
 use Symfony\Component\CssSelector\Node\FunctionNode;
 use Symfony\Component\CssSelector\Parser\Parser;
@@ -36,58 +35,70 @@ class TranslatorTest extends TestCase
         $this->assertEquals($xpath, $translator->cssToXPath($css, ''));
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testCssToXPathPseudoElement()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
-        $this->expectException(ExpressionErrorException::class);
         $translator->cssToXPath('e::first-line');
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testGetExtensionNotExistsExtension()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
-        $this->expectException(ExpressionErrorException::class);
         $translator->getExtension('fake');
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testAddCombinationNotExistsExtension()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
-        $this->expectException(ExpressionErrorException::class);
         $parser = new Parser();
         $xpath = $parser->parse('*')[0];
         $combinedXpath = $parser->parse('*')[0];
         $translator->addCombination('fake', $xpath, $combinedXpath);
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testAddFunctionNotExistsFunction()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
         $function = new FunctionNode(new ElementNode(), 'fake');
-        $this->expectException(ExpressionErrorException::class);
         $translator->addFunction($xpath, $function);
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testAddPseudoClassNotExistsClass()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
-        $this->expectException(ExpressionErrorException::class);
         $translator->addPseudoClass($xpath, 'fake');
     }
 
+    /**
+     * @expectedException \Symfony\Component\CssSelector\Exception\ExpressionErrorException
+     */
     public function testAddAttributeMatchingClassNotExistsClass()
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $xpath = new XPathExpr();
-        $this->expectException(ExpressionErrorException::class);
         $translator->addAttributeMatching($xpath, '', '', '');
     }
 

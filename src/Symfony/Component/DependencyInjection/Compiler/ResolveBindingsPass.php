@@ -34,8 +34,6 @@ class ResolveBindingsPass extends AbstractRecursivePass
      */
     public function process(ContainerBuilder $container)
     {
-        $this->usedBindings = $container->getRemovedBindingIds();
-
         try {
             parent::process($container);
 

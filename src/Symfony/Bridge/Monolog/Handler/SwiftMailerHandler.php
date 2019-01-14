@@ -60,6 +60,14 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->flushMemorySpool();
+    }
+
+    /**
      * Flushes the mail queue if a memory spool is used.
      */
     private function flushMemorySpool()

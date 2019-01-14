@@ -75,7 +75,8 @@ class XmlFileLoader extends FileLoader
             if (isset($xml->{'discriminator-map'})) {
                 $mapping = array();
                 foreach ($xml->{'discriminator-map'}->mapping as $element) {
-                    $mapping[(string) $element->attributes()->type] = (string) $element->attributes()->class;
+                    $elementAttributes = $element->attributes();
+                    $mapping[(string) $elementAttributes->type] = (string) $elementAttributes->class;
                 }
 
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(

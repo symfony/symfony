@@ -13,11 +13,16 @@ namespace Symfony\Component\BrowserKit;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class Response
 {
+    /** @internal */
     protected $content;
+    /** @internal */
     protected $status;
+    /** @internal */
     protected $headers;
 
     /**

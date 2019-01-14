@@ -4,6 +4,7 @@ UPGRADE FROM 4.2 to 4.3
 BrowserKit
 ----------
 
+ * Marked `Response` final.
  * Deprecated `Response::buildHeader()`
  * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
 

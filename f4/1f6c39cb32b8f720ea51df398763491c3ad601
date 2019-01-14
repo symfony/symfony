@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-01-14T14:10:17Z
+
+this requires releasing Twig first
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-14T14:14:30Z
+
+The commit has already been merged into Twig's `2.x` branch which is enough to make our test suite green again. But yes, Twig must have a new release before we tag a new version of the TwigBridge.

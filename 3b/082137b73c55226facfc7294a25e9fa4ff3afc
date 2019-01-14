@@ -1,0 +1,249 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-08T15:20:00Z
+
+@weaverryan I'd like to read your opinion about this. In the past you insisted a lot to add the `$form->isSubmitted() && ...` to all the doc examples to be more explicit. I think that's the right decision because code is easier to understand (otherwise newcomers can get lost: *who/when/how was the form submitted !?!?*)
+
+So, my question: are you happy with the proposed shortcut name?
+
+```php
+if ($this->isFormValid($form, $request)) { ... }
+```
+
+Or would you prefer to keep being explicit about the form submission?
+
+```php
+if ($this->isFormSubmittedAndValid($form, $request)) { ... }
+
+if ($this->formIsSubmittedAndValid($form, $request)) { ... }
+
+...
+```
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-01-08T15:36:20Z
+
+@javiereguiluz we added `isSubmitted()` everywhere in the doc to fix an inconsistency in the Form Component. This is just a hack. Before the inconsistency was raised, almost nobody used `isSubmitted()` and everything were fine.
+
+So let's keep thing simple here. I really prefer `isFormValid()`. There are no need to explain about `isSubmitted()`
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-08T15:44:43Z
+
+I've seen lots of newcomers have problems understand where or who submits the form. With the current recommended way of working, you can easily see the "is submitted?" check:
+
+```php
+public function new(Request $request)
+{
+    $task = new Task();
+    $form = $this->createForm(TaskType::class, $task);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // ...
+
+        return $this->redirectToRoute('task_success');
+    }
+
+    return $this->render('task/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+```
+
+If you remove the optional `$form->isSubmitted()` ... the code is harder to understand but newcomers think: *"OK, I guess the form submission will take place in this weird $form->handleRequest($request) call which I don't understand (yet)."*
+
+My fear is that the new shortcut removes any clues about the form being submitted or processed or handled:
+
+```php
+public function new(Request $request)
+{
+    $task = new Task();
+    $form = $this->createForm(TaskType::class, $task);
+
+    if ($this->isFormValid($form, $request)) {
+        // ...
+
+        return $this->redirectToRoute('task_success');
+    }
+
+    return $this->render('task/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+```
+
+But my fears could be exaggerated. That's why I want to know Ryan's opinion about this. Thanks!
+
+---------------------------------------------------------------------------
+
+by mbabker at 2019-01-08T17:01:13Z
+
+If the form being submitted is a condition of it being valid, then I would suggest `isFormValid` is perfectly fine as far as naming goes.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-01-10T03:49:05Z
+
+Sorry @lyrixx, I don't really like this new shortcut, though it looks like Fab does like it, so it's certainly subjective. As Javier mentioned, with:
+
+```php
+public function new(Request $request)
+{
+    $task = new Task();
+    $form = $this->createForm(TaskType::class, $task);
+
+    if ($this->isFormValid($form, $request)) {
+        // ...
+
+        return $this->redirectToRoute('task_success');
+    }
+
+    return $this->render('task/new.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+```
+
+The flow is very non-obvious. It's very strange to have a method starting with `is` that performs an action (an important action). And I can't really think of anything I love :/. But I'm also not sure the current/old way is a huge problem.
+
+If anything, I tend to agree with Javier's suggestions: https://github.com/symfony/symfony/pull/29813#issuecomment-452335729 - or `if ($this->submitForm($form, $request) && $form->isValid())`
+
+> **lyrixx** we added isSubmitted() everywhere in the doc to fix an inconsistency in the Form Component. This is just a hack. Before the inconsistency was raised, almost nobody used isSubmitted() and everything were fine.
+
+Yes, but before we added `isSubmitted()`, there WAS still `handleRequest()`. So you could guess (even though the name isn't great) that this is the line that's probably submitting things. Removing any line that suggests the form being submitted is where things get slippery.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-10T06:24:52Z
+
+@lyrixx With this PR, I think the shortcut has less "value". It was already quite controversial, but reading @weaverryan and @javiereguiluz comments, I think I tend to agree with them now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-01-10T09:50:53Z
+
+What should I do? I'm a bit confused here :|
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-10T10:13:50Z
+
+@lyrixx I still like this shortcut ... but I think we need to tweak it a bit to make it better. I don't have a perfect solution for this, though.
+
+As mentioned, controllers handling forms have two very different execution branches ... and this shortcut hides that too much at the moment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-10T10:19:27Z
+
+I think we should remove the method personally.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-10T10:24:58Z
+
+I would vote to revert as well.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-01-10T13:16:57Z
+
+> As mentioned, controllers handling forms have two very different execution branches ... and this shortcut hides that too much at the moment.
+
+Are you talking about submitted vs valid ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-10T13:47:04Z
+
+@lyrixx no, I was talking about creating/rendering the form vs processing the form. That's why I need the "isSubmitted()" thing ... to say, *"yes! now it's when we are processing the form instead of rendering it"*.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-01-10T14:24:47Z
+
+Too much important things are hidden by this shortcut, the name does not reflect what it does. I don't expect a `isFormValid()` method to throw if the form is submitted, nor I expect it to process submission by itself. +1 for reverting.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-01-10T15:21:16Z
+
+Actually, I just wanted to replace
+
+```php
+if ($form->handleRequest($request)->isSubmitted()) && $form->isValid()) {
+    # code...
+}
+```
+```php
+if ($this->isFormValid($form) {
+    # code...
+}
+```
+
+I guess I have used the following code only once
+```php
+if ($form->handleRequest($request)->isSubmitted()) {
+   #code
+}
+```
+
+I think I spend more time to make theses PR merged than typing `if ($form->handleRequest($request)->isSubmitted()) && $form->isValid()) {` :joy:
+So Let's revert it :)
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-01-11T13:11:00Z
+
+Changing `array()` syntax to `[]` is probably outside the scope of this pull request.
+
+Also, can someone from the core team clarify which syntax Symfony components now use?
+Last I heard the only place the new syntax was being used was in [`symfony/flex`](https://github.com/symfony/flex) and not the components :woman_shrugging:
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-01-11T13:44:12Z
+
+All the concerns raised could be solved by using @javiereguiluz's suggestion `isFormSubmittedAndValid`. Not sure why revert was chosen instead of simple rename.
+
+edit: to clarify, I'm not implying this should submit the form. This is only shortcut for `isSubmitted && isValid`
+
+---------------------------------------------------------------------------
+
+by gharlan at 2019-01-11T14:15:52Z
+
+Maybe just add a `isSubmittedAndValid()` shortcut to form instead of ControllerTrait, and without implicit `handleRequest`?
+
+![2019-01-11 14 59 11](https://user-images.githubusercontent.com/330436/51037927-fe382d80-15b1-11e9-953a-6bb403b34c28.gif)
+
+vs.
+
+![2019-01-11 15 01 43](https://user-images.githubusercontent.com/330436/51037937-05f7d200-15b2-11e9-87b5-0a0576dc7fe4.gif)
+
+I need ~5.8s to type this instead of ~9.3s (with autocompletion in phpstorm). Don't know, if it is worth it. ;)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-01-11T17:23:36Z
+
+And have an `isSubmitted...()` throwing an exception if the form is not submitted? Sounds plain wrong to me.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-01-12T15:47:10Z
+
+No exception, it's not implied anywhere
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-01-14T10:26:25Z
+
+Just as a minor public service announcement, I just found out it was quietly decided [6 days ago that the main Symfony codebase now uses the short array syntax](https://github.com/symfony/symfony/commit/cb07a3b551e670e4ce5e7991785daddde2a05288).
+Therefore the changes that @lyrixx has included in this PR are the correct way of doing it.
+/cc @sstok

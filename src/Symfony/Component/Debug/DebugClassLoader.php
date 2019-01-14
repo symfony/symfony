@@ -124,7 +124,10 @@ class DebugClassLoader
         }
     }
 
-    public function findFile($class): ?string
+    /**
+     * @return string|null
+     */
+    public function findFile($class)
     {
         return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
     }

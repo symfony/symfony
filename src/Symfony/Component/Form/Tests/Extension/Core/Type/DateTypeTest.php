@@ -1037,4 +1037,19 @@ class DateTypeTest extends BaseTypeTest
             'Compound choice fields' => ['choice', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
         ];
     }
+
+    public function testSubmitStringWithCustomInputFormat(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'string',
+            'input_format' => 'd/m/Y',
+        ]);
+
+        $form->submit('2018-01-14');
+
+        $this->assertSame('14/01/2018', $form->getData());
+    }
 }

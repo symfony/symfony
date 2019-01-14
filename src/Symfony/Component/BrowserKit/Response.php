@@ -83,8 +83,17 @@ class Response
      * Gets the response status code.
      *
      * @return int The response status code
+     *
+     * @deprecated since Symfony 4.3, use getStatusCode() instead
      */
     public function getStatus()
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3, use getStatusCode() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->status;
+    }
+
+    public function getStatusCode(): int
     {
         return $this->status;
     }

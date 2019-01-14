@@ -52,7 +52,7 @@ class TestClient extends Client
     protected function filterResponse($response)
     {
         if ($response instanceof SpecialResponse) {
-            return new Response($response->getContent(), $response->getStatus(), $response->getHeaders());
+            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
         }
 
         return $response;

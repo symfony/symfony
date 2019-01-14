@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
+
 4.2.0
 -----
 

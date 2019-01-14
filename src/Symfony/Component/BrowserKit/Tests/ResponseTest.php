@@ -22,10 +22,19 @@ class ResponseTest extends TestCase
         $this->assertEquals('foo', $response->getContent(), '->getContent() returns the content of the response');
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetStatus()
     {
         $response = new Response('foo', 304);
         $this->assertEquals('304', $response->getStatus(), '->getStatus() returns the status of the response');
+    }
+
+    public function testGetStatusCode()
+    {
+        $response = new Response('foo', 304);
+        $this->assertEquals('304', $response->getStatusCode(), '->getStatusCode() returns the status of the response');
     }
 
     public function testGetHeaders()

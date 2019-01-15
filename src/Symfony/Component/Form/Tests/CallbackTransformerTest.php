@@ -16,14 +16,35 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class CallbackTransformerTest extends TestCase
 {
-    public function testTransform()
+    /**
+     * @dataProvider transformProvider
+     */
+    public function testTransform($expected, ?callable $transform, $value): void
     {
-        $transformer = new CallbackTransformer(
-            function ($value) { return $value.' has been transformed'; },
-            function ($value) { return $value.' has reversely been transformed'; }
-        );
+        $this->assertSame($expected, (new CallbackTransformer($transform, null))->transform($value));
+    }
 
-        $this->assertEquals('foo has been transformed', $transformer->transform('foo'));
-        $this->assertEquals('bar has reversely been transformed', $transformer->reverseTransform('bar'));
+    public function transformProvider(): array
+    {
+        return [
+            ['foo has been transformed', function ($value) { return $value.' has been transformed'; }, 'foo'],
+            ['ccc', null, 'ccc'],
+        ];
+    }
+
+    /**
+     * @dataProvider reverseTransformProvider
+     */
+    public function testReverseTransform($expected, ?callable $reverseTransform, $value): void
+    {
+        $this->assertSame($expected, (new CallbackTransformer(null, $reverseTransform))->reverseTransform($value));
+    }
+
+    public function reverseTransformProvider(): array
+    {
+        return [
+          ['bar has reversely been transformed', function ($value) { return $value.' has reversely been transformed'; }, 'bar'],
+          ['ccc', null, 'ccc'],
+        ];
     }
 }

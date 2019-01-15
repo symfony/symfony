@@ -20,10 +20,10 @@ class CallbackTransformer implements DataTransformerInterface
     private $reverseTransform;
 
     /**
-     * @param callable $transform        The forward transform callback
-     * @param callable $reverseTransform The reverse transform callback
+     * @param callable|null $transform        The forward transform callback
+     * @param callable|null $reverseTransform The reverse transform callback
      */
-    public function __construct(callable $transform, callable $reverseTransform)
+    public function __construct(?callable $transform, ?callable $reverseTransform)
     {
         $this->transform = $transform;
         $this->reverseTransform = $reverseTransform;
@@ -41,6 +41,10 @@ class CallbackTransformer implements DataTransformerInterface
      */
     public function transform($data)
     {
+        if (null === $this->transform) {
+            return $data;
+        }
+
         return ($this->transform)($data);
     }
 
@@ -57,6 +61,10 @@ class CallbackTransformer implements DataTransformerInterface
      */
     public function reverseTransform($data)
     {
+        if (null === $this->reverseTransform) {
+            return $data;
+        }
+
         return ($this->reverseTransform)($data);
     }
 }

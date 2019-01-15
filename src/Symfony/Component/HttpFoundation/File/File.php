@@ -55,18 +55,15 @@ class File extends \SplFileInfo
      */
     public function guessExtension()
     {
-        $type = $this->getMimeType();
-        $guesser = ExtensionGuesser::getInstance();
-
-        return $guesser->guess($type);
+        return ExtensionGuesser::getInstance()->guess($this->getMimeType());
     }
 
     /**
      * Returns the mime type of the file.
      *
-     * The mime type is guessed using a MimeTypeGuesser instance, which uses finfo(),
-     * mime_content_type() and the system binary "file" (in this order), depending on
-     * which of those are available.
+     * The mime type is guessed using a MimeTypeGuesserInterface instance,
+     * which uses finfo_file() then the "file" system binary,
+     * depending on which of those are available.
      *
      * @return string|null The guessed mime type (e.g. "application/pdf")
      *
@@ -74,9 +71,7 @@ class File extends \SplFileInfo
      */
     public function getMimeType()
     {
-        $guesser = MimeTypeGuesser::getInstance();
-
-        return $guesser->guess($this->getPathname());
+        return MimeTypeGuesser::getInstance()->guess($this->getPathname());
     }
 
     /**

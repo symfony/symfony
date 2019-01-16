@@ -38,7 +38,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected function setUp()
     {
-        $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
+        $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(['getNormalizedIniPostMaxSize', 'getContentLength'])->getMock();
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
@@ -46,19 +46,19 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     public function methodExceptGetProvider()
     {
-        return array(
-            array('POST'),
-            array('PUT'),
-            array('DELETE'),
-            array('PATCH'),
-        );
+        return [
+            ['POST'],
+            ['PUT'],
+            ['DELETE'],
+            ['PATCH'],
+        ];
     }
 
     public function methodProvider()
     {
-        return array_merge(array(
-            array('GET'),
-        ), $this->methodExceptGetProvider());
+        return array_merge([
+            ['GET'],
+        ], $this->methodExceptGetProvider());
     }
 
     /**
@@ -68,9 +68,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
     {
         $form = $this->getMockForm('param1', $method);
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             'param1' => 'DATA',
-        ));
+        ]);
 
         $form->expects($this->once())
             ->method('submit')
@@ -88,9 +88,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
         $otherMethod = 'POST' === $method ? 'PUT' : 'POST';
 
-        $this->setRequestData($otherMethod, array(
+        $this->setRequestData($otherMethod, [
             'param1' => 'DATA',
-        ));
+        ]);
 
         $form->expects($this->never())
             ->method('submit');
@@ -105,9 +105,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
     {
         $form = $this->getMockForm('param1', $method, false);
 
-        $this->setRequestData($method, array(
-            'paramx' => array(),
-        ));
+        $this->setRequestData($method, [
+            'paramx' => [],
+        ]);
 
         $form->expects($this->never())
             ->method('submit');
@@ -122,9 +122,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
     {
         $form = $this->getMockForm('param1', $method, true);
 
-        $this->setRequestData($method, array(
-            'paramx' => array(),
-        ));
+        $this->setRequestData($method, [
+            'paramx' => [],
+        ]);
 
         $form->expects($this->never())
             ->method('submit');
@@ -136,9 +136,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
     {
         $form = $this->getMockForm('param1', 'GET');
 
-        $this->setRequestData('GET', array(
-            'paramx' => array(),
-        ));
+        $this->setRequestData('GET', [
+            'paramx' => [],
+        ]);
 
         $form->expects($this->never())
             ->method('submit');
@@ -154,15 +154,15 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('', $method);
         $form->expects($this->any())
             ->method('all')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'param1' => $this->getMockForm('param1'),
                 'param2' => $this->getMockForm('param2'),
-            )));
+            ]));
 
-        $this->setRequestData($method, $requestData = array(
+        $this->setRequestData($method, $requestData = [
             'param1' => 'submitted value',
             'paramx' => 'submitted value',
-        ));
+        ]);
 
         $form->expects($this->once())
             ->method('submit')
@@ -179,14 +179,14 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('', $method);
         $form->expects($this->any())
             ->method('all')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 'param1' => $this->getMockForm('param1'),
                 'param2' => $this->getMockForm('param2'),
-            )));
+            ]));
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             'paramx' => 'submitted value',
-        ));
+        ]);
 
         $form->expects($this->never())
             ->method('submit');
@@ -202,22 +202,22 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
 
-        $this->setRequestData($method, array(
-            'param1' => array(
+        $this->setRequestData($method, [
+            'param1' => [
                 'field1' => 'DATA',
-            ),
-        ), array(
-            'param1' => array(
+            ],
+        ], [
+            'param1' => [
                 'field2' => $file,
-            ),
-        ));
+            ],
+        ]);
 
         $form->expects($this->once())
             ->method('submit')
-            ->with(array(
+            ->with([
                 'field1' => 'DATA',
                 'field2' => $file,
-            ), 'PATCH' !== $method);
+            ], 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -230,11 +230,11 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             'param1' => 'DATA',
-        ), array(
+        ], [
             'param1' => $file,
-        ));
+        ]);
 
         $form->expects($this->once())
             ->method('submit')
@@ -251,11 +251,11 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             'param1' => null,
-        ), array(
+        ], [
             'param1' => $file,
-        ));
+        ]);
 
         $form->expects($this->once())
             ->method('submit')
@@ -272,13 +272,13 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             'param1' => null,
-        ), array(
+        ], [
             'param2' => $this->getMockFile('2'),
             'param1' => $file,
             'param3' => $this->getMockFile('3'),
-        ));
+        ]);
 
         $form->expects($this->once())
              ->method('submit')
@@ -295,11 +295,11 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->getMockForm(null, $method);
         $file = $this->getMockFile();
 
-        $this->setRequestData($method, array(
+        $this->setRequestData($method, [
             '' => null,
-        ), array(
+        ], [
             '' => $file,
-        ));
+        ]);
 
         $form->expects($this->once())
              ->method('submit')
@@ -311,7 +311,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider getPostMaxSizeFixtures
      */
-    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
+    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = [])
     {
         $this->serverParams->expects($this->once())
             ->method('getContentLength')
@@ -320,9 +320,9 @@ abstract class AbstractRequestHandlerTest extends TestCase
             ->method('getNormalizedIniPostMaxSize')
             ->will($this->returnValue($iniMax));
 
-        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $options = ['post_max_size_message' => 'Max {{ max }}!'];
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
-        $this->setRequestData('POST', array(), array());
+        $this->setRequestData('POST', [], []);
 
         $this->requestHandler->handleRequest($form, $this->request);
 
@@ -330,7 +330,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
             $error = new FormError($options['post_max_size_message'], null, $errorParams);
             $error->setOrigin($form);
 
-            $this->assertEquals(array($error), iterator_to_array($form->getErrors()));
+            $this->assertEquals([$error], iterator_to_array($form->getErrors()));
             $this->assertTrue($form->isSubmitted());
         } else {
             $this->assertCount(0, $form->getErrors());
@@ -340,17 +340,17 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     public function getPostMaxSizeFixtures()
     {
-        return array(
-            array(pow(1024, 3) + 1, '1G', true, array('{{ max }}' => '1G')),
-            array(pow(1024, 3), '1G', false),
-            array(pow(1024, 2) + 1, '1M', true, array('{{ max }}' => '1M')),
-            array(pow(1024, 2), '1M', false),
-            array(1024 + 1, '1K', true, array('{{ max }}' => '1K')),
-            array(1024, '1K', false),
-            array(null, '1K', false),
-            array(1024, '', false),
-            array(1024, 0, false),
-        );
+        return [
+            [pow(1024, 3) + 1, '1G', true, ['{{ max }}' => '1G']],
+            [pow(1024, 3), '1G', false],
+            [pow(1024, 2) + 1, '1M', true, ['{{ max }}' => '1M']],
+            [pow(1024, 2), '1M', false],
+            [1024 + 1, '1K', true, ['{{ max }}' => '1K']],
+            [1024, '1K', false],
+            [null, '1K', false],
+            [1024, '', false],
+            [1024, 0, false],
+        ];
     }
 
     public function testUploadedFilesAreAccepted()
@@ -363,7 +363,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $this->assertFalse($this->requestHandler->isFileUpload($this->getInvalidFile()));
     }
 
-    abstract protected function setRequestData($method, $data, $files = array());
+    abstract protected function setRequestData($method, $data, $files = []);
 
     abstract protected function getRequestHandler();
 

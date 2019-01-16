@@ -27,7 +27,7 @@ class Query extends AbstractQuery
     /** @var resource */
     private $search;
 
-    public function __construct(Connection $connection, $dn, $query, array $options = array())
+    public function __construct(Connection $connection, $dn, $query, array $options = [])
     {
         parent::__construct($connection, $dn, $query, $options);
     }

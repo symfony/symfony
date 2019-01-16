@@ -62,10 +62,10 @@ class ExceptionHandlerTest extends TestCase
 
         $this->assertContains('Sorry, the page you are looking for could not be found.', $response);
 
-        $expectedHeaders = array(
-            array('HTTP/1.0 404', true, null),
-            array('Content-Type: text/html; charset=iso8859-1', true, null),
-        );
+        $expectedHeaders = [
+            ['HTTP/1.0 404', true, null],
+            ['Content-Type: text/html; charset=iso8859-1', true, null],
+        ];
 
         $this->assertSame($expectedHeaders, testHeader());
     }
@@ -75,14 +75,14 @@ class ExceptionHandlerTest extends TestCase
         $handler = new ExceptionHandler(false, 'iso8859-1');
 
         ob_start();
-        $handler->sendPhpResponse(new MethodNotAllowedHttpException(array('POST')));
+        $handler->sendPhpResponse(new MethodNotAllowedHttpException(['POST']));
         $response = ob_get_clean();
 
-        $expectedHeaders = array(
-            array('HTTP/1.0 405', true, null),
-            array('Allow: POST', false, null),
-            array('Content-Type: text/html; charset=iso8859-1', true, null),
-        );
+        $expectedHeaders = [
+            ['HTTP/1.0 405', true, null],
+            ['Allow: POST', false, null],
+            ['Content-Type: text/html; charset=iso8859-1', true, null],
+        ];
 
         $this->assertSame($expectedHeaders, testHeader());
     }
@@ -101,7 +101,7 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new \Exception('foo');
 
-        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(array('sendPhpResponse'))->getMock();
+        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
         $handler
             ->expects($this->exactly(2))
             ->method('sendPhpResponse');
@@ -119,7 +119,7 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__);
 
-        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(array('sendPhpResponse'))->getMock();
+        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
         $handler
             ->expects($this->once())
             ->method('sendPhpResponse');

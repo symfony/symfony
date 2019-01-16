@@ -65,7 +65,7 @@ class ParserCacheAdapter implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         throw new \BadMethodCallException('Not implemented');
     }

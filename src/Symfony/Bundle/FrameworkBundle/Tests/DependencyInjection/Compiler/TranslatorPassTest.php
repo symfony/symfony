@@ -26,10 +26,10 @@ class TranslatorPassTest extends TestCase
     public function testValidCollector()
     {
         $loader = (new Definition())
-            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'));
+            ->addTag('translation.loader', ['alias' => 'xliff', 'legacy-alias' => 'xlf']);
 
         $translator = (new Definition())
-            ->setArguments(array(null, null, null, null));
+            ->setArguments([null, null, null, null]);
 
         $container = new ContainerBuilder();
         $container->setDefinition('translator.default', $translator);
@@ -39,15 +39,15 @@ class TranslatorPassTest extends TestCase
         $pass->process($container);
 
         $expected = (new Definition())
-            ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'))
-            ->addMethodCall('addLoader', array('xliff', new Reference('translation.loader')))
-            ->addMethodCall('addLoader', array('xlf', new Reference('translation.loader')))
+            ->addTag('translation.loader', ['alias' => 'xliff', 'legacy-alias' => 'xlf'])
+            ->addMethodCall('addLoader', ['xliff', new Reference('translation.loader')])
+            ->addMethodCall('addLoader', ['xlf', new Reference('translation.loader')])
         ;
         $this->assertEquals($expected, $loader);
 
-        $this->assertSame(array('translation.loader' => array('xliff', 'xlf')), $translator->getArgument(3));
+        $this->assertSame(['translation.loader' => ['xliff', 'xlf']], $translator->getArgument(3));
 
-        $expected = array('translation.loader' => new ServiceClosureArgument(new Reference('translation.loader')));
+        $expected = ['translation.loader' => new ServiceClosureArgument(new Reference('translation.loader'))];
         $this->assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
     }
 }

@@ -22,7 +22,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
 {
     private $engine;
 
-    public function __construct(EngineInterface $engine, array $defaultThemes = array())
+    public function __construct(EngineInterface $engine, array $defaultThemes = [])
     {
         parent::__construct($defaultThemes);
 
@@ -32,7 +32,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         return trim($this->engine->render($resource, $variables));
     }

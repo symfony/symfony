@@ -28,7 +28,7 @@ class LoggingTranslatorTest extends TestCase
 
         $translator = new Translator('ar');
         $loggableTranslator = new LoggingTranslator($translator, $logger);
-        $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
+        $loggableTranslator->transChoice('some_message2', 10, ['%count%' => 10]);
         $loggableTranslator->trans('bar');
     }
 
@@ -41,10 +41,10 @@ class LoggingTranslatorTest extends TestCase
         ;
 
         $translator = new Translator('ar');
-        $translator->setFallbackLocales(array('en'));
+        $translator->setFallbackLocales(['en']);
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
+        $translator->addResource('array', ['some_message2' => 'one thing|%count% things'], 'en');
         $loggableTranslator = new LoggingTranslator($translator, $logger);
-        $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
+        $loggableTranslator->transChoice('some_message2', 10, ['%count%' => 10]);
     }
 }

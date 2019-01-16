@@ -25,12 +25,12 @@ class TokenProcessorTest extends TestCase
 {
     public function testProcessor()
     {
-        $token = new UsernamePasswordToken('user', 'password', 'provider', array('ROLE_USER'));
+        $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
-        $record = array('extra' => array());
+        $record = ['extra' => []];
         $record = $processor($record);
 
         $this->assertArrayHasKey('token', $record['extra']);

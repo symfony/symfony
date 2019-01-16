@@ -54,10 +54,10 @@ class UsernameNotFoundException extends AuthenticationException
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->username,
             parent::serialize(),
-        ));
+        ]);
     }
 
     /**
@@ -75,6 +75,6 @@ class UsernameNotFoundException extends AuthenticationException
      */
     public function getMessageData()
     {
-        return array('{{ username }}' => $this->username);
+        return ['{{ username }}' => $this->username];
     }
 }

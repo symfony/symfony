@@ -40,7 +40,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * Regions excluded from generation.
      */
-    private static $blacklist = array(
+    private static $blacklist = [
         self::UNKNOWN_REGION_ID => true,
         // Look like countries, but are sub-continents
         self::OUTLYING_OCEANIA_REGION_ID => true,
@@ -53,14 +53,14 @@ class RegionDataGenerator extends AbstractDataGenerator
         self::BOUVET_ISLAND_ID => true,
         self::HEARD_MCDONALD_ISLANDS_ID => true,
         self::CLIPPERTON_ISLAND_ID => true,
-    );
+    ];
 
     /**
      * Collects all available language codes.
      *
      * @var string[]
      */
-    private $regionCodes = array();
+    private $regionCodes = [];
 
     /**
      * {@inheritdoc}
@@ -83,7 +83,7 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->regionCodes = array();
+        $this->regionCodes = [];
     }
 
     /**
@@ -95,10 +95,10 @@ class RegionDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Countries']) && null !== $localeBundle['Countries']) {
-            $data = array(
+            $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => $this->generateRegionNames($localeBundle),
-            );
+            ];
 
             $this->regionCodes = array_merge($this->regionCodes, array_keys($data['Names']));
 
@@ -124,10 +124,10 @@ class RegionDataGenerator extends AbstractDataGenerator
 
         sort($this->regionCodes);
 
-        return array(
+        return [
             'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
-        );
+        ];
     }
 
     /**
@@ -136,7 +136,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     protected function generateRegionNames(ArrayAccessibleResourceBundle $localeBundle)
     {
         $unfilteredRegionNames = iterator_to_array($localeBundle['Countries']);
-        $regionNames = array();
+        $regionNames = [];
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
             if (isset(self::$blacklist[$region])) {

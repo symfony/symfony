@@ -90,7 +90,7 @@ class SessionListenerTest extends TestCase
 
         $request = new Request();
         $response = new Response();
-        $response->setCache(array('public' => true, 'max_age' => '30'));
+        $response->setCache(['public' => true, 'max_age' => '30']);
         $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
         $this->assertTrue($request->hasSession());
 

@@ -102,7 +102,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             // to derivate customized instances from the prototype one.
             $container->register($id .= '.'.$callerId, ServiceLocator::class)
                 ->setPublic(false)
-                ->setFactory(array(new Reference($locatorId), 'withContext'))
+                ->setFactory([new Reference($locatorId), 'withContext'])
                 ->addArgument($callerId)
                 ->addArgument(new Reference('service_container'));
         }

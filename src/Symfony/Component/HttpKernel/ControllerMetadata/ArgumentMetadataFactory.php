@@ -47,7 +47,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      */
     public function createArgumentMetadata($controller)
     {
-        $arguments = array();
+        $arguments = [];
 
         if (\is_array($controller)) {
             $reflection = new \ReflectionMethod($controller[0], $controller[1]);

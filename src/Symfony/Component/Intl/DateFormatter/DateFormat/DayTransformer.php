@@ -41,8 +41,8 @@ class DayTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array(
+        return [
             'day' => (int) $matched,
-        );
+        ];
     }
 }

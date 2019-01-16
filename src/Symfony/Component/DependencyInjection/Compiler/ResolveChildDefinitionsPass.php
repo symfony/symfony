@@ -39,7 +39,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $value = $this->container->getDefinition($this->currentId);
         }
         if ($value instanceof ChildDefinition) {
-            $this->currentPath = array();
+            $this->currentPath = [];
             $value = $this->resolveDefinition($value);
             if ($isRoot) {
                 $this->container->setDefinition($this->currentId, $value);

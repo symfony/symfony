@@ -36,9 +36,9 @@ interface EventSubscriberInterface
      *
      * For instance:
      *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2')))
+     *  * ['eventName' => 'methodName']
+     *  * ['eventName' => ['methodName', $priority]]
+     *  * ['eventName' => [['methodName1', $priority], ['methodName2']]]
      *
      * @return array The event names to listen to
      */

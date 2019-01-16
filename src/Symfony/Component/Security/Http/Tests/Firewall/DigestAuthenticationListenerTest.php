@@ -34,7 +34,7 @@ class DigestAuthenticationListenerTest extends TestCase
             'response="'.$serverDigest.'"'
         ;
 
-        $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_DIGEST' => $digestData));
+        $request = new Request([], [], [], [], [], ['PHP_AUTH_DIGEST' => $digestData]);
 
         $entryPoint = new DigestAuthenticationEntryPoint($realm, $secret);
 

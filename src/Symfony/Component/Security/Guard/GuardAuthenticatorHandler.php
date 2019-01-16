@@ -42,7 +42,7 @@ class GuardAuthenticatorHandler
     /**
      * @param array $statelessProviderKeys An array of provider/firewall keys that are "stateless" and so do not need the session migrated on success
      */
-    public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = array())
+    public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher = null, array $statelessProviderKeys = [])
     {
         $this->tokenStorage = $tokenStorage;
         $this->dispatcher = $eventDispatcher;

@@ -33,25 +33,25 @@ class HttpFoundationExtensionTest extends TestCase
 
     public function getGenerateAbsoluteUrlData()
     {
-        return array(
-            array('http://localhost/foo.png', '/foo.png', '/foo/bar.html'),
-            array('http://localhost/foo/foo.png', 'foo.png', '/foo/bar.html'),
-            array('http://localhost/foo/foo.png', 'foo.png', '/foo/bar'),
-            array('http://localhost/foo/bar/foo.png', 'foo.png', '/foo/bar/'),
+        return [
+            ['http://localhost/foo.png', '/foo.png', '/foo/bar.html'],
+            ['http://localhost/foo/foo.png', 'foo.png', '/foo/bar.html'],
+            ['http://localhost/foo/foo.png', 'foo.png', '/foo/bar'],
+            ['http://localhost/foo/bar/foo.png', 'foo.png', '/foo/bar/'],
 
-            array('http://example.com/baz', 'http://example.com/baz', '/'),
-            array('https://example.com/baz', 'https://example.com/baz', '/'),
-            array('//example.com/baz', '//example.com/baz', '/'),
+            ['http://example.com/baz', 'http://example.com/baz', '/'],
+            ['https://example.com/baz', 'https://example.com/baz', '/'],
+            ['//example.com/baz', '//example.com/baz', '/'],
 
-            array('http://localhost/foo/bar?baz', '?baz', '/foo/bar'),
-            array('http://localhost/foo/bar?baz=1', '?baz=1', '/foo/bar?foo=1'),
-            array('http://localhost/foo/baz?baz=1', 'baz?baz=1', '/foo/bar?foo=1'),
+            ['http://localhost/foo/bar?baz', '?baz', '/foo/bar'],
+            ['http://localhost/foo/bar?baz=1', '?baz=1', '/foo/bar?foo=1'],
+            ['http://localhost/foo/baz?baz=1', 'baz?baz=1', '/foo/bar?foo=1'],
 
-            array('http://localhost/foo/bar#baz', '#baz', '/foo/bar'),
-            array('http://localhost/foo/bar?0#baz', '#baz', '/foo/bar?0'),
-            array('http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'),
-            array('http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'),
-        );
+            ['http://localhost/foo/bar#baz', '#baz', '/foo/bar'],
+            ['http://localhost/foo/bar?0#baz', '#baz', '/foo/bar?0'],
+            ['http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'],
+            ['http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'],
+        ];
     }
 
     /**
@@ -85,16 +85,16 @@ class HttpFoundationExtensionTest extends TestCase
 
     public function getGenerateAbsoluteUrlRequestContextData()
     {
-        return array(
-            array('/foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo.png'),
-            array('foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo/foo.png'),
-            array('foo.png', '/foo/bar/', 'localhost', 'http', 80, 443, 'http://localhost/foo/bar/foo.png'),
-            array('/foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo.png'),
-            array('foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo/foo.png'),
-            array('foo.png', '/foo/bar/', 'localhost', 'https', 80, 443, 'https://localhost/foo/bar/foo.png'),
-            array('/foo.png', '/foo', 'localhost', 'http', 443, 80, 'http://localhost:443/foo.png'),
-            array('/foo.png', '/foo', 'localhost', 'https', 443, 80, 'https://localhost:80/foo.png'),
-        );
+        return [
+            ['/foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo.png'],
+            ['foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo/foo.png'],
+            ['foo.png', '/foo/bar/', 'localhost', 'http', 80, 443, 'http://localhost/foo/bar/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo.png'],
+            ['foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo/foo.png'],
+            ['foo.png', '/foo/bar/', 'localhost', 'https', 80, 443, 'https://localhost/foo/bar/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'http', 443, 80, 'http://localhost:443/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'https', 443, 80, 'https://localhost:80/foo.png'],
+        ];
     }
 
     public function testGenerateAbsoluteUrlWithScriptFileName()
@@ -130,14 +130,14 @@ class HttpFoundationExtensionTest extends TestCase
 
     public function getGenerateRelativePathData()
     {
-        return array(
-            array('../foo.png', '/foo.png', '/foo/bar.html'),
-            array('../baz/foo.png', '/baz/foo.png', '/foo/bar.html'),
-            array('baz/foo.png', 'baz/foo.png', '/foo/bar.html'),
+        return [
+            ['../foo.png', '/foo.png', '/foo/bar.html'],
+            ['../baz/foo.png', '/baz/foo.png', '/foo/bar.html'],
+            ['baz/foo.png', 'baz/foo.png', '/foo/bar.html'],
 
-            array('http://example.com/baz', 'http://example.com/baz', '/'),
-            array('https://example.com/baz', 'https://example.com/baz', '/'),
-            array('//example.com/baz', '//example.com/baz', '/'),
-        );
+            ['http://example.com/baz', 'http://example.com/baz', '/'],
+            ['https://example.com/baz', 'https://example.com/baz', '/'],
+            ['//example.com/baz', '//example.com/baz', '/'],
+        ];
     }
 }

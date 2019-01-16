@@ -15,18 +15,18 @@ class ValidateWorkflowsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('definition1', WorkflowDefinition::class)
-            ->addArgument(array('a', 'b', 'c'))
-            ->addArgument(array(
-                new Definition(Transition::class, array('t1', 'a', 'b')),
-                new Definition(Transition::class, array('t2', 'a', 'c')),
-            ))
-            ->addTag('workflow.definition', array('name' => 'wf1', 'type' => 'state_machine', 'marking_store' => 'foo'));
+            ->addArgument(['a', 'b', 'c'])
+            ->addArgument([
+                new Definition(Transition::class, ['t1', 'a', 'b']),
+                new Definition(Transition::class, ['t2', 'a', 'c']),
+            ])
+            ->addTag('workflow.definition', ['name' => 'wf1', 'type' => 'state_machine', 'marking_store' => 'foo']);
 
         (new ValidateWorkflowsPass())->process($container);
 
         $workflowDefinition = $container->get('definition1');
 
-        $this->assertSame(array('a' => 'a', 'b' => 'b', 'c' => 'c'), $workflowDefinition->getPlaces());
-        $this->assertEquals(array(new Transition('t1', 'a', 'b'), new Transition('t2', 'a', 'c')), $workflowDefinition->getTransitions());
+        $this->assertSame(['a' => 'a', 'b' => 'b', 'c' => 'c'], $workflowDefinition->getPlaces());
+        $this->assertEquals([new Transition('t1', 'a', 'b'), new Transition('t2', 'a', 'c')], $workflowDefinition->getTransitions());
     }
 }

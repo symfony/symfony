@@ -79,7 +79,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug('Digest Authorization header received from user agent.', array('header' => $header));
+            $this->logger->debug('Digest Authorization header received from user agent.', ['header' => $header]);
         }
 
         try {
@@ -106,7 +106,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
         if (!hash_equals($serverDigestMd5, $digestAuth->getResponse())) {
             if (null !== $this->logger) {
-                $this->logger->debug('Unexpected response from the DigestAuth received; is the header returning a clear text passwords?', array('expected' => $serverDigestMd5, 'received' => $digestAuth->getResponse()));
+                $this->logger->debug('Unexpected response from the DigestAuth received; is the header returning a clear text passwords?', ['expected' => $serverDigestMd5, 'received' => $digestAuth->getResponse()]);
             }
 
             $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
@@ -121,7 +121,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Digest authentication successful.', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
+            $this->logger->info('Digest authentication successful.', ['username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()]);
         }
 
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey);
@@ -148,7 +148,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Digest authentication failed.', array('exception' => $authException));
+            $this->logger->info('Digest authentication failed.', ['exception' => $authException]);
         }
 
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
@@ -169,7 +169,7 @@ class DigestAuthenticationListener implements ListenerInterface
  */
 class DigestData
 {
-    private $elements = array();
+    private $elements = [];
     private $header;
     private $nonceExpiryTime;
 
@@ -193,12 +193,12 @@ class DigestData
 
     public function getUsername()
     {
-        return strtr($this->elements['username'], array('\\"' => '"', '\\\\' => '\\'));
+        return strtr($this->elements['username'], ['\\"' => '"', '\\\\' => '\\']);
     }
 
     public function validateAndDecode($entryPointKey, $expectedRealm)
     {
-        if ($keys = array_diff(array('username', 'realm', 'nonce', 'uri', 'response'), array_keys($this->elements))) {
+        if ($keys = array_diff(['username', 'realm', 'nonce', 'uri', 'response'], array_keys($this->elements))) {
             throw new BadCredentialsException(sprintf('Missing mandatory digest value; received header "%s" (%s)', $this->header, implode(', ', $keys)));
         }
 

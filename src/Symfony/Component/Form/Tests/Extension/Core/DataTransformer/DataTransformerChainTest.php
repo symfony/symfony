@@ -29,7 +29,7 @@ class DataTransformerChainTest extends TestCase
             ->with($this->identicalTo('bar'))
             ->will($this->returnValue('baz'));
 
-        $chain = new DataTransformerChain(array($transformer1, $transformer2));
+        $chain = new DataTransformerChain([$transformer1, $transformer2]);
 
         $this->assertEquals('baz', $chain->transform('foo'));
     }
@@ -47,7 +47,7 @@ class DataTransformerChainTest extends TestCase
             ->with($this->identicalTo('bar'))
             ->will($this->returnValue('baz'));
 
-        $chain = new DataTransformerChain(array($transformer1, $transformer2));
+        $chain = new DataTransformerChain([$transformer1, $transformer2]);
 
         $this->assertEquals('baz', $chain->reverseTransform('foo'));
     }

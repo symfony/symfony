@@ -20,11 +20,11 @@ class ServiceLocatorTest extends TestCase
 {
     public function testHas()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
             function () { return 'dummy'; },
-        ));
+        ]);
 
         $this->assertTrue($locator->has('foo'));
         $this->assertTrue($locator->has('bar'));
@@ -33,10 +33,10 @@ class ServiceLocatorTest extends TestCase
 
     public function testGet()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
-        ));
+        ]);
 
         $this->assertSame('bar', $locator->get('foo'));
         $this->assertSame('baz', $locator->get('bar'));
@@ -45,13 +45,13 @@ class ServiceLocatorTest extends TestCase
     public function testGetDoesNotMemoize()
     {
         $i = 0;
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () use (&$i) {
                 ++$i;
 
                 return 'bar';
             },
-        ));
+        ]);
 
         $this->assertSame('bar', $locator->get('foo'));
         $this->assertSame('bar', $locator->get('foo'));
@@ -64,10 +64,10 @@ class ServiceLocatorTest extends TestCase
      */
     public function testGetThrowsOnUndefinedService()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
-        ));
+        ]);
 
         $locator->get('dummy');
     }
@@ -78,9 +78,9 @@ class ServiceLocatorTest extends TestCase
      */
     public function testThrowsOnUndefinedInternalService()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
-        ));
+        ]);
 
         $locator->get('foo');
     }
@@ -91,11 +91,11 @@ class ServiceLocatorTest extends TestCase
      */
     public function testThrowsOnCircularReference()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () use (&$locator) { return $locator->get('bar'); },
             'bar' => function () use (&$locator) { return $locator->get('baz'); },
             'baz' => function () use (&$locator) { return $locator->get('bar'); },
-        ));
+        ]);
 
         $locator->get('foo');
     }
@@ -109,7 +109,7 @@ class ServiceLocatorTest extends TestCase
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
-        $subscriber->container = new ServiceLocator(array('bar' => function () {}));
+        $subscriber->container = new ServiceLocator(['bar' => function () {}]);
         $subscriber->container = $subscriber->container->withContext('caller', $container);
 
         $subscriber->getFoo();
@@ -124,17 +124,17 @@ class ServiceLocatorTest extends TestCase
         $container = new Container();
         $container->set('foo', new \stdClass());
 
-        $locator = new ServiceLocator(array());
+        $locator = new ServiceLocator([]);
         $locator = $locator->withContext('foo', $container);
         $locator->get('foo');
     }
 
     public function testInvoke()
     {
-        $locator = new ServiceLocator(array(
+        $locator = new ServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
-        ));
+        ]);
 
         $this->assertSame('bar', $locator('foo'));
         $this->assertSame('baz', $locator('bar'));
@@ -153,6 +153,6 @@ class SomeServiceSubscriber implements ServiceSubscriberinterface
 
     public static function getSubscribedServices()
     {
-        return array('bar' => 'stdClass');
+        return ['bar' => 'stdClass'];
     }
 }

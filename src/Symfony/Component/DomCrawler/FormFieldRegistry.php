@@ -20,7 +20,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class FormFieldRegistry
 {
-    private $fields = array();
+    private $fields = [];
 
     private $base;
 
@@ -34,7 +34,7 @@ class FormFieldRegistry
         $target = &$this->fields;
         while ($segments) {
             if (!\is_array($target)) {
-                $target = array();
+                $target = [];
             }
             $path = array_shift($segments);
             if ('' === $path) {
@@ -133,7 +133,7 @@ class FormFieldRegistry
     /**
      * Returns the list of field with their value.
      *
-     * @return FormField[] The list of fields as array((string) Fully qualified name => (mixed) value)
+     * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
     public function all()
     {
@@ -167,9 +167,9 @@ class FormFieldRegistry
      * @param string $base   The name of the base field
      * @param array  $output The initial values
      *
-     * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     * @return array The list of fields as [string] Fully qualified name => (mixed) value)
      */
-    private function walk(array $array, $base = '', array &$output = array())
+    private function walk(array $array, $base = '', array &$output = [])
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
@@ -186,7 +186,7 @@ class FormFieldRegistry
     /**
      * Splits a field name into segments as a web browser would do.
      *
-     *     getSegments('base[foo][3][]') = array('base', 'foo, '3', '');
+     *     getSegments('base[foo][3][]') = ['base', 'foo, '3', ''];
      *
      * @param string $name The name of the field
      *
@@ -195,7 +195,7 @@ class FormFieldRegistry
     private function getSegments($name)
     {
         if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
-            $segments = array($m['base']);
+            $segments = [$m['base']];
             while (!empty($m['extra'])) {
                 $extra = $m['extra'];
                 if (preg_match('/^\[(?P<segment>.*?)\](?P<extra>.*)$/', $extra, $m)) {
@@ -208,6 +208,6 @@ class FormFieldRegistry
             return $segments;
         }
 
-        return array($name);
+        return [$name];
     }
 }

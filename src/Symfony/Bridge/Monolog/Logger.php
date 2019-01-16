@@ -30,7 +30,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface
             return $logger->getLogs();
         }
 
-        return array();
+        return [];
     }
 
     /**

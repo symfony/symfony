@@ -38,16 +38,16 @@ class FormDataExtractor implements FormDataExtractorInterface
      */
     public function extractConfiguration(FormInterface $form)
     {
-        $data = array(
+        $data = [
             'id' => $this->buildId($form),
             'name' => $form->getName(),
             'type_class' => \get_class($form->getConfig()->getType()->getInnerType()),
             'synchronized' => $form->isSynchronized(),
-            'passed_options' => array(),
-            'resolved_options' => array(),
-        );
+            'passed_options' => [],
+            'resolved_options' => [],
+        ];
 
-        foreach ($form->getConfig()->getAttribute('data_collector/passed_options', array()) as $option => $value) {
+        foreach ($form->getConfig()->getAttribute('data_collector/passed_options', []) as $option => $value) {
             $data['passed_options'][$option] = $value;
         }
 
@@ -66,12 +66,12 @@ class FormDataExtractor implements FormDataExtractorInterface
      */
     public function extractDefaultData(FormInterface $form)
     {
-        $data = array(
-            'default_data' => array(
+        $data = [
+            'default_data' => [
                 'norm' => $form->getNormData(),
-            ),
-            'submitted_data' => array(),
-        );
+            ],
+            'submitted_data' => [],
+        ];
 
         if ($form->getData() !== $form->getNormData()) {
             $data['default_data']['model'] = $form->getData();
@@ -89,12 +89,12 @@ class FormDataExtractor implements FormDataExtractorInterface
      */
     public function extractSubmittedData(FormInterface $form)
     {
-        $data = array(
-            'submitted_data' => array(
+        $data = [
+            'submitted_data' => [
                 'norm' => $form->getNormData(),
-            ),
-            'errors' => array(),
-        );
+            ],
+            'errors' => [],
+        ];
 
         if ($form->getViewData() !== $form->getNormData()) {
             $data['submitted_data']['view'] = $form->getViewData();
@@ -105,13 +105,13 @@ class FormDataExtractor implements FormDataExtractorInterface
         }
 
         foreach ($form->getErrors() as $error) {
-            $errorData = array(
+            $errorData = [
                 'message' => $error->getMessage(),
                 'origin' => \is_object($error->getOrigin())
                     ? spl_object_hash($error->getOrigin())
                     : null,
-                'trace' => array(),
-            );
+                'trace' => [],
+            ];
 
             $cause = $error->getCause();
 
@@ -148,11 +148,11 @@ class FormDataExtractor implements FormDataExtractorInterface
      */
     public function extractViewVariables(FormView $view)
     {
-        $data = array(
+        $data = [
             'id' => isset($view->vars['id']) ? $view->vars['id'] : null,
             'name' => isset($view->vars['name']) ? $view->vars['name'] : null,
-            'view_vars' => array(),
-        );
+            'view_vars' => [],
+        ];
 
         foreach ($view->vars as $varName => $value) {
             $data['view_vars'][$varName] = $value;

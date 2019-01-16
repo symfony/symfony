@@ -24,9 +24,9 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 {
     use RuntimeLoaderProvider;
 
-    protected $testableFeatures = array(
+    protected $testableFeatures = [
         'choice_attr',
-    );
+    ];
 
     /**
      * @var FormRenderer
@@ -37,32 +37,32 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
     {
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
+        $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ));
+        ]);
 
-        $environment = new Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, ['strict_variables' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 
-        $rendererEngine = new TwigRendererEngine(array(
+        $rendererEngine = new TwigRendererEngine([
             'bootstrap_3_horizontal_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ], $environment);
         $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
-    protected function renderForm(FormView $view, array $vars = array())
+    protected function renderForm(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = array())
+    protected function renderLabel(FormView $view, $label = null, array $vars = [])
     {
         if (null !== $label) {
-            $vars += array('label' => $label);
+            $vars += ['label' => $label];
         }
 
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
@@ -73,27 +73,27 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
         return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
-    protected function renderWidget(FormView $view, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = array())
+    protected function renderStart(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = array())
+    protected function renderEnd(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }

@@ -40,7 +40,7 @@ class XmlDumper extends Dumper
      *
      * @return string An xml string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
@@ -306,7 +306,7 @@ class XmlDumper extends Dumper
                 $text = $this->document->createTextNode(self::phpToXml((string) $value));
                 $element->appendChild($text);
             } else {
-                if (\in_array($value, array('null', 'true', 'false'), true)) {
+                if (\in_array($value, ['null', 'true', 'false'], true)) {
                     $element->setAttribute('type', 'string');
                 }
                 $text = $this->document->createTextNode(self::phpToXml($value));
@@ -323,7 +323,7 @@ class XmlDumper extends Dumper
      */
     private function escape(array $arguments)
     {
-        $args = array();
+        $args = [];
         foreach ($arguments as $k => $v) {
             if (\is_array($v)) {
                 $args[$k] = $this->escape($v);

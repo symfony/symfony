@@ -17,36 +17,36 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
-        $this->normalizedIds = array(
+        $this->services = [];
+        $this->normalizedIds = [
             'bar_%env(bar)%' => 'bar_%env(BAR)%',
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'bar_%env(BAR)%' => 'getBarenvBARService',
             'foo' => 'getFooService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'bar_%env(BAR)%' => true,
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar_%env(BAR)%' => true,
             'baz_%env(BAR)%' => true,
-        );
+        ];
     }
 
     public function compile()
@@ -83,7 +83,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'}, array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
+        return $this->services['foo'] = new \stdClass(${($_ = isset($this->services['bar_%env(BAR)%']) ? $this->services['bar_%env(BAR)%'] : ($this->services['bar_%env(BAR)%'] = new \stdClass())) && false ?: '_'}, ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
     }
 
     /**
@@ -139,8 +139,8 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -156,9 +156,9 @@ class ProjectServiceContainer extends Container
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
-    private $normalizedParameterNames = array(
+    private $normalizedParameterNames = [
         'env(bar)' => 'env(BAR)',
-    );
+    ];
 
     private function normalizeParameterName($name)
     {
@@ -181,8 +181,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'env(BAR)' => 'bar',
-        );
+        ];
     }
 }

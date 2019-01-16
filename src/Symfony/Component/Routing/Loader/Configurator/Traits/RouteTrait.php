@@ -124,7 +124,7 @@ trait RouteTrait
      */
     final public function controller($controller)
     {
-        $this->route->addDefaults(array('_controller' => $controller));
+        $this->route->addDefaults(['_controller' => $controller]);
 
         return $this;
     }

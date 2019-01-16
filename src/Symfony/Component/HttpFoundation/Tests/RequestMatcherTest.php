@@ -34,20 +34,20 @@ class RequestMatcherTest extends TestCase
 
     public function getMethodData()
     {
-        return array(
-            array('get', 'get', true),
-            array('get', array('get', 'post'), true),
-            array('get', 'post', false),
-            array('get', 'GET', true),
-            array('get', array('GET', 'POST'), true),
-            array('get', 'POST', false),
-        );
+        return [
+            ['get', 'get', true],
+            ['get', ['get', 'post'], true],
+            ['get', 'post', false],
+            ['get', 'GET', true],
+            ['get', ['GET', 'POST'], true],
+            ['get', 'POST', false],
+        ];
     }
 
     public function testScheme()
     {
         $httpRequest = $request = $request = Request::create('');
-        $httpsRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
+        $httpsRequest = $request = $request = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
 
         $matcher = new RequestMatcher();
         $matcher->matchScheme('https');
@@ -69,7 +69,7 @@ class RequestMatcherTest extends TestCase
     public function testHost($pattern, $isMatch)
     {
         $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
+        $request = Request::create('', 'get', [], [], [], ['HTTP_HOST' => 'foo.example.com']);
 
         $matcher->matchHost($pattern);
         $this->assertSame($isMatch, $matcher->matches($request));
@@ -80,16 +80,16 @@ class RequestMatcherTest extends TestCase
 
     public function getHostData()
     {
-        return array(
-            array('.*\.example\.com', true),
-            array('\.example\.com$', true),
-            array('^.*\.example\.com$', true),
-            array('.*\.sensio\.com', false),
-            array('.*\.example\.COM', true),
-            array('\.example\.COM$', true),
-            array('^.*\.example\.COM$', true),
-            array('.*\.sensio\.COM', false),
-        );
+        return [
+            ['.*\.example\.com', true],
+            ['\.example\.com$', true],
+            ['^.*\.example\.com$', true],
+            ['.*\.sensio\.com', false],
+            ['.*\.example\.COM', true],
+            ['\.example\.COM$', true],
+            ['^.*\.example\.COM$', true],
+            ['.*\.sensio\.COM', false],
+        ];
     }
 
     public function testPath()

@@ -80,7 +80,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -96,7 +96,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function forward($controller, array $path = array(), array $query = array())
+    protected function forward($controller, array $path = [], array $query = [])
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $path['_forwarded'] = $request->attributes;
@@ -132,7 +132,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function redirectToRoute($route, array $parameters = array(), $status = 302)
+    protected function redirectToRoute($route, array $parameters = [], $status = 302)
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }
@@ -149,12 +149,12 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function json($data, $status = 200, $headers = array(), $context = array())
+    protected function json($data, $status = 200, $headers = [], $context = [])
     {
         if ($this->container->has('serializer')) {
-            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge(array(
+            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge([
                 'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-            ), $context));
+            ], $context));
 
             return new JsonResponse($json, $status, $headers, true);
         }
@@ -254,7 +254,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function renderView($view, array $parameters = array())
+    protected function renderView($view, array $parameters = [])
     {
         if ($this->container->has('templating')) {
             return $this->container->get('templating')->render($view, $parameters);
@@ -278,7 +278,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function render($view, array $parameters = array(), Response $response = null)
+    protected function render($view, array $parameters = [], Response $response = null)
     {
         if ($this->container->has('templating')) {
             $content = $this->container->get('templating')->render($view, $parameters);
@@ -308,7 +308,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    protected function stream($view, array $parameters = [], StreamedResponse $response = null)
     {
         if ($this->container->has('templating')) {
             $templating = $this->container->get('templating');
@@ -390,7 +390,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function createForm($type, $data = null, array $options = array())
+    protected function createForm($type, $data = null, array $options = [])
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
@@ -405,7 +405,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function createFormBuilder($data = null, array $options = array())
+    protected function createFormBuilder($data = null, array $options = [])
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }

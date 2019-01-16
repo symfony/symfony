@@ -26,9 +26,9 @@ class ResponseListenerTest extends TestCase
     {
         $cookie = new Cookie('rememberme');
 
-        $request = $this->getRequest(array(
+        $request = $this->getRequest([
             RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
-        ));
+        ]);
 
         $response = $this->getResponse();
         $response->headers->expects($this->once())->method('setCookie')->with($cookie);
@@ -41,9 +41,9 @@ class ResponseListenerTest extends TestCase
     {
         $cookie = new Cookie('rememberme');
 
-        $request = $this->getRequest(array(
+        $request = $this->getRequest([
             RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
-        ));
+        ]);
 
         $response = $this->getResponse();
         $response->headers->expects($this->never())->method('setCookie');
@@ -67,10 +67,10 @@ class ResponseListenerTest extends TestCase
     {
         $listener = new ResponseListener();
 
-        $this->assertSame(array(KernelEvents::RESPONSE => 'onKernelResponse'), ResponseListener::getSubscribedEvents());
+        $this->assertSame([KernelEvents::RESPONSE => 'onKernelResponse'], ResponseListener::getSubscribedEvents());
     }
 
-    private function getRequest(array $attributes = array())
+    private function getRequest(array $attributes = [])
     {
         $request = new Request();
 

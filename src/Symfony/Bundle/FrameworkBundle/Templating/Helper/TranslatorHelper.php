@@ -29,7 +29,7 @@ class TranslatorHelper extends Helper
     /**
      * @see TranslatorInterface::trans()
      */
-    public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function trans($id, array $parameters = [], $domain = 'messages', $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -37,7 +37,7 @@ class TranslatorHelper extends Helper
     /**
      * @see TranslatorInterface::transChoice()
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = 'messages', $locale = null)
     {
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
     }

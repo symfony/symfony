@@ -131,7 +131,7 @@ class FrameworkExtension extends Extension
         if (!class_exists(ContainerAwareEventDispatcher::class)) {
             $definition = $container->getDefinition('event_dispatcher');
             $definition->setClass(EventDispatcher::class);
-            $definition->setArguments(array());
+            $definition->setArguments([]);
         }
 
         if (\PHP_VERSION_ID < 70000) {
@@ -204,13 +204,13 @@ class FrameworkExtension extends Extension
 
         if (!$container->hasParameter('debug.file_link_format')) {
             if (!$container->hasParameter('templating.helper.code.file_link_format')) {
-                $links = array(
+                $links = [
                     'textmate' => 'txmt://open?url=file://%%f&line=%%l',
                     'macvim' => 'mvim://open?url=file://%%f&line=%%l',
                     'emacs' => 'emacs://open?url=file://%%f&line=%%l',
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
                     'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
-                );
+                ];
                 $ide = $config['ide'];
 
                 $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
@@ -317,14 +317,14 @@ class FrameworkExtension extends Extension
             $loader->load('web_link.xml');
         }
 
-        $this->addAnnotatedClassesToCompile(array(
+        $this->addAnnotatedClassesToCompile([
             '**\\Controller\\',
             '**\\Entity\\',
 
             // Added explicitly so that we don't rely on the class map being dumped to make it work
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
-        ));
+        ]);
 
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command');
@@ -353,7 +353,7 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResettableInterface::class)
-            ->addTag('kernel.reset', array('method' => 'reset'));
+            ->addTag('kernel.reset', ['method' => 'reset']);
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)
@@ -377,11 +377,11 @@ class FrameworkExtension extends Extension
 
         if (!$container->getParameter('kernel.debug')) {
             // remove tagged iterator argument for resource checkers
-            $container->getDefinition('config_cache_factory')->setArguments(array());
+            $container->getDefinition('config_cache_factory')->setArguments([]);
         }
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Symfony\\Component\\Config\\ConfigCache',
                 'Symfony\\Component\\Config\\FileLocator',
 
@@ -418,7 +418,7 @@ class FrameworkExtension extends Extension
 
                 // cannot be included as commands are discovered based on the path to this class via Reflection
                 // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
-            ));
+            ]);
         }
     }
 
@@ -511,7 +511,7 @@ class FrameworkExtension extends Extension
     {
         if (!$this->isConfigEnabled($container, $config)) {
             // this is needed for the WebProfiler to work even if the profiler is disabled
-            $container->setParameter('data_collector.templates', array());
+            $container->setParameter('data_collector.templates', []);
 
             return;
         }
@@ -563,22 +563,22 @@ class FrameworkExtension extends Extension
                 $definition->setPublic(false);
 
                 if (isset($config['matcher']['ip'])) {
-                    $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
+                    $definition->addMethodCall('matchIp', [$config['matcher']['ip']]);
                 }
 
                 if (isset($config['matcher']['ips'])) {
-                    $definition->addMethodCall('matchIps', array($config['matcher']['ips']));
+                    $definition->addMethodCall('matchIps', [$config['matcher']['ips']]);
                 }
 
                 if (isset($config['matcher']['path'])) {
-                    $definition->addMethodCall('matchPath', array($config['matcher']['path']));
+                    $definition->addMethodCall('matchPath', [$config['matcher']['path']]);
                 }
             }
         }
 
         $container->getDefinition('profiler')
             ->addArgument($config['collect'])
-            ->addTag('kernel.reset', array('method' => 'reset'));
+            ->addTag('kernel.reset', ['method' => 'reset']);
     }
 
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
@@ -610,13 +610,13 @@ class FrameworkExtension extends Extension
             $workflowId = sprintf('%s.%s', $type, $name);
 
             // Create transitions
-            $transitions = array();
-            $guardsConfiguration = array();
+            $transitions = [];
+            $guardsConfiguration = [];
             // Global transition counter per workflow
             $transitionCounter = 0;
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
-                    $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $transition['from'], $transition['to']]);
                     $transitionDefinition->setPublic(false);
                     $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
                     $container->setDefinition($transitionId, $transitionDefinition);
@@ -632,7 +632,7 @@ class FrameworkExtension extends Extension
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition = new Definition(Workflow\Transition::class, [$transition['name'], $from, $to]);
                             $transitionDefinition->setPublic(false);
                             $transitionId = sprintf('%s.transition.%s', $workflowId, $transitionCounter++);
                             $container->setDefinition($transitionId, $transitionDefinition);
@@ -655,11 +655,11 @@ class FrameworkExtension extends Extension
             $definitionDefinition->setPublic(false);
             $definitionDefinition->addArgument($workflow['places']);
             $definitionDefinition->addArgument($transitions);
-            $definitionDefinition->addTag('workflow.definition', array(
+            $definitionDefinition->addTag('workflow.definition', [
                 'name' => $name,
                 'type' => $type,
                 'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
-            ));
+            ]);
             if (isset($workflow['initial_place'])) {
                 $definitionDefinition->addArgument($workflow['initial_place']);
             }
@@ -689,22 +689,22 @@ class FrameworkExtension extends Extension
             // Add workflow to Registry
             if ($workflow['supports']) {
                 foreach ($workflow['supports'] as $supportedClassName) {
-                    $strategyDefinition = new Definition(Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, array($supportedClassName));
+                    $strategyDefinition = new Definition(Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, [$supportedClassName]);
                     $strategyDefinition->setPublic(false);
-                    $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
+                    $registryDefinition->addMethodCall('add', [new Reference($workflowId), $strategyDefinition]);
                 }
             } elseif (isset($workflow['support_strategy'])) {
-                $registryDefinition->addMethodCall('add', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
+                $registryDefinition->addMethodCall('add', [new Reference($workflowId), new Reference($workflow['support_strategy'])]);
             }
 
             // Enable the AuditTrail
             if ($workflow['audit_trail']['enabled']) {
                 $listener = new Definition(Workflow\EventListener\AuditTrailListener::class);
                 $listener->setPrivate(true);
-                $listener->addTag('monolog.logger', array('channel' => 'workflow'));
-                $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave'));
-                $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition'));
-                $listener->addTag('kernel.event_listener', array('event' => sprintf('workflow.%s.enter', $name), 'method' => 'onEnter'));
+                $listener->addTag('monolog.logger', ['channel' => 'workflow']);
+                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.leave', $name), 'method' => 'onLeave']);
+                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.transition', $name), 'method' => 'onTransition']);
+                $listener->addTag('kernel.event_listener', ['event' => sprintf('workflow.%s.enter', $name), 'method' => 'onEnter']);
                 $listener->addArgument(new Reference('logger'));
                 $container->setDefinition(sprintf('%s.listener.audit_trail', $workflowId), $listener);
             }
@@ -722,7 +722,7 @@ class FrameworkExtension extends Extension
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);
                 $guard->setPrivate(true);
 
-                $guard->setArguments(array(
+                $guard->setArguments([
                     $guardsConfiguration,
                     new Reference('workflow.security.expression_language'),
                     new Reference('security.token_storage'),
@@ -730,9 +730,9 @@ class FrameworkExtension extends Extension
                     new Reference('security.authentication.trust_resolver'),
                     new Reference('security.role_hierarchy'),
                     new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-                ));
+                ]);
                 foreach ($guardsConfiguration as $eventName => $config) {
-                    $guard->addTag('kernel.event_listener', array('event' => $eventName, 'method' => 'onTransition'));
+                    $guard->addTag('kernel.event_listener', ['event' => $eventName, 'method' => 'onTransition']);
                 }
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);
@@ -751,7 +751,7 @@ class FrameworkExtension extends Extension
             $container->register('debug.stopwatch', Stopwatch::class)
                 ->addArgument(true)
                 ->setPrivate(true)
-                ->addTag('kernel.reset', array('method' => 'reset'));
+                ->addTag('kernel.reset', ['method' => 'reset']);
             $container->setAlias(Stopwatch::class, new Alias('debug.stopwatch', false));
         }
 
@@ -815,36 +815,36 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
                 'Symfony\\Component\\Routing\\RequestContext',
                 'Symfony\\Component\\Routing\\Router',
                 'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
                 $container->findDefinition('router.default')->getClass(),
-            ));
+            ]);
         }
 
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
                 ->setPublic(false)
-                ->addTag('routing.loader', array('priority' => -10))
+                ->addTag('routing.loader', ['priority' => -10])
                 ->addArgument(new Reference('annotation_reader'));
 
             $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
                 ->setPublic(false)
-                ->addTag('routing.loader', array('priority' => -10))
-                ->setArguments(array(
+                ->addTag('routing.loader', ['priority' => -10])
+                ->setArguments([
                     new Reference('file_locator'),
                     new Reference('routing.loader.annotation'),
-                ));
+                ]);
 
             $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
                 ->setPublic(false)
-                ->addTag('routing.loader', array('priority' => -10))
-                ->setArguments(array(
+                ->addTag('routing.loader', ['priority' => -10])
+                ->setArguments([
                     new Reference('file_locator'),
                     new Reference('routing.loader.annotation'),
-                ));
+                ]);
         }
     }
 
@@ -860,8 +860,8 @@ class FrameworkExtension extends Extension
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
-        $options = array('cache_limiter' => '0');
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
+        $options = ['cache_limiter' => '0'];
+        foreach (['name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode'] as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -881,7 +881,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.save_path', $config['save_path']);
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Symfony\\Component\\HttpKernel\\EventListener\\SessionListener',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
@@ -889,12 +889,12 @@ class FrameworkExtension extends Extension
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
                 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
                 $container->getDefinition('session')->getClass(),
-            ));
+            ]);
 
             if ($container->hasDefinition($config['storage_id'])) {
-                $this->addClassesToCompile(array(
+                $this->addClassesToCompile([
                     $container->findDefinition('session.storage')->getClass(),
-                ));
+                ]);
             }
         }
 
@@ -925,11 +925,11 @@ class FrameworkExtension extends Extension
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
 
             $container->getDefinition('templating.loader.cache')
-                ->addTag('monolog.logger', array('channel' => 'templating'))
-                ->addMethodCall('setLogger', array($logger));
+                ->addTag('monolog.logger', ['channel' => 'templating'])
+                ->addMethodCall('setLogger', [$logger]);
             $container->getDefinition('templating.loader.chain')
-                ->addTag('monolog.logger', array('channel' => 'templating'))
-                ->addMethodCall('setLogger', array($logger));
+                ->addTag('monolog.logger', ['channel' => 'templating'])
+                ->addMethodCall('setLogger', [$logger]);
         }
 
         if (!empty($config['loaders'])) {
@@ -955,12 +955,12 @@ class FrameworkExtension extends Extension
         }
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
                 'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
                 $container->findDefinition('templating.locator')->getClass(),
-            ));
+            ]);
         }
 
         $container->setParameter('templating.engines', $config['engines']);
@@ -972,13 +972,13 @@ class FrameworkExtension extends Extension
         } else {
             $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
             foreach ($engines as $engine) {
-                $templateEngineDefinition->addMethodCall('addEngine', array($engine));
+                $templateEngineDefinition->addMethodCall('addEngine', [$engine]);
             }
             $container->setAlias('templating', 'templating.engine.delegating')->setPublic(true);
         }
 
         $container->getDefinition('fragment.renderer.hinclude')
-            ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+            ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
             ->replaceArgument(0, new Reference('templating'))
         ;
 
@@ -1008,11 +1008,11 @@ class FrameworkExtension extends Extension
             }
 
             if (\PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
+                $this->addClassesToCompile([
                     'Symfony\\Component\\Templating\\Storage\\FileStorage',
                     'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
                     'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
-                ));
+                ]);
             }
 
             if ($container->has('assets.packages')) {
@@ -1048,7 +1048,7 @@ class FrameworkExtension extends Extension
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
-        $namedPackages = array();
+        $namedPackages = [];
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
@@ -1160,13 +1160,13 @@ class FrameworkExtension extends Extension
         $container->setAlias('translator', 'translator.default')->setPublic(true);
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
         $translator = $container->findDefinition('translator.default');
-        $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
+        $translator->addMethodCall('setFallbackLocales', [$config['fallbacks']]);
 
         $container->setParameter('translator.logging', $config['logging']);
         $container->setParameter('translator.default_path', $config['default_path']);
 
         // Discover translation directories
-        $dirs = array();
+        $dirs = [];
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
@@ -1210,7 +1210,7 @@ class FrameworkExtension extends Extension
 
         // Register translation resources
         if ($dirs) {
-            $files = array();
+            $files = [];
             $finder = Finder::create()
                 ->followLinks()
                 ->files()
@@ -1224,7 +1224,7 @@ class FrameworkExtension extends Extension
             foreach ($finder as $file) {
                 list(, $locale) = explode('.', $file->getBasename(), 3);
                 if (!isset($files[$locale])) {
-                    $files[$locale] = array();
+                    $files[$locale] = [];
                 }
 
                 $files[$locale][] = (string) $file;
@@ -1232,7 +1232,7 @@ class FrameworkExtension extends Extension
 
             $options = array_merge(
                 $translator->getArgument(4),
-                array('resource_files' => $files)
+                ['resource_files' => $files]
             );
 
             $translator->replaceArgument(4, $options);
@@ -1259,15 +1259,15 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
-        $files = array('xml' => array(), 'yml' => array());
+        $files = ['xml' => [], 'yml' => []];
         $this->registerValidatorMapping($container, $config, $files);
 
         if (!empty($files['xml'])) {
-            $validatorBuilder->addMethodCall('addXmlMappings', array($files['xml']));
+            $validatorBuilder->addMethodCall('addXmlMappings', [$files['xml']]);
         }
 
         if (!empty($files['yml'])) {
-            $validatorBuilder->addMethodCall('addYamlMappings', array($files['yml']));
+            $validatorBuilder->addMethodCall('addYamlMappings', [$files['yml']]);
         }
 
         $definition = $container->findDefinition('validator.email');
@@ -1278,12 +1278,12 @@ class FrameworkExtension extends Extension
                 throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
             }
 
-            $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
+            $validatorBuilder->addMethodCall('enableAnnotationMapping', [new Reference('annotation_reader')]);
         }
 
         if (array_key_exists('static_method', $config) && $config['static_method']) {
             foreach ($config['static_method'] as $methodName) {
-                $validatorBuilder->addMethodCall('addMethodMapping', array($methodName));
+                $validatorBuilder->addMethodCall('addMethodMapping', [$methodName]);
             }
         }
 
@@ -1293,9 +1293,9 @@ class FrameworkExtension extends Extension
                 'validator_'.$this->getKernelRootHash($container)
             );
 
-            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
+            $validatorBuilder->addMethodCall('setMetadataCache', [new Reference($config['cache'])]);
         } elseif (!$container->getParameter('kernel.debug')) {
-            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.symfony')));
+            $validatorBuilder->addMethodCall('setMetadataCache', [new Reference('validator.mapping.cache.symfony')]);
         }
     }
 
@@ -1377,7 +1377,7 @@ class FrameworkExtension extends Extension
 
         if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
             $container->getDefinition('annotations.dummy_registry')
-                ->setMethodCalls(array(array('registerLoader', array('class_exists'))));
+                ->setMethodCalls([['registerLoader', ['class_exists']]]);
         }
 
         if ('none' !== $config['cache']) {
@@ -1395,10 +1395,10 @@ class FrameworkExtension extends Extension
                 $definition->addTag('kernel.cache_warmer');
 
                 if (\PHP_VERSION_ID < 70000) {
-                    $this->addClassesToCompile(array(
+                    $this->addClassesToCompile([
                         'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
                         'Symfony\Component\Cache\DoctrineProvider',
-                    ));
+                    ]);
                 }
             } elseif ('file' === $config['cache']) {
                 $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
@@ -1486,7 +1486,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.encoder.yaml');
         }
 
-        $serializerLoaders = array();
+        $serializerLoaders = [];
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
@@ -1494,7 +1494,7 @@ class FrameworkExtension extends Extension
 
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
-                 array(new Reference('annotation_reader'))
+                 [new Reference('annotation_reader')]
             );
             $annotationLoader->setPublic(false);
 
@@ -1502,7 +1502,7 @@ class FrameworkExtension extends Extension
         }
 
         $fileRecorder = function ($extension, $path) use (&$serializerLoaders) {
-            $definition = new Definition(\in_array($extension, array('yaml', 'yml')) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($path));
+            $definition = new Definition(\in_array($extension, ['yaml', 'yml']) ? 'Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', [$path]);
             $definition->setPublic(false);
             $serializerLoaders[] = $definition;
         };
@@ -1548,10 +1548,10 @@ class FrameworkExtension extends Extension
         } elseif (!$container->getParameter('kernel.debug')) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
-                array(
+                [
                     new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
                     new Reference('serializer.mapping.cache.symfony'),
-                )
+                ]
             );
             $cacheMetadataFactory->setPublic(false);
             $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
@@ -1564,7 +1564,7 @@ class FrameworkExtension extends Extension
         }
 
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
-            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', [new Reference($config['circular_reference_handler'])]);
         }
     }
 
@@ -1581,8 +1581,8 @@ class FrameworkExtension extends Extension
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->setPrivate(true);
-            $definition->addTag('property_info.description_extractor', array('priority' => -1000));
-            $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+            $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
+            $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
         }
     }
 
@@ -1596,7 +1596,7 @@ class FrameworkExtension extends Extension
             }
 
             // Generate stores
-            $storeDefinitions = array();
+            $storeDefinitions = [];
             foreach ($resourceStores as $storeDsn) {
                 $storeDsn = $container->resolveEnvPlaceholders($storeDsn, null, $usedEnvs);
                 switch (true) {
@@ -1610,15 +1610,15 @@ class FrameworkExtension extends Extension
                         if (!$container->hasDefinition($connectionDefinitionId = $container->hash($storeDsn))) {
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
-                            $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
-                            $connectionDefinition->setArguments(array($storeDsn, array('lazy' => true)));
+                            $connectionDefinition->setFactory([AbstractAdapter::class, 'createConnection']);
+                            $connectionDefinition->setArguments([$storeDsn, ['lazy' => true]]);
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
                         $storeDefinition = new Definition(StoreInterface::class);
                         $storeDefinition->setPublic(false);
-                        $storeDefinition->setFactory(array(StoreFactory::class, 'createStore'));
-                        $storeDefinition->setArguments(array(new Reference($connectionDefinitionId)));
+                        $storeDefinition->setFactory([StoreFactory::class, 'createStore']);
+                        $storeDefinition->setArguments([new Reference($connectionDefinitionId)]);
 
                         $container->setDefinition($storeDefinitionId = 'lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);
 
@@ -1648,8 +1648,8 @@ class FrameworkExtension extends Extension
             // Generate services for lock instances
             $lockDefinition = new Definition(Lock::class);
             $lockDefinition->setPublic(false);
-            $lockDefinition->setFactory(array(new Reference('lock.'.$resourceName.'.factory'), 'createLock'));
-            $lockDefinition->setArguments(array($resourceName));
+            $lockDefinition->setFactory([new Reference('lock.'.$resourceName.'.factory'), 'createLock']);
+            $lockDefinition->setArguments([$resourceName]);
             $container->setDefinition('lock.'.$resourceName, $lockDefinition);
 
             // provide alias for default resource
@@ -1678,16 +1678,16 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (array('doctrine', 'psr6', 'redis', 'memcached') as $name) {
+        foreach (['doctrine', 'psr6', 'redis', 'memcached'] as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
         }
-        foreach (array('app', 'system') as $name) {
-            $config['pools']['cache.'.$name] = array(
+        foreach (['app', 'system'] as $name) {
+            $config['pools']['cache.'.$name] = [
                 'adapter' => $config[$name],
                 'public' => true,
-            );
+            ];
         }
         foreach ($config['pools'] as $name => $pool) {
             $definition = new ChildDefinition($pool['adapter']);
@@ -1703,22 +1703,22 @@ class FrameworkExtension extends Extension
             $propertyAccessDefinition->setPublic(false);
 
             if (!$container->getParameter('kernel.debug')) {
-                $propertyAccessDefinition->setFactory(array(PropertyAccessor::class, 'createCache'));
-                $propertyAccessDefinition->setArguments(array(null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
-                $propertyAccessDefinition->addTag('cache.pool', array('clearer' => 'cache.system_clearer'));
-                $propertyAccessDefinition->addTag('monolog.logger', array('channel' => 'cache'));
+                $propertyAccessDefinition->setFactory([PropertyAccessor::class, 'createCache']);
+                $propertyAccessDefinition->setArguments([null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
+                $propertyAccessDefinition->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
+                $propertyAccessDefinition->addTag('monolog.logger', ['channel' => 'cache']);
             } else {
                 $propertyAccessDefinition->setClass(ArrayAdapter::class);
-                $propertyAccessDefinition->setArguments(array(0, false));
+                $propertyAccessDefinition->setArguments([0, false]);
             }
         }
 
         if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
+            $this->addClassesToCompile([
                 'Symfony\Component\Cache\Adapter\ApcuAdapter',
                 'Symfony\Component\Cache\Adapter\FilesystemAdapter',
                 'Symfony\Component\Cache\CacheItem',
-            ));
+            ]);
         }
     }
 

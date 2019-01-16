@@ -84,7 +84,7 @@ class StrictSessionHandlerTest extends TestCase
     {
         $handler = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $handler->expects($this->exactly(2))->method('read')
-            ->withConsecutive(array('id1'), array('id2'))
+            ->withConsecutive(['id1'], ['id2'])
             ->will($this->onConsecutiveCalls('data1', 'data2'));
         $proxy = new StrictSessionHandler($handler);
 

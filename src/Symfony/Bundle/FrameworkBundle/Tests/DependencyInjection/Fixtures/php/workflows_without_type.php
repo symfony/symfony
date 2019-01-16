@@ -2,25 +2,25 @@
 
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
 
-$container->loadFromExtension('framework', array(
-    'workflows' => array(
-        'missing_type' => array(
-            'marking_store' => array(
+$container->loadFromExtension('framework', [
+    'workflows' => [
+        'missing_type' => [
+            'marking_store' => [
                 'service' => 'workflow_service',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 \stdClass::class,
-            ),
-            'places' => array(
+            ],
+            'places' => [
                 'first',
                 'last',
-            ),
-            'transitions' => array(
-                'go' => array(
+            ],
+            'transitions' => [
+                'go' => [
                     'from' => 'first',
                     'to' => 'last',
-                ),
-            ),
-        ),
-    ),
-));
+                ],
+            ],
+        ],
+    ],
+]);

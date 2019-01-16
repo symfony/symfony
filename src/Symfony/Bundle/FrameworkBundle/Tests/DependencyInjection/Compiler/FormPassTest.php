@@ -42,12 +42,12 @@ class FormPassTest extends TestCase
 
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setPublic(true);
-        $extDefinition->setArguments(array(
+        $extDefinition->setArguments([
             new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-        ));
+            [],
+            [],
+            [],
+        ]);
 
         $container->setDefinition('form.extension', $extDefinition);
         $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
@@ -57,10 +57,10 @@ class FormPassTest extends TestCase
 
         $extDefinition = $container->getDefinition('form.extension');
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             __CLASS__.'_Type1' => 'my.type1',
             __CLASS__.'_Type2' => 'my.type2',
-        ), $extDefinition->getArgument(1));
+        ], $extDefinition->getArgument(1));
     }
 
     /**
@@ -71,12 +71,12 @@ class FormPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
 
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', [
             new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-        ));
+            [],
+            [],
+            [],
+        ]);
         $extDefinition->setPublic(true);
 
         $container->setDefinition('form.extension', $extDefinition);
@@ -96,33 +96,33 @@ class FormPassTest extends TestCase
      */
     public function addTaggedTypeExtensionsDataProvider()
     {
-        return array(
-            array(
-                array(
-                    'my.type_extension1' => array('extended_type' => 'type1'),
-                    'my.type_extension2' => array('extended_type' => 'type1'),
-                    'my.type_extension3' => array('extended_type' => 'type2'),
-                ),
-                array(
-                    'type1' => array('my.type_extension1', 'my.type_extension2'),
-                    'type2' => array('my.type_extension3'),
-                ),
-            ),
-            array(
-                array(
-                    'my.type_extension1' => array('extended_type' => 'type1', 'priority' => 1),
-                    'my.type_extension2' => array('extended_type' => 'type1', 'priority' => 2),
-                    'my.type_extension3' => array('extended_type' => 'type1', 'priority' => -1),
-                    'my.type_extension4' => array('extended_type' => 'type2', 'priority' => 2),
-                    'my.type_extension5' => array('extended_type' => 'type2', 'priority' => 1),
-                    'my.type_extension6' => array('extended_type' => 'type2', 'priority' => 1),
-                ),
-                array(
-                    'type1' => array('my.type_extension2', 'my.type_extension1', 'my.type_extension3'),
-                    'type2' => array('my.type_extension4', 'my.type_extension5', 'my.type_extension6'),
-                ),
-            ),
-        );
+        return [
+            [
+                [
+                    'my.type_extension1' => ['extended_type' => 'type1'],
+                    'my.type_extension2' => ['extended_type' => 'type1'],
+                    'my.type_extension3' => ['extended_type' => 'type2'],
+                ],
+                [
+                    'type1' => ['my.type_extension1', 'my.type_extension2'],
+                    'type2' => ['my.type_extension3'],
+                ],
+            ],
+            [
+                [
+                    'my.type_extension1' => ['extended_type' => 'type1', 'priority' => 1],
+                    'my.type_extension2' => ['extended_type' => 'type1', 'priority' => 2],
+                    'my.type_extension3' => ['extended_type' => 'type1', 'priority' => -1],
+                    'my.type_extension4' => ['extended_type' => 'type2', 'priority' => 2],
+                    'my.type_extension5' => ['extended_type' => 'type2', 'priority' => 1],
+                    'my.type_extension6' => ['extended_type' => 'type2', 'priority' => 1],
+                ],
+                [
+                    'type1' => ['my.type_extension2', 'my.type_extension1', 'my.type_extension3'],
+                    'type2' => ['my.type_extension4', 'my.type_extension5', 'my.type_extension6'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -134,12 +134,12 @@ class FormPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new FormPass());
 
-        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', array(
+        $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension', [
             new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-        ));
+            [],
+            [],
+            [],
+        ]);
         $extDefinition->setPublic(true);
 
         $container->setDefinition('form.extension', $extDefinition);
@@ -156,12 +156,12 @@ class FormPassTest extends TestCase
 
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
         $extDefinition->setPublic(true);
-        $extDefinition->setArguments(array(
+        $extDefinition->setArguments([
             new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-        ));
+            [],
+            [],
+            [],
+        ]);
 
         $definition1 = new Definition('stdClass');
         $definition1->addTag('form.type_guesser');
@@ -176,10 +176,10 @@ class FormPassTest extends TestCase
 
         $extDefinition = $container->getDefinition('form.extension');
 
-        $this->assertSame(array(
+        $this->assertSame([
             'my.guesser1',
             'my.guesser2',
-        ), $extDefinition->getArgument(3));
+        ], $extDefinition->getArgument(3));
     }
 
     /**
@@ -191,15 +191,15 @@ class FormPassTest extends TestCase
         $container->addCompilerPass(new FormPass());
 
         $extDefinition = new Definition('Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension');
-        $extDefinition->setArguments(array(
+        $extDefinition->setArguments([
             new Reference('service_container'),
-            array(),
-            array(),
-            array(),
-        ));
+            [],
+            [],
+            [],
+        ]);
 
         $container->setDefinition('form.extension', $extDefinition);
-        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, array('extended_type' => 'Foo'));
+        $container->register($id, 'stdClass')->setPublic(false)->addTag($tagName, ['extended_type' => 'Foo']);
 
         $container->compile();
         $this->assertTrue($container->getDefinition($id)->isPublic());
@@ -207,11 +207,11 @@ class FormPassTest extends TestCase
 
     public function privateTaggedServicesProvider()
     {
-        return array(
-            array('my.type', 'form.type'),
-            array('my.type_extension', 'form.type_extension'),
-            array('my.guesser', 'form.type_guesser'),
-        );
+        return [
+            ['my.type', 'form.type'],
+            ['my.type_extension', 'form.type_extension'],
+            ['my.guesser', 'form.type_guesser'],
+        ];
     }
 }
 

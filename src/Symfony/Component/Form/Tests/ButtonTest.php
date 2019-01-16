@@ -66,13 +66,13 @@ class ButtonTest extends TestCase
 
     public function getDisabledStates()
     {
-        return array(
+        return [
             // parent, button, result
-            array(true, true, true),
-            array(true, false, true),
-            array(false, true, true),
-            array(false, false, false),
-        );
+            [true, true, true],
+            [true, false, true],
+            [false, true, true],
+            [false, false, false],
+        ];
     }
 
     private function getButtonBuilder($name)

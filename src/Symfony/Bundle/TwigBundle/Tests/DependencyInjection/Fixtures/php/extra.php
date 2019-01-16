@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('twig', array(
-     'paths' => array(
+$container->loadFromExtension('twig', [
+     'paths' => [
          'namespaced_path3' => 'namespace3',
-      ),
-));
+      ],
+]);

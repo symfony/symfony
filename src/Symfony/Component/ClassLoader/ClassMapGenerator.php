@@ -31,7 +31,7 @@ class ClassMapGenerator
     public static function dump($dirs, $file)
     {
         $dirs = (array) $dirs;
-        $maps = array();
+        $maps = [];
 
         foreach ($dirs as $dir) {
             $maps = array_merge($maps, static::createMap($dir));
@@ -53,7 +53,7 @@ class ClassMapGenerator
             $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         }
 
-        $map = array();
+        $map = [];
 
         foreach ($dir as $file) {
             if (!$file->isFile()) {
@@ -93,7 +93,7 @@ class ClassMapGenerator
         $contents = file_get_contents($path);
         $tokens = token_get_all($contents);
 
-        $classes = array();
+        $classes = [];
 
         $namespace = '';
         for ($i = 0; isset($tokens[$i]); ++$i) {
@@ -110,7 +110,7 @@ class ClassMapGenerator
                     $namespace = '';
                     // If there is a namespace, extract it
                     while (isset($tokens[++$i][1])) {
-                        if (\in_array($tokens[$i][0], array(T_STRING, T_NS_SEPARATOR))) {
+                        if (\in_array($tokens[$i][0], [T_STRING, T_NS_SEPARATOR])) {
                             $namespace .= $tokens[$i][1];
                         }
                     }
@@ -129,7 +129,7 @@ class ClassMapGenerator
                         if (T_DOUBLE_COLON === $tokens[$j][0]) {
                             $isClassConstant = true;
                             break;
-                        } elseif (!\in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                        } elseif (!\in_array($tokens[$j][0], [T_WHITESPACE, T_DOC_COMMENT, T_COMMENT])) {
                             break;
                         }
                     }

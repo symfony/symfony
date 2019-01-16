@@ -62,7 +62,7 @@ class RedisStore implements StoreInterface
         ';
 
         $key->reduceLifetime($this->initialTtl);
-        if (!$this->evaluate($script, (string) $key, array($this->getToken($key), (int) ceil($this->initialTtl * 1000)))) {
+        if (!$this->evaluate($script, (string) $key, [$this->getToken($key), (int) ceil($this->initialTtl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -90,7 +90,7 @@ class RedisStore implements StoreInterface
         ';
 
         $key->reduceLifetime($ttl);
-        if (!$this->evaluate($script, (string) $key, array($this->getToken($key), (int) ceil($ttl * 1000)))) {
+        if (!$this->evaluate($script, (string) $key, [$this->getToken($key), (int) ceil($ttl * 1000)])) {
             throw new LockConflictedException();
         }
 
@@ -112,7 +112,7 @@ class RedisStore implements StoreInterface
             end
         ';
 
-        $this->evaluate($script, (string) $key, array($this->getToken($key)));
+        $this->evaluate($script, (string) $key, [$this->getToken($key)]);
     }
 
     /**
@@ -135,15 +135,15 @@ class RedisStore implements StoreInterface
     private function evaluate($script, $resource, array $args)
     {
         if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster || $this->redis instanceof RedisProxy) {
-            return $this->redis->eval($script, array_merge(array($resource), $args), 1);
+            return $this->redis->eval($script, array_merge([$resource], $args), 1);
         }
 
         if ($this->redis instanceof \RedisArray) {
-            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge(array($resource), $args), 1);
+            return $this->redis->_instance($this->redis->_target($resource))->eval($script, array_merge([$resource], $args), 1);
         }
 
         if ($this->redis instanceof \Predis\Client) {
-            return \call_user_func_array(array($this->redis, 'eval'), array_merge(array($script, 1, $resource), $args));
+            return \call_user_func_array([$this->redis, 'eval'], array_merge([$script, 1, $resource], $args));
         }
 
         throw new InvalidArgumentException(sprintf('%s() expects being initialized with a Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, \is_object($this->redis) ? \get_class($this->redis) : \gettype($this->redis)));

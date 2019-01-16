@@ -129,13 +129,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private $cacheItemPool;
 
-    private $readPropertyCache = array();
-    private $writePropertyCache = array();
-    private $propertyPathCache = array();
+    private $readPropertyCache = [];
+    private $writePropertyCache = [];
+    private $propertyPathCache = [];
 
     private static $previousErrorHandler = false;
-    private static $errorHandler = array(__CLASS__, 'handleError');
-    private static $resultProto = array(self::VALUE => null);
+    private static $errorHandler = [__CLASS__, 'handleError'];
+    private static $resultProto = [self::VALUE => null];
 
     /**
      * Should not be used by application code. Use
@@ -159,9 +159,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
 
-        $zval = array(
+        $zval = [
             self::VALUE => $objectOrArray,
-        );
+        ];
         $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
@@ -174,10 +174,10 @@ class PropertyAccessor implements PropertyAccessorInterface
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
 
-        $zval = array(
+        $zval = [
             self::VALUE => $objectOrArray,
             self::REF => &$objectOrArray,
-        );
+        ];
         $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength() - 1);
         $overwrite = true;
 
@@ -244,7 +244,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * @internal
      */
-    public static function handleError($type, $message, $file, $line, $context = array())
+    public static function handleError($type, $message, $file, $line, $context = [])
     {
         if (E_RECOVERABLE_ERROR === $type) {
             self::throwInvalidArgumentException($message, debug_backtrace(false), 1);
@@ -280,9 +280,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         try {
-            $zval = array(
+            $zval = [
                 self::VALUE => $objectOrArray,
-            );
+            ];
             $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
             return true;
@@ -301,9 +301,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         $propertyPath = $this->getPropertyPath($propertyPath);
 
         try {
-            $zval = array(
+            $zval = [
                 self::VALUE => $objectOrArray,
-            );
+            ];
             $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength() - 1);
 
             for ($i = \count($propertyValues) - 1; 0 <= $i; --$i) {
@@ -353,7 +353,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         // Add the root object to the list
-        $propertyValues = array($zval);
+        $propertyValues = [$zval];
 
         for ($i = 0; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
@@ -378,10 +378,10 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                     if ($i + 1 < $propertyPath->getLength()) {
                         if (isset($zval[self::REF])) {
-                            $zval[self::VALUE][$property] = array();
+                            $zval[self::VALUE][$property] = [];
                             $zval[self::REF] = $zval[self::VALUE];
                         } else {
-                            $zval[self::VALUE] = array($property => array());
+                            $zval[self::VALUE] = [$property => []];
                         }
                     }
                 }
@@ -521,7 +521,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
-        $access = array();
+        $access = [];
 
         $reflClass = new \ReflectionClass($class);
         $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
@@ -556,7 +556,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
             $access[self::ACCESS_NAME] = $getter;
         } else {
-            $methods = array($getter, $getsetter, $isser, $hasser, '__get');
+            $methods = [$getter, $getsetter, $isser, $hasser, '__get'];
             if ($this->magicCall) {
                 $methods[] = '__call';
             }
@@ -701,7 +701,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
-        $access = array();
+        $access = [];
 
         $reflClass = new \ReflectionClass($class);
         $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
@@ -786,7 +786,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             return false;
         }
 
-        $access = $this->getWriteAccessInfo(\get_class($object), $property, array());
+        $access = $this->getWriteAccessInfo(\get_class($object), $property, []);
 
         $isWritable = self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]
             || self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]
@@ -837,7 +837,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $removeMethodFound = $this->isMethodAccessible($reflClass, $removeMethod, 1);
 
             if ($addMethodFound && $removeMethodFound) {
-                return array($addMethod, $removeMethod);
+                return [$addMethod, $removeMethod];
             }
         }
     }

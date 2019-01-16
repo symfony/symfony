@@ -43,6 +43,6 @@ class DayOfYearTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array();
+        return [];
     }
 }

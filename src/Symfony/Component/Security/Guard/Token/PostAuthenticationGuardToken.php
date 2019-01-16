@@ -58,7 +58,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function getCredentials()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -76,7 +76,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function serialize()
     {
-        return serialize(array($this->providerKey, parent::serialize()));
+        return serialize([$this->providerKey, parent::serialize()]);
     }
 
     /**

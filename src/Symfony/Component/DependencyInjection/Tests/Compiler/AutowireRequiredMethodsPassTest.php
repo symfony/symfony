@@ -32,7 +32,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'));
+            ->addMethodCall('setWithCallsConfigured', ['manual_arg1', 'manual_arg2']);
 
         (new ResolveClassPass())->process($container);
         (new AutowireRequiredMethodsPass())->process($container);
@@ -40,17 +40,17 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'),
+            ['setWithCallsConfigured', 'setFoo', 'setDependencies', 'setChildMethodWithoutDocBlock'],
             array_column($methodCalls, 0)
         );
 
         // test setWithCallsConfigured args
         $this->assertEquals(
-            array('manual_arg1', 'manual_arg2'),
+            ['manual_arg1', 'manual_arg2'],
             $methodCalls[0][1]
         );
         // test setFoo args
-        $this->assertEquals(array(), $methodCalls[1][1]);
+        $this->assertEquals([], $methodCalls[1][1]);
     }
 
     public function testExplicitMethodInjection()
@@ -64,7 +64,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $container
             ->register('setter_injection', SetterInjection::class)
             ->setAutowired(true)
-            ->addMethodCall('notASetter', array());
+            ->addMethodCall('notASetter', []);
 
         (new ResolveClassPass())->process($container);
         (new AutowireRequiredMethodsPass())->process($container);
@@ -72,9 +72,9 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
 
         $this->assertEquals(
-            array('notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'),
+            ['notASetter', 'setFoo', 'setDependencies', 'setWithCallsConfigured', 'setChildMethodWithoutDocBlock'],
             array_column($methodCalls, 0)
         );
-        $this->assertEquals(array(), $methodCalls[0][1]);
+        $this->assertEquals([], $methodCalls[0][1]);
     }
 }

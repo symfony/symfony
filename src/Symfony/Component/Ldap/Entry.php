@@ -19,7 +19,7 @@ class Entry
     private $dn;
     private $attributes;
 
-    public function __construct($dn, array $attributes = array())
+    public function __construct($dn, array $attributes = [])
     {
         $this->dn = $dn;
         $this->attributes = $attributes;

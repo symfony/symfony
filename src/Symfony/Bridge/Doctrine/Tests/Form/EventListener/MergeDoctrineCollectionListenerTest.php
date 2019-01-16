@@ -30,7 +30,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->collection = new ArrayCollection(array('test'));
+        $this->collection = new ArrayCollection(['test']);
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->getBuilder()
@@ -60,7 +60,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
     public function testOnSubmitDoNothing()
     {
-        $submittedData = array('test');
+        $submittedData = ['test'];
         $event = new FormEvent($this->getForm(), $submittedData);
 
         $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
@@ -71,7 +71,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
     public function testOnSubmitNullClearCollection()
     {
-        $submittedData = array();
+        $submittedData = [];
         $event = new FormEvent($this->getForm(), $submittedData);
 
         $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
@@ -88,7 +88,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
             ->setData($this->collection)
             ->addEventSubscriber(new TestClassExtendingMergeDoctrineCollectionListener())
             ->getForm();
-        $submittedData = array();
+        $submittedData = [];
         $event = new FormEvent($form, $submittedData);
 
         $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);

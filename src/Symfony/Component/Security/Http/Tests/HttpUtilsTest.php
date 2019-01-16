@@ -67,13 +67,13 @@ class HttpUtilsTest extends TestCase
 
     public function badRequestDomainUrls()
     {
-        return array(
-            array('http://pirate.net/foo'),
-            array('http:\\\\pirate.net/foo'),
-            array('http:/\\pirate.net/foo'),
-            array('http:\\/pirate.net/foo'),
-            array('http://////pirate.net/foo'),
-        );
+        return [
+            ['http://pirate.net/foo'],
+            ['http:\\\\pirate.net/foo'],
+            ['http:/\\pirate.net/foo'],
+            ['http:\\/pirate.net/foo'],
+            ['http://////pirate.net/foo'],
+        ];
     }
 
     public function testCreateRedirectResponseWithProtocolRelativeTarget()
@@ -91,7 +91,7 @@ class HttpUtilsTest extends TestCase
         $urlGenerator
             ->expects($this->any())
             ->method('generate')
-            ->with('foobar', array(), UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('foobar', [], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
         $urlGenerator
@@ -173,11 +173,11 @@ class HttpUtilsTest extends TestCase
 
     public function provideSecurityContextAttributes()
     {
-        return array(
-            array(Security::AUTHENTICATION_ERROR),
-            array(Security::ACCESS_DENIED_ERROR),
-            array(Security::LAST_USERNAME),
-        );
+        return [
+            [Security::AUTHENTICATION_ERROR],
+            [Security::ACCESS_DENIED_ERROR],
+            [Security::LAST_USERNAME],
+        ];
     }
 
     public function testCheckRequestPath()
@@ -215,7 +215,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->willThrowException(new MethodNotAllowedException(array()))
+            ->willThrowException(new MethodNotAllowedException([]))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -229,7 +229,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/foo/bar')
-            ->will($this->returnValue(array('_route' => 'foobar')))
+            ->will($this->returnValue(['_route' => 'foobar']))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -244,7 +244,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->returnValue(array('_route' => 'foobar')))
+            ->will($this->returnValue(['_route' => 'foobar']))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -273,7 +273,7 @@ class HttpUtilsTest extends TestCase
         $urlMatcher
             ->expects($this->any())
             ->method('match')
-            ->willReturn(array('_controller' => 'PathController'))
+            ->willReturn(['_controller' => 'PathController'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);

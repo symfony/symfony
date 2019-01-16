@@ -21,7 +21,7 @@ class TransitionTest extends TestCase
         $transition = new Transition('name', 'a', 'b');
 
         $this->assertSame('name', $transition->getName());
-        $this->assertSame(array('a'), $transition->getFroms());
-        $this->assertSame(array('b'), $transition->getTos());
+        $this->assertSame(['a'], $transition->getFroms());
+        $this->assertSame(['b'], $transition->getTos());
     }
 }

@@ -94,12 +94,12 @@ class WrappedListener
             $this->stub = self::$hasClassStub ? new ClassStub($this->pretty.'()', $this->listener) : $this->pretty.'()';
         }
 
-        return array(
+        return [
             'event' => $eventName,
             'priority' => null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null,
             'pretty' => $this->pretty,
             'stub' => $this->stub,
-        );
+        ];
     }
 
     public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)

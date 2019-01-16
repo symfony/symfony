@@ -42,7 +42,7 @@ abstract class AbstractUriElement
      */
     public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
     {
-        if (!\in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
+        if (!\in_array(strtolower(substr($currentUri, 0, 4)), ['http', 'file'])) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
@@ -144,7 +144,7 @@ abstract class AbstractUriElement
             $path .= '/';
         }
 
-        $output = array();
+        $output = [];
 
         foreach (explode('/', $path) as $segment) {
             if ('..' === $segment) {

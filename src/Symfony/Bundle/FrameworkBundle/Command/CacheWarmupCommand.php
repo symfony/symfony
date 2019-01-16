@@ -54,9 +54,9 @@ class CacheWarmupCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
-            ))
+            ])
             ->setDescription('Warms up an empty cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command warms up the cache.

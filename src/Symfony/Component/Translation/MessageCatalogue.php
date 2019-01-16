@@ -19,9 +19,9 @@ use Symfony\Component\Translation\Exception\LogicException;
  */
 class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterface
 {
-    private $messages = array();
-    private $metadata = array();
-    private $resources = array();
+    private $messages = [];
+    private $metadata = [];
+    private $resources = [];
     private $locale;
     private $fallbackCatalogue;
     private $parent;
@@ -30,7 +30,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * @param string $locale   The locale
      * @param array  $messages An array of messages classified by domain
      */
-    public function __construct($locale, array $messages = array())
+    public function __construct($locale, array $messages = [])
     {
         $this->locale = $locale;
         $this->messages = $messages;
@@ -61,7 +61,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             return $this->messages;
         }
 
-        return isset($this->messages[$domain]) ? $this->messages[$domain] : array();
+        return isset($this->messages[$domain]) ? $this->messages[$domain] : [];
     }
 
     /**
@@ -69,7 +69,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function set($id, $translation, $domain = 'messages')
     {
-        $this->add(array($id => $translation), $domain);
+        $this->add([$id => $translation], $domain);
     }
 
     /**
@@ -117,7 +117,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function replace($messages, $domain = 'messages')
     {
-        $this->messages[$domain] = array();
+        $this->messages[$domain] = [];
 
         $this->add($messages, $domain);
     }
@@ -247,7 +247,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
     public function deleteMetadata($key = '', $domain = 'messages')
     {
         if ('' == $domain) {
-            $this->metadata = array();
+            $this->metadata = [];
         } elseif ('' == $key) {
             unset($this->metadata[$domain]);
         } else {

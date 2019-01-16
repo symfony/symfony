@@ -68,12 +68,12 @@ class FragmentHandlerTest extends TestCase
 
     public function testRender()
     {
-        $handler = $this->getHandler($this->returnValue(new Response('foo')), array('/', Request::create('/'), array('foo' => 'foo', 'ignore_errors' => true)));
+        $handler = $this->getHandler($this->returnValue(new Response('foo')), ['/', Request::create('/'), ['foo' => 'foo', 'ignore_errors' => true]]);
 
-        $this->assertEquals('foo', $handler->render('/', 'foo', array('foo' => 'foo')));
+        $this->assertEquals('foo', $handler->render('/', 'foo', ['foo' => 'foo']));
     }
 
-    protected function getHandler($returnValue, $arguments = array())
+    protected function getHandler($returnValue, $arguments = [])
     {
         $renderer = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface')->getMock();
         $renderer
@@ -88,7 +88,7 @@ class FragmentHandlerTest extends TestCase
         ;
 
         if ($arguments) {
-            \call_user_func_array(array($e, 'with'), $arguments);
+            \call_user_func_array([$e, 'with'], $arguments);
         }
 
         $handler = new FragmentHandler($this->requestStack);

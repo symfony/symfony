@@ -30,12 +30,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     /**
      * The service IDs of the event listeners and subscribers.
      */
-    private $listenerIds = array();
+    private $listenerIds = [];
 
     /**
      * The services registered as listeners.
      */
-    private $listeners = array();
+    private $listeners = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -67,10 +67,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use EventDispatcher with closure factories instead.', __CLASS__), E_USER_DEPRECATED);
 
         if (!\is_array($callback) || 2 !== \count($callback)) {
-            throw new \InvalidArgumentException('Expected an array("service", "method") argument');
+            throw new \InvalidArgumentException('Expected an ["service", "method"] argument');
         }
 
-        $this->listenerIds[$eventName][] = array($callback[0], $callback[1], $priority);
+        $this->listenerIds[$eventName][] = [$callback[0], $callback[1], $priority];
     }
 
     public function removeListener($eventName, $listener)
@@ -80,7 +80,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         if (isset($this->listenerIds[$eventName])) {
             foreach ($this->listenerIds[$eventName] as $i => list($serviceId, $method)) {
                 $key = $serviceId.'.'.$method;
-                if (isset($this->listeners[$eventName][$key]) && $listener === array($this->listeners[$eventName][$key], $method)) {
+                if (isset($this->listeners[$eventName][$key]) && $listener === [$this->listeners[$eventName][$key], $method]) {
                     unset($this->listeners[$eventName][$key]);
                     if (empty($this->listeners[$eventName])) {
                         unset($this->listeners[$eventName]);
@@ -150,12 +150,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
             if (\is_string($params)) {
-                $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
+                $this->listenerIds[$eventName][] = [$serviceId, $params, 0];
             } elseif (\is_string($params[0])) {
-                $this->listenerIds[$eventName][] = array($serviceId, $params[0], isset($params[1]) ? $params[1] : 0);
+                $this->listenerIds[$eventName][] = [$serviceId, $params[0], isset($params[1]) ? $params[1] : 0];
             } else {
                 foreach ($params as $listener) {
-                    $this->listenerIds[$eventName][] = array($serviceId, $listener[0], isset($listener[1]) ? $listener[1] : 0);
+                    $this->listenerIds[$eventName][] = [$serviceId, $listener[0], isset($listener[1]) ? $listener[1] : 0];
                 }
             }
         }
@@ -184,10 +184,10 @@ class ContainerAwareEventDispatcher extends EventDispatcher
 
                 $key = $serviceId.'.'.$method;
                 if (!isset($this->listeners[$eventName][$key])) {
-                    $this->addListener($eventName, array($listener, $method), $priority);
+                    $this->addListener($eventName, [$listener, $method], $priority);
                 } elseif ($this->listeners[$eventName][$key] !== $listener) {
-                    parent::removeListener($eventName, array($this->listeners[$eventName][$key], $method));
-                    $this->addListener($eventName, array($listener, $method), $priority);
+                    parent::removeListener($eventName, [$this->listeners[$eventName][$key], $method]);
+                    $this->addListener($eventName, [$listener, $method], $priority);
                 }
 
                 $this->listeners[$eventName][$key] = $listener;

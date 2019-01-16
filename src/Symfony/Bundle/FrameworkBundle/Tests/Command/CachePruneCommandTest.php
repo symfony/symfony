@@ -24,13 +24,13 @@ class CachePruneCommandTest extends TestCase
     public function testCommandWithPools()
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getRewindableGenerator());
-        $tester->execute(array());
+        $tester->execute([]);
     }
 
     public function testCommandWithNoPools()
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getEmptyRewindableGenerator());
-        $tester->execute(array());
+        $tester->execute([]);
     }
 
     /**
@@ -50,7 +50,7 @@ class CachePruneCommandTest extends TestCase
     private function getEmptyRewindableGenerator()
     {
         return new RewindableGenerator(function () {
-            return new \ArrayIterator(array());
+            return new \ArrayIterator([]);
         }, 0);
     }
 
@@ -75,7 +75,7 @@ class CachePruneCommandTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundles')
-            ->willReturn(array());
+            ->willReturn([]);
 
         return $kernel;
     }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
  */
 class InMemoryTokenProvider implements TokenProviderInterface
 {
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * {@inheritdoc}

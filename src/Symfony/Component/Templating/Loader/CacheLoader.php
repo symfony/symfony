@@ -53,7 +53,7 @@ class CacheLoader extends Loader
 
         if (is_file($path)) {
             if (null !== $this->logger) {
-                $this->logger->debug('Fetching template from cache.', array('name' => $template->get('name')));
+                $this->logger->debug('Fetching template from cache.', ['name' => $template->get('name')]);
             }
 
             return new FileStorage($path);
@@ -72,7 +72,7 @@ class CacheLoader extends Loader
         file_put_contents($path, $content);
 
         if (null !== $this->logger) {
-            $this->logger->debug('Storing template in cache.', array('name' => $template->get('name')));
+            $this->logger->debug('Storing template in cache.', ['name' => $template->get('name')]);
         }
 
         return new FileStorage($path);

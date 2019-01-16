@@ -23,9 +23,9 @@ class StringUtilTest extends TestCase
     {
         // This is only a stub to make sure the BC layer works
         // Actual tests are in the Symfony Inflector component
-        return array(
-            array('axes', array('ax', 'axe', 'axis')),
-        );
+        return [
+            ['axes', ['ax', 'axe', 'axis']],
+        ];
     }
 
     /**

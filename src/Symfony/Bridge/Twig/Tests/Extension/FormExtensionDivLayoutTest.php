@@ -35,22 +35,22 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
+        $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ));
+        ]);
 
-        $environment = new Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, ['strict_variables' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         // the value can be any template that exists
         $environment->addGlobal('dynamic_template_name', 'child_label');
         $environment->addExtension(new FormExtension());
 
-        $rendererEngine = new TwigRendererEngine(array(
+        $rendererEngine = new TwigRendererEngine([
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ], $environment);
         $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
@@ -62,7 +62,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->setTheme($view, array('theme_use.html.twig'));
+        $this->setTheme($view, ['theme_use.html.twig']);
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
@@ -77,7 +77,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->setTheme($view, array('theme_extends.html.twig'));
+        $this->setTheme($view, ['theme_extends.html.twig']);
 
         $this->assertMatchesXpath(
             $this->renderWidget($view),
@@ -92,7 +92,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             ->createView()
         ;
 
-        $this->renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
+        $this->renderer->setTheme($view, ['page_dynamic_extends.html.twig']);
         $this->assertMatchesXpath(
             $this->renderer->searchAndRenderBlock($view, 'row'),
             '/div/label[text()="child"]'
@@ -101,18 +101,18 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function isSelectedChoiceProvider()
     {
-        return array(
-            array(true, '0', '0'),
-            array(true, '1', '1'),
-            array(true, '', ''),
-            array(true, '1.23', '1.23'),
-            array(true, 'foo', 'foo'),
-            array(true, 'foo10', 'foo10'),
-            array(true, 'foo', array(1, 'foo', 'foo10')),
+        return [
+            [true, '0', '0'],
+            [true, '1', '1'],
+            [true, '', ''],
+            [true, '1.23', '1.23'],
+            [true, 'foo', 'foo'],
+            [true, 'foo10', 'foo10'],
+            [true, 'foo', [1, 'foo', 'foo10']],
 
-            array(false, 10, array(1, 'foo', 'foo10')),
-            array(false, 0, array(1, 'foo', 'foo10')),
-        );
+            [false, 10, [1, 'foo', 'foo10']],
+            [false, 0, [1, 'foo', 'foo10']],
+        ];
     }
 
     /**
@@ -127,10 +127,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -139,10 +139,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '0',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -151,10 +151,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function isRootFormProvider()
     {
-        return array(
-            array(true, new FormView()),
-            array(false, new FormView(new FormView())),
-        );
+        return [
+            [true, new FormView()],
+            [false, new FormView(new FormView())],
+        ];
     }
 
     /**
@@ -167,18 +167,18 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public function testMoneyWidgetInIso()
     {
-        $environment = new Environment(new StubFilesystemLoader(array(
+        $environment = new Environment(new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        )), array('strict_variables' => true));
+        ]), ['strict_variables' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
         $environment->setCharset('ISO-8859-1');
 
-        $rendererEngine = new TwigRendererEngine(array(
+        $rendererEngine = new TwigRendererEngine([
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ], $environment);
         $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
@@ -190,15 +190,15 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
     }
 
-    protected function renderForm(FormView $view, array $vars = array())
+    protected function renderForm(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = array())
+    protected function renderLabel(FormView $view, $label = null, array $vars = [])
     {
         if (null !== $label) {
-            $vars += array('label' => $label);
+            $vars += ['label' => $label];
         }
 
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
@@ -209,27 +209,27 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
-    protected function renderWidget(FormView $view, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = array())
+    protected function renderStart(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = array())
+    protected function renderEnd(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
@@ -241,15 +241,15 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     public static function themeBlockInheritanceProvider()
     {
-        return array(
-            array(array('theme.html.twig')),
-        );
+        return [
+            [['theme.html.twig']],
+        ];
     }
 
     public static function themeInheritanceProvider()
     {
-        return array(
-            array(array('parent_label.html.twig'), array('child_label.html.twig')),
-        );
+        return [
+            [['parent_label.html.twig'], ['child_label.html.twig']],
+        ];
     }
 }

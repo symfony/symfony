@@ -158,7 +158,7 @@ abstract class KernelTestCase extends TestCase
      *
      * @return KernelInterface A KernelInterface instance
      */
-    protected static function bootKernel(array $options = array())
+    protected static function bootKernel(array $options = [])
     {
         static::ensureKernelShutdown();
 
@@ -178,7 +178,7 @@ abstract class KernelTestCase extends TestCase
      *
      * @return KernelInterface A KernelInterface instance
      */
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();

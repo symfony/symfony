@@ -38,7 +38,7 @@ class AdapterTest extends LdapTestCase
         $ldap = new Adapter($this->getLdapConfig());
 
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
-        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());
+        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $result = $query->execute();
 
         $this->assertInstanceOf(Collection::class, $result);
@@ -46,8 +46,8 @@ class AdapterTest extends LdapTestCase
 
         $entry = $result[0];
         $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals(array('Fabien Potencier'), $entry->getAttribute('cn'));
-        $this->assertEquals(array('fabpot@symfony.com', 'fabien@potencier.com'), $entry->getAttribute('mail'));
+        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+        $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
     /**
@@ -58,14 +58,14 @@ class AdapterTest extends LdapTestCase
         $ldap = new Adapter($this->getLdapConfig());
 
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
-        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());
+        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $result = $query->execute();
         $iterator = $result->getIterator();
         $iterator->rewind();
         $entry = $iterator->current();
         $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals(array('Fabien Potencier'), $entry->getAttribute('cn'));
-        $this->assertEquals(array('fabpot@symfony.com', 'fabien@potencier.com'), $entry->getAttribute('mail'));
+        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
+        $this->assertEquals(['fabpot@symfony.com', 'fabien@potencier.com'], $entry->getAttribute('mail'));
     }
 
     /**
@@ -75,7 +75,7 @@ class AdapterTest extends LdapTestCase
     {
         $ldap = new Adapter($this->getLdapConfig());
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
-        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array());
+        $query = $ldap->createQuery('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', []);
         $query->execute();
     }
 
@@ -85,14 +85,14 @@ class AdapterTest extends LdapTestCase
 
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
-        $query = $ldap->createQuery('cn=Fabien Potencier,dc=symfony,dc=com', '(objectclass=*)', array(
+        $query = $ldap->createQuery('cn=Fabien Potencier,dc=symfony,dc=com', '(objectclass=*)', [
            'scope' => Query::SCOPE_BASE,
-        ));
+        ]);
         $result = $query->execute();
 
         $entry = $result[0];
         $this->assertEquals($result->count(), 1);
-        $this->assertEquals(array('Fabien Potencier'), $entry->getAttribute('cn'));
+        $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
     }
 
     public function testLdapQueryScopeOneLevel()
@@ -101,14 +101,14 @@ class AdapterTest extends LdapTestCase
 
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
-        $one_level_result = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)', array(
+        $one_level_result = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)', [
             'scope' => Query::SCOPE_ONE,
-        ))->execute();
+        ])->execute();
 
         $subtree_count = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)')->execute()->count();
 
         $this->assertNotEquals($one_level_result->count(), $subtree_count);
         $this->assertEquals($one_level_result->count(), 1);
-        $this->assertEquals($one_level_result[0]->getAttribute('ou'), array('Ldap'));
+        $this->assertEquals($one_level_result[0]->getAttribute('ou'), ['Ldap']);
     }
 }

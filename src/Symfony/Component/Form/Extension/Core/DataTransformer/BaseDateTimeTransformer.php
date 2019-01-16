@@ -17,13 +17,13 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 abstract class BaseDateTimeTransformer implements DataTransformerInterface
 {
-    protected static $formats = array(
+    protected static $formats = [
         \IntlDateFormatter::NONE,
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
-    );
+    ];
 
     protected $inputTimezone;
 

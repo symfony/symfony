@@ -17,17 +17,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
-        $this->syntheticIds = array(
+        $this->services = [];
+        $this->syntheticIds = [
             'request' => true,
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'configured_service' => 'getConfiguredServiceService',
@@ -49,21 +49,21 @@ class ProjectServiceContainer extends Container
             'service_from_static_method' => 'getServiceFromStaticMethodService',
             'tagged_iterator' => 'getTaggedIteratorService',
             'tagged_iterator_foo' => 'getTaggedIteratorFooService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'factory_simple' => true,
             'tagged_iterator_foo' => true,
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
-        );
+        ];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'configurator_service' => true,
@@ -74,7 +74,7 @@ class ProjectServiceContainer extends Container
             'inlined' => true,
             'new_factory' => true,
             'tagged_iterator_foo' => true,
-        );
+        ];
     }
 
     public function compile()
@@ -218,11 +218,11 @@ class ProjectServiceContainer extends Container
     {
         $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'};
 
-        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+        $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
-        $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
+        $instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
         $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->getBarService()) && false ?: '_'});
         $instance->initialize();
         sc_configure($instance);
@@ -426,8 +426,8 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -443,7 +443,7 @@ class ProjectServiceContainer extends Container
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
-    private $normalizedParameterNames = array();
+    private $normalizedParameterNames = [];
 
     private function normalizeParameterName($name)
     {
@@ -466,10 +466,10 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
-        );
+        ];
     }
 }

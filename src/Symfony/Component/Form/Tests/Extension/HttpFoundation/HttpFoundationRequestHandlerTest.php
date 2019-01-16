@@ -37,9 +37,9 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), new \stdClass());
     }
 
-    protected function setRequestData($method, $data, $files = array())
+    protected function setRequestData($method, $data, $files = [])
     {
-        $this->request = Request::create('http://localhost', $method, $data, array(), $files);
+        $this->request = Request::create('http://localhost', $method, $data, [], $files);
     }
 
     protected function getRequestHandler()

@@ -16,14 +16,14 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 class SymfonyCaster
 {
-    private static $requestGetters = array(
+    private static $requestGetters = [
         'pathInfo' => 'getPathInfo',
         'requestUri' => 'getRequestUri',
         'baseUrl' => 'getBaseUrl',
         'basePath' => 'getBasePath',
         'method' => 'getMethod',
         'format' => 'getRequestFormat',
-    );
+    ];
 
     public static function castRequest(Request $request, array $a, Stub $stub, $isNested)
     {

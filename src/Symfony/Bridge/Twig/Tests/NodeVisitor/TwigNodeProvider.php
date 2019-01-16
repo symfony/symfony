@@ -28,9 +28,9 @@ class TwigNodeProvider
         return new ModuleNode(
             new ConstantExpression($content, 0),
             null,
-            new ArrayExpression(array(), 0),
-            new ArrayExpression(array(), 0),
-            new ArrayExpression(array(), 0),
+            new ArrayExpression([], 0),
+            new ArrayExpression([], 0),
+            new ArrayExpression([], 0),
             null,
             new Source('', '')
         );
@@ -39,10 +39,10 @@ class TwigNodeProvider
     public static function getTransFilter($message, $domain = null, $arguments = null)
     {
         if (!$arguments) {
-            $arguments = $domain ? array(
-                new ArrayExpression(array(), 0),
+            $arguments = $domain ? [
+                new ArrayExpression([], 0),
                 new ConstantExpression($domain, 0),
-            ) : array();
+            ] : [];
         }
 
         return new FilterExpression(
@@ -56,11 +56,11 @@ class TwigNodeProvider
     public static function getTransChoiceFilter($message, $domain = null, $arguments = null)
     {
         if (!$arguments) {
-            $arguments = $domain ? array(
+            $arguments = $domain ? [
                 new ConstantExpression(0, 0),
-                new ArrayExpression(array(), 0),
+                new ArrayExpression([], 0),
                 new ConstantExpression($domain, 0),
-            ) : array();
+            ] : [];
         }
 
         return new FilterExpression(
@@ -74,7 +74,7 @@ class TwigNodeProvider
     public static function getTransTag($message, $domain = null)
     {
         return new TransNode(
-            new BodyNode(array(), array('data' => $message)),
+            new BodyNode([], ['data' => $message]),
             $domain ? new ConstantExpression($domain, 0) : null
         );
     }

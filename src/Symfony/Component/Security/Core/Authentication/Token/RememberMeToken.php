@@ -94,11 +94,11 @@ class RememberMeToken extends AbstractToken
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->secret,
             $this->providerKey,
             parent::serialize(),
-        ));
+        ]);
     }
 
     /**

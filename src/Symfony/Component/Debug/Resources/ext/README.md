@@ -25,41 +25,41 @@ function symfony_zval_info($key, $array, $options = 0)
         return null;
     }
 
-    $info = array(
+    $info = [
         'type' => gettype($array[$key]),
         'zval_hash' => /* hashed memory address of $array[$key] */,
         'zval_refcount' => /* internal zval refcount of $array[$key] */,
         'zval_isref' => /* is_ref status of $array[$key] */,
-    );
+    ];
 
     switch ($info['type']) {
         case 'object':
-            $info += array(
+            $info += [
                 'object_class' => get_class($array[$key]),
                 'object_refcount' => /* internal object refcount of $array[$key] */,
                 'object_hash' => spl_object_hash($array[$key]),
                 'object_handle' => /* internal object handle $array[$key] */,
-            );
+            ];
             break;
 
         case 'resource':
-            $info += array(
+            $info += [
                 'resource_handle' => (int) $array[$key],
                 'resource_type' => get_resource_type($array[$key]),
                 'resource_refcount' => /* internal resource refcount of $array[$key] */,
-            );
+            ];
             break;
 
         case 'array':
-            $info += array(
+            $info += [
                 'array_count' => count($array[$key]),
-            );
+            ];
             break;
 
         case 'string':
-            $info += array(
+            $info += [
                 'strlen' => strlen($array[$key]),
-            );
+            ];
             break;
     }
 

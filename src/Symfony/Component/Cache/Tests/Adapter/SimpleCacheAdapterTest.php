@@ -19,9 +19,9 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
  */
 class SimpleCacheAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testPrune' => 'SimpleCache just proxies',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 class ServiceLocator implements PsrContainerInterface
 {
     private $factories;
-    private $loading = array();
+    private $loading = [];
     private $externalId;
     private $container;
 
@@ -48,7 +48,7 @@ class ServiceLocator implements PsrContainerInterface
     public function get($id)
     {
         if (!isset($this->factories[$id])) {
-            throw new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), $this->createServiceNotFoundMessage($id));
+            throw new ServiceNotFoundException($id, end($this->loading) ?: null, null, [], $this->createServiceNotFoundMessage($id));
         }
 
         if (isset($this->loading[$id])) {
@@ -94,7 +94,7 @@ class ServiceLocator implements PsrContainerInterface
         $class = isset($class[2]['object']) ? \get_class($class[2]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
-        $msg = array();
+        $msg = [];
         $msg[] = sprintf('Service "%s" not found:', $id);
 
         if (!$this->container) {

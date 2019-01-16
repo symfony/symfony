@@ -24,7 +24,7 @@ class AutowiringTypesTest extends WebTestCase
 {
     public function testAnnotationReaderAutowiring()
     {
-        static::bootKernel(array('root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache'));
+        static::bootKernel(['root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache']);
         $container = static::$kernel->getContainer();
 
         $annotationReader = $container->get('test.autowiring_types.autowired_services')->getAnnotationReader();
@@ -52,7 +52,7 @@ class AutowiringTypesTest extends WebTestCase
 
     public function testEventDispatcherAutowiring()
     {
-        static::bootKernel(array('debug' => false));
+        static::bootKernel(['debug' => false]);
         $container = static::$kernel->getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
@@ -63,7 +63,7 @@ class AutowiringTypesTest extends WebTestCase
             $this->assertInstanceOf(EventDispatcher::class, $autowiredServices->getDispatcher(), 'The event_dispatcher service should be injected if the debug is not enabled');
         }
 
-        static::bootKernel(array('debug' => true));
+        static::bootKernel(['debug' => true]);
         $container = static::$kernel->getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
@@ -79,8 +79,8 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(FilesystemAdapter::class, $autowiredServices->getCachePool());
     }
 
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
-        return parent::createKernel(array('test_case' => 'AutowiringTypes') + $options);
+        return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);
     }
 }

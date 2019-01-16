@@ -13,8 +13,8 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
-return array(
+return [
     new FrameworkBundle(),
     new SecurityBundle(),
     new TwigBundle(),
-);
+];

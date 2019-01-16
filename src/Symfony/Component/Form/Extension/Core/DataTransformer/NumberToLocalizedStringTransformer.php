@@ -121,7 +121,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         // Convert non-breaking and narrow non-breaking spaces to normal ones
-        $value = str_replace(array("\xc2\xa0", "\xe2\x80\xaf"), ' ', $value);
+        $value = str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
 
         return $value;
     }
@@ -146,7 +146,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             return;
         }
 
-        if (\in_array($value, array('NaN', 'NAN', 'nan'), true)) {
+        if (\in_array($value, ['NaN', 'NAN', 'nan'], true)) {
             throw new TransformationFailedException('"NaN" is not a valid number');
         }
 

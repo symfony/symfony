@@ -30,11 +30,11 @@ class AuditTrailListenerTest extends TestCase
 
         $workflow->apply($object, 't1');
 
-        $expected = array(
+        $expected = [
             'Leaving "a" for subject of class "stdClass" in workflow "unnamed".',
             'Transition "t1" for subject of class "stdClass" in workflow "unnamed".',
             'Entering "b" for subject of class "stdClass" in workflow "unnamed".',
-        );
+        ];
 
         $this->assertSame($expected, $logger->logs);
     }
@@ -42,9 +42,9 @@ class AuditTrailListenerTest extends TestCase
 
 class Logger extends AbstractLogger
 {
-    public $logs = array();
+    public $logs = [];
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         $this->logs[] = $message;
     }

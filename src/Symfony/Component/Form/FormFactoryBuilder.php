@@ -26,22 +26,22 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = array();
+    private $extensions = [];
 
     /**
      * @var FormTypeInterface[]
      */
-    private $types = array();
+    private $types = [];
 
     /**
      * @var FormTypeExtensionInterface[]
      */
-    private $typeExtensions = array();
+    private $typeExtensions = [];
 
     /**
      * @var FormTypeGuesserInterface[]
      */
-    private $typeGuessers = array();
+    private $typeGuessers = [];
 
     /**
      * {@inheritdoc}

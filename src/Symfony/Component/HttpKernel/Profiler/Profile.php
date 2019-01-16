@@ -25,7 +25,7 @@ class Profile
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = array();
+    private $collectors = [];
 
     private $ip;
     private $method;
@@ -41,7 +41,7 @@ class Profile
     /**
      * @var Profile[]
      */
-    private $children = array();
+    private $children = [];
 
     /**
      * @param string $token The token
@@ -74,7 +74,7 @@ class Profile
     /**
      * Sets the parent token.
      */
-    public function setParent(Profile $parent)
+    public function setParent(self $parent)
     {
         $this->parent = $parent;
     }
@@ -204,7 +204,7 @@ class Profile
      */
     public function setChildren(array $children)
     {
-        $this->children = array();
+        $this->children = [];
         foreach ($children as $child) {
             $this->addChild($child);
         }
@@ -213,7 +213,7 @@ class Profile
     /**
      * Adds the child token.
      */
-    public function addChild(Profile $child)
+    public function addChild(self $child)
     {
         $this->children[] = $child;
         $child->setParent($this);
@@ -254,7 +254,7 @@ class Profile
      */
     public function setCollectors(array $collectors)
     {
-        $this->collectors = array();
+        $this->collectors = [];
         foreach ($collectors as $collector) {
             $this->addCollector($collector);
         }
@@ -282,6 +282,6 @@ class Profile
 
     public function __sleep()
     {
-        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode');
+        return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode'];
     }
 }

@@ -38,10 +38,10 @@ class HttpFoundationExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('absolute_url', array($this, 'generateAbsoluteUrl')),
-            new TwigFunction('relative_path', array($this, 'generateRelativePath')),
-        );
+        return [
+            new TwigFunction('absolute_url', [$this, 'generateAbsoluteUrl']),
+            new TwigFunction('relative_path', [$this, 'generateRelativePath']),
+        ];
     }
 
     /**

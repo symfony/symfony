@@ -37,7 +37,7 @@ class Command
     private $application;
     private $name;
     private $processTitle;
-    private $aliases = array();
+    private $aliases = [];
     private $definition;
     private $hidden = false;
     private $help;
@@ -46,8 +46,8 @@ class Command
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis = array();
-    private $usages = array();
+    private $synopsis = [];
+    private $usages = [];
     private $helperSet;
 
     /**
@@ -535,14 +535,14 @@ class Command
         $name = $this->name;
         $isSingleCommand = $this->application && $this->application->isSingleCommand();
 
-        $placeholders = array(
+        $placeholders = [
             '%command.name%',
             '%command.full_name%',
-        );
-        $replacements = array(
+        ];
+        $replacements = [
             $name,
             $isSingleCommand ? $_SERVER['PHP_SELF'] : $_SERVER['PHP_SELF'].' '.$name,
-        );
+        ];
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
     }

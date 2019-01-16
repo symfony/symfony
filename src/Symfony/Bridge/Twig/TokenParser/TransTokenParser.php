@@ -39,7 +39,7 @@ class TransTokenParser extends AbstractTokenParser
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = new ArrayExpression(array(), $lineno);
+        $vars = new ArrayExpression([], $lineno);
         $domain = null;
         $locale = null;
         if (!$stream->test(Token::BLOCK_END_TYPE)) {
@@ -66,7 +66,7 @@ class TransTokenParser extends AbstractTokenParser
 
         // {% trans %}message{% endtrans %}
         $stream->expect(Token::BLOCK_END_TYPE);
-        $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
+        $body = $this->parser->subparse([$this, 'decideTransFork'], true);
 
         if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
             throw new SyntaxError('A message inside a trans tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
@@ -79,7 +79,7 @@ class TransTokenParser extends AbstractTokenParser
 
     public function decideTransFork($token)
     {
-        return $token->test(array('endtrans'));
+        return $token->test(['endtrans']);
     }
 
     /**

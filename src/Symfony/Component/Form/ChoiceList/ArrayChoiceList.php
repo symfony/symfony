@@ -132,7 +132,7 @@ class ArrayChoiceList implements ChoiceListInterface
      */
     public function getChoicesForValues(array $values)
     {
-        $choices = array();
+        $choices = [];
 
         foreach ($values as $i => $givenValue) {
             if (array_key_exists($givenValue, $this->choices)) {
@@ -148,11 +148,11 @@ class ArrayChoiceList implements ChoiceListInterface
      */
     public function getValuesForChoices(array $choices)
     {
-        $values = array();
+        $values = [];
 
         // Use the value callback to compare choices by their values, if present
         if ($this->valueCallback) {
-            $givenValues = array();
+            $givenValues = [];
 
             foreach ($choices as $i => $givenChoice) {
                 $givenValues[$i] = (string) \call_user_func($this->valueCallback, $givenChoice);
@@ -190,9 +190,9 @@ class ArrayChoiceList implements ChoiceListInterface
     protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
     {
         if (null === $choicesByValues) {
-            $choicesByValues = array();
-            $keysByValues = array();
-            $structuredValues = array();
+            $choicesByValues = [];
+            $keysByValues = [];
+            $structuredValues = [];
         }
 
         foreach ($choices as $key => $choice) {
@@ -219,7 +219,7 @@ class ArrayChoiceList implements ChoiceListInterface
      * @return bool returns true if the choices can be cast to strings and
      *              false otherwise
      */
-    private function castableToString(array $choices, array &$cache = array())
+    private function castableToString(array $choices, array &$cache = [])
     {
         foreach ($choices as $choice) {
             if (\is_array($choice)) {

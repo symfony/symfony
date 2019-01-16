@@ -28,7 +28,7 @@ class AccessListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array('foo' => 'bar'), null)))
+            ->will($this->returnValue([['foo' => 'bar'], null]))
         ;
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
@@ -49,7 +49,7 @@ class AccessListenerTest extends TestCase
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
-            ->with($this->equalTo($token), $this->equalTo(array('foo' => 'bar')), $this->equalTo($request))
+            ->with($this->equalTo($token), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
             ->will($this->returnValue(false))
         ;
 
@@ -79,7 +79,7 @@ class AccessListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(array('foo' => 'bar'), null)))
+            ->will($this->returnValue([['foo' => 'bar'], null]))
         ;
 
         $notAuthenticatedToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
@@ -120,7 +120,7 @@ class AccessListenerTest extends TestCase
         $accessDecisionManager
             ->expects($this->once())
             ->method('decide')
-            ->with($this->equalTo($authenticatedToken), $this->equalTo(array('foo' => 'bar')), $this->equalTo($request))
+            ->with($this->equalTo($authenticatedToken), $this->equalTo(['foo' => 'bar']), $this->equalTo($request))
             ->will($this->returnValue(true))
         ;
 
@@ -150,7 +150,7 @@ class AccessListenerTest extends TestCase
             ->expects($this->any())
             ->method('getPatterns')
             ->with($this->equalTo($request))
-            ->will($this->returnValue(array(null, null)))
+            ->will($this->returnValue([null, null]))
         ;
 
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();

@@ -43,7 +43,7 @@ final class FirewallConfig
      * @param string[]    $listeners
      * @param array|null  $switchUser
      */
-    public function __construct($name, $userChecker, $requestMatcher = null, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = array(), $switchUser = null)
+    public function __construct($name, $userChecker, $requestMatcher = null, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = [], $switchUser = null)
     {
         $this->name = $name;
         $this->userChecker = $userChecker;

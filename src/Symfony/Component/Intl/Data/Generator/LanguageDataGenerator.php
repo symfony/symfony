@@ -29,7 +29,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
     /**
      * Source: http://www-01.sil.org/iso639-3/codes.asp.
      */
-    private static $preferredAlpha2ToAlpha3Mapping = array(
+    private static $preferredAlpha2ToAlpha3Mapping = [
         'ak' => 'aka',
         'ar' => 'ara',
         'ay' => 'aym',
@@ -81,14 +81,14 @@ class LanguageDataGenerator extends AbstractDataGenerator
         'yi' => 'yid',
         'za' => 'zha',
         'zh' => 'zho',
-    );
+    ];
 
     /**
      * Collects all available language codes.
      *
      * @var string[]
      */
-    private $languageCodes = array();
+    private $languageCodes = [];
 
     /**
      * {@inheritdoc}
@@ -112,7 +112,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->languageCodes = array();
+        $this->languageCodes = [];
     }
 
     /**
@@ -124,10 +124,10 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Languages']) && null !== $localeBundle['Languages']) {
-            $data = array(
+            $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => iterator_to_array($localeBundle['Languages']),
-            );
+            ];
 
             $this->languageCodes = array_merge($this->languageCodes, array_keys($data['Names']));
 
@@ -154,18 +154,18 @@ class LanguageDataGenerator extends AbstractDataGenerator
 
         sort($this->languageCodes);
 
-        return array(
+        return [
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
             'Aliases' => array_column(iterator_to_array($metadataBundle['alias']['language']), 'replacement'),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
-        );
+        ];
     }
 
     private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)
     {
         $aliases = iterator_to_array($metadataBundle['alias']['language']);
-        $alpha2ToAlpha3 = array();
+        $alpha2ToAlpha3 = [];
 
         foreach ($aliases as $alias => $language) {
             $language = $language['replacement'];

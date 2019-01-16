@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class UnusedTagsPass implements CompilerPassInterface
 {
-    private $whitelist = array(
+    private $whitelist = [
         'annotations.cached_reader',
         'cache.pool.clearer',
         'console.command',
@@ -55,7 +55,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'twig.loader',
         'validator.constraint_validator',
         'validator.initializer',
-    );
+    ];
 
     public function process(ContainerBuilder $container)
     {
@@ -68,7 +68,7 @@ class UnusedTagsPass implements CompilerPassInterface
             }
 
             // check for typos
-            $candidates = array();
+            $candidates = [];
             foreach ($tags as $definedTag) {
                 if ($definedTag === $tag) {
                     continue;

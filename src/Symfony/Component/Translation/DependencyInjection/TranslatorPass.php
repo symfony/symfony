@@ -43,8 +43,8 @@ class TranslatorPass implements CompilerPassInterface
             return;
         }
 
-        $loaders = array();
-        $loaderRefs = array();
+        $loaders = [];
+        $loaderRefs = [];
         foreach ($container->findTaggedServiceIds($this->loaderTag, true) as $id => $attributes) {
             $loaderRefs[$id] = new Reference($id);
             $loaders[$id][] = $attributes[0]['alias'];
@@ -57,7 +57,7 @@ class TranslatorPass implements CompilerPassInterface
             $definition = $container->getDefinition($this->readerServiceId);
             foreach ($loaders as $id => $formats) {
                 foreach ($formats as $format) {
-                    $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));
+                    $definition->addMethodCall('addLoader', [$format, $loaderRefs[$id]]);
                 }
             }
         }
@@ -68,7 +68,7 @@ class TranslatorPass implements CompilerPassInterface
                 $definition = $container->getDefinition('translation.reader');
                 foreach ($loaders as $id => $formats) {
                     foreach ($formats as $format) {
-                        $definition->addMethodCall('addLoader', array($format, $loaderRefs[$id]));
+                        $definition->addMethodCall('addLoader', [$format, $loaderRefs[$id]]);
                     }
                 }
             }

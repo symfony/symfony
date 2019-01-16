@@ -123,8 +123,8 @@ class XmlDumperTest extends TestCase
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
-        return array(
-            array("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+        return [
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
@@ -133,8 +133,8 @@ class XmlDumperTest extends TestCase
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
-", include $fixturesPath.'/containers/container15.php'),
-            array("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+", include $fixturesPath.'/containers/container15.php'],
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
@@ -143,8 +143,8 @@ class XmlDumperTest extends TestCase
     <service id=\"Symfony\Component\DependencyInjection\ContainerInterface\" alias=\"service_container\" public=\"false\"/>
   </services>
 </container>
-", include $fixturesPath.'/containers/container16.php'),
-        );
+", include $fixturesPath.'/containers/container16.php'],
+        ];
     }
 
     /**
@@ -163,13 +163,13 @@ class XmlDumperTest extends TestCase
 
     public function provideCompiledContainerData()
     {
-        return array(
-            array('container8'),
-            array('container9'),
-            array('container11'),
-            array('container12'),
-            array('container14'),
-        );
+        return [
+            ['container8'],
+            ['container9'],
+            ['container11'],
+            ['container12'],
+            ['container14'],
+        ];
     }
 
     public function testDumpInlinedServices()
@@ -194,7 +194,7 @@ class XmlDumperTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_dump_load.xml');
 
-        $this->assertEquals(array(new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)), $container->getDefinition('foo')->getArguments());
+        $this->assertEquals([new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $container->getDefinition('foo')->getArguments());
 
         $dumper = new XmlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_dump_load.xml', $dumper->dump());

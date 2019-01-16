@@ -28,7 +28,7 @@ class LogoutUrlGenerator
     private $requestStack;
     private $router;
     private $tokenStorage;
-    private $listeners = array();
+    private $listeners = [];
     private $currentFirewall;
 
     public function __construct(RequestStack $requestStack = null, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
@@ -63,7 +63,7 @@ class LogoutUrlGenerator
             $context = null;
         }
 
-        $this->listeners[$key] = array($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context);
+        $this->listeners[$key] = [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context];
     }
 
     /**
@@ -96,7 +96,7 @@ class LogoutUrlGenerator
      */
     public function setCurrentFirewall($key, $context = null)
     {
-        $this->currentFirewall = array($key, $context);
+        $this->currentFirewall = [$key, $context];
     }
 
     /**
@@ -115,7 +115,7 @@ class LogoutUrlGenerator
             throw new \LogicException('Unable to generate the logout URL without a path.');
         }
 
-        $parameters = null !== $csrfTokenManager ? array($csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)) : array();
+        $parameters = null !== $csrfTokenManager ? [$csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)] : [];
 
         if ('/' === $logoutPath[0]) {
             if (!$this->requestStack) {

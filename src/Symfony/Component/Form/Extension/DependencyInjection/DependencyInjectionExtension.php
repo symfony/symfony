@@ -76,7 +76,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
 
     public function getTypeExtensions($name)
     {
-        $extensions = array();
+        $extensions = [];
 
         if (isset($this->typeExtensionServices[$name])) {
             foreach ($this->typeExtensionServices[$name] as $serviceId => $extension) {
@@ -105,7 +105,7 @@ class DependencyInjectionExtension implements FormExtensionInterface
     {
         if (!$this->guesserLoaded) {
             $this->guesserLoaded = true;
-            $guessers = array();
+            $guessers = [];
 
             foreach ($this->guesserServices as $serviceId => $service) {
                 if (null !== $this->guesserServiceIds) {

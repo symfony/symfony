@@ -41,20 +41,20 @@ class CodeExtensionTest extends TestCase
 
     public function getClassNameProvider()
     {
-        return array(
-            array('F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'),
-            array('Bare', '<abbr title="Bare">Bare</abbr>'),
-        );
+        return [
+            ['F\Q\N\Foo', '<abbr title="F\Q\N\Foo">Foo</abbr>'],
+            ['Bare', '<abbr title="Bare">Bare</abbr>'],
+        ];
     }
 
     public function getMethodNameProvider()
     {
-        return array(
-            array('F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'),
-            array('Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'),
-            array('Closure', '<abbr title="Closure">Closure</abbr>'),
-            array('Method', '<abbr title="Method">Method</abbr>()'),
-        );
+        return [
+            ['F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'],
+            ['Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'],
+            ['Closure', '<abbr title="Closure">Closure</abbr>'],
+            ['Method', '<abbr title="Method">Method</abbr>()'],
+        ];
     }
 
     public function testGetName()

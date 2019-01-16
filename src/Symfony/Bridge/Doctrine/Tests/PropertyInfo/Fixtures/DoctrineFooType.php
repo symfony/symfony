@@ -38,7 +38,7 @@ class DoctrineFooType extends Type
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
     {
-        return $platform->getClobTypeDeclarationSQL(array());
+        return $platform->getClobTypeDeclarationSQL([]);
     }
 
     /**

@@ -91,7 +91,7 @@ class MockFileSessionStorageTest extends TestCase
         $storage->start();
         $this->assertEquals('108', $storage->getBag('attributes')->get('new'));
         $this->assertTrue($storage->getBag('flashes')->has('newkey'));
-        $this->assertEquals(array('test'), $storage->getBag('flashes')->peek('newkey'));
+        $this->assertEquals(['test'], $storage->getBag('flashes')->peek('newkey'));
     }
 
     public function testMultipleInstances()

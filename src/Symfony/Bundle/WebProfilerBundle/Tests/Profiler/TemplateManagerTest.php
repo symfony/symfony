@@ -43,11 +43,11 @@ class TemplateManagerTest extends TestCase
 
         $profiler = $this->mockProfiler();
         $twigEnvironment = $this->mockTwigEnvironment();
-        $templates = array(
-            'data_collector.foo' => array('foo', 'FooBundle:Collector:foo'),
-            'data_collector.bar' => array('bar', 'FooBundle:Collector:bar'),
-            'data_collector.baz' => array('baz', 'FooBundle:Collector:baz'),
-        );
+        $templates = [
+            'data_collector.foo' => ['foo', 'FooBundle:Collector:foo'],
+            'data_collector.bar' => ['bar', 'FooBundle:Collector:bar'],
+            'data_collector.baz' => ['baz', 'FooBundle:Collector:baz'],
+        ];
 
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
     }
@@ -69,12 +69,12 @@ class TemplateManagerTest extends TestCase
         $this->profiler->expects($this->any())
             ->method('has')
             ->withAnyParameters()
-            ->will($this->returnCallback(array($this, 'profilerHasCallback')));
+            ->will($this->returnCallback([$this, 'profilerHasCallback']));
 
         $profile = $this->mockProfile();
         $profile->expects($this->any())
             ->method('hasCollector')
-            ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
+            ->will($this->returnCallback([$this, 'profileHasCollectorCallback']));
 
         $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName($profile, 'foo'));
     }
@@ -88,12 +88,12 @@ class TemplateManagerTest extends TestCase
         $profile = $this->mockProfile();
         $profile->expects($this->any())
             ->method('hasCollector')
-            ->will($this->returnCallback(array($this, 'profilerHasCallback')));
+            ->will($this->returnCallback([$this, 'profilerHasCallback']));
 
         $this->profiler->expects($this->any())
             ->method('has')
             ->withAnyParameters()
-            ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
+            ->will($this->returnCallback([$this, 'profileHasCollectorCallback']));
 
         $result = $this->templateManager->getTemplates($profile);
         $this->assertArrayHasKey('foo', $result);

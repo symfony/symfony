@@ -48,10 +48,10 @@ class AuditTrailListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            'workflow.leave' => array('onLeave'),
-            'workflow.transition' => array('onTransition'),
-            'workflow.enter' => array('onEnter'),
-        );
+        return [
+            'workflow.leave' => ['onLeave'],
+            'workflow.transition' => ['onTransition'],
+            'workflow.enter' => ['onEnter'],
+        ];
     }
 }

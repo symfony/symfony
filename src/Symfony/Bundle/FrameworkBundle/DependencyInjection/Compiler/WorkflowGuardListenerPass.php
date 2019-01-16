@@ -32,12 +32,12 @@ class WorkflowGuardListenerPass implements CompilerPassInterface
 
         $container->getParameterBag()->remove('workflow.has_guard_listeners');
 
-        $servicesNeeded = array(
+        $servicesNeeded = [
             'security.token_storage',
             'security.authorization_checker',
             'security.authentication.trust_resolver',
             'security.role_hierarchy',
-        );
+        ];
 
         foreach ($servicesNeeded as $service) {
             if (!$container->has($service)) {

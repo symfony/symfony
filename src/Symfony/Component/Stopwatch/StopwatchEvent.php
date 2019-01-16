@@ -21,7 +21,7 @@ class StopwatchEvent
     /**
      * @var StopwatchPeriod[]
      */
-    private $periods = array();
+    private $periods = [];
 
     /**
      * @var float
@@ -41,7 +41,7 @@ class StopwatchEvent
     /**
      * @var float[]
      */
-    private $started = array();
+    private $started = [];
 
     /**
      * @param float       $origin        The origin time in milliseconds

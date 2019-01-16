@@ -25,9 +25,9 @@ class ContainerAwareRuntimeLoaderTest extends TestCase
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container->expects($this->once())->method('get')->with('foo');
 
-        $loader = new ContainerAwareRuntimeLoader($container, array(
+        $loader = new ContainerAwareRuntimeLoader($container, [
             'FooClass' => 'foo',
-        ));
+        ]);
         $loader->load('FooClass');
     }
 
@@ -35,7 +35,7 @@ class ContainerAwareRuntimeLoaderTest extends TestCase
     {
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $logger->expects($this->once())->method('warning')->with('Class "BarClass" is not configured as a Twig runtime. Add the "twig.runtime" tag to the related service in the container.');
-        $loader = new ContainerAwareRuntimeLoader($this->getMockBuilder(ContainerInterface::class)->getMock(), array(), $logger);
+        $loader = new ContainerAwareRuntimeLoader($this->getMockBuilder(ContainerInterface::class)->getMock(), [], $logger);
         $this->assertNull($loader->load('BarClass'));
     }
 }

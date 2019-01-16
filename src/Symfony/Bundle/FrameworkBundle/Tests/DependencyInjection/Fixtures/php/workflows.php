@@ -2,110 +2,110 @@
 
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
 
-$container->loadFromExtension('framework', array(
-    'workflows' => array(
-        'article' => array(
+$container->loadFromExtension('framework', [
+    'workflows' => [
+        'article' => [
             'type' => 'workflow',
-            'marking_store' => array(
+            'marking_store' => [
                 'type' => 'multiple_state',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
+            ],
             'initial_place' => 'draft',
-            'places' => array(
+            'places' => [
                 'draft',
                 'wait_for_journalist',
                 'approved_by_journalist',
                 'wait_for_spellchecker',
                 'approved_by_spellchecker',
                 'published',
-            ),
-            'transitions' => array(
-                'request_review' => array(
+            ],
+            'transitions' => [
+                'request_review' => [
                     'from' => 'draft',
-                    'to' => array('wait_for_journalist', 'wait_for_spellchecker'),
-                ),
-                'journalist_approval' => array(
+                    'to' => ['wait_for_journalist', 'wait_for_spellchecker'],
+                ],
+                'journalist_approval' => [
                     'from' => 'wait_for_journalist',
                     'to' => 'approved_by_journalist',
-                ),
-                'spellchecker_approval' => array(
+                ],
+                'spellchecker_approval' => [
                     'from' => 'wait_for_spellchecker',
                     'to' => 'approved_by_spellchecker',
-                ),
-                'publish' => array(
-                    'from' => array('approved_by_journalist', 'approved_by_spellchecker'),
+                ],
+                'publish' => [
+                    'from' => ['approved_by_journalist', 'approved_by_spellchecker'],
                     'to' => 'published',
-                ),
-            ),
-        ),
-        'pull_request' => array(
+                ],
+            ],
+        ],
+        'pull_request' => [
             'type' => 'state_machine',
-            'marking_store' => array(
+            'marking_store' => [
                 'type' => 'single_state',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
+            ],
             'initial_place' => 'start',
-            'places' => array(
+            'places' => [
                 'start',
                 'coding',
                 'travis',
                 'review',
                 'merged',
                 'closed',
-            ),
-            'transitions' => array(
-                'submit' => array(
+            ],
+            'transitions' => [
+                'submit' => [
                     'from' => 'start',
                     'to' => 'travis',
-                ),
-                'update' => array(
-                    'from' => array('coding', 'travis', 'review'),
+                ],
+                'update' => [
+                    'from' => ['coding', 'travis', 'review'],
                     'to' => 'travis',
-                ),
-                'wait_for_review' => array(
+                ],
+                'wait_for_review' => [
                     'from' => 'travis',
                     'to' => 'review',
-                ),
-                'request_change' => array(
+                ],
+                'request_change' => [
                     'from' => 'review',
                     'to' => 'coding',
-                ),
-                'accept' => array(
+                ],
+                'accept' => [
                     'from' => 'review',
                     'to' => 'merged',
-                ),
-                'reject' => array(
+                ],
+                'reject' => [
                     'from' => 'review',
                     'to' => 'closed',
-                ),
-                'reopen' => array(
+                ],
+                'reopen' => [
                     'from' => 'closed',
                     'to' => 'review',
-                ),
-            ),
-        ),
-        'service_marking_store_workflow' => array(
+                ],
+            ],
+        ],
+        'service_marking_store_workflow' => [
             'type' => 'workflow',
-            'marking_store' => array(
+            'marking_store' => [
                 'service' => 'workflow_service',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
-            'places' => array(
+            ],
+            'places' => [
                 'first',
                 'last',
-            ),
-            'transitions' => array(
-                'go' => array(
+            ],
+            'transitions' => [
+                'go' => [
                     'from' => 'first',
                     'to' => 'last',
-                ),
-            ),
-        ),
-    ),
-));
+                ],
+            ],
+        ],
+    ],
+]);

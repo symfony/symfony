@@ -43,8 +43,8 @@ namespace Symfony\Component\ClassLoader;
  */
 class ClassLoader
 {
-    private $prefixes = array();
-    private $fallbackDirs = array();
+    private $prefixes = [];
+    private $fallbackDirs = [];
     private $useIncludePath = false;
 
     /**
@@ -136,7 +136,7 @@ class ClassLoader
      */
     public function register($prepend = false)
     {
-        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+        spl_autoload_register([$this, 'loadClass'], true, $prepend);
     }
 
     /**
@@ -144,7 +144,7 @@ class ClassLoader
      */
     public function unregister()
     {
-        spl_autoload_unregister(array($this, 'loadClass'));
+        spl_autoload_unregister([$this, 'loadClass']);
     }
 
     /**

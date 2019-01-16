@@ -39,7 +39,7 @@ class FormPass implements CompilerPassInterface
         $definition = $container->getDefinition('form.extension');
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
-        $types = array();
+        $types = [];
 
         foreach ($container->findTaggedServiceIds('form.type') as $serviceId => $tag) {
             $serviceDefinition = $container->getDefinition($serviceId);
@@ -53,7 +53,7 @@ class FormPass implements CompilerPassInterface
 
         $definition->replaceArgument(1, $types);
 
-        $typeExtensions = array();
+        $typeExtensions = [];
 
         foreach ($this->findAndSortTaggedServices('form.type_extension', $container) as $reference) {
             $serviceId = (string) $reference;

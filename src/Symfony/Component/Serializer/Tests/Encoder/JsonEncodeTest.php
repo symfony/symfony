@@ -43,10 +43,10 @@ class JsonEncodeTest extends TestCase
 
     public function encodeProvider()
     {
-        return array(
-            array(array(), '[]', array()),
-            array(array(), '{}', array('json_encode_options' => JSON_FORCE_OBJECT)),
-        );
+        return [
+            [[], '[]', []],
+            [[], '{}', ['json_encode_options' => JSON_FORCE_OBJECT]],
+        ];
     }
 
     /**

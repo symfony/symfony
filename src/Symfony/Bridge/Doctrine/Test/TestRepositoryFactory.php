@@ -24,7 +24,7 @@ final class TestRepositoryFactory implements RepositoryFactory
     /**
      * @var ObjectRepository[]
      */
-    private $repositoryList = array();
+    private $repositoryList = [];
 
     /**
      * {@inheritdoc}

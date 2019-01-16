@@ -33,11 +33,11 @@ class DataCollectorTranslatorPassTest extends TestCase
         $this->container->register('translator.data_collector', 'Symfony\Component\Translation\DataCollectorTranslator')
             ->setPublic(false)
             ->setDecoratedService('translator')
-            ->setArguments(array(new Reference('translator.data_collector.inner')))
+            ->setArguments([new Reference('translator.data_collector.inner')])
         ;
 
         $this->container->register('data_collector.translation', 'Symfony\Component\Translation\DataCollector\TranslationDataCollector')
-            ->setArguments(array(new Reference('translator.data_collector')))
+            ->setArguments([new Reference('translator.data_collector')])
         ;
     }
 
@@ -67,10 +67,10 @@ class DataCollectorTranslatorPassTest extends TestCase
 
     public function getImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
-        return array(
-            array('Symfony\Component\Translation\Translator'),
-            array('%translator_implementing_bag%'),
-        );
+        return [
+            ['Symfony\Component\Translation\Translator'],
+            ['%translator_implementing_bag%'],
+        ];
     }
 
     /**
@@ -99,20 +99,20 @@ class DataCollectorTranslatorPassTest extends TestCase
 
     public function getNotImplementingTranslatorBagInterfaceTranslatorClassNames()
     {
-        return array(
-            array('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag'),
-            array('%translator_not_implementing_bag%'),
-        );
+        return [
+            ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\TranslatorWithTranslatorBag'],
+            ['%translator_not_implementing_bag%'],
+        ];
     }
 }
 
 class TranslatorWithTranslatorBag implements TranslatorInterface
 {
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
     }
 
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
     }
 

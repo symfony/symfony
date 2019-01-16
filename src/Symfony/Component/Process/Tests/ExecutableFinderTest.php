@@ -88,7 +88,7 @@ class ExecutableFinderTest extends TestCase
 
         $this->setPath('');
 
-        $extraDirs = array(\dirname(PHP_BINARY));
+        $extraDirs = [\dirname(PHP_BINARY)];
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), null, $extraDirs);

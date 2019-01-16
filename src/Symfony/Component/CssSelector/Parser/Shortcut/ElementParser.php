@@ -39,9 +39,9 @@ class ElementParser implements ParserInterface
         //     1 => string 'testns' (length=6)
         //     2 => string 'testel' (length=6)
         if (preg_match('/^(?:([a-z]++)\|)?([\w-]++|\*)$/i', trim($source), $matches)) {
-            return array(new SelectorNode(new ElementNode($matches[1] ?: null, $matches[2])));
+            return [new SelectorNode(new ElementNode($matches[1] ?: null, $matches[2]))];
         }
 
-        return array();
+        return [];
     }
 }

@@ -38,7 +38,7 @@ interface UserInterface
      *
      *     public function getRoles()
      *     {
-     *         return array('ROLE_USER');
+     *         return ['ROLE_USER'];
      *     }
      *
      * Alternatively, the roles might be stored on a ``roles`` property,

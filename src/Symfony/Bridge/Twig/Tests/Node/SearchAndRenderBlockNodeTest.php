@@ -25,9 +25,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
 {
     public function testCompileWidget()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
@@ -44,13 +44,13 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileWidgetWithVariables()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
-            new ArrayExpression(array(
+            new ArrayExpression([
                 new ConstantExpression('foo', 0),
                 new ConstantExpression('bar', 0),
-            ), 0),
-        ));
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_widget', $arguments, 0);
 
@@ -67,10 +67,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabel()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConstantExpression('my label', 0),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -87,10 +87,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithNullLabel()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConstantExpression(null, 0),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -109,10 +109,10 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithEmptyStringLabel()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConstantExpression('', 0),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -131,9 +131,9 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithDefaultLabel()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -150,14 +150,14 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithAttributes()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConstantExpression(null, 0),
-            new ArrayExpression(array(
+            new ArrayExpression([
                 new ConstantExpression('foo', 0),
                 new ConstantExpression('bar', 0),
-            ), 0),
-        ));
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -177,16 +177,16 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelAndAttributes()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConstantExpression('value in argument', 0),
-            new ArrayExpression(array(
+            new ArrayExpression([
                 new ConstantExpression('foo', 0),
                 new ConstantExpression('bar', 0),
                 new ConstantExpression('label', 0),
                 new ConstantExpression('value in attributes', 0),
-            ), 0),
-        ));
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -203,7 +203,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelThatEvaluatesToNull()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConditionalExpression(
                 // if
@@ -214,7 +214,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
                 new ConstantExpression(null, 0),
                 0
             ),
-        ));
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 
@@ -234,7 +234,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
     {
-        $arguments = new Node(array(
+        $arguments = new Node([
             new NameExpression('form', 0),
             new ConditionalExpression(
                 // if
@@ -245,13 +245,13 @@ class SearchAndRenderBlockNodeTest extends TestCase
                 new ConstantExpression(null, 0),
                 0
             ),
-            new ArrayExpression(array(
+            new ArrayExpression([
                 new ConstantExpression('foo', 0),
                 new ConstantExpression('bar', 0),
                 new ConstantExpression('label', 0),
                 new ConstantExpression('value in attributes', 0),
-            ), 0),
-        ));
+            ], 0),
+        ]);
 
         $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
 

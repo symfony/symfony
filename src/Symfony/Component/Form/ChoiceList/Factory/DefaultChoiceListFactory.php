@@ -47,8 +47,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
-        $preferredViews = array();
-        $otherViews = array();
+        $preferredViews = [];
+        $otherViews = [];
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
@@ -137,7 +137,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $label,
             // The attributes may be a callable or a mapping from choice indices
             // to nested arrays
-            \is_callable($attr) ? \call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
+            \is_callable($attr) ? \call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : [])
         );
 
         // $isPreferred may be null if no choices are preferred
@@ -157,8 +157,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
 
             // Add the contents of groups to new ChoiceGroupView instances
             if (\is_array($value)) {
-                $preferredViewsForGroup = array();
-                $otherViewsForGroup = array();
+                $preferredViewsForGroup = [];
+                $otherViewsForGroup = [];
 
                 self::addChoiceViewsGroupedBy(
                     $value,

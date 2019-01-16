@@ -55,7 +55,7 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against the constraints defined
             // in the form
-            $constraints = $config->getOption('constraints', array());
+            $constraints = $config->getOption('constraints', []);
 
             if ($groups instanceof GroupSequence) {
                 $validator->atPath('data')->validate($form->getData(), $constraints, $groups);
@@ -115,7 +115,7 @@ class FormValidator extends ConstraintValidator
 
                 $this->context->setConstraint($constraint);
                 $this->context->buildViolation($config->getOption('invalid_message'))
-                    ->setParameters(array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')))
+                    ->setParameters(array_replace(['{{ value }}' => $clientDataAsString], $config->getOption('invalid_message_parameters')))
                     ->setInvalidValue($form->getViewData())
                     ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
                     ->setCause($form->getTransformationFailure())
@@ -166,7 +166,7 @@ class FormValidator extends ConstraintValidator
             $form = $form->getParent();
         } while (null !== $form);
 
-        return array(Constraint::DEFAULT_GROUP);
+        return [Constraint::DEFAULT_GROUP];
     }
 
     /**

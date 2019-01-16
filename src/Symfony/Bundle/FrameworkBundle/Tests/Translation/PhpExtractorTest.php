@@ -42,8 +42,8 @@ EOF;
 nowdoc key with whitespace and nonescaped \$\n sequences
 EOF;
         // Assert
-        $expectedCatalogue = array(
-            'messages' => array(
+        $expectedCatalogue = [
+            'messages' => [
                 'single-quoted key' => 'prefixsingle-quoted key',
                 'double-quoted key' => 'prefixdouble-quoted key',
                 'heredoc key' => 'prefixheredoc key',
@@ -54,8 +54,8 @@ EOF;
                 $expectedHeredoc => 'prefix'.$expectedHeredoc,
                 $expectedNowdoc => 'prefix'.$expectedNowdoc,
                 '{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples' => 'prefix{0} There is no apples|{1} There is one apple|]1,Inf[ There are %count% apples',
-            ),
-            'not_messages' => array(
+            ],
+            'not_messages' => [
                 'other-domain-test-no-params-short-array' => 'prefixother-domain-test-no-params-short-array',
                 'other-domain-test-no-params-long-array' => 'prefixother-domain-test-no-params-long-array',
                 'other-domain-test-params-short-array' => 'prefixother-domain-test-params-short-array',
@@ -65,8 +65,8 @@ EOF;
                 'typecast' => 'prefixtypecast',
                 'msg1' => 'prefixmsg1',
                 'msg2' => 'prefixmsg2',
-            ),
-        );
+            ],
+        ];
         $actualCatalogue = $catalogue->all();
 
         $this->assertEquals($expectedCatalogue, $actualCatalogue);
@@ -75,7 +75,7 @@ EOF;
     public function resourcesProvider()
     {
         $directory = __DIR__.'/../Fixtures/Resources/views/';
-        $splFiles = array();
+        $splFiles = [];
         foreach (new \DirectoryIterator($directory) as $fileInfo) {
             if ($fileInfo->isDot()) {
                 continue;
@@ -86,13 +86,13 @@ EOF;
             $splFiles[] = $fileInfo->getFileInfo();
         }
 
-        return array(
-            array($directory),
-            array($phpFile),
-            array(glob($directory.'*')),
-            array($splFiles),
-            array(new \ArrayObject(glob($directory.'*'))),
-            array(new \ArrayObject($splFiles)),
-        );
+        return [
+            [$directory],
+            [$phpFile],
+            [glob($directory.'*')],
+            [$splFiles],
+            [new \ArrayObject(glob($directory.'*'))],
+            [new \ArrayObject($splFiles)],
+        ];
     }
 }

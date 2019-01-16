@@ -30,7 +30,7 @@ class TestRunnerForV6 extends BaseRunner
 
         parent::handleConfiguration($arguments);
 
-        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
+        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : [];
 
         $registeredLocally = false;
 

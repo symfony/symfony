@@ -44,7 +44,7 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
      */
     public function getMarking($subject)
     {
-        return new Marking($this->propertyAccessor->getValue($subject, $this->property) ?: array());
+        return new Marking($this->propertyAccessor->getValue($subject, $this->property) ?: []);
     }
 
     /**

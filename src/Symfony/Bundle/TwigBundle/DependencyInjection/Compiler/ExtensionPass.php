@@ -45,7 +45,7 @@ class ExtensionPass implements CompilerPassInterface
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
 
             $coreThemePath = \dirname(\dirname($reflClass->getFileName())).'/Resources/views/Form';
-            $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array($coreThemePath));
+            $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', [$coreThemePath]);
 
             $paths = $container->getDefinition('twig.template_iterator')->getArgument(2);
             $paths[$coreThemePath] = null;
@@ -67,9 +67,9 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.runtime.httpkernel')->addTag('twig.runtime');
 
             // inject Twig in the hinclude service if Twig is the only registered templating engine
-            if ((!$container->hasParameter('templating.engines') || array('twig') == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
+            if ((!$container->hasParameter('templating.engines') || ['twig'] == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
                 $container->getDefinition('fragment.renderer.hinclude')
-                    ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+                    ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
                     ->replaceArgument(0, new Reference('twig'))
                 ;
             }

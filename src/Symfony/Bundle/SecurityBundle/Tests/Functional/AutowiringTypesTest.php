@@ -18,21 +18,21 @@ class AutowiringTypesTest extends WebTestCase
 {
     public function testAccessDecisionManagerAutowiring()
     {
-        static::bootKernel(array('debug' => false));
+        static::bootKernel(['debug' => false]);
         $container = static::$kernel->getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
 
-        static::bootKernel(array('debug' => true));
+        static::bootKernel(['debug' => true]);
         $container = static::$kernel->getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
     }
 
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
-        return parent::createKernel(array('test_case' => 'AutowiringTypes') + $options);
+        return parent::createKernel(['test_case' => 'AutowiringTypes'] + $options);
     }
 }

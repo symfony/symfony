@@ -53,9 +53,9 @@ class SecurityExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('is_granted', array($this, 'isGranted')),
-        );
+        return [
+            new TwigFunction('is_granted', [$this, 'isGranted']),
+        ];
     }
 
     /**

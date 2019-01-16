@@ -97,7 +97,7 @@ class IntegrationTest extends TestCase
         $container
             ->register('a', '\stdClass')
             ->addArgument(new Reference('b'))
-            ->addMethodCall('setC', array(new Reference('c')))
+            ->addMethodCall('setC', [new Reference('c')])
         ;
 
         $container
@@ -155,8 +155,8 @@ class IntegrationTest extends TestCase
         $expectedService = $container->getDefinition($expectedServiceId);
 
         // reset changes, we don't care if these differ
-        $actualService->setChanges(array());
-        $expectedService->setChanges(array());
+        $actualService->setChanges([]);
+        $expectedService->setChanges([]);
 
         $this->assertEquals($expectedService, $actualService);
     }
@@ -165,61 +165,61 @@ class IntegrationTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(IntegrationTestStub::class);
-        yield array(
+        yield [
             'autoconfigure_child_not_applied',
             'child_service',
             'child_service_expected',
             $container,
-        );
+        ];
 
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(IntegrationTestStub::class);
-        yield array(
+        yield [
             'autoconfigure_parent_child',
             'child_service',
             'child_service_expected',
             $container,
-        );
+        ];
 
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(IntegrationTestStub::class)
             ->addTag('from_autoconfigure');
-        yield array(
+        yield [
             'autoconfigure_parent_child_tags',
             'child_service',
             'child_service_expected',
             $container,
-        );
+        ];
 
-        yield array(
+        yield [
             'child_parent',
             'child_service',
             'child_service_expected',
-        );
+        ];
 
-        yield array(
+        yield [
             'defaults_child_tags',
             'child_service',
             'child_service_expected',
-        );
+        ];
 
-        yield array(
+        yield [
             'defaults_instanceof_importance',
             'main_service',
             'main_service_expected',
-        );
+        ];
 
-        yield array(
+        yield [
             'defaults_parent_child',
             'child_service',
             'child_service_expected',
-        );
+        ];
 
-        yield array(
+        yield [
             'instanceof_parent_child',
             'child_service',
             'child_service_expected',
-        );
+        ];
     }
 }
 
@@ -227,7 +227,7 @@ class ServiceSubscriberStub implements ServiceSubscriberInterface
 {
     public static function getSubscribedServices()
     {
-        return array();
+        return [];
     }
 }
 

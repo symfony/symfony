@@ -17,12 +17,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
-        $this->methodMap = array(
+        $this->services = [];
+        $this->methodMap = [
             'bar2' => 'getBar2Service',
             'bar3' => 'getBar3Service',
             'bar6' => 'getBar6Service',
@@ -45,8 +45,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'multiuse1' => 'getMultiuse1Service',
             'root' => 'getRootService',
             'subscriber' => 'getSubscriberService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'bar6' => true,
             'level2' => true,
             'level3' => true,
@@ -54,14 +54,14 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'level5' => true,
             'level6' => true,
             'multiuse1' => true,
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar' => true,
@@ -83,7 +83,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'logger2' => true,
             'multiuse1' => true,
             'subscriber2' => true,
-        );
+        ];
     }
 
     public function compile()

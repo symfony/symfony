@@ -35,7 +35,7 @@ class ChoiceView
      * @param string $label The label displayed to humans
      * @param array  $attr  Additional attributes for the HTML tag
      */
-    public function __construct($data, $value, $label, array $attr = array())
+    public function __construct($data, $value, $label, array $attr = [])
     {
         $this->data = $data;
         $this->value = $value;

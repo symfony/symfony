@@ -149,7 +149,7 @@ class XmlFileLoader extends FileLoader
         $imported = $this->import($resource, ('' !== $type ? $type : null), false, $file);
 
         if (!\is_array($imported)) {
-            $imported = array($imported);
+            $imported = [$imported];
         }
 
         foreach ($imported as $subCollection) {
@@ -203,9 +203,9 @@ class XmlFileLoader extends FileLoader
      */
     private function parseConfigs(\DOMElement $node, $path)
     {
-        $defaults = array();
-        $requirements = array();
-        $options = array();
+        $defaults = [];
+        $requirements = [];
+        $options = [];
         $condition = null;
 
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
@@ -246,7 +246,7 @@ class XmlFileLoader extends FileLoader
             $defaults['_controller'] = $controller;
         }
 
-        return array($defaults, $requirements, $options, $condition);
+        return [$defaults, $requirements, $options, $condition];
     }
 
     /**
@@ -310,7 +310,7 @@ class XmlFileLoader extends FileLoader
             case 'string':
                 return trim($node->nodeValue);
             case 'list':
-                $list = array();
+                $list = [];
 
                 foreach ($node->childNodes as $element) {
                     if (!$element instanceof \DOMElement) {
@@ -326,7 +326,7 @@ class XmlFileLoader extends FileLoader
 
                 return $list;
             case 'map':
-                $map = array();
+                $map = [];
 
                 foreach ($node->childNodes as $element) {
                     if (!$element instanceof \DOMElement) {

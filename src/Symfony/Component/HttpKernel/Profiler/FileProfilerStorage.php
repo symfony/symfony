@@ -54,13 +54,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $file = $this->getIndexFilename();
 
         if (!file_exists($file)) {
-            return array();
+            return [];
         }
 
         $file = fopen($file, 'r');
         fseek($file, 0, SEEK_END);
 
-        $result = array();
+        $result = [];
         while (\count($result) < $limit && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line);
             list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
@@ -78,7 +78,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $result[$csvToken] = array(
+            $result[$csvToken] = [
                 'token' => $csvToken,
                 'ip' => $csvIp,
                 'method' => $csvMethod,
@@ -86,7 +86,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'time' => $csvTime,
                 'parent' => $csvParent,
                 'status_code' => $csvStatusCode,
-            );
+            ];
         }
 
         fclose($file);
@@ -151,7 +151,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }, $profile->getChildren()));
 
         // Store profile
-        $data = array(
+        $data = [
             'token' => $profileToken,
             'parent' => $parentToken,
             'children' => $childrenToken,
@@ -161,7 +161,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'url' => $profile->getUrl(),
             'time' => $profile->getTime(),
             'status_code' => $profile->getStatusCode(),
-        );
+        ];
 
         if (false === file_put_contents($file, serialize($data))) {
             return false;
@@ -173,7 +173,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 return false;
             }
 
-            fputcsv($file, array(
+            fputcsv($file, [
                 $profile->getToken(),
                 $profile->getIp(),
                 $profile->getMethod(),
@@ -181,7 +181,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getTime(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
-            ));
+            ]);
             fclose($file);
         }
 

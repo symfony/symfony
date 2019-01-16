@@ -27,17 +27,17 @@ class TraceableValidatorTest extends TestCase
     public function testValidate()
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
-        $violations = new ConstraintViolationList(array(
+        $violations = new ConstraintViolationList([
             $this->createMock(ConstraintViolation::class),
             $this->createMock(ConstraintViolation::class),
-        ));
+        ]);
         $originalValidator->expects($this->exactly(2))->method('validate')->willReturn($violations);
 
         $validator = new TraceableValidator($originalValidator);
 
         $object = new \stdClass();
-        $constraints = array($this->createMock(Constraint::class));
-        $groups = array('Default', 'Create');
+        $constraints = [$this->createMock(Constraint::class)];
+        $groups = ['Default', 'Create'];
 
         $validator->validate($object, $constraints, $groups);
         $line = __LINE__ - 1;
@@ -50,17 +50,17 @@ class TraceableValidatorTest extends TestCase
 
         $this->assertSame(iterator_to_array($violations), $callData['violations']);
 
-        $this->assertSame(array(
+        $this->assertSame([
             'value' => $object,
             'constraints' => $constraints,
             'groups' => $groups,
-        ), $callData['context']);
+        ], $callData['context']);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             'name' => 'TraceableValidatorTest.php',
             'file' => __FILE__,
             'line' => $line,
-        ), $callData['caller']);
+        ], $callData['caller']);
 
         $validator->validate($object, $constraints, $groups);
         $collectedData = $validator->getCollectedData();

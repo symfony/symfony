@@ -60,7 +60,7 @@ class RouterController
         $this->profiler->disable();
 
         if (null === $this->matcher || null === $this->routes) {
-            return new Response('The Router is not enabled.', 200, array('Content-Type' => 'text/html'));
+            return new Response('The Router is not enabled.', 200, ['Content-Type' => 'text/html']);
         }
 
         $profile = $this->profiler->loadProfile($token);
@@ -68,11 +68,11 @@ class RouterController
         /** @var RequestDataCollector $request */
         $request = $profile->getCollector('request');
 
-        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
+        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', [
             'request' => $request,
             'router' => $profile->getCollector('router'),
             'traces' => $this->getTraces($request, $profile->getMethod()),
-        )), 200, array('Content-Type' => 'text/html'));
+        ]), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -88,9 +88,9 @@ class RouterController
         $traceRequest = Request::create(
             $request->getPathInfo(),
             $request->getRequestServer(true)->get('REQUEST_METHOD'),
-            array(),
+            [],
             $request->getRequestCookies(true)->all(),
-            array(),
+            [],
             $request->getRequestServer(true)->all()
         );
 

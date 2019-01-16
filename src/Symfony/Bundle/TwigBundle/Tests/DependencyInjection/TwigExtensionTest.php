@@ -29,7 +29,7 @@ class TwigExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', array());
+        $container->loadFromExtension('twig', []);
         $this->compileContainer($container);
 
         $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
@@ -72,9 +72,9 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
-        if (\in_array($format, array('yml', 'php'))) {
+        if (\in_array($format, ['yml', 'php'])) {
             $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals(['key' => 'foo'], $calls[5][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
@@ -99,7 +99,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
+        $this->assertEquals([new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'], $options['autoescape']);
     }
 
     /**
@@ -138,8 +138,8 @@ class TwigExtensionTest extends TestCase
 
     public function testGlobalsWithDifferentTypesAndValues()
     {
-        $globals = array(
-            'array' => array(),
+        $globals = [
+            'array' => [],
             'false' => false,
             'float' => 2.0,
             'integer' => 3,
@@ -147,11 +147,11 @@ class TwigExtensionTest extends TestCase
             'object' => new \stdClass(),
             'string' => 'foo',
             'true' => true,
-        );
+        ];
 
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', array('globals' => $globals));
+        $container->loadFromExtension('twig', ['globals' => $globals]);
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
@@ -175,49 +175,49 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
-        $paths = array();
+        $paths = [];
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
                 $paths[] = $call[1];
             }
         }
 
-        $this->assertEquals(array(
-            array('path1'),
-            array('path2'),
-            array('namespaced_path1', 'namespace1'),
-            array('namespaced_path2', 'namespace2'),
-            array('namespaced_path3', 'namespace3'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'Twig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'Twig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'Twig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'Twig'),
-            array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
-            array(__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'),
-            array(realpath(__DIR__.'/../..').'/Resources/views', 'Twig'),
-            array(realpath(__DIR__.'/../..').'/Resources/views', '!Twig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'ChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
-            array(__DIR__.'/Fixtures/Resources/views'),
-            array(__DIR__.'/Fixtures/templates'),
-        ), $paths);
+        $this->assertEquals([
+            ['path1'],
+            ['path2'],
+            ['namespaced_path1', 'namespace1'],
+            ['namespaced_path2', 'namespace2'],
+            ['namespaced_path3', 'namespace3'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'Twig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'Twig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'Twig'],
+            [__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'Twig'],
+            [__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'],
+            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
+            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'ChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'],
+            [__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildChildTwig'],
+            [__DIR__.'/Fixtures/Resources/views'],
+            [__DIR__.'/Fixtures/templates'],
+        ], $paths);
     }
 
     public function getFormats()
     {
-        return array(
-            array('php'),
-            array('yml'),
-            array('xml'),
-        );
+        return [
+            ['php'],
+            ['yml'],
+            ['xml'],
+        ];
     }
 
     /**
@@ -231,7 +231,7 @@ class TwigExtensionTest extends TestCase
             $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
         }
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', array());
+        $container->loadFromExtension('twig', []);
         $container->setAlias('test.twig.extension.debug.stopwatch', 'twig.extension.debug.stopwatch')->setPublic(true);
         $this->compileContainer($container);
 
@@ -244,19 +244,19 @@ class TwigExtensionTest extends TestCase
 
     public function stopwatchExtensionAvailabilityProvider()
     {
-        return array(
-            'debug-and-stopwatch-enabled' => array(true, true, true),
-            'only-stopwatch-enabled' => array(false, true, false),
-            'only-debug-enabled' => array(true, false, false),
-            'debug-and-stopwatch-disabled' => array(false, false, false),
-        );
+        return [
+            'debug-and-stopwatch-enabled' => [true, true, true],
+            'only-stopwatch-enabled' => [false, true, false],
+            'only-debug-enabled' => [true, false, false],
+            'debug-and-stopwatch-disabled' => [false, false, false],
+        ];
     }
 
     public function testRuntimeLoader()
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', array());
+        $container->loadFromExtension('twig', []);
         $container->setParameter('kernel.environment', 'test');
         $container->setParameter('debug.file_link_format', 'test');
         $container->setParameter('foo', 'FooClass');
@@ -265,7 +265,7 @@ class TwigExtensionTest extends TestCase
         $container->register('templating.name_parser', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
 
         $loader = $container->getDefinition('twig.runtime_loader');
@@ -278,55 +278,55 @@ class TwigExtensionTest extends TestCase
 
     private function createContainer()
     {
-        $container = new ContainerBuilder(new ParameterBag(array(
+        $container = new ContainerBuilder(new ParameterBag([
             'kernel.cache_dir' => __DIR__,
             'kernel.root_dir' => __DIR__.'/Fixtures',
             'kernel.project_dir' => __DIR__,
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
-            'kernel.bundles' => array(
+            'kernel.bundles' => [
                 'TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle',
                 'ChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
                 'ChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',
                 'ChildChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildTwigBundle\\ChildChildChildTwigBundle',
                 'ChildChildChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildChildTwigBundle\\ChildChildChildChildTwigBundle',
-            ),
-            'kernel.bundles_metadata' => array(
-                'ChildChildChildChildTwigBundle' => array(
+            ],
+            'kernel.bundles_metadata' => [
+                'ChildChildChildChildTwigBundle' => [
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildChildTwigBundle\\ChildChildChildChildTwigBundle',
                     'parent' => 'ChildChildChildTwigBundle',
                     'path' => __DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle',
-                ),
-                'TwigBundle' => array(
+                ],
+                'TwigBundle' => [
                     'namespace' => 'Symfony\\Bundle\\TwigBundle',
                     'parent' => null,
                     'path' => realpath(__DIR__.'/../..'),
-                ),
-                'ChildTwigBundle' => array(
+                ],
+                'ChildTwigBundle' => [
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
                     'parent' => 'TwigBundle',
                     'path' => __DIR__.'/Fixtures/Bundle/ChildTwigBundle',
-                ),
-                'ChildChildChildTwigBundle' => array(
+                ],
+                'ChildChildChildTwigBundle' => [
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildTwigBundle\\ChildChildChildTwigBundle',
                     'parent' => 'ChildChildTwigBundle',
                     'path' => __DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle',
-                ),
-                'ChildChildTwigBundle' => array(
+                ],
+                'ChildChildTwigBundle' => [
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',
                     'parent' => 'ChildTwigBundle',
                     'path' => __DIR__.'/Fixtures/Bundle/ChildChildTwigBundle',
-                ),
-            ),
-        )));
+                ],
+            ],
+        ]));
 
         return $container;
     }
 
     private function compileContainer(ContainerBuilder $container)
     {
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
     }
 

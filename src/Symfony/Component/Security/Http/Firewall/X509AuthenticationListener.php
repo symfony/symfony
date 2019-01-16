@@ -52,6 +52,6 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
             throw new BadCredentialsException(sprintf('SSL credentials not found: %s, %s', $this->userKey, $this->credentialKey));
         }
 
-        return array($user, $request->server->get($this->credentialKey, ''));
+        return [$user, $request->server->get($this->credentialKey, '')];
     }
 }

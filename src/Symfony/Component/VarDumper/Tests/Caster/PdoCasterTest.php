@@ -29,9 +29,9 @@ class PdoCasterTest extends TestCase
     public function testCastPdo()
     {
         $pdo = new \PDO('sqlite::memory:');
-        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array($pdo)));
+        $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, ['PDOStatement', [$pdo]]);
 
-        $cast = PdoCaster::castPdo($pdo, array(), new Stub(), false);
+        $cast = PdoCaster::castPdo($pdo, [], new Stub(), false);
 
         $this->assertInstanceOf('Symfony\Component\VarDumper\Caster\EnumStub', $cast["\0~\0attributes"]);
 

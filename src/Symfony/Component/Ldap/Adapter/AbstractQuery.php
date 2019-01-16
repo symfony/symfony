@@ -24,10 +24,10 @@ abstract class AbstractQuery implements QueryInterface
     protected $query;
     protected $options;
 
-    public function __construct(ConnectionInterface $connection, $dn, $query, array $options = array())
+    public function __construct(ConnectionInterface $connection, $dn, $query, array $options = [])
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'filter' => '*',
             'maxItems' => 0,
             'sizeLimit' => 0,
@@ -35,12 +35,12 @@ abstract class AbstractQuery implements QueryInterface
             'deref' => static::DEREF_NEVER,
             'attrsOnly' => 0,
             'scope' => static::SCOPE_SUB,
-        ));
-        $resolver->setAllowedValues('deref', array(static::DEREF_ALWAYS, static::DEREF_NEVER, static::DEREF_FINDING, static::DEREF_SEARCHING));
-        $resolver->setAllowedValues('scope', array(static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB));
+        ]);
+        $resolver->setAllowedValues('deref', [static::DEREF_ALWAYS, static::DEREF_NEVER, static::DEREF_FINDING, static::DEREF_SEARCHING]);
+        $resolver->setAllowedValues('scope', [static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB]);
 
         $resolver->setNormalizer('filter', function (Options $options, $value) {
-            return \is_array($value) ? $value : array($value);
+            return \is_array($value) ? $value : [$value];
         });
 
         $this->connection = $connection;

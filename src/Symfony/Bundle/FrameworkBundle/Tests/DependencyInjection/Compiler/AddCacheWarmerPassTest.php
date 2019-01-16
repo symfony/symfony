@@ -24,20 +24,20 @@ class AddCacheWarmerPassTest extends TestCase
     public function testThatCacheWarmersAreProcessedInPriorityOrder()
     {
         $container = new ContainerBuilder();
-        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument(array());
-        $container->register('my_cache_warmer_service1')->addTag('kernel.cache_warmer', array('priority' => 100));
-        $container->register('my_cache_warmer_service2')->addTag('kernel.cache_warmer', array('priority' => 200));
+        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument([]);
+        $container->register('my_cache_warmer_service1')->addTag('kernel.cache_warmer', ['priority' => 100]);
+        $container->register('my_cache_warmer_service2')->addTag('kernel.cache_warmer', ['priority' => 200]);
         $container->register('my_cache_warmer_service3')->addTag('kernel.cache_warmer');
 
         $addCacheWarmerPass = new AddCacheWarmerPass();
         $addCacheWarmerPass->process($container);
 
         $this->assertEquals(
-            array(
+            [
                 new Reference('my_cache_warmer_service2'),
                 new Reference('my_cache_warmer_service1'),
                 new Reference('my_cache_warmer_service3'),
-            ),
+            ],
             $cacheWarmerDefinition->getArgument(0)
         );
     }
@@ -56,11 +56,11 @@ class AddCacheWarmerPassTest extends TestCase
     public function testThatCacheWarmersMightBeNotDefined()
     {
         $container = new ContainerBuilder();
-        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument(array());
+        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument([]);
 
         $addCacheWarmerPass = new AddCacheWarmerPass();
         $addCacheWarmerPass->process($container);
 
-        $this->assertSame(array(), $cacheWarmerDefinition->getArgument(0));
+        $this->assertSame([], $cacheWarmerDefinition->getArgument(0));
     }
 }

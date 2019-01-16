@@ -18,7 +18,7 @@ class SerializerTest extends WebTestCase
 {
     public function testDeserializeArrayOfObject()
     {
-        static::bootKernel(array('test_case' => 'Serializer'));
+        static::bootKernel(['test_case' => 'Serializer']);
         $container = static::$kernel->getContainer();
 
         $result = $container->get('serializer')->deserialize('{"bars": [{"id": 1}, {"id": 2}]}', Foo::class, 'json');
@@ -29,7 +29,7 @@ class SerializerTest extends WebTestCase
         $bar2->id = 2;
 
         $expected = new Foo();
-        $expected->bars = array($bar1, $bar2);
+        $expected->bars = [$bar1, $bar2];
 
         $this->assertEquals($expected, $result);
     }

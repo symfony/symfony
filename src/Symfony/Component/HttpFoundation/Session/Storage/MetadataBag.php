@@ -39,7 +39,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * @var array
      */
-    protected $meta = array(self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0);
+    protected $meta = [self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0];
 
     /**
      * Unix timestamp.

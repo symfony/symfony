@@ -66,14 +66,14 @@ class PhpFileLoaderTest extends TestCase
 
     public function provideConfig()
     {
-        yield array('basic');
-        yield array('defaults');
-        yield array('instanceof');
-        yield array('prototype');
-        yield array('child');
+        yield ['basic'];
+        yield ['defaults'];
+        yield ['instanceof'];
+        yield ['prototype'];
+        yield ['child'];
 
         if (\PHP_VERSION_ID >= 70000) {
-            yield array('php7');
+            yield ['php7'];
         }
     }
 

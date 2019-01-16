@@ -28,7 +28,7 @@ if (!class_exists(BaseExpressionLanguage::class)) {
         /**
          * {@inheritdoc}
          */
-        public function __construct($cache = null, array $providers = array())
+        public function __construct($cache = null, array $providers = [])
         {
             // prepend the default provider to let users override it easily
             array_unshift($providers, new ExpressionLanguageProvider());

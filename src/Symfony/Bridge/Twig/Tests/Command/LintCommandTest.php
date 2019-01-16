@@ -28,7 +28,7 @@ class LintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo }}');
 
-        $ret = $tester->execute(array('filename' => array($filename)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
+        $ret = $tester->execute(['filename' => [$filename]], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('OK in', trim($tester->getDisplay()));
@@ -39,7 +39,7 @@ class LintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo');
 
-        $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
+        $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
@@ -54,7 +54,7 @@ class LintCommandTest extends TestCase
         $filename = $this->createFile('');
         unlink($filename);
 
-        $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
+        $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
     }
 
     public function testLintFileCompileTimeException()
@@ -62,7 +62,7 @@ class LintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile("{{ 2|number_format(2, decimal_point='.', ',') }}");
 
-        $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
+        $ret = $tester->execute(['filename' => [$filename]], ['decorated' => false]);
 
         $this->assertEquals(1, $ret, 'Returns 1 in case of error');
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
@@ -83,7 +83,7 @@ class LintCommandTest extends TestCase
         $command = $application->find('lint:twig');
 
         $tester = new CommandTester($command);
-        $tester->execute(array());
+        $tester->execute([]);
     }
 
     /**
@@ -115,7 +115,7 @@ class LintCommandTest extends TestCase
 
     protected function setUp()
     {
-        $this->files = array();
+        $this->files = [];
     }
 
     protected function tearDown()

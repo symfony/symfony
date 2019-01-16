@@ -21,7 +21,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
 {
     public function validate(Definition $definition, $name)
     {
-        $transitionFromNames = array();
+        $transitionFromNames = [];
         foreach ($definition->getTransitions() as $transition) {
             // Make sure that each transition has exactly one TO
             if (1 !== \count($transition->getTos())) {

@@ -49,7 +49,7 @@ class AnonymousAuthenticationListenerTest extends TestCase
             ->will($this->returnValue(null))
         ;
 
-        $anonymousToken = new AnonymousToken('TheSecret', 'anon.', array());
+        $anonymousToken = new AnonymousToken('TheSecret', 'anon.', []);
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
         $authenticationManager

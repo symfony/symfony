@@ -47,7 +47,7 @@ class FormError implements \Serializable
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null, $cause = null)
+    public function __construct($message, $messageTemplate = null, array $messageParameters = [], $messagePluralization = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;
@@ -141,13 +141,13 @@ class FormError implements \Serializable
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->message,
             $this->messageTemplate,
             $this->messageParameters,
             $this->messagePluralization,
             $this->cause,
-        ));
+        ]);
     }
 
     /**
@@ -158,7 +158,7 @@ class FormError implements \Serializable
     public function unserialize($serialized)
     {
         if (\PHP_VERSION_ID >= 70000) {
-            list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, array('allowed_classes' => false));
+            list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, ['allowed_classes' => false]);
         } else {
             list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized);
         }

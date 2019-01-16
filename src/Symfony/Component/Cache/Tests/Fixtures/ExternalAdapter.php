@@ -34,7 +34,7 @@ class ExternalAdapter implements CacheItemPoolInterface
         return $this->cache->getItem($key);
     }
 
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         return $this->cache->getItems($keys);
     }

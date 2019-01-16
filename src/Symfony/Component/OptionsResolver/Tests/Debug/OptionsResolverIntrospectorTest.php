@@ -64,7 +64,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     public function testGetLazyClosures()
     {
         $resolver = new OptionsResolver();
-        $closures = array();
+        $closures = [];
         $resolver->setDefault($option = 'foo', $closures[] = function (Options $options) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
@@ -100,7 +100,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setAllowedTypes($option = 'foo', $allowedTypes = array('string', 'bool'));
+        $resolver->setAllowedTypes($option = 'foo', $allowedTypes = ['string', 'bool']);
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($allowedTypes, $debug->getAllowedTypes($option));
@@ -135,7 +135,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setAllowedValues($option = 'foo', $allowedValues = array('bar', 'baz'));
+        $resolver->setAllowedValues($option = 'foo', $allowedValues = ['bar', 'baz']);
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($allowedValues, $debug->getAllowedValues($option));

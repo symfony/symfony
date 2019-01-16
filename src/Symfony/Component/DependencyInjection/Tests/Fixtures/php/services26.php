@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
@@ -27,21 +27,21 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         }
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
-        $this->methodMap = array(
+        $this->services = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'test' => 'getTestService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     public function compile()
@@ -126,14 +126,14 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array(
+    private $loadedDynamicParameters = [
         'bar' => false,
         'baz' => false,
         'json' => false,
         'db_dsn' => false,
         'env(json_file)' => false,
-    );
-    private $dynamicParameters = array();
+    ];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -159,10 +159,10 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         return $this->dynamicParameters[$name] = $value;
     }
 
-    private $normalizedParameterNames = array(
+    private $normalizedParameterNames = [
         'env(foo)' => 'env(FOO)',
         'env(db)' => 'env(DB)',
-    );
+    ];
 
     private function normalizeParameterName($name)
     {
@@ -185,10 +185,10 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'project_dir' => '/foo/bar',
             'env(FOO)' => 'foo',
             'env(DB)' => 'sqlite://%project_dir%/var/data.db',
-        );
+        ];
     }
 }

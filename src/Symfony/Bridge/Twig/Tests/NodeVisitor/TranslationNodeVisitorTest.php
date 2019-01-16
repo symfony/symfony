@@ -25,7 +25,7 @@ class TranslationNodeVisitorTest extends TestCase
     /** @dataProvider getMessagesExtractionTestData */
     public function testMessagesExtraction(Node $node, array $expectedMessages)
     {
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationNodeVisitor();
         $visitor->enable();
         $visitor->enterNode($node, $env);
@@ -40,14 +40,14 @@ class TranslationNodeVisitorTest extends TestCase
         $node = new FilterExpression(
             new ConstantExpression($message, 0),
             new ConstantExpression('trans', 0),
-            new Node(array(
-                new ArrayExpression(array(), 0),
+            new Node([
+                new ArrayExpression([], 0),
                 new NameExpression('variable', 0),
-            )),
+            ]),
             0
         );
 
-        $this->testMessagesExtraction($node, array(array($message, TranslationNodeVisitor::UNDEFINED_DOMAIN)));
+        $this->testMessagesExtraction($node, [[$message, TranslationNodeVisitor::UNDEFINED_DOMAIN]]);
     }
 
     public function getMessagesExtractionTestData()
@@ -55,13 +55,13 @@ class TranslationNodeVisitorTest extends TestCase
         $message = 'new key';
         $domain = 'domain';
 
-        return array(
-            array(TwigNodeProvider::getTransFilter($message), array(array($message, null))),
-            array(TwigNodeProvider::getTransChoiceFilter($message), array(array($message, null))),
-            array(TwigNodeProvider::getTransTag($message), array(array($message, null))),
-            array(TwigNodeProvider::getTransFilter($message, $domain), array(array($message, $domain))),
-            array(TwigNodeProvider::getTransChoiceFilter($message, $domain), array(array($message, $domain))),
-            array(TwigNodeProvider::getTransTag($message, $domain), array(array($message, $domain))),
-        );
+        return [
+            [TwigNodeProvider::getTransFilter($message), [[$message, null]]],
+            [TwigNodeProvider::getTransChoiceFilter($message), [[$message, null]]],
+            [TwigNodeProvider::getTransTag($message), [[$message, null]]],
+            [TwigNodeProvider::getTransFilter($message, $domain), [[$message, $domain]]],
+            [TwigNodeProvider::getTransChoiceFilter($message, $domain), [[$message, $domain]]],
+            [TwigNodeProvider::getTransTag($message, $domain), [[$message, $domain]]],
+        ];
     }
 }

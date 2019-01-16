@@ -39,7 +39,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(array('one/b/c.neon', 'one/b/d.neon'), $match);
+        $this->assertSame(['one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarNonStrictDots()
@@ -56,7 +56,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(array('.dot/b/c.neon', '.dot/b/d.neon', 'one/b/c.neon', 'one/b/d.neon'), $match);
+        $this->assertSame(['.dot/b/c.neon', '.dot/b/d.neon', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarWithoutLeadingSlash()
@@ -73,7 +73,7 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(array('one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'), $match);
+        $this->assertSame(['one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 
     public function testGlobToRegexDoubleStarWithoutLeadingSlashNotStrictLeadingDot()
@@ -90,6 +90,6 @@ class GlobTest extends TestCase
         }
         sort($match);
 
-        $this->assertSame(array('one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'), $match);
+        $this->assertSame(['one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
 }

@@ -16,7 +16,7 @@ class PredisClusterAdapterTest extends AbstractRedisAdapterTest
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = new \Predis\Client(array(array('host' => getenv('REDIS_HOST'))));
+        self::$redis = new \Predis\Client([['host' => getenv('REDIS_HOST')]]);
     }
 
     public static function tearDownAfterClass()

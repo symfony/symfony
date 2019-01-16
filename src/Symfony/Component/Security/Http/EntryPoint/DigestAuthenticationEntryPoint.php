@@ -58,7 +58,7 @@ class DigestAuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug('WWW-Authenticate header sent.', array('header' => $authenticateHeader));
+            $this->logger->debug('WWW-Authenticate header sent.', ['header' => $authenticateHeader]);
         }
 
         $response = new Response();

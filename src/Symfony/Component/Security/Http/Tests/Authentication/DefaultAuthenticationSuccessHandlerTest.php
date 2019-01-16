@@ -42,72 +42,72 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $requestWithSession = Request::create('/');
         $requestWithSession->setSession($session);
 
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 Request::create('/'),
-                array(),
+                [],
                 '/',
-            ),
-            'forced target path' => array(
+            ],
+            'forced target path' => [
                 Request::create('/'),
-                array('always_use_default_target_path' => true, 'default_target_path' => '/dashboard'),
+                ['always_use_default_target_path' => true, 'default_target_path' => '/dashboard'],
                 '/dashboard',
-            ),
-            'target path as query string' => array(
+            ],
+            'target path as query string' => [
                 Request::create('/?_target_path=/dashboard'),
-                array(),
+                [],
                 '/dashboard',
-            ),
-            'target path name as query string is customized' => array(
+            ],
+            'target path name as query string is customized' => [
                 Request::create('/?_my_target_path=/dashboard'),
-                array('target_path_parameter' => '_my_target_path'),
+                ['target_path_parameter' => '_my_target_path'],
                 '/dashboard',
-            ),
-            'target path name as query string is customized and nested' => array(
+            ],
+            'target path name as query string is customized and nested' => [
                 Request::create('/?_target_path[value]=/dashboard'),
-                array('target_path_parameter' => '_target_path[value]'),
+                ['target_path_parameter' => '_target_path[value]'],
                 '/dashboard',
-            ),
-            'target path in session' => array(
+            ],
+            'target path in session' => [
                 $requestWithSession,
-                array(),
+                [],
                 '/admin/dashboard',
-            ),
-            'target path as referer' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/dashboard')),
-                array('use_referer' => true),
+            ],
+            'target path as referer' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => 'http://localhost/dashboard']),
+                ['use_referer' => true],
                 '/dashboard',
-            ),
-            'target path as referer is ignored if not configured' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/dashboard')),
-                array(),
+            ],
+            'target path as referer is ignored if not configured' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => 'http://localhost/dashboard']),
+                [],
                 '/',
-            ),
-            'target path as referer when referer not set' => array(
+            ],
+            'target path as referer when referer not set' => [
                 Request::create('/'),
-                array('use_referer' => true),
+                ['use_referer' => true],
                 '/',
-            ),
-            'target path as referer when referer is ?' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => '?')),
-                array('use_referer' => true),
+            ],
+            'target path as referer when referer is ?' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => '?']),
+                ['use_referer' => true],
                 '/',
-            ),
-            'target path should be different than login URL' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login')),
-                array('use_referer' => true, 'login_path' => '/login'),
+            ],
+            'target path should be different than login URL' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => 'http://localhost/login']),
+                ['use_referer' => true, 'login_path' => '/login'],
                 '/',
-            ),
-            'target path should be different than login URL (query string does not matter)' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
-                array('use_referer' => true, 'login_path' => '/login'),
+            ],
+            'target path should be different than login URL (query string does not matter)' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => 'http://localhost/login?t=1&p=2']),
+                ['use_referer' => true, 'login_path' => '/login'],
                 '/',
-            ),
-            'target path should be different than login URL (login_path as a route)' => array(
-                Request::create('/', 'GET', array(), array(), array(), array('HTTP_REFERER' => 'http://localhost/login?t=1&p=2')),
-                array('use_referer' => true, 'login_path' => 'login_route'),
+            ],
+            'target path should be different than login URL (login_path as a route)' => [
+                Request::create('/', 'GET', [], [], [], ['HTTP_REFERER' => 'http://localhost/login?t=1&p=2']),
+                ['use_referer' => true, 'login_path' => 'login_route'],
                 '/',
-            ),
-        );
+            ],
+        ];
     }
 }

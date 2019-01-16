@@ -34,13 +34,13 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $this->reader
             ->expects($this->any())
             ->method('getClassAnnotations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
@@ -48,22 +48,22 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 
     public function testLoadIgnoresHiddenDirectories()
     {
-        $this->expectAnnotationsToBeReadFrom(array(
+        $this->expectAnnotationsToBeReadFrom([
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BazClass',
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\FooClass',
-        ));
+        ]);
 
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $this->reader
             ->expects($this->any())
             ->method('getClassAnnotations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
@@ -92,7 +92,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->reader
             ->expects($this->any())
             ->method('getMethodAnnotations')
-            ->will($this->returnValue(array()))
+            ->will($this->returnValue([]))
         ;
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');

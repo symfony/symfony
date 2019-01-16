@@ -19,8 +19,8 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class EnvPlaceholderParameterBag extends ParameterBag
 {
-    private $envPlaceholders = array();
-    private $providedTypes = array();
+    private $envPlaceholders = [];
+    private $providedTypes = [];
 
     /**
      * {@inheritdoc}

@@ -19,21 +19,21 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Container extends \Symfony\Component\DependencyInjection\Dump\AbstractContainer
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
+        $this->services = [];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     public function compile()

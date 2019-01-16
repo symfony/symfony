@@ -17,28 +17,28 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
-        $this->normalizedIds = array(
+        $this->services = [];
+        $this->normalizedIds = [
             'tsantos\\serializer\\serializerinterface' => 'TSantos\\Serializer\\SerializerInterface',
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'tsantos_serializer' => 'getTsantosSerializerService',
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'TSantos\\Serializer\\SerializerInterface' => 'tsantos_serializer',
-        );
+        ];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     public function compile()

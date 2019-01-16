@@ -17,32 +17,32 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
-        $this->methodMap = array(
+        $this->services = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'foo1' => 'getFoo1Service',
             'foo3' => 'getFoo3Service',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'foo3' => true,
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
-        );
+        ];
     }
 
     public function compile()
@@ -74,13 +74,13 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};
         $instance->foo2 = null;
         $instance->foo3 = ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : null) && false ?: '_'};
-        $instance->closures = array(0 => function () {
+        $instance->closures = [0 => function () {
             return ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};
         }, 1 => function () {
             return null;
         }, 2 => function () {
             return ${($_ = isset($this->services['foo3']) ? $this->services['foo3'] : null) && false ?: '_'};
-        });
+        }];
         $instance->iter = new RewindableGenerator(function () {
             if (isset($this->services['foo1'])) {
                 yield 'foo1' => ${($_ = isset($this->services['foo1']) ? $this->services['foo1'] : null) && false ?: '_'};

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
@@ -25,8 +25,8 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
         for ($i = 1; $i <= 5; ++$i) {
             $this->targetDirs[$i] = $dir = \dirname($dir);
         }
-        $this->services = array();
-        $this->methodMap = array(
+        $this->services = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'private' => 'getPrivateService',
             'private_alias' => 'getPrivateAliasService',
@@ -37,8 +37,8 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private_not_removed' => 'getPrivateNotRemovedService',
             'private_parent' => 'getPrivateParentService',
             'public_child' => 'getPublicChildService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'decorated_private' => true,
             'decorated_private_alias' => true,
             'private' => true,
@@ -47,17 +47,17 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private_not_inlined' => true,
             'private_not_removed' => true,
             'private_parent' => true,
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'alias_to_private' => 'private',
             'decorated_private' => 'private_decorator',
             'decorated_private_alias' => 'private_alias_decorator',
-        );
+        ];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'decorated_private' => true,
@@ -71,7 +71,7 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
             'private_not_inlined' => true,
             'private_not_removed' => true,
             'private_parent' => true,
-        );
+        ];
     }
 
     public function compile()

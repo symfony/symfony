@@ -17,12 +17,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = array();
-        $this->normalizedIds = array(
+        $this->services = [];
+        $this->normalizedIds = [
             'app\\bus' => 'App\\Bus',
             'app\\db' => 'App\\Db',
             'app\\handler1' => 'App\\Handler1',
@@ -30,8 +30,8 @@ class ProjectServiceContainer extends Container
             'app\\processor' => 'App\\Processor',
             'app\\registry' => 'App\\Registry',
             'app\\schema' => 'App\\Schema',
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'App\\Bus' => 'getBusService',
             'App\\Db' => 'getDbService',
             'App\\Handler1' => 'getHandler1Service',
@@ -39,21 +39,21 @@ class ProjectServiceContainer extends Container
             'App\\Processor' => 'getProcessorService',
             'App\\Registry' => 'getRegistryService',
             'App\\Schema' => 'getSchemaService',
-        );
-        $this->privates = array(
+        ];
+        $this->privates = [
             'App\\Handler1' => true,
             'App\\Handler2' => true,
             'App\\Processor' => true,
             'App\\Registry' => true,
             'App\\Schema' => true,
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'App\\Handler1' => true,
             'App\\Handler2' => true,
             'App\\Processor' => true,
@@ -61,7 +61,7 @@ class ProjectServiceContainer extends Container
             'App\\Schema' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     public function compile()
@@ -167,7 +167,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['App\Registry'] = $instance = new \App\Registry();
 
-        $instance->processor = array(0 => ${($_ = isset($this->services['App\Db']) ? $this->services['App\Db'] : $this->getDbService()) && false ?: '_'}, 1 => ${($_ = isset($this->services['App\Bus']) ? $this->services['App\Bus'] : $this->getBusService()) && false ?: '_'});
+        $instance->processor = [0 => ${($_ = isset($this->services['App\Db']) ? $this->services['App\Db'] : $this->getDbService()) && false ?: '_'}, 1 => ${($_ = isset($this->services['App\Bus']) ? $this->services['App\Bus'] : $this->getBusService()) && false ?: '_'}];
 
         return $instance;
     }

@@ -12,11 +12,11 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             __CLASS__,
             '?'.CustomDefinition::class,
             'bar' => CustomDefinition::class,
             'baz' => '?'.CustomDefinition::class,
-        );
+        ];
     }
 }

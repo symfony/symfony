@@ -215,11 +215,11 @@ EOF;
 
             if ($ids = array_keys($this->container->getRemovedIds())) {
                 sort($ids);
-                $c = "<?php\n\nreturn array(\n";
+                $c = "<?php\n\nreturn [\n";
                 foreach ($ids as $id) {
                     $c .= '    '.$this->doExport($id)." => true,\n";
                 }
-                $files['removed-ids.php'] = $c .= ");\n";
+                $files['removed-ids.php'] = $c .= "];\n";
             }
 
             foreach ($this->generateServiceFiles() as $file => $c) {
@@ -258,11 +258,11 @@ if (!\\class_exists({$options['class']}::class, false)) {
     \\class_alias(\\Container{$hash}\\{$options['class']}::class, {$options['class']}::class, false);
 }
 
-return new \\Container{$hash}\\{$options['class']}(array(
+return new \\Container{$hash}\\{$options['class']}([
     'container.build_hash' => '$hash',
     'container.build_id' => '$id',
     'container.build_time' => $time,
-), __DIR__.\\DIRECTORY_SEPARATOR.'Container{$hash}');
+], __DIR__.\\DIRECTORY_SEPARATOR.'Container{$hash}');
 
 EOF;
         } else {
@@ -607,7 +607,7 @@ EOF;
                 return sprintf("        (%s)->%s(\$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
             }
 
-            return sprintf("        \\call_user_func(array(%s, '%s'), \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
+            return sprintf("        \\call_user_func([%s, '%s'], \$%s);\n", $this->dumpValue($callable[0]), $callable[1], $variableName);
         }
 
         return sprintf("        %s(\$%s);\n", $callable, $variableName);
@@ -900,7 +900,7 @@ EOTXT
                     return $return.sprintf("(%s)->%s(%s);\n", $class, $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
-                return $return.sprintf("\\call_user_func(array(%s, '%s')%s);\n", $class, $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
+                return $return.sprintf("\\call_user_func([%s, '%s']%s);\n", $class, $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
             }
 
             return $return.sprintf("%s(%s);\n", $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '');
@@ -947,7 +947,7 @@ $bagClass
 class $class extends $baseClass
 {
     private \$parameters;
-    private \$targetDirs = array();
+    private \$targetDirs = [];
 
     public function __construct()
     {
@@ -965,7 +965,7 @@ EOF;
         }
         if ($this->asFiles) {
             $code = str_replace('$parameters', "\$buildParameters;\n    private \$containerDir;\n    private \$parameters", $code);
-            $code = str_replace('__construct()', '__construct(array $buildParameters = array(), $containerDir = __DIR__)', $code);
+            $code = str_replace('__construct()', '__construct(array $buildParameters = [], $containerDir = __DIR__)', $code);
             $code .= "        \$this->buildParameters = \$buildParameters;\n";
             $code .= "        \$this->containerDir = \$containerDir;\n";
         }
@@ -987,7 +987,7 @@ EOF;
                 $code .= "        \$this->parameters = \$this->getDefaultParameters();\n\n";
             }
 
-            $code .= "        \$this->services = array();\n";
+            $code .= "        \$this->services = [];\n";
         } else {
             $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
             $code .= "        parent::__construct($arguments);\n";
@@ -1085,7 +1085,7 @@ EOF;
             }
         }
 
-        return $code ? "        \$this->normalizedIds = array(\n".$code."        );\n" : '';
+        return $code ? "        \$this->normalizedIds = [\n".$code."        ];\n" : '';
     }
 
     /**
@@ -1104,7 +1104,7 @@ EOF;
             }
         }
 
-        return $code ? "        \$this->syntheticIds = array(\n{$code}        );\n" : '';
+        return $code ? "        \$this->syntheticIds = [\n{$code}        ];\n" : '';
     }
 
     /**
@@ -1130,7 +1130,7 @@ EOF;
                 $code .= '            '.$this->doExport($id)." => true,\n";
             }
 
-            $code = "array(\n{$code}        )";
+            $code = "[\n{$code}        ]";
         }
 
         return <<<EOF
@@ -1159,7 +1159,7 @@ EOF;
             }
         }
 
-        return $code ? "        \$this->methodMap = array(\n{$code}        );\n" : '';
+        return $code ? "        \$this->methodMap = [\n{$code}        ];\n" : '';
     }
 
     /**
@@ -1178,7 +1178,7 @@ EOF;
             }
         }
 
-        return $code ? "        \$this->fileMap = array(\n{$code}        );\n" : '';
+        return $code ? "        \$this->fileMap = [\n{$code}        ];\n" : '';
     }
 
     /**
@@ -1210,9 +1210,9 @@ EOF;
             return '';
         }
 
-        $out = "        \$this->privates = array(\n";
+        $out = "        \$this->privates = [\n";
         $out .= $code;
-        $out .= "        );\n";
+        $out .= "        ];\n";
 
         return $out;
     }
@@ -1225,10 +1225,10 @@ EOF;
     private function addAliases()
     {
         if (!$aliases = $this->container->getAliases()) {
-            return $this->container->isCompiled() ? "\n        \$this->aliases = array();\n" : '';
+            return $this->container->isCompiled() ? "\n        \$this->aliases = [];\n" : '';
         }
 
-        $code = "        \$this->aliases = array(\n";
+        $code = "        \$this->aliases = [\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
             $id = $this->container->normalizeId($id);
@@ -1238,7 +1238,7 @@ EOF;
             $code .= '            '.$this->doExport($alias).' => '.$this->doExport($id).",\n";
         }
 
-        return $code."        );\n";
+        return $code."        ];\n";
     }
 
     private function addInlineRequires()
@@ -1295,7 +1295,7 @@ EOF;
                 $normalizedParams[] = sprintf('        %s => %s,', $this->export($lcKey), $this->export($key));
             }
             $export = $this->exportParameters([$value]);
-            $export = explode('0 => ', substr(rtrim($export, " )\n"), 7, -1), 2);
+            $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
             if (preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDirs\[\d++\])/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%scase %s: $value = %s; break;', $export[0], $this->export($key), $export[1]);
@@ -1303,7 +1303,8 @@ EOF;
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
             }
         }
-        $parameters = sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', 8));
+
+        $parameters = sprintf("[\n%s\n%s]", implode("\n", $php), str_repeat(' ', 8));
 
         $code = '';
         if ($this->container->isCompiled()) {
@@ -1379,14 +1380,14 @@ EOF;
 EOF;
                 $getDynamicParameter = sprintf($getDynamicParameter, implode("\n", $dynamicPhp));
             } else {
-                $loadedDynamicParameters = 'array()';
+                $loadedDynamicParameters = '[]';
                 $getDynamicParameter = str_repeat(' ', 8).'throw new InvalidArgumentException(sprintf(\'The dynamic parameter "%s" must be defined.\', $name));';
             }
 
             $code .= <<<EOF
 
     private \$loadedDynamicParameters = {$loadedDynamicParameters};
-    private \$dynamicParameters = array();
+    private \$dynamicParameters = [];
 
     /*{$this->docStar}
      * Computes a dynamic parameter.
@@ -1405,7 +1406,7 @@ EOF;
 
 EOF;
 
-            $code .= '    private $normalizedParameterNames = '.($normalizedParams ? sprintf("array(\n%s\n    );", implode("\n", $normalizedParams)) : 'array();')."\n";
+            $code .= '    private $normalizedParameterNames = '.($normalizedParams ? sprintf("[\n%s\n    ];", implode("\n", $normalizedParams)) : '[];')."\n";
             $code .= <<<'EOF'
 
     private function normalizeParameterName($name)
@@ -1478,7 +1479,7 @@ EOF;
             $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), $this->export($key), $value);
         }
 
-        return sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', $indent - 4));
+        return sprintf("[\n%s\n%s]", implode("\n", $php), str_repeat(' ', $indent - 4));
     }
 
     /**
@@ -1599,7 +1600,7 @@ EOF;
                 $code[] = sprintf('%s => %s', $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
             }
 
-            return sprintf('array(%s)', implode(', ', $code));
+            return sprintf('[%s]', implode(', ', $code));
         } elseif ($value instanceof ArgumentInterface) {
             $scope = [$this->definitionVariables, $this->referenceVariables];
             $this->definitionVariables = $this->referenceVariables = null;
@@ -1691,7 +1692,7 @@ EOF;
                             return sprintf('(%s)->%s(%s)', $class, $factory[1], implode(', ', $arguments));
                         }
 
-                        return sprintf("\\call_user_func(array(%s, '%s')%s)", $class, $factory[1], \count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                        return sprintf("\\call_user_func([%s, '%s']%s)", $class, $factory[1], \count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                     }
 
                     if ($factory[0] instanceof Reference) {

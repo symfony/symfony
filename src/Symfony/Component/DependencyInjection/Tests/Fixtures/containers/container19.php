@@ -12,7 +12,7 @@ $container->setParameter('foo', '%env(FOO)%');
 
 $container
     ->register('service_from_anonymous_factory', '%foo%')
-    ->setFactory(array(new Definition('%foo%'), 'getInstance'))
+    ->setFactory([new Definition('%foo%'), 'getInstance'])
     ->setPublic(true)
 ;
 
@@ -20,7 +20,7 @@ $anonymousServiceWithFactory = new Definition('Bar\FooClass');
 $anonymousServiceWithFactory->setFactory('Bar\FooClass::getInstance');
 $container
     ->register('service_with_method_call_and_factory', 'Bar\FooClass')
-    ->addMethodCall('setBar', array($anonymousServiceWithFactory))
+    ->addMethodCall('setBar', [$anonymousServiceWithFactory])
     ->setPublic(true)
 ;
 

@@ -15,7 +15,7 @@ $container->register('foo', FooCircular::class)->setPublic(true)
    ->addArgument(new Reference('bar'));
 
 $container->register('bar', BarCircular::class)->setPublic($public)
-    ->addMethodCall('addFoobar', array(new Reference('foobar')));
+    ->addMethodCall('addFoobar', [new Reference('foobar')]);
 
 $container->register('foobar', FoobarCircular::class)->setPublic($public)
     ->addArgument(new Reference('foo'));
@@ -26,7 +26,7 @@ $container->register('foo2', FooCircular::class)->setPublic(true)
    ->addArgument(new Reference('bar2'));
 
 $container->register('bar2', BarCircular::class)->setPublic(!$public)
-    ->addMethodCall('addFoobar', array(new Reference('foobar2')));
+    ->addMethodCall('addFoobar', [new Reference('foobar2')]);
 
 $container->register('foobar2', FoobarCircular::class)->setPublic($public)
     ->addArgument(new Reference('foo2'));
@@ -34,7 +34,7 @@ $container->register('foobar2', FoobarCircular::class)->setPublic($public)
 // simple inline setter with internal reference
 
 $container->register('bar3', BarCircular::class)->setPublic(true)
-    ->addMethodCall('addFoobar', array(new Reference('foobar3'), new Reference('foobar3')));
+    ->addMethodCall('addFoobar', [new Reference('foobar3'), new Reference('foobar3')]);
 
 $container->register('foobar3', FoobarCircular::class)->setPublic($public);
 

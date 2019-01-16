@@ -43,10 +43,10 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('filter', InputArgument::OPTIONAL, 'Show details for all entries matching this filter'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (text or json)', 'text'),
-            ))
+            ])
             ->setDescription('Shows a list of twig functions, filters, globals and tests')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command outputs a list of twig functions,
@@ -71,10 +71,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $types = array('functions', 'filters', 'tests', 'globals');
+        $types = ['functions', 'filters', 'tests', 'globals'];
 
         if ('json' === $input->getOption('format')) {
-            $data = array();
+            $data = [];
             foreach ($types as $type) {
                 foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                     $data[$type][$name] = $this->getMetadata($type, $entity);
@@ -90,7 +90,7 @@ EOF
         $filter = $input->getArgument('filter');
 
         foreach ($types as $index => $type) {
-            $items = array();
+            $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
                     $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
@@ -107,20 +107,20 @@ EOF
             $io->listing($items);
         }
 
-        $rows = array();
+        $rows = [];
         $firstNamespace = true;
         $prevHasSeparator = false;
         foreach ($this->getLoaderPaths() as $namespace => $paths) {
             if (!$firstNamespace && !$prevHasSeparator && \count($paths) > 1) {
-                $rows[] = array('', '');
+                $rows[] = ['', ''];
             }
             $firstNamespace = false;
             foreach ($paths as $path) {
-                $rows[] = array($namespace, $path.\DIRECTORY_SEPARATOR);
+                $rows[] = [$namespace, $path.\DIRECTORY_SEPARATOR];
                 $namespace = '';
             }
             if (\count($paths) > 1) {
-                $rows[] = array('', '');
+                $rows[] = ['', ''];
                 $prevHasSeparator = true;
             } else {
                 $prevHasSeparator = false;
@@ -130,7 +130,7 @@ EOF
             array_pop($rows);
         }
         $io->section('Loader Paths');
-        $io->table(array('Namespace', 'Paths'), $rows);
+        $io->table(['Namespace', 'Paths'], $rows);
 
         return 0;
     }
@@ -138,10 +138,10 @@ EOF
     private function getLoaderPaths()
     {
         if (!($loader = $this->twig->getLoader()) instanceof FilesystemLoader) {
-            return array();
+            return [];
         }
 
-        $loaderPaths = array();
+        $loaderPaths = [];
         foreach ($loader->getNamespaces() as $namespace) {
             $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {

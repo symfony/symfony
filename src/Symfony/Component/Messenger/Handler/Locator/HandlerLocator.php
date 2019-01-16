@@ -23,7 +23,7 @@ class HandlerLocator implements HandlerLocatorInterface
      */
     private $messageToHandlerMapping;
 
-    public function __construct(array $messageToHandlerMapping = array())
+    public function __construct(array $messageToHandlerMapping = [])
     {
         $this->messageToHandlerMapping = $messageToHandlerMapping;
     }

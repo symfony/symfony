@@ -52,7 +52,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             null,
             CacheItem::class
         );
-        $getId = \Closure::fromCallable(array($this, 'getId'));
+        $getId = \Closure::fromCallable([$this, 'getId']);
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace, &$expiredIds) use ($getId) {
                 $byLifetime = [];

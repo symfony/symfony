@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         $pathinfo = rawurldecode($pathinfo) ?: '/';
         $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
@@ -34,8 +34,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     goto not_put_and_post;
                 }
 
-                $ret = array('_route' => 'put_and_post');
-                if (!isset(($a = array('PUT' => 0, 'POST' => 1))[$requestMethod])) {
+                $ret = ['_route' => 'put_and_post'];
+                if (!isset(($a = ['PUT' => 0, 'POST' => 1])[$requestMethod])) {
                     $allow += $a;
                     goto not_put_and_post;
                 }
@@ -47,8 +47,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     goto not_put_and_get_and_head;
                 }
 
-                $ret = array('_route' => 'put_and_get_and_head');
-                if (!isset(($a = array('PUT' => 0, 'GET' => 1, 'HEAD' => 2))[$canonicalMethod])) {
+                $ret = ['_route' => 'put_and_get_and_head'];
+                if (!isset(($a = ['PUT' => 0, 'GET' => 1, 'HEAD' => 2])[$canonicalMethod])) {
                     $allow += $a;
                     goto not_put_and_get_and_head;
                 }
@@ -57,12 +57,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 not_put_and_get_and_head:
                 break;
             default:
-                $routes = array(
-                    '/just_head' => array(array('_route' => 'just_head'), null, array('HEAD' => 0), null, false),
-                    '/head_and_get' => array(array('_route' => 'head_and_get'), null, array('HEAD' => 0, 'GET' => 1), null, false),
-                    '/get_and_head' => array(array('_route' => 'get_and_head'), null, array('GET' => 0, 'HEAD' => 1), null, false),
-                    '/post_and_head' => array(array('_route' => 'post_and_head'), null, array('POST' => 0, 'HEAD' => 1), null, false),
-                );
+                $routes = [
+                    '/just_head' => [['_route' => 'just_head'], null, ['HEAD' => 0], null, false],
+                    '/head_and_get' => [['_route' => 'head_and_get'], null, ['HEAD' => 0, 'GET' => 1], null, false],
+                    '/get_and_head' => [['_route' => 'get_and_head'], null, ['GET' => 0, 'HEAD' => 1], null, false],
+                    '/post_and_head' => [['_route' => 'post_and_head'], null, ['POST' => 0, 'HEAD' => 1], null, false],
+                ];
 
                 if (!isset($routes[$trimmedPathinfo])) {
                     break;

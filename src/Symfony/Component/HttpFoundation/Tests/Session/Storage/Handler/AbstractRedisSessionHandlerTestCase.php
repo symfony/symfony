@@ -50,7 +50,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->redisClient = $this->createRedisClient($host);
         $this->storage = new RedisSessionHandler(
             $this->redisClient,
-            array('prefix' => self::PREFIX)
+            ['prefix' => self::PREFIX]
         );
     }
 
@@ -117,7 +117,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $lowTtl = 10;
 
         $this->redisClient->setex(self::PREFIX.'id', $lowTtl, 'foo');
-        $this->storage->updateTimestamp('id', array());
+        $this->storage->updateTimestamp('id', []);
 
         $this->assertGreaterThan($lowTtl, $this->redisClient->ttl(self::PREFIX.'id'));
     }
@@ -137,9 +137,9 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
     public function getOptionFixtures(): array
     {
-        return array(
-            array(array('prefix' => 'session'), true),
-            array(array('prefix' => 'sfs', 'foo' => 'bar'), false),
-        );
+        return [
+            [['prefix' => 'session'], true],
+            [['prefix' => 'sfs', 'foo' => 'bar'], false],
+        ];
     }
 }

@@ -32,7 +32,7 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message)
             ->willReturn($this->createMock(ConstraintViolationListInterface::class))
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $next
             ->expects($this->once())
             ->method('__invoke')
@@ -47,7 +47,7 @@ class ValidationMiddlewareTest extends TestCase
 
     public function testValidateWithConfigurationAndNextMiddleware()
     {
-        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = array('Default', 'Extra')));
+        $envelope = Envelope::wrap($message = new DummyMessage('Hey'))->with(new ValidationConfiguration($groups = ['Default', 'Extra']));
 
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
@@ -56,7 +56,7 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message, null, $groups)
             ->willReturn($this->createMock(ConstraintViolationListInterface::class))
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $next
             ->expects($this->once())
             ->method('__invoke')
@@ -90,7 +90,7 @@ class ValidationMiddlewareTest extends TestCase
             ->with($message)
             ->willReturn($violationList)
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $next
             ->expects($this->never())
             ->method('__invoke')

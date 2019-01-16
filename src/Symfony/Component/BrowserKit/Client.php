@@ -31,7 +31,7 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server = array();
+    protected $server = [];
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
@@ -43,7 +43,7 @@ abstract class Client
 
     private $maxRedirects = -1;
     private $redirectCount = 0;
-    private $redirects = array();
+    private $redirects = [];
     private $isMainRequest = true;
 
     /**
@@ -51,7 +51,7 @@ abstract class Client
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
      */
-    public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
         $this->history = $history ?: new History();
@@ -122,9 +122,9 @@ abstract class Client
      */
     public function setServerParameters(array $server)
     {
-        $this->server = array_merge(array(
+        $this->server = array_merge([
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
-        ), $server);
+        ], $server);
     }
 
     /**
@@ -151,7 +151,7 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
-    public function xmlHttpRequest(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
+    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
 
@@ -290,10 +290,10 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
+    public function submit(Form $form, array $values = []/*, array $serverParameters = array()*/)
     {
         $form->setValues($values);
-        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
+        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : [];
 
         return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
     }
@@ -311,7 +311,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true)
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -398,7 +398,7 @@ abstract class Client
         if (file_exists($deprecationsFile)) {
             $deprecations = file_get_contents($deprecationsFile);
             unlink($deprecationsFile);
-            foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
+            foreach ($deprecations ? unserialize($deprecations) : [] as $deprecation) {
                 if ($deprecation[0]) {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
@@ -542,9 +542,9 @@ abstract class Client
 
         $request = $this->internalRequest;
 
-        if (\in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
+        if (\in_array($this->internalResponse->getStatus(), [301, 302, 303])) {
             $method = 'GET';
-            $files = array();
+            $files = [];
             $content = null;
         } else {
             $method = $request->getMethod();
@@ -554,7 +554,7 @@ abstract class Client
 
         if ('GET' === strtoupper($method)) {
             // Don't forward parameters for GET request as it should reach the redirection URI
-            $parameters = array();
+            $parameters = [];
         } else {
             $parameters = $request->getParameters();
         }

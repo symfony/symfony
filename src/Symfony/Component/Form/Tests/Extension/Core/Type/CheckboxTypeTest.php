@@ -178,20 +178,20 @@ class CheckboxTypeTest extends BaseTypeTest
      */
     public function testCustomFalseValues($falseValue)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
-            'false_values' => array($falseValue),
-        ));
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'false_values' => [$falseValue],
+        ]);
         $form->submit($falseValue);
         $this->assertFalse($form->getData());
     }
 
     public function provideCustomFalseValues()
     {
-        return array(
-            array(''),
-            array('false'),
-            array('0'),
-        );
+        return [
+            [''],
+            ['false'],
+            ['0'],
+        ];
     }
 
     /**
@@ -200,9 +200,9 @@ class CheckboxTypeTest extends BaseTypeTest
     public function testDontAllowNonArrayFalseValues()
     {
         $this->expectExceptionMessageRegExp('/"false_values" with value "invalid" is expected to be of type "array"/');
-        $this->factory->create(static::TESTED_TYPE, null, array(
+        $this->factory->create(static::TESTED_TYPE, null, [
             'false_values' => 'invalid',
-        ));
+        ]);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

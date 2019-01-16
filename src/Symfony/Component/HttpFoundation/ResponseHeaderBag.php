@@ -290,7 +290,7 @@ class ResponseHeaderBag extends HeaderBag
             throw new \InvalidArgumentException('The filename and the fallback cannot contain the "/" and "\\" characters.');
         }
 
-        $params = array('filename' => $filenameFallback);
+        $params = ['filename' => $filenameFallback];
         if ($filename !== $filenameFallback) {
             $params['filename*'] = "utf-8''".rawurlencode($filename);
         }

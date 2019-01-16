@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         $pathinfo = rawurldecode($pathinfo) ?: '/';
         $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
@@ -35,14 +35,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 }
 
                 if (($context->getMethod() == "GET")) {
-                    return array('_route' => 'with-condition');
+                    return ['_route' => 'with-condition'];
                 }
                 not_withcondition:
                 break;
             default:
-                $routes = array(
-                    '/rootprefix/test' => array(array('_route' => 'static'), null, null, null, false),
-                );
+                $routes = [
+                    '/rootprefix/test' => [['_route' => 'static'], null, null, null, false],
+                ];
 
                 if (!isset($routes[$trimmedPathinfo])) {
                     break;
@@ -68,19 +68,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         $matchedPathinfo = $pathinfo;
-        $regexList = array(
+        $regexList = [
             0 => '{^(?'
                     .'|/rootprefix/([^/]++)(*:27)'
                 .')/?$}sD',
-        );
+        ];
 
         foreach ($regexList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 switch ($m = (int) $matches['MARK']) {
                     default:
-                        $routes = array(
-                            27 => array(array('_route' => 'dynamic'), array('var'), null, null, false, true),
-                        );
+                        $routes = [
+                            27 => [['_route' => 'dynamic'], ['var'], null, null, false, true],
+                        ];
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 

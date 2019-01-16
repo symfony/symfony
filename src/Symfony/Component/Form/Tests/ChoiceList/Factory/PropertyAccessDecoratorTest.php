@@ -38,7 +38,7 @@ class PropertyAccessDecoratorTest extends TestCase
 
     public function testCreateFromChoicesPropertyPath()
     {
-        $choices = array((object) array('property' => 'value'));
+        $choices = [(object) ['property' => 'value']];
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -47,12 +47,12 @@ class PropertyAccessDecoratorTest extends TestCase
                 return array_map($callback, $choices);
             }));
 
-        $this->assertSame(array('value'), $this->factory->createListFromChoices($choices, 'property'));
+        $this->assertSame(['value'], $this->factory->createListFromChoices($choices, 'property'));
     }
 
     public function testCreateFromChoicesPropertyPathInstance()
     {
-        $choices = array((object) array('property' => 'value'));
+        $choices = [(object) ['property' => 'value']];
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -61,7 +61,7 @@ class PropertyAccessDecoratorTest extends TestCase
                 return array_map($callback, $choices);
             }));
 
-        $this->assertSame(array('value'), $this->factory->createListFromChoices($choices, new PropertyPath('property')));
+        $this->assertSame(['value'], $this->factory->createListFromChoices($choices, new PropertyPath('property')));
     }
 
     public function testCreateFromLoaderPropertyPath()
@@ -72,7 +72,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($loader, $callback) {
-                return $callback((object) array('property' => 'value'));
+                return $callback((object) ['property' => 'value']);
             }));
 
         $this->assertSame('value', $this->factory->createListFromLoader($loader, 'property'));
@@ -81,7 +81,7 @@ class PropertyAccessDecoratorTest extends TestCase
     // https://github.com/symfony/symfony/issues/5494
     public function testCreateFromChoicesAssumeNullIfValuePropertyPathUnreadable()
     {
-        $choices = array(null);
+        $choices = [null];
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
@@ -90,7 +90,7 @@ class PropertyAccessDecoratorTest extends TestCase
                 return array_map($callback, $choices);
             }));
 
-        $this->assertSame(array(null), $this->factory->createListFromChoices($choices, 'property'));
+        $this->assertSame([null], $this->factory->createListFromChoices($choices, 'property'));
     }
 
     // https://github.com/symfony/symfony/issues/5494
@@ -116,7 +116,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($loader, $callback) {
-                return $callback((object) array('property' => 'value'));
+                return $callback((object) ['property' => 'value']);
             }));
 
         $this->assertSame('value', $this->factory->createListFromLoader($loader, new PropertyPath('property')));
@@ -130,7 +130,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred) {
-                return $preferred((object) array('property' => true));
+                return $preferred((object) ['property' => true]);
             }));
 
         $this->assertTrue($this->factory->createView(
@@ -147,7 +147,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred) {
-                return $preferred((object) array('property' => true));
+                return $preferred((object) ['property' => true]);
             }));
 
         $this->assertTrue($this->factory->createView(
@@ -165,7 +165,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred) {
-                return $preferred((object) array('category' => null));
+                return $preferred((object) ['category' => null]);
             }));
 
         $this->assertFalse($this->factory->createView(
@@ -182,7 +182,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label) {
-                return $label((object) array('property' => 'label'));
+                return $label((object) ['property' => 'label']);
             }));
 
         $this->assertSame('label', $this->factory->createView(
@@ -200,7 +200,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label) {
-                return $label((object) array('property' => 'label'));
+                return $label((object) ['property' => 'label']);
             }));
 
         $this->assertSame('label', $this->factory->createView(
@@ -218,7 +218,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index) {
-                return $index((object) array('property' => 'index'));
+                return $index((object) ['property' => 'index']);
             }));
 
         $this->assertSame('index', $this->factory->createView(
@@ -237,7 +237,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index) {
-                return $index((object) array('property' => 'index'));
+                return $index((object) ['property' => 'index']);
             }));
 
         $this->assertSame('index', $this->factory->createView(
@@ -256,7 +256,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) array('property' => 'group'));
+                return $groupBy((object) ['property' => 'group']);
             }));
 
         $this->assertSame('group', $this->factory->createView(
@@ -276,7 +276,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) array('property' => 'group'));
+                return $groupBy((object) ['property' => 'group']);
             }));
 
         $this->assertSame('group', $this->factory->createView(
@@ -297,7 +297,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
-                return $groupBy((object) array('group' => null));
+                return $groupBy((object) ['group' => null]);
             }));
 
         $this->assertNull($this->factory->createView(
@@ -317,7 +317,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return $attr((object) array('property' => 'attr'));
+                return $attr((object) ['property' => 'attr']);
             }));
 
         $this->assertSame('attr', $this->factory->createView(
@@ -338,7 +338,7 @@ class PropertyAccessDecoratorTest extends TestCase
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
             ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
-                return $attr((object) array('property' => 'attr'));
+                return $attr((object) ['property' => 'attr']);
             }));
 
         $this->assertSame('attr', $this->factory->createView(

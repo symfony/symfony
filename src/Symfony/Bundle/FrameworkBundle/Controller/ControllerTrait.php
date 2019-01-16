@@ -68,7 +68,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function generateUrl(string $route, array $parameters = array(), int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -80,7 +80,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function forward(string $controller, array $path = array(), array $query = array()): Response
+    protected function forward(string $controller, array $path = [], array $query = []): Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
         $path['_controller'] = $controller;
@@ -104,7 +104,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302): RedirectResponse
+    protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }
@@ -114,12 +114,12 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function json($data, int $status = 200, array $headers = array(), array $context = array()): JsonResponse
+    protected function json($data, int $status = 200, array $headers = [], array $context = []): JsonResponse
     {
         if ($this->container->has('serializer')) {
-            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge(array(
+            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge([
                 'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-            ), $context));
+            ], $context));
 
             return new JsonResponse($json, $status, $headers, true);
         }
@@ -198,7 +198,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function renderView(string $view, array $parameters = array()): string
+    protected function renderView(string $view, array $parameters = []): string
     {
         if ($this->container->has('templating')) {
             return $this->container->get('templating')->render($view, $parameters);
@@ -216,7 +216,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function render(string $view, array $parameters = array(), Response $response = null): Response
+    protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
         if ($this->container->has('templating')) {
             $content = $this->container->get('templating')->render($view, $parameters);
@@ -240,7 +240,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function stream(string $view, array $parameters = array(), StreamedResponse $response = null): StreamedResponse
+    protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
         if ($this->container->has('templating')) {
             $templating = $this->container->get('templating');
@@ -306,7 +306,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function createForm(string $type, $data = null, array $options = array()): FormInterface
+    protected function createForm(string $type, $data = null, array $options = []): FormInterface
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
@@ -316,7 +316,7 @@ trait ControllerTrait
      *
      * @final
      */
-    protected function createFormBuilder($data = null, array $options = array()): FormBuilderInterface
+    protected function createFormBuilder($data = null, array $options = []): FormBuilderInterface
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
     }

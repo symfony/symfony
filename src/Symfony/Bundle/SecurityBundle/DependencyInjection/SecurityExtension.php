@@ -39,18 +39,18 @@ use Symfony\Component\Security\Http\Controller\UserValueResolver;
  */
 class SecurityExtension extends Extension
 {
-    private $requestMatchers = array();
-    private $expressions = array();
-    private $contextListeners = array();
-    private $listenerPositions = array('pre_auth', 'form', 'http', 'remember_me');
-    private $factories = array();
-    private $userProviderFactories = array();
-    private $statelessFirewallKeys = array();
+    private $requestMatchers = [];
+    private $expressions = [];
+    private $contextListeners = [];
+    private $listenerPositions = ['pre_auth', 'form', 'http', 'remember_me'];
+    private $factories = [];
+    private $userProviderFactories = [];
+    private $statelessFirewallKeys = [];
 
     public function __construct()
     {
         foreach ($this->listenerPositions as $position) {
-            $this->factories[$position] = array();
+            $this->factories[$position] = [];
         }
     }
 
@@ -154,7 +154,7 @@ class SecurityExtension extends Extension
             }
 
             $container->getDefinition('security.access_map')
-                      ->addMethodCall('add', array($matcher, $attributes, $access['requires_channel']));
+                      ->addMethodCall('add', [$matcher, $attributes, $access['requires_channel']]);
         }
 
         // allow cache warm-up for expressions
@@ -178,7 +178,7 @@ class SecurityExtension extends Extension
         // make the ContextListener aware of the configured user providers
         $contextListenerDefinition = $container->getDefinition('security.context_listener');
         $arguments = $contextListenerDefinition->getArguments();
-        $userProviders = array();
+        $userProviders = [];
         foreach ($providerIds as $userProviderId) {
             $userProviders[] = new Reference($userProviderId);
         }
@@ -193,7 +193,7 @@ class SecurityExtension extends Extension
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = $authenticationProviders = $contextRefs = array();
+        $map = $authenticationProviders = $contextRefs = [];
         foreach ($firewalls as $name => $firewall) {
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
                 $customUserChecker = true;
@@ -246,7 +246,7 @@ class SecurityExtension extends Extension
         } elseif (isset($firewall['pattern']) || isset($firewall['host'])) {
             $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
             $host = isset($firewall['host']) ? $firewall['host'] : null;
-            $methods = isset($firewall['methods']) ? $firewall['methods'] : array();
+            $methods = isset($firewall['methods']) ? $firewall['methods'] : [];
             $matcher = $this->createRequestMatcher($container, $pattern, $host, $methods);
         }
 
@@ -255,7 +255,7 @@ class SecurityExtension extends Extension
 
         // Security disabled?
         if (false === $firewall['security']) {
-            return array($matcher, array(), null, null);
+            return [$matcher, [], null, null];
         }
 
         $config->replaceArgument(4, $firewall['stateless']);
@@ -274,8 +274,8 @@ class SecurityExtension extends Extension
         $config->replaceArgument(5, $defaultProvider);
 
         // Register listeners
-        $listeners = array();
-        $listenerKeys = array();
+        $listeners = [];
+        $listenerKeys = [];
 
         // Channel listener
         $listeners[] = new Reference('security.channel_listener');
@@ -299,11 +299,11 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $logoutListenerId = 'security.logout_listener.'.$id;
             $logoutListener = $container->setDefinition($logoutListenerId, new ChildDefinition('security.logout_listener'));
-            $logoutListener->replaceArgument(3, array(
+            $logoutListener->replaceArgument(3, [
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
-            ));
+            ]);
 
             // add logout success handler
             if (isset($firewall['logout']['success_handler'])) {
@@ -322,7 +322,7 @@ class SecurityExtension extends Extension
 
             // add session logout handler
             if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
-                $logoutListener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+                $logoutListener->addMethodCall('addHandler', [new Reference('security.logout.handler.session')]);
             }
 
             // add cookie logout handler
@@ -331,25 +331,25 @@ class SecurityExtension extends Extension
                 $cookieHandler = $container->setDefinition($cookieHandlerId, new ChildDefinition('security.logout.handler.cookie_clearing'));
                 $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
 
-                $logoutListener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
+                $logoutListener->addMethodCall('addHandler', [new Reference($cookieHandlerId)]);
             }
 
             // add custom handlers
             foreach ($firewall['logout']['handlers'] as $handlerId) {
-                $logoutListener->addMethodCall('addHandler', array(new Reference($handlerId)));
+                $logoutListener->addMethodCall('addHandler', [new Reference($handlerId)]);
             }
 
             // register with LogoutUrlGenerator
             $container
                 ->getDefinition('security.logout_url_generator')
-                ->addMethodCall('registerListener', array(
+                ->addMethodCall('registerListener', [
                     $id,
                     $firewall['logout']['path'],
                     $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
                     isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
-                ))
+                ])
             ;
         }
 
@@ -396,7 +396,7 @@ class SecurityExtension extends Extension
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, isset($firewall['switch_user']) ? $firewall['switch_user'] : null);
 
-        return array($matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null);
+        return [$matcher, $listeners, $exceptionListener, null !== $logoutListenerId ? new Reference($logoutListenerId) : null];
     }
 
     private function createContextListener($container, $contextKey)
@@ -414,7 +414,7 @@ class SecurityExtension extends Extension
 
     private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider = null, array $providerIds, $defaultEntryPoint)
     {
-        $listeners = array();
+        $listeners = [];
         $hasListeners = false;
 
         foreach ($this->listenerPositions as $position) {
@@ -476,19 +476,19 @@ class SecurityExtension extends Extension
             throw new InvalidConfigurationException(sprintf('No authentication listener registered for firewall "%s".', $id));
         }
 
-        return array($listeners, $defaultEntryPoint);
+        return [$listeners, $defaultEntryPoint];
     }
 
     private function createEncoders($encoders, ContainerBuilder $container)
     {
-        $encoderMap = array();
+        $encoderMap = [];
         foreach ($encoders as $class => $encoder) {
             $encoderMap[$class] = $this->createEncoder($encoder, $container);
         }
 
         $container
             ->getDefinition('security.encoder_factory.generic')
-            ->setArguments(array($encoderMap))
+            ->setArguments([$encoderMap])
         ;
     }
 
@@ -501,33 +501,33 @@ class SecurityExtension extends Extension
 
         // plaintext encoder
         if ('plaintext' === $config['algorithm']) {
-            $arguments = array($config['ignore_case']);
+            $arguments = [$config['ignore_case']];
 
-            return array(
+            return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
                 'arguments' => $arguments,
-            );
+            ];
         }
 
         // pbkdf2 encoder
         if ('pbkdf2' === $config['algorithm']) {
-            return array(
+            return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => array(
+                'arguments' => [
                     $config['hash_algorithm'],
                     $config['encode_as_base64'],
                     $config['iterations'],
                     $config['key_length'],
-                ),
-            );
+                ],
+            ];
         }
 
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
-            return array(
+            return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => array($config['cost']),
-            );
+                'arguments' => [$config['cost']],
+            ];
         }
 
         // Argon2i encoder
@@ -536,14 +536,14 @@ class SecurityExtension extends Extension
                 throw new InvalidConfigurationException('Argon2i algorithm is not supported. Please install the libsodium extension or upgrade to PHP 7.2+.');
             }
 
-            return array(
+            return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => array(
+                'arguments' => [
                     $config['memory_cost'],
                     $config['time_cost'],
                     $config['threads'],
-                ),
-            );
+                ],
+            ];
         }
 
         // run-time configured encoder
@@ -553,7 +553,7 @@ class SecurityExtension extends Extension
     // Parses user providers and returns an array of their ids
     private function createUserProviders($config, ContainerBuilder $container)
     {
-        $providerIds = array();
+        $providerIds = [];
         foreach ($config['providers'] as $name => $provider) {
             $id = $this->createUserDaoProvider($name, $provider, $container);
             $providerIds[str_replace('-', '_', $name)] = $id;
@@ -587,7 +587,7 @@ class SecurityExtension extends Extension
 
         // Chain provider
         if (isset($provider['chain'])) {
-            $providers = array();
+            $providers = [];
             foreach ($provider['chain']['providers'] as $providerName) {
                 $providers[] = new Reference($this->getUserProviderId($providerName));
             }
@@ -664,20 +664,20 @@ class SecurityExtension extends Extension
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
+    private function createRequestMatcher($container, $path = null, $host = null, $methods = [], $ip = null, array $attributes = [])
     {
         if ($methods) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash(array($path, $host, $methods, $ip, $attributes));
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $methods, $ip, $attributes]);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
         // only add arguments that are necessary
-        $arguments = array($path, $host, $methods, $ip, $attributes);
+        $arguments = [$path, $host, $methods, $ip, $attributes];
         while (\count($arguments) > 0 && !end($arguments)) {
             array_pop($arguments);
         }

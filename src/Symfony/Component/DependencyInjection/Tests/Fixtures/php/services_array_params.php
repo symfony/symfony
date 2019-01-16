@@ -17,12 +17,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     /**
      * @internal but protected for BC on cache:clear
      */
-    protected $privates = array();
+    protected $privates = [];
 
     public function __construct()
     {
@@ -32,17 +32,17 @@ class ProjectServiceContainer extends Container
         }
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function reset()
     {
-        $this->privates = array();
+        $this->privates = [];
         parent::reset();
     }
 
@@ -58,10 +58,10 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -117,10 +117,10 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array(
+    private $loadedDynamicParameters = [
         'array_2' => false,
-    );
-    private $dynamicParameters = array();
+    ];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -134,9 +134,9 @@ class ProjectServiceContainer extends Container
     private function getDynamicParameter($name)
     {
         switch ($name) {
-            case 'array_2': $value = array(
+            case 'array_2': $value = [
                 0 => ($this->targetDirs[2].'/Dumper'),
-            ); break;
+            ]; break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }
         $this->loadedDynamicParameters[$name] = true;
@@ -151,10 +151,10 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
-            'array_1' => array(
+        return [
+            'array_1' => [
                 0 => 123,
-            ),
-        );
+            ],
+        ];
     }
 }

@@ -74,7 +74,7 @@ class UrlValidator extends ConstraintValidator
         }
 
         if ($constraint->checkDNS) {
-            if (!\in_array($constraint->checkDNS, array(
+            if (!\in_array($constraint->checkDNS, [
                 Url::CHECK_DNS_TYPE_ANY,
                 Url::CHECK_DNS_TYPE_A,
                 Url::CHECK_DNS_TYPE_A6,
@@ -87,8 +87,8 @@ class UrlValidator extends ConstraintValidator
                 Url::CHECK_DNS_TYPE_SOA,
                 Url::CHECK_DNS_TYPE_SRV,
                 Url::CHECK_DNS_TYPE_TXT,
-            ), true)) {
-                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), array('checkDNS'));
+            ], true)) {
+                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), ['checkDNS']);
             }
 
             $host = parse_url($value, PHP_URL_HOST);

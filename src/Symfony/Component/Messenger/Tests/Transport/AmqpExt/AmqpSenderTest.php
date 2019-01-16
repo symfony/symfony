@@ -26,7 +26,7 @@ class AmqpSenderTest extends TestCase
     public function testItSendsTheEncodedMessage()
     {
         $envelope = Envelope::wrap(new DummyMessage('Oy'));
-        $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $encoder->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);

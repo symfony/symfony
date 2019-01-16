@@ -25,9 +25,9 @@ class EnvelopeTest extends TestCase
 {
     public function testConstruct()
     {
-        $envelope = new Envelope($dummy = new DummyMessage('dummy'), array(
+        $envelope = new Envelope($dummy = new DummyMessage('dummy'), [
             $receivedConfig = new ReceivedMessage(),
-        ));
+        ]);
 
         $this->assertSame($dummy, $envelope->getMessage());
         $this->assertArrayHasKey(ReceivedMessage::class, $configs = $envelope->all());
@@ -66,7 +66,7 @@ class EnvelopeTest extends TestCase
     {
         $envelope = Envelope::wrap($dummy = new DummyMessage('dummy'))
             ->with($receivedConfig = new ReceivedMessage())
-            ->with($validationConfig = new ValidationConfiguration(array('foo')))
+            ->with($validationConfig = new ValidationConfiguration(['foo']))
         ;
 
         $configs = $envelope->all();

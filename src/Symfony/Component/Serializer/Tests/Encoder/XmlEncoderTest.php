@@ -534,10 +534,10 @@ XML;
 </people>
 XML;
 
-        $expected = array('person' => array(
-          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre'),
-          array('firstname' => 'Damien', 'lastname' => 'Clay'),
-        ));
+        $expected = ['person' => [
+          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+        ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
@@ -559,14 +559,14 @@ XML;
 </people>
 XML;
 
-        $this->encoder = new XmlEncoder('people', null, array(XML_PI_NODE));
-        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $this->encoder = new XmlEncoder('people', null, [XML_PI_NODE]);
+        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
         $this->encoder->setSerializer($serializer);
 
-        $expected = array('person' => array(
-          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '),
-          array('firstname' => 'Damien', 'lastname' => 'Clay'),
-        ));
+        $expected = ['person' => [
+          ['firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '],
+          ['firstname' => 'Damien', 'lastname' => 'Clay'],
+        ]];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
@@ -574,7 +574,7 @@ XML;
     public function testDecodeAlwaysAsCollection()
     {
         $this->encoder = new XmlEncoder('response', null);
-        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
         $this->encoder->setSerializer($serializer);
 
         $source = <<<'XML'
@@ -586,16 +586,16 @@ XML;
     </order_row>
 </order_rows>
 XML;
-        $expected = array(
+        $expected = [
             '@nodeType' => 'order_row',
             '@virtualEntity' => 'true',
-            'order_row' => array(array(
-                'id' => array(16),
-                'test' => array(16),
-            )),
-        );
+            'order_row' => [[
+                'id' => [16],
+                'test' => [16],
+            ]],
+        ];
 
-        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', array('as_collection' => true)));
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', ['as_collection' => true]));
     }
 
     public function testDecodeWithoutItemHash()

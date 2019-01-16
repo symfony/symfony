@@ -22,7 +22,7 @@ class FormThemeNode extends Node
 {
     public function __construct(Node $form, Node $resources, int $lineno, string $tag = null, bool $only = false)
     {
-        parent::__construct(array('form' => $form, 'resources' => $resources), array('only' => $only), $lineno, $tag);
+        parent::__construct(['form' => $form, 'resources' => $resources], ['only' => $only], $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)

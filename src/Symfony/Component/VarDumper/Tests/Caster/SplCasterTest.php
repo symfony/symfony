@@ -23,8 +23,8 @@ class SplCasterTest extends TestCase
 
     public function getCastFileInfoTests()
     {
-        return array(
-            array(__FILE__, <<<'EOTXT'
+        return [
+            [__FILE__, <<<'EOTXT'
 SplFileInfo {
 %Apath: "%sCaster"
   filename: "SplCasterTest.php"
@@ -49,8 +49,8 @@ SplFileInfo {
   link: false
 %A}
 EOTXT
-            ),
-            array('https://google.com/about', <<<'EOTXT'
+            ],
+            ['https://google.com/about', <<<'EOTXT'
 SplFileInfo {
 %Apath: "https://google.com"
   filename: "about"
@@ -60,8 +60,8 @@ SplFileInfo {
   realPath: false
 %A}
 EOTXT
-            ),
-        );
+            ],
+        ];
     }
 
     /** @dataProvider getCastFileInfoTests */
@@ -137,12 +137,12 @@ EOTXT;
 
     public function provideCastSplDoublyLinkedList()
     {
-        return array(
-            array(\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'),
-            array(\SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'),
-            array(\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_FIFO | IT_MODE_DELETE'),
-            array(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'),
-        );
+        return [
+            [\SplDoublyLinkedList::IT_MODE_FIFO, 'IT_MODE_FIFO | IT_MODE_KEEP'],
+            [\SplDoublyLinkedList::IT_MODE_LIFO, 'IT_MODE_LIFO | IT_MODE_KEEP'],
+            [\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_FIFO | IT_MODE_DELETE'],
+            [\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_DELETE, 'IT_MODE_LIFO | IT_MODE_DELETE'],
+        ];
     }
 
     public function testCastObjectStorageIsntModified()
@@ -166,7 +166,7 @@ EOTXT;
 
     public function testCastArrayObject()
     {
-        $var = new \ArrayObject(array(123));
+        $var = new \ArrayObject([123]);
         $var->foo = 234;
 
         $expected = <<<EOTXT
@@ -185,7 +185,7 @@ EOTXT;
 
     public function testArrayIterator()
     {
-        $var = new MyArrayIterator(array(234));
+        $var = new MyArrayIterator([234]);
 
         $expected = <<<EOTXT
 Symfony\Component\VarDumper\Tests\Caster\MyArrayIterator {

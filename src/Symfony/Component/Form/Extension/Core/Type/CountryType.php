@@ -39,7 +39,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
@@ -49,9 +49,9 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
-        ));
+        ]);
 
-        $resolver->setAllowedTypes('choice_translation_locale', array('null', 'string'));
+        $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
     }
 
     /**
@@ -98,7 +98,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $values = array_filter($values);
         if (empty($values)) {
-            return array();
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -116,7 +116,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $choices = array_filter($choices);
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // If no callable is set, choices are the same as values

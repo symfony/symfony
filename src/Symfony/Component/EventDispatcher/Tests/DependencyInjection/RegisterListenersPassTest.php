@@ -145,41 +145,41 @@ class RegisterListenersPassTest extends TestCase
     public function testInvokableEventListener()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', array('event' => 'foo.bar'));
-        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', array('event' => 'foo.bar'));
-        $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', array('event' => 'event'));
+        $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
+        $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
 
         $definition = $container->getDefinition('event_dispatcher');
-        $expectedCalls = array(
-            array(
+        $expectedCalls = [
+            [
                 'addListener',
-                array(
+                [
                     'foo.bar',
-                    array(new ServiceClosureArgument(new Reference('foo')), 'onFooBar'),
+                    [new ServiceClosureArgument(new Reference('foo')), 'onFooBar'],
                     0,
-                ),
-            ),
-            array(
+                ],
+            ],
+            [
                 'addListener',
-                array(
+                [
                     'foo.bar',
-                    array(new ServiceClosureArgument(new Reference('bar')), '__invoke'),
+                    [new ServiceClosureArgument(new Reference('bar')), '__invoke'],
                     0,
-                ),
-            ),
-            array(
+                ],
+            ],
+            [
                 'addListener',
-                array(
+                [
                     'event',
-                    array(new ServiceClosureArgument(new Reference('baz')), 'onEvent'),
+                    [new ServiceClosureArgument(new Reference('baz')), 'onEvent'],
                     0,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 }

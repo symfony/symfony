@@ -27,17 +27,17 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
-        $violations = array();
-        $messages = array();
+        $violations = [];
+        $messages = [];
         foreach ($object as $violation) {
             $propertyPath = $violation->getPropertyPath();
 
-            $violationEntry = array(
+            $violationEntry = [
                 'propertyPath' => $propertyPath,
                 'title' => $violation->getMessage(),
-            );
+            ];
             if (null !== $code = $violation->getCode()) {
                 $violationEntry['type'] = sprintf('urn:uuid:%s', $code);
             }
@@ -48,10 +48,10 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $messages[] = $prefix.$violation->getMessage();
         }
 
-        $result = array(
+        $result = [
             'type' => $context['type'] ?? 'https://symfony.com/errors/validation',
             'title' => $context['title'] ?? 'Validation Failed',
-        );
+        ];
         if (isset($context['status'])) {
             $result['status'] = $context['status'];
         }
@@ -62,7 +62,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface, Cacheabl
             $result['instance'] = $context['instance'];
         }
 
-        return $result + array('violations' => $violations);
+        return $result + ['violations' => $violations];
     }
 
     /**

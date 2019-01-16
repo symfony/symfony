@@ -45,7 +45,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * @var array
      */
-    private $attributes = array();
+    private $attributes = [];
 
     /**
      * @var array
@@ -55,7 +55,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * @throws InvalidArgumentException if the name is empty
      */
-    public function __construct(?string $name, array $options = array())
+    public function __construct(?string $name, array $options = [])
     {
         if ('' === $name || null === $name) {
             throw new InvalidArgumentException('Buttons cannot have empty names.');
@@ -76,7 +76,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -92,7 +92,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function create($name, $type = null, array $options = array())
+    public function create($name, $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -144,7 +144,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function all()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -582,7 +582,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getViewTransformers()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -592,7 +592,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getModelTransformers()
     {
-        return array();
+        return [];
     }
 
     /**

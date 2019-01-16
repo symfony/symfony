@@ -192,12 +192,12 @@ class TableStyle
      */
     public function getBorderChars()
     {
-        return array(
+        return [
             $this->horizontalOutsideBorderChar,
             $this->verticalOutsideBorderChar,
             $this->horizontalInsideBorderChar,
             $this->verticalInsideBorderChar,
-        );
+        ];
     }
 
     /**
@@ -290,7 +290,7 @@ class TableStyle
      */
     public function getCrossingChars(): array
     {
-        return array(
+        return [
             $this->crossingChar,
             $this->crossingTopLeftChar,
             $this->crossingTopMidChar,
@@ -303,7 +303,7 @@ class TableStyle
             $this->crossingTopLeftBottomChar,
             $this->crossingTopMidBottomChar,
             $this->crossingTopRightBottomChar,
-        );
+        ];
     }
 
     /**

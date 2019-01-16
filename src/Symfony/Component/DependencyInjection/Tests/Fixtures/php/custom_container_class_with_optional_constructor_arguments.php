@@ -19,26 +19,26 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container\ConstructorWithOptionalArgumentsContainer
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     /**
      * @internal but protected for BC on cache:clear
      */
-    protected $privates = array();
+    protected $privates = [];
 
     public function __construct()
     {
         parent::__construct();
         $this->parameterBag = null;
 
-        $this->services = $this->privates = array();
+        $this->services = $this->privates = [];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function reset()
     {
-        $this->privates = array();
+        $this->privates = [];
         parent::reset();
     }
 
@@ -54,9 +54,9 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 }

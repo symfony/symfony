@@ -89,9 +89,9 @@ class PhpGeneratorDumperTest extends TestCase
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test'));
         $this->routeCollection->add('test.nl', (new Route('/testen/is/leuk'))->setDefault('_locale', 'nl')->setDefault('_canonical_route', 'test'));
 
-        $code = $this->generatorDumper->dump(array(
+        $code = $this->generatorDumper->dump([
             'class' => 'LocalizedProjectUrlGenerator',
-        ));
+        ]);
         file_put_contents($this->testTmpFilepath, $code);
         include $this->testTmpFilepath;
 
@@ -99,7 +99,7 @@ class PhpGeneratorDumperTest extends TestCase
         $projectUrlGenerator = new \LocalizedProjectUrlGenerator($context, null, 'en');
 
         $urlWithDefaultLocale = $projectUrlGenerator->generate('test');
-        $urlWithSpecifiedLocale = $projectUrlGenerator->generate('test', array('_locale' => 'nl'));
+        $urlWithSpecifiedLocale = $projectUrlGenerator->generate('test', ['_locale' => 'nl']);
         $context->setParameter('_locale', 'en');
         $urlWithEnglishContext = $projectUrlGenerator->generate('test');
         $context->setParameter('_locale', 'nl');

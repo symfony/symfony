@@ -2,120 +2,120 @@
 
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
 
-$container->loadFromExtension('framework', array(
-    'workflows' => array(
-        'article' => array(
+$container->loadFromExtension('framework', [
+    'workflows' => [
+        'article' => [
             'type' => 'workflow',
-            'marking_store' => array(
+            'marking_store' => [
                 'type' => 'multiple_state',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
+            ],
             'initial_place' => 'draft',
-            'places' => array(
+            'places' => [
                 'draft',
                 'wait_for_journalist',
                 'approved_by_journalist',
                 'wait_for_spellchecker',
                 'approved_by_spellchecker',
                 'published',
-            ),
-            'transitions' => array(
-                'request_review' => array(
+            ],
+            'transitions' => [
+                'request_review' => [
                     'from' => 'draft',
-                    'to' => array('wait_for_journalist', 'wait_for_spellchecker'),
-                ),
-                'journalist_approval' => array(
+                    'to' => ['wait_for_journalist', 'wait_for_spellchecker'],
+                ],
+                'journalist_approval' => [
                     'from' => 'wait_for_journalist',
                     'to' => 'approved_by_journalist',
-                ),
-                'spellchecker_approval' => array(
+                ],
+                'spellchecker_approval' => [
                     'from' => 'wait_for_spellchecker',
                     'to' => 'approved_by_spellchecker',
-                ),
-                'publish' => array(
-                    'from' => array('approved_by_journalist', 'approved_by_spellchecker'),
+                ],
+                'publish' => [
+                    'from' => ['approved_by_journalist', 'approved_by_spellchecker'],
                     'to' => 'published',
-                ),
-            ),
-        ),
-        'pull_request' => array(
-            'marking_store' => array(
+                ],
+            ],
+        ],
+        'pull_request' => [
+            'marking_store' => [
                 'type' => 'single_state',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
+            ],
             'initial_place' => 'start',
-            'metadata' => array(
+            'metadata' => [
                 'title' => 'workflow title',
-            ),
-            'places' => array(
-                'start_name_not_used' => array(
+            ],
+            'places' => [
+                'start_name_not_used' => [
                     'name' => 'start',
-                    'metadata' => array(
+                    'metadata' => [
                         'title' => 'place start title',
-                    ),
-                ),
+                    ],
+                ],
                 'coding' => null,
                 'travis' => null,
                 'review' => null,
                 'merged' => null,
                 'closed' => null,
-            ),
-            'transitions' => array(
-                'submit' => array(
+            ],
+            'transitions' => [
+                'submit' => [
                     'from' => 'start',
                     'to' => 'travis',
-                    'metadata' => array(
+                    'metadata' => [
                         'title' => 'transition submit title',
-                    ),
-                ),
-                'update' => array(
-                    'from' => array('coding', 'travis', 'review'),
+                    ],
+                ],
+                'update' => [
+                    'from' => ['coding', 'travis', 'review'],
                     'to' => 'travis',
-                ),
-                'wait_for_review' => array(
+                ],
+                'wait_for_review' => [
                     'from' => 'travis',
                     'to' => 'review',
-                ),
-                'request_change' => array(
+                ],
+                'request_change' => [
                     'from' => 'review',
                     'to' => 'coding',
-                ),
-                'accept' => array(
+                ],
+                'accept' => [
                     'from' => 'review',
                     'to' => 'merged',
-                ),
-                'reject' => array(
+                ],
+                'reject' => [
                     'from' => 'review',
                     'to' => 'closed',
-                ),
-                'reopen' => array(
+                ],
+                'reopen' => [
                     'from' => 'closed',
                     'to' => 'review',
-                ),
-            ),
-        ),
-        'service_marking_store_workflow' => array(
+                ],
+            ],
+        ],
+        'service_marking_store_workflow' => [
             'type' => 'workflow',
-            'marking_store' => array(
+            'marking_store' => [
                 'service' => 'workflow_service',
-            ),
-            'supports' => array(
+            ],
+            'supports' => [
                 FrameworkExtensionTest::class,
-            ),
-            'places' => array(
-                array('name' => 'first'),
-                array('name' => 'last'),
-            ),
-            'transitions' => array(
-                'go' => array(
+            ],
+            'places' => [
+                ['name' => 'first'],
+                ['name' => 'last'],
+            ],
+            'transitions' => [
+                'go' => [
                     'from' => 'first',
                     'to' => 'last',
-                ),
-            ),
-        ),
-    ),
-));
+                ],
+            ],
+        ],
+    ],
+]);

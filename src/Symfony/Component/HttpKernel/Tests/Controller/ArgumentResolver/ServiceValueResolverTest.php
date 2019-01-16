@@ -119,7 +119,7 @@ class ServiceValueResolverTest extends TestCase
 
         $container->compile();
 
-        $request = $this->requestWithAttributes(array('_controller' => array(DummyController::class, 'index')));
+        $request = $this->requestWithAttributes(['_controller' => [DummyController::class, 'index']]);
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
         $container->get('argument_resolver.service')->resolve($request, $argument)->current();
     }

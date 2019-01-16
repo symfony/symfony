@@ -85,7 +85,7 @@ class MoneyTypeTest extends BaseTypeTest
 
     public function testDefaultFormattingWithDefaultRounding()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0]);
         $form->setData('12345.54321');
 
         $this->assertSame('12346', $form->createView()->vars['value']);
@@ -93,7 +93,7 @@ class MoneyTypeTest extends BaseTypeTest
 
     public function testDefaultFormattingWithSpecifiedRounding()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_DOWN));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_DOWN]);
         $form->setData('12345.54321');
 
         $this->assertSame('12345', $form->createView()->vars['value']);

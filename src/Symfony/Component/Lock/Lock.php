@@ -76,7 +76,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
             }
 
             $this->dirty = true;
-            $this->logger->info('Successfully acquired the "{resource}" lock.', array('resource' => $this->key));
+            $this->logger->info('Successfully acquired the "{resource}" lock.', ['resource' => $this->key]);
 
             if ($this->ttl) {
                 $this->refresh();
@@ -89,7 +89,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
             return true;
         } catch (LockConflictedException $e) {
             $this->dirty = false;
-            $this->logger->notice('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', ['resource' => $this->key]);
 
             if ($blocking) {
                 throw $e;
@@ -97,7 +97,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
 
             return false;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to acquire the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
+            $this->logger->notice('Failed to acquire the "{resource}" lock.', ['resource' => $this->key, 'exception' => $e]);
             throw new LockAcquiringException(sprintf('Failed to acquire the "%s" lock.', $this->key), 0, $e);
         }
     }
@@ -123,13 +123,13 @@ final class Lock implements LockInterface, LoggerAwareInterface
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $this->key));
             }
 
-            $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $ttl));
+            $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', ['resource' => $this->key, 'ttl' => $ttl]);
         } catch (LockConflictedException $e) {
             $this->dirty = false;
-            $this->logger->notice('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', ['resource' => $this->key]);
             throw $e;
         } catch (\Exception $e) {
-            $this->logger->notice('Failed to define an expiration for the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
+            $this->logger->notice('Failed to define an expiration for the "{resource}" lock.', ['resource' => $this->key, 'exception' => $e]);
             throw new LockAcquiringException(sprintf('Failed to define an expiration for the "%s" lock.', $this->key), 0, $e);
         }
     }
@@ -151,7 +151,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
         $this->dirty = false;
 
         if ($this->store->exists($this->key)) {
-            $this->logger->notice('Failed to release the "{resource}" lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to release the "{resource}" lock.', ['resource' => $this->key]);
             throw new LockReleasingException(sprintf('Failed to release the "%s" lock.', $this->key));
         }
     }

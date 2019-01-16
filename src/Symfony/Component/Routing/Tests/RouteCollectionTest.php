@@ -321,9 +321,9 @@ class RouteCollectionTest extends TestCase
     public function testAddNamePrefixCanonicalRouteName()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', new Route('/foo', array('_canonical_route' => 'foo')));
-        $collection->add('bar', new Route('/bar', array('_canonical_route' => 'bar')));
-        $collection->add('api_foo', new Route('/api/foo', array('_canonical_route' => 'api_foo')));
+        $collection->add('foo', new Route('/foo', ['_canonical_route' => 'foo']));
+        $collection->add('bar', new Route('/bar', ['_canonical_route' => 'bar']));
+        $collection->add('api_foo', new Route('/api/foo', ['_canonical_route' => 'api_foo']));
         $collection->addNamePrefix('api_');
 
         $this->assertEquals('api_foo', $collection->get('api_foo')->getDefault('_canonical_route'));

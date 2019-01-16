@@ -1,15 +1,15 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'serializer' => array(
+$container->loadFromExtension('framework', [
+    'serializer' => [
         'enabled' => false,
-    ),
-    'messenger' => array(
-        'serializer' => array(
+    ],
+    'messenger' => [
+        'serializer' => [
             'enabled' => true,
-        ),
-        'transports' => array(
+        ],
+        'transports' => [
             'default' => 'amqp://localhost/%2f/messages',
-        ),
-    ),
-));
+        ],
+    ],
+]);

@@ -20,9 +20,9 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholderUniquePrefix;
-    private $envPlaceholders = array();
-    private $unusedEnvPlaceholders = array();
-    private $providedTypes = array();
+    private $envPlaceholders = [];
+    private $unusedEnvPlaceholders = [];
+    private $providedTypes = [];
 
     /**
      * {@inheritdoc}
@@ -89,7 +89,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     public function clearUnusedEnvPlaceholders()
     {
-        $this->unusedEnvPlaceholders = array();
+        $this->unusedEnvPlaceholders = [];
     }
 
     /**

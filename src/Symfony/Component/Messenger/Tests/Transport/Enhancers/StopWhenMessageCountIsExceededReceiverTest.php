@@ -32,7 +32,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -49,10 +49,10 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
 
     public function countProvider()
     {
-        yield array(1, true);
-        yield array(2, true);
-        yield array(3, true);
-        yield array(4, false);
+        yield [1, true];
+        yield [2, true];
+        yield [3, true];
+        yield [4, false];
     }
 
     public function testReceiverDoesntIncreaseItsCounterWhenReceiveNullMessage()
@@ -65,7 +65,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -83,7 +83,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -94,7 +94,7 @@ class StopWhenMessageCountIsExceededReceiverTest extends TestCase
         $logger->expects($this->once())->method('info')
             ->with(
                 $this->equalTo('Receiver stopped due to maximum count of {count} exceeded'),
-                $this->equalTo(array('count' => 1))
+                $this->equalTo(['count' => 1])
             );
 
         $maximumCountReceiver = new StopWhenMessageCountIsExceededReceiver($decoratedReceiver, 1, $logger);

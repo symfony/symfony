@@ -64,8 +64,8 @@ EOF;
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
-            array('filename' => '@AppBundle/Resources'),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => '@AppBundle/Resources'],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
@@ -134,7 +134,7 @@ EOF;
     protected function setUp()
     {
         @mkdir(sys_get_temp_dir().'/xliff-lint-test');
-        $this->files = array();
+        $this->files = [];
     }
 
     protected function tearDown()

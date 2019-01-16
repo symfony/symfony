@@ -27,9 +27,9 @@ class SenderLocatorTest extends TestCase
         $container = new Container();
         $container->set('my_amqp_sender', $sender);
 
-        $locator = new SenderLocator($container, array(
+        $locator = new SenderLocator($container, [
             DummyMessage::class => 'my_amqp_sender',
-        ));
+        ]);
 
         $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
         $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
@@ -45,10 +45,10 @@ class SenderLocatorTest extends TestCase
         $apiSender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container->set('my_api_sender', $apiSender);
 
-        $locator = new SenderLocator($container, array(
+        $locator = new SenderLocator($container, [
             DummyMessageInterface::class => 'my_api_sender',
             DummyMessage::class => 'my_amqp_sender',
-        ));
+        ]);
 
         $this->assertSame($sender, $locator->getSenderForMessage(new ChildDummyMessage('Hello')));
         $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
@@ -61,9 +61,9 @@ class SenderLocatorTest extends TestCase
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container->set('my_amqp_sender', $sender);
 
-        $locator = new SenderLocator($container, array(
+        $locator = new SenderLocator($container, [
             DummyMessageInterface::class => 'my_amqp_sender',
-        ));
+        ]);
 
         $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
         $this->assertNull($locator->getSenderForMessage(new SecondMessage()));
@@ -79,10 +79,10 @@ class SenderLocatorTest extends TestCase
         $apiSender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container->set('my_api_sender', $apiSender);
 
-        $locator = new SenderLocator($container, array(
+        $locator = new SenderLocator($container, [
             DummyMessage::class => 'my_amqp_sender',
             '*' => 'my_api_sender',
-        ));
+        ]);
 
         $this->assertSame($sender, $locator->getSenderForMessage(new DummyMessage('Hello')));
         $this->assertSame($apiSender, $locator->getSenderForMessage(new SecondMessage()));

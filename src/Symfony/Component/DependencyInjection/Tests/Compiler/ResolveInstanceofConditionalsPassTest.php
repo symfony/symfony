@@ -207,21 +207,21 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $expected = array(
-            array('setFoo', array(
+        $expected = [
+            ['setFoo', [
                 'plain_value',
                 '%some_parameter%',
-            )),
-            array('callBar', array()),
-            array('isBaz', array()),
-        );
+            ]],
+            ['callBar', []],
+            ['isBaz', []],
+        ];
 
         $container->registerForAutoconfiguration(parent::class)->addMethodCall('setFoo', $expected[0][1]);
         $container->registerForAutoconfiguration(self::class)->addMethodCall('callBar');
 
         $def = $container->register('foo', self::class)->setAutoconfigured(true)->addMethodCall('isBaz');
         $this->assertEquals(
-            array(array('isBaz', array())),
+            [['isBaz', []]],
             $def->getMethodCalls(),
             'Definition shouldn\'t have only one method call.'
         );

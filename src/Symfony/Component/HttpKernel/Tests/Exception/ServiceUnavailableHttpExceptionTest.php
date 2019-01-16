@@ -14,9 +14,9 @@ class ServiceUnavailableHttpExceptionTest extends HttpExceptionTest
 
     public function testWithHeaderConstruct()
     {
-        $headers = array(
+        $headers = [
             'Cache-Control' => 'public, s-maxage=1337',
-        );
+        ];
 
         $exception = new ServiceUnavailableHttpException(1337, null, null, null, $headers);
 

@@ -25,16 +25,16 @@ class TraceableMessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn($result = array('foo' => 'bar'));
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn($result = ['foo' => 'bar']);
 
         $traceableBus = new TraceableMessageBus($bus);
         $this->assertSame($result, $traceableBus->dispatch($message));
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
             'result' => $result,
             'envelopeItems' => null,
-        ), $tracedMessages[0], true);
+        ], $tracedMessages[0], true);
     }
 
     public function testItTracesResultWithEnvelope()
@@ -42,16 +42,16 @@ class TraceableMessageBusTest extends TestCase
         $envelope = Envelope::wrap($message = new DummyMessage('Hello'))->with($envelopeItem = new AnEnvelopeItem());
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($result = array('foo' => 'bar'));
+        $bus->expects($this->once())->method('dispatch')->with($envelope)->willReturn($result = ['foo' => 'bar']);
 
         $traceableBus = new TraceableMessageBus($bus);
         $this->assertSame($result, $traceableBus->dispatch($envelope));
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
             'result' => $result,
-            'envelopeItems' => array($envelopeItem),
-        ), $tracedMessages[0], true);
+            'envelopeItems' => [$envelopeItem],
+        ], $tracedMessages[0], true);
     }
 
     public function testItTracesExceptions()
@@ -70,10 +70,10 @@ class TraceableMessageBusTest extends TestCase
         }
 
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
             'exception' => $exception,
             'envelopeItems' => null,
-        ), $tracedMessages[0], true);
+        ], $tracedMessages[0], true);
     }
 }

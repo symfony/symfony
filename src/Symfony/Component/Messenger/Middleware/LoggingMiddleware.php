@@ -37,7 +37,7 @@ class LoggingMiddleware implements MiddlewareInterface
         } catch (\Throwable $e) {
             $this->logger->warning('An exception occurred while handling message {class}', array_merge(
                 $this->createContext($message),
-                array('exception' => $e)
+                ['exception' => $e]
             ));
 
             throw $e;
@@ -50,9 +50,9 @@ class LoggingMiddleware implements MiddlewareInterface
 
     private function createContext($message): array
     {
-        return array(
+        return [
             'message' => $message,
             'class' => \get_class($message),
-        );
+        ];
     }
 }

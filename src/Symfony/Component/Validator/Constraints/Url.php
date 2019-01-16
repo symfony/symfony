@@ -88,9 +88,9 @@ class Url extends Constraint
 
     const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
-    );
+    ];
 
     public $message = 'This value is not a valid URL.';
 
@@ -98,7 +98,7 @@ class Url extends Constraint
      * @deprecated since Symfony 4.1
      */
     public $dnsMessage = 'The host could not be resolved.';
-    public $protocols = array('http', 'https');
+    public $protocols = ['http', 'https'];
 
     /**
      * @deprecated since Symfony 4.1

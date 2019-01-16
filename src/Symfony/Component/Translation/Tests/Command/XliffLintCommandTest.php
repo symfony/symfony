@@ -32,8 +32,8 @@ class XliffLintCommandTest extends TestCase
         $filename = $this->createFile();
 
         $tester->execute(
-            array('filename' => $filename),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => $filename],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
@@ -45,7 +45,7 @@ class XliffLintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note <target>');
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
 
         $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         $this->assertContains('Opening and ending tag mismatch: target line 6 and source', trim($tester->getDisplay()));
@@ -56,7 +56,7 @@ class XliffLintCommandTest extends TestCase
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note', 'es');
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
 
         $this->assertEquals(1, $tester->getStatusCode(), 'Returns 1 in case of error');
         $this->assertContains('There is a mismatch between the file extension ("en.xlf") and the "es" value used in the "target-language" attribute of the file.', trim($tester->getDisplay()));
@@ -71,7 +71,7 @@ class XliffLintCommandTest extends TestCase
         $filename = $this->createFile();
         unlink($filename);
 
-        $tester->execute(array('filename' => $filename), array('decorated' => false));
+        $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
     public function testGetHelp()
@@ -147,7 +147,7 @@ XLIFF;
 
     protected function setUp()
     {
-        $this->files = array();
+        $this->files = [];
         @mkdir(sys_get_temp_dir().'/translation-xliff-lint-test');
     }
 

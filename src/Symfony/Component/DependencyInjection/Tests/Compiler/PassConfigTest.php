@@ -39,11 +39,11 @@ class PassConfigTest extends TestCase
     public function testPassOrderingWithoutPasses()
     {
         $config = new PassConfig();
-        $config->setBeforeOptimizationPasses(array());
-        $config->setAfterRemovingPasses(array());
-        $config->setBeforeRemovingPasses(array());
-        $config->setOptimizationPasses(array());
-        $config->setRemovingPasses(array());
+        $config->setBeforeOptimizationPasses([]);
+        $config->setAfterRemovingPasses([]);
+        $config->setBeforeRemovingPasses([]);
+        $config->setOptimizationPasses([]);
+        $config->setRemovingPasses([]);
 
         $this->assertEmpty($config->getBeforeOptimizationPasses());
         $this->assertEmpty($config->getAfterRemovingPasses());

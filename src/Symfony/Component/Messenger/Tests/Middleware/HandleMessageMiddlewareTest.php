@@ -22,14 +22,14 @@ class HandleMessageMiddlewareTest extends TestCase
     {
         $message = new DummyMessage('Hey');
 
-        $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $handler = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $handler->method('__invoke')->willReturn('Hello');
 
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
 
-        $middleware = new HandleMessageMiddleware(new HandlerLocator(array(
+        $middleware = new HandleMessageMiddleware(new HandlerLocator([
             DummyMessage::class => $handler,
-        )));
+        ]));
 
         $handler->expects($this->once())->method('__invoke')->with($message);
         $next->expects($this->once())->method('__invoke')->with($message);

@@ -55,10 +55,10 @@ class TwigExtension extends Extension
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {
                     if (\is_array($value) && isset($value['key'])) {
-                        $configs[$key]['globals'][$name] = array(
+                        $configs[$key]['globals'][$name] = [
                             'key' => $name,
                             'value' => $value,
-                        );
+                        ];
                     }
                 }
             }
@@ -86,9 +86,9 @@ class TwigExtension extends Extension
         // register user-configured paths
         foreach ($config['paths'] as $path => $namespace) {
             if (!$namespace) {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path]);
             } else {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
             }
         }
 
@@ -99,22 +99,22 @@ class TwigExtension extends Extension
         foreach ($this->getBundleTemplatePaths($container, $config) as $name => $paths) {
             $namespace = $this->normalizeBundleName($name);
             foreach ($paths as $path) {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
             }
 
             if ($paths) {
                 // the last path must be the bundle views directory
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, '!'.$namespace));
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, '!'.$namespace]);
             }
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
         }
         $container->addResource(new FileExistenceResource($dir));
 
         if (file_exists($dir = $container->getParameterBag()->resolveValue($config['default_path']))) {
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir));
+            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
         }
         $container->addResource(new FileExistenceResource($dir));
 
@@ -122,9 +122,9 @@ class TwigExtension extends Extension
             $def = $container->getDefinition('twig');
             foreach ($config['globals'] as $key => $global) {
                 if (isset($global['type']) && 'service' === $global['type']) {
-                    $def->addMethodCall('addGlobal', array($key, new Reference($global['id'])));
+                    $def->addMethodCall('addGlobal', [$key, new Reference($global['id'])]);
                 } else {
-                    $def->addMethodCall('addGlobal', array($key, $global['value']));
+                    $def->addMethodCall('addGlobal', [$key, $global['value']]);
                 }
             }
         }
@@ -136,7 +136,7 @@ class TwigExtension extends Extension
         );
 
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
-            $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
+            $config['autoescape'] = [new Reference($config['autoescape_service']), $config['autoescape_service_method']];
         }
         unset($config['autoescape_service'], $config['autoescape_service_method']);
 
@@ -156,7 +156,7 @@ class TwigExtension extends Extension
 
     private function getBundleTemplatePaths(ContainerBuilder $container, array $config)
     {
-        $bundleHierarchy = array();
+        $bundleHierarchy = [];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
                 $bundleHierarchy[$name][] = $dir;

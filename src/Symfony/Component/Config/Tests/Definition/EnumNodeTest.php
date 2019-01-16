@@ -45,7 +45,7 @@ class EnumNodeTest extends TestCase
 
     public function testConstructionWithNullName()
     {
-        $node = new EnumNode(null, null, array('foo'));
+        $node = new EnumNode(null, null, ['foo']);
         $this->assertSame('foo', $node->finalize('foo'));
     }
 

@@ -28,17 +28,17 @@ class StaticPrefixCollection
     /**
      * @var string[]
      */
-    private $staticPrefixes = array();
+    private $staticPrefixes = [];
 
     /**
      * @var string[]
      */
-    private $prefixes = array();
+    private $prefixes = [];
 
     /**
      * @var array[]|self[]
      */
-    private $items = array();
+    private $items = [];
 
     public function __construct(string $prefix = '/')
     {
@@ -106,7 +106,7 @@ class StaticPrefixCollection
                 $child = new self($commonPrefix);
                 list($child->prefixes[0], $child->staticPrefixes[0]) = $child->getCommonPrefix($this->prefixes[$i], $this->prefixes[$i]);
                 list($child->prefixes[1], $child->staticPrefixes[1]) = $child->getCommonPrefix($prefix, $prefix);
-                $child->items = array($this->items[$i], $route);
+                $child->items = [$this->items[$i], $route];
 
                 $this->staticPrefixes[$i] = $commonStaticPrefix;
                 $this->prefixes[$i] = $commonPrefix;
@@ -149,7 +149,7 @@ class StaticPrefixCollection
         $baseLength = \strlen($this->prefix);
         $end = min(\strlen($prefix), \strlen($anotherPrefix));
         $staticLength = null;
-        set_error_handler(array(__CLASS__, 'handleError'));
+        set_error_handler([__CLASS__, 'handleError']);
 
         for ($i = $baseLength; $i < $end && $prefix[$i] === $anotherPrefix[$i]; ++$i) {
             if ('(' === $prefix[$i]) {
@@ -192,7 +192,7 @@ class StaticPrefixCollection
             } while (0b10 === (\ord($prefix[$i]) >> 6));
         }
 
-        return array(substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i));
+        return [substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i)];
     }
 
     public static function handleError($type, $msg)

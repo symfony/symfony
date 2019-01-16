@@ -22,16 +22,16 @@ class LoggerTest extends TestCase
     public function testGetLogsWithoutDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger(__METHOD__, array($handler));
+        $logger = new Logger(__METHOD__, [$handler]);
 
         $this->assertTrue($logger->error('error message'));
-        $this->assertSame(array(), $logger->getLogs());
+        $this->assertSame([], $logger->getLogs());
     }
 
     public function testCountErrorsWithoutDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger(__METHOD__, array($handler));
+        $logger = new Logger(__METHOD__, [$handler]);
 
         $this->assertTrue($logger->error('error message'));
         $this->assertSame(0, $logger->countErrors());
@@ -41,7 +41,7 @@ class LoggerTest extends TestCase
     {
         $handler = new TestHandler();
         $processor = new DebugProcessor();
-        $logger = new Logger(__METHOD__, array($handler), array($processor));
+        $logger = new Logger(__METHOD__, [$handler], [$processor]);
 
         $this->assertTrue($logger->error('error message'));
         $this->assertCount(1, $logger->getLogs());
@@ -51,7 +51,7 @@ class LoggerTest extends TestCase
     {
         $handler = new TestHandler();
         $processor = new DebugProcessor();
-        $logger = new Logger(__METHOD__, array($handler), array($processor));
+        $logger = new Logger(__METHOD__, [$handler], [$processor]);
 
         $this->assertTrue($logger->debug('test message'));
         $this->assertTrue($logger->info('test message'));
@@ -69,7 +69,7 @@ class LoggerTest extends TestCase
     public function testGetLogsWithDebugProcessor2()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test', array($handler));
+        $logger = new Logger('test', [$handler]);
         $logger->pushProcessor(new DebugProcessor());
 
         $logger->addInfo('test');
@@ -88,7 +88,7 @@ class LoggerTest extends TestCase
         $processor->expects($this->once())->method('countErrors')->with($request);
 
         $handler = new TestHandler();
-        $logger = new Logger('test', array($handler));
+        $logger = new Logger('test', [$handler]);
         $logger->pushProcessor($processor);
 
         $logger->getLogs($request);
@@ -98,7 +98,7 @@ class LoggerTest extends TestCase
     public function testClear()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test', array($handler));
+        $logger = new Logger('test', [$handler]);
         $logger->pushProcessor(new DebugProcessor());
 
         $logger->addInfo('test');

@@ -206,7 +206,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNamePrefix()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));
         $routeCollection = $loader->load('routing.yml');
 
         $this->assertNotNull($routeCollection->get('app_blog'));
@@ -224,7 +224,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testLoadingLocalizedRoute()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('localized-route.yml');
 
         $this->assertCount(3, $routes);
@@ -232,7 +232,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportingRoutesFromDefinition()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importing-localized-route.yml');
 
         $this->assertCount(3, $routes);
@@ -243,7 +243,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportingRoutesWithLocales()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-locale.yml');
 
         $this->assertCount(2, $routes);
@@ -253,7 +253,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportingNonLocalizedRoutesWithLocales()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-locale-imports-non-localized-route.yml');
 
         $this->assertCount(2, $routes);
@@ -263,7 +263,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportingRoutesWithOfficialLocales()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('officially_formatted_locales.yml');
 
         $this->assertCount(3, $routes);
@@ -274,21 +274,21 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportingRoutesFromDefinitionMissingLocalePrefix()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('missing-locale-in-importer.yml');
     }
 
     public function testImportingRouteWithoutPathOrLocales()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('route-without-path-or-locales.yml');
     }
 
     public function testImportingWithControllerDefault()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-controller-default.yml');
         $this->assertCount(3, $routes);
         $this->assertEquals('DefaultController::defaultAction', $routes->get('home.en')->getDefault('_controller'));
@@ -298,7 +298,7 @@ class YamlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNoTrailingSlash()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_no_trailing_slash']));
         $routeCollection = $loader->load('routing.yml');
 
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());

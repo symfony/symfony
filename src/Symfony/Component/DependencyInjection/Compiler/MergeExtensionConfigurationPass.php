@@ -144,7 +144,7 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
 
     public function getUnusedEnvPlaceholders(): array
     {
-        return null === $this->processedEnvPlaceholders ? array() : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
+        return null === $this->processedEnvPlaceholders ? [] : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
     }
 }
 

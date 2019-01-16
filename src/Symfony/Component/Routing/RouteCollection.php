@@ -158,7 +158,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addNamePrefix(string $prefix)
     {
-        $prefixedRoutes = array();
+        $prefixedRoutes = [];
 
         foreach ($this->routes as $name => $route) {
             $prefixedRoutes[$prefix.$name] = $route;

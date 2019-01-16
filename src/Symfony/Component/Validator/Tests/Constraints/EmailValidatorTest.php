@@ -82,16 +82,16 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidEmails()
     {
-        return array(
-            array('fabien@symfony.com'),
-            array('example@example.co.uk'),
-            array('fabien_potencier@example.fr'),
-            array('example@example.co..uk'),
-            array('{}~!@!@£$%%^&*().!@£$%^&*()'),
-            array('example@example.co..uk'),
-            array('example@-example.com'),
-            array(sprintf('example@%s.com', str_repeat('a', 64))),
-        );
+        return [
+            ['fabien@symfony.com'],
+            ['example@example.co.uk'],
+            ['fabien_potencier@example.fr'],
+            ['example@example.co..uk'],
+            ['{}~!@!@£$%%^&*().!@£$%^&*()'],
+            ['example@example.co..uk'],
+            ['example@-example.com'],
+            [sprintf('example@%s.com', str_repeat('a', 64))],
+        ];
     }
 
     /**
@@ -99,19 +99,19 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidEmailsHtml5($email)
     {
-        $this->validator->validate($email, new Email(array('mode' => Email::VALIDATION_MODE_HTML5)));
+        $this->validator->validate($email, new Email(['mode' => Email::VALIDATION_MODE_HTML5]));
 
         $this->assertNoViolation();
     }
 
     public function getValidEmailsHtml5()
     {
-        return array(
-            array('fabien@symfony.com'),
-            array('example@example.co.uk'),
-            array('fabien_potencier@example.fr'),
-            array('{}~!@example.com'),
-        );
+        return [
+            ['fabien@symfony.com'],
+            ['example@example.co.uk'],
+            ['fabien_potencier@example.fr'],
+            ['{}~!@example.com'],
+        ];
     }
 
     /**
@@ -119,9 +119,9 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidEmails($email)
     {
-        $constraint = new Email(array(
+        $constraint = new Email([
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate($email, $constraint);
 
@@ -133,12 +133,12 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidEmails()
     {
-        return array(
-            array('example'),
-            array('example@'),
-            array('example@localhost'),
-            array('foo@example.com bar'),
-        );
+        return [
+            ['example'],
+            ['example@'],
+            ['example@localhost'],
+            ['foo@example.com bar'],
+        ];
     }
 
     /**
@@ -147,10 +147,10 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidHtml5Emails($email)
     {
         $constraint = new Email(
-            array(
+            [
                 'message' => 'myMessage',
                 'mode' => Email::VALIDATION_MODE_HTML5,
-            )
+            ]
         );
 
         $this->validator->validate($email, $constraint);
@@ -163,29 +163,29 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidHtml5Emails()
     {
-        return array(
-            array('example'),
-            array('example@'),
-            array('example@localhost'),
-            array('example@example.co..uk'),
-            array('foo@example.com bar'),
-            array('example@example.'),
-            array('example@.fr'),
-            array('@example.com'),
-            array('example@example.com;example@example.com'),
-            array('example@.'),
-            array(' example@example.com'),
-            array('example@ '),
-            array(' example@example.com '),
-            array(' example @example .com '),
-            array('example@-example.com'),
-            array(sprintf('example@%s.com', str_repeat('a', 64))),
-        );
+        return [
+            ['example'],
+            ['example@'],
+            ['example@localhost'],
+            ['example@example.co..uk'],
+            ['foo@example.com bar'],
+            ['example@example.'],
+            ['example@.fr'],
+            ['@example.com'],
+            ['example@example.com;example@example.com'],
+            ['example@.'],
+            [' example@example.com'],
+            ['example@ '],
+            [' example@example.com '],
+            [' example @example .com '],
+            ['example@-example.com'],
+            [sprintf('example@%s.com', str_repeat('a', 64))],
+        ];
     }
 
     public function testModeStrict()
     {
-        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_STRICT));
+        $constraint = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
 
         $this->validator->validate('example@localhost', $constraint);
 
@@ -194,7 +194,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function testModeHtml5()
     {
-        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_HTML5));
+        $constraint = new Email(['mode' => Email::VALIDATION_MODE_HTML5]);
 
         $this->validator->validate('example@example..com', $constraint);
 
@@ -206,7 +206,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function testModeLoose()
     {
-        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_LOOSE));
+        $constraint = new Email(['mode' => Email::VALIDATION_MODE_LOOSE]);
 
         $this->validator->validate('example@example..com', $constraint);
 
@@ -232,7 +232,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testStrict()
     {
-        $constraint = new Email(array('strict' => true));
+        $constraint = new Email(['strict' => true]);
 
         $this->validator->validate('example@localhost', $constraint);
 
@@ -244,10 +244,10 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testStrictWithInvalidEmails($email)
     {
-        $constraint = new Email(array(
+        $constraint = new Email([
             'message' => 'myMessage',
             'mode' => Email::VALIDATION_MODE_STRICT,
-        ));
+        ]);
 
         $this->validator->validate($email, $constraint);
 
@@ -263,55 +263,55 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function getInvalidEmailsForStrictChecks()
     {
-        return array(
-            array('test@example.com test'),
-            array('user  name@example.com'),
-            array('user   name@example.com'),
-            array('example.@example.co.uk'),
-            array('example@example@example.co.uk'),
-            array('(test_exampel@example.fr)'),
-            array('example(example)example@example.co.uk'),
-            array('.example@localhost'),
-            array('ex\ample@localhost'),
-            array('example@local\host'),
-            array('example@localhost.'),
-            array('user name@example.com'),
-            array('username@ example . com'),
-            array('example@(fake).com'),
-            array('example@(fake.com'),
-            array('username@example,com'),
-            array('usern,ame@example.com'),
-            array('user[na]me@example.com'),
-            array('"""@iana.org'),
-            array('"\"@iana.org'),
-            array('"test"test@iana.org'),
-            array('"test""test"@iana.org'),
-            array('"test"."test"@iana.org'),
-            array('"test".test@iana.org'),
-            array('"test"'.\chr(0).'@iana.org'),
-            array('"test\"@iana.org'),
-            array(\chr(226).'@iana.org'),
-            array('test@'.\chr(226).'.org'),
-            array('\r\ntest@iana.org'),
-            array('\r\n test@iana.org'),
-            array('\r\n \r\ntest@iana.org'),
-            array('\r\n \r\ntest@iana.org'),
-            array('\r\n \r\n test@iana.org'),
-            array('test@iana.org \r\n'),
-            array('test@iana.org \r\n '),
-            array('test@iana.org \r\n \r\n'),
-            array('test@iana.org \r\n\r\n'),
-            array('test@iana.org  \r\n\r\n '),
-            array('test@iana/icann.org'),
-            array('test@foo;bar.com'),
-            array('test;123@foobar.com'),
-            array('test@example..com'),
-            array('email.email@email."'),
-            array('test@email>'),
-            array('test@email<'),
-            array('test@email{'),
-            array(str_repeat('x', 254).'@example.com'), //email with warnings
-        );
+        return [
+            ['test@example.com test'],
+            ['user  name@example.com'],
+            ['user   name@example.com'],
+            ['example.@example.co.uk'],
+            ['example@example@example.co.uk'],
+            ['(test_exampel@example.fr)'],
+            ['example(example)example@example.co.uk'],
+            ['.example@localhost'],
+            ['ex\ample@localhost'],
+            ['example@local\host'],
+            ['example@localhost.'],
+            ['user name@example.com'],
+            ['username@ example . com'],
+            ['example@(fake).com'],
+            ['example@(fake.com'],
+            ['username@example,com'],
+            ['usern,ame@example.com'],
+            ['user[na]me@example.com'],
+            ['"""@iana.org'],
+            ['"\"@iana.org'],
+            ['"test"test@iana.org'],
+            ['"test""test"@iana.org'],
+            ['"test"."test"@iana.org'],
+            ['"test".test@iana.org'],
+            ['"test"'.\chr(0).'@iana.org'],
+            ['"test\"@iana.org'],
+            [\chr(226).'@iana.org'],
+            ['test@'.\chr(226).'.org'],
+            ['\r\ntest@iana.org'],
+            ['\r\n test@iana.org'],
+            ['\r\n \r\ntest@iana.org'],
+            ['\r\n \r\ntest@iana.org'],
+            ['\r\n \r\n test@iana.org'],
+            ['test@iana.org \r\n'],
+            ['test@iana.org \r\n '],
+            ['test@iana.org \r\n \r\n'],
+            ['test@iana.org \r\n\r\n'],
+            ['test@iana.org  \r\n\r\n '],
+            ['test@iana/icann.org'],
+            ['test@foo;bar.com'],
+            ['test;123@foobar.com'],
+            ['test@example..com'],
+            ['email.email@email."'],
+            ['test@email>'],
+            ['test@email<'],
+            ['test@email{'],
+            [str_repeat('x', 254).'@example.com'], //email with warnings
+        ];
     }
 
     /**
@@ -320,12 +320,12 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testDnsChecks($type, $violation)
     {
-        DnsMock::withMockedHosts(array('example.com' => array(array('type' => $violation ? false : $type))));
+        DnsMock::withMockedHosts(['example.com' => [['type' => $violation ? false : $type]]]);
 
-        $constraint = new Email(array(
+        $constraint = new Email([
             'message' => 'myMessage',
             'MX' === $type ? 'checkMX' : 'checkHost' => true,
-        ));
+        ]);
 
         $this->validator->validate('foo@example.com', $constraint);
 
@@ -341,14 +341,14 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function getDnsChecks()
     {
-        return array(
-            array('MX', false),
-            array('MX', Email::MX_CHECK_FAILED_ERROR),
-            array('A', false),
-            array('A', Email::HOST_CHECK_FAILED_ERROR),
-            array('AAAA', false),
-            array('AAAA', Email::HOST_CHECK_FAILED_ERROR),
-        );
+        return [
+            ['MX', false],
+            ['MX', Email::MX_CHECK_FAILED_ERROR],
+            ['A', false],
+            ['A', Email::HOST_CHECK_FAILED_ERROR],
+            ['AAAA', false],
+            ['AAAA', Email::HOST_CHECK_FAILED_ERROR],
+        ];
     }
 
     /**
@@ -356,11 +356,11 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testHostnameIsProperlyParsed()
     {
-        DnsMock::withMockedHosts(array('baz.com' => array(array('type' => 'MX'))));
+        DnsMock::withMockedHosts(['baz.com' => [['type' => 'MX']]]);
 
         $this->validator->validate(
             '"foo@bar"@baz.com',
-            new Email(array('checkMX' => true))
+            new Email(['checkMX' => true])
         );
 
         $this->assertNoViolation();
@@ -373,10 +373,10 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             'foo@bar.fr@',
-            new Email(array(
+            new Email([
                 'message' => 'myMessage',
                 $checkType => true,
-            ))
+            ])
         );
 
         $this
@@ -388,9 +388,9 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function provideCheckTypes()
     {
-        return array(
-            array('checkMX', Email::MX_CHECK_FAILED_ERROR),
-            array('checkHost', Email::HOST_CHECK_FAILED_ERROR),
-        );
+        return [
+            ['checkMX', Email::MX_CHECK_FAILED_ERROR],
+            ['checkHost', Email::HOST_CHECK_FAILED_ERROR],
+        ];
     }
 }

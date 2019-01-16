@@ -273,12 +273,12 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
     public function testPassingCustomValues()
     {
-        $constraint = new Expression(array(
+        $constraint = new Expression([
             'expression' => 'value + custom == 2',
-            'values' => array(
+            'values' => [
                 'custom' => 1,
-            ),
-        ));
+            ],
+        ]);
 
         $this->validator->validate(1, $constraint);
 

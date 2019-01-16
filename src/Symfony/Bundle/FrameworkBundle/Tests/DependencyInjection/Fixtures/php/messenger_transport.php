@@ -1,11 +1,11 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('framework', [
     'serializer' => true,
-    'messenger' => array(
-        'serializer' => array(
+    'messenger' => [
+        'serializer' => [
             'format' => 'csv',
-            'context' => array('enable_max_depth' => true),
-        ),
-    ),
-));
+            'context' => ['enable_max_depth' => true],
+        ],
+    ],
+]);

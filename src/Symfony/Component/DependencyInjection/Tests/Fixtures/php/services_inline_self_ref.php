@@ -17,26 +17,26 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     /**
      * @internal but protected for BC on cache:clear
      */
-    protected $privates = array();
+    protected $privates = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'App\\Foo' => 'getFooService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function reset()
     {
-        $this->privates = array();
+        $this->privates = [];
         parent::reset();
     }
 
@@ -52,10 +52,10 @@ class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**

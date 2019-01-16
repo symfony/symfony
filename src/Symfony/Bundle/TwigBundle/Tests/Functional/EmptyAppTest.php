@@ -39,9 +39,9 @@ class EmptyAppKernel extends Kernel
     {
         $loader->load(function ($container) {
             $container
-                ->loadFromExtension('twig', array( // to be removed in 5.0 relying on default
+                ->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
                     'strict_variables' => false,
-                ))
+                ])
             ;
         });
     }

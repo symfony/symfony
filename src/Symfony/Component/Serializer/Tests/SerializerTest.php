@@ -366,28 +366,28 @@ class SerializerTest extends TestCase
         $example = new AbstractDummyFirstChild('foo-value', 'bar-value');
 
         $loaderMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
-        $loaderMock->method('hasMetadataFor')->will($this->returnValueMap(array(
-            array(
+        $loaderMock->method('hasMetadataFor')->will($this->returnValueMap([
+            [
                 AbstractDummy::class,
                 true,
-            ),
-        )));
+            ],
+        ]));
 
-        $loaderMock->method('getMetadataFor')->will($this->returnValueMap(array(
-            array(
+        $loaderMock->method('getMetadataFor')->will($this->returnValueMap([
+            [
                 AbstractDummy::class,
                 new ClassMetadata(
                     AbstractDummy::class,
-                    new ClassDiscriminatorMapping('type', array(
+                    new ClassDiscriminatorMapping('type', [
                         'first' => AbstractDummyFirstChild::class,
                         'second' => AbstractDummySecondChild::class,
-                    ))
+                    ])
                 ),
-            ),
-        )));
+            ],
+        ]));
 
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
-        $serializer = new Serializer(array(new ObjectNormalizer(null, null, null, null, $discriminatorResolver)), array('json' => new JsonEncoder()));
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, null, $discriminatorResolver)], ['json' => new JsonEncoder()]);
 
         $jsonData = '{"type":"first","bar":"bar-value","foo":"foo-value"}';
 
@@ -419,15 +419,15 @@ class SerializerTest extends TestCase
         $example->two = 2;
 
         $serializer = $this->serializerWithClassDiscriminator();
-        $deserialized = $serializer->deserialize('{"type":"one","one":1,"two":2}', DummyMessageInterface::class, 'json', array(
-            'groups' => array('two'),
-        ));
+        $deserialized = $serializer->deserialize('{"type":"one","one":1,"two":2}', DummyMessageInterface::class, 'json', [
+            'groups' => ['two'],
+        ]);
 
         $this->assertEquals($example, $deserialized);
 
-        $serialized = $serializer->serialize($deserialized, 'json', array(
-            'groups' => array('two'),
-        ));
+        $serialized = $serializer->serialize($deserialized, 'json', [
+            'groups' => ['two'],
+        ]);
 
         $this->assertEquals('{"two":2,"type":"one"}', $serialized);
     }
@@ -470,7 +470,7 @@ class SerializerTest extends TestCase
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
-        return new Serializer(array(new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))), array('json' => new JsonEncoder()));
+        return new Serializer([new ObjectNormalizer($classMetadataFactory, null, null, new ReflectionExtractor(), new ClassDiscriminatorFromClassMetadata($classMetadataFactory))], ['json' => new JsonEncoder()]);
     }
 }
 

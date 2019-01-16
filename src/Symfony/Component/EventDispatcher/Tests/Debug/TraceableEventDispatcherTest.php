@@ -178,7 +178,7 @@ class TraceableEventDispatcherTest extends TestCase
         $tdispatcher->dispatch('foo');
         $events = $tdispatcher->getOrphanedEvents();
         $this->assertCount(1, $events);
-        $this->assertEquals(array('foo'), $events);
+        $this->assertEquals(['foo'], $events);
     }
 
     public function testItDoesNotReturnHandledEvents()

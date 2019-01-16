@@ -26,7 +26,7 @@ class SerializerTest extends TestCase
     public function testEncodedIsDecodable()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'));
@@ -37,12 +37,12 @@ class SerializerTest extends TestCase
     public function testEncodedWithConfigurationIsDecodable()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'))
-            ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
-            ->with(new ValidationConfiguration(array('foo', 'bar')))
+            ->with(new SerializerConfiguration([ObjectNormalizer::GROUPS => ['foo']]))
+            ->with(new ValidationConfiguration(['foo', 'bar']))
         ;
 
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
@@ -51,7 +51,7 @@ class SerializerTest extends TestCase
     public function testEncodedIsHavingTheBodyAndTypeHeader()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $encoded = $serializer->encode(Envelope::wrap(new DummyMessage('Hello')));
@@ -68,10 +68,10 @@ class SerializerTest extends TestCase
         $message = new DummyMessage('Foo');
 
         $serializer = $this->getMockBuilder(SerializerComponent\SerializerInterface::class)->getMock();
-        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', array('foo' => 'bar'))->willReturn('Yay');
-        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', array('foo' => 'bar'))->willReturn($message);
+        $serializer->expects($this->once())->method('serialize')->with($message, 'csv', ['foo' => 'bar'])->willReturn('Yay');
+        $serializer->expects($this->once())->method('deserialize')->with('Yay', DummyMessage::class, 'csv', ['foo' => 'bar'])->willReturn($message);
 
-        $encoder = new Serializer($serializer, 'csv', array('foo' => 'bar'));
+        $encoder = new Serializer($serializer, 'csv', ['foo' => 'bar']);
 
         $encoded = $encoder->encode(Envelope::wrap($message));
         $decoded = $encoder->decode($encoded);
@@ -83,12 +83,12 @@ class SerializerTest extends TestCase
     public function testEncodedWithSerializationConfiguration()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = Envelope::wrap(new DummyMessage('Hello'))
-            ->with(new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('foo'))))
-            ->with(new ValidationConfiguration(array('foo', 'bar')))
+            ->with(new SerializerConfiguration([ObjectNormalizer::GROUPS => ['foo']]))
+            ->with(new ValidationConfiguration(['foo', 'bar']))
         ;
 
         $encoded = $serializer->encode($envelope);

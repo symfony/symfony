@@ -39,8 +39,8 @@ class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 4096),
-        );
+        return [
+            KernelEvents::REQUEST => ['onKernelRequest', 4096],
+        ];
     }
 }

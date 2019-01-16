@@ -40,11 +40,11 @@ class Email extends Constraint
      *
      * @internal
      */
-    public static $validationModes = array(
+    public static $validationModes = [
         self::VALIDATION_MODE_HTML5,
         self::VALIDATION_MODE_STRICT,
         self::VALIDATION_MODE_LOOSE,
-    );
+    ];
 
     public $message = 'This value is not a valid email address.';
     public $checkMX = false;

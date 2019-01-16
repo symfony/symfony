@@ -29,7 +29,7 @@ class StopWhenTimeLimitIsReachedReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -38,7 +38,7 @@ class StopWhenTimeLimitIsReachedReceiverTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')
-            ->with('Receiver stopped due to time limit of {timeLimit}s reached', array('timeLimit' => 1));
+            ->with('Receiver stopped due to time limit of {timeLimit}s reached', ['timeLimit' => 1]);
 
         $timeoutReceiver = new StopWhenTimeLimitIsReachedReceiver($decoratedReceiver, 1, $logger);
         $timeoutReceiver->receive(function () {

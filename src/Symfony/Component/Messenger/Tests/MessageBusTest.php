@@ -58,10 +58,10 @@ class MessageBusTest extends TestCase
             ->with($message, $this->anything())
             ->willReturn($responseFromDepthMiddleware);
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
-        ));
+        ]);
 
         $this->assertEquals($responseFromDepthMiddleware, $bus->dispatch($message));
     }
@@ -69,7 +69,7 @@ class MessageBusTest extends TestCase
     public function testItKeepsTheEnvelopeEvenThroughAMiddlewareThatIsNotEnvelopeAware()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, array(new ReceivedMessage()));
+        $envelope = new Envelope($message, [new ReceivedMessage()]);
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $firstMiddleware->expects($this->once())
@@ -79,16 +79,16 @@ class MessageBusTest extends TestCase
                 return $next($message);
             }));
 
-        $secondMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
+        $secondMiddleware = $this->getMockBuilder([MiddlewareInterface::class, EnvelopeAwareInterface::class])->getMock();
         $secondMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($envelope);
     }
@@ -96,10 +96,10 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanAddSomeItemsToTheEnvelope()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, array(new ReceivedMessage()));
+        $envelope = new Envelope($message, [new ReceivedMessage()]);
         $envelopeWithAnotherItem = $envelope->with(new AnEnvelopeItem());
 
-        $firstMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
+        $firstMiddleware = $this->getMockBuilder([MiddlewareInterface::class, EnvelopeAwareInterface::class])->getMock();
         $firstMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelope, $this->anything())
@@ -115,17 +115,17 @@ class MessageBusTest extends TestCase
                 return $next($message);
             }));
 
-        $thirdMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
+        $thirdMiddleware = $this->getMockBuilder([MiddlewareInterface::class, EnvelopeAwareInterface::class])->getMock();
         $thirdMiddleware->expects($this->once())
             ->method('handle')
             ->with($envelopeWithAnotherItem, $this->anything())
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
             $thirdMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($envelope);
     }
@@ -133,7 +133,7 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeItems()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, $items = array(new ReceivedMessage()));
+        $envelope = new Envelope($message, $items = [new ReceivedMessage()]);
 
         $changedMessage = new DummyMessage('Changed');
         $expectedEnvelope = new Envelope($changedMessage, $items);
@@ -146,16 +146,16 @@ class MessageBusTest extends TestCase
                 return $next($changedMessage);
             }));
 
-        $secondMiddleware = $this->getMockBuilder(array(MiddlewareInterface::class, EnvelopeAwareInterface::class))->getMock();
+        $secondMiddleware = $this->getMockBuilder([MiddlewareInterface::class, EnvelopeAwareInterface::class])->getMock();
         $secondMiddleware->expects($this->once())
             ->method('handle')
             ->with($expectedEnvelope, $this->anything())
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($envelope);
     }

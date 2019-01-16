@@ -22,7 +22,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
      * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
-    private $mappingForMappedObjectCache = array();
+    private $mappingForMappedObjectCache = [];
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)
     {

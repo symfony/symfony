@@ -416,9 +416,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testHelp()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
-        ));
+        ]);
         $view = $form->createView();
         $html = $this->renderHelp($view);
 
@@ -442,9 +442,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testHelpSetLinkFromWidget()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
-        ));
+        ]);
         $view = $form->createView();
         $html = $this->renderRow($view);
 

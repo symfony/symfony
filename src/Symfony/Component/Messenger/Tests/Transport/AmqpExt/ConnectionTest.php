@@ -32,15 +32,15 @@ class ConnectionTest extends TestCase
     public function testItGetsParametersFromTheDsn()
     {
         $this->assertEquals(
-            new Connection(array(
+            new Connection([
                 'host' => 'localhost',
                 'port' => 5672,
                 'vhost' => '/',
-            ), array(
+            ], [
                 'name' => 'messages',
-            ), array(
+            ], [
                 'name' => 'messages',
-            )),
+            ]),
             Connection::fromDsn('amqp://localhost/%2f/messages')
         );
     }
@@ -48,17 +48,17 @@ class ConnectionTest extends TestCase
     public function testOverrideOptionsViaQueryParameters()
     {
         $this->assertEquals(
-            new Connection(array(
+            new Connection([
                 'host' => 'redis',
                 'port' => 1234,
                 'vhost' => '/',
                 'login' => 'guest',
                 'password' => 'password',
-            ), array(
+            ], [
                 'name' => 'exchangeName',
-            ), array(
+            ], [
                 'name' => 'queue',
-            )),
+            ]),
             Connection::fromDsn('amqp://guest:password@redis:1234/%2f/queue?exchange[name]=exchangeName')
         );
     }
@@ -66,22 +66,22 @@ class ConnectionTest extends TestCase
     public function testOptionsAreTakenIntoAccountAndOverwrittenByDsn()
     {
         $this->assertEquals(
-            new Connection(array(
+            new Connection([
                 'host' => 'redis',
                 'port' => 1234,
                 'vhost' => '/',
                 'login' => 'guest',
                 'password' => 'password',
                 'persistent' => 'true',
-            ), array(
+            ], [
                 'name' => 'exchangeName',
-            ), array(
+            ], [
                 'name' => 'queueName',
-            )),
-            Connection::fromDsn('amqp://guest:password@redis:1234/%2f/queue?exchange[name]=exchangeName&queue[name]=queueName', array(
+            ]),
+            Connection::fromDsn('amqp://guest:password@redis:1234/%2f/queue?exchange[name]=exchangeName&queue[name]=queueName', [
                 'persistent' => 'true',
-                'exchange' => array('name' => 'toBeOverwritten'),
-            ))
+                'exchange' => ['name' => 'toBeOverwritten'],
+            ])
         );
     }
 
@@ -94,27 +94,27 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock()
         );
 
-        $amqpQueue->expects($this->once())->method('setArguments')->with(array(
+        $amqpQueue->expects($this->once())->method('setArguments')->with([
             'x-dead-letter-exchange' => 'dead-exchange',
             'x-message-ttl' => '1200',
-        ));
+        ]);
 
-        $amqpExchange->expects($this->once())->method('setArguments')->with(array(
+        $amqpExchange->expects($this->once())->method('setArguments')->with([
             'alternate-exchange' => 'alternate',
-        ));
+        ]);
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[arguments][x-dead-letter-exchange]=dead-exchange', array(
-            'queue' => array(
-                'arguments' => array(
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[arguments][x-dead-letter-exchange]=dead-exchange', [
+            'queue' => [
+                'arguments' => [
                     'x-message-ttl' => '1200',
-                ),
-            ),
-            'exchange' => array(
-                'arguments' => array(
+                ],
+            ],
+            'exchange' => [
+                'arguments' => [
                     'alternate-exchange' => 'alternate',
-                ),
-            ),
-        ), true, $factory);
+                ],
+            ],
+        ], true, $factory);
         $connection->publish('body');
     }
 
@@ -129,7 +129,7 @@ class ConnectionTest extends TestCase
 
         $amqpConnection->expects($this->once())->method('connect');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', array(), false, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', [], false, $factory);
         $connection->publish('body');
     }
 
@@ -144,7 +144,7 @@ class ConnectionTest extends TestCase
 
         $amqpConnection->expects($this->once())->method('pconnect');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?persistent=true', array(), false, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?persistent=true', [], false, $factory);
         $connection->publish('body');
     }
 
@@ -162,7 +162,7 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->once())->method('bind')->with('exchange_name', 'my_key');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', array(), true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', [], true, $factory);
         $connection->publish('body');
     }
 
@@ -180,13 +180,13 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->never())->method('declareQueue');
         $amqpQueue->expects($this->never())->method('bind');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', array('auto-setup' => 'false'), true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => 'false'], true, $factory);
         $connection->publish('body');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', array('auto-setup' => false), true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => false], true, $factory);
         $connection->publish('body');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', array(), true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', [], true, $factory);
         $connection->publish('body');
     }
 }

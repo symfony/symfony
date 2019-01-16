@@ -45,7 +45,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      * @param int|null $loadOptions      A bit field of LIBXML_* constants
      * @param int[]    $ignoredNodeTypes an array of ignored XML node types, each one of the DOM Predefined XML_* Constants
      */
-    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE))
+    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = [XML_PI_NODE, XML_COMMENT_NODE])
     {
         $this->rootNodeName = $rootNodeName;
         $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
@@ -55,7 +55,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         if ($data instanceof \DOMDocument) {
             return $data->saveXML();
@@ -81,7 +81,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         if ('' === trim($data)) {
             throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
@@ -117,7 +117,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         if ($rootNode->hasChildNodes()) {
             $xpath = new \DOMXPath($dom);
-            $data = array();
+            $data = [];
             foreach ($xpath->query('namespace::*', $dom->documentElement) as $nsNode) {
                 $data['@'.$nsNode->nodeName] = $nsNode->nodeValue;
             }
@@ -135,7 +135,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $rootNode->nodeValue;
         }
 
-        $data = array();
+        $data = [];
 
         foreach ($rootNode->attributes as $attrKey => $attr) {
             $data['@'.$attrKey] = $attr->nodeValue;
@@ -241,7 +241,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXml(\DOMNode $node, array $context = array())
+    private function parseXml(\DOMNode $node, array $context = [])
     {
         $data = $this->parseXmlAttributes($node, $context);
 
@@ -273,13 +273,13 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode attributes into an array.
      */
-    private function parseXmlAttributes(\DOMNode $node, array $context = array()): array
+    private function parseXmlAttributes(\DOMNode $node, array $context = []): array
     {
         if (!$node->hasAttributes()) {
-            return array();
+            return [];
         }
 
-        $data = array();
+        $data = [];
         $typeCastAttributes = $this->resolveXmlTypeCastAttributes($context);
 
         foreach ($node->attributes as $attr) {
@@ -306,17 +306,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXmlValue(\DOMNode $node, array $context = array())
+    private function parseXmlValue(\DOMNode $node, array $context = [])
     {
         if (!$node->hasChildNodes()) {
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
             return $node->firstChild->nodeValue;
         }
 
-        $value = array();
+        $value = [];
 
         foreach ($node->childNodes as $subnode) {
             if (\in_array($subnode->nodeType, $this->ignoredNodeTypes, true)) {
@@ -471,7 +471,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Get real XML root node name, taking serializer options into account.
      */
-    private function resolveXmlRootName(array $context = array()): string
+    private function resolveXmlRootName(array $context = []): string
     {
         return isset($context['xml_root_node_name'])
             ? $context['xml_root_node_name']
@@ -481,7 +481,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Get XML option for type casting attributes Defaults to true.
      */
-    private function resolveXmlTypeCastAttributes(array $context = array()): bool
+    private function resolveXmlTypeCastAttributes(array $context = []): bool
     {
         return isset($context['xml_type_cast_attributes'])
             ? (bool) $context['xml_type_cast_attributes']
@@ -496,7 +496,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $document = new \DOMDocument();
 
         // Set an attribute on the DOM document specifying, as part of the XML declaration,
-        $xmlOptions = array(
+        $xmlOptions = [
             // nicely formats output with indentation and extra space
             'xml_format_output' => 'formatOutput',
             // the version number of the document
@@ -505,7 +505,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             'xml_encoding' => 'encoding',
             // whether the document is standalone
             'xml_standalone' => 'xmlStandalone',
-        );
+        ];
         foreach ($xmlOptions as $xmlOption => $documentProperty) {
             if (isset($context[$xmlOption])) {
                 $document->$documentProperty = $context[$xmlOption];

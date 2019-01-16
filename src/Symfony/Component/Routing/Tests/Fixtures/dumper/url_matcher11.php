@@ -17,14 +17,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
             return $ret;
         }
         if ($allow) {
             throw new MethodNotAllowedException(array_keys($allow));
         }
-        if (!in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+        if (!in_array($this->context->getMethod(), ['HEAD', 'GET'], true)) {
             // no-op
         } elseif ($allowSchemes) {
             redirect_scheme:
@@ -50,9 +50,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $pathinfo, array &$allow = array(), array &$allowSchemes = array()): array
+    private function doMatch(string $pathinfo, array &$allow = [], array &$allowSchemes = []): array
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         $pathinfo = rawurldecode($pathinfo) ?: '/';
         $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
@@ -63,7 +63,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
         $matchedPathinfo = $pathinfo;
-        $regexList = array(
+        $regexList = [
             0 => '{^(?'
                     .'|/(en|fr)/(?'
                         .'|admin/post(?'
@@ -94,28 +94,28 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     .')'
                     .'|/(en|fr)?(*:264)'
                 .')/?$}sD',
-        );
+        ];
 
         foreach ($regexList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 switch ($m = (int) $matches['MARK']) {
                     default:
-                        $routes = array(
-                            32 => array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, true, false),
-                            46 => array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null, false, false),
-                            58 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null, false, true),
-                            75 => array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null, false, false),
-                            94 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null, false, false),
-                            110 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, true, false),
-                            130 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null, false, false),
-                            154 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null, false, true),
-                            175 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null, false, true),
-                            202 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null, false, false),
-                            216 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null, false, false),
-                            234 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null, false, false),
-                            245 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null, false, false),
-                            264 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null, false, true),
-                        );
+                        $routes = [
+                            32 => [['_route' => 'a', '_locale' => 'en'], ['_locale'], null, null, true, false],
+                            46 => [['_route' => 'b', '_locale' => 'en'], ['_locale'], null, null, false, false],
+                            58 => [['_route' => 'c', '_locale' => 'en'], ['_locale', 'id'], null, null, false, true],
+                            75 => [['_route' => 'd', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false],
+                            94 => [['_route' => 'e', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false],
+                            110 => [['_route' => 'f', '_locale' => 'en'], ['_locale'], null, null, true, false],
+                            130 => [['_route' => 'g', '_locale' => 'en'], ['_locale'], null, null, false, false],
+                            154 => [['_route' => 'h', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true],
+                            175 => [['_route' => 'i', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true],
+                            202 => [['_route' => 'j', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false],
+                            216 => [['_route' => 'k', '_locale' => 'en'], ['_locale'], null, null, false, false],
+                            234 => [['_route' => 'l', '_locale' => 'en'], ['_locale'], null, null, false, false],
+                            245 => [['_route' => 'm', '_locale' => 'en'], ['_locale'], null, null, false, false],
+                            264 => [['_route' => 'n', '_locale' => 'en'], ['_locale'], null, null, false, true],
+                        ];
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 
@@ -128,7 +128,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         }
                         if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                             if ('GET' === $canonicalMethod && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                                return $allow = $allowSchemes = array();
+                                return $allow = $allowSchemes = [];
                             }
                             if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
                                 break;
@@ -167,6 +167,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             throw new Symfony\Component\Routing\Exception\NoConfigurationException();
         }
 
-        return array();
+        return [];
     }
 }

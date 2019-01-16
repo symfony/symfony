@@ -87,12 +87,12 @@ class ExceptionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::EXCEPTION => array(
-                array('logKernelException', 0),
-                array('onKernelException', -128),
-            ),
-        );
+        return [
+            KernelEvents::EXCEPTION => [
+                ['logKernelException', 0],
+                ['onKernelException', -128],
+            ],
+        ];
     }
 
     /**
@@ -105,9 +105,9 @@ class ExceptionListener implements EventSubscriberInterface
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                $this->logger->critical($message, array('exception' => $exception));
+                $this->logger->critical($message, ['exception' => $exception]);
             } else {
-                $this->logger->error($message, array('exception' => $exception));
+                $this->logger->error($message, ['exception' => $exception]);
             }
         }
     }
@@ -122,11 +122,11 @@ class ExceptionListener implements EventSubscriberInterface
      */
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
-        $attributes = array(
+        $attributes = [
             '_controller' => $this->controller,
             'exception' => FlattenException::create($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-        );
+        ];
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');
 

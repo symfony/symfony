@@ -60,7 +60,7 @@ class MoneyType extends AbstractType
             'compound' => false,
         ]);
 
-        $resolver->setAllowedValues('rounding_mode', array(
+        $resolver->setAllowedValues('rounding_mode', [
             NumberToLocalizedStringTransformer::ROUND_FLOOR,
             NumberToLocalizedStringTransformer::ROUND_DOWN,
             NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
@@ -68,7 +68,7 @@ class MoneyType extends AbstractType
             NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             NumberToLocalizedStringTransformer::ROUND_UP,
             NumberToLocalizedStringTransformer::ROUND_CEILING,
-        ));
+        ]);
 
         $resolver->setAllowedTypes('scale', 'int');
     }

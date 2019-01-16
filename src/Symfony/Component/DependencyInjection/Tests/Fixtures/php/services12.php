@@ -17,12 +17,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     /**
      * @internal but protected for BC on cache:clear
      */
-    protected $privates = array();
+    protected $privates = [];
 
     public function __construct()
     {
@@ -32,17 +32,17 @@ class ProjectServiceContainer extends Container
         }
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'test' => 'getTestService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function reset()
     {
-        $this->privates = array();
+        $this->privates = [];
         parent::reset();
     }
 
@@ -58,10 +58,10 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -71,7 +71,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), [('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')]);
     }
 
     public function getParameter($name)
@@ -113,11 +113,11 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array(
+    private $loadedDynamicParameters = [
         'foo' => false,
         'buz' => false,
-    );
-    private $dynamicParameters = array();
+    ];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -147,9 +147,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
-        );
+        ];
     }
 }

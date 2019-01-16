@@ -41,16 +41,16 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testSubmitDateTimeImmutable()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'datetime_immutable',
-        ));
+        ]);
 
-        $input = array(
+        $input = [
             'hour' => '3',
             'minute' => '4',
-        );
+        ];
 
         $form->submit($input);
 

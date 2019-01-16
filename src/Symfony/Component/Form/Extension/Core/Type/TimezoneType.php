@@ -35,7 +35,7 @@ class TimezoneType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
                 $regions = $options['regions'];
 
@@ -46,9 +46,9 @@ class TimezoneType extends AbstractType
             'choice_translation_domain' => false,
             'input' => 'string',
             'regions' => \DateTimeZone::ALL,
-        ));
+        ]);
 
-        $resolver->setAllowedValues('input', array('string', 'datetimezone'));
+        $resolver->setAllowedValues('input', ['string', 'datetimezone']);
 
         $resolver->setAllowedTypes('regions', 'int');
     }
@@ -74,7 +74,7 @@ class TimezoneType extends AbstractType
      */
     private static function getTimezones(int $regions): array
     {
-        $timezones = array();
+        $timezones = [];
 
         foreach (\DateTimeZone::listIdentifiers($regions) as $timezone) {
             $parts = explode('/', $timezone);

@@ -23,7 +23,7 @@ class Serializer implements DecoderInterface, EncoderInterface
     private $format;
     private $context;
 
-    public function __construct(SerializerInterface $serializer, string $format = 'json', array $context = array())
+    public function __construct(SerializerInterface $serializer, string $format = 'json', array $context = [])
     {
         $this->serializer = $serializer;
         $this->format = $format;
@@ -43,7 +43,7 @@ class Serializer implements DecoderInterface, EncoderInterface
             throw new \InvalidArgumentException('Encoded envelope does not have a `type` header.');
         }
 
-        $envelopeItems = isset($encodedEnvelope['headers']['X-Message-Envelope-Items']) ? unserialize($encodedEnvelope['headers']['X-Message-Envelope-Items']) : array();
+        $envelopeItems = isset($encodedEnvelope['headers']['X-Message-Envelope-Items']) ? unserialize($encodedEnvelope['headers']['X-Message-Envelope-Items']) : [];
 
         $context = $this->context;
         /** @var SerializerConfiguration|null $serializerConfig */
@@ -67,14 +67,14 @@ class Serializer implements DecoderInterface, EncoderInterface
             $context = $serializerConfig->getContext() + $context;
         }
 
-        $headers = array('type' => \get_class($envelope->getMessage()));
+        $headers = ['type' => \get_class($envelope->getMessage())];
         if ($configurations = $envelope->all()) {
             $headers['X-Message-Envelope-Items'] = serialize($configurations);
         }
 
-        return array(
+        return [
             'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
-        );
+        ];
     }
 }

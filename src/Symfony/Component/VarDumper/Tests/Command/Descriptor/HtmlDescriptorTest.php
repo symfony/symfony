@@ -39,11 +39,11 @@ class HtmlDescriptorTest extends TestCase
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 
-        $descriptor->describe($output, new Data(array(array(123))), array('timestamp' => 1544804268.3668), 1);
+        $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
         $this->assertStringMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output');
 
-        $descriptor->describe($output, new Data(array(array(123))), array('timestamp' => 1544804268.3668), 1);
+        $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
 
         $this->assertStringNotMatchesFormat('<style>%A</style><script>%A</script>%A', $output->fetch(), 'styles & scripts are output only once');
     }
@@ -58,21 +58,21 @@ class HtmlDescriptorTest extends TestCase
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 
-        $descriptor->describe($output, new Data(array(array(123))), $context + array('timestamp' => 1544804268.3668), 1);
+        $descriptor->describe($output, new Data([[123]]), $context + ['timestamp' => 1544804268.3668], 1);
 
         $this->assertStringMatchesFormat(trim($expectedOutput), trim(preg_replace('@<style>.*</style><script>.*</script>@s', '', $output->fetch())));
     }
 
     public function provideContext()
     {
-        yield 'source' => array(
-            array(
-                'source' => array(
+        yield 'source' => [
+            [
+                'source' => [
                     'name' => 'CliDescriptorTest.php',
                     'line' => 30,
                     'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 <article data-dedup-id="%s">
     <header>
@@ -92,19 +92,19 @@ class HtmlDescriptorTest extends TestCase
     </section>
 </article>
 TXT
-        );
+        ];
 
-        yield 'source full' => array(
-            array(
-                'source' => array(
+        yield 'source full' => [
+            [
+                'source' => [
                     'name' => 'CliDescriptorTest.php',
                     'project_dir' => 'src/Symfony/',
                     'line' => 30,
                     'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                     'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                     'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 <article data-dedup-id="%s">
     <header>
@@ -128,15 +128,15 @@ TXT
     </section>
 </article>
 TXT
-        );
+        ];
 
-        yield 'cli' => array(
-            array(
-                'cli' => array(
+        yield 'cli' => [
+            [
+                'cli' => [
                     'identifier' => 'd8bece1c',
                     'command_line' => 'bin/phpunit',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 <article data-dedup-id="d8bece1c">
     <header>
@@ -156,17 +156,17 @@ TXT
     </section>
 </article>
 TXT
-        );
+        ];
 
-        yield 'request' => array(
-            array(
-                'request' => array(
+        yield 'request' => [
+            [
+                'request' => [
                     'identifier' => 'd8bece1c',
-                    'controller' => new Data(array(array('FooController.php'))),
+                    'controller' => new Data([['FooController.php']]),
                     'method' => 'GET',
                     'uri' => 'http://localhost/foo',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 <article data-dedup-id="d8bece1c">
     <header>
@@ -190,6 +190,6 @@ TXT
     </section>
 </article>
 TXT
-        );
+        ];
     }
 }

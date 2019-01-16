@@ -131,7 +131,7 @@ return function (ContainerConfigurator $c) {
         ->args([tagged('foo')]);
 
     $s->set('runtime_error', 'stdClass')
-        ->args(array(new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)))
+        ->args([new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)])
         ->public();
     $s->set('errored_definition', 'stdClass')->private();
 

@@ -24,7 +24,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     private $optionalsEnabled = false;
     private $onlyOptionalsEnabled = false;
 
-    public function __construct(iterable $warmers = array())
+    public function __construct(iterable $warmers = [])
     {
         $this->warmers = $warmers;
     }

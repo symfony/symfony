@@ -53,10 +53,10 @@ class LoggerDataCollectorTest extends TestCase
 
         $logger = $this
             ->getMockBuilder(DebugLoggerInterface::class)
-            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->with(null);
-        $logger->expects($this->exactly(2))->method('getLogs')->with(null)->will($this->returnValue(array()));
+        $logger->expects($this->exactly(2))->method('getLogs')->with(null)->will($this->returnValue([]));
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 
@@ -74,10 +74,10 @@ class LoggerDataCollectorTest extends TestCase
 
         $logger = $this
             ->getMockBuilder(DebugLoggerInterface::class)
-            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->setMethods(['countErrors', 'getLogs', 'clear'])
             ->getMock();
         $logger->expects($this->once())->method('countErrors')->with($subRequest);
-        $logger->expects($this->exactly(2))->method('getLogs')->with($subRequest)->will($this->returnValue(array()));
+        $logger->expects($this->exactly(2))->method('getLogs')->with($subRequest)->will($this->returnValue([]));
 
         $c = new LoggerDataCollector($logger, __DIR__.'/', $stack);
 

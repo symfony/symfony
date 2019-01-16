@@ -47,7 +47,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -63,9 +63,9 @@ class TranslatorTest extends TestCase
     public function testTransWithCaching()
     {
         // prime the cache
-        $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($this->getLoader(), ['cache_dir' => $this->tmpDir]);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -81,9 +81,9 @@ class TranslatorTest extends TestCase
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader->expects($this->never())->method('load');
 
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir]);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -103,7 +103,7 @@ class TranslatorTest extends TestCase
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir], 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
 
         $translator->trans('foo');
     }
@@ -111,13 +111,13 @@ class TranslatorTest extends TestCase
     public function testLoadResourcesWithoutCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
-        $resourceFiles = array(
-            'fr' => array(
+        $resourceFiles = [
+            'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
-        );
+            ],
+        ];
 
-        $translator = $this->getTranslator($loader, array('resource_files' => $resourceFiles), 'yml');
+        $translator = $this->getTranslator($loader, ['resource_files' => $resourceFiles], 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
@@ -139,13 +139,13 @@ class TranslatorTest extends TestCase
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
-        (new Translator($container, new MessageFormatter(), 'en', array(), array('foo' => 'bar')));
+        (new Translator($container, new MessageFormatter(), 'en', [], ['foo' => 'bar']));
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */
     public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
     {
-        $someCatalogue = $this->getCatalogue('some_locale', array());
+        $someCatalogue = $this->getCatalogue('some_locale', []);
 
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
 
@@ -161,10 +161,10 @@ class TranslatorTest extends TestCase
             ->with('second_resource.some_locale.loader', 'some_locale', 'messages')
             ->willReturn($someCatalogue);
 
-        $options = array(
-            'resource_files' => array('some_locale' => array('messages.some_locale.loader')),
+        $options = [
+            'resource_files' => ['some_locale' => ['messages.some_locale.loader']],
             'debug' => $debug,
-        );
+        ];
 
         if ($enableCache) {
             $options['cache_dir'] = $this->tmpDir;
@@ -174,20 +174,20 @@ class TranslatorTest extends TestCase
         $translator = $this->createTranslator($loader, $options);
         $translator->addResource('loader', 'second_resource.some_locale.loader', 'some_locale', 'messages');
 
-        $translator->trans('some_message', array(), null, 'some_locale');
+        $translator->trans('some_message', [], null, 'some_locale');
     }
 
     public function getDebugModeAndCacheDirCombinations()
     {
-        return array(
-            array(false, false),
-            array(true, false),
-            array(false, true),
-            array(true, true),
-        );
+        return [
+            [false, false],
+            [true, false],
+            [false, true],
+            [true, true],
+        ];
     }
 
-    protected function getCatalogue($locale, $messages, $resources = array())
+    protected function getCatalogue($locale, $messages, $resources = [])
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
@@ -206,53 +206,53 @@ class TranslatorTest extends TestCase
         $loader
             ->expects($this->at(0))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array(
+            ->will($this->returnValue($this->getCatalogue('fr', [
                 'foo' => 'foo (FR)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(1))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('en', array(
+            ->will($this->returnValue($this->getCatalogue('en', [
                 'foo' => 'foo (EN)',
                 'bar' => 'bar (EN)',
                 'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(2))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('es', array(
+            ->will($this->returnValue($this->getCatalogue('es', [
                 'foobar' => 'foobar (ES)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(3))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('pt-PT', array(
+            ->will($this->returnValue($this->getCatalogue('pt-PT', [
                 'foobarfoo' => 'foobarfoo (PT-PT)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(4))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('pt_BR', array(
+            ->will($this->returnValue($this->getCatalogue('pt_BR', [
                 'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(5))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr.UTF-8', array(
+            ->will($this->returnValue($this->getCatalogue('fr.UTF-8', [
                 'foobarbaz' => 'foobarbaz (fr.UTF-8)',
-            ))))
+            ])))
         ;
         $loader
             ->expects($this->at(6))
             ->method('load')
-            ->will($this->returnValue($this->getCatalogue('sr@latin', array(
+            ->will($this->returnValue($this->getCatalogue('sr@latin', [
                 'foobarbax' => 'foobarbax (sr@latin)',
-            ))))
+            ])))
         ;
 
         return $loader;
@@ -270,7 +270,7 @@ class TranslatorTest extends TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en')
+    public function getTranslator($loader, $options = [], $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $defaultLocale = 'en')
     {
         $translator = $this->createTranslator($loader, $options, $translatorClass, $loaderFomat, $defaultLocale);
 
@@ -290,15 +290,15 @@ class TranslatorTest extends TestCase
     public function testWarmup()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
-        $resourceFiles = array(
-            'fr' => array(
+        $resourceFiles = [
+            'fr' => [
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
-        );
+            ],
+        ];
 
         // prime the cache
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
-        $translator->setFallbackLocales(array('fr'));
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
+        $translator->setFallbackLocales(['fr']);
         $translator->warmup($this->tmpDir);
 
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
@@ -306,9 +306,9 @@ class TranslatorTest extends TestCase
             ->expects($this->never())
             ->method('load');
 
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('fr'));
+        $translator->setFallbackLocales(['fr']);
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
@@ -318,7 +318,7 @@ class TranslatorTest extends TestCase
             return new $translatorClass(
                 $this->getContainer($loader),
                 new MessageFormatter(),
-                array($loaderFomat => array($loaderFomat)),
+                [$loaderFomat => [$loaderFomat]],
                 $options
             );
         }
@@ -327,7 +327,7 @@ class TranslatorTest extends TestCase
             $this->getContainer($loader),
             new MessageFormatter(),
             $defaultLocale,
-            array($loaderFomat => array($loaderFomat)),
+            [$loaderFomat => [$loaderFomat]],
             $options
         );
     }

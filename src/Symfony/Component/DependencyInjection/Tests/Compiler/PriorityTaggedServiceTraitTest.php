@@ -83,7 +83,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
     {
         $container = new ContainerBuilder();
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
-        $this->assertEquals(array(), $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+        $this->assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 }
 

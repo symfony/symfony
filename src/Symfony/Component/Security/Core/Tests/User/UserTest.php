@@ -117,16 +117,16 @@ class UserTest extends TestCase
 
     public static function isEqualToData()
     {
-        return array(
-            array(true, new User('username', 'password'), new User('username', 'password')),
-            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password')),
-            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password', array('NO ROLE'))),
-            array(false, new User('diff', 'diff'), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false, false), new User('username', 'password')),
-            array(false, new User('diff', 'diff', array(), false, false, false, false), new User('username', 'password')),
-        );
+        return [
+            [true, new User('username', 'password'), new User('username', 'password')],
+            [true, new User('username', 'password', ['ROLE']), new User('username', 'password')],
+            [true, new User('username', 'password', ['ROLE']), new User('username', 'password', ['NO ROLE'])],
+            [false, new User('diff', 'diff'), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false, false), new User('username', 'password')],
+            [false, new User('diff', 'diff', [], false, false, false, false), new User('username', 'password')],
+        ];
     }
 
     public function testIsEqualToWithDifferentUser()

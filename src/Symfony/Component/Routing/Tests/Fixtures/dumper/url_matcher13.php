@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         $pathinfo = rawurldecode($pathinfo) ?: '/';
         $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
@@ -29,7 +29,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         $matchedPathinfo = $host.'.'.$pathinfo;
-        $regexList = array(
+        $regexList = [
             0 => '{^(?'
                 .'|(?i:([^\\.]++)\\.exampple\\.com)\\.(?'
                     .'|/abc([^/]++)(?'
@@ -37,7 +37,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     .')'
                 .')'
                 .')/?$}sD',
-        );
+        ];
 
         foreach ($regexList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
@@ -52,9 +52,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             goto not_r1;
                         }
 
-                        $matches = array('foo' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
+                        $matches = ['foo' => $matches[1] ?? null, 'foo' => $matches[2] ?? null];
 
-                        return $this->mergeDefaults(array('_route' => 'r1') + $matches, array());
+                        return $this->mergeDefaults(['_route' => 'r1'] + $matches, []);
                         not_r1:
 
                         // r2
@@ -66,7 +66,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             goto not_r2;
                         }
 
-                        return $this->mergeDefaults(array('_route' => 'r2') + $matches, array());
+                        return $this->mergeDefaults(['_route' => 'r2'] + $matches, []);
                         not_r2:
 
                         break;

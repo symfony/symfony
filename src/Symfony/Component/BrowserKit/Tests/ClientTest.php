@@ -107,7 +107,7 @@ class ClientTest extends TestCase
     public function testXmlHttpRequest()
     {
         $client = new TestClient();
-        $client->xmlHttpRequest('GET', 'http://example.com/', array(), array(), array(), null, true);
+        $client->xmlHttpRequest('GET', 'http://example.com/', [], [], [], null, true);
         $this->assertEquals($client->getRequest()->getServer()['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest');
         $this->assertFalse($client->getServerParameter('HTTP_X_REQUESTED_WITH', false));
     }
@@ -372,9 +372,9 @@ class ClientTest extends TestCase
         $client = new TestClient();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
-        $headers = array('Accept-Language' => 'de');
+        $headers = ['Accept-Language' => 'de'];
 
-        $client->submit($crawler->filter('input')->form(), array(), $headers);
+        $client->submit($crawler->filter('input')->form(), [], $headers);
 
         $server = $client->getRequest()->getServer();
         $this->assertArrayHasKey('Accept-Language', $server);

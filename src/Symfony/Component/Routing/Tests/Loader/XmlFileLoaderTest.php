@@ -85,7 +85,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadLocalized()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('localized.xml');
         $routes = $routeCollection->all();
 
@@ -98,7 +98,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLocalizedImports()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routeCollection = $loader->load('importer-with-locale.xml');
         $routes = $routeCollection->all();
 
@@ -111,7 +111,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLocalizedImportsOfNotLocalizedRoutes()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');
         $routes = $routeCollection->all();
 
@@ -424,7 +424,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNamePrefix()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));
         $routeCollection = $loader->load('routing.xml');
 
         $this->assertNotNull($routeCollection->get('app_blog'));
@@ -435,7 +435,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNoTrailingSlash()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_no_trailing_slash']));
         $routeCollection = $loader->load('routing.xml');
 
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());

@@ -77,7 +77,7 @@ class EntryManager implements EntryManagerInterface
     {
         $con = $this->getConnectionResource();
 
-        if (!@ldap_mod_add($con, $entry->getDn(), array($attribute => $values))) {
+        if (!@ldap_mod_add($con, $entry->getDn(), [$attribute => $values])) {
             throw new LdapException(sprintf('Could not add values to entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
         }
     }
@@ -92,7 +92,7 @@ class EntryManager implements EntryManagerInterface
     {
         $con = $this->getConnectionResource();
 
-        if (!@ldap_mod_del($con, $entry->getDn(), array($attribute => $values))) {
+        if (!@ldap_mod_del($con, $entry->getDn(), [$attribute => $values])) {
             throw new LdapException(sprintf('Could not remove values from entry "%s", attribute %s: %s.', $entry->getDn(), $attribute, ldap_error($con)));
         }
     }

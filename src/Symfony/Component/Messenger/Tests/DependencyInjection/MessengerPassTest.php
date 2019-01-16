@@ -53,7 +53,7 @@ class MessengerPassTest extends TestCase
         ;
         $container
             ->register(MissingArgumentTypeHandler::class, MissingArgumentTypeHandler::class)
-            ->addTag('messenger.message_handler', array('handles' => SecondMessage::class))
+            ->addTag('messenger.message_handler', ['handles' => SecondMessage::class])
         ;
         $container
             ->register(DummyReceiver::class, DummyReceiver::class)
@@ -67,15 +67,15 @@ class MessengerPassTest extends TestCase
         $handlerLocatorDefinition = $container->getDefinition($container->getDefinition("$busId.messenger.handler_resolver")->getArgument(0));
         $this->assertSame(ServiceLocator::class, $handlerLocatorDefinition->getClass());
         $this->assertEquals(
-            array(
+            [
                 'handler.'.DummyMessage::class => new ServiceClosureArgument(new Reference(DummyHandler::class)),
                 'handler.'.SecondMessage::class => new ServiceClosureArgument(new Reference(MissingArgumentTypeHandler::class)),
-            ),
+            ],
             $handlerLocatorDefinition->getArgument(0)
         );
 
         $this->assertEquals(
-            array(DummyReceiver::class => new Reference(DummyReceiver::class)),
+            [DummyReceiver::class => new Reference(DummyReceiver::class)],
             $container->getDefinition('messenger.receiver_locator')->getArgument(0)
         );
     }
@@ -83,22 +83,22 @@ class MessengerPassTest extends TestCase
     public function testProcessHandlersByBus()
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
-        $container->register($queryBusId = 'query_bus', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus');
+        $container->register($queryBusId = 'query_bus', MessageBusInterface::class)->setArgument(0, [])->addTag('messenger.bus');
         $container->register('messenger.middleware.call_message_handler', HandleMessageMiddleware::class)
             ->addArgument(null)
             ->setAbstract(true)
         ;
 
-        $middlewares = array(array('id' => 'call_message_handler'));
+        $middlewares = [['id' => 'call_message_handler']];
 
         $container->setParameter($commandBusId.'.middleware', $middlewares);
         $container->setParameter($queryBusId.'.middleware', $middlewares);
 
-        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', array('bus' => $commandBusId));
-        $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', array('bus' => $queryBusId));
+        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', ['bus' => $commandBusId]);
+        $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', ['bus' => $queryBusId]);
         $container->register(MultipleBusesMessageHandler::class)
-            ->addTag('messenger.message_handler', array('bus' => $commandBusId))
-            ->addTag('messenger.message_handler', array('bus' => $queryBusId))
+            ->addTag('messenger.message_handler', ['bus' => $commandBusId])
+            ->addTag('messenger.message_handler', ['bus' => $queryBusId])
         ;
 
         (new ResolveClassPass())->process($container);
@@ -107,20 +107,20 @@ class MessengerPassTest extends TestCase
         $commandBusHandlerLocatorDefinition = $container->getDefinition($container->getDefinition("$commandBusId.messenger.handler_resolver")->getArgument(0));
         $this->assertSame(ServiceLocator::class, $commandBusHandlerLocatorDefinition->getClass());
         $this->assertEquals(
-            array(
+            [
                 'handler.'.DummyCommand::class => new ServiceClosureArgument(new Reference(DummyCommandHandler::class)),
                 'handler.'.MultipleBusesMessage::class => new ServiceClosureArgument(new Reference(MultipleBusesMessageHandler::class)),
-            ),
+            ],
             $commandBusHandlerLocatorDefinition->getArgument(0)
         );
 
         $queryBusHandlerLocatorDefinition = $container->getDefinition($container->getDefinition("$queryBusId.messenger.handler_resolver")->getArgument(0));
         $this->assertSame(ServiceLocator::class, $queryBusHandlerLocatorDefinition->getClass());
         $this->assertEquals(
-            array(
+            [
                 'handler.'.DummyQuery::class => new ServiceClosureArgument(new Reference(DummyQueryHandler::class)),
                 'handler.'.MultipleBusesMessage::class => new ServiceClosureArgument(new Reference(MultipleBusesMessageHandler::class)),
-            ),
+            ],
             $queryBusHandlerLocatorDefinition->getArgument(0)
         );
     }
@@ -133,7 +133,7 @@ class MessengerPassTest extends TestCase
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
 
-        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', array('bus' => 'unknown_bus'));
+        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', ['bus' => 'unknown_bus']);
 
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
@@ -164,7 +164,7 @@ class MessengerPassTest extends TestCase
         $definition = $container->getDefinition($handlerReference);
 
         $this->assertSame(ChainHandler::class, $definition->getClass());
-        $this->assertEquals(array(new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class)), $definition->getArgument(0));
+        $this->assertEquals([new Reference(PrioritizedHandler::class), new Reference(HandlerWithMultipleMessages::class)], $definition->getArgument(0));
     }
 
     public function testGetClassesAndMethodsAndPrioritiesFromTheSubscriber()
@@ -190,8 +190,8 @@ class MessengerPassTest extends TestCase
         $dummyHandlerReference = (string) $handlerMapping['handler.'.DummyMessage::class]->getValues()[0];
         $dummyHandlerDefinition = $container->getDefinition($dummyHandlerReference);
         $this->assertSame('callable', $dummyHandlerDefinition->getClass());
-        $this->assertEquals(array(new Reference(HandlerMappingMethods::class), 'dummyMethod'), $dummyHandlerDefinition->getArgument(0));
-        $this->assertSame(array('Closure', 'fromCallable'), $dummyHandlerDefinition->getFactory());
+        $this->assertEquals([new Reference(HandlerMappingMethods::class), 'dummyMethod'], $dummyHandlerDefinition->getArgument(0));
+        $this->assertSame(['Closure', 'fromCallable'], $dummyHandlerDefinition->getFactory());
 
         $secondHandlerReference = (string) $handlerMapping['handler.'.SecondMessage::class]->getValues()[0];
         $secondHandlerDefinition = $container->getDefinition($secondHandlerReference);
@@ -219,11 +219,11 @@ class MessengerPassTest extends TestCase
     {
         $container = $this->getContainerBuilder();
         $container->register('message_bus', MessageBusInterface::class)->addTag('messenger.bus');
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
 
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array('amqp' => new Reference(AmqpReceiver::class), AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+        $this->assertEquals(['amqp' => new Reference(AmqpReceiver::class), AmqpReceiver::class => new Reference(AmqpReceiver::class)], $container->getDefinition('messenger.receiver_locator')->getArgument(0));
     }
 
     public function testItRegistersReceiversWithoutTagName()
@@ -234,35 +234,35 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array(AmqpReceiver::class => new Reference(AmqpReceiver::class)), $container->getDefinition('messenger.receiver_locator')->getArgument(0));
+        $this->assertEquals([AmqpReceiver::class => new Reference(AmqpReceiver::class)], $container->getDefinition('messenger.receiver_locator')->getArgument(0));
     }
 
     public function testItRegistersMultipleReceiversAndSetsTheReceiverNamesOnTheCommand()
     {
         $container = $this->getContainerBuilder();
-        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments(array(
+        $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments([
             new Reference('message_bus'),
             new Reference('messenger.receiver_locator'),
             null,
             null,
-        ));
+        ]);
 
-        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', array('alias' => 'amqp'));
-        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', array('alias' => 'dummy'));
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'dummy']);
 
         (new MessengerPass())->process($container);
 
-        $this->assertSame(array('amqp', 'dummy'), $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
+        $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_consume_messages')->getArgument(3));
     }
 
     public function testItRegistersSenders()
     {
         $container = $this->getContainerBuilder();
-        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender', array('alias' => 'amqp'));
+        $container->register(AmqpSender::class, AmqpSender::class)->addTag('messenger.sender', ['alias' => 'amqp']);
 
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array('amqp' => new Reference(AmqpSender::class), AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
+        $this->assertEquals(['amqp' => new Reference(AmqpSender::class), AmqpSender::class => new Reference(AmqpSender::class)], $container->getDefinition('messenger.sender_locator')->getArgument(0));
     }
 
     public function testItRegistersSenderWithoutTagName()
@@ -272,7 +272,7 @@ class MessengerPassTest extends TestCase
 
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array(AmqpSender::class => new Reference(AmqpSender::class)), $container->getDefinition('messenger.sender_locator')->getArgument(0));
+        $this->assertEquals([AmqpSender::class => new Reference(AmqpSender::class)], $container->getDefinition('messenger.sender_locator')->getArgument(0));
     }
 
     public function testItShouldNotThrowIfGeneratorIsReturnedInsteadOfArray()
@@ -290,11 +290,11 @@ class MessengerPassTest extends TestCase
 
         $this->assertArrayHasKey('handler.'.DummyMessage::class, $handlerMapping);
         $firstReference = $handlerMapping['handler.'.DummyMessage::class]->getValues()[0];
-        $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'dummyMethod'), $container->getDefinition($firstReference)->getArgument(0));
+        $this->assertEquals([new Reference(HandlerWithGenerators::class), 'dummyMethod'], $container->getDefinition($firstReference)->getArgument(0));
 
         $this->assertArrayHasKey('handler.'.SecondMessage::class, $handlerMapping);
         $secondReference = $handlerMapping['handler.'.SecondMessage::class]->getValues()[0];
-        $this->assertEquals(array(new Reference(HandlerWithGenerators::class), 'secondMessage'), $container->getDefinition($secondReference)->getArgument(0));
+        $this->assertEquals([new Reference(HandlerWithGenerators::class), 'secondMessage'], $container->getDefinition($secondReference)->getArgument(0));
     }
 
     /**
@@ -441,8 +441,8 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertTrue($container->hasDefinition($debuggedFooBusId = 'debug.traced.'.$fooBusId));
-        $this->assertSame(array($fooBusId, null, 0), $container->getDefinition($debuggedFooBusId)->getDecoratedService());
-        $this->assertEquals(array(array('registerBus', array($fooBusId, new Reference($debuggedFooBusId)))), $container->getDefinition('data_collector.messenger')->getMethodCalls());
+        $this->assertSame([$fooBusId, null, 0], $container->getDefinition($debuggedFooBusId)->getDecoratedService());
+        $this->assertEquals([['registerBus', [$fooBusId, new Reference($debuggedFooBusId)]]], $container->getDefinition('data_collector.messenger')->getMethodCalls());
     }
 
     public function testRegistersMiddlewareFromServices()
@@ -453,12 +453,12 @@ class MessengerPassTest extends TestCase
         $container->register('middleware_with_factory_using_default', UselessMiddleware::class)->addArgument('some_default')->setAbstract(true);
         $container->register(UselessMiddleware::class, UselessMiddleware::class);
 
-        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', array(
-            array('id' => UselessMiddleware::class),
-            array('id' => 'middleware_with_factory', 'arguments' => array('foo', 'bar')),
-            array('id' => 'middleware_with_factory_using_default'),
-            array('id' => 'allow_no_handler'),
-        ));
+        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
+            ['id' => UselessMiddleware::class],
+            ['id' => 'middleware_with_factory', 'arguments' => ['foo', 'bar']],
+            ['id' => 'middleware_with_factory_using_default'],
+            ['id' => 'allow_no_handler'],
+        ]);
 
         (new MessengerPass())->process($container);
         (new ResolveChildDefinitionsPass())->process($container);
@@ -467,24 +467,24 @@ class MessengerPassTest extends TestCase
 
         $this->assertTrue($container->hasDefinition($factoryChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory'));
         $this->assertEquals(
-            array('foo', 'bar'),
+            ['foo', 'bar'],
             $container->getDefinition($factoryChildMiddlewareId)->getArguments(),
             'parent default argument is overridden, and next ones appended'
         );
 
         $this->assertTrue($container->hasDefinition($factoryWithDefaultChildMiddlewareId = $fooBusId.'.middleware.middleware_with_factory_using_default'));
         $this->assertEquals(
-            array('some_default'),
+            ['some_default'],
             $container->getDefinition($factoryWithDefaultChildMiddlewareId)->getArguments(),
             'parent default argument is used'
         );
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             new Reference(UselessMiddleware::class),
             new Reference($factoryChildMiddlewareId),
             new Reference($factoryWithDefaultChildMiddlewareId),
             new Reference($childMiddlewareId),
-        ), $container->getDefinition($fooBusId)->getArgument(0));
+        ], $container->getDefinition($fooBusId)->getArgument(0));
         $this->assertFalse($container->hasParameter($middlewareParameter));
     }
 
@@ -495,9 +495,9 @@ class MessengerPassTest extends TestCase
     public function testCannotRegistersAnUndefinedMiddleware()
     {
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
-        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', array(
-            array('id' => 'not_defined_middleware', 'arguments' => array()),
-        ));
+        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
+            ['id' => 'not_defined_middleware', 'arguments' => []],
+        ]);
 
         (new MessengerPass())->process($container);
     }
@@ -510,9 +510,9 @@ class MessengerPassTest extends TestCase
     {
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
         $container->register('not_an_abstract_definition', UselessMiddleware::class);
-        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', array(
-            array('id' => 'not_an_abstract_definition', 'arguments' => array('foo')),
-        ));
+        $container->setParameter($middlewareParameter = $fooBusId.'.middleware', [
+            ['id' => 'not_an_abstract_definition', 'arguments' => ['foo']],
+        ]);
 
         (new MessengerPass())->process($container);
     }
@@ -520,41 +520,41 @@ class MessengerPassTest extends TestCase
     public function testItRegistersTheDebugCommand()
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');
-        $container->register($queryBusId = 'query_bus', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus');
-        $container->register($emptyBus = 'empty_bus', MessageBusInterface::class)->setArgument(0, array())->addTag('messenger.bus');
+        $container->register($queryBusId = 'query_bus', MessageBusInterface::class)->setArgument(0, [])->addTag('messenger.bus');
+        $container->register($emptyBus = 'empty_bus', MessageBusInterface::class)->setArgument(0, [])->addTag('messenger.bus');
         $container->register('messenger.middleware.call_message_handler', HandleMessageMiddleware::class)
             ->addArgument(null)
             ->setAbstract(true)
         ;
 
-        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument(array());
+        $container->register('console.command.messenger_debug', DebugCommand::class)->addArgument([]);
 
-        $middlewares = array(array('id' => 'call_message_handler'));
+        $middlewares = [['id' => 'call_message_handler']];
 
         $container->setParameter($commandBusId.'.middleware', $middlewares);
         $container->setParameter($queryBusId.'.middleware', $middlewares);
 
-        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', array('bus' => $commandBusId));
-        $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', array('bus' => $queryBusId));
+        $container->register(DummyCommandHandler::class)->addTag('messenger.message_handler', ['bus' => $commandBusId]);
+        $container->register(DummyQueryHandler::class)->addTag('messenger.message_handler', ['bus' => $queryBusId]);
         $container->register(MultipleBusesMessageHandler::class)
-            ->addTag('messenger.message_handler', array('bus' => $commandBusId))
-            ->addTag('messenger.message_handler', array('bus' => $queryBusId))
+            ->addTag('messenger.message_handler', ['bus' => $commandBusId])
+            ->addTag('messenger.message_handler', ['bus' => $queryBusId])
         ;
 
         (new ResolveClassPass())->process($container);
         (new MessengerPass())->process($container);
 
-        $this->assertEquals(array(
-            $commandBusId => array(
-                DummyCommand::class => array(DummyCommandHandler::class),
-                MultipleBusesMessage::class => array(MultipleBusesMessageHandler::class),
-            ),
-            $queryBusId => array(
-                DummyQuery::class => array(DummyQueryHandler::class),
-                MultipleBusesMessage::class => array(MultipleBusesMessageHandler::class),
-            ),
-            $emptyBus => array(),
-        ), $container->getDefinition('console.command.messenger_debug')->getArgument(0));
+        $this->assertEquals([
+            $commandBusId => [
+                DummyCommand::class => [DummyCommandHandler::class],
+                MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+            ],
+            $queryBusId => [
+                DummyQuery::class => [DummyQueryHandler::class],
+                MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+            ],
+            $emptyBus => [],
+        ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
     }
 
     private function getContainerBuilder(string $busId = 'message_bus'): ContainerBuilder
@@ -562,7 +562,7 @@ class MessengerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
 
-        $container->register($busId, MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, array());
+        $container->register($busId, MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
         if ('message_bus' !== $busId) {
             $container->setAlias('message_bus', $busId);
         }
@@ -627,7 +627,7 @@ class UndefinedMessageHandlerViaSubscriberInterface implements MessageSubscriber
 {
     public static function getHandledMessages(): iterable
     {
-        return array(UndefinedMessage::class);
+        return [UndefinedMessage::class];
     }
 
     public function __invoke()
@@ -664,10 +664,10 @@ class HandlerWithMultipleMessages implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
+        return [
             DummyMessage::class,
             SecondMessage::class,
-        );
+        ];
     }
 
     public function __invoke()
@@ -679,9 +679,9 @@ class PrioritizedHandler implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
-            array(SecondMessage::class, 10),
-        );
+        return [
+            [SecondMessage::class, 10],
+        ];
     }
 
     public function __invoke()
@@ -693,10 +693,10 @@ class HandlerMappingMethods implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
+        return [
             DummyMessage::class => 'dummyMethod',
-            SecondMessage::class => array('secondMessage', 20),
-        );
+            SecondMessage::class => ['secondMessage', 20],
+        ];
     }
 
     public function dummyMethod()
@@ -712,9 +712,9 @@ class HandlerMappingWithNonExistentMethod implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array(
+        return [
             DummyMessage::class => 'dummyMethod',
-        );
+        ];
     }
 }
 
@@ -722,7 +722,7 @@ class HandleNoMessageHandler implements MessageSubscriberInterface
 {
     public static function getHandledMessages(): iterable
     {
-        return array();
+        return [];
     }
 
     public function __invoke()

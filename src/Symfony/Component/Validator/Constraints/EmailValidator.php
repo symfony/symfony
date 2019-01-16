@@ -33,10 +33,10 @@ class EmailValidator extends ConstraintValidator
      */
     const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
 
-    private static $emailPatterns = array(
+    private static $emailPatterns = [
         Email::VALIDATION_MODE_LOOSE => self::PATTERN_LOOSE,
         Email::VALIDATION_MODE_HTML5 => self::PATTERN_HTML5,
-    );
+    ];
 
     /**
      * @var string

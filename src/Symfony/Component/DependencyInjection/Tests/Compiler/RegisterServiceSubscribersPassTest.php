@@ -53,7 +53,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', TestServiceSubscriber::class)
-            ->addTag('container.service_subscriber', array('bar' => '123'))
+            ->addTag('container.service_subscriber', ['bar' => '123'])
         ;
 
         (new RegisterServiceSubscribersPass())->process($container);
@@ -78,12 +78,12 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertFalse($locator->isPublic());
         $this->assertSame(ServiceLocator::class, $locator->getClass());
 
-        $expected = array(
+        $expected = [
             TestServiceSubscriber::class => new ServiceClosureArgument(new TypedReference(TestServiceSubscriber::class, TestServiceSubscriber::class)),
             CustomDefinition::class => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
             'bar' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class)),
             'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-        );
+        ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
@@ -95,8 +95,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->register('foo', TestServiceSubscriber::class)
             ->setAutowired(true)
             ->addArgument(new Reference(PsrContainerInterface::class))
-            ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'bar'))
-            ->addTag('container.service_subscriber', array('key' => 'bar', 'id' => 'baz')) // should be ignored: the first wins
+            ->addTag('container.service_subscriber', ['key' => 'bar', 'id' => 'bar'])
+            ->addTag('container.service_subscriber', ['key' => 'bar', 'id' => 'baz']) // should be ignored: the first wins
         ;
 
         (new RegisterServiceSubscribersPass())->process($container);
@@ -108,12 +108,12 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertFalse($locator->isPublic());
         $this->assertSame(ServiceLocator::class, $locator->getClass());
 
-        $expected = array(
+        $expected = [
             TestServiceSubscriber::class => new ServiceClosureArgument(new TypedReference(TestServiceSubscriber::class, TestServiceSubscriber::class)),
             CustomDefinition::class => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
             'bar' => new ServiceClosureArgument(new TypedReference('bar', CustomDefinition::class)),
             'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-        );
+        ];
 
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
@@ -128,10 +128,10 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->register('foo_service', TestServiceSubscriber::class)
             ->setAutowired(true)
             ->addArgument(new Reference(PsrContainerInterface::class))
-            ->addTag('container.service_subscriber', array(
+            ->addTag('container.service_subscriber', [
                 'key' => 'test',
                 'id' => TestServiceSubscriber::class,
-            ))
+            ])
         ;
         $container->register(TestServiceSubscriber::class, TestServiceSubscriber::class);
         $container->compile();

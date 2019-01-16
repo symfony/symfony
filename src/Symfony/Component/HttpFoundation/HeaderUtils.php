@@ -80,7 +80,7 @@ class HeaderUtils
      */
     public static function combine(array $parts): array
     {
-        $assoc = array();
+        $assoc = [];
         foreach ($parts as $part) {
             $name = strtolower($part[0]);
             $value = $part[1] ?? true;
@@ -104,7 +104,7 @@ class HeaderUtils
      */
     public static function toString(array $assoc, string $separator): string
     {
-        $parts = array();
+        $parts = [];
         foreach ($assoc as $name => $value) {
             if (true === $value) {
                 $parts[] = $name;
@@ -149,7 +149,7 @@ class HeaderUtils
         $partSeparators = substr($separators, 1);
 
         $i = 0;
-        $partMatches = array();
+        $partMatches = [];
         foreach ($matches as $match) {
             if (isset($match['separator']) && $match['separator'] === $separator) {
                 ++$i;
@@ -158,7 +158,7 @@ class HeaderUtils
             }
         }
 
-        $parts = array();
+        $parts = [];
         if ($partSeparators) {
             foreach ($partMatches as $matches) {
                 $parts[] = self::groupParts($matches, $partSeparators);

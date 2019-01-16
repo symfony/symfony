@@ -27,7 +27,7 @@ class SendMessageMiddleware implements MiddlewareInterface, EnvelopeAwareInterfa
     private $senderLocator;
     private $messagesToSendAndHandleMapping;
 
-    public function __construct(SenderLocatorInterface $senderLocator, array $messagesToSendAndHandleMapping = array())
+    public function __construct(SenderLocatorInterface $senderLocator, array $messagesToSendAndHandleMapping = [])
     {
         $this->senderLocator = $senderLocator;
         $this->messagesToSendAndHandleMapping = $messagesToSendAndHandleMapping;

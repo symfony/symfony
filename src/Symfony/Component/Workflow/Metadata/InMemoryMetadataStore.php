@@ -24,7 +24,7 @@ final class InMemoryMetadataStore implements MetadataStoreInterface
     private $placesMetadata;
     private $transitionsMetadata;
 
-    public function __construct(array $workflowMetadata = array(), array $placesMetadata = array(), \SplObjectStorage $transitionsMetadata = null)
+    public function __construct(array $workflowMetadata = [], array $placesMetadata = [], \SplObjectStorage $transitionsMetadata = null)
     {
         $this->workflowMetadata = $workflowMetadata;
         $this->placesMetadata = $placesMetadata;
@@ -38,11 +38,11 @@ final class InMemoryMetadataStore implements MetadataStoreInterface
 
     public function getPlaceMetadata(string $place): array
     {
-        return $this->placesMetadata[$place] ?? array();
+        return $this->placesMetadata[$place] ?? [];
     }
 
     public function getTransitionMetadata(Transition $transition): array
     {
-        return $this->transitionsMetadata[$transition] ?? array();
+        return $this->transitionsMetadata[$transition] ?? [];
     }
 }

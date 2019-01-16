@@ -27,7 +27,7 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->exactly(2))
             ->method('debug')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $next
             ->expects($this->once())
             ->method('__invoke')
@@ -56,7 +56,7 @@ class LoggingMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('warning')
         ;
-        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $next
             ->expects($this->once())
             ->method('__invoke')

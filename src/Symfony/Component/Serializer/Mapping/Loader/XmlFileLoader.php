@@ -69,7 +69,7 @@ class XmlFileLoader extends FileLoader
             }
 
             if (isset($xml->{'discriminator-map'})) {
-                $mapping = array();
+                $mapping = [];
                 foreach ($xml->{'discriminator-map'}->mapping as $element) {
                     $elementAttributes = $element->attributes();
                     $mapping[(string) $elementAttributes->type] = (string) $elementAttributes->class;

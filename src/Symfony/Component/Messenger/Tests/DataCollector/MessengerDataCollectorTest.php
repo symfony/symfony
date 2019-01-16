@@ -70,7 +70,7 @@ class MessengerDataCollectorTest extends TestCase
   ]
 DUMP;
 
-        yield 'no returned value' => array(
+        yield 'no returned value' => [
             null,
             <<<DUMP
 array:4 [
@@ -81,9 +81,9 @@ $messageDump
   ]
 ]
 DUMP
-        );
+        ];
 
-        yield 'scalar returned value' => array(
+        yield 'scalar returned value' => [
             'returned value',
             <<<DUMP
 array:4 [
@@ -94,10 +94,10 @@ $messageDump
   ]
 ]
 DUMP
-        );
+        ];
 
-        yield 'array returned value' => array(
-            array('returned value'),
+        yield 'array returned value' => [
+            ['returned value'],
             <<<DUMP
 array:4 [
 $messageDump
@@ -109,7 +109,7 @@ $messageDump
   ]
 ]
 DUMP
-        );
+        ];
     }
 
     public function testHandleWithException()

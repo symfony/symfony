@@ -44,7 +44,7 @@ class StopWhenMemoryUsageIsExceededReceiver implements ReceiverInterface
             if ($memoryResolver() > $this->memoryLimit) {
                 $this->stop();
                 if (null !== $this->logger) {
-                    $this->logger->info('Receiver stopped due to memory limit of {limit} exceeded', array('limit' => $this->memoryLimit));
+                    $this->logger->info('Receiver stopped due to memory limit of {limit} exceeded', ['limit' => $this->memoryLimit]);
                 }
             }
         });

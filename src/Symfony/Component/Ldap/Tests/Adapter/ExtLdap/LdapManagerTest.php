@@ -200,14 +200,14 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $entryManager->addAttributeValues($entry, 'mail', array('fabpot@example.org', 'fabpot2@example.org'));
+        $entryManager->addAttributeValues($entry, 'mail', ['fabpot@example.org', 'fabpot2@example.org']);
 
         $result = $this->executeSearchQuery(1);
         $newEntry = $result[0];
 
         $this->assertCount(4, $newEntry->getAttribute('mail'));
 
-        $entryManager->removeAttributeValues($newEntry, 'mail', array('fabpot@example.org', 'fabpot2@example.org'));
+        $entryManager->removeAttributeValues($newEntry, 'mail', ['fabpot@example.org', 'fabpot2@example.org']);
 
         $result = $this->executeSearchQuery(1);
         $newNewEntry = $result[0];
@@ -224,7 +224,7 @@ class LdapManagerTest extends LdapTestCase
 
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
 
-        $entryManager->removeAttributeValues($entry, 'mail', array('fabpot@example.org'));
+        $entryManager->removeAttributeValues($entry, 'mail', ['fabpot@example.org']);
     }
 
     public function testLdapAddAttributeValuesError()

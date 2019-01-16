@@ -34,7 +34,7 @@ class PhpMatcherDumper extends MatcherDumper
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = array();
+    private $expressionLanguageProviders = [];
 
     /**
      * Dumps a set of routes to a PHP class.
@@ -48,12 +48,12 @@ class PhpMatcherDumper extends MatcherDumper
      *
      * @return string A PHP class representing the matcher class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
-        $options = array_replace(array(
+        $options = array_replace([
             'class' => 'ProjectUrlMatcher',
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-        ), $options);
+        ], $options);
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);
@@ -102,7 +102,7 @@ EOF;
                 $host = '/'.strtr(strrev($host), '}.{', '(/)');
             }
 
-            $routes->addRoute($host ?: '/(.*)', array($name, $route));
+            $routes->addRoute($host ?: '/(.*)', [$name, $route]);
         }
         $routes = $matchHost ? $routes->populateCollection(new RouteCollection()) : $this->getRoutes();
 
@@ -208,7 +208,7 @@ EOF
      */
     private function groupStaticRoutes(RouteCollection $collection): array
     {
-        $staticRoutes = $dynamicRegex = array();
+        $staticRoutes = $dynamicRegex = [];
         $dynamicRoutes = new RouteCollection();
 
         foreach ($collection->all() as $name => $route) {
@@ -229,20 +229,20 @@ EOF
                 }
                 foreach ($dynamicRegex as list($hostRx, $rx)) {
                     if (preg_match($rx, $url) && (!$host || !$hostRx || preg_match($hostRx, $host))) {
-                        $dynamicRegex[] = array($hostRegex, $regex);
+                        $dynamicRegex[] = [$hostRegex, $regex];
                         $dynamicRoutes->add($name, $route);
                         continue 2;
                     }
                 }
 
-                $staticRoutes[$url][$name] = array($route, $hasTrailingSlash);
+                $staticRoutes[$url][$name] = [$route, $hasTrailingSlash];
             } else {
-                $dynamicRegex[] = array($hostRegex, $regex);
+                $dynamicRegex[] = [$hostRegex, $regex];
                 $dynamicRoutes->add($name, $route);
             }
         }
 
-        return array($staticRoutes, $dynamicRoutes);
+        return [$staticRoutes, $dynamicRoutes];
     }
 
     /**
@@ -274,7 +274,7 @@ EOF
                     $default .= sprintf(
                         "%s => array(%s, %s, %s, %s, %s),\n",
                         self::export($url),
-                        self::export(array('_route' => $name) + $defaults),
+                        self::export(['_route' => $name] + $defaults),
                         self::export(!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null),
                         self::export(array_flip($route->getMethods()) ?: null),
                         self::export(array_flip($route->getSchemes()) ?: null),
@@ -332,15 +332,15 @@ EOF;
             return '';
         }
         $code = '';
-        $state = (object) array(
+        $state = (object) [
             'regex' => '',
             'switch' => '',
             'default' => '',
             'mark' => 0,
             'markTail' => 0,
-            'hostVars' => array(),
-            'vars' => array(),
-        );
+            'hostVars' => [],
+            'vars' => [],
+        ];
         $state->getVars = static function ($m) use ($state) {
             if ('_route' === $m[1]) {
                 return '?:';
@@ -353,13 +353,13 @@ EOF;
 
         $chunkSize = 0;
         $prev = null;
-        $perModifiers = array();
+        $perModifiers = [];
         foreach ($collection->all() as $name => $route) {
             preg_match('#[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
             if ($chunkLimit < ++$chunkSize || $prev !== $rx[0] && $route->compile()->getPathVariables()) {
                 $chunkSize = 1;
                 $routes = new RouteCollection();
-                $perModifiers[] = array($rx[0], $routes);
+                $perModifiers[] = [$rx[0], $routes];
                 $prev = $rx[0];
             }
             $routes->add($name, $route);
@@ -367,12 +367,12 @@ EOF;
 
         foreach ($perModifiers as list($modifiers, $routes)) {
             $prev = false;
-            $perHost = array();
+            $perHost = [];
             foreach ($routes->all() as $name => $route) {
                 $regex = $route->compile()->getHostRegex();
                 if ($prev !== $regex) {
                     $routes = new RouteCollection();
-                    $perHost[] = array($regex, $routes);
+                    $perHost[] = [$regex, $routes];
                     $prev = $regex;
                 }
                 $routes->add($name, $route);
@@ -387,12 +387,12 @@ EOF;
                 if ($matchHost) {
                     if ($hostRegex) {
                         preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $hostRegex, $rx);
-                        $state->vars = array();
+                        $state->vars = [];
                         $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')\.';
                         $state->hostVars = $state->vars;
                     } else {
                         $hostRegex = '(?:(?:[^./]*+\.)++)';
-                        $state->hostVars = array();
+                        $state->hostVars = [];
                     }
                     $state->mark += \strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
                     $code .= "\n                .".self::export($rx);
@@ -404,14 +404,14 @@ EOF;
                 foreach ($routes->all() as $name => $route) {
                     preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
 
-                    $state->vars = array();
+                    $state->vars = [];
                     $regex = preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]);
                     if ($hasTrailingSlash = '/' !== $regex && '/' === $regex[-1]) {
                         $regex = substr($regex, 0, -1);
                     }
                     $hasTrailingVar = (bool) preg_match('#\{\w+\}/?$#', $route->getPath());
 
-                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route, $hasTrailingSlash, $hasTrailingVar));
+                    $tree->addRoute($regex, [$name, $regex, $state->vars, $route, $hasTrailingSlash, $hasTrailingVar]);
                 }
 
                 $code .= $this->compileStaticPrefixCollection($tree, $state);
@@ -520,7 +520,7 @@ EOF;
                 $state->default .= sprintf(
                     "%s => array(%s, %s, %s, %s, %s, %s),\n",
                     $state->mark,
-                    self::export(array('_route' => $name) + $defaults),
+                    self::export(['_route' => $name] + $defaults),
                     self::export($vars),
                     self::export(array_flip($route->getMethods()) ?: null),
                     self::export(array_flip($route->getSchemes()) ?: null),
@@ -639,7 +639,7 @@ EOF;
     private function compileRoute(Route $route, string $name, bool $checkHost, bool $hasTrailingSlash, bool $hasTrailingVar = false, array $vars = null): string
     {
         $compiledRoute = $route->compile();
-        $conditions = array();
+        $conditions = [];
         $matches = (bool) $compiledRoute->getPathVariables();
         $hostMatches = (bool) $compiledRoute->getHostVariables();
         $methods = array_flip($route->getMethods());
@@ -718,7 +718,7 @@ EOF
         }
 
         if ($route->getCondition()) {
-            $expression = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
+            $expression = $this->getExpressionLanguage()->compile($route->getCondition(), ['context', 'request']);
 
             if (false !== strpos($expression, '$request')) {
                 $conditions[] = '($request = $request ?? $this->request ?: $this->createRequest($pathinfo))';
@@ -755,7 +755,7 @@ EOF;
 
         // optimize parameters array
         if ($matches || $hostMatches) {
-            $vars = array("array('_route' => '$name')");
+            $vars = ["array('_route' => '$name')"];
             if ($matches || ($hostMatches && !$checkHost)) {
                 $vars[] = '$matches';
             }
@@ -769,7 +769,7 @@ EOF;
                 self::export($defaults)
             );
         } elseif ($defaults) {
-            $code .= sprintf("            \$ret = %s;\n", self::export(array('_route' => $name) + $defaults));
+            $code .= sprintf("            \$ret = %s;\n", self::export(['_route' => $name] + $defaults));
         } else {
             $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
         }

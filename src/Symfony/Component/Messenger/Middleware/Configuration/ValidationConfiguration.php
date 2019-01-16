@@ -40,10 +40,10 @@ final class ValidationConfiguration implements EnvelopeItemInterface
     {
         $isGroupSequence = $this->groups instanceof GroupSequence;
 
-        return serialize(array(
+        return serialize([
             'groups' => $isGroupSequence ? $this->groups->groups : $this->groups,
             'is_group_sequence' => $isGroupSequence,
-        ));
+        ]);
     }
 
     public function unserialize($serialized)
@@ -51,7 +51,7 @@ final class ValidationConfiguration implements EnvelopeItemInterface
         list(
             'groups' => $groups,
             'is_group_sequence' => $isGroupSequence
-        ) = unserialize($serialized, array('allowed_classes' => false));
+        ) = unserialize($serialized, ['allowed_classes' => false]);
 
         $this->__construct($isGroupSequence ? new GroupSequence($groups) : $groups);
     }

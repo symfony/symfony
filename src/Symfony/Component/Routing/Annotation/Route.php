@@ -22,7 +22,7 @@ namespace Symfony\Component\Routing\Annotation;
 class Route
 {
     private $path;
-    private $localizedPaths = array();
+    private $localizedPaths = [];
     private $name;
     private $requirements = [];
     private $options = [];

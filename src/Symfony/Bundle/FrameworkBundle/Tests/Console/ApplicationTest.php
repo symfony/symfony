@@ -197,14 +197,14 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
-        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
+        $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel
             ->method('getBundles')
-            ->willReturn(array($this->createBundleMock(
-                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
-            )));
+            ->willReturn([$this->createBundleMock(
+                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); })]
+            )]);
         $kernel
             ->method('getContainer')
             ->willReturn($container);
@@ -213,7 +213,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'list'));
+        $tester->run(['command' => 'list']);
 
         $this->assertSame(0, $tester->getStatusCode());
         $display = explode('Lists commands', $tester->getDisplay());

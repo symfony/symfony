@@ -17,28 +17,28 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     /**
      * @internal but protected for BC on cache:clear
      */
-    protected $privates = array();
+    protected $privates = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'foo1' => 'getFoo1Service',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function reset()
     {
-        $this->privates = array();
+        $this->privates = [];
         parent::reset();
     }
 
@@ -54,12 +54,12 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
-        );
+        ];
     }
 
     /**
@@ -74,13 +74,13 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $instance->foo1 = ($this->services['foo1'] ?? null);
         $instance->foo2 = null;
         $instance->foo3 = ($this->privates['foo3'] ?? null);
-        $instance->closures = array(0 => function () {
+        $instance->closures = [0 => function () {
             return ($this->services['foo1'] ?? null);
         }, 1 => function () {
             return null;
         }, 2 => function () {
             return ($this->privates['foo3'] ?? null);
-        });
+        }];
         $instance->iter = new RewindableGenerator(function () {
             if (isset($this->services['foo1'])) {
                 yield 'foo1' => ($this->services['foo1'] ?? null);

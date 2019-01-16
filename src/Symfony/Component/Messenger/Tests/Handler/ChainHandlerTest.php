@@ -21,14 +21,14 @@ class ChainHandlerTest extends TestCase
     {
         $message = new DummyMessage('Hey');
 
-        $handler1 = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $handler1 = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $handler1
             ->expects($this->once())
             ->method('__invoke')
             ->with($message)
             ->willReturn('Hello')
         ;
-        $handler2 = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $handler2 = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $handler2
             ->expects($this->once())
             ->method('__invoke')
@@ -36,9 +36,9 @@ class ChainHandlerTest extends TestCase
             ->willReturn('World')
         ;
 
-        $results = (new ChainHandler(array($handler1, $handler2)))($message);
+        $results = (new ChainHandler([$handler1, $handler2]))($message);
 
-        $this->assertSame(array('Hello', 'World'), $results);
+        $this->assertSame(['Hello', 'World'], $results);
     }
 
     /**
@@ -47,6 +47,6 @@ class ChainHandlerTest extends TestCase
      */
     public function testInvalidArgumentExceptionOnEmptyHandlers()
     {
-        new ChainHandler(array());
+        new ChainHandler([]);
     }
 }

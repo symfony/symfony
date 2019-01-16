@@ -81,7 +81,7 @@ class FormType extends BaseType
         }
 
         $formConfig = $form->getConfig();
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
@@ -94,7 +94,7 @@ class FormType extends BaseType
             'method' => $formConfig->getMethod(),
             'action' => $formConfig->getAction(),
             'submitted' => $form->isSubmitted(),
-        ));
+        ]);
     }
 
     /**
@@ -137,7 +137,7 @@ class FormType extends BaseType
             }
 
             return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? array() : '';
+                return $form->getConfig()->getCompound() ? [] : '';
             };
         };
 
@@ -156,11 +156,11 @@ class FormType extends BaseType
 
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setDefined(array(
+        $resolver->setDefined([
             'data',
-        ));
+        ]);
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
@@ -169,23 +169,23 @@ class FormType extends BaseType
             'mapped' => true,
             'by_reference' => true,
             'error_bubbling' => $errorBubbling,
-            'label_attr' => array(),
+            'label_attr' => [],
             'inherit_data' => false,
             'compound' => true,
             'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
-            'attr' => array(),
+            'attr' => [],
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
             'allow_file_upload' => false,
             'help' => null,
-        ));
+        ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');
-        $resolver->setAllowedTypes('upload_max_size_message', array('callable'));
-        $resolver->setAllowedTypes('help', array('string', 'null'));
+        $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
+        $resolver->setAllowedTypes('help', ['string', 'null']);
     }
 
     /**

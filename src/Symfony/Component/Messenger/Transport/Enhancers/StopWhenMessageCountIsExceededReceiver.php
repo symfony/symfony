@@ -41,7 +41,7 @@ class StopWhenMessageCountIsExceededReceiver implements ReceiverInterface
             if (null !== $envelope && ++$receivedMessages >= $this->maximumNumberOfMessages) {
                 $this->stop();
                 if (null !== $this->logger) {
-                    $this->logger->info('Receiver stopped due to maximum count of {count} exceeded', array('count' => $this->maximumNumberOfMessages));
+                    $this->logger->info('Receiver stopped due to maximum count of {count} exceeded', ['count' => $this->maximumNumberOfMessages]);
                 }
             }
         });

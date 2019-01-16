@@ -79,8 +79,8 @@ class ApplicationTesterTest extends TestCase
         });
         $tester = new ApplicationTester($application);
 
-        $tester->setInputs(array('I1', 'I2', 'I3'));
-        $tester->run(array('command' => 'foo'));
+        $tester->setInputs(['I1', 'I2', 'I3']);
+        $tester->run(['command' => 'foo']);
 
         $this->assertSame(0, $tester->getStatusCode());
         $this->assertEquals('Q1Q2Q3', $tester->getDisplay(true));

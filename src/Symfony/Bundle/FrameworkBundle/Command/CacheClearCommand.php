@@ -53,10 +53,10 @@ class CacheClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption('no-warmup', '', InputOption::VALUE_NONE, 'Do not warm up the cache'),
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
-            ))
+            ])
             ->setDescription('Clears the cache')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the application cache for a given environment
@@ -137,7 +137,7 @@ EOF
             if ('/' === \DIRECTORY_SEPARATOR && $mounts = @file('/proc/mounts')) {
                 foreach ($mounts as $mount) {
                     $mount = \array_slice(explode(' ', $mount), 1, -3);
-                    if (!\in_array(array_pop($mount), array('vboxsf', 'nfs'))) {
+                    if (!\in_array(array_pop($mount), ['vboxsf', 'nfs'])) {
                         continue;
                     }
                     $mount = implode(' ', $mount).'/';
@@ -195,7 +195,7 @@ EOF
         }
 
         // fix references to cached files with the real cache directory name
-        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $search = [$warmupDir, str_replace('\\', '\\\\', $warmupDir)];
         $replace = str_replace('\\', '/', $realCacheDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
             $content = str_replace($search, $replace, file_get_contents($file), $count);

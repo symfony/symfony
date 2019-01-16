@@ -14,9 +14,9 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
 
     public function testWithHeaderConstruct()
     {
-        $headers = array(
+        $headers = [
             'Cache-Control' => 'public, s-maxage=1200',
-        );
+        ];
 
         $exception = new UnauthorizedHttpException('Challenge', null, null, null, $headers);
 

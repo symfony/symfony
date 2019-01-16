@@ -30,16 +30,16 @@ class WrappedListenerTest extends TestCase
 
     public function provideListenersToDescribe()
     {
-        return array(
-            array(new FooListener(), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::__invoke'),
-            array(array(new FooListener(), 'listen'), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'),
-            array(array('Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'),
-            array('var_dump', 'var_dump'),
-            array(function () {}, 'closure'),
-            array(\Closure::fromCallable(array(new FooListener(), 'listen')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'),
-            array(\Closure::fromCallable(array('Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic')), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'),
-            array(\Closure::fromCallable(function () {}), 'closure'),
-        );
+        return [
+            [new FooListener(), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::__invoke'],
+            [[new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
+            [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
+            ['var_dump', 'var_dump'],
+            [function () {}, 'closure'],
+            [\Closure::fromCallable([new FooListener(), 'listen']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
+            [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
+            [\Closure::fromCallable(function () {}), 'closure'],
+        ];
     }
 }
 

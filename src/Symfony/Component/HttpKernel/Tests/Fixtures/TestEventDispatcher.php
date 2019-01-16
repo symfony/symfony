@@ -31,6 +31,6 @@ class TestEventDispatcher extends TraceableEventDispatcher
 
     public function getOrphanedEvents()
     {
-        return array();
+        return [];
     }
 }

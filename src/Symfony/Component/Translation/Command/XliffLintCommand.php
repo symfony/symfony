@@ -85,14 +85,14 @@ EOF
                 throw new RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            return $this->display($io, array($this->validate($stdin)));
+            return $this->display($io, [$this->validate($stdin)]);
         }
 
         if (!$this->isReadable($filename)) {
             throw new RuntimeException(sprintf('File or directory "%s" is not readable.', $filename));
         }
 
-        $filesInfo = array();
+        $filesInfo = [];
         foreach ($this->getFiles($filename) as $file) {
             $filesInfo[] = $this->validate(file_get_contents($file), $file);
         }
@@ -102,11 +102,11 @@ EOF
 
     private function validate($content, $file = null)
     {
-        $errors = array();
+        $errors = [];
 
         // Avoid: Warning DOMDocument::loadXML(): Empty string supplied as input
         if ('' === trim($content)) {
-            return array('file' => $file, 'valid' => true);
+            return ['file' => $file, 'valid' => true];
         }
 
         libxml_use_internal_errors(true);
@@ -119,27 +119,27 @@ EOF
             $realFileExtension = explode('.', basename($file), 2)[1] ?? '';
 
             if ($expectedFileExtension !== $realFileExtension) {
-                $errors[] = array(
+                $errors[] = [
                     'line' => -1,
                     'column' => -1,
                     'message' => sprintf('There is a mismatch between the file extension ("%s") and the "%s" value used in the "target-language" attribute of the file.', $realFileExtension, $targetLanguage),
-                );
+                ];
             }
         }
 
         $document->schemaValidate(__DIR__.'/../Resources/schemas/xliff-core-1.2-strict.xsd');
         foreach (libxml_get_errors() as $xmlError) {
-            $errors[] = array(
+            $errors[] = [
                 'line' => $xmlError->line,
                 'column' => $xmlError->column,
                 'message' => trim($xmlError->message),
-            );
+            ];
         }
 
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        return array('file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors);
+        return ['file' => $file, 'valid' => 0 === \count($errors), 'messages' => $errors];
     }
 
     private function display(SymfonyStyle $io, array $files)
@@ -206,7 +206,7 @@ EOF
         }
 
         foreach ($this->getDirectoryIterator($fileOrDirectory) as $file) {
-            if (!\in_array($file->getExtension(), array('xlf', 'xliff'))) {
+            if (!\in_array($file->getExtension(), ['xlf', 'xliff'])) {
                 continue;
             }
 
@@ -259,7 +259,7 @@ EOF
 
     private function getTargetLanguageFromFile(\DOMDocument $xliffContents): ?string
     {
-        foreach ($xliffContents->getElementsByTagName('file')[0]->attributes ?? array() as $attribute) {
+        foreach ($xliffContents->getElementsByTagName('file')[0]->attributes ?? [] as $attribute) {
             if ('target-language' === $attribute->nodeName) {
                 return $attribute->nodeValue;
             }

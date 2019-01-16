@@ -20,14 +20,14 @@ namespace Symfony\Component\Messenger;
  */
 final class Envelope
 {
-    private $items = array();
+    private $items = [];
     private $message;
 
     /**
      * @param object                  $message
      * @param EnvelopeItemInterface[] $items
      */
-    public function __construct($message, array $items = array())
+    public function __construct($message, array $items = [])
     {
         $this->message = $message;
         foreach ($items as $item) {

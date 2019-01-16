@@ -31,20 +31,20 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/secured_area/.*',
-                    'form_login' => array(
+                    'form_login' => [
                         'check_path' => '/some_area/login_check',
-                    ),
-                ),
-            ),
-        ));
+                    ],
+                ],
+            ],
+        ]);
 
         $container->compile();
     }
@@ -57,17 +57,17 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $container->compile();
     }
@@ -83,18 +83,18 @@ class SecurityExtensionTest extends TestCase
         $extension = $container->getExtension('security');
         $extension->addUserProviderFactory(new DummyProvider());
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'my_foo' => array('foo' => array()),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'my_foo' => ['foo' => []],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
-                    'http_basic' => array(),
-                ),
-            ),
-        ));
+                    'http_basic' => [],
+                ],
+            ],
+        ]);
 
         $container->compile();
     }
@@ -103,20 +103,20 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
             'role_hierarchy' => null,
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
                     'http_basic' => null,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $container->compile();
 
@@ -127,46 +127,46 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '^/admin',
                     'http_basic' => null,
-                ),
-                'stateless_firewall' => array(
+                ],
+                'stateless_firewall' => [
                     'pattern' => '/.*',
                     'stateless' => true,
                     'http_basic' => null,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $container->compile();
         $definition = $container->getDefinition('security.authentication.guard_handler');
-        $this->assertSame(array('stateless_firewall'), $definition->getArgument(2));
+        $this->assertSame(['stateless_firewall'], $definition->getArgument(2));
     }
 
     public function testSwitchUserNotStatelessOnStatelessFirewall()
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'stateless' => true,
                     'http_basic' => null,
                     'switch_user' => true,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $container->compile();
 
@@ -176,18 +176,18 @@ class SecurityExtensionTest extends TestCase
     public function testPerListenerProvider()
     {
         $container = $this->getRawContainer();
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'first' => array('id' => 'foo'),
-                'second' => array('id' => 'bar'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
 
-            'firewalls' => array(
-                'default' => array(
-                    'http_basic' => array('provider' => 'second'),
-                ),
-            ),
-        ));
+            'firewalls' => [
+                'default' => [
+                    'http_basic' => ['provider' => 'second'],
+                ],
+            ],
+        ]);
 
         $container->compile();
         $this->addToAssertionCount(1);
@@ -200,19 +200,19 @@ class SecurityExtensionTest extends TestCase
     public function testMissingProviderForListener()
     {
         $container = $this->getRawContainer();
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'first' => array('id' => 'foo'),
-                'second' => array('id' => 'bar'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
 
-            'firewalls' => array(
-                'ambiguous' => array(
+            'firewalls' => [
+                'ambiguous' => [
                     'http_basic' => true,
-                    'form_login' => array('provider' => 'second'),
-                ),
-            ),
-        ));
+                    'form_login' => ['provider' => 'second'],
+                ],
+            ],
+        ]);
 
         $container->compile();
     }
@@ -220,19 +220,19 @@ class SecurityExtensionTest extends TestCase
     public function testPerListenerProviderWithRememberMe()
     {
         $container = $this->getRawContainer();
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'first' => array('id' => 'foo'),
-                'second' => array('id' => 'bar'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
 
-            'firewalls' => array(
-                'default' => array(
-                    'form_login' => array('provider' => 'second'),
-                    'remember_me' => array('secret' => 'baz'),
-                ),
-            ),
-        ));
+            'firewalls' => [
+                'default' => [
+                    'form_login' => ['provider' => 'second'],
+                    'remember_me' => ['secret' => 'baz'],
+                ],
+            ],
+        ]);
 
         $container->compile();
         $this->addToAssertionCount(1);
@@ -244,20 +244,20 @@ class SecurityExtensionTest extends TestCase
 
         $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
-            'firewalls' => array(
-                'some_firewall' => array(
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
-                    'http_basic' => array(),
-                ),
-            ),
-            'access_control' => array(
-                array('path' => '/', 'allow_if' => $rawExpression),
-            ),
-        ));
+                    'http_basic' => [],
+                ],
+            ],
+            'access_control' => [
+                ['path' => '/', 'allow_if' => $rawExpression],
+            ],
+        ]);
 
         $container->compile();
         $accessMap = $container->getDefinition('security.access_map');
@@ -274,7 +274,7 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.cache_warmer.expression'));
         $this->assertEquals(
-            new IteratorArgument(array(new Reference($expressionId))),
+            new IteratorArgument([new Reference($expressionId)]),
             $container->getDefinition('security.cache_warmer.expression')->getArgument(0)
         );
     }
@@ -282,17 +282,17 @@ class SecurityExtensionTest extends TestCase
     public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
     {
         $container = $this->getRawContainer();
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
-            'firewalls' => array(
-                'some_firewall' => array(
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
-                    'http_basic' => array(),
-                ),
-            ),
-        ));
+                    'http_basic' => [],
+                ],
+            ],
+        ]);
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
@@ -302,18 +302,18 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'default' => array('id' => 'foo'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
                     'http_basic' => null,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $container->compile();
 
@@ -324,19 +324,19 @@ class SecurityExtensionTest extends TestCase
     {
         $container = $this->getRawContainer();
 
-        $container->loadFromExtension('security', array(
-            'providers' => array(
-                'first' => array('id' => 'foo'),
-                'second' => array('id' => 'bar'),
-            ),
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'first' => ['id' => 'foo'],
+                'second' => ['id' => 'bar'],
+            ],
 
-            'firewalls' => array(
-                'some_firewall' => array(
+            'firewalls' => [
+                'some_firewall' => [
                     'pattern' => '/.*',
-                    'http_basic' => array('provider' => 'second'),
-                ),
-            ),
-        ));
+                    'http_basic' => ['provider' => 'second'],
+                ],
+            ],
+        ]);
 
         $container->compile();
 
@@ -352,8 +352,8 @@ class SecurityExtensionTest extends TestCase
         $bundle = new SecurityBundle();
         $bundle->build($container);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
 
         return $container;
     }

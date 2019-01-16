@@ -54,26 +54,26 @@ class DateTimeTypeTest extends BaseTypeTest
 
     public function testSubmitDateTimeImmutable()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'date_widget' => 'choice',
-            'years' => array(2010),
+            'years' => [2010],
             'time_widget' => 'choice',
             'input' => 'datetime_immutable',
-        ));
+        ]);
 
-        $form->submit(array(
-            'date' => array(
+        $form->submit([
+            'date' => [
                 'day' => '2',
                 'month' => '6',
                 'year' => '2010',
-            ),
-            'time' => array(
+            ],
+            'time' => [
                 'hour' => '3',
                 'minute' => '4',
-            ),
-        ));
+            ],
+        ]);
 
         $dateTime = new \DateTimeImmutable('2010-06-02 03:04:00 UTC');
 
@@ -249,12 +249,12 @@ class DateTimeTypeTest extends BaseTypeTest
 
     public function testSubmitDifferentTimezonesDateTimeImmutable()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'America/New_York',
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
-        ));
+        ]);
 
         $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
 

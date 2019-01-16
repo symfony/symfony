@@ -22,7 +22,7 @@ class SerializerConfigurationTest extends TestCase
 {
     public function testSerializable()
     {
-        $config = new SerializerConfiguration(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
+        $config = new SerializerConfiguration([ObjectNormalizer::GROUPS => ['Default', 'Extra']]);
 
         $this->assertTrue(is_subclass_of(SerializerConfiguration::class, \Serializable::class, true));
         $this->assertEquals($config, unserialize(serialize($config)));

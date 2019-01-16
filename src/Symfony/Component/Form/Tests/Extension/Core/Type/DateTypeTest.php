@@ -112,13 +112,13 @@ class DateTypeTest extends BaseTypeTest
 
         \Locale::setDefault('de_DE');
 
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
             'input' => 'datetime_immutable',
-        ));
+        ]);
 
         $form->submit('2.6.2010');
 

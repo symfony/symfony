@@ -47,7 +47,7 @@ class ContainerDebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services (deprecated)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
@@ -59,7 +59,7 @@ class ContainerDebugCommand extends Command
                 new InputOption('types', null, InputOption::VALUE_NONE, 'Displays types (classes/interfaces) available in the container'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
-            ))
+            ])
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
@@ -116,26 +116,26 @@ EOF
         $object = $this->getContainerBuilder();
 
         if ($input->getOption('types')) {
-            $options = array();
-            $options['filter'] = array($this, 'filterToServiceTypes');
+            $options = [];
+            $options['filter'] = [$this, 'filterToServiceTypes'];
         } elseif ($input->getOption('parameters')) {
-            $parameters = array();
+            $parameters = [];
             foreach ($object->getParameterBag()->all() as $k => $v) {
                 $parameters[$k] = $object->resolveEnvPlaceholders($v);
             }
             $object = new ParameterBag($parameters);
-            $options = array();
+            $options = [];
         } elseif ($parameter = $input->getOption('parameter')) {
-            $options = array('parameter' => $parameter);
+            $options = ['parameter' => $parameter];
         } elseif ($input->getOption('tags')) {
-            $options = array('group_by' => 'tags');
+            $options = ['group_by' => 'tags'];
         } elseif ($tag = $input->getOption('tag')) {
-            $options = array('tag' => $tag);
+            $options = ['tag' => $tag];
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
-            $options = array('id' => $name);
+            $options = ['id' => $name];
         } else {
-            $options = array();
+            $options = [];
         }
 
         $helper = new DescriptorHelper();
@@ -164,7 +164,7 @@ EOF
      */
     protected function validateInput(InputInterface $input)
     {
-        $options = array('tags', 'tag', 'parameters', 'parameter');
+        $options = ['tags', 'tag', 'parameters', 'parameter'];
 
         $optionsCount = 0;
         foreach ($options as $option) {
@@ -199,7 +199,7 @@ EOF
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
             $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
-            $container->getCompilerPassConfig()->setRemovingPasses(array());
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->compile();
         } else {
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
@@ -227,7 +227,7 @@ EOF
     private function findServiceIdsContaining(ContainerBuilder $builder, string $name, bool $showHidden)
     {
         $serviceIds = $builder->getServiceIds();
-        $foundServiceIds = array();
+        $foundServiceIds = [];
         foreach ($serviceIds as $serviceId) {
             if (!$showHidden && 0 === strpos($serviceId, '.')) {
                 continue;

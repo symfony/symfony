@@ -40,7 +40,7 @@ class ConsumeMessagesCommand extends Command
     private $logger;
     private $receiverNames;
 
-    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = array())
+    public function __construct(MessageBusInterface $bus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [])
     {
         $this->bus = $bus;
         $this->receiverLocator = $receiverLocator;
@@ -58,12 +58,12 @@ class ConsumeMessagesCommand extends Command
         $defaultReceiverName = 1 === \count($this->receiverNames) ? current($this->receiverNames) : null;
 
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('receiver', $defaultReceiverName ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'Name of the receiver', $defaultReceiverName),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
-            ))
+            ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -161,7 +161,7 @@ EOF
 
     private function findAlternatives($name, array $collection)
     {
-        $alternatives = array();
+        $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
             if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {

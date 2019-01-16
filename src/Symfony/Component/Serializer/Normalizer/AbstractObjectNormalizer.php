@@ -37,7 +37,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     private $propertyTypeExtractor;
-    private $attributesCache = array();
+    private $attributesCache = [];
 
     /**
      * @var callable|null
@@ -72,7 +72,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -82,8 +82,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $data = array();
-        $stack = array();
+        $data = [];
+        $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
         $class = \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
@@ -197,7 +197,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return string[]
      */
-    abstract protected function extractAttributes($object, $format = null, array $context = array());
+    abstract protected function extractAttributes($object, $format = null, array $context = []);
 
     /**
      * Gets the attribute value.
@@ -209,7 +209,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return mixed
      */
-    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = array());
+    abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = []);
 
     /**
      * Sets a handler function that will be called when the max depth is reached.
@@ -230,7 +230,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -238,7 +238,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
-        $extraAttributes = array();
+        $extraAttributes = [];
 
         $reflectionClass = new \ReflectionClass($class);
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
@@ -280,7 +280,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param string|null $format
      * @param array       $context
      */
-    abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
+    abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []);
 
     /**
      * Validates the submitted data and denormalizes it.
@@ -298,7 +298,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        $expectedTypes = array();
+        $expectedTypes = [];
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return;
@@ -311,7 +311,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // Fix a collection that contains the only one element
                 // This is special to xml format only
                 if ('xml' === $format && !\is_int(key($data))) {
-                    $data = array($data);
+                    $data = [$data];
                 }
 
                 if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
@@ -384,9 +384,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         if (null !== $this->classDiscriminatorResolver && null !== $discriminatorMapping = $this->classDiscriminatorResolver->getMappingForClass($currentClass)) {
             if ($discriminatorMapping->getTypeProperty() === $attribute) {
-                return array(
+                return [
                     new Type(Type::BUILTIN_TYPE_STRING),
-                );
+                ];
             }
 
             foreach ($discriminatorMapping->getTypesMapping() as $mappedClass) {

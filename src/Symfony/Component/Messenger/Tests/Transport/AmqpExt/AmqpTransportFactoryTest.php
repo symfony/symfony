@@ -28,9 +28,9 @@ class AmqpTransportFactoryTest extends TestCase
             true
         );
 
-        $this->assertTrue($factory->supports('amqp://localhost', array()));
-        $this->assertFalse($factory->supports('sqs://localhost', array()));
-        $this->assertFalse($factory->supports('invalid-dsn', array()));
+        $this->assertTrue($factory->supports('amqp://localhost', []));
+        $this->assertFalse($factory->supports('sqs://localhost', []));
+        $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
     public function testItCreatesTheTransport()
@@ -41,8 +41,8 @@ class AmqpTransportFactoryTest extends TestCase
             true
         );
 
-        $expectedTransport = new AmqpTransport($encoder, $decoder, Connection::fromDsn('amqp://localhost', array('foo' => 'bar'), true), array('foo' => 'bar'), true);
+        $expectedTransport = new AmqpTransport($encoder, $decoder, Connection::fromDsn('amqp://localhost', ['foo' => 'bar'], true), ['foo' => 'bar'], true);
 
-        $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', array('foo' => 'bar')));
+        $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', ['foo' => 'bar']));
     }
 }

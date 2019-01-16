@@ -113,9 +113,9 @@ class SessionListenerTest extends TestCase
         $response->setSharedMaxAge(60);
         $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
 
-        $container = new ServiceLocator(array(
+        $container = new ServiceLocator([
             'initialized_session' => function () {},
-        ));
+        ]);
 
         $listener = new SessionListener($container);
         $listener->onKernelResponse(new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response));

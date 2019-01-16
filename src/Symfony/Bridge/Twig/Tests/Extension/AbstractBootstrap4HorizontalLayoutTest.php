@@ -219,7 +219,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
         $view = $form->createView();
-        $html = $this->renderRow($view, array('label' => 'foo', 'help' => 'really helpful text'));
+        $html = $this->renderRow($view, ['label' => 'foo', 'help' => 'really helpful text']);
 
         $this->assertMatchesXpath($html,
 '/div

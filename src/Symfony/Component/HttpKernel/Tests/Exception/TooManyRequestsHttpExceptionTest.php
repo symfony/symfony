@@ -14,9 +14,9 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
 
     public function testWithHeaderConstruct()
     {
-        $headers = array(
+        $headers = [
             'Cache-Control' => 'public, s-maxage=69',
-        );
+        ];
 
         $exception = new TooManyRequestsHttpException(69, null, null, null, $headers);
 

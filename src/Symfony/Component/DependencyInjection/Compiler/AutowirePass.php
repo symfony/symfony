@@ -117,7 +117,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if ($constructor) {
-            array_unshift($this->methodCalls, array($constructor, $value->getArguments()));
+            array_unshift($this->methodCalls, [$constructor, $value->getArguments()]);
         }
 
         $this->methodCalls = $this->autowireCalls($reflectionClass, $isRoot);
@@ -291,8 +291,8 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function populateAvailableTypes()
     {
-        $this->types = array();
-        $this->ambiguousServiceTypes = array();
+        $this->types = [];
+        $this->ambiguousServiceTypes = [];
 
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
@@ -343,7 +343,7 @@ class AutowirePass extends AbstractRecursivePass
 
         // keep an array of all services matching this type
         if (!isset($this->ambiguousServiceTypes[$type])) {
-            $this->ambiguousServiceTypes[$type] = array($this->types[$type]);
+            $this->ambiguousServiceTypes[$type] = [$this->types[$type]];
             unset($this->types[$type]);
         }
         $this->ambiguousServiceTypes[$type][] = $id;
@@ -418,7 +418,7 @@ class AutowirePass extends AbstractRecursivePass
 
     private function getAliasesSuggestionForType($type, $extraContext = null)
     {
-        $aliases = array();
+        $aliases = [];
         foreach (class_parents($type) + class_implements($type) as $parent) {
             if ($this->container->has($parent) && !$this->container->findDefinition($parent)->isAbstract()) {
                 $aliases[] = $parent;

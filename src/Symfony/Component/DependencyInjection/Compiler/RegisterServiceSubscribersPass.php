@@ -31,7 +31,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $serviceMap = array();
+        $serviceMap = [];
         $autowire = $value->isAutowired();
 
         foreach ($value->getTag('container.service_subscriber') as $attributes) {
@@ -40,7 +40,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 continue;
             }
             ksort($attributes);
-            if (array() !== array_diff(array_keys($attributes), array('id', 'key'))) {
+            if ([] !== array_diff(array_keys($attributes), ['id', 'key'])) {
                 throw new InvalidArgumentException(sprintf('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "%s" given for service "%s".', implode('", "', array_keys($attributes)), $this->currentId));
             }
             if (!array_key_exists('id', $attributes)) {
@@ -64,7 +64,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
         $class = $r->name;
 
-        $subscriberMap = array();
+        $subscriberMap = [];
 
         foreach ($class::getSubscribedServices() as $key => $type) {
             if (!\is_string($type) || !preg_match('/^\??[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $type)) {
@@ -93,7 +93,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)));
+        $value->addTag('container.service_subscriber.locator', ['id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)]);
 
         return parent::processValue($value);
     }

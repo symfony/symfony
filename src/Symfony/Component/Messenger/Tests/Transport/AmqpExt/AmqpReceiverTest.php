@@ -30,14 +30,14 @@ class AmqpReceiverTest extends TestCase
     public function testItSendTheDecodedMessageToTheHandlerAndAcknowledgeIt()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
@@ -57,14 +57,14 @@ class AmqpReceiverTest extends TestCase
     public function testItNonAcknowledgeTheMessageIfAnExceptionHappened()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
@@ -83,14 +83,14 @@ class AmqpReceiverTest extends TestCase
     public function testItRejectsTheMessageIfTheExceptionIsARejectMessageExceptionInterface()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);

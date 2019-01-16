@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         $pathinfo = rawurldecode($pathinfo) ?: '/';
         $trimmedPathinfo = rtrim($pathinfo, '/') ?: '/';
         $context = $this->context;
@@ -29,16 +29,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         switch ($trimmedPathinfo) {
             default:
-                $routes = array(
-                    '/trailing/simple/no-methods' => array(array('_route' => 'simple_trailing_slash_no_methods'), null, null, null, true),
-                    '/trailing/simple/get-method' => array(array('_route' => 'simple_trailing_slash_GET_method'), null, array('GET' => 0), null, true),
-                    '/trailing/simple/head-method' => array(array('_route' => 'simple_trailing_slash_HEAD_method'), null, array('HEAD' => 0), null, true),
-                    '/trailing/simple/post-method' => array(array('_route' => 'simple_trailing_slash_POST_method'), null, array('POST' => 0), null, true),
-                    '/not-trailing/simple/no-methods' => array(array('_route' => 'simple_not_trailing_slash_no_methods'), null, null, null, false),
-                    '/not-trailing/simple/get-method' => array(array('_route' => 'simple_not_trailing_slash_GET_method'), null, array('GET' => 0), null, false),
-                    '/not-trailing/simple/head-method' => array(array('_route' => 'simple_not_trailing_slash_HEAD_method'), null, array('HEAD' => 0), null, false),
-                    '/not-trailing/simple/post-method' => array(array('_route' => 'simple_not_trailing_slash_POST_method'), null, array('POST' => 0), null, false),
-                );
+                $routes = [
+                    '/trailing/simple/no-methods' => [['_route' => 'simple_trailing_slash_no_methods'], null, null, null, true],
+                    '/trailing/simple/get-method' => [['_route' => 'simple_trailing_slash_GET_method'], null, ['GET' => 0], null, true],
+                    '/trailing/simple/head-method' => [['_route' => 'simple_trailing_slash_HEAD_method'], null, ['HEAD' => 0], null, true],
+                    '/trailing/simple/post-method' => [['_route' => 'simple_trailing_slash_POST_method'], null, ['POST' => 0], null, true],
+                    '/not-trailing/simple/no-methods' => [['_route' => 'simple_not_trailing_slash_no_methods'], null, null, null, false],
+                    '/not-trailing/simple/get-method' => [['_route' => 'simple_not_trailing_slash_GET_method'], null, ['GET' => 0], null, false],
+                    '/not-trailing/simple/head-method' => [['_route' => 'simple_not_trailing_slash_HEAD_method'], null, ['HEAD' => 0], null, false],
+                    '/not-trailing/simple/post-method' => [['_route' => 'simple_not_trailing_slash_POST_method'], null, ['POST' => 0], null, false],
+                ];
 
                 if (!isset($routes[$trimmedPathinfo])) {
                     break;
@@ -64,7 +64,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         $matchedPathinfo = $pathinfo;
-        $regexList = array(
+        $regexList = [
             0 => '{^(?'
                     .'|/trailing/regex/(?'
                         .'|no\\-methods/([^/]++)(*:46)'
@@ -79,22 +79,22 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         .'|post\\-method/([^/]++)(*:269)'
                     .')'
                 .')/?$}sD',
-        );
+        ];
 
         foreach ($regexList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 switch ($m = (int) $matches['MARK']) {
                     default:
-                        $routes = array(
-                            46 => array(array('_route' => 'regex_trailing_slash_no_methods'), array('param'), null, null, true, true),
-                            73 => array(array('_route' => 'regex_trailing_slash_GET_method'), array('param'), array('GET' => 0), null, true, true),
-                            101 => array(array('_route' => 'regex_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null, true, true),
-                            130 => array(array('_route' => 'regex_trailing_slash_POST_method'), array('param'), array('POST' => 0), null, true, true),
-                            183 => array(array('_route' => 'regex_not_trailing_slash_no_methods'), array('param'), null, null, false, true),
-                            211 => array(array('_route' => 'regex_not_trailing_slash_GET_method'), array('param'), array('GET' => 0), null, false, true),
-                            240 => array(array('_route' => 'regex_not_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null, false, true),
-                            269 => array(array('_route' => 'regex_not_trailing_slash_POST_method'), array('param'), array('POST' => 0), null, false, true),
-                        );
+                        $routes = [
+                            46 => [['_route' => 'regex_trailing_slash_no_methods'], ['param'], null, null, true, true],
+                            73 => [['_route' => 'regex_trailing_slash_GET_method'], ['param'], ['GET' => 0], null, true, true],
+                            101 => [['_route' => 'regex_trailing_slash_HEAD_method'], ['param'], ['HEAD' => 0], null, true, true],
+                            130 => [['_route' => 'regex_trailing_slash_POST_method'], ['param'], ['POST' => 0], null, true, true],
+                            183 => [['_route' => 'regex_not_trailing_slash_no_methods'], ['param'], null, null, false, true],
+                            211 => [['_route' => 'regex_not_trailing_slash_GET_method'], ['param'], ['GET' => 0], null, false, true],
+                            240 => [['_route' => 'regex_not_trailing_slash_HEAD_method'], ['param'], ['HEAD' => 0], null, false, true],
+                            269 => [['_route' => 'regex_not_trailing_slash_POST_method'], ['param'], ['POST' => 0], null, false, true],
+                        ];
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 

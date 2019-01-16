@@ -18,8 +18,8 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class DebugProcessor implements DebugLoggerInterface
 {
-    private $records = array();
-    private $errorCount = array();
+    private $records = [];
+    private $errorCount = [];
     private $requestStack;
 
     public function __construct(RequestStack $requestStack = null)
@@ -31,14 +31,14 @@ class DebugProcessor implements DebugLoggerInterface
     {
         $hash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
 
-        $this->records[$hash][] = array(
+        $this->records[$hash][] = [
             'timestamp' => $record['datetime']->getTimestamp(),
             'message' => $record['message'],
             'priority' => $record['level'],
             'priorityName' => $record['level_name'],
             'context' => $record['context'],
             'channel' => isset($record['channel']) ? $record['channel'] : '',
-        );
+        ];
 
         if (!isset($this->errorCount[$hash])) {
             $this->errorCount[$hash] = 0;
@@ -61,11 +61,11 @@ class DebugProcessor implements DebugLoggerInterface
     public function getLogs(/* Request $request = null */)
     {
         if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
-            return $this->records[spl_object_hash($request)] ?? array();
+            return $this->records[spl_object_hash($request)] ?? [];
         }
 
         if (0 === \count($this->records)) {
-            return array();
+            return [];
         }
 
         return array_merge(...array_values($this->records));
@@ -88,7 +88,7 @@ class DebugProcessor implements DebugLoggerInterface
      */
     public function clear()
     {
-        $this->records = array();
-        $this->errorCount = array();
+        $this->records = [];
+        $this->errorCount = [];
     }
 }

@@ -20,14 +20,14 @@ class ExpressionCacheWarmerTest extends TestCase
 {
     public function testWarmUp()
     {
-        $expressions = array(new Expression('A'), new Expression('B'));
+        $expressions = [new Expression('A'), new Expression('B')];
 
         $expressionLang = $this->createMock(ExpressionLanguage::class);
         $expressionLang->expects($this->exactly(2))
             ->method('parse')
             ->withConsecutive(
-                array($expressions[0], array('token', 'user', 'object', 'subject', 'roles', 'request', 'trust_resolver')),
-                array($expressions[1], array('token', 'user', 'object', 'subject', 'roles', 'request', 'trust_resolver'))
+                [$expressions[0], ['token', 'user', 'object', 'subject', 'roles', 'request', 'trust_resolver']],
+                [$expressions[1], ['token', 'user', 'object', 'subject', 'roles', 'request', 'trust_resolver']]
             );
 
         (new ExpressionCacheWarmer($expressions, $expressionLang))->warmUp('');

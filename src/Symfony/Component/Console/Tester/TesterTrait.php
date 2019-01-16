@@ -24,7 +24,7 @@ trait TesterTrait
 {
     /** @var StreamOutput */
     private $output;
-    private $inputs = array();
+    private $inputs = [];
 
     /**
      * Gets the display returned by the last execution of the command or application.

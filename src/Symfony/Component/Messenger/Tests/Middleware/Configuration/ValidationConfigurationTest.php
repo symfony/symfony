@@ -22,17 +22,17 @@ class ValidationConfigurationTest extends TestCase
 {
     public function testConfig()
     {
-        $config = new ValidationConfiguration($groups = array('Default', 'Extra'));
+        $config = new ValidationConfiguration($groups = ['Default', 'Extra']);
         $this->assertSame($groups, $config->getGroups());
 
-        $config = new ValidationConfiguration($groups = new GroupSequence(array('Default', 'Then')));
+        $config = new ValidationConfiguration($groups = new GroupSequence(['Default', 'Then']));
         $this->assertSame($groups, $config->getGroups());
     }
 
     public function testSerializable()
     {
         $this->assertTrue(is_subclass_of(ValidationConfiguration::class, \Serializable::class, true));
-        $this->assertEquals($config = new ValidationConfiguration(array('Default', 'Extra')), unserialize(serialize($config)));
-        $this->assertEquals($config = new ValidationConfiguration(new GroupSequence(array('Default', 'Then'))), unserialize(serialize($config)));
+        $this->assertEquals($config = new ValidationConfiguration(['Default', 'Extra']), unserialize(serialize($config)));
+        $this->assertEquals($config = new ValidationConfiguration(new GroupSequence(['Default', 'Then'])), unserialize(serialize($config)));
     }
 }

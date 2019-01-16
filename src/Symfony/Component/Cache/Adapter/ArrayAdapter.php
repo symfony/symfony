@@ -66,7 +66,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
                 $isHit = false;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', ['key' => $key, 'exception' => $e]);
             $this->values[$key] = $value = null;
             $isHit = false;
         }
@@ -78,7 +78,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
             CacheItem::validateKey($key);
@@ -122,7 +122,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
                 $value = serialize($value);
             } catch (\Exception $e) {
                 $type = \is_object($value) ? \get_class($value) : \gettype($value);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => $key, 'type' => $type, 'exception' => $e]);
 
                 return false;
             }

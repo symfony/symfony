@@ -27,7 +27,7 @@ final class Inflector
      *
      * @see http://english-zone.com/spelling/plurals.html
      */
-    private static $pluralMap = array(
+    private static $pluralMap = [
         // First entry: plural suffix, reversed
         // Second entry: length of plural suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -35,109 +35,109 @@ final class Inflector
         // Fifth entry: singular suffix, normal
 
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        array('a', 1, true, true, array('on', 'um')),
+        ['a', 1, true, true, ['on', 'um']],
 
         // nebulae (nebula)
-        array('ea', 2, true, true, 'a'),
+        ['ea', 2, true, true, 'a'],
 
         // services (service)
-        array('secivres', 8, true, true, 'service'),
+        ['secivres', 8, true, true, 'service'],
 
         // mice (mouse), lice (louse)
-        array('eci', 3, false, true, 'ouse'),
+        ['eci', 3, false, true, 'ouse'],
 
         // geese (goose)
-        array('esee', 4, false, true, 'oose'),
+        ['esee', 4, false, true, 'oose'],
 
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
-        array('i', 1, true, true, 'us'),
+        ['i', 1, true, true, 'us'],
 
         // men (man), women (woman)
-        array('nem', 3, true, true, 'man'),
+        ['nem', 3, true, true, 'man'],
 
         // children (child)
-        array('nerdlihc', 8, true, true, 'child'),
+        ['nerdlihc', 8, true, true, 'child'],
 
         // oxen (ox)
-        array('nexo', 4, false, false, 'ox'),
+        ['nexo', 4, false, false, 'ox'],
 
         // indices (index), appendices (appendix), prices (price)
-        array('seci', 4, false, true, array('ex', 'ix', 'ice')),
+        ['seci', 4, false, true, ['ex', 'ix', 'ice']],
 
         // selfies (selfie)
-        array('seifles', 7, true, true, 'selfie'),
+        ['seifles', 7, true, true, 'selfie'],
 
         // movies (movie)
-        array('seivom', 6, true, true, 'movie'),
+        ['seivom', 6, true, true, 'movie'],
 
         // feet (foot)
-        array('teef', 4, true, true, 'foot'),
+        ['teef', 4, true, true, 'foot'],
 
         // geese (goose)
-        array('eseeg', 5, true, true, 'goose'),
+        ['eseeg', 5, true, true, 'goose'],
 
         // teeth (tooth)
-        array('hteet', 5, true, true, 'tooth'),
+        ['hteet', 5, true, true, 'tooth'],
 
         // news (news)
-        array('swen', 4, true, true, 'news'),
+        ['swen', 4, true, true, 'news'],
 
         // series (series)
-        array('seires', 6, true, true, 'series'),
+        ['seires', 6, true, true, 'series'],
 
         // babies (baby)
-        array('sei', 3, false, true, 'y'),
+        ['sei', 3, false, true, 'y'],
 
         // accesses (access), addresses (address), kisses (kiss)
-        array('sess', 4, true, false, 'ss'),
+        ['sess', 4, true, false, 'ss'],
 
         // analyses (analysis), ellipses (ellipsis), fungi (fungus),
         // neuroses (neurosis), theses (thesis), emphases (emphasis),
         // oases (oasis), crises (crisis), houses (house), bases (base),
         // atlases (atlas)
-        array('ses', 3, true, true, array('s', 'se', 'sis')),
+        ['ses', 3, true, true, ['s', 'se', 'sis']],
 
         // objectives (objective), alternative (alternatives)
-        array('sevit', 5, true, true, 'tive'),
+        ['sevit', 5, true, true, 'tive'],
 
         // drives (drive)
-        array('sevird', 6, false, true, 'drive'),
+        ['sevird', 6, false, true, 'drive'],
 
         // lives (life), wives (wife)
-        array('sevi', 4, false, true, 'ife'),
+        ['sevi', 4, false, true, 'ife'],
 
         // moves (move)
-        array('sevom', 5, true, true, 'move'),
+        ['sevom', 5, true, true, 'move'],
 
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf), caves (cave), staves (staff)
-        array('sev', 3, true, true, array('f', 've', 'ff')),
+        ['sev', 3, true, true, ['f', 've', 'ff']],
 
         // axes (axis), axes (ax), axes (axe)
-        array('sexa', 4, false, false, array('ax', 'axe', 'axis')),
+        ['sexa', 4, false, false, ['ax', 'axe', 'axis']],
 
         // indexes (index), matrixes (matrix)
-        array('sex', 3, true, false, 'x'),
+        ['sex', 3, true, false, 'x'],
 
         // quizzes (quiz)
-        array('sezz', 4, true, false, 'z'),
+        ['sezz', 4, true, false, 'z'],
 
         // bureaus (bureau)
-        array('suae', 4, false, true, 'eau'),
+        ['suae', 4, false, true, 'eau'],
 
         // roses (rose), garages (garage), cassettes (cassette),
         // waltzes (waltz), heroes (hero), bushes (bush), arches (arch),
         // shoes (shoe)
-        array('se', 2, true, true, array('', 'e')),
+        ['se', 2, true, true, ['', 'e']],
 
         // tags (tag)
-        array('s', 1, true, true, ''),
+        ['s', 1, true, true, ''],
 
         // chateaux (chateau)
-        array('xuae', 4, false, true, 'eau'),
+        ['xuae', 4, false, true, 'eau'],
 
         // people (person)
-        array('elpoep', 6, true, true, 'person'),
-    );
+        ['elpoep', 6, true, true, 'person'],
+    ];
 
     /**
      * This class should not be instantiated.
@@ -207,7 +207,7 @@ final class Inflector
                     $firstUpper = ctype_upper($pluralRev[$j - 1]);
 
                     if (\is_array($newSuffix)) {
-                        $singulars = array();
+                        $singulars = [];
 
                         foreach ($newSuffix as $newSuffixEntry) {
                             $singulars[] = $newBase.($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);

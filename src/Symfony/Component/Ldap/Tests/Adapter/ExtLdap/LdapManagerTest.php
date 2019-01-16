@@ -38,12 +38,12 @@ class LdapManagerTest extends LdapTestCase
     {
         $this->executeSearchQuery(1);
 
-        $entry = new Entry('cn=Charles Sarrazin,dc=symfony,dc=com', array(
-            'sn' => array('csarrazi'),
-            'objectclass' => array(
+        $entry = new Entry('cn=Charles Sarrazin,dc=symfony,dc=com', [
+            'sn' => ['csarrazi'],
+            'objectclass' => [
                 'inetOrgPerson',
-            ),
-        ));
+            ],
+        ]);
 
         $em = $this->adapter->getEntryManager();
         $em->add($entry);
@@ -63,11 +63,11 @@ class LdapManagerTest extends LdapTestCase
         $this->executeSearchQuery(1);
 
         // The entry is missing a subject name
-        $entry = new Entry('cn=Charles Sarrazin,dc=symfony,dc=com', array(
-            'objectclass' => array(
+        $entry = new Entry('cn=Charles Sarrazin,dc=symfony,dc=com', [
+            'objectclass' => [
                 'inetOrgPerson',
-            ),
-        ));
+            ],
+        ]);
 
         $em = $this->adapter->getEntryManager();
         $em->add($entry);

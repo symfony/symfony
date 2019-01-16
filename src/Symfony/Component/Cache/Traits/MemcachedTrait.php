@@ -22,12 +22,12 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 trait MemcachedTrait
 {
-    private static $defaultClientOptions = array(
+    private static $defaultClientOptions = [
         'persistent_id' => null,
         'username' => null,
         'password' => null,
         'serializer' => 'php',
-    );
+    ];
 
     private $client;
     private $lazyClient;
@@ -64,7 +64,7 @@ trait MemcachedTrait
      *
      * Examples for servers:
      * - 'memcached://user:pass@localhost?weight=33'
-     * - array(array('localhost', 11211, 33))
+     * - [['localhost', 11211, 33]]
      *
      * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
      * @param array                   $options An array of options
@@ -73,10 +73,10 @@ trait MemcachedTrait
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = array())
+    public static function createConnection($servers, array $options = [])
     {
         if (\is_string($servers)) {
-            $servers = array($servers);
+            $servers = [$servers];
         } elseif (!\is_array($servers)) {
             throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, %s given.', \gettype($servers)));
         }
@@ -100,7 +100,7 @@ trait MemcachedTrait
                 }
                 $params = preg_replace_callback('#^memcached://(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
                     if (!empty($m[1])) {
-                        list($username, $password) = explode(':', $m[1], 2) + array(1 => null);
+                        list($username, $password) = explode(':', $m[1], 2) + [1 => null];
                     }
 
                     return 'file://';
@@ -115,18 +115,18 @@ trait MemcachedTrait
                     $params['weight'] = $m[1];
                     $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
                 }
-                $params += array(
+                $params += [
                     'host' => isset($params['host']) ? $params['host'] : $params['path'],
                     'port' => isset($params['host']) ? 11211 : null,
                     'weight' => 0,
-                );
+                ];
                 if (isset($params['query'])) {
                     parse_str($params['query'], $query);
                     $params += $query;
                     $options = $query + $options;
                 }
 
-                $servers[$i] = array($params['host'], $params['port'], $params['weight']);
+                $servers[$i] = [$params['host'], $params['port'], $params['weight']];
             }
 
             // set client's options
@@ -154,12 +154,12 @@ trait MemcachedTrait
 
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {
-                $oldServers = array();
+                $oldServers = [];
                 foreach ($client->getServerList() as $server) {
-                    $oldServers[] = array($server['host'], $server['port']);
+                    $oldServers[] = [$server['host'], $server['port']];
                 }
 
-                $newServers = array();
+                $newServers = [];
                 foreach ($servers as $server) {
                     if (1 < \count($server)) {
                         $server = array_values($server);
@@ -199,7 +199,7 @@ trait MemcachedTrait
             $lifetime += time();
         }
 
-        $encodedValues = array();
+        $encodedValues = [];
         foreach ($values as $key => $value) {
             $encodedValues[rawurlencode($key)] = $value;
         }
@@ -218,7 +218,7 @@ trait MemcachedTrait
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
-            $result = array();
+            $result = [];
             foreach ($encodedResult as $key => $value) {
                 $result[rawurldecode($key)] = $value;
             }

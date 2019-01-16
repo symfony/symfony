@@ -32,20 +32,20 @@ abstract class Descriptor implements DescriptorInterface
     /** @var OutputStyle */
     protected $output;
     protected $type;
-    protected $ownOptions = array();
-    protected $overriddenOptions = array();
-    protected $parentOptions = array();
-    protected $extensionOptions = array();
-    protected $requiredOptions = array();
-    protected $parents = array();
-    protected $extensions = array();
+    protected $ownOptions = [];
+    protected $overriddenOptions = [];
+    protected $parentOptions = [];
+    protected $extensionOptions = [];
+    protected $requiredOptions = [];
+    protected $parents = [];
+    protected $extensions = [];
 
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = [])
     {
-        $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
+        $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput([]), $output);
 
         switch (true) {
             case null === $object:
@@ -64,14 +64,14 @@ abstract class Descriptor implements DescriptorInterface
 
     abstract protected function describeDefaults(array $options);
 
-    abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array());
+    abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = []);
 
     abstract protected function describeOption(OptionsResolver $optionsResolver, array $options);
 
     protected function collectOptions(ResolvedFormTypeInterface $type)
     {
-        $this->parents = array();
-        $this->extensions = array();
+        $this->parents = [];
+        $this->extensions = [];
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());
@@ -83,7 +83,7 @@ abstract class Descriptor implements DescriptorInterface
         $this->ownOptions = array_diff($ownOptionsResolver->getDefinedOptions(), $optionsResolver->getDefinedOptions());
         $overriddenOptions = array_intersect(array_merge($ownOptionsResolver->getDefinedOptions(), $ownOptionsResolver->getUndefinedOptions()), $optionsResolver->getDefinedOptions());
 
-        $this->parentOptions = array();
+        $this->parentOptions = [];
         foreach ($this->parents as $class => $parentOptions) {
             $this->overriddenOptions[$class] = array_intersect($overriddenOptions, $parentOptions);
             $this->parentOptions[$class] = array_diff($parentOptions, $overriddenOptions);
@@ -91,7 +91,7 @@ abstract class Descriptor implements DescriptorInterface
 
         $type->getInnerType()->configureOptions($optionsResolver);
         $this->collectTypeExtensionsOptions($type, $optionsResolver);
-        $this->extensionOptions = array();
+        $this->extensionOptions = [];
         foreach ($this->extensions as $class => $extensionOptions) {
             $this->overriddenOptions[$class] = array_intersect($overriddenOptions, $extensionOptions);
             $this->extensionOptions[$class] = array_diff($extensionOptions, $overriddenOptions);
@@ -108,17 +108,17 @@ abstract class Descriptor implements DescriptorInterface
 
     protected function getOptionDefinition(OptionsResolver $optionsResolver, $option)
     {
-        $definition = array('required' => $optionsResolver->isRequired($option));
+        $definition = ['required' => $optionsResolver->isRequired($option)];
 
         $introspector = new OptionsResolverIntrospector($optionsResolver);
 
-        $map = array(
+        $map = [
             'default' => 'getDefault',
             'lazy' => 'getLazyClosures',
             'allowedTypes' => 'getAllowedTypes',
             'allowedValues' => 'getAllowedValues',
             'normalizer' => 'getNormalizer',
-        );
+        ];
 
         foreach ($map as $key => $method) {
             try {
@@ -133,7 +133,7 @@ abstract class Descriptor implements DescriptorInterface
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type)
     {
-        $this->parents[$class = \get_class($type->getInnerType())] = array();
+        $this->parents[$class = \get_class($type->getInnerType())] = [];
 
         if (null !== $type->getParent()) {
             $optionsResolver = clone $this->getParentOptionsResolver($type->getParent());

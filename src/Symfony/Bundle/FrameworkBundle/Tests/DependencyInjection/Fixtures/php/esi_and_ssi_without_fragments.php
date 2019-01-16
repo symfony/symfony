@@ -1,13 +1,13 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'fragments' => array(
+$container->loadFromExtension('framework', [
+    'fragments' => [
         'enabled' => false,
-    ),
-    'esi' => array(
+    ],
+    'esi' => [
         'enabled' => true,
-    ),
-    'ssi' => array(
+    ],
+    'ssi' => [
         'enabled' => true,
-    ),
-));
+    ],
+]);

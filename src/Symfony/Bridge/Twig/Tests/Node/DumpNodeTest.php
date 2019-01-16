@@ -70,9 +70,9 @@ EOTXT;
 
     public function testOneVar()
     {
-        $vars = new Node(array(
+        $vars = new Node([
             new NameExpression('foo', 7),
-        ));
+        ]);
         $node = new DumpNode('bar', $vars, 7);
 
         $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
@@ -93,10 +93,10 @@ EOTXT;
 
     public function testMultiVars()
     {
-        $vars = new Node(array(
+        $vars = new Node([
             new NameExpression('foo', 7),
             new NameExpression('bar', 7),
-        ));
+        ]);
         $node = new DumpNode('bar', $vars, 7);
 
         $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());

@@ -22,7 +22,7 @@ class WebServerExtensionTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.project_dir', __DIR__);
-        (new WebServerExtension())->load(array(), $container);
+        (new WebServerExtension())->load([], $container);
 
         $this->assertSame(
             __DIR__.'/test',

@@ -31,7 +31,7 @@ class TraceableEventDispatcherTest extends TestCase
         $kernel->terminate($request, $response);
 
         $events = $stopwatch->getSectionEvents($response->headers->get('X-Debug-Token'));
-        $this->assertEquals(array(
+        $this->assertEquals([
             '__section__',
             'kernel.request',
             'kernel.controller',
@@ -39,13 +39,13 @@ class TraceableEventDispatcherTest extends TestCase
             'controller',
             'kernel.response',
             'kernel.terminate',
-        ), array_keys($events));
+        ], array_keys($events));
     }
 
     public function testStopwatchCheckControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
-            ->setMethods(array('isStarted'))
+            ->setMethods(['isStarted'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
@@ -61,7 +61,7 @@ class TraceableEventDispatcherTest extends TestCase
     public function testStopwatchStopControllerOnRequestEvent()
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')
-            ->setMethods(array('isStarted', 'stop', 'stopSection'))
+            ->setMethods(['isStarted', 'stop', 'stopSection'])
             ->getMock();
         $stopwatch->expects($this->once())
             ->method('isStarted')
@@ -114,7 +114,7 @@ class TraceableEventDispatcherTest extends TestCase
         $controllerResolver = $this->getMockBuilder('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface')->getMock();
         $controllerResolver->expects($this->once())->method('getController')->will($this->returnValue($controller));
         $argumentResolver = $this->getMockBuilder('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface')->getMock();
-        $argumentResolver->expects($this->once())->method('getArguments')->will($this->returnValue(array()));
+        $argumentResolver->expects($this->once())->method('getArguments')->will($this->returnValue([]));
 
         return new HttpKernel($dispatcher, $controllerResolver, new RequestStack(), $argumentResolver);
     }

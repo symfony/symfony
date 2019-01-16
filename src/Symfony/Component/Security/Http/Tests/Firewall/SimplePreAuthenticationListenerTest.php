@@ -102,7 +102,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
 
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
 
-        $this->request = new Request(array(), array(), array(), array(), array(), array());
+        $this->request = new Request([], [], [], [], [], []);
 
         $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
         $this->event

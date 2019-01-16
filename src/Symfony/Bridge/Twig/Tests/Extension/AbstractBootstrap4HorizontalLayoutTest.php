@@ -49,7 +49,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
         $view = $form->createView();
-        $this->renderWidget($view, array('label' => 'foo'));
+        $this->renderWidget($view, ['label' => 'foo']);
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
@@ -63,11 +63,11 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     public function testLabelDoesNotRenderFieldAttributes()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $html = $this->renderLabel($form->createView(), null, array(
-            'attr' => array(
+        $html = $this->renderLabel($form->createView(), null, [
+            'attr' => [
                 'class' => 'my&class',
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -80,11 +80,11 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     public function testLabelWithCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $html = $this->renderLabel($form->createView(), null, array(
-            'label_attr' => array(
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
                 'class' => 'my&class',
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -97,11 +97,11 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $html = $this->renderLabel($form->createView(), 'Custom label', array(
-            'label_attr' => array(
+        $html = $this->renderLabel($form->createView(), 'Custom label', [
+            'label_attr' => [
                 'class' => 'my&class',
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -114,14 +114,14 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => 'Custom label',
-        ));
-        $html = $this->renderLabel($form->createView(), null, array(
-            'label_attr' => array(
+        ]);
+        $html = $this->renderLabel($form->createView(), null, [
+            'label_attr' => [
                 'class' => 'my&class',
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertMatchesXpath($html,
 '/label
@@ -134,11 +134,11 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
     public function testLegendOnExpandedType()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'label' => 'Custom label',
             'expanded' => true,
-            'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
-        ));
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+        ]);
         $view = $form->createView();
         $this->renderWidget($view);
         $html = $this->renderLabel($view);
@@ -153,10 +153,10 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
     public function testStartTag()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => 'http://example.com/directory',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -165,25 +165,25 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
     public function testStartTagWithOverriddenVars()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'put',
             'action' => 'http://example.com/directory',
-        ));
+        ]);
 
-        $html = $this->renderStart($form->createView(), array(
+        $html = $this->renderStart($form->createView(), [
             'method' => 'post',
             'action' => 'http://foo.com/directory',
-        ));
+        ]);
 
         $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
     public function testStartTagForMultipartForm()
     {
-        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
                 'method' => 'get',
                 'action' => 'http://example.com/directory',
-            ))
+            ])
             ->add('file', 'Symfony\Component\Form\Extension\Core\Type\FileType')
             ->getForm();
 
@@ -194,14 +194,14 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
 
     public function testStartTagWithExtraAttributes()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => 'http://example.com/directory',
-        ));
+        ]);
 
-        $html = $this->renderStart($form->createView(), array(
-            'attr' => array('class' => 'foobar'),
-        ));
+        $html = $this->renderStart($form->createView(), [
+            'attr' => ['class' => 'foobar'],
+        ]);
 
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
@@ -210,7 +210,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
         $view = $form->createView();
-        $html = $this->renderRow($view, array('label' => 'foo'));
+        $html = $this->renderRow($view, ['label' => 'foo']);
 
         $this->assertMatchesXpath($html, '/div[@class="form-group row"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
     }

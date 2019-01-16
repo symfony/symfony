@@ -22,8 +22,8 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 final class Definition
 {
-    private $places = array();
-    private $transitions = array();
+    private $places = [];
+    private $transitions = [];
     private $initialPlace;
     private $metadataStore;
 

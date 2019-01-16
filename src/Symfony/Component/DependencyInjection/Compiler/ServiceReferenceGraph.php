@@ -28,7 +28,7 @@ class ServiceReferenceGraph
     /**
      * @var ServiceReferenceGraphNode[]
      */
-    private $nodes = array();
+    private $nodes = [];
 
     public function hasNode(string $id): bool
     {
@@ -67,7 +67,7 @@ class ServiceReferenceGraph
         foreach ($this->nodes as $node) {
             $node->clear();
         }
-        $this->nodes = array();
+        $this->nodes = [];
     }
 
     /**

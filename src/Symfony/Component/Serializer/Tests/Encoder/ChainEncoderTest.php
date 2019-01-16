@@ -34,12 +34,12 @@ class ChainEncoderTest extends TestCase
 
         $this->encoder1
             ->method('supportsEncoding')
-            ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, array(), true),
-                array(self::FORMAT_2, array(), false),
-                array(self::FORMAT_3, array(), false),
-                array(self::FORMAT_3, array('foo' => 'bar'), true),
-            )));
+            ->will($this->returnValueMap([
+                [self::FORMAT_1, [], true],
+                [self::FORMAT_2, [], false],
+                [self::FORMAT_3, [], false],
+                [self::FORMAT_3, ['foo' => 'bar'], true],
+            ]));
 
         $this->encoder2 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')
@@ -47,13 +47,13 @@ class ChainEncoderTest extends TestCase
 
         $this->encoder2
             ->method('supportsEncoding')
-            ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, array(), false),
-                array(self::FORMAT_2, array(), true),
-                array(self::FORMAT_3, array(), false),
-            )));
+            ->will($this->returnValueMap([
+                [self::FORMAT_1, [], false],
+                [self::FORMAT_2, [], true],
+                [self::FORMAT_3, [], false],
+            ]));
 
-        $this->chainEncoder = new ChainEncoder(array($this->encoder1, $this->encoder2));
+        $this->chainEncoder = new ChainEncoder([$this->encoder1, $this->encoder2]);
     }
 
     public function testSupportsEncoding()
@@ -61,7 +61,7 @@ class ChainEncoderTest extends TestCase
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
         $this->assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, array('foo' => 'bar')));
+        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
     }
 
     public function testEncode()
@@ -69,7 +69,7 @@ class ChainEncoderTest extends TestCase
         $this->encoder1->expects($this->never())->method('encode');
         $this->encoder2->expects($this->once())->method('encode');
 
-        $this->chainEncoder->encode(array('foo' => 123), self::FORMAT_2);
+        $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2);
     }
 
     /**
@@ -77,7 +77,7 @@ class ChainEncoderTest extends TestCase
      */
     public function testEncodeUnsupportedFormat()
     {
-        $this->chainEncoder->encode(array('foo' => 123), self::FORMAT_3);
+        $this->chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 
     public function testNeedsNormalizationBasic()
@@ -98,7 +98,7 @@ class ChainEncoderTest extends TestCase
         $chainEncoder->method('supportsEncoding')->willReturn(true);
         $chainEncoder->method('needsNormalization')->willReturn($bool);
 
-        $sut = new ChainEncoder(array($chainEncoder));
+        $sut = new ChainEncoder([$chainEncoder]);
 
         $this->assertEquals($bool, $sut->needsNormalization(self::FORMAT_1));
     }
@@ -106,17 +106,17 @@ class ChainEncoderTest extends TestCase
     public function testNeedsNormalizationNormalizationAware()
     {
         $encoder = new NormalizationAwareEncoder();
-        $sut = new ChainEncoder(array($encoder));
+        $sut = new ChainEncoder([$encoder]);
 
         $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
     }
 
     public function booleanProvider()
     {
-        return array(
-            array(true),
-            array(false),
-        );
+        return [
+            [true],
+            [false],
+        ];
     }
 }
 
@@ -131,7 +131,7 @@ class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareI
         return true;
     }
 
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
     }
 }

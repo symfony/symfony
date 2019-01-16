@@ -27,24 +27,24 @@ class MultiplePcreFilterIteratorTest extends TestCase
 
     public function getIsRegexFixtures()
     {
-        return array(
-            array('foo', false, 'string'),
-            array(' foo ', false, '" " is not a valid delimiter'),
-            array('\\foo\\', false, '"\\" is not a valid delimiter'),
-            array('afooa', false, '"a" is not a valid delimiter'),
-            array('//', false, 'the pattern should contain at least 1 character'),
-            array('/a/', true, 'valid regex'),
-            array('/foo/', true, 'valid regex'),
-            array('/foo/i', true, 'valid regex with a single modifier'),
-            array('/foo/imsxu', true, 'valid regex with multiple modifiers'),
-            array('#foo#', true, '"#" is a valid delimiter'),
-            array('{foo}', true, '"{,}" is a valid delimiter pair'),
-            array('[foo]', true, '"[,]" is a valid delimiter pair'),
-            array('(foo)', true, '"(,)" is a valid delimiter pair'),
-            array('<foo>', true, '"<,>" is a valid delimiter pair'),
-            array('*foo.*', false, '"*" is not considered as a valid delimiter'),
-            array('?foo.?', false, '"?" is not considered as a valid delimiter'),
-        );
+        return [
+            ['foo', false, 'string'],
+            [' foo ', false, '" " is not a valid delimiter'],
+            ['\\foo\\', false, '"\\" is not a valid delimiter'],
+            ['afooa', false, '"a" is not a valid delimiter'],
+            ['//', false, 'the pattern should contain at least 1 character'],
+            ['/a/', true, 'valid regex'],
+            ['/foo/', true, 'valid regex'],
+            ['/foo/i', true, 'valid regex with a single modifier'],
+            ['/foo/imsxu', true, 'valid regex with multiple modifiers'],
+            ['#foo#', true, '"#" is a valid delimiter'],
+            ['{foo}', true, '"{,}" is a valid delimiter pair'],
+            ['[foo]', true, '"[,]" is a valid delimiter pair'],
+            ['(foo)', true, '"(,)" is a valid delimiter pair'],
+            ['<foo>', true, '"<,>" is a valid delimiter pair'],
+            ['*foo.*', false, '"*" is not considered as a valid delimiter'],
+            ['?foo.?', false, '"?" is not considered as a valid delimiter'],
+        ];
     }
 }
 

@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
  */
 class PhpArrayCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testBasicUsageWithLongKey' => 'PhpArrayCache does no writes',
 
         'testDelete' => 'PhpArrayCache does no writes',
@@ -45,7 +45,7 @@ class PhpArrayCacheTest extends CacheTestCase
 
         'testDefaultLifeTime' => 'PhpArrayCache does not allow configuring a default lifetime.',
         'testPrune' => 'PhpArrayCache just proxies',
-    );
+    ];
 
     protected static $file;
 
@@ -68,22 +68,22 @@ class PhpArrayCacheTest extends CacheTestCase
 
     public function testStore()
     {
-        $arrayWithRefs = array();
+        $arrayWithRefs = [];
         $arrayWithRefs[0] = 123;
         $arrayWithRefs[1] = &$arrayWithRefs[0];
 
-        $object = (object) array(
+        $object = (object) [
             'foo' => 'bar',
             'foo2' => 'bar2',
-        );
+        ];
 
-        $expected = array(
+        $expected = [
             'null' => null,
             'serializedString' => serialize($object),
             'arrayWithRefs' => $arrayWithRefs,
             'object' => $object,
-            'arrayWithObject' => array('bar' => $object),
-        );
+            'arrayWithObject' => ['bar' => $object],
+        ];
 
         $cache = new PhpArrayCache(self::$file, new NullCache());
         $cache->warmUp($expected);
@@ -95,13 +95,13 @@ class PhpArrayCacheTest extends CacheTestCase
 
     public function testStoredFile()
     {
-        $expected = array(
+        $expected = [
             'integer' => 42,
             'float' => 42.42,
             'boolean' => true,
-            'array_simple' => array('foo', 'bar'),
-            'array_associative' => array('foo' => 'bar', 'foo2' => 'bar2'),
-        );
+            'array_simple' => ['foo', 'bar'],
+            'array_associative' => ['foo' => 'bar', 'foo2' => 'bar2'],
+        ];
 
         $cache = new PhpArrayCache(self::$file, new NullCache());
         $cache->warmUp($expected);

@@ -21,7 +21,7 @@ class VarClonerTest extends TestCase
 {
     public function testMaxIntBoundary()
     {
-        $data = array(PHP_INT_MAX => 123);
+        $data = [PHP_INT_MAX => 123];
 
         $cloner = new VarCloner();
         $clone = $cloner->cloneVar($data);
@@ -149,42 +149,42 @@ EOTXT;
     public function testLimits()
     {
         // Level 0:
-        $data = array(
+        $data = [
             // Level 1:
-            array(
+            [
                 // Level 2:
-                array(
+                [
                     // Level 3:
                     'Level 3 Item 0',
                     'Level 3 Item 1',
                     'Level 3 Item 2',
                     'Level 3 Item 3',
-                ),
-                array(
+                ],
+                [
                     'Level 3 Item 4',
                     'Level 3 Item 5',
                     'Level 3 Item 6',
-                ),
-                array(
+                ],
+                [
                     'Level 3 Item 7',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'Level 3 Item 8',
-                ),
+                ],
                 'Level 2 Item 0',
-            ),
-            array(
+            ],
+            [
                 'Level 2 Item 1',
-            ),
+            ],
             'Level 1 Item 0',
-            array(
+            [
                 // Test setMaxString:
                 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
                 'SHORT',
-            ),
-        );
+            ],
+        ];
 
         $cloner = new VarCloner();
         $cloner->setMinDepth(2);
@@ -381,16 +381,16 @@ EOTXT;
 
     public function testCaster()
     {
-        $cloner = new VarCloner(array(
+        $cloner = new VarCloner([
             '*' => function ($obj, $array) {
-                return array('foo' => 123);
+                return ['foo' => 123];
             },
             __CLASS__ => function ($obj, $array) {
                 ++$array['foo'];
 
                 return $array;
             },
-        ));
+        ]);
         $clone = $cloner->cloneVar($this);
 
         $expected = <<<EOTXT

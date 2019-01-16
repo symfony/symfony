@@ -92,12 +92,12 @@ class SecurityDataCollectorTest extends TestCase
 
     public function testCollectImpersonatedToken()
     {
-        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', array('ROLE_ADMIN'));
+        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', ['ROLE_ADMIN']);
 
-        $userRoles = array(
+        $userRoles = [
             'ROLE_USER',
             new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
-        );
+        ];
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
@@ -112,8 +112,8 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('yceruto', $collector->getImpersonatorUser());
         $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(array('ROLE_USER', 'ROLE_PREVIOUS_ADMIN'), $collector->getRoles()->getValue(true));
-        $this->assertSame(array(), $collector->getInheritedRoles()->getValue(true));
+        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
 
@@ -208,7 +208,7 @@ class SecurityDataCollectorTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($request)
-            ->willReturn(array(array($listener), null));
+            ->willReturn([[$listener], null]);
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
@@ -223,43 +223,43 @@ class SecurityDataCollectorTest extends TestCase
 
     public function provideRoles()
     {
-        return array(
+        return [
             // Basic roles
-            array(
-                array('ROLE_USER'),
-                array('ROLE_USER'),
-                array(),
-            ),
-            array(
-                array(new Role('ROLE_USER')),
-                array('ROLE_USER'),
-                array(),
-            ),
+            [
+                ['ROLE_USER'],
+                ['ROLE_USER'],
+                [],
+            ],
+            [
+                [new Role('ROLE_USER')],
+                ['ROLE_USER'],
+                [],
+            ],
             // Inherited roles
-            array(
-                array('ROLE_ADMIN'),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array(new Role('ROLE_ADMIN')),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-        );
+            [
+                ['ROLE_ADMIN'],
+                ['ROLE_ADMIN'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+            [
+                [new Role('ROLE_ADMIN')],
+                ['ROLE_ADMIN'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+            [
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+        ];
     }
 
     private function getRoleHierarchy()
     {
-        return new RoleHierarchy(array(
-            'ROLE_ADMIN' => array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_OPERATOR' => array('ROLE_USER'),
-        ));
+        return new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            'ROLE_OPERATOR' => ['ROLE_USER'],
+        ]);
     }
 
     private function getRequest()

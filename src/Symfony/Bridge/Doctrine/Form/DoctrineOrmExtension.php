@@ -26,9 +26,9 @@ class DoctrineOrmExtension extends AbstractExtension
 
     protected function loadTypes()
     {
-        return array(
+        return [
             new EntityType($this->registry),
-        );
+        ];
     }
 
     protected function loadTypeGuesser()

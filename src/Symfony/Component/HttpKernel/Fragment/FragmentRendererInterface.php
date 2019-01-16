@@ -31,7 +31,7 @@ interface FragmentRendererInterface
      *
      * @return Response A Response instance
      */
-    public function render($uri, Request $request, array $options = array());
+    public function render($uri, Request $request, array $options = []);
 
     /**
      * Gets the name of the strategy.

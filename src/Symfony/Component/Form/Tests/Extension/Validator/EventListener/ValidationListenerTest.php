@@ -62,7 +62,7 @@ class ValidationListenerTest extends TestCase
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
         $this->messageTemplate = 'Message template';
-        $this->params = array('foo' => 'bar');
+        $this->params = ['foo' => 'bar'];
     }
 
     private function getConstraintViolation($code = null)
@@ -74,7 +74,7 @@ class ValidationListenerTest extends TestCase
     {
         $builder = new FormBuilder($name, $dataClass, $this->dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath($propertyPath ?: $name));
-        $builder->setAttribute('error_mapping', array());
+        $builder->setAttribute('error_mapping', []);
         $builder->setErrorBubbling(false);
         $builder->setMapped(true);
 
@@ -99,7 +99,7 @@ class ValidationListenerTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(array($violation)));
+            ->will($this->returnValue([$violation]));
 
         $this->violationMapper->expects($this->once())
             ->method('mapViolation')
@@ -115,7 +115,7 @@ class ValidationListenerTest extends TestCase
 
         $this->validator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(array($violation)));
+            ->will($this->returnValue([$violation]));
 
         $this->violationMapper->expects($this->once())
             ->method('mapViolation')

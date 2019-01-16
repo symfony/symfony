@@ -33,16 +33,16 @@ $container
     ->setProperty('foo1', new Reference('foo1', $container::IGNORE_ON_UNINITIALIZED_REFERENCE))
     ->setProperty('foo2', new Reference('foo2', $container::IGNORE_ON_UNINITIALIZED_REFERENCE))
     ->setProperty('foo3', new Reference('foo3', $container::IGNORE_ON_UNINITIALIZED_REFERENCE))
-    ->setProperty('closures', array(
+    ->setProperty('closures', [
         new ServiceClosureArgument(new Reference('foo1', $container::IGNORE_ON_UNINITIALIZED_REFERENCE)),
         new ServiceClosureArgument(new Reference('foo2', $container::IGNORE_ON_UNINITIALIZED_REFERENCE)),
         new ServiceClosureArgument(new Reference('foo3', $container::IGNORE_ON_UNINITIALIZED_REFERENCE)),
-    ))
-    ->setProperty('iter', new IteratorArgument(array(
+    ])
+    ->setProperty('iter', new IteratorArgument([
         'foo1' => new Reference('foo1', $container::IGNORE_ON_UNINITIALIZED_REFERENCE),
         'foo2' => new Reference('foo2', $container::IGNORE_ON_UNINITIALIZED_REFERENCE),
         'foo3' => new Reference('foo3', $container::IGNORE_ON_UNINITIALIZED_REFERENCE),
-    )))
+    ]))
     ->setPublic(true)
 ;
 

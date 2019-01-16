@@ -43,13 +43,13 @@ class PreviewErrorController
          * the additional "showException" flag.
          */
 
-        $subRequest = $request->duplicate(null, null, array(
+        $subRequest = $request->duplicate(null, null, [
             '_controller' => $this->controller,
             'exception' => $exception,
             'logger' => null,
             'format' => $request->getRequestFormat(),
             'showException' => false,
-        ));
+        ]);
 
         return $this->kernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }

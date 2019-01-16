@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
 {
-    protected static $patterns = array();
+    protected static $patterns = [];
 
     /**
      * {@inheritdoc}
@@ -51,14 +51,14 @@ class MoneyType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'scale' => 2,
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
-        ));
+        ]);
 
         $resolver->setAllowedValues('rounding_mode', array(
             NumberToLocalizedStringTransformer::ROUND_FLOOR,
@@ -96,7 +96,7 @@ class MoneyType extends AbstractType
         $locale = \Locale::getDefault();
 
         if (!isset(self::$patterns[$locale])) {
-            self::$patterns[$locale] = array();
+            self::$patterns[$locale] = [];
         }
 
         if (!isset(self::$patterns[$locale][$currency])) {

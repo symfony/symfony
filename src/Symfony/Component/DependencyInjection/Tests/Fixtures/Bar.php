@@ -13,7 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 class Bar implements BarInterface
 {
-    public function __construct($quz = null, \NonExistent $nonExistent = null, BarInterface $decorated = null, array $foo = array())
+    public function __construct($quz = null, \NonExistent $nonExistent = null, BarInterface $decorated = null, array $foo = [])
     {
     }
 

@@ -79,7 +79,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
             $this->hash = $this->computeHash();
         }
 
-        return serialize(array($this->prefix, $this->pattern, $this->recursive, $this->hash));
+        return serialize([$this->prefix, $this->pattern, $this->recursive, $this->hash]);
     }
 
     public function unserialize($serialized)

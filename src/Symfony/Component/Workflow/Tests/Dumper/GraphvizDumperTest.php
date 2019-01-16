@@ -40,23 +40,23 @@ class GraphvizDumperTest extends TestCase
 
     public function provideWorkflowDefinitionWithMarking()
     {
-        yield array(
+        yield [
             $this->createComplexWorkflowDefinition(),
-            new Marking(array('b' => 1)),
+            new Marking(['b' => 1]),
             $this->createComplexWorkflowDefinitionDumpWithMarking(),
-        );
+        ];
 
-        yield array(
+        yield [
             $this->createSimpleWorkflowDefinition(),
-            new Marking(array('c' => 1, 'd' => 1)),
+            new Marking(['c' => 1, 'd' => 1]),
             $this->createSimpleWorkflowDumpWithMarking(),
-        );
+        ];
     }
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
-        yield array($this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
+        yield [$this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking()];
+        yield [$this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking()];
     }
 
     public function createComplexWorkflowDefinitionDumpWithMarking()

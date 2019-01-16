@@ -70,6 +70,6 @@ class LocaleTypeTest extends BaseTypeTest
     {
         $type = new LocaleType();
 
-        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

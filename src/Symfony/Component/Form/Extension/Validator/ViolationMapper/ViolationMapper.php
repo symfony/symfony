@@ -153,7 +153,7 @@ class ViolationMapper implements ViolationMapperInterface
         $foundAtIndex = null;
 
         // Construct mapping rules for the given form
-        $rules = array();
+        $rules = [];
 
         foreach ($form->getConfig()->getOption('error_mapping') as $propertyPath => $targetPath) {
             // Dot rules are considered at the very end

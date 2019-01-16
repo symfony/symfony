@@ -31,7 +31,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface
             return \call_user_func_array(array($logger, 'getLogs'), \func_get_args());
         }
 
-        return array();
+        return [];
     }
 
     /**

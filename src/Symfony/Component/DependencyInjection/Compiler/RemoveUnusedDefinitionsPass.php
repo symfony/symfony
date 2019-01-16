@@ -45,8 +45,8 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 
             if ($graph->hasNode($id)) {
                 $edges = $graph->getNode($id)->getInEdges();
-                $referencingAliases = array();
-                $sourceIds = array();
+                $referencingAliases = [];
+                $sourceIds = [];
                 foreach ($edges as $edge) {
                     if ($edge->isWeak()) {
                         continue;
@@ -60,7 +60,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                 }
                 $isReferenced = (\count(array_unique($sourceIds)) - \count($referencingAliases)) > 0;
             } else {
-                $referencingAliases = array();
+                $referencingAliases = [];
                 $isReferenced = false;
             }
 

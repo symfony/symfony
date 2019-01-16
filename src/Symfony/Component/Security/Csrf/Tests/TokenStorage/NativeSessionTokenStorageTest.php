@@ -31,7 +31,7 @@ class NativeSessionTokenStorageTest extends TestCase
 
     protected function setUp()
     {
-        $_SESSION = array();
+        $_SESSION = [];
 
         $this->storage = new NativeSessionTokenStorage(self::SESSION_NAMESPACE);
     }
@@ -40,7 +40,7 @@ class NativeSessionTokenStorageTest extends TestCase
     {
         $this->storage->setToken('token_id', 'TOKEN');
 
-        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
+        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
     }
 
     public function testStoreTokenInClosedSessionWithExistingSessionId()
@@ -52,7 +52,7 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->storage->setToken('token_id', 'TOKEN');
 
         $this->assertSame(PHP_SESSION_ACTIVE, session_status());
-        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
+        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
     }
 
     public function testStoreTokenInActiveSession()
@@ -61,7 +61,7 @@ class NativeSessionTokenStorageTest extends TestCase
 
         $this->storage->setToken('token_id', 'TOKEN');
 
-        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
+        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
     }
 
     /**

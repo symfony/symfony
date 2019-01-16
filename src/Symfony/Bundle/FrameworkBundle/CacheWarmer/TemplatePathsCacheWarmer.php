@@ -39,7 +39,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     public function warmUp($cacheDir)
     {
         $filesystem = new Filesystem();
-        $templates = array();
+        $templates = [];
 
         foreach ($this->finder->findAllTemplates() as $template) {
             $templates[$template->getLogicalName()] = rtrim($filesystem->makePathRelative($this->locator->locate($template), $cacheDir), '/');

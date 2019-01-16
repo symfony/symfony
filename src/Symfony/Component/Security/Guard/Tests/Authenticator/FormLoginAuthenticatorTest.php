@@ -77,8 +77,8 @@ class FormLoginAuthenticatorTest extends TestCase
 
     protected function setUp()
     {
-        $this->requestWithoutSession = new Request(array(), array(), array(), array(), array(), array());
-        $this->requestWithSession = new Request(array(), array(), array(), array(), array(), array());
+        $this->requestWithoutSession = new Request([], [], [], [], [], []);
+        $this->requestWithSession = new Request([], [], [], [], [], []);
 
         $session = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\Session\\SessionInterface')
             ->disableOriginalConstructor()

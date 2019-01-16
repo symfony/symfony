@@ -32,7 +32,7 @@ interface AdapterInterface
      *
      * @return QueryInterface
      */
-    public function createQuery($dn, $query, array $options = array());
+    public function createQuery($dn, $query, array $options = []);
 
     /**
      * Fetches the entry manager instance.

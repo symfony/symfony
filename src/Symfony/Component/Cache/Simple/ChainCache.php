@@ -27,7 +27,7 @@ use Symfony\Component\Cache\ResettableInterface;
 class ChainCache implements CacheInterface, PruneableInterface, ResettableInterface
 {
     private $miss;
-    private $caches = array();
+    private $caches = [];
     private $defaultLifetime;
     private $cacheCount;
 
@@ -87,7 +87,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
 
     private function generateItems($values, $cacheIndex, $miss, $default)
     {
-        $missing = array();
+        $missing = [];
         $nextCacheIndex = $cacheIndex + 1;
         $nextCache = isset($this->caches[$nextCacheIndex]) ? $this->caches[$nextCacheIndex] : null;
 
@@ -201,7 +201,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
         if ($values instanceof \Traversable) {
             $valuesIterator = $values;
             $values = function () use ($valuesIterator, &$values) {
-                $generatedValues = array();
+                $generatedValues = [];
 
                 foreach ($valuesIterator as $key => $value) {
                     yield $key => $value;

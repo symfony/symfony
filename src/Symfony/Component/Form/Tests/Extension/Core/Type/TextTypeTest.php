@@ -22,9 +22,9 @@ class TextTypeTest extends BaseTypeTest
 
     public function testSubmitNullReturnsNullWithEmptyDataAsString()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 'name', array(
+        $form = $this->factory->create(static::TESTED_TYPE, 'name', [
             'empty_data' => '',
-        ));
+        ]);
 
         $form->submit(null);
         $this->assertSame('', $form->getData());
@@ -34,11 +34,11 @@ class TextTypeTest extends BaseTypeTest
 
     public function provideZeros()
     {
-        return array(
-            array(0, '0'),
-            array('0', '0'),
-            array('00000', '00000'),
-        );
+        return [
+            [0, '0'],
+            ['0', '0'],
+            ['00000', '00000'],
+        ];
     }
 
     /**
@@ -48,9 +48,9 @@ class TextTypeTest extends BaseTypeTest
      */
     public function testSetDataThroughParamsWithZero($data, $dataAsString)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'data' => $data,
-        ));
+        ]);
         $view = $form->createView();
 
         $this->assertFalse($form->isEmpty());

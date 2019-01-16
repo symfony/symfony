@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
-    private $headers = array();
+    private $headers = [];
 
     /**
      * @var Response
@@ -42,7 +42,7 @@ class FirePHPHandler extends BaseFirePHPHandler
         if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $request->headers->get('User-Agent'))
             && !$request->headers->has('X-FirePHP-Version')) {
             self::$sendHeaders = false;
-            $this->headers = array();
+            $this->headers = [];
 
             return;
         }
@@ -51,7 +51,7 @@ class FirePHPHandler extends BaseFirePHPHandler
         foreach ($this->headers as $header => $content) {
             $this->response->headers->set($header, $content);
         }
-        $this->headers = array();
+        $this->headers = [];
     }
 
     /**

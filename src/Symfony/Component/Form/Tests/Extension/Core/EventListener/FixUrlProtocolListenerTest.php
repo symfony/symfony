@@ -43,13 +43,13 @@ class FixUrlProtocolListenerTest extends TestCase
 
     public function provideUrlsWithSupportedProtocols()
     {
-        return array(
-            array('ftp://www.symfony.com'),
-            array('chrome-extension://foo'),
-            array('h323://foo'),
-            array('iris.beep://foo'),
-            array('foo+bar://foo'),
-        );
+        return [
+            ['ftp://www.symfony.com'],
+            ['chrome-extension://foo'],
+            ['h323://foo'],
+            ['iris.beep://foo'],
+            ['foo+bar://foo'],
+        ];
     }
 
     /**

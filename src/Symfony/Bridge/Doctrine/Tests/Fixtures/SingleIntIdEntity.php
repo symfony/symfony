@@ -25,7 +25,7 @@ class SingleIntIdEntity
     public $name;
 
     /** @Column(type="array", nullable=true) */
-    public $phoneNumbers = array();
+    public $phoneNumbers = [];
 
     public function __construct($id, $name)
     {

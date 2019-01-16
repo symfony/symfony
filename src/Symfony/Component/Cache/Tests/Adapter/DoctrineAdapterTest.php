@@ -19,11 +19,11 @@ use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
  */
 class DoctrineAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayCache is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayCache is not.',
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {

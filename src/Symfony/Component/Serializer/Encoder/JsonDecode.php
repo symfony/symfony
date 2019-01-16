@@ -64,7 +64,7 @@ class JsonDecode implements DecoderInterface
      *
      * @see http://php.net/json_decode json_decode
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         $context = $this->resolveContext($context);
 
@@ -96,11 +96,11 @@ class JsonDecode implements DecoderInterface
      */
     private function resolveContext(array $context)
     {
-        $defaultOptions = array(
+        $defaultOptions = [
             'json_decode_associative' => $this->associative,
             'json_decode_recursion_depth' => $this->recursionDepth,
             'json_decode_options' => 0,
-        );
+        ];
 
         return array_merge($defaultOptions, $context);
     }

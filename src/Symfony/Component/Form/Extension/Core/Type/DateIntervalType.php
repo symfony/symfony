@@ -28,7 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateIntervalType extends AbstractType
 {
-    private $timeParts = array(
+    private $timeParts = [
         'years',
         'months',
         'weeks',
@@ -36,12 +36,12 @@ class DateIntervalType extends AbstractType
         'hours',
         'minutes',
         'seconds',
-    );
-    private static $widgets = array(
+    ];
+    private static $widgets = [
         'text' => TextType::class,
         'integer' => IntegerType::class,
         'choice' => ChoiceType::class,
-    );
+    ];
 
     /**
      * {@inheritdoc}
@@ -58,7 +58,7 @@ class DateIntervalType extends AbstractType
             throw new InvalidConfigurationException('You can not enable weeks and days fields together.');
         }
         $format = 'P';
-        $parts = array();
+        $parts = [];
         if ($options['with_years']) {
             $format .= '%yY';
             $parts[] = 'years';
@@ -98,7 +98,7 @@ class DateIntervalType extends AbstractType
         } else {
             foreach ($this->timeParts as $part) {
                 if ($options['with_'.$part]) {
-                    $childOptions = array(
+                    $childOptions = [
                         'error_bubbling' => true,
                         'label' => $options['labels'][$part],
                         // Append generic carry-along options
@@ -106,7 +106,7 @@ class DateIntervalType extends AbstractType
                         'translation_domain' => $options['translation_domain'],
                         // when compound the array entries are ignored, we need to cascade the configuration here
                         'empty_data' => isset($options['empty_data'][$part]) ? $options['empty_data'][$part] : null,
-                    );
+                    ];
                     if ('choice' === $options['widget']) {
                         $childOptions['choice_translation_domain'] = false;
                         $childOptions['choices'] = $options[$part];
@@ -124,12 +124,12 @@ class DateIntervalType extends AbstractType
                 }
             }
             if ($options['with_invert']) {
-                $builder->add('invert', CheckboxType::class, array(
+                $builder->add('invert', CheckboxType::class, [
                     'label' => $options['labels']['invert'],
                     'error_bubbling' => true,
                     'required' => false,
                     'translation_domain' => $options['translation_domain'],
-                ));
+                ]);
             }
             $builder->addViewTransformer(new DateIntervalToArrayTransformer($parts, 'text' === $options['widget']));
         }
@@ -153,10 +153,10 @@ class DateIntervalType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $vars = array(
+        $vars = [
             'widget' => $options['widget'],
             'with_invert' => $options['with_invert'],
-        );
+        ];
         foreach ($this->timeParts as $part) {
             $vars['with_'.$part] = $options['with_'.$part];
         }
@@ -173,7 +173,7 @@ class DateIntervalType extends AbstractType
             return 'single_text' !== $options['widget'];
         };
         $emptyData = function (Options $options) {
-            return 'single_text' === $options['widget'] ? '' : array();
+            return 'single_text' === $options['widget'] ? '' : [];
         };
 
         $placeholderDefault = function (Options $options) {
@@ -191,7 +191,7 @@ class DateIntervalType extends AbstractType
         };
 
         $labelsNormalizer = function (Options $options, array $labels) {
-            return array_replace(array(
+            return array_replace([
                 'years' => null,
                 'months' => null,
                 'days' => null,
@@ -200,13 +200,13 @@ class DateIntervalType extends AbstractType
                 'minutes' => null,
                 'seconds' => null,
                 'invert' => 'Negative interval',
-            ), array_filter($labels, function ($label) {
+            ], array_filter($labels, function ($label) {
                 return null !== $label;
             }));
         };
 
         $resolver->setDefaults(
-            array(
+            [
                 'with_years' => true,
                 'with_months' => true,
                 'with_days' => true,
@@ -234,28 +234,28 @@ class DateIntervalType extends AbstractType
                 'data_class' => null,
                 'compound' => $compound,
                 'empty_data' => $emptyData,
-                'labels' => array(),
-            )
+                'labels' => [],
+            ]
         );
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);
 
         $resolver->setAllowedValues(
             'input',
-            array(
+            [
                 'dateinterval',
                 'string',
                 'array',
-            )
+            ]
         );
         $resolver->setAllowedValues(
             'widget',
-            array(
+            [
                 'single_text',
                 'text',
                 'integer',
                 'choice',
-            )
+            ]
         );
         // Don't clone \DateInterval classes, as i.e. format()
         // does not work after that

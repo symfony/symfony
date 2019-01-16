@@ -47,7 +47,7 @@ class UriSigner
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
         } else {
-            $params = array();
+            $params = [];
         }
 
         $uri = $this->buildUrl($url, $params);
@@ -69,7 +69,7 @@ class UriSigner
         if (isset($url['query'])) {
             parse_str($url['query'], $params);
         } else {
-            $params = array();
+            $params = [];
         }
 
         if (empty($params[$this->parameter])) {
@@ -87,7 +87,7 @@ class UriSigner
         return base64_encode(hash_hmac('sha256', $uri, $this->secret, true));
     }
 
-    private function buildUrl(array $url, array $params = array())
+    private function buildUrl(array $url, array $params = [])
     {
         ksort($params, SORT_STRING);
         $url['query'] = http_build_query($params, '', '&');

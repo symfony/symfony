@@ -48,7 +48,7 @@ EOGRAPH;
     public function testDumpWithMarking()
     {
         $definition = $this->createComplexStateMachineDefinition();
-        $marking = new Marking(array('b' => 1));
+        $marking = new Marking(['b' => 1]);
 
         $expected = <<<'EOGRAPH'
 digraph workflow {

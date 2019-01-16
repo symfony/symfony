@@ -62,17 +62,17 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * @var array
      */
-    protected $callbacks = array();
+    protected $callbacks = [];
 
     /**
      * @var array
      */
-    protected $ignoredAttributes = array();
+    protected $ignoredAttributes = [];
 
     /**
      * @var array
      */
-    protected $camelizedAttributes = array();
+    protected $camelizedAttributes = [];
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
@@ -230,7 +230,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return false;
         }
 
-        $allowedAttributes = array();
+        $allowedAttributes = [];
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
             $name = $attributeMetadata->getName();
 
@@ -255,7 +255,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
         if (\in_array($attribute, $this->ignoredAttributes)) {
             return false;
@@ -335,7 +335,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
 
-            $params = array();
+            $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;

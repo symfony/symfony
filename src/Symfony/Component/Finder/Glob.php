@@ -18,7 +18,7 @@ namespace Symfony\Component\Finder;
  *
  *     // prints foo.bar and foo.baz
  *     $regex = glob_to_regex("foo.*");
- *     for (array('foo.bar', 'foo.baz', 'foo', 'bar') as $t)
+ *     for (['foo.bar', 'foo.baz', 'foo', 'bar'] as $t)
  *     {
  *         if (/$regex/) echo "matched: $car\n";
  *     }

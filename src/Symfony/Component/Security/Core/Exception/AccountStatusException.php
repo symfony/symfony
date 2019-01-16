@@ -44,10 +44,10 @@ abstract class AccountStatusException extends AuthenticationException
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->user,
             parent::serialize(),
-        ));
+        ]);
     }
 
     /**

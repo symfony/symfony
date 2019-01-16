@@ -32,7 +32,7 @@ class EmptyAppKernel extends Kernel
 {
     public function registerBundles()
     {
-        return array(new TwigBundle());
+        return [new TwigBundle()];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

@@ -21,13 +21,13 @@ class DebugAutowiringCommandTest extends WebTestCase
 {
     public function testBasicFunctionality()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:autowiring'));
+        $tester->run(['command' => 'debug:autowiring']);
 
         $this->assertContains('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
         $this->assertContains('alias to http_kernel', $tester->getDisplay());
@@ -35,13 +35,13 @@ class DebugAutowiringCommandTest extends WebTestCase
 
     public function testSearchArgument()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:autowiring', 'search' => 'kern'));
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'kern']);
 
         $this->assertContains('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
         $this->assertNotContains('Symfony\Component\Routing\RouterInterface', $tester->getDisplay());
@@ -49,13 +49,13 @@ class DebugAutowiringCommandTest extends WebTestCase
 
     public function testSearchNoResults()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:autowiring', 'search' => 'foo_fake'), array('capture_stderr_separately' => true));
+        $tester->run(['command' => 'debug:autowiring', 'search' => 'foo_fake'], ['capture_stderr_separately' => true]);
 
         $this->assertContains('No autowirable classes or interfaces found matching "foo_fake"', $tester->getErrorOutput());
         $this->assertEquals(1, $tester->getStatusCode());

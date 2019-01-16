@@ -29,7 +29,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     protected function setUp()
     {
-        $extractors = array(new NullExtractor(), new DummyExtractor());
+        $extractors = [new NullExtractor(), new DummyExtractor()];
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);
     }
 
@@ -43,31 +43,31 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     public function testGetShortDescription()
     {
-        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
+        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', []));
     }
 
     public function testGetLongDescription()
     {
-        $this->assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', array()));
+        $this->assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', []));
     }
 
     public function testGetTypes()
     {
-        $this->assertEquals(array(new Type(Type::BUILTIN_TYPE_INT)), $this->propertyInfo->getTypes('Foo', 'bar', array()));
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_INT)], $this->propertyInfo->getTypes('Foo', 'bar', []));
     }
 
     public function testIsReadable()
     {
-        $this->assertTrue($this->propertyInfo->isReadable('Foo', 'bar', array()));
+        $this->assertTrue($this->propertyInfo->isReadable('Foo', 'bar', []));
     }
 
     public function testIsWritable()
     {
-        $this->assertTrue($this->propertyInfo->isWritable('Foo', 'bar', array()));
+        $this->assertTrue($this->propertyInfo->isWritable('Foo', 'bar', []));
     }
 
     public function testGetProperties()
     {
-        $this->assertEquals(array('a', 'b'), $this->propertyInfo->getProperties('Foo'));
+        $this->assertEquals(['a', 'b'], $this->propertyInfo->getProperties('Foo'));
     }
 }

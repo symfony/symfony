@@ -81,7 +81,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $class = $em->getClassMetadata(\get_class($entity));
         /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
 
-        $criteria = array();
+        $criteria = [];
         $hasNullValue = false;
 
         foreach ($fields as $fieldName) {
@@ -149,15 +149,15 @@ class UniqueEntityValidator extends ConstraintValidator
         if ($result instanceof \Iterator) {
             $result->rewind();
             if ($result instanceof \Countable && 1 < \count($result)) {
-                $result = array($result->current(), $result->current());
+                $result = [$result->current(), $result->current()];
             } else {
                 $result = $result->current();
-                $result = null === $result ? array() : array($result);
+                $result = null === $result ? [] : [$result];
             }
         } elseif (\is_array($result)) {
             reset($result);
         } else {
-            $result = null === $result ? array() : array($result);
+            $result = null === $result ? [] : [$result];
         }
 
         /* If no entity matched the query criteria or a single entity matched,
@@ -197,7 +197,7 @@ class UniqueEntityValidator extends ConstraintValidator
             } else {
                 // this case might happen if the non unique column has a custom doctrine type and its value is an object
                 // in which case we cannot get any identifiers for it
-                $identifiers = array();
+                $identifiers = [];
             }
         } else {
             $identifiers = $class->getIdentifierValues($value);

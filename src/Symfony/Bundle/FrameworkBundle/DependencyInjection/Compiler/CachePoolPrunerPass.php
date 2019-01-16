@@ -41,7 +41,7 @@ class CachePoolPrunerPass implements CompilerPassInterface
             return;
         }
 
-        $services = array();
+        $services = [];
 
         foreach ($container->findTaggedServiceIds($this->cachePoolTag) as $id => $tags) {
             $class = $container->getParameterBag()->resolveValue($container->getDefinition($id)->getClass());

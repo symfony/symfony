@@ -20,27 +20,27 @@ class PriorityTaggedServiceTraitTest extends TestCase
 {
     public function testThatCacheWarmersAreProcessedInPriorityOrder()
     {
-        $services = array(
-            'my_service1' => array('my_custom_tag' => array('priority' => 100)),
-            'my_service2' => array('my_custom_tag' => array('priority' => 200)),
-            'my_service3' => array('my_custom_tag' => array('priority' => -501)),
-            'my_service4' => array('my_custom_tag' => array()),
-            'my_service5' => array('my_custom_tag' => array('priority' => -1)),
-            'my_service6' => array('my_custom_tag' => array('priority' => -500)),
-            'my_service7' => array('my_custom_tag' => array('priority' => -499)),
-            'my_service8' => array('my_custom_tag' => array('priority' => 1)),
-            'my_service9' => array('my_custom_tag' => array('priority' => -2)),
-            'my_service10' => array('my_custom_tag' => array('priority' => -1000)),
-            'my_service11' => array('my_custom_tag' => array('priority' => -1001)),
-            'my_service12' => array('my_custom_tag' => array('priority' => -1002)),
-            'my_service13' => array('my_custom_tag' => array('priority' => -1003)),
-            'my_service14' => array('my_custom_tag' => array('priority' => -1000)),
-            'my_service15' => array('my_custom_tag' => array('priority' => 1)),
-            'my_service16' => array('my_custom_tag' => array('priority' => -1)),
-            'my_service17' => array('my_custom_tag' => array('priority' => 200)),
-            'my_service18' => array('my_custom_tag' => array('priority' => 100)),
-            'my_service19' => array('my_custom_tag' => array()),
-        );
+        $services = [
+            'my_service1' => ['my_custom_tag' => ['priority' => 100]],
+            'my_service2' => ['my_custom_tag' => ['priority' => 200]],
+            'my_service3' => ['my_custom_tag' => ['priority' => -501]],
+            'my_service4' => ['my_custom_tag' => []],
+            'my_service5' => ['my_custom_tag' => ['priority' => -1]],
+            'my_service6' => ['my_custom_tag' => ['priority' => -500]],
+            'my_service7' => ['my_custom_tag' => ['priority' => -499]],
+            'my_service8' => ['my_custom_tag' => ['priority' => 1]],
+            'my_service9' => ['my_custom_tag' => ['priority' => -2]],
+            'my_service10' => ['my_custom_tag' => ['priority' => -1000]],
+            'my_service11' => ['my_custom_tag' => ['priority' => -1001]],
+            'my_service12' => ['my_custom_tag' => ['priority' => -1002]],
+            'my_service13' => ['my_custom_tag' => ['priority' => -1003]],
+            'my_service14' => ['my_custom_tag' => ['priority' => -1000]],
+            'my_service15' => ['my_custom_tag' => ['priority' => 1]],
+            'my_service16' => ['my_custom_tag' => ['priority' => -1]],
+            'my_service17' => ['my_custom_tag' => ['priority' => 200]],
+            'my_service18' => ['my_custom_tag' => ['priority' => 100]],
+            'my_service19' => ['my_custom_tag' => []],
+        ];
 
         $container = new ContainerBuilder();
 
@@ -52,7 +52,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
             }
         }
 
-        $expected = array(
+        $expected = [
             new Reference('my_service2'),
             new Reference('my_service17'),
             new Reference('my_service1'),
@@ -72,7 +72,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
             new Reference('my_service11'),
             new Reference('my_service12'),
             new Reference('my_service13'),
-        );
+        ];
 
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
 

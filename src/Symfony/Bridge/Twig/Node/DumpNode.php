@@ -23,12 +23,12 @@ class DumpNode extends Node
 
     public function __construct($varPrefix, Node $values = null, int $lineno, string $tag = null)
     {
-        $nodes = array();
+        $nodes = [];
         if (null !== $values) {
             $nodes['values'] = $values;
         }
 
-        parent::__construct($nodes, array(), $lineno, $tag);
+        parent::__construct($nodes, [], $lineno, $tag);
         $this->varPrefix = $varPrefix;
     }
 

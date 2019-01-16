@@ -63,7 +63,7 @@ class CountryTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, 'country')
             ->createView()->vars['choices'];
 
-        $countryCodes = array();
+        $countryCodes = [];
 
         foreach ($choices as $choice) {
             $countryCodes[] = $choice->value;
@@ -89,6 +89,6 @@ class CountryTypeTest extends BaseTypeTest
     {
         $type = new CountryType();
 
-        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

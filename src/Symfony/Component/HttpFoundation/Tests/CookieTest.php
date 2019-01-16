@@ -26,17 +26,17 @@ class CookieTest extends TestCase
 {
     public function invalidNames()
     {
-        return array(
-            array(''),
-            array(',MyName'),
-            array(';MyName'),
-            array(' MyName'),
-            array("\tMyName"),
-            array("\rMyName"),
-            array("\nMyName"),
-            array("\013MyName"),
-            array("\014MyName"),
-        );
+        return [
+            [''],
+            [',MyName'],
+            [';MyName'],
+            [' MyName'],
+            ["\tMyName"],
+            ["\rMyName"],
+            ["\nMyName"],
+            ["\013MyName"],
+            ["\014MyName"],
+        ];
     }
 
     /**

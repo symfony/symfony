@@ -45,8 +45,8 @@ class YearTransformer extends Transformer
      */
     public function extractDateOptions(string $matched, int $length): array
     {
-        return array(
+        return [
             'year' => (int) $matched,
-        );
+        ];
     }
 }

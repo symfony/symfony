@@ -31,7 +31,7 @@ class CloneVarDataCollector extends DataCollector
 
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
     }
 
     public function getData()

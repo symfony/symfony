@@ -32,7 +32,7 @@ class PdoDbalCacheTest extends CacheTestCase
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
-        $pool = new PdoCache(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
+        $pool = new PdoCache(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
         $pool->createTable();
     }
 
@@ -43,6 +43,6 @@ class PdoDbalCacheTest extends CacheTestCase
 
     public function createSimpleCache($defaultLifetime = 0)
     {
-        return new PdoCache(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)), '', $defaultLifetime);
+        return new PdoCache(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }
 }

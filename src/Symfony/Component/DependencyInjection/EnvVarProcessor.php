@@ -32,7 +32,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
      */
     public static function getProvidedTypes()
     {
-        return array(
+        return [
             'base64' => 'string',
             'bool' => 'bool',
             'const' => 'bool|int|float|string|array',
@@ -43,7 +43,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'json' => 'array',
             'resolve' => 'string',
             'string' => 'string',
-        );
+        ];
     }
 
     /**

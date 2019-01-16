@@ -61,46 +61,46 @@ EOT
         /** @var $kernel KernelInterface */
         $kernel = $this->getApplication()->getKernel();
 
-        $rows = array(
-            array('<info>Symfony</>'),
+        $rows = [
+            ['<info>Symfony</>'],
             new TableSeparator(),
-            array('Version', Kernel::VERSION),
-            array('End of maintenance', Kernel::END_OF_MAINTENANCE.(self::isExpired(Kernel::END_OF_MAINTENANCE) ? ' <error>Expired</>' : '')),
-            array('End of life', Kernel::END_OF_LIFE.(self::isExpired(Kernel::END_OF_LIFE) ? ' <error>Expired</>' : '')),
+            ['Version', Kernel::VERSION],
+            ['End of maintenance', Kernel::END_OF_MAINTENANCE.(self::isExpired(Kernel::END_OF_MAINTENANCE) ? ' <error>Expired</>' : '')],
+            ['End of life', Kernel::END_OF_LIFE.(self::isExpired(Kernel::END_OF_LIFE) ? ' <error>Expired</>' : '')],
             new TableSeparator(),
-            array('<info>Kernel</>'),
+            ['<info>Kernel</>'],
             new TableSeparator(),
-            array('Type', \get_class($kernel)),
-            array('Name', $kernel->getName()),
-            array('Environment', $kernel->getEnvironment()),
-            array('Debug', $kernel->isDebug() ? 'true' : 'false'),
-            array('Charset', $kernel->getCharset()),
-            array('Root directory', self::formatPath($kernel->getRootDir(), $kernel->getProjectDir())),
-            array('Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'),
-            array('Log directory', self::formatPath($kernel->getLogDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'),
+            ['Type', \get_class($kernel)],
+            ['Name', $kernel->getName()],
+            ['Environment', $kernel->getEnvironment()],
+            ['Debug', $kernel->isDebug() ? 'true' : 'false'],
+            ['Charset', $kernel->getCharset()],
+            ['Root directory', self::formatPath($kernel->getRootDir(), $kernel->getProjectDir())],
+            ['Cache directory', self::formatPath($kernel->getCacheDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getCacheDir()).'</>)'],
+            ['Log directory', self::formatPath($kernel->getLogDir(), $kernel->getProjectDir()).' (<comment>'.self::formatFileSize($kernel->getLogDir()).'</>)'],
             new TableSeparator(),
-            array('<info>PHP</>'),
+            ['<info>PHP</>'],
             new TableSeparator(),
-            array('Version', PHP_VERSION),
-            array('Architecture', (PHP_INT_SIZE * 8).' bits'),
-            array('Intl locale', class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'),
-            array('Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'),
-            array('OPcache', \extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'),
-            array('APCu', \extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'),
-            array('Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'),
-        );
+            ['Version', PHP_VERSION],
+            ['Architecture', (PHP_INT_SIZE * 8).' bits'],
+            ['Intl locale', class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a'],
+            ['Timezone', date_default_timezone_get().' (<comment>'.(new \DateTime())->format(\DateTime::W3C).'</>)'],
+            ['OPcache', \extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'],
+            ['APCu', \extension_loaded('apcu') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'],
+            ['Xdebug', \extension_loaded('xdebug') ? 'true' : 'false'],
+        ];
 
         if ($dotenv = self::getDotenvVars()) {
-            $rows = array_merge($rows, array(
+            $rows = array_merge($rows, [
                 new TableSeparator(),
-                array('<info>Environment (.env)</>'),
+                ['<info>Environment (.env)</>'],
                 new TableSeparator(),
-            ), array_map(function ($value, $name) {
-                return array($name, $value);
+            ], array_map(function ($value, $name) {
+                return [$name, $value];
             }, $dotenv, array_keys($dotenv)));
         }
 
-        $io->table(array(), $rows);
+        $io->table([], $rows);
     }
 
     private static function formatPath(string $path, string $baseDir = null): string
@@ -131,7 +131,7 @@ EOT
 
     private static function getDotenvVars(): array
     {
-        $vars = array();
+        $vars = [];
         foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {
             if ('' !== $name && false !== $value = getenv($name)) {
                 $vars[$name] = $value;

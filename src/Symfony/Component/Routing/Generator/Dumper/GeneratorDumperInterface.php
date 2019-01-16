@@ -28,7 +28,7 @@ interface GeneratorDumperInterface
      *
      * @return string Executable code
      */
-    public function dump(array $options = array());
+    public function dump(array $options = []);
 
     /**
      * Gets the routes to dump.

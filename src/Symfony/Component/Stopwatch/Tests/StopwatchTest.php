@@ -70,11 +70,11 @@ class StopwatchTest extends TestCase
         $events->setAccessible(true);
 
         $stopwatchMockEvent = $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
-            ->setConstructorArgs(array(microtime(true) * 1000))
+            ->setConstructorArgs([microtime(true) * 1000])
             ->getMock()
         ;
 
-        $events->setValue(end($section), array('foo' => $stopwatchMockEvent));
+        $events->setValue(end($section), ['foo' => $stopwatchMockEvent]);
 
         $this->assertFalse($stopwatch->isStarted('foo'));
     }

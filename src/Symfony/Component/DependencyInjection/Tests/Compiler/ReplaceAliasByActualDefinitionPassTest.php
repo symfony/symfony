@@ -26,7 +26,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $aDefinition = $container->register('a', '\stdClass');
-        $aDefinition->setFactory(array(new Reference('b'), 'createA'));
+        $aDefinition->setFactory([new Reference('b'), 'createA']);
 
         $bDefinition = new Definition('\stdClass');
         $bDefinition->setPublic(false);

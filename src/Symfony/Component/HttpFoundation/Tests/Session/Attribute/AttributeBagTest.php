@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  */
 class AttributeBagTest extends TestCase
 {
-    private $array = array();
+    private $array = [];
 
     /**
      * @var AttributeBag
@@ -30,21 +30,21 @@ class AttributeBagTest extends TestCase
 
     protected function setUp()
     {
-        $this->array = array(
+        $this->array = [
             'hello' => 'world',
             'always' => 'be happy',
             'user.login' => 'drak',
-            'csrf.token' => array(
+            'csrf.token' => [
                 'a' => '1234',
                 'b' => '4321',
-            ),
-            'category' => array(
-                'fishing' => array(
+            ],
+            'category' => [
+                'fishing' => [
                     'first' => 'cod',
                     'second' => 'sole',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $this->bag = new AttributeBag('_sf2');
         $this->bag->initialize($this->array);
     }
@@ -52,7 +52,7 @@ class AttributeBagTest extends TestCase
     protected function tearDown()
     {
         $this->bag = null;
-        $this->array = array();
+        $this->array = [];
     }
 
     public function testInitialize()
@@ -60,7 +60,7 @@ class AttributeBagTest extends TestCase
         $bag = new AttributeBag();
         $bag->initialize($this->array);
         $this->assertEquals($this->array, $bag->all());
-        $array = array('should' => 'change');
+        $array = ['should' => 'change'];
         $bag->initialize($array);
         $this->assertEquals($array, $bag->all());
     }
@@ -122,7 +122,7 @@ class AttributeBagTest extends TestCase
 
     public function testReplace()
     {
-        $array = array();
+        $array = [];
         $array['name'] = 'jack';
         $array['foo.bar'] = 'beep';
         $this->bag->replace($array);
@@ -150,22 +150,22 @@ class AttributeBagTest extends TestCase
     public function testClear()
     {
         $this->bag->clear();
-        $this->assertEquals(array(), $this->bag->all());
+        $this->assertEquals([], $this->bag->all());
     }
 
     public function attributesProvider()
     {
-        return array(
-            array('hello', 'world', true),
-            array('always', 'be happy', true),
-            array('user.login', 'drak', true),
-            array('csrf.token', array('a' => '1234', 'b' => '4321'), true),
-            array('category', array('fishing' => array('first' => 'cod', 'second' => 'sole')), true),
-            array('user2.login', null, false),
-            array('never', null, false),
-            array('bye', null, false),
-            array('bye/for/now', null, false),
-        );
+        return [
+            ['hello', 'world', true],
+            ['always', 'be happy', true],
+            ['user.login', 'drak', true],
+            ['csrf.token', ['a' => '1234', 'b' => '4321'], true],
+            ['category', ['fishing' => ['first' => 'cod', 'second' => 'sole']], true],
+            ['user2.login', null, false],
+            ['never', null, false],
+            ['bye', null, false],
+            ['bye/for/now', null, false],
+        ];
     }
 
     public function testGetIterator()

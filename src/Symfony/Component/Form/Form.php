@@ -88,7 +88,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @var FormError[] An array of FormError instances
      */
-    private $errors = array();
+    private $errors = [];
 
     /**
      * Whether this form was submitted.
@@ -130,7 +130,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @var array
      */
-    private $extraData = array();
+    private $extraData = [];
 
     /**
      * Returns the transformation failure generated during submission, if any.
@@ -507,7 +507,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         // Initialize errors in the very beginning so that we don't lose any
         // errors added during listeners
-        $this->errors = array();
+        $this->errors = [];
 
         // Obviously, a disabled form should not change its data upon submission.
         if ($this->isDisabled()) {
@@ -564,7 +564,7 @@ class Form implements \IteratorAggregate, FormInterface
             // (think of empty collection forms)
             if ($this->config->getCompound()) {
                 if (null === $submittedData) {
-                    $submittedData = array();
+                    $submittedData = [];
                 }
 
                 if (!\is_array($submittedData)) {
@@ -812,7 +812,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form');
@@ -875,7 +875,7 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
-            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child->getName() => $child)));
+            $iterator = new InheritDataAwareIterator(new \ArrayIterator([$child->getName() => $child]));
             $iterator = new \RecursiveIteratorIterator($iterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $iterator);
         }

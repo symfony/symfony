@@ -13,7 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 class TestPluralAdderRemoverAndSetter
 {
-    private $emails = array();
+    private $emails = [];
 
     public function getEmails()
     {
@@ -22,7 +22,7 @@ class TestPluralAdderRemoverAndSetter
 
     public function setEmails(array $emails)
     {
-        $this->emails = array('foo@email.com');
+        $this->emails = ['foo@email.com'];
     }
 
     public function addEmail($email)
@@ -32,6 +32,6 @@ class TestPluralAdderRemoverAndSetter
 
     public function removeEmail($email)
     {
-        $this->emails = array_diff($this->emails, array($email));
+        $this->emails = array_diff($this->emails, [$email]);
     }
 }

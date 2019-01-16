@@ -43,7 +43,7 @@ class CsrfValidationListenerTest extends TestCase
 
     protected function getBuilder($name = 'name')
     {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory, array('compound' => true));
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory, ['compound' => true]);
     }
 
     protected function getForm($name = 'name')
@@ -88,7 +88,7 @@ class CsrfValidationListenerTest extends TestCase
             ->willReturn(true)
         ;
 
-        $event = new FormEvent($this->form, array('csrf' => 'token'));
+        $event = new FormEvent($this->form, ['csrf' => 'token']);
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, $serverParams);
 
         $validation->preSubmit($event);

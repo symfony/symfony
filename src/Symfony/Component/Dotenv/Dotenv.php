@@ -108,12 +108,12 @@ final class Dotenv
     public function parse(string $data, string $path = '.env'): array
     {
         $this->path = $path;
-        $this->data = str_replace(array("\r\n", "\r"), "\n", $data);
+        $this->data = str_replace(["\r\n", "\r"], "\n", $data);
         $this->lineno = 1;
         $this->cursor = 0;
         $this->end = \strlen($this->data);
         $this->state = self::STATE_VARNAME;
-        $this->values = array();
+        $this->values = [];
         $name = '';
 
         $this->skipEmptyLines();
@@ -139,7 +139,7 @@ final class Dotenv
         try {
             return $this->values;
         } finally {
-            $this->values = array();
+            $this->values = [];
             $this->data = null;
             $this->path = null;
         }
@@ -225,7 +225,7 @@ final class Dotenv
                     throw $this->createFormatException('Missing quote to end the value');
                 }
                 ++$this->cursor;
-                $value = str_replace(array('\\"', '\r', '\n'), array('"', "\r", "\n"), $value);
+                $value = str_replace(['\\"', '\r', '\n'], ['"', "\r", "\n"], $value);
                 $resolvedValue = $value;
                 $resolvedValue = $this->resolveVariables($resolvedValue);
                 $resolvedValue = $this->resolveCommands($resolvedValue);
@@ -234,7 +234,7 @@ final class Dotenv
             } else {
                 $value = '';
                 $prevChr = $this->data[$this->cursor - 1];
-                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], array("\n", '"', "'"), true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
+                while ($this->cursor < $this->end && !\in_array($this->data[$this->cursor], ["\n", '"', "'"], true) && !((' ' === $prevChr || "\t" === $prevChr) && '#' === $this->data[$this->cursor])) {
                     if ('\\' === $this->data[$this->cursor] && isset($this->data[$this->cursor + 1]) && ('"' === $this->data[$this->cursor + 1] || "'" === $this->data[$this->cursor + 1])) {
                         ++$this->cursor;
                     }

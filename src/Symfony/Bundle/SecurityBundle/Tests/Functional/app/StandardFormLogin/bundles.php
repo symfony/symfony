@@ -14,9 +14,9 @@ use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\FormLoginBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
-return array(
+return [
     new FrameworkBundle(),
     new SecurityBundle(),
     new TwigBundle(),
     new FormLoginBundle(),
-);
+];

@@ -261,7 +261,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     public function findByCodes($codes)
     {
         $codes = (array) $codes;
-        $errors = array();
+        $errors = [];
         foreach ($this as $error) {
             $cause = $error->getCause();
             if ($cause instanceof ConstraintViolation && \in_array($cause->getCode(), $codes, true)) {

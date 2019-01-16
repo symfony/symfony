@@ -51,7 +51,7 @@ abstract class IteratorTestCase extends TestCase
         $values = array_values(array_map(function (\SplFileInfo $fileinfo) { return $fileinfo->getPathname(); }, iterator_to_array($iterator)));
 
         foreach ($expected as $subarray) {
-            $temp = array();
+            $temp = [];
             while (\count($values) && \count($temp) < \count($subarray)) {
                 $temp[] = array_shift($values);
             }
@@ -69,7 +69,7 @@ abstract class IteratorTestCase extends TestCase
      */
     protected function assertIteratorInForeach($expected, \Traversable $iterator)
     {
-        $values = array();
+        $values = [];
         foreach ($iterator as $file) {
             $this->assertInstanceOf('Symfony\\Component\\Finder\\SplFileInfo', $file);
             $values[] = $file->getPathname();
@@ -89,7 +89,7 @@ abstract class IteratorTestCase extends TestCase
      */
     protected function assertOrderedIteratorInForeach($expected, \Traversable $iterator)
     {
-        $values = array();
+        $values = [];
         foreach ($iterator as $file) {
             $this->assertInstanceOf('Symfony\\Component\\Finder\\SplFileInfo', $file);
             $values[] = $file->getPathname();

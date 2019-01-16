@@ -23,5 +23,5 @@ interface ContextAwareEncoderInterface extends EncoderInterface
      *
      * @param array $context options that encoders have access to
      */
-    public function supportsEncoding($format, array $context = array());
+    public function supportsEncoding($format, array $context = []);
 }

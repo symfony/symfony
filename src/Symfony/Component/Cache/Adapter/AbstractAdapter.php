@@ -55,9 +55,9 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         $getId = \Closure::fromCallable(array($this, 'getId'));
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace, &$expiredIds) use ($getId) {
-                $byLifetime = array();
+                $byLifetime = [];
                 $now = time();
-                $expiredIds = array();
+                $expiredIds = [];
 
                 foreach ($deferred as $key => $item) {
                     $key = (string) $key;
@@ -120,10 +120,10 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             $apcu->setLogger($logger);
         }
 
-        return new ChainAdapter(array($apcu, $fs));
+        return new ChainAdapter([$apcu, $fs]);
     }
 
-    public static function createConnection($dsn, array $options = array())
+    public static function createConnection($dsn, array $options = [])
     {
         if (!\is_string($dsn)) {
             throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, \gettype($dsn)));
@@ -153,11 +153,11 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         $value = null;
 
         try {
-            foreach ($this->doFetch(array($id)) as $value) {
+            foreach ($this->doFetch([$id]) as $value) {
                 $isHit = true;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', ['key' => $key, 'exception' => $e]);
         }
 
         return $f($key, $value, $isHit);
@@ -166,12 +166,12 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         if ($this->deferred) {
             $this->commit();
         }
-        $ids = array();
+        $ids = [];
 
         foreach ($keys as $key) {
             $ids[] = $this->getId($key);
@@ -179,8 +179,8 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         try {
             $items = $this->doFetch($ids);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested items', array('keys' => $keys, 'exception' => $e));
-            $items = array();
+            CacheItem::log($this->logger, 'Failed to fetch requested items', ['keys' => $keys, 'exception' => $e]);
+            $items = [];
         }
         $ids = array_combine($ids, $keys);
 
@@ -221,7 +221,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         $ok = true;
         $byLifetime = $this->mergeByLifetime;
         $byLifetime = $byLifetime($this->deferred, $this->namespace, $expiredIds);
-        $retry = $this->deferred = array();
+        $retry = $this->deferred = [];
 
         if ($expiredIds) {
             $this->doDelete($expiredIds);
@@ -231,7 +231,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                 $e = $this->doSave($values, $lifetime);
             } catch (\Exception $e) {
             }
-            if (true === $e || array() === $e) {
+            if (true === $e || [] === $e) {
                 continue;
             }
             if (\is_array($e) || 1 === \count($values)) {
@@ -239,7 +239,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                     $ok = false;
                     $v = $values[$id];
                     $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
+                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null]);
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -253,15 +253,15 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             foreach ($ids as $id) {
                 try {
                     $v = $byLifetime[$lifetime][$id];
-                    $e = $this->doSave(array($id => $v), $lifetime);
+                    $e = $this->doSave([$id => $v], $lifetime);
                 } catch (\Exception $e) {
                 }
-                if (true === $e || array() === $e) {
+                if (true === $e || [] === $e) {
                     continue;
                 }
                 $ok = false;
                 $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null]);
             }
         }
 
@@ -289,7 +289,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                 yield $key => $f($key, $value, true);
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested items', array('keys' => array_values($keys), 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to fetch requested items', ['keys' => array_values($keys), 'exception' => $e]);
         }
 
         foreach ($keys as $key) {

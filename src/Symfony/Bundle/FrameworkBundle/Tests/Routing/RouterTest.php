@@ -36,12 +36,12 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             ' /{_locale}',
-            array(
+            [
                 '_locale' => '%locale%',
-            ),
-            array(
+            ],
+            [
                 '_locale' => 'en|es',
-            ), array(), '', array(), array(), '"%foo%" == "bar"'
+            ], [], '', [], [], '"%foo%" == "bar"'
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -77,8 +77,8 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo');
 
-        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
-        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
+        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
@@ -88,15 +88,15 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-                'boo' => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
-            array(
-            )
+                'boo' => ['%parameter%', '%%escaped_parameter%%', ['%bee_parameter%', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
+            [
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -151,13 +151,13 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
-                'bee' => array('bee', 'bee'),
-            ),
+                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
+                'bee' => ['bee', 'bee'],
+            ],
             $route->getDefaults()
         );
     }
@@ -168,13 +168,13 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            array(
-            ),
-            array(
+            [
+            ],
+            [
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            )
+            ]
         ));
 
         $sc = $this->getPsr11ServiceContainer($routes);
@@ -220,11 +220,11 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-            ),
+            ],
             $route->getRequirements()
         );
     }
@@ -391,7 +391,7 @@ class RouterTest extends TestCase
     public function testDefaultValuesAsNonStrings($value)
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
+        $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
 
         $sc = $this->getPsr11ServiceContainer($routes);
 
@@ -444,12 +444,12 @@ class RouterTest extends TestCase
 
         $routeCollection = $router->getRouteCollection();
 
-        $this->assertEquals(array(new ContainerParametersResource(array('locale' => 'en'))), $routeCollection->getResources());
+        $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
     public function getNonStringValues()
     {
-        return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
+        return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
     }
 
     /**
@@ -465,7 +465,7 @@ class RouterTest extends TestCase
             ->will($this->returnValue($routes))
         ;
 
-        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(array('get'))->getMock();
+        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
 
         $sc
             ->expects($this->once())

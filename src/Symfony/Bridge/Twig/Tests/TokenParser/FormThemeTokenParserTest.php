@@ -28,7 +28,7 @@ class FormThemeTokenParserTest extends TestCase
      */
     public function testCompile($source, $expected)
     {
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $env->addTokenParser(new FormThemeTokenParser());
         $stream = $env->tokenize(new Source($source, ''));
         $parser = new Parser($env);
@@ -38,34 +38,34 @@ class FormThemeTokenParserTest extends TestCase
 
     public function getTestsForFormTheme()
     {
-        return array(
-            array(
+        return [
+            [
                 '{% form_theme form "tpl1" %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
-                    new ArrayExpression(array(
+                    new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
-                    ), 1),
+                    ], 1),
                     1,
                     'form_theme'
                 ),
-            ),
-            array(
+            ],
+            [
                 '{% form_theme form "tpl1" "tpl2" %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
-                    new ArrayExpression(array(
+                    new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
                         new ConstantExpression(1, 1),
                         new ConstantExpression('tpl2', 1),
-                    ), 1),
+                    ], 1),
                     1,
                     'form_theme'
                 ),
-            ),
-            array(
+            ],
+            [
                 '{% form_theme form with "tpl1" %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
@@ -73,48 +73,48 @@ class FormThemeTokenParserTest extends TestCase
                     1,
                     'form_theme'
                 ),
-            ),
-            array(
+            ],
+            [
                 '{% form_theme form with ["tpl1"] %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
-                    new ArrayExpression(array(
+                    new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
-                    ), 1),
+                    ], 1),
                     1,
                     'form_theme'
                 ),
-            ),
-            array(
+            ],
+            [
                 '{% form_theme form with ["tpl1", "tpl2"] %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
-                    new ArrayExpression(array(
+                    new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
                         new ConstantExpression(1, 1),
                         new ConstantExpression('tpl2', 1),
-                    ), 1),
+                    ], 1),
                     1,
                     'form_theme'
                 ),
-            ),
-            array(
+            ],
+            [
                 '{% form_theme form with ["tpl1", "tpl2"] only %}',
                 new FormThemeNode(
                     new NameExpression('form', 1),
-                    new ArrayExpression(array(
+                    new ArrayExpression([
                         new ConstantExpression(0, 1),
                         new ConstantExpression('tpl1', 1),
                         new ConstantExpression(1, 1),
                         new ConstantExpression('tpl2', 1),
-                    ), 1),
+                    ], 1),
                     1,
                     'form_theme',
                     true
                 ),
-            ),
-        );
+            ],
+        ];
     }
 }

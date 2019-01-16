@@ -114,7 +114,7 @@ class WebServerConfig
 
     private function getFrontControllerFileNames($env)
     {
-        return array('app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php');
+        return ['app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php'];
     }
 
     private function findBestPort()

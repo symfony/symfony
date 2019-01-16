@@ -24,7 +24,7 @@ class MultipleStateMarkingStoreTest extends TestCase
 
         $markingStore->setMarking($subject, $marking);
 
-        $this->assertSame(array('first_place' => 1), $subject->myMarks);
+        $this->assertSame(['first_place' => 1], $subject->myMarks);
 
         $marking2 = $markingStore->getMarking($subject);
 

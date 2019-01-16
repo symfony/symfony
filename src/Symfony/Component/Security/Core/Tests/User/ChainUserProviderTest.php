@@ -36,7 +36,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->loadUserByUsername('foo'));
     }
 
@@ -61,7 +61,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UsernameNotFoundException('not found'))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $provider->loadUserByUsername('foo');
     }
 
@@ -81,7 +81,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
@@ -101,7 +101,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
@@ -124,7 +124,7 @@ class ChainUserProviderTest extends TestCase
             ->willThrowException(new UnsupportedUserException('unsupported'))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $provider->refreshUser($this->getAccount());
     }
 
@@ -146,7 +146,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue(true))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertTrue($provider->supportsClass('foo'));
     }
 
@@ -168,7 +168,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue(false))
         ;
 
-        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider = new ChainUserProvider([$provider1, $provider2]);
         $this->assertFalse($provider->supportsClass('foo'));
     }
 
@@ -188,7 +188,7 @@ class ChainUserProviderTest extends TestCase
             ->will($this->returnValue($account = $this->getAccount()))
         ;
 
-        $provider = new ChainUserProvider(new \ArrayObject(array($provider1, $provider2)));
+        $provider = new ChainUserProvider(new \ArrayObject([$provider1, $provider2]));
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 

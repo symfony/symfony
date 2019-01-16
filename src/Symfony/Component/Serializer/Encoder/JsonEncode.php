@@ -32,7 +32,7 @@ class JsonEncode implements EncoderInterface
      *
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $context = $this->resolveContext($context);
 
@@ -58,8 +58,8 @@ class JsonEncode implements EncoderInterface
      *
      * @return array
      */
-    private function resolveContext(array $context = array())
+    private function resolveContext(array $context = [])
     {
-        return array_merge(array('json_encode_options' => $this->options), $context);
+        return array_merge(['json_encode_options' => $this->options], $context);
     }
 }

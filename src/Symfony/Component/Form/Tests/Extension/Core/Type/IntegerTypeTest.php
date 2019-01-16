@@ -41,9 +41,9 @@ class IntegerTypeTest extends BaseTypeTest
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10)
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
-        ));
+        ]);
         $form->submit(null);
 
         $this->assertSame($emptyData, $form->getViewData());

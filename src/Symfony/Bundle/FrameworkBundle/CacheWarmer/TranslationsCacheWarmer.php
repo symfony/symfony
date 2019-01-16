@@ -60,8 +60,8 @@ class TranslationsCacheWarmer implements CacheWarmerInterface, ServiceSubscriber
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'translator' => TranslatorInterface::class,
-        );
+        ];
     }
 }

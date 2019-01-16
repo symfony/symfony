@@ -25,7 +25,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function create($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
         return $this->createBuilder($type, $data, $options)->getForm();
     }
@@ -33,7 +33,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamed($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createNamed($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
         return $this->createNamedBuilder($name, $type, $data, $options)->getForm();
     }
@@ -41,7 +41,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createForProperty($class, $property, $data = null, array $options = array())
+    public function createForProperty($class, $property, $data = null, array $options = [])
     {
         return $this->createBuilderForProperty($class, $property, $data, $options)->getForm();
     }
@@ -49,7 +49,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createBuilder($type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
         if (!\is_string($type)) {
             throw new UnexpectedTypeException($type, 'string');
@@ -61,7 +61,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = array())
+    public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
         if (null !== $data && !array_key_exists('data', $options)) {
             $options['data'] = $data;
@@ -85,7 +85,7 @@ class FormFactory implements FormFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilderForProperty($class, $property, $data = null, array $options = array())
+    public function createBuilderForProperty($class, $property, $data = null, array $options = [])
     {
         if (null === $guesser = $this->registry->getTypeGuesser()) {
             return $this->createNamedBuilder($property, 'Symfony\Component\Form\Extension\Core\Type\TextType', $data, $options);
@@ -102,23 +102,23 @@ class FormFactory implements FormFactoryInterface
         $pattern = $patternGuess ? $patternGuess->getValue() : null;
 
         if (null !== $pattern) {
-            $options = array_replace_recursive(array('attr' => array('pattern' => $pattern)), $options);
+            $options = array_replace_recursive(['attr' => ['pattern' => $pattern]], $options);
         }
 
         if (null !== $maxLength) {
-            $options = array_replace_recursive(array('attr' => array('maxlength' => $maxLength)), $options);
+            $options = array_replace_recursive(['attr' => ['maxlength' => $maxLength]], $options);
         }
 
         if ($requiredGuess) {
-            $options = array_merge(array('required' => $requiredGuess->getValue()), $options);
+            $options = array_merge(['required' => $requiredGuess->getValue()], $options);
         }
 
         // user options may override guessed options
         if ($typeGuess) {
-            $attrs = array();
+            $attrs = [];
             $typeGuessOptions = $typeGuess->getOptions();
             if (isset($typeGuessOptions['attr']) && isset($options['attr'])) {
-                $attrs = array('attr' => array_merge($typeGuessOptions['attr'], $options['attr']));
+                $attrs = ['attr' => array_merge($typeGuessOptions['attr'], $options['attr'])];
             }
 
             $options = array_merge($typeGuessOptions, $options, $attrs);

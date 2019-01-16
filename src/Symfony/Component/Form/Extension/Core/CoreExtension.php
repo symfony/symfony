@@ -41,7 +41,7 @@ class CoreExtension extends AbstractExtension
 
     protected function loadTypes()
     {
-        return array(
+        return [
             new Type\FormType($this->propertyAccessor),
             new Type\BirthdayType(),
             new Type\CheckboxType(),
@@ -76,13 +76,13 @@ class CoreExtension extends AbstractExtension
             new Type\CurrencyType(),
             new Type\TelType(),
             new Type\ColorType(),
-        );
+        ];
     }
 
     protected function loadTypeExtensions()
     {
-        return array(
+        return [
             new TransformationFailureExtension($this->translator),
-        );
+        ];
     }
 }

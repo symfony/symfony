@@ -63,7 +63,7 @@ class TranslationUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
@@ -73,7 +73,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
-            ))
+            ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
@@ -112,7 +112,7 @@ EOF
         // check format
         $supportedFormats = $this->writer->getFormats();
         if (!\in_array($input->getOption('output-format'), $supportedFormats)) {
-            $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
+            $errorIo->error(['Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.']);
 
             return 1;
         }
@@ -120,11 +120,11 @@ EOF
         $kernel = $this->getApplication()->getKernel();
 
         // Define Root Paths
-        $transPaths = array($kernel->getRootDir().'/Resources/translations');
+        $transPaths = [$kernel->getRootDir().'/Resources/translations'];
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array($kernel->getRootDir().'/Resources/views');
+        $viewsPaths = [$kernel->getRootDir().'/Resources/views'];
         if ($this->defaultViewsPath) {
             $viewsPaths[] = $this->defaultViewsPath;
         }
@@ -134,12 +134,12 @@ EOF
         if (null !== $input->getArgument('bundle')) {
             try {
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = array($foundBundle->getPath().'/Resources/translations');
+                $transPaths = [$foundBundle->getPath().'/Resources/translations'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath.'/'.$foundBundle->getName();
                 }
                 $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $foundBundle->getName());
-                $viewsPaths = array($foundBundle->getPath().'/Resources/views');
+                $viewsPaths = [$foundBundle->getPath().'/Resources/views'];
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$foundBundle->getName();
                 }
@@ -147,8 +147,8 @@ EOF
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $transPaths = array($input->getArgument('bundle').'/Resources/translations');
-                $viewsPaths = array($input->getArgument('bundle').'/Resources/views');
+                $transPaths = [$input->getArgument('bundle').'/Resources/translations'];
+                $viewsPaths = [$input->getArgument('bundle').'/Resources/views'];
                 $currentName = $transPaths[0];
 
                 if (!is_dir($transPaths[0])) {
@@ -250,7 +250,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

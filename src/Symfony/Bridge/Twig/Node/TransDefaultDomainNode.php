@@ -22,7 +22,7 @@ class TransDefaultDomainNode extends Node
 {
     public function __construct(AbstractExpression $expr, int $lineno = 0, string $tag = null)
     {
-        parent::__construct(array('expr' => $expr), array(), $lineno, $tag);
+        parent::__construct(['expr' => $expr], [], $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)

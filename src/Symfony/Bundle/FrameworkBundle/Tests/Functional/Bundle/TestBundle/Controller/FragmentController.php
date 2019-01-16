@@ -22,7 +22,7 @@ class FragmentController implements ContainerAwareInterface
 
     public function indexAction(Request $request)
     {
-        return $this->container->get('templating')->renderResponse('fragment.html.php', array('bar' => new Bar()));
+        return $this->container->get('templating')->renderResponse('fragment.html.php', ['bar' => new Bar()]);
     }
 
     public function inlinedAction($options, $_format)

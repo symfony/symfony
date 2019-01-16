@@ -44,16 +44,16 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     public function __construct($mimeTypeGuesser = null)
     {
         if ($mimeTypeGuesser instanceof DeprecatedMimeTypeGuesserInterface) {
-            @trigger_error(sprintf('Passing a %s to "%s()" is deprecated since Symfony 4.3, pass a %s instead.', DeprecatedMimeTypeGuesserInterface::class, __METHOD__, MimeTypeGuesserInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a %s to "%s()" is deprecated since Symfony 4.3, pass a "%s" instead.', DeprecatedMimeTypeGuesserInterface::class, __METHOD__, MimeTypeGuesserInterface::class), E_USER_DEPRECATED);
         } elseif (null === $mimeTypeGuesser) {
             if (class_exists(MimeTypes::class)) {
                 $mimeTypeGuesser = MimeTypes::getDefault();
             } else {
-                @trigger_error(sprintf('Passing null to "%s()" without symfony/mime installed is deprecated since Symfony 4.3, install symfony/mime.', DeprecatedMimeTypeGuesserInterface::class, __METHOD__), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing null to "%s()" without symfony/mime installed is deprecated since Symfony 4.3, install symfony/mime.', __METHOD__), E_USER_DEPRECATED);
                 $mimeTypeGuesser = MimeTypeGuesser::getInstance();
             }
         } elseif (!$mimeTypeGuesser instanceof MimeTypes) {
-            throw new \InvalidArgumentException(sprintf('Argument 1 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, MimeTypes::class, \is_object($mimeTypeGuesser) ? \get_class($mimeTypeGuesser) : \gettype($mimeTypeGuesser)));
+            throw new \InvalidArgumentException(sprintf('Argument 1 passed to "%s()" must be an instance of "%s" or null, %s given.', __METHOD__, MimeTypes::class, \is_object($mimeTypeGuesser) ? \get_class($mimeTypeGuesser) : \gettype($mimeTypeGuesser)));
         }
 
         $this->mimeTypeGuesser = $mimeTypeGuesser;

@@ -30,7 +30,7 @@ class AddMimeTypeGuesserPass implements CompilerPassInterface
         if ($container->has('mime_types')) {
             $definition = $container->findDefinition('mime_types');
             foreach ($container->findTaggedServiceIds('mime.mime_type_guesser', true) as $id => $attributes) {
-                $definition->addMethodCall('registerGuesser', array(new Reference($id)));
+                $definition->addMethodCall('registerGuesser', [new Reference($id)]);
             }
         }
     }

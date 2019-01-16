@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Mime\MimeTypes;
 
 /**
  * @requires extension fileinfo

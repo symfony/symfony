@@ -21,6 +21,8 @@ use Symfony\Component\Mime\FileinfoMimeTypeGuesser as NewFileinfoMimeTypeGuesser
  * Guesses the mime type using the PECL extension FileInfo.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 4.3, use {@link NewFileinfoMimeTypeGuesser} instead
  */
 class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 {

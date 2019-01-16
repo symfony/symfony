@@ -21,6 +21,8 @@ use Symfony\Component\Mime\FileBinaryMimeTypeGuesser as NewFileBinaryMimeTypeGue
  * Guesses the mime type with the binary "file" (only available on *nix).
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since Symfony 4.3, use {@link NewFileBinaryMimeTypeGuesser} instead
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {

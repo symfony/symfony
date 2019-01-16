@@ -97,10 +97,10 @@ class CachePoolPassTest extends TestCase
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
-        $cachePool->addTag('cache.pool', array(
+        $cachePool->addTag('cache.pool', [
             'name' => 'foobar',
             'provider' => 'foobar',
-        ));
+        ]);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);

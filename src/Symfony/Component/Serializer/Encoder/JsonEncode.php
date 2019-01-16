@@ -22,14 +22,14 @@ class JsonEncode implements EncoderInterface
 {
     const OPTIONS = 'json_encode_options';
 
-    private $defaultContext = array(
+    private $defaultContext = [
         self::OPTIONS => 0,
-    );
+    ];
 
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = array())
+    public function __construct($defaultContext = [])
     {
         if (!\is_array($defaultContext)) {
             @trigger_error(sprintf('Passing an integer as first parameter of the "%s()" method is deprecated since Symfony 4.2, use the "json_encode_options" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
@@ -45,7 +45,7 @@ class JsonEncode implements EncoderInterface
      *
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
         $encodedJson = json_encode($data, $jsonEncodeOptions);

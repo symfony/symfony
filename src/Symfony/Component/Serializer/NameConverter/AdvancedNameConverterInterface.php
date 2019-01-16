@@ -21,10 +21,10 @@ interface AdvancedNameConverterInterface extends NameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName, string $class = null, string $format = null, array $context = array());
+    public function normalize($propertyName, string $class = null, string $format = null, array $context = []);
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName, string $class = null, string $format = null, array $context = array());
+    public function denormalize($propertyName, string $class = null, string $format = null, array $context = []);
 }

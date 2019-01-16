@@ -23,7 +23,7 @@ class DebugCommandTest extends TestCase
     public function testDebugCommand()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array(), array('decorated' => false));
+        $ret = $tester->execute([], ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Functions', trim($tester->getDisplay()));
@@ -32,11 +32,11 @@ class DebugCommandTest extends TestCase
     public function testFilterAndJsonFormatOptions()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('--filter' => 'abs', '--format' => 'json'), array('decorated' => false));
+        $ret = $tester->execute(['--filter' => 'abs', '--format' => 'json'], ['decorated' => false]);
 
-        $expected = array(
-            'filters' => array('abs' => array()),
-        );
+        $expected = [
+            'filters' => ['abs' => []],
+        ];
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
@@ -44,19 +44,19 @@ class DebugCommandTest extends TestCase
 
     public function testWarningsWrongBundleOverriding()
     {
-        $bundleMetadata = array(
+        $bundleMetadata = [
             'TwigBundle' => 'vendor/twig-bundle/',
             'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
-        );
+        ];
         $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
 
-        $tester = $this->createCommandTester(array(), $bundleMetadata, $defaultPath);
-        $ret = $tester->execute(array('--filter' => 'unknown', '--format' => 'json'), array('decorated' => false));
+        $tester = $this->createCommandTester([], $bundleMetadata, $defaultPath);
+        $ret = $tester->execute(['--filter' => 'unknown', '--format' => 'json'], ['decorated' => false]);
 
-        $expected = array('warnings' => array(
+        $expected = ['warnings' => [
             'Path "templates/bundles/UnknownBundle" not matching any bundle found',
             'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
-        ));
+        ]];
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
@@ -68,21 +68,21 @@ class DebugCommandTest extends TestCase
      */
     public function testDeprecationForWrongBundleOverridingInLegacyPath()
     {
-        $bundleMetadata = array(
+        $bundleMetadata = [
             'TwigBundle' => 'vendor/twig-bundle/',
             'WebProfilerBundle' => 'vendor/web-profiler-bundle/',
-        );
+        ];
         $defaultPath = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'templates';
         $rootDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
 
-        $tester = $this->createCommandTester(array(), $bundleMetadata, $defaultPath, $rootDir);
-        $ret = $tester->execute(array('--filter' => 'unknown', '--format' => 'json'), array('decorated' => false));
+        $tester = $this->createCommandTester([], $bundleMetadata, $defaultPath, $rootDir);
+        $ret = $tester->execute(['--filter' => 'unknown', '--format' => 'json'], ['decorated' => false]);
 
-        $expected = array('warnings' => array(
+        $expected = ['warnings' => [
             'Path "Resources/BarBundle" not matching any bundle found',
             'Path "templates/bundles/UnknownBundle" not matching any bundle found',
             'Path "templates/bundles/WebProfileBundle" not matching any bundle found, did you mean "WebProfilerBundle"?',
-        ));
+        ]];
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
@@ -94,7 +94,7 @@ class DebugCommandTest extends TestCase
      */
     public function testMalformedTemplateName()
     {
-        $this->createCommandTester()->execute(array('name' => '@foo'));
+        $this->createCommandTester()->execute(['name' => '@foo']);
     }
 
     /**
@@ -103,7 +103,7 @@ class DebugCommandTest extends TestCase
     public function testDebugTemplateName(array $input, string $output, array $paths)
     {
         $tester = $this->createCommandTester($paths);
-        $ret = $tester->execute($input, array('decorated' => false));
+        $ret = $tester->execute($input, ['decorated' => false]);
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
         $this->assertStringMatchesFormat($output, $tester->getDisplay(true));
@@ -111,14 +111,14 @@ class DebugCommandTest extends TestCase
 
     public function getDebugTemplateNameTestData()
     {
-        $defaultPaths = array(
+        $defaultPaths = [
             'templates/' => null,
             'templates/bundles/TwigBundle/' => 'Twig',
             'vendors/twig-bundle/Resources/views/' => 'Twig',
-        );
+        ];
 
-        yield 'no template paths configured for your application' => array(
-            'input' => array('name' => 'base.html.twig'),
+        yield 'no template paths configured for your application' => [
+            'input' => ['name' => 'base.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -140,11 +140,11 @@ Configured Paths
 
 TXT
             ,
-            'paths' => array('vendors/twig-bundle/Resources/views/' => 'Twig'),
-        );
+            'paths' => ['vendors/twig-bundle/Resources/views/' => 'Twig'],
+        ];
 
-        yield 'no matched template' => array(
-            'input' => array('name' => '@App/foo.html.twig'),
+        yield 'no matched template' => [
+            'input' => ['name' => '@App/foo.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -170,10 +170,10 @@ Configured Paths
 TXT
             ,
             'paths' => $defaultPaths,
-        );
+        ];
 
-        yield 'matched file' => array(
-            'input' => array('name' => 'base.html.twig'),
+        yield 'matched file' => [
+            'input' => ['name' => 'base.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -194,10 +194,10 @@ Configured Paths
 TXT
             ,
             'paths' => $defaultPaths,
-        );
+        ];
 
-        yield 'overridden files' => array(
-            'input' => array('name' => '@Twig/error.html.twig'),
+        yield 'overridden files' => [
+            'input' => ['name' => '@Twig/error.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -224,10 +224,10 @@ Configured Paths
 TXT
             ,
             'paths' => $defaultPaths,
-        );
+        ];
 
-        yield 'template namespace alternative' => array(
-            'input' => array('name' => '@Twg/error.html.twig'),
+        yield 'template namespace alternative' => [
+            'input' => ['name' => '@Twg/error.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -247,10 +247,10 @@ Configured Paths
 TXT
             ,
             'paths' => $defaultPaths,
-        );
+        ];
 
-        yield 'template name alternative' => array(
-            'input' => array('name' => '@Twig/eror.html.twig'),
+        yield 'template name alternative' => [
+            'input' => ['name' => '@Twig/eror.html.twig'],
             'output' => <<<TXT
 
 Matched File
@@ -276,13 +276,13 @@ Configured Paths
 TXT
             ,
             'paths' => $defaultPaths,
-        );
+        ];
     }
 
-    private function createCommandTester(array $paths = array(), array $bundleMetadata = array(), string $defaultPath = null, string $rootDir = null): CommandTester
+    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, string $rootDir = null): CommandTester
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
-        $loader = new FilesystemLoader(array(), $projectDir);
+        $loader = new FilesystemLoader([], $projectDir);
         foreach ($paths as $path => $namespace) {
             if (null === $namespace) {
                 $loader->addPath($path);

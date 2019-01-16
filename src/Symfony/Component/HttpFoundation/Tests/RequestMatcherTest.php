@@ -81,7 +81,7 @@ class RequestMatcherTest extends TestCase
     public function testPort()
     {
         $matcher = new RequestMatcher();
-        $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => null, 'SERVER_PORT' => 8000));
+        $request = Request::create('', 'get', [], [], [], ['HTTP_HOST' => null, 'SERVER_PORT' => 8000]);
 
         $matcher->matchPort(8000);
         $this->assertTrue($matcher->matches($request));
@@ -89,7 +89,7 @@ class RequestMatcherTest extends TestCase
         $matcher->matchPort(9000);
         $this->assertFalse($matcher->matches($request));
 
-        $matcher = new RequestMatcher(null, null, null, null, array(), null, 8000);
+        $matcher = new RequestMatcher(null, null, null, null, [], null, 8000);
         $this->assertTrue($matcher->matches($request));
     }
 

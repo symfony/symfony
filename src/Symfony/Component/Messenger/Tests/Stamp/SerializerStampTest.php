@@ -22,7 +22,7 @@ class SerializerStampTest extends TestCase
 {
     public function testSerializable()
     {
-        $stamp = new SerializerStamp(array(ObjectNormalizer::GROUPS => array('Default', 'Extra')));
+        $stamp = new SerializerStamp([ObjectNormalizer::GROUPS => ['Default', 'Extra']]);
 
         $this->assertEquals($stamp, unserialize(serialize($stamp)));
     }

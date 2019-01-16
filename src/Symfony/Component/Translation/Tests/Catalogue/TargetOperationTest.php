@@ -56,13 +56,13 @@ class TargetOperationTest extends AbstractOperationTest
     public function testGetResultFromIntlDomain()
     {
         $this->assertEquals(
-            new MessageCatalogue('en', array(
-                'messages' => array('a' => 'old_a'),
-                'messages+intl-icu' => array('c' => 'new_c'),
-            )),
+            new MessageCatalogue('en', [
+                'messages' => ['a' => 'old_a'],
+                'messages+intl-icu' => ['c' => 'new_c'],
+            ]),
             $this->createOperation(
-                new MessageCatalogue('en', array('messages' => array('a' => 'old_a'), 'messages+intl-icu' => array('b' => 'old_b'))),
-                new MessageCatalogue('en', array('messages' => array('a' => 'new_a'), 'messages+intl-icu' => array('c' => 'new_c')))
+                new MessageCatalogue('en', ['messages' => ['a' => 'old_a'], 'messages+intl-icu' => ['b' => 'old_b']]),
+                new MessageCatalogue('en', ['messages' => ['a' => 'new_a'], 'messages+intl-icu' => ['c' => 'new_c']])
             )->getResult()
         );
     }

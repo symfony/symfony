@@ -41,6 +41,6 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
      */
     public static function getExtendedTypes(): iterable
     {
-        return array(RepeatedType::class);
+        return [RepeatedType::class];
     }
 }

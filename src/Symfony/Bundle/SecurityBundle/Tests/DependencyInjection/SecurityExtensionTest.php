@@ -352,22 +352,22 @@ class SecurityExtensionTest extends TestCase
         $container = $this->getRawContainer();
 
         $container->registerExtension(new FrameworkExtension());
-        $container->setParameter('kernel.bundles_metadata', array());
+        $container->setParameter('kernel.bundles_metadata', []);
         $container->setParameter('kernel.project_dir', __DIR__);
         $container->setParameter('kernel.root_dir', __DIR__);
         $container->setParameter('kernel.cache_dir', __DIR__);
 
-        $container->loadFromExtension('security', array(
-            'firewalls' => array(
-                'default' => array(
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
                     'form_login' => null,
-                    'remember_me' => array('secret' => 'baz'),
-                ),
-            ),
-        ));
-        $container->loadFromExtension('framework', array(
+                    'remember_me' => ['secret' => 'baz'],
+                ],
+            ],
+        ]);
+        $container->loadFromExtension('framework', [
             'session' => $config,
-        ));
+        ]);
 
         $container->compile();
 
@@ -379,22 +379,22 @@ class SecurityExtensionTest extends TestCase
 
     public function sessionConfigurationProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 false,
                 null,
                 false,
-            ),
-            array(
-                array(
+            ],
+            [
+                [
                     'cookie_secure' => true,
                     'cookie_samesite' => 'lax',
                     'save_path' => null,
-                ),
+                ],
                 'lax',
                 true,
-            ),
-        );
+            ],
+        ];
     }
 
     protected function getRawContainer()

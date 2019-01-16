@@ -69,10 +69,10 @@ class TranslationExtension extends AbstractExtension
      */
     public function getFilters()
     {
-        return array(
-            new TwigFilter('trans', array($this, 'trans')),
-            new TwigFilter('transchoice', array($this, 'transchoice'), array('deprecated' => '4.2', 'alternative' => 'trans" with parameter "%count%')),
-        );
+        return [
+            new TwigFilter('trans', [$this, 'trans']),
+            new TwigFilter('transchoice', [$this, 'transchoice'], ['deprecated' => '4.2', 'alternative' => 'trans" with parameter "%count%']),
+        ];
     }
 
     /**
@@ -82,7 +82,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             // {% trans %}Symfony is great!{% endtrans %}
             new TransTokenParser(),
 
@@ -93,7 +93,7 @@ class TranslationExtension extends AbstractExtension
 
             // {% trans_default_domain "foobar" %}
             new TransDefaultDomainTokenParser(),
-        );
+        ];
     }
 
     /**
@@ -101,7 +101,7 @@ class TranslationExtension extends AbstractExtension
      */
     public function getNodeVisitors()
     {
-        return array($this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor());
+        return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
     public function getTranslationNodeVisitor()
@@ -109,7 +109,7 @@ class TranslationExtension extends AbstractExtension
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = array(), $domain = null, $locale = null, $count = null)
+    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null)
     {
         if (null !== $count) {
             $arguments['%count%'] = $count;
@@ -124,16 +124,16 @@ class TranslationExtension extends AbstractExtension
     /**
      * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
-    public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
+    public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return $this->doTrans($message, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+            return $this->doTrans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
         }
         if ($this->translator instanceof TranslatorInterface) {
-            return $this->translator->trans($message, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+            return $this->translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
         }
 
-        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+        return $this->translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
     }
 
     /**

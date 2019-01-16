@@ -37,7 +37,7 @@ class DefaultMarshaller implements MarshallerInterface
      */
     public function marshall(array $values, ?array &$failed): array
     {
-        $serialized = $failed = array();
+        $serialized = $failed = [];
 
         foreach ($values as $id => $value) {
             try {

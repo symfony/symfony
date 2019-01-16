@@ -200,7 +200,7 @@ EOF
 
     private function filterTypesByDeprecated(array $types): array
     {
-        $typesWithDeprecatedOptions = array();
+        $typesWithDeprecatedOptions = [];
         foreach ($types as $class) {
             $optionsResolver = $this->formRegistry->getType($class)->getOptionsResolver();
             foreach ($optionsResolver->getDefinedOptions() as $option) {

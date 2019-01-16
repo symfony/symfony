@@ -26,7 +26,7 @@ class ZookeeperStoreTest extends AbstractStoreTest
     {
         $zookeeper_server = getenv('ZOOKEEPER_HOST').':2181';
 
-        $zookeeper = new \Zookeeper(implode(',', array($zookeeper_server)));
+        $zookeeper = new \Zookeeper(implode(',', [$zookeeper_server]));
 
         return StoreFactory::createStore($zookeeper);
     }

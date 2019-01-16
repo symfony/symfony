@@ -284,13 +284,13 @@ class ReflectionExtractorTest extends TestCase
 
     public function getInitializableProperties(): array
     {
-        return array(
-            array(Php71Dummy::class, 'string', true),
-            array(Php71Dummy::class, 'intPrivate', true),
-            array(Php71Dummy::class, 'notExist', false),
-            array(Php71DummyExtended2::class, 'intWithAccessor', true),
-            array(Php71DummyExtended2::class, 'intPrivate', false),
-            array(NotInstantiable::class, 'foo', false),
-        );
+        return [
+            [Php71Dummy::class, 'string', true],
+            [Php71Dummy::class, 'intPrivate', true],
+            [Php71Dummy::class, 'notExist', false],
+            [Php71DummyExtended2::class, 'intWithAccessor', true],
+            [Php71DummyExtended2::class, 'intPrivate', false],
+            [NotInstantiable::class, 'foo', false],
+        ];
     }
 }

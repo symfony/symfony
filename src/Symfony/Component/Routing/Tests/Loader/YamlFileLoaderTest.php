@@ -311,7 +311,7 @@ class YamlFileLoaderTest extends TestCase
      */
     public function testRequirementsWithoutPlaceholderName()
     {
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('requirements_without_placeholder_name.yml');
     }
 }

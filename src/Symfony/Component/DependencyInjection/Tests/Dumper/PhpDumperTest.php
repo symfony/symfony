@@ -1086,7 +1086,7 @@ class PhpDumperTest extends TestCase
         $container = include self::$fixturesPath.'/containers/container_service_locator_argument.php';
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Service_Locator_Argument'));
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Locator_Argument']);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_service_locator_argument.php', str_replace(str_replace('\\', '\\\\', self::$fixturesPath.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dump));
         eval('?>'.$dump);
 

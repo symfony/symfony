@@ -371,10 +371,10 @@ class YamlFileLoaderTest extends TestCase
             $fixturesDir.'Prototype',
             '',
             true,
-            false, array(
+            false, [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
-            )
+            ]
         );
         $this->assertContains((string) $globResource, $resources);
         $resources = array_map('strval', $resources);
@@ -768,6 +768,6 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_lazy_fqcn.yml');
 
         $definition = $container->getDefinition('foo');
-        $this->assertSame(array(array('interface' => 'SomeInterface')), $definition->getTag('proxy'));
+        $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
 }

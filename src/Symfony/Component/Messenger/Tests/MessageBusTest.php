@@ -58,10 +58,10 @@ class MessageBusTest extends TestCase
             ->willReturn($envelope)
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($message);
     }
@@ -95,11 +95,11 @@ class MessageBusTest extends TestCase
             ->willReturn($envelopeWithAnotherStamp)
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
             $thirdMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($envelope);
     }
@@ -107,7 +107,7 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeStamps()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, ...$stamps = array(new ReceivedStamp()));
+        $envelope = new Envelope($message, ...$stamps = [new ReceivedStamp()]);
 
         $changedMessage = new DummyMessage('Changed');
         $expectedEnvelope = new Envelope($changedMessage, ...$stamps);
@@ -127,10 +127,10 @@ class MessageBusTest extends TestCase
             ->willReturn($envelope)
         ;
 
-        $bus = new MessageBus(array(
+        $bus = new MessageBus([
             $firstMiddleware,
             $secondMiddleware,
-        ));
+        ]);
 
         $bus->dispatch($envelope);
     }

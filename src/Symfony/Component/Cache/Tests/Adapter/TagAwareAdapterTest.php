@@ -161,7 +161,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pool->save($i->tag('foo'));
 
         $i = $pool->getItem('k');
-        $this->assertSame(array('foo' => 'foo'), $i->getMetadata()[CacheItem::METADATA_TAGS]);
+        $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);
     }
 
     public function testPrune()

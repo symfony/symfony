@@ -1,22 +1,22 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'messenger' => array(
+$container->loadFromExtension('framework', [
+    'messenger' => [
         'default_bus' => 'messenger.bus.commands',
-        'buses' => array(
+        'buses' => [
             'messenger.bus.commands' => null,
-            'messenger.bus.events' => array(
-                'middleware' => array(
-                    array('with_factory' => array('foo', true, array('bar' => 'baz'))),
-                ),
-            ),
-            'messenger.bus.queries' => array(
+            'messenger.bus.events' => [
+                'middleware' => [
+                    ['with_factory' => ['foo', true, ['bar' => 'baz']]],
+                ],
+            ],
+            'messenger.bus.queries' => [
                 'default_middleware' => false,
-                'middleware' => array(
+                'middleware' => [
                     'send_message',
                     'handle_message',
-                ),
-            ),
-        ),
-    ),
-));
+                ],
+            ],
+        ],
+    ],
+]);

@@ -122,12 +122,12 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testHelpAttr()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
-            'help_attr' => array(
+            'help_attr' => [
                 'class' => 'class-test',
-            ),
-        ));
+            ],
+        ]);
         $view = $form->createView();
         $html = $this->renderHelp($view);
 

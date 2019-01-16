@@ -71,10 +71,10 @@ class CachePoolPassTest extends TestCase
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
-        $cachePool->addTag('cache.pool', array(
+        $cachePool->addTag('cache.pool', [
             'provider' => 'foobar',
             'default_lifetime' => 3,
-        ));
+        ]);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);
@@ -94,10 +94,10 @@ class CachePoolPassTest extends TestCase
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('cache.prefix.seed', 'foo');
         $cachePool = new Definition();
-        $cachePool->addTag('cache.pool', array(
+        $cachePool->addTag('cache.pool', [
             'name' => 'foobar',
             'provider' => 'foobar',
-        ));
+        ]);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);
         $cachePool->addArgument(null);
@@ -122,7 +122,7 @@ class CachePoolPassTest extends TestCase
         $adapter->addTag('cache.pool');
         $container->setDefinition('app.cache_adapter', $adapter);
         $cachePool = new ChildDefinition('app.cache_adapter');
-        $cachePool->addTag('cache.pool', array('foobar' => 123));
+        $cachePool->addTag('cache.pool', ['foobar' => 123]);
         $container->setDefinition('app.cache_pool', $cachePool);
 
         $this->cachePoolPass->process($container);

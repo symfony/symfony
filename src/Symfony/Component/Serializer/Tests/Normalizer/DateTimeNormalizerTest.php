@@ -59,7 +59,7 @@ class DateTimeNormalizerTest extends TestCase
 
     private function doTestNormalizeUsingFormatPassedInConstructor(bool $legacy = false)
     {
-        $normalizer = $legacy ? new DateTimeNormalizer('y') : new DateTimeNormalizer(array(DateTimeNormalizer::FORMAT_KEY => 'y'));
+        $normalizer = $legacy ? new DateTimeNormalizer('y') : new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y']);
         $this->assertEquals('16', $normalizer->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
@@ -78,7 +78,7 @@ class DateTimeNormalizerTest extends TestCase
         if ($legacy) {
             $normalizer = new DateTimeNormalizer(\DateTime::RFC3339, new \DateTimeZone('Japan'));
         } else {
-            $normalizer = new DateTimeNormalizer(array(DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')));
+            $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Japan')]);
         }
 
         $this->assertSame('2016-12-01T00:00:00+09:00', $normalizer->normalize(new \DateTime('2016/12/01', new \DateTimeZone('Japan'))));
@@ -217,7 +217,7 @@ class DateTimeNormalizerTest extends TestCase
     {
         $timezone = new \DateTimeZone('Japan');
         $expected = new \DateTime('2016/12/01 17:35:00', $timezone);
-        $normalizer = $legacy ? new DateTimeNormalizer(null, $timezone) : new DateTimeNormalizer(array(DateTimeNormalizer::TIMEZONE_KEY => $timezone));
+        $normalizer = $legacy ? new DateTimeNormalizer(null, $timezone) : new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => $timezone]);
 
         $this->assertEquals($expected, $normalizer->denormalize('2016.12.01 17:35:00', \DateTime::class, null, [
             DateTimeNormalizer::FORMAT_KEY => 'Y.m.d H:i:s',

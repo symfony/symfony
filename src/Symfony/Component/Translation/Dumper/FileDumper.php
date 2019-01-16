@@ -84,7 +84,7 @@ abstract class FileDumper implements DumperInterface
                 $intlPath = $options['path'].'/'.$this->getRelativePath($intlDomain, $messages->getLocale());
                 file_put_contents($intlPath, $this->formatCatalogue($messages, $intlDomain, $options));
 
-                $messages->replace(array(), $intlDomain);
+                $messages->replace([], $intlDomain);
 
                 try {
                     if ($messages->all($domain)) {

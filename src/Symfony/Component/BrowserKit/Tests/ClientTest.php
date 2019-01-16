@@ -375,12 +375,12 @@ class ClientTest extends TestCase
         $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" value="the username" /><input type="password" name="password" value="the password" /><input type="submit" value="Register" /></form></html>'));
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
-        $client->submitForm('Register', array(
+        $client->submitForm('Register', [
             'username' => 'new username',
             'password' => 'new password',
-        ), 'PUT', array(
+        ], 'PUT', [
             'HTTP_USER_AGENT' => 'Symfony User Agent',
-        ));
+        ]);
 
         $this->assertEquals('http://www.example.com/foo', $client->getRequest()->getUri(), '->submitForm() submit forms');
         $this->assertEquals('PUT', $client->getRequest()->getMethod(), '->submitForm() allows to change the method');
@@ -396,10 +396,10 @@ class ClientTest extends TestCase
         $client->request('GET', 'http://www.example.com/foo/foobar');
 
         try {
-            $client->submitForm('Register', array(
+            $client->submitForm('Register', [
                 'username' => 'username',
                 'password' => 'password',
-            ), 'POST');
+            ], 'POST');
             $this->fail('->submitForm() throws a \InvalidArgumentException if the form could not be found');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->submitForm() throws a \InvalidArgumentException if the form could not be found');
@@ -670,23 +670,23 @@ class ClientTest extends TestCase
 
     public function getTestsForMetaRefresh()
     {
-        return array(
-            array('<html><head><meta http-equiv="Refresh" content="4" /><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content="0;URL=\'http://www.example.com/redirected\'"/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content=\'0;URL="http://www.example.com/redirected"\'/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content="0; URL = http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content="0;URL= http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'),
-            array('<html><head><noscript><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></noscript></head></head></html>', 'http://www.example.com/redirected'),
+        return [
+            ['<html><head><meta http-equiv="Refresh" content="4" /><meta http-equiv="refresh" content="0; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;URL=\'http://www.example.com/redirected\'"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content=\'0;URL="http://www.example.com/redirected"\'/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0; URL = http://www.example.com/redirected"/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;URL= http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected  "/></head></html>', 'http://www.example.com/redirected'],
+            ['<html><head><noscript><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></noscript></head></head></html>', 'http://www.example.com/redirected'],
             // Non-zero timeout should not result in a redirect.
-            array('<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'),
-            array('<html><body></body></html>', 'http://www.example.com/foo/foobar'),
+            ['<html><head><meta http-equiv="refresh" content="4; URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar'],
+            ['<html><body></body></html>', 'http://www.example.com/foo/foobar'],
             // Invalid meta tag placement should not result in a redirect.
-            array('<html><body><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected"/></body></html>', 'http://www.example.com/foo/foobar'),
+            ['<html><body><meta http-equiv="refresh" content="0;url=http://www.example.com/redirected"/></body></html>', 'http://www.example.com/foo/foobar'],
             // Valid meta refresh should not be followed if disabled.
-            array('<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar', false),
-        );
+            ['<html><head><meta http-equiv="refresh" content="0;URL=http://www.example.com/redirected"/></head></html>', 'http://www.example.com/foo/foobar', false],
+        ];
     }
 
     public function testBack()
@@ -927,7 +927,7 @@ class ClassThatInheritClient extends Client
         return $response;
     }
 
-    public function submit(DomCrawlerForm $form, array $values = array())
+    public function submit(DomCrawlerForm $form, array $values = [])
     {
         return parent::submit($form, $values);
     }

@@ -63,7 +63,7 @@ class TranslationUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
@@ -73,7 +73,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
-            ))
+            ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command extracts translation strings from templates
@@ -112,7 +112,7 @@ EOF
         // check format
         $supportedFormats = $this->writer->getFormats();
         if (!\in_array($input->getOption('output-format'), $supportedFormats, true)) {
-            $errorIo->error(array('Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.'));
+            $errorIo->error(['Wrong output format', 'Supported formats are: '.implode(', ', $supportedFormats).'.']);
 
             return 1;
         }
@@ -121,7 +121,7 @@ EOF
         $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = array();
+        $transPaths = [];
         if (is_dir($dir = $rootDir.'/Resources/translations')) {
             if ($dir !== $this->defaultTransPath) {
                 $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
@@ -132,7 +132,7 @@ EOF
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array();
+        $viewsPaths = [];
         if (is_dir($dir = $rootDir.'/Resources/views')) {
             if ($dir !== $this->defaultViewsPath) {
                 $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
@@ -149,7 +149,7 @@ EOF
         if (null !== $input->getArgument('bundle')) {
             try {
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = array($foundBundle->getPath().'/Resources/translations');
+                $transPaths = [$foundBundle->getPath().'/Resources/translations'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
@@ -158,7 +158,7 @@ EOF
                     $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $foundBundle->getName(), $dir);
                     @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
                 }
-                $viewsPaths = array($foundBundle->getPath().'/Resources/views');
+                $viewsPaths = [$foundBundle->getPath().'/Resources/views'];
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath;
                 }
@@ -172,7 +172,7 @@ EOF
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 
-                $transPaths = array($path.'/translations');
+                $transPaths = [$path.'/translations'];
                 if (is_dir($dir = $path.'/Resources/translations')) {
                     if ($dir !== $this->defaultTransPath) {
                         @trigger_error(sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/translations'), E_USER_DEPRECATED);
@@ -180,7 +180,7 @@ EOF
                     $transPaths[] = $dir;
                 }
 
-                $viewsPaths = array($path.'/templates');
+                $viewsPaths = [$path.'/templates'];
                 if (is_dir($dir = $path.'/Resources/views')) {
                     if ($dir !== $this->defaultViewsPath) {
                         @trigger_error(sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
@@ -287,7 +287,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

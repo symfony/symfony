@@ -86,7 +86,7 @@ class AddSecurityVotersPassTest extends TestCase
 
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array($voterDef1, $voterDef2));
+            ->addArgument([$voterDef1, $voterDef2]);
         $container->setParameter('kernel.debug', true);
 
         $compilerPass = new AddSecurityVotersPass();
@@ -119,7 +119,7 @@ class AddSecurityVotersPassTest extends TestCase
 
         $container
             ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array($voterDef1, $voterDef2));
+            ->addArgument([$voterDef1, $voterDef2]);
 
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);

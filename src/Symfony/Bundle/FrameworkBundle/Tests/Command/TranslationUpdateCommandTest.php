@@ -93,8 +93,8 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
         $this->fs->mkdir($this->translationDir.'/Resources/views');
 
-        $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
-        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', '--force' => true));
+        $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
+        $tester->execute(['command' => 'translation:update', 'locale' => 'en', '--force' => true]);
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 

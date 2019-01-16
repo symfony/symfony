@@ -334,7 +334,7 @@ abstract class Client
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
      */
-    public function submitForm(string $button, array $fieldValues = array(), string $method = 'POST', array $serverParameters = array()): Crawler
+    public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
     {
         if (null === $this->crawler) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -343,7 +343,7 @@ abstract class Client
         $buttonNode = $this->crawler->selectButton($button);
         $form = $buttonNode->form($fieldValues, $method);
 
-        return $this->submit($form, array(), $serverParameters);
+        return $this->submit($form, [], $serverParameters);
     }
 
     /**
@@ -634,7 +634,7 @@ abstract class Client
     private function getMetaRefreshUrl(): ?string
     {
         $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
-        foreach ($metaRefresh->extract(array('content')) as $content) {
+        foreach ($metaRefresh->extract(['content']) as $content) {
             if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/i', $content, $m)) {
                 return str_replace("\t\r\n", '', rtrim($m[1]));
             }

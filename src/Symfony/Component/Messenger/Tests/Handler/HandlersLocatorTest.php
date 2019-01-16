@@ -20,11 +20,11 @@ class HandlersLocatorTest extends TestCase
 {
     public function testItYieldsProvidedAliasAsKey()
     {
-        $handler = $this->createPartialMock(\stdClass::class, array('__invoke'));
-        $locator = new HandlersLocator(array(
-            DummyMessage::class => array('dummy' => $handler),
-        ));
+        $handler = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $locator = new HandlersLocator([
+            DummyMessage::class => ['dummy' => $handler],
+        ]);
 
-        $this->assertSame(array('dummy' => $handler), iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
+        $this->assertSame(['dummy' => $handler], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
     }
 }

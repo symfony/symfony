@@ -982,13 +982,13 @@ TABLE;
         (new Table($output = $this->getOutputStream()))
             ->setHeaderTitle($headerTitle)
             ->setFooterTitle($footerTitle)
-            ->setHeaders(array('ISBN', 'Title', 'Author'))
-            ->setRows(array(
-                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
-                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
-                array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
-                array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
-            ))
+            ->setHeaders(['ISBN', 'Title', 'Author'])
+            ->setRows([
+                ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'],
+                ['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'],
+                ['960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'],
+                ['80-902734-1-6', 'And Then There Were None', 'Agatha Christie'],
+            ])
             ->setStyle($style)
             ->render()
         ;
@@ -998,8 +998,8 @@ TABLE;
 
     public function renderSetTitle()
     {
-        return array(
-            array(
+        return [
+            [
                 'Books',
                 'Page 1/2',
                 'default',
@@ -1014,8 +1014,8 @@ TABLE;
 +---------------+--------- Page 1/2 -------+------------------+
 
 TABLE
-            ),
-            array(
+            ],
+            [
                 'Books',
                 'Page 1/2',
                 'box',
@@ -1030,8 +1030,8 @@ TABLE
 └───────────────┴───────── Page 1/2 ───────┴──────────────────┘
 
 TABLE
-            ),
-            array(
+            ],
+            [
                 'Boooooooooooooooooooooooooooooooooooooooooooooooooooooooks',
                 'Page 1/999999999999999999999999999999999999999999999999999',
                 'default',
@@ -1046,17 +1046,17 @@ TABLE
 +- Page 1/99999999999999999999999999999999999999999999999... -+
 
 TABLE
-            ),
-        );
+            ],
+        ];
     }
 
     public function testColumnMaxWidths()
     {
         $table = new Table($output = $this->getOutputStream());
         $table
-            ->setRows(array(
-                array('Divine Comedy', 'A Tale of Two Cities', 'The Lord of the Rings', 'And Then There Were None'),
-            ))
+            ->setRows([
+                ['Divine Comedy', 'A Tale of Two Cities', 'The Lord of the Rings', 'And Then There Were None'],
+            ])
             ->setColumnMaxWidth(1, 5)
             ->setColumnMaxWidth(2, 10)
             ->setColumnMaxWidth(3, 15);

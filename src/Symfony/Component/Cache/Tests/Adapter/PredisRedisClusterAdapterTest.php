@@ -21,7 +21,7 @@ class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTest
             self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
-        self::$redis = RedisAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', array('class' => \Predis\Client::class, 'redis_cluster' => true));
+        self::$redis = RedisAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['class' => \Predis\Client::class, 'redis_cluster' => true]);
     }
 
     public static function tearDownAfterClass()

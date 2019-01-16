@@ -116,10 +116,10 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = array(
+        $bindings = [
             '$c' => new BoundArgument(new Reference('bar')),
             CaseSensitiveClass::class.'$c' => new BoundArgument(new Reference('foo')),
-        );
+        ];
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
         $definition->addMethodCall('setSensitiveClass');
@@ -129,10 +129,10 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $expected = array(
-            array('setSensitiveClass', array(new Reference('foo'))),
-            array('setAnotherC', array(new Reference('bar'))),
-        );
+        $expected = [
+            ['setSensitiveClass', [new Reference('foo')]],
+            ['setAnotherC', [new Reference('bar')]],
+        ];
         $this->assertEquals($expected, $definition->getMethodCalls());
     }
 }

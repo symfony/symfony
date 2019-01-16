@@ -34,10 +34,10 @@ class LoggingMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $message = $envelope->getMessage();
-        $context = array(
+        $context = [
             'message' => $message,
             'class' => \get_class($envelope->getMessage()),
-        );
+        ];
         $this->logger->debug('Starting handling message "{class}"', $context);
 
         try {

@@ -53,8 +53,8 @@ trait ApcuTrait
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
         try {
-            $values = array();
-            foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
+            $values = [];
+            foreach (apcu_fetch($ids, $ok) ?: [] as $k => $v) {
                 if (null !== $v || $ok) {
                     $values[$k] = $v;
                 }

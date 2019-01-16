@@ -31,8 +31,8 @@ trait PhpFilesTrait
 
     private $includeHandler;
     private $appendOnly;
-    private $values = array();
-    private $files = array();
+    private $values = [];
+    private $files = [];
 
     private static $startTime;
 
@@ -78,13 +78,13 @@ trait PhpFilesTrait
     {
         if ($this->appendOnly) {
             $now = 0;
-            $missingIds = array();
+            $missingIds = [];
         } else {
             $now = time();
             $missingIds = $ids;
-            $ids = array();
+            $ids = [];
         }
-        $values = array();
+        $values = [];
 
         begin:
         foreach ($ids as $id) {
@@ -124,7 +124,7 @@ trait PhpFilesTrait
         }
 
         $ids = $missingIds;
-        $missingIds = array();
+        $missingIds = [];
         goto begin;
     }
 
@@ -215,7 +215,7 @@ trait PhpFilesTrait
      */
     protected function doClear($namespace)
     {
-        $this->values = array();
+        $this->values = [];
 
         return $this->doCommonClear($namespace);
     }

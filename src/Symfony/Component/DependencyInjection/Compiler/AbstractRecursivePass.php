@@ -86,7 +86,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
         } elseif ($value instanceof ArgumentInterface) {
             $value->setValues($this->processValue($value->getValues()));
         } elseif ($value instanceof Expression && $this->processExpressions) {
-            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
+            $this->getExpressionLanguage()->compile((string) $value, ['this' => 'container']);
         } elseif ($value instanceof Definition) {
             $value->setArguments($this->processValue($value->getArguments()));
             $value->setProperties($this->processValue($value->getProperties()));

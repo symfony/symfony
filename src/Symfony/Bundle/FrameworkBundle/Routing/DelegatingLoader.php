@@ -34,7 +34,7 @@ class DelegatingLoader extends BaseDelegatingLoader
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
      * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
-    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver, array $defaultOptions = array())
+    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver, array $defaultOptions = [])
     {
         $this->parser = $parser;
         $this->defaultOptions = $defaultOptions;

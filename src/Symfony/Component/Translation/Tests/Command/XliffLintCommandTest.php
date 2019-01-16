@@ -47,8 +47,8 @@ class XliffLintCommandTest extends TestCase
         $filename2 = $this->createFile();
 
         $tester->execute(
-            array('filename' => array($filename1, $filename2)),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => [$filename1, $filename2]],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
@@ -64,8 +64,8 @@ class XliffLintCommandTest extends TestCase
         $filename = $this->createFile('note', $targetLanguage, $fileNamePattern);
 
         $tester->execute(
-            array('filename' => $filename),
-            array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false)
+            ['filename' => $filename],
+            ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]
         );
 
         $this->assertEquals($mustFail ? 1 : 0, $tester->getStatusCode());
@@ -195,13 +195,13 @@ XLIFF;
 
     public function provideStrictFilenames()
     {
-        yield array(false, 'messages.%locale%.xlf', 'en', false);
-        yield array(false, 'messages.%locale%.xlf', 'es', true);
-        yield array(false, '%locale%.messages.xlf', 'en', false);
-        yield array(false, '%locale%.messages.xlf', 'es', true);
-        yield array(true, 'messages.%locale%.xlf', 'en', false);
-        yield array(true, 'messages.%locale%.xlf', 'es', true);
-        yield array(true, '%locale%.messages.xlf', 'en', true);
-        yield array(true, '%locale%.messages.xlf', 'es', true);
+        yield [false, 'messages.%locale%.xlf', 'en', false];
+        yield [false, 'messages.%locale%.xlf', 'es', true];
+        yield [false, '%locale%.messages.xlf', 'en', false];
+        yield [false, '%locale%.messages.xlf', 'es', true];
+        yield [true, 'messages.%locale%.xlf', 'en', false];
+        yield [true, 'messages.%locale%.xlf', 'es', true];
+        yield [true, '%locale%.messages.xlf', 'en', true];
+        yield [true, '%locale%.messages.xlf', 'es', true];
     }
 }

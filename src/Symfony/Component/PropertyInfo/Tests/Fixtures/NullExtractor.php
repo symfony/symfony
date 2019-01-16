@@ -80,7 +80,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return null;
     }

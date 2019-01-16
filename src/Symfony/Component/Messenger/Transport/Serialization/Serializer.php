@@ -35,7 +35,7 @@ class Serializer implements SerializerInterface
     private $format;
     private $context;
 
-    public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = array())
+    public function __construct(SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
         $this->serializer = $serializer ?? self::create()->serializer;
         $this->format = $format;
@@ -48,8 +48,8 @@ class Serializer implements SerializerInterface
             throw new LogicException(sprintf('The default Messenger Serializer requires Symfony\'s Serializer component. Try running "composer require symfony/serializer".'));
         }
 
-        $encoders = array(new XmlEncoder(), new JsonEncoder());
-        $normalizers = array(new ArrayDenormalizer(), new ObjectNormalizer());
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ArrayDenormalizer(), new ObjectNormalizer()];
         $serializer = new SymfonySerializer($normalizers, $encoders);
 
         return new self($serializer);
@@ -91,17 +91,17 @@ class Serializer implements SerializerInterface
             $context = $serializerStamp->getContext() + $context;
         }
 
-        $headers = array('type' => \get_class($envelope->getMessage())) + $this->encodeStamps($envelope);
+        $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope);
 
-        return array(
+        return [
             'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
             'headers' => $headers,
-        );
+        ];
     }
 
     private function decodeStamps(array $encodedEnvelope): array
     {
-        $stamps = array();
+        $stamps = [];
         foreach ($encodedEnvelope['headers'] as $name => $value) {
             if (0 !== strpos($name, self::STAMP_HEADER_PREFIX)) {
                 continue;
@@ -119,10 +119,10 @@ class Serializer implements SerializerInterface
     private function encodeStamps(Envelope $envelope): array
     {
         if (!$allStamps = $envelope->all()) {
-            return array();
+            return [];
         }
 
-        $headers = array();
+        $headers = [];
         foreach ($allStamps as $class => $stamps) {
             $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
         }

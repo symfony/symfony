@@ -130,7 +130,7 @@ class EntryManager implements EntryManagerInterface
      */
     public function applyOperations(string $dn, iterable $operations): void
     {
-        $operationsMapped = array();
+        $operationsMapped = [];
         foreach ($operations as $modification) {
             $operationsMapped[] = $modification->toArray();
         }

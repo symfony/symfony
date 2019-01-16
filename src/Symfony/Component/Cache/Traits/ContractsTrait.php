@@ -30,7 +30,7 @@ trait ContractsTrait
         doGet as private contractsGet;
     }
 
-    private $callbackWrapper = array(LockRegistry::class, 'compute');
+    private $callbackWrapper = [LockRegistry::class, 'compute'];
 
     /**
      * Wraps the callback passed to ->get() in a callable.

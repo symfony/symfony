@@ -808,7 +808,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      */
     public function clearErrors(bool $deep = false): self
     {
-        $this->errors = array();
+        $this->errors = [];
 
         if ($deep) {
             // Clear errors from children

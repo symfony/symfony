@@ -59,13 +59,13 @@ class DependencyInjectionExtension implements FormExtensionInterface
                 $extensions[] = $extension;
 
                 if (method_exists($extension, 'getExtendedTypes')) {
-                    $extendedTypes = array();
+                    $extendedTypes = [];
 
                     foreach ($extension::getExtendedTypes() as $extendedType) {
                         $extendedTypes[] = $extendedType;
                     }
                 } else {
-                    $extendedTypes = array($extension->getExtendedType());
+                    $extendedTypes = [$extension->getExtendedType()];
                 }
 
                 // validate the result of getExtendedTypes()/getExtendedType() to ensure it is consistent with the service definition

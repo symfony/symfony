@@ -163,7 +163,7 @@ class HeaderUtils
      */
     public static function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
-        if (!\in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
+        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE])) {
             throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
         }
 
@@ -186,7 +186,7 @@ class HeaderUtils
             throw new \InvalidArgumentException('The filename and the fallback cannot contain the "/" and "\\" characters.');
         }
 
-        $params = array('filename' => $filenameFallback);
+        $params = ['filename' => $filenameFallback];
         if ($filename !== $filenameFallback) {
             $params['filename*'] = "utf-8''".rawurlencode($filename);
         }

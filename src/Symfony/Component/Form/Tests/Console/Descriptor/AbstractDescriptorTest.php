@@ -69,28 +69,28 @@ abstract class AbstractDescriptorTest extends TestCase
 
     public function getDescribeDefaultsTestData()
     {
-        $options['core_types'] = array('Symfony\Component\Form\Extension\Core\Type\FormType');
-        $options['service_types'] = array('Symfony\Bridge\Doctrine\Form\Type\EntityType');
-        $options['extensions'] = array('Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension');
-        $options['guessers'] = array('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser');
+        $options['core_types'] = ['Symfony\Component\Form\Extension\Core\Type\FormType'];
+        $options['service_types'] = ['Symfony\Bridge\Doctrine\Form\Type\EntityType'];
+        $options['extensions'] = ['Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension'];
+        $options['guessers'] = ['Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser'];
         $options['decorated'] = false;
         $options['show_deprecated'] = false;
-        yield array(null, $options, 'defaults_1');
+        yield [null, $options, 'defaults_1'];
 
-        $options['core_types'] = array();
-        $options['service_types'] = array(FooType::class);
+        $options['core_types'] = [];
+        $options['service_types'] = [FooType::class];
         $options['show_deprecated'] = true;
-        yield array(null, $options, 'types_with_deprecated_options');
+        yield [null, $options, 'types_with_deprecated_options'];
     }
 
     public function getDescribeResolvedFormTypeTestData()
     {
-        $typeExtensions = array(new FormTypeCsrfExtension(new CsrfTokenManager()));
+        $typeExtensions = [new FormTypeCsrfExtension(new CsrfTokenManager())];
         $parent = new ResolvedFormType(new FormType(), $typeExtensions);
 
-        yield array(new ResolvedFormType(new ChoiceType(), array(), $parent), array('decorated' => false, 'show_deprecated' => false), 'resolved_form_type_1');
-        yield array(new ResolvedFormType(new FormType()), array('decorated' => false, 'show_deprecated' => false), 'resolved_form_type_2');
-        yield array(new ResolvedFormType(new FooType(), array(), $parent), array('decorated' => false, 'show_deprecated' => true), 'deprecated_options_of_type');
+        yield [new ResolvedFormType(new ChoiceType(), [], $parent), ['decorated' => false, 'show_deprecated' => false], 'resolved_form_type_1'];
+        yield [new ResolvedFormType(new FormType()), ['decorated' => false, 'show_deprecated' => false], 'resolved_form_type_2'];
+        yield [new ResolvedFormType(new FooType(), [], $parent), ['decorated' => false, 'show_deprecated' => true], 'deprecated_options_of_type'];
     }
 
     public function getDescribeOptionTestData()
@@ -99,24 +99,24 @@ abstract class AbstractDescriptorTest extends TestCase
         $options['decorated'] = false;
         $options['show_deprecated'] = false;
 
-        $resolvedType = new ResolvedFormType(new ChoiceType(), array(), $parent);
+        $resolvedType = new ResolvedFormType(new ChoiceType(), [], $parent);
         $options['type'] = $resolvedType->getInnerType();
         $options['option'] = 'choice_translation_domain';
-        yield array($resolvedType->getOptionsResolver(), $options, 'default_option_with_normalizer');
+        yield [$resolvedType->getOptionsResolver(), $options, 'default_option_with_normalizer'];
 
-        $resolvedType = new ResolvedFormType(new FooType(), array(), $parent);
+        $resolvedType = new ResolvedFormType(new FooType(), [], $parent);
         $options['type'] = $resolvedType->getInnerType();
         $options['option'] = 'foo';
-        yield array($resolvedType->getOptionsResolver(), $options, 'required_option_with_allowed_values');
+        yield [$resolvedType->getOptionsResolver(), $options, 'required_option_with_allowed_values'];
 
         $options['option'] = 'empty_data';
-        yield array($resolvedType->getOptionsResolver(), $options, 'overridden_option_with_default_closures');
+        yield [$resolvedType->getOptionsResolver(), $options, 'overridden_option_with_default_closures'];
 
-        $resolvedType = new ResolvedFormType(new FooType(), array(), $parent);
+        $resolvedType = new ResolvedFormType(new FooType(), [], $parent);
         $options['type'] = $resolvedType->getInnerType();
         $options['option'] = 'bar';
         $options['show_deprecated'] = true;
-        yield array($resolvedType->getOptionsResolver(), $options, 'deprecated_option');
+        yield [$resolvedType->getOptionsResolver(), $options, 'deprecated_option'];
     }
 
     abstract protected function getDescriptor();
@@ -126,7 +126,7 @@ abstract class AbstractDescriptorTest extends TestCase
     private function getObjectDescription($object, array $options)
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, $options['decorated']);
-        $io = new SymfonyStyle(new ArrayInput(array()), $output);
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
 
         $this->getDescriptor()->describe($io, $object, $options);
 
@@ -155,11 +155,11 @@ class FooType extends AbstractType
             $foo = $options['foo'];
 
             return function (FormInterface $form) use ($foo) {
-                return $form->getConfig()->getCompound() ? array($foo) : $foo;
+                return $form->getConfig()->getCompound() ? [$foo] : $foo;
             };
         });
         $resolver->setAllowedTypes('foo', 'string');
-        $resolver->setAllowedValues('foo', array('bar', 'baz'));
+        $resolver->setAllowedValues('foo', ['bar', 'baz']);
         $resolver->setNormalizer('foo', function (Options $options, $value) {
             return (string) $value;
         });

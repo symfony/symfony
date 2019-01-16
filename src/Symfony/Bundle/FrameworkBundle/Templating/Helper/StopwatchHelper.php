@@ -33,7 +33,7 @@ class StopwatchHelper extends Helper
         return 'stopwatch';
     }
 
-    public function __call($method, $arguments = array())
+    public function __call($method, $arguments = [])
     {
         if (null !== $this->stopwatch) {
             if (method_exists($this->stopwatch, $method)) {

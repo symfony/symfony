@@ -419,7 +419,7 @@ trait ControllerTrait
         }
 
         if (null === $linkProvider = $request->attributes->get('_links')) {
-            $request->attributes->set('_links', new GenericLinkProvider(array($link)));
+            $request->attributes->set('_links', new GenericLinkProvider([$link]));
 
             return;
         }

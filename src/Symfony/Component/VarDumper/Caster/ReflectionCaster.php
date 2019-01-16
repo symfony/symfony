@@ -49,7 +49,7 @@ class ReflectionCaster
         if ($filter & Caster::EXCLUDE_VERBOSE) {
             $stub->cut += ($c->getFileName() ? 2 : 0) + \count($a);
 
-            return array();
+            return [];
         }
 
         if (isset($a[$prefix.'parameters'])) {

@@ -70,21 +70,21 @@ class ContainerDebugCommandTest extends WebTestCase
      */
     public function testIgnoreBackslashWhenFindingService(string $validServiceId)
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'debug:container', 'name' => $validServiceId));
+        $tester->run(['command' => 'debug:container', 'name' => $validServiceId]);
         $this->assertNotContains('No services found', $tester->getDisplay());
     }
 
     public function provideIgnoreBackslashWhenFindingService()
     {
-        return array(
-            array(BackslashClass::class),
-            array('FixturesBackslashClass'),
-        );
+        return [
+            [BackslashClass::class],
+            ['FixturesBackslashClass'],
+        ];
     }
 }

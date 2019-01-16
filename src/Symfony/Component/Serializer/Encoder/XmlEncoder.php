@@ -54,15 +54,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     const TYPE_CASE_ATTRIBUTES = 'xml_type_cast_attributes';
     const VERSION = 'xml_version';
 
-    private $defaultContext = array(
+    private $defaultContext = [
         self::AS_COLLECTION => false,
-        self::DECODER_IGNORED_NODE_TYPES => array(XML_PI_NODE, XML_COMMENT_NODE),
-        self::ENCODER_IGNORED_NODE_TYPES => array(),
+        self::DECODER_IGNORED_NODE_TYPES => [XML_PI_NODE, XML_COMMENT_NODE],
+        self::ENCODER_IGNORED_NODE_TYPES => [],
         self::LOAD_OPTIONS => LIBXML_NONET | LIBXML_NOBLANKS,
         self::REMOVE_EMPTY_TAGS => false,
         self::ROOT_NODE_NAME => 'response',
         self::TYPE_CASE_ATTRIBUTES => true,
-    );
+    ];
 
     /**
      * @var \DOMDocument
@@ -74,17 +74,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = array(), int $loadOptions = null, array $decoderIgnoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE), array $encoderIgnoredNodeTypes = array())
+    public function __construct($defaultContext = [], int $loadOptions = null, array $decoderIgnoredNodeTypes = [XML_PI_NODE, XML_COMMENT_NODE], array $encoderIgnoredNodeTypes = [])
     {
         if (!\is_array($defaultContext)) {
             @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
 
-            $defaultContext = array(
+            $defaultContext = [
                 self::DECODER_IGNORED_NODE_TYPES => $decoderIgnoredNodeTypes,
                 self::ENCODER_IGNORED_NODE_TYPES => $encoderIgnoredNodeTypes,
                 self::LOAD_OPTIONS => $loadOptions ?? LIBXML_NONET | LIBXML_NOBLANKS,
                 self::ROOT_NODE_NAME => (string) $defaultContext,
-            );
+            ];
         }
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
@@ -93,7 +93,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $encoderIgnoredNodeTypes = $context[self::ENCODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::ENCODER_IGNORED_NODE_TYPES];
         $ignorePiNode = \in_array(XML_PI_NODE, $encoderIgnoredNodeTypes, true);
@@ -121,7 +121,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         if ('' === trim($data)) {
             throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
@@ -158,7 +158,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         if ($rootNode->hasChildNodes()) {
             $xpath = new \DOMXPath($dom);
-            $data = array();
+            $data = [];
             foreach ($xpath->query('namespace::*', $dom->documentElement) as $nsNode) {
                 $data['@'.$nsNode->nodeName] = $nsNode->nodeValue;
             }
@@ -176,7 +176,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $rootNode->nodeValue;
         }
 
-        $data = array();
+        $data = [];
 
         foreach ($rootNode->attributes as $attrKey => $attr) {
             $data['@'.$attrKey] = $attr->nodeValue;
@@ -297,7 +297,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXml(\DOMNode $node, array $context = array())
+    private function parseXml(\DOMNode $node, array $context = [])
     {
         $data = $this->parseXmlAttributes($node, $context);
 
@@ -329,13 +329,13 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode attributes into an array.
      */
-    private function parseXmlAttributes(\DOMNode $node, array $context = array()): array
+    private function parseXmlAttributes(\DOMNode $node, array $context = []): array
     {
         if (!$node->hasAttributes()) {
-            return array();
+            return [];
         }
 
-        $data = array();
+        $data = [];
         $typeCastAttributes = (bool) ($context[self::TYPE_CASE_ATTRIBUTES] ?? $this->defaultContext[self::TYPE_CASE_ATTRIBUTES]);
 
         foreach ($node->attributes as $attr) {
@@ -362,17 +362,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return array|string
      */
-    private function parseXmlValue(\DOMNode $node, array $context = array())
+    private function parseXmlValue(\DOMNode $node, array $context = [])
     {
         if (!$node->hasChildNodes()) {
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {
             return $node->firstChild->nodeValue;
         }
 
-        $value = array();
+        $value = [];
         $decoderIgnoredNodeTypes = $context[self::DECODER_IGNORED_NODE_TYPES] ?? $this->defaultContext[self::DECODER_IGNORED_NODE_TYPES];
         foreach ($node->childNodes as $subnode) {
             if (\in_array($subnode->nodeType, $decoderIgnoredNodeTypes, true)) {
@@ -539,7 +539,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $document = new \DOMDocument();
 
         // Set an attribute on the DOM document specifying, as part of the XML declaration,
-        $xmlOptions = array(
+        $xmlOptions = [
             // nicely formats output with indentation and extra space
             self::FORMAT_OUTPUT => 'formatOutput',
             // the version number of the document
@@ -548,7 +548,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             self::ENCODING => 'encoding',
             // whether the document is standalone
             self::STANDALONE => 'xmlStandalone',
-        );
+        ];
         foreach ($xmlOptions as $xmlOption => $documentProperty) {
             if ($contextOption = $context[$xmlOption] ?? $this->defaultContext[$xmlOption] ?? false) {
                 $document->$documentProperty = $contextOption;

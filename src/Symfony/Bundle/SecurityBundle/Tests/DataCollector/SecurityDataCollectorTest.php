@@ -97,12 +97,12 @@ class SecurityDataCollectorTest extends TestCase
 
     public function testCollectImpersonatedToken()
     {
-        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', array('ROLE_ADMIN'));
+        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', ['ROLE_ADMIN']);
 
-        $userRoles = array(
+        $userRoles = [
             'ROLE_USER',
             new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
-        );
+        ];
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
@@ -117,8 +117,8 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('yceruto', $collector->getImpersonatorUser());
         $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(array('ROLE_USER', 'ROLE_PREVIOUS_ADMIN'), $collector->getRoles()->getValue(true));
-        $this->assertSame(array(), $collector->getInheritedRoles()->getValue(true));
+        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
+        $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
 
@@ -213,7 +213,7 @@ class SecurityDataCollectorTest extends TestCase
             ->expects($this->once())
             ->method('getListeners')
             ->with($request)
-            ->willReturn(array(array($listener), null, null));
+            ->willReturn([[$listener], null, null]);
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
@@ -235,79 +235,79 @@ class SecurityDataCollectorTest extends TestCase
         $decoratedVoter1 = new TraceableVoter($voter1, $eventDispatcher);
         $decoratedVoter2 = new TraceableVoter($voter2, $eventDispatcher);
 
-        yield array(
+        yield [
             AccessDecisionManager::STRATEGY_AFFIRMATIVE,
-            array(array(
-                'attributes' => array('view'),
+            [[
+                'attributes' => ['view'],
                 'object' => new \stdClass(),
                 'result' => true,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                ),
-            )),
-            array($decoratedVoter1, $decoratedVoter1),
-            array(\get_class($voter1), \get_class($voter2)),
-            array(array(
-                'attributes' => array('view'),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ],
+            ]],
+            [$decoratedVoter1, $decoratedVoter1],
+            [\get_class($voter1), \get_class($voter2)],
+            [[
+                'attributes' => ['view'],
                 'object' => new \stdClass(),
                 'result' => true,
-                'voter_details' => array(
-                    array('class' => \get_class($voter1), 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('class' => \get_class($voter2), 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                ),
-            )),
-        );
+                'voter_details' => [
+                    ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ],
+            ]],
+        ];
 
-        yield array(
+        yield [
             AccessDecisionManager::STRATEGY_UNANIMOUS,
-            array(
-                array(
-                    'attributes' => array('view', 'edit'),
+            [
+                [
+                    'attributes' => ['view', 'edit'],
                     'object' => new \stdClass(),
                     'result' => false,
-                    'voterDetails' => array(
-                        array('voter' => $voter1, 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_DENIED),
-                        array('voter' => $voter1, 'attributes' => array('edit'), 'vote' => VoterInterface::ACCESS_DENIED),
-                        array('voter' => $voter2, 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                        array('voter' => $voter2, 'attributes' => array('edit'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                    ),
-                ),
-                array(
-                    'attributes' => array('update'),
+                    'voterDetails' => [
+                        ['voter' => $voter1, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['voter' => $voter1, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['voter' => $voter2, 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['voter' => $voter2, 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+                [
+                    'attributes' => ['update'],
                     'object' => new \stdClass(),
                     'result' => true,
-                    'voterDetails' => array(
-                        array('voter' => $voter1, 'attributes' => array('update'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                        array('voter' => $voter2, 'attributes' => array('update'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                    ),
-                ),
-            ),
-            array($decoratedVoter1, $decoratedVoter1),
-            array(\get_class($voter1), \get_class($voter2)),
-            array(
-                array(
-                    'attributes' => array('view', 'edit'),
+                    'voterDetails' => [
+                        ['voter' => $voter1, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['voter' => $voter2, 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+            ],
+            [$decoratedVoter1, $decoratedVoter1],
+            [\get_class($voter1), \get_class($voter2)],
+            [
+                [
+                    'attributes' => ['view', 'edit'],
                     'object' => new \stdClass(),
                     'result' => false,
-                    'voter_details' => array(
-                        array('class' => \get_class($voter1), 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_DENIED),
-                        array('class' => \get_class($voter1), 'attributes' => array('edit'), 'vote' => VoterInterface::ACCESS_DENIED),
-                        array('class' => \get_class($voter2), 'attributes' => array('view'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                        array('class' => \get_class($voter2), 'attributes' => array('edit'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                    ),
-                ),
-                array(
-                    'attributes' => array('update'),
+                    'voter_details' => [
+                        ['class' => \get_class($voter1), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => \get_class($voter1), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_DENIED],
+                        ['class' => \get_class($voter2), 'attributes' => ['view'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => \get_class($voter2), 'attributes' => ['edit'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+                [
+                    'attributes' => ['update'],
                     'object' => new \stdClass(),
                     'result' => true,
-                    'voter_details' => array(
-                        array('class' => \get_class($voter1), 'attributes' => array('update'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                        array('class' => \get_class($voter2), 'attributes' => array('update'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                    ),
-                ),
-            ),
-        );
+                    'voter_details' => [
+                        ['class' => \get_class($voter1), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                        ['class' => \get_class($voter2), 'attributes' => ['update'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -326,7 +326,7 @@ class SecurityDataCollectorTest extends TestCase
         $accessDecisionManager = $this
             ->getMockBuilder(TraceableAccessDecisionManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getStrategy', 'getVoters', 'getDecisionLog'))
+            ->setMethods(['getStrategy', 'getVoters', 'getDecisionLog'])
             ->getMock();
 
         $accessDecisionManager
@@ -359,43 +359,43 @@ class SecurityDataCollectorTest extends TestCase
 
     public function provideRoles()
     {
-        return array(
+        return [
             // Basic roles
-            array(
-                array('ROLE_USER'),
-                array('ROLE_USER'),
-                array(),
-            ),
-            array(
-                array(new Role('ROLE_USER')),
-                array('ROLE_USER'),
-                array(),
-            ),
+            [
+                ['ROLE_USER'],
+                ['ROLE_USER'],
+                [],
+            ],
+            [
+                [new Role('ROLE_USER')],
+                ['ROLE_USER'],
+                [],
+            ],
             // Inherited roles
-            array(
-                array('ROLE_ADMIN'),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array(new Role('ROLE_ADMIN')),
-                array('ROLE_ADMIN'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-            array(
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_ADMIN', 'ROLE_OPERATOR'),
-                array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            ),
-        );
+            [
+                ['ROLE_ADMIN'],
+                ['ROLE_ADMIN'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+            [
+                [new Role('ROLE_ADMIN')],
+                ['ROLE_ADMIN'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+            [
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_ADMIN', 'ROLE_OPERATOR'],
+                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            ],
+        ];
     }
 
     private function getRoleHierarchy()
     {
-        return new RoleHierarchy(array(
-            'ROLE_ADMIN' => array('ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_OPERATOR' => array('ROLE_USER'),
-        ));
+        return new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
+            'ROLE_OPERATOR' => ['ROLE_USER'],
+        ]);
     }
 
     private function getRequest()

@@ -9,8 +9,8 @@
  * file that was distributed with this source code.
  */
 
-return array(
+return [
     new Symfony\Bundle\SecurityBundle\SecurityBundle(),
     new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
     new Symfony\Bundle\TwigBundle\TwigBundle(),
-);
+];

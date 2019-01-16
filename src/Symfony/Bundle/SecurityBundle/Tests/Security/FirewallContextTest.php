@@ -46,7 +46,7 @@ class FirewallContextTest extends TestCase
      */
     public function testFirewallConfigAs3rdConstructorArgument()
     {
-        new FirewallContext(array(), $this->getExceptionListenerMock(), new FirewallConfig('main', 'user_checker', 'request_matcher'));
+        new FirewallContext([], $this->getExceptionListenerMock(), new FirewallConfig('main', 'user_checker', 'request_matcher'));
     }
 
     private function getExceptionListenerMock()

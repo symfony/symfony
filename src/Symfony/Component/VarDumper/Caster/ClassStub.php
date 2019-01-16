@@ -62,7 +62,7 @@ class ClassStub extends ConstStub
             }
 
             if (null !== $callable && $r instanceof \ReflectionFunctionAbstract) {
-                $s = ReflectionCaster::castFunctionAbstract($r, array(), new Stub(), true);
+                $s = ReflectionCaster::castFunctionAbstract($r, [], new Stub(), true);
                 $s = ReflectionCaster::getSignature($s);
 
                 if ('()' === substr($identifier, -2)) {

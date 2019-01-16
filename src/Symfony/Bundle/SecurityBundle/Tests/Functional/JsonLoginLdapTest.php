@@ -17,7 +17,7 @@ class JsonLoginLdapTest extends WebTestCase
 {
     public function testKernelBoot()
     {
-        $kernel = self::createKernel(array('test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml'));
+        $kernel = self::createKernel(['test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml']);
         $kernel->boot();
 
         $this->assertInstanceOf(Kernel::class, $kernel);

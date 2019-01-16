@@ -276,21 +276,21 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->registerForAutoconfiguration(self::class)
-            ->setBindings(array(
+            ->setBindings([
                 '$foo' => new BoundArgument(234, false),
                 parent::class => new BoundArgument(new Reference('foo'), false),
-            ));
+            ]);
 
         $container->register('foo', self::class)
             ->setAutoconfigured(true)
-            ->setBindings(array('$foo' => new BoundArgument(123, false)));
+            ->setBindings(['$foo' => new BoundArgument(123, false)]);
 
         (new ResolveInstanceofConditionalsPass())->process($container);
 
-        $expected = array(
+        $expected = [
             '$foo' => new BoundArgument(123, false),
             parent::class => new BoundArgument(new Reference('foo'), false),
-        );
+        ];
         $this->assertEquals($expected, $container->findDefinition('foo')->getBindings());
     }
 

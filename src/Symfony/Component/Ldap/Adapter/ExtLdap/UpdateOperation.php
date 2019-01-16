@@ -19,12 +19,12 @@ class UpdateOperation
     private $values;
     private $attribute;
 
-    private $validOperationTypes = array(
+    private $validOperationTypes = [
         LDAP_MODIFY_BATCH_ADD,
         LDAP_MODIFY_BATCH_REMOVE,
         LDAP_MODIFY_BATCH_REMOVE_ALL,
         LDAP_MODIFY_BATCH_REPLACE,
-    );
+    ];
 
     /**
      * @param int    $operationType An LDAP_MODIFY_BATCH_* constant
@@ -48,10 +48,10 @@ class UpdateOperation
 
     public function toArray(): array
     {
-        return array(
+        return [
             'attrib' => $this->attribute,
             'modtype' => $this->operationType,
             'values' => $this->values,
-        );
+        ];
     }
 }

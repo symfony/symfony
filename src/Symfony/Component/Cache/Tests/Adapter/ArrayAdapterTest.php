@@ -18,11 +18,11 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  */
 class ArrayAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testGetMetadata' => 'ArrayAdapter does not keep metadata.',
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {

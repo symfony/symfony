@@ -23,14 +23,14 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
-    private $serviceLocatorContextIds = array();
+    private $serviceLocatorContextIds = [];
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->serviceLocatorContextIds = array();
+        $this->serviceLocatorContextIds = [];
         foreach ($container->findTaggedServiceIds('container.service_locator_context') as $id => $tags) {
             $this->serviceLocatorContextIds[$id] = $tags[0]['id'];
             $container->getDefinition($id)->clearTag('container.service_locator_context');
@@ -39,7 +39,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         try {
             return parent::process($container);
         } finally {
-            $this->serviceLocatorContextIds = array();
+            $this->serviceLocatorContextIds = [];
         }
     }
 

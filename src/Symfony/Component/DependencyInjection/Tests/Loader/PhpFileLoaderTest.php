@@ -67,16 +67,16 @@ class PhpFileLoaderTest extends TestCase
 
     public function provideConfig()
     {
-        yield array('basic');
-        yield array('object');
-        yield array('defaults');
-        yield array('instanceof');
-        yield array('prototype');
-        yield array('prototype_array');
-        yield array('child');
-        yield array('php7');
-        yield array('anonymous');
-        yield array('lazy_fqcn');
+        yield ['basic'];
+        yield ['object'];
+        yield ['defaults'];
+        yield ['instanceof'];
+        yield ['prototype'];
+        yield ['prototype_array'];
+        yield ['child'];
+        yield ['php7'];
+        yield ['anonymous'];
+        yield ['lazy_fqcn'];
     }
 
     /**

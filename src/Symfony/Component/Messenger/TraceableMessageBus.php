@@ -19,7 +19,7 @@ namespace Symfony\Component\Messenger;
 class TraceableMessageBus implements MessageBusInterface
 {
     private $decoratedBus;
-    private $dispatchedMessages = array();
+    private $dispatchedMessages = [];
 
     public function __construct(MessageBusInterface $decoratedBus)
     {
@@ -32,12 +32,12 @@ class TraceableMessageBus implements MessageBusInterface
     public function dispatch($message): Envelope
     {
         $envelope = $message instanceof Envelope ? $message : new Envelope($message);
-        $context = array(
+        $context = [
             'stamps' => array_values($envelope->all()),
             'message' => $envelope->getMessage(),
             'caller' => $this->getCaller(),
             'callTime' => microtime(true),
-        );
+        ];
 
         try {
             return $this->decoratedBus->dispatch($message);
@@ -57,7 +57,7 @@ class TraceableMessageBus implements MessageBusInterface
 
     public function reset()
     {
-        $this->dispatchedMessages = array();
+        $this->dispatchedMessages = [];
     }
 
     private function getCaller(): array

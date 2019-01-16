@@ -346,12 +346,12 @@ class EnvVarProcessorTest extends TestCase
 
     public function noArrayValues()
     {
-        return array(
-            array(null),
-            array('string'),
-            array(1),
-            array(true),
-        );
+        return [
+            [null],
+            ['string'],
+            [1],
+            [true],
+        ];
     }
 
     /**
@@ -372,11 +372,11 @@ class EnvVarProcessorTest extends TestCase
 
     public function invalidArrayValues()
     {
-        return array(
-            array(array()),
-            array(array('index2' => 'value')),
-            array(array('index', 'index2')),
-        );
+        return [
+            [[]],
+            [['index2' => 'value']],
+            [['index', 'index2']],
+        ];
     }
 
     /**
@@ -395,17 +395,17 @@ class EnvVarProcessorTest extends TestCase
 
     public function arrayValues()
     {
-        return array(
-            array(array('index' => 'password')),
-            array(array('index' => 'true')),
-            array(array('index' => false)),
-            array(array('index' => '1')),
-            array(array('index' => 1)),
-            array(array('index' => '1.1')),
-            array(array('index' => 1.1)),
-            array(array('index' => array())),
-            array(array('index' => array('val1', 'val2'))),
-        );
+        return [
+            [['index' => 'password']],
+            [['index' => 'true']],
+            [['index' => false]],
+            [['index' => '1']],
+            [['index' => 1]],
+            [['index' => '1.1']],
+            [['index' => 1.1]],
+            [['index' => []]],
+            [['index' => ['val1', 'val2']]],
+        ];
     }
 
     public function testGetEnvKeyChained()
@@ -415,9 +415,9 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('password', $processor->getEnv('key', 'index:file:foo', function ($name) {
             $this->assertSame('file:foo', $name);
 
-            return array(
+            return [
                 'index' => 'password',
-            );
+            ];
         }));
     }
 }

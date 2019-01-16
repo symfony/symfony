@@ -47,11 +47,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      */
     const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
 
-    protected $defaultContext = array(
+    protected $defaultContext = [
         self::ALLOW_EXTRA_ATTRIBUTES => true,
         self::CIRCULAR_REFERENCE_LIMIT => 1,
-        self::IGNORED_ATTRIBUTES => array(),
-    );
+        self::IGNORED_ATTRIBUTES => [],
+    ];
 
     /**
      * @deprecated since Symfony 4.2
@@ -93,7 +93,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
      */
-    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = array())
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -245,7 +245,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = array()" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
         $format = \func_num_args() > 1 ? func_get_arg(1) : null;
-        $context = \func_num_args() > 2 ? func_get_arg(2) : array();
+        $context = \func_num_args() > 2 ? func_get_arg(2) : [];
 
         $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->circularReferenceHandler;
         if ($circularReferenceHandler) {
@@ -419,7 +419,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     unset($data[$key]);
                 } elseif (array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
-                } elseif (array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? array())) {
+                } elseif (array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();

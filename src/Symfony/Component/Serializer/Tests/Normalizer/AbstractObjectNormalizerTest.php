@@ -168,8 +168,8 @@ class AbstractObjectNormalizerTest extends TestCase
         $dummy->bar = 'present';
 
         $normalizer = new ObjectNormalizer();
-        $result = $normalizer->normalize($dummy, null, array(AbstractObjectNormalizer::SKIP_NULL_VALUES => true));
-        $this->assertSame(array('bar' => 'present'), $result);
+        $result = $normalizer->normalize($dummy, null, [AbstractObjectNormalizer::SKIP_NULL_VALUES => true]);
+        $this->assertSame(['bar' => 'present'], $result);
     }
 }
 

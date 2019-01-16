@@ -57,7 +57,7 @@ trait PhpArrayTrait
         }
 
         $dumpedValues = '';
-        $dumpedMap = array();
+        $dumpedMap = [];
         $dump = <<<'EOF'
 <?php
 
@@ -124,7 +124,7 @@ EOF;
      */
     public function clear()
     {
-        $this->keys = $this->values = array();
+        $this->keys = $this->values = [];
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
 
@@ -137,14 +137,14 @@ EOF;
     private function initialize()
     {
         if (!file_exists($this->file)) {
-            $this->keys = $this->values = array();
+            $this->keys = $this->values = [];
 
             return;
         }
-        $values = (include $this->file) ?: array(array(), array());
+        $values = (include $this->file) ?: [[], []];
 
         if (2 !== \count($values) || !isset($values[0], $values[1])) {
-            $this->keys = $this->values = array();
+            $this->keys = $this->values = [];
         } else {
             list($this->keys, $this->values) = $values;
         }

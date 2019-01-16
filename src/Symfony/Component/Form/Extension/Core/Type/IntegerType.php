@@ -31,14 +31,14 @@ class IntegerType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'grouping' => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
             'compound' => false,
-        ));
+        ]);
 
-        $resolver->setAllowedValues('rounding_mode', array(
+        $resolver->setAllowedValues('rounding_mode', [
             IntegerToLocalizedStringTransformer::ROUND_FLOOR,
             IntegerToLocalizedStringTransformer::ROUND_DOWN,
             IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
@@ -46,10 +46,10 @@ class IntegerType extends AbstractType
             IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
             IntegerToLocalizedStringTransformer::ROUND_UP,
             IntegerToLocalizedStringTransformer::ROUND_CEILING,
-        ));
+        ]);
 
         $resolver->setDefined('scale');
-        $resolver->setAllowedTypes('scale', array('null', 'int'));
+        $resolver->setAllowedTypes('scale', ['null', 'int']);
         $resolver->setDeprecated('scale');
     }
 

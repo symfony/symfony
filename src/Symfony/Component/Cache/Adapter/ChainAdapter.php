@@ -33,7 +33,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 {
     use ContractsTrait;
 
-    private $adapters = array();
+    private $adapters = [];
     private $adapterCount;
     private $syncItem;
 
@@ -118,7 +118,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     public function getItem($key)
     {
         $syncItem = $this->syncItem;
-        $misses = array();
+        $misses = [];
 
         foreach ($this->adapters as $i => $adapter) {
             $item = $adapter->getItem($key);
@@ -140,15 +140,15 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         return $this->generateItems($this->adapters[0]->getItems($keys), 0);
     }
 
     private function generateItems($items, $adapterIndex)
     {
-        $missing = array();
-        $misses = array();
+        $missing = [];
+        $misses = [];
         $nextAdapterIndex = $adapterIndex + 1;
         $nextAdapter = isset($this->adapters[$nextAdapterIndex]) ? $this->adapters[$nextAdapterIndex] : null;
 

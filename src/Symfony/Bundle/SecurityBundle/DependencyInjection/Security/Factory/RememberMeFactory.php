@@ -142,9 +142,9 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values(array(true, false, 'auto'))->defaultValue('auto' === $value ? null : $value);
+                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue('auto' === $value ? null : $value);
             } elseif ('samesite' === $name) {
-                $builder->enumNode($name)->values(array(null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT))->defaultValue($value);
+                $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT])->defaultValue($value);
             } elseif (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
             } else {

@@ -98,10 +98,10 @@ class ObjectsProvider
 
     public static function getContainerDefinitionsWithExistingClasses()
     {
-        return array(
+        return [
             'existing_class_def_1' => new Definition(ClassWithDocComment::class),
             'existing_class_def_2' => new Definition(ClassWithoutDocComment::class),
-        );
+        ];
     }
 
     public static function getContainerDefinitions()

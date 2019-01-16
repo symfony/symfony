@@ -46,21 +46,21 @@ class HandledStampTest extends TestCase
 
     public function provideCallables()
     {
-        yield array(function () {}, 'Closure');
-        yield array('var_dump', 'var_dump');
-        yield array(new DummyCommandHandler(), DummyCommandHandler::class.'::__invoke');
-        yield array(
-            array(new DummyCommandHandlerWithSpecificMethod(), 'handle'),
+        yield [function () {}, 'Closure'];
+        yield ['var_dump', 'var_dump'];
+        yield [new DummyCommandHandler(), DummyCommandHandler::class.'::__invoke'];
+        yield [
+            [new DummyCommandHandlerWithSpecificMethod(), 'handle'],
             DummyCommandHandlerWithSpecificMethod::class.'::handle',
-        );
-        yield array(\Closure::fromCallable(function () {}), 'Closure');
-        yield array(\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke');
-        yield array(\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure');
-        yield array(new class() {
+        ];
+        yield [\Closure::fromCallable(function () {}), 'Closure'];
+        yield [\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke'];
+        yield [\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure'];
+        yield [new class() {
             public function __invoke()
             {
             }
-        }, 'class@anonymous%sHandledStampTest.php%s::__invoke');
+        }, 'class@anonymous%sHandledStampTest.php%s::__invoke'];
     }
 }
 

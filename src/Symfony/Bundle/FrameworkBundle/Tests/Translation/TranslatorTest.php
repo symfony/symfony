@@ -52,10 +52,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
@@ -67,7 +67,7 @@ class TranslatorTest extends TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
@@ -83,10 +83,10 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
         $this->assertEquals('foobar (ES)', $translator->trans('foobar'));
-        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', array('%count%' => 0)));
+        $this->assertEquals('choice 0 (EN)', $translator->trans('choice', ['%count%' => 0]));
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
-        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', array('%count%' => 1)));
+        $this->assertEquals('other choice 1 (PT-BR)', $translator->trans('other choice', ['%count%' => 1]));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
@@ -113,9 +113,9 @@ class TranslatorTest extends TestCase
     public function testTransChoiceWithCaching()
     {
         // prime the cache
-        $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($this->getLoader(), ['cache_dir' => $this->tmpDir]);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
@@ -124,9 +124,9 @@ class TranslatorTest extends TestCase
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader->expects($this->never())->method('load');
 
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir]);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
+        $translator->setFallbackLocales(['en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin']);
 
         $this->assertEquals('choice 0 (EN)', $translator->transChoice('choice', 0));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));

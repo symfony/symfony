@@ -104,8 +104,8 @@ class ApplicationTesterTest extends TestCase
 
         $tester = new ApplicationTester($application);
         $tester->run(
-            array('command' => 'foo', 'foo' => 'bar'),
-            array('capture_stderr_separately' => true)
+            ['command' => 'foo', 'foo' => 'bar'],
+            ['capture_stderr_separately' => true]
         );
 
         $this->assertSame('foo', $tester->getErrorOutput());

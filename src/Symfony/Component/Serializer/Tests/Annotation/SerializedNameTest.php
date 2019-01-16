@@ -25,15 +25,15 @@ class SerializedNameTest extends TestCase
      */
     public function testNotSetSerializedNameParameter()
     {
-        new SerializedName(array());
+        new SerializedName([]);
     }
 
     public function provideInvalidValues()
     {
-        return array(
-            array(''),
-            array(0),
-        );
+        return [
+            [''],
+            [0],
+        ];
     }
 
     /**
@@ -44,12 +44,12 @@ class SerializedNameTest extends TestCase
      */
     public function testNotAStringSerializedNameParameter($value)
     {
-        new SerializedName(array('value' => $value));
+        new SerializedName(['value' => $value]);
     }
 
     public function testSerializedNameParameters()
     {
-        $maxDepth = new SerializedName(array('value' => 'foo'));
+        $maxDepth = new SerializedName(['value' => 'foo']);
         $this->assertEquals('foo', $maxDepth->getSerializedName());
     }
 }

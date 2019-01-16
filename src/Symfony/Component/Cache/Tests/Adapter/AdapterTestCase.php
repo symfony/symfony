@@ -77,10 +77,10 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $item = $cache->getItem('foo');
 
-        $expected = array(
+        $expected = [
             CacheItem::METADATA_EXPIRY => 9.5 + time(),
             CacheItem::METADATA_CTIME => 1000,
-        );
+        ];
         $this->assertEquals($expected, $item->getMetadata(), 'Item metadata should embed expiry and ctime.', .6);
     }
 

@@ -46,7 +46,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $abstractDefinition = new Definition('stdClass');
         $abstractDefinition->setAbstract(true);
-        $abstractDefinition->addTag('doctrine.event_listener', array('event' => 'test'));
+        $abstractDefinition->addTag('doctrine.event_listener', ['event' => 'test']);
 
         $container->setDefinition('a', $abstractDefinition);
 
@@ -60,30 +60,30 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $container
             ->register('a', 'stdClass')
             ->setPublic(false)
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'bar',
-            ))
-            ->addTag('doctrine.event_listener', array(
+            ])
+            ->addTag('doctrine.event_listener', [
                 'event' => 'foo',
                 'priority' => -5,
-            ))
-            ->addTag('doctrine.event_listener', array(
+            ])
+            ->addTag('doctrine.event_listener', [
                 'event' => 'foo_bar',
                 'priority' => 3,
-            ))
+            ])
         ;
         $container
             ->register('b', 'stdClass')
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'foo',
-            ))
+            ])
         ;
         $container
             ->register('c', 'stdClass')
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'foo_bar',
                 'priority' => 4,
-            ))
+            ])
         ;
 
         $this->process($container);
@@ -91,24 +91,24 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $methodCalls = $eventManagerDef->getMethodCalls();
 
         $this->assertEquals(
-            array(
-                array('addEventListener', array(array('foo_bar'), 'c')),
-                array('addEventListener', array(array('foo_bar'), 'a')),
-                array('addEventListener', array(array('bar'), 'a')),
-                array('addEventListener', array(array('foo'), 'b')),
-                array('addEventListener', array(array('foo'), 'a')),
-            ),
+            [
+                ['addEventListener', [['foo_bar'], 'c']],
+                ['addEventListener', [['foo_bar'], 'a']],
+                ['addEventListener', [['bar'], 'a']],
+                ['addEventListener', [['foo'], 'b']],
+                ['addEventListener', [['foo'], 'a']],
+            ],
             $methodCalls
         );
 
         $serviceLocatorDef = $container->getDefinition((string) $eventManagerDef->getArgument(0));
         $this->assertSame(ServiceLocator::class, $serviceLocatorDef->getClass());
         $this->assertEquals(
-            array(
+            [
                 'c' => new ServiceClosureArgument(new Reference('c')),
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'b' => new ServiceClosureArgument(new Reference('b')),
-            ),
+            ],
             $serviceLocatorDef->getArgument(0)
         );
     }
@@ -119,25 +119,25 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'onFlush',
-            ))
+            ])
         ;
 
         $container
             ->register('b', 'stdClass')
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'onFlush',
                 'connection' => 'default',
-            ))
+            ])
         ;
 
         $container
             ->register('c', 'stdClass')
-            ->addTag('doctrine.event_listener', array(
+            ->addTag('doctrine.event_listener', [
                 'event' => 'onFlush',
                 'connection' => 'second',
-            ))
+            ])
         ;
 
         $this->process($container);
@@ -146,40 +146,40 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         // first connection
         $this->assertEquals(
-            array(
-                array('addEventListener', array(array('onFlush'), 'a')),
-                array('addEventListener', array(array('onFlush'), 'b')),
-            ),
+            [
+                ['addEventListener', [['onFlush'], 'a']],
+                ['addEventListener', [['onFlush'], 'b']],
+            ],
             $eventManagerDef->getMethodCalls()
         );
 
         $serviceLocatorDef = $container->getDefinition((string) $eventManagerDef->getArgument(0));
         $this->assertSame(ServiceLocator::class, $serviceLocatorDef->getClass());
         $this->assertEquals(
-            array(
+            [
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'b' => new ServiceClosureArgument(new Reference('b')),
-            ),
+            ],
             $serviceLocatorDef->getArgument(0)
         );
 
         // second connection
         $secondEventManagerDef = $container->getDefinition('doctrine.dbal.second_connection.event_manager');
         $this->assertEquals(
-            array(
-                array('addEventListener', array(array('onFlush'), 'a')),
-                array('addEventListener', array(array('onFlush'), 'c')),
-            ),
+            [
+                ['addEventListener', [['onFlush'], 'a']],
+                ['addEventListener', [['onFlush'], 'c']],
+            ],
             $secondEventManagerDef->getMethodCalls()
         );
 
         $serviceLocatorDef = $container->getDefinition((string) $secondEventManagerDef->getArgument(0));
         $this->assertSame(ServiceLocator::class, $serviceLocatorDef->getClass());
         $this->assertEquals(
-            array(
+            [
                 'a' => new ServiceClosureArgument(new Reference('a')),
                 'c' => new ServiceClosureArgument(new Reference('c')),
-            ),
+            ],
             $serviceLocatorDef->getArgument(0)
         );
     }
@@ -190,42 +190,42 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $container
             ->register('a', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'event' => 'onFlush',
-            ))
+            ])
         ;
 
         $container
             ->register('b', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'event' => 'onFlush',
                 'connection' => 'default',
-            ))
+            ])
         ;
 
         $container
             ->register('c', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'event' => 'onFlush',
                 'connection' => 'second',
-            ))
+            ])
         ;
 
         $this->process($container);
 
         $this->assertEquals(
-            array(
-                array('addEventSubscriber', array(new Reference('a'))),
-                array('addEventSubscriber', array(new Reference('b'))),
-            ),
+            [
+                ['addEventSubscriber', [new Reference('a')]],
+                ['addEventSubscriber', [new Reference('b')]],
+            ],
             $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls()
         );
 
         $this->assertEquals(
-            array(
-                array('addEventSubscriber', array(new Reference('a'))),
-                array('addEventSubscriber', array(new Reference('c'))),
-            ),
+            [
+                ['addEventSubscriber', [new Reference('a')]],
+                ['addEventSubscriber', [new Reference('c')]],
+            ],
             $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls()
         );
     }
@@ -240,39 +240,39 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         ;
         $container
             ->register('b', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'priority' => 5,
-            ))
+            ])
         ;
         $container
             ->register('c', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'priority' => 10,
-            ))
+            ])
         ;
         $container
             ->register('d', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'priority' => 10,
-            ))
+            ])
         ;
         $container
             ->register('e', 'stdClass')
-            ->addTag('doctrine.event_subscriber', array(
+            ->addTag('doctrine.event_subscriber', [
                 'priority' => 10,
-            ))
+            ])
         ;
 
         $this->process($container);
 
         $this->assertEquals(
-            array(
-                array('addEventSubscriber', array(new Reference('c'))),
-                array('addEventSubscriber', array(new Reference('d'))),
-                array('addEventSubscriber', array(new Reference('e'))),
-                array('addEventSubscriber', array(new Reference('b'))),
-                array('addEventSubscriber', array(new Reference('a'))),
-            ),
+            [
+                ['addEventSubscriber', [new Reference('c')]],
+                ['addEventSubscriber', [new Reference('d')]],
+                ['addEventSubscriber', [new Reference('e')]],
+                ['addEventSubscriber', [new Reference('b')]],
+                ['addEventSubscriber', [new Reference('a')]],
+            ],
             $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls()
         );
     }
@@ -283,9 +283,9 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
 
         $this->process($container);
 
-        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
+        $this->assertEquals([], $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
 
-        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
+        $this->assertEquals([], $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
     private function process(ContainerBuilder $container)
@@ -298,7 +298,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $connections = array('default' => 'doctrine.dbal.default_connection');
+        $connections = ['default' => 'doctrine.dbal.default_connection'];
 
         $container->register('doctrine.dbal.default_connection.event_manager', 'stdClass')
             ->addArgument(new Reference('service_container'));

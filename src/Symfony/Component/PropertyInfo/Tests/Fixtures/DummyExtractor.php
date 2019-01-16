@@ -74,7 +74,7 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return true;
     }

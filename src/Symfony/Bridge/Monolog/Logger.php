@@ -36,7 +36,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
             return $logger->getLogs(...\func_get_args());
         }
 
-        return array();
+        return [];
     }
 
     /**

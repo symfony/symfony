@@ -61,10 +61,10 @@ class TranslatorHelper extends Helper
         @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%count%" parameter.', __METHOD__), E_USER_DEPRECATED);
 
         if (null === $this->translator) {
-            return $this->doTrans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+            return $this->doTrans($id, ['%count%' => $number] + $parameters, $domain, $locale);
         }
         if ($this->translator instanceof TranslatorInterface) {
-            return $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+            return $this->translator->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
         }
 
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);

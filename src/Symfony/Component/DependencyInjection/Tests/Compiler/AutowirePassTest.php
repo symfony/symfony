@@ -924,12 +924,12 @@ class AutowirePassTest extends TestCase
 
         $pass->process($container);
 
-        $expected = array(
-            array(
+        $expected = [
+            [
                 'setMultipleInstancesForOneArg',
-                array(new TypedReference(CollisionInterface::class.' $collision', CollisionInterface::class)),
-            ),
-        );
+                [new TypedReference(CollisionInterface::class.' $collision', CollisionInterface::class)],
+            ],
+        ];
         $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
     }
 }

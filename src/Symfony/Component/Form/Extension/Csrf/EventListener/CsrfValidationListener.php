@@ -74,7 +74,7 @@ class CsrfValidationListener implements EventSubscriberInterface
                     $errorMessage = $this->translator->trans($errorMessage, [], $this->translationDomain);
                 }
 
-                $form->addError(new FormError($errorMessage, $errorMessage, array(), null, $csrfToken));
+                $form->addError(new FormError($errorMessage, $errorMessage, [], null, $csrfToken));
             }
 
             if (\is_array($data)) {

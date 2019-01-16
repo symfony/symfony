@@ -37,7 +37,7 @@ class JsonSerializableNormalizerTest extends TestCase
         $this->createNormalizer();
     }
 
-    private function createNormalizer(array $defaultContext = array())
+    private function createNormalizer(array $defaultContext = [])
     {
         $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
         $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
@@ -86,7 +86,7 @@ class JsonSerializableNormalizerTest extends TestCase
      */
     private function doTestCircularNormalize(bool $legacy = false)
     {
-        $legacy ? $this->normalizer->setCircularReferenceLimit(1) : $this->createNormalizer(array(JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1));
+        $legacy ? $this->normalizer->setCircularReferenceLimit(1) : $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->serializer
             ->expects($this->once())

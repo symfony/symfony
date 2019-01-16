@@ -203,12 +203,12 @@ abstract class AbstractDescriptorTest extends TestCase
 
     public function getClassDescriptionTestData()
     {
-        return array(
-            array(ClassWithDocCommentOnMultipleLines::class, 'This is the first line of the description. This is the second line.'),
-            array(ClassWithDocCommentWithoutInitialSpace::class, 'Foo.'),
-            array(ClassWithoutDocComment::class, ''),
-            array(ClassWithDocComment::class, 'This is a class with a doc comment.'),
-        );
+        return [
+            [ClassWithDocCommentOnMultipleLines::class, 'This is the first line of the description. This is the second line.'],
+            [ClassWithDocCommentWithoutInitialSpace::class, 'Foo.'],
+            [ClassWithoutDocComment::class, ''],
+            [ClassWithDocComment::class, 'This is a class with a doc comment.'],
+        ];
     }
 
     abstract protected function getDescriptor();

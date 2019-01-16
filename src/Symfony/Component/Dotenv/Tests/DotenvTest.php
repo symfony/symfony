@@ -343,7 +343,7 @@ class DotenvTest extends TestCase
         putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
 
         $dotenv = new Dotenv();
-        $dotenv->populate(array('TEST_ENV_VAR_OVERRIDEN' => 'new_value'), true);
+        $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
 
         $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
         $this->assertSame('new_value', $_ENV['TEST_ENV_VAR_OVERRIDEN']);

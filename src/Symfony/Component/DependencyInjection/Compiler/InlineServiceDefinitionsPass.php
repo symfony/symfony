@@ -26,10 +26,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 {
     private $analyzingPass;
     private $repeatedPass;
-    private $cloningIds = array();
-    private $connectedIds = array();
-    private $notInlinedIds = array();
-    private $inlinedIds = array();
+    private $cloningIds = [];
+    private $connectedIds = [];
+    private $notInlinedIds = [];
+    private $inlinedIds = [];
     private $graph;
 
     public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
@@ -68,7 +68,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
                 }
                 $this->graph = $analyzedContainer->getCompiler()->getServiceReferenceGraph();
                 $notInlinedIds = $this->notInlinedIds;
-                $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = array();
+                $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = [];
 
                 foreach ($analyzedContainer->getDefinitions() as $id => $definition) {
                     if (!$this->graph->hasNode($id)) {
@@ -96,7 +96,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             }
         } finally {
             $this->container = null;
-            $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = array();
+            $this->connectedIds = $this->notInlinedIds = $this->inlinedIds = [];
             $this->graph = null;
         }
     }
@@ -193,7 +193,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
         $this->connectedIds[$id] = true;
 
-        $srcIds = array();
+        $srcIds = [];
         $srcCount = 0;
         $isReferencedByConstructor = false;
         foreach ($this->graph->getNode($id)->getInEdges() as $edge) {

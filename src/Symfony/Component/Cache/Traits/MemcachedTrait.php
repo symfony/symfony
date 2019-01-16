@@ -24,12 +24,12 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 trait MemcachedTrait
 {
-    private static $defaultClientOptions = array(
+    private static $defaultClientOptions = [
         'persistent_id' => null,
         'username' => null,
         'password' => null,
         'serializer' => 'php',
-    );
+    ];
 
     private $marshaller;
     private $client;
@@ -77,10 +77,10 @@ trait MemcachedTrait
      *
      * @throws \ErrorException When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = array())
+    public static function createConnection($servers, array $options = [])
     {
         if (\is_string($servers)) {
-            $servers = array($servers);
+            $servers = [$servers];
         } elseif (!\is_array($servers)) {
             throw new InvalidArgumentException(sprintf('MemcachedAdapter::createClient() expects array or string as first argument, %s given.', \gettype($servers)));
         }
@@ -104,7 +104,7 @@ trait MemcachedTrait
                 }
                 $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
                     if (!empty($m[2])) {
-                        list($username, $password) = explode(':', $m[2], 2) + array(1 => null);
+                        list($username, $password) = explode(':', $m[2], 2) + [1 => null];
                     }
 
                     return 'file:'.($m[1] ?? '');
@@ -112,7 +112,7 @@ trait MemcachedTrait
                 if (false === $params = parse_url($params)) {
                     throw new InvalidArgumentException(sprintf('Invalid Memcached DSN: %s', $dsn));
                 }
-                $query = $hosts = array();
+                $query = $hosts = [];
                 if (isset($params['query'])) {
                     parse_str($params['query'], $query);
 
@@ -122,9 +122,9 @@ trait MemcachedTrait
                         }
                         foreach ($hosts as $host => $weight) {
                             if (false === $port = strrpos($host, ':')) {
-                                $hosts[$host] = array($host, 11211, (int) $weight);
+                                $hosts[$host] = [$host, 11211, (int) $weight];
                             } else {
-                                $hosts[$host] = array(substr($host, 0, $port), (int) substr($host, 1 + $port), (int) $weight);
+                                $hosts[$host] = [substr($host, 0, $port), (int) substr($host, 1 + $port), (int) $weight];
                             }
                         }
                         $hosts = array_values($hosts);
@@ -143,17 +143,17 @@ trait MemcachedTrait
                     $params['weight'] = $m[1];
                     $params['path'] = substr($params['path'], 0, -\strlen($m[0]));
                 }
-                $params += array(
+                $params += [
                     'host' => isset($params['host']) ? $params['host'] : $params['path'],
                     'port' => isset($params['host']) ? 11211 : null,
                     'weight' => 0,
-                );
+                ];
                 if ($query) {
                     $params += $query;
                     $options = $query + $options;
                 }
 
-                $servers[$i] = array($params['host'], $params['port'], $params['weight']);
+                $servers[$i] = [$params['host'], $params['port'], $params['weight']];
 
                 if ($hosts) {
                     $servers = array_merge($servers, $hosts);
@@ -185,12 +185,12 @@ trait MemcachedTrait
 
             // set client's servers, taking care of persistent connections
             if (!$client->isPristine()) {
-                $oldServers = array();
+                $oldServers = [];
                 foreach ($client->getServerList() as $server) {
-                    $oldServers[] = array($server['host'], $server['port']);
+                    $oldServers[] = [$server['host'], $server['port']];
                 }
 
-                $newServers = array();
+                $newServers = [];
                 foreach ($servers as $server) {
                     if (1 < \count($server)) {
                         $server = array_values($server);
@@ -234,7 +234,7 @@ trait MemcachedTrait
             $lifetime += time();
         }
 
-        $encodedValues = array();
+        $encodedValues = [];
         foreach ($values as $key => $value) {
             $encodedValues[rawurlencode($key)] = $value;
         }
@@ -252,7 +252,7 @@ trait MemcachedTrait
 
             $encodedResult = $this->checkResultCode($this->getClient()->getMulti($encodedIds));
 
-            $result = array();
+            $result = [];
             foreach ($encodedResult as $key => $value) {
                 $result[rawurldecode($key)] = $this->marshaller->unmarshall($value);
             }

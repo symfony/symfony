@@ -24,19 +24,19 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     const FORMAT_KEY = 'dateinterval_format';
 
-    private $defaultContext = array(
+    private $defaultContext = [
         self::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS',
-    );
+    ];
 
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = array())
+    public function __construct($defaultContext = [])
     {
         if (!\is_array($defaultContext)) {
             @trigger_error(sprintf('The "format" parameter is deprecated since Symfony 4.2, use the "%s" key of the context instead.', self::FORMAT_KEY), E_USER_DEPRECATED);
 
-            $defaultContext = array(self::FORMAT_KEY => (string) $defaultContext);
+            $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
         }
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);

@@ -170,7 +170,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
             unset($metadata[CacheItem::METADATA_TAGS]);
 
             if ($metadata) {
-                $values[$key] = array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $values[$key]);
+                $values[$key] = ["\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $values[$key]];
             }
         }
 

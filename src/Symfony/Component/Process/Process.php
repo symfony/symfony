@@ -190,7 +190,7 @@ class Process implements \IteratorAggregate
      */
     public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
-        $process = new static(array(), $cwd, $env, $input, $timeout);
+        $process = new static([], $cwd, $env, $input, $timeout);
         $process->commandline = $command;
 
         return $process;

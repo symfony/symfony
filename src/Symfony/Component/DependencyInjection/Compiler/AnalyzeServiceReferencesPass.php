@@ -78,7 +78,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         try {
             parent::process($container);
         } finally {
-            $this->aliases = $this->definitions = array();
+            $this->aliases = $this->definitions = [];
         }
     }
 

@@ -56,7 +56,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
                 $definition = $container->getDefinition($targetId);
             } catch (ServiceNotFoundException $e) {
                 if ('' !== $e->getId() && '@' === $e->getId()[0]) {
-                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, array(substr($e->getId(), 1)));
+                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);
                 }
 
                 throw $e;

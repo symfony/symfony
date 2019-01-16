@@ -65,7 +65,7 @@ final class Dotenv
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = array('test')): void
+    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = ['test']): void
     {
         if (file_exists($path) || !file_exists($p = "$path.dist")) {
             $this->load($path);
@@ -74,7 +74,7 @@ final class Dotenv
         }
 
         if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
-            $this->populate(array($varName => $env = $defaultEnv));
+            $this->populate([$varName => $env = $defaultEnv]);
         }
 
         if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {

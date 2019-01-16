@@ -306,7 +306,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         if (\count($value) && !$this->ignoreExtraKeys) {
             $proposals = array_keys($this->children);
             sort($proposals);
-            $guesses = array();
+            $guesses = [];
 
             foreach (array_keys($value) as $subject) {
                 $minScore = INF;

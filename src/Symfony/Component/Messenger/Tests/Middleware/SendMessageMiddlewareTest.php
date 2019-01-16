@@ -30,7 +30,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array(DummyMessage::class => array($sender))));
+        $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -47,7 +47,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope(new ChildDummyMessage('Hey'));
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array(DummyMessage::class => array($sender))));
+        $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -60,9 +60,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(['*' => [$sender]], [
             DummyMessage::class => true,
-        )));
+        ]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -75,9 +75,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(['*' => [$sender]], [
             DummyMessage::class => true,
-        )));
+        ]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -90,9 +90,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(['*' => [$sender]], [
             DummyMessageInterface::class => true,
-        )));
+        ]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -105,9 +105,9 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = new Envelope($message);
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender)), array(
+        $middleware = new SendMessageMiddleware(new SendersLocator(['*' => [$sender]], [
             '*' => true,
-        )));
+        ]));
 
         $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
 
@@ -119,7 +119,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array()));
+        $middleware = new SendMessageMiddleware(new SendersLocator([]));
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -130,7 +130,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 
-        $middleware = new SendMessageMiddleware(new SendersLocator(array('*' => array($sender))));
+        $middleware = new SendMessageMiddleware(new SendersLocator(['*' => [$sender]]));
 
         $sender->expects($this->never())->method('send');
 

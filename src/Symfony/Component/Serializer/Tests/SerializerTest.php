@@ -61,7 +61,7 @@ class SerializerTest extends TestCase
      */
     public function testDeprecationErrorOnInvalidNormalizer()
     {
-        new Serializer(array(new \stdClass()));
+        new Serializer([new \stdClass()]);
     }
 
     /**
@@ -70,7 +70,7 @@ class SerializerTest extends TestCase
      */
     public function testDeprecationErrorOnInvalidEncoder()
     {
-        new Serializer(array(), array(new \stdClass()));
+        new Serializer([], [new \stdClass()]);
     }
 
     /**
@@ -352,7 +352,7 @@ class SerializerTest extends TestCase
 
     public function testNormalizerAware()
     {
-        $normalizerAware = $this->getMockBuilder(array(NormalizerAwareInterface::class, NormalizerInterface::class))->getMock();
+        $normalizerAware = $this->getMockBuilder([NormalizerAwareInterface::class, NormalizerInterface::class])->getMock();
         $normalizerAware->expects($this->once())
             ->method('setNormalizer')
             ->with($this->isInstanceOf(NormalizerInterface::class));
@@ -362,7 +362,7 @@ class SerializerTest extends TestCase
 
     public function testDenormalizerAware()
     {
-        $denormalizerAware = $this->getMockBuilder(array(DenormalizerAwareInterface::class, DenormalizerInterface::class))->getMock();
+        $denormalizerAware = $this->getMockBuilder([DenormalizerAwareInterface::class, DenormalizerInterface::class])->getMock();
         $denormalizerAware->expects($this->once())
             ->method('setDenormalizer')
             ->with($this->isInstanceOf(DenormalizerInterface::class));

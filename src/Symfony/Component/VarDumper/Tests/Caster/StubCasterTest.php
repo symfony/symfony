@@ -192,14 +192,14 @@ EODUMP;
 
     public function testClassStubWithAnonymousClass()
     {
-        $var = array(new ClassStub(\get_class(new class() extends \Exception {
-        })));
+        $var = [new ClassStub(\get_class(new class() extends \Exception {
+        }))];
 
         $cloner = new VarCloner();
         $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
-        $dump = $dumper->dump($cloner->cloneVar($var), true, array('fileLinkFormat' => '%f:%l'));
+        $dump = $dumper->dump($cloner->cloneVar($var), true, ['fileLinkFormat' => '%f:%l']);
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>

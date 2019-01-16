@@ -96,7 +96,7 @@ class ExpressionVoter implements VoterInterface
             $roles = $token->getRoles();
         }
 
-        $variables = array(
+        $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'object' => $subject,
@@ -104,7 +104,7 @@ class ExpressionVoter implements VoterInterface
             'roles' => array_map(function ($role) { return $role->getRole(); }, $roles),
             'trust_resolver' => $this->trustResolver,
             'auth_checker' => $this->authChecker,
-        );
+        ];
 
         // this is mainly to propose a better experience when the expression is used
         // in an access control rule, as the developer does not know that it's going

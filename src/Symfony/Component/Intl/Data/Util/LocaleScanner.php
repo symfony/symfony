@@ -89,7 +89,7 @@ class LocaleScanner
     public function scanParents(string $sourceDir): array
     {
         $locales = $this->scanLocales($sourceDir);
-        $fallbacks = array();
+        $fallbacks = [];
 
         foreach ($locales as $locale) {
             $content = \file_get_contents($sourceDir.'/'.$locale.'.txt');

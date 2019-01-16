@@ -34,6 +34,6 @@ class ChoiceTypeExtension extends AbstractTypeExtension
      */
     public static function getExtendedTypes(): iterable
     {
-        return array(self::$extendedType);
+        return [self::$extendedType];
     }
 }

@@ -47,7 +47,7 @@ class ArrayNodeTest extends TestCase
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
         $node->addChild(new ArrayNode('beta'));
-        $node->normalize(array('alpha3' => 'foo'));
+        $node->normalize(['alpha3' => 'foo']);
     }
 
     /**
@@ -59,7 +59,7 @@ class ArrayNodeTest extends TestCase
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
         $node->addChild(new ArrayNode('alpha2'));
-        $node->normalize(array('beta' => 'foo'));
+        $node->normalize(['beta' => 'foo']);
     }
 
     public function ignoreAndRemoveMatrixProvider()

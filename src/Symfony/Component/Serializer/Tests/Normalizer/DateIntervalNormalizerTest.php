@@ -71,7 +71,7 @@ class DateIntervalNormalizerTest extends TestCase
 
     private function doTestNormalizeUsingFormatPassedInConstructor($format, $output, $input, bool $legacy = false)
     {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer(array(DateIntervalNormalizer::FORMAT_KEY => $format));
+        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertEquals($output, $normalizer->normalize(new \DateInterval($input)));
     }
 
@@ -121,7 +121,7 @@ class DateIntervalNormalizerTest extends TestCase
 
     private function doTestDenormalizeUsingFormatPassedInConstructor($format, $input, $output, bool $legacy = false)
     {
-        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer(array(DateIntervalNormalizer::FORMAT_KEY => $format));
+        $normalizer = $legacy ? new DateIntervalNormalizer($format) : new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
         $this->assertDateIntervalEquals(new \DateInterval($output), $normalizer->denormalize($input, \DateInterval::class));
     }
 

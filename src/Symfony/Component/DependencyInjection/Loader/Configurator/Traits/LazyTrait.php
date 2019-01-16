@@ -24,7 +24,7 @@ trait LazyTrait
     {
         $this->definition->setLazy((bool) $lazy);
         if (\is_string($lazy)) {
-            $this->definition->addTag('proxy', array('interface' => $lazy));
+            $this->definition->addTag('proxy', ['interface' => $lazy]);
         }
 
         return $this;

@@ -619,10 +619,10 @@ class XmlFileLoaderTest extends TestCase
             '/*',
             true,
             false,
-            array(
+            [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
-            )
+            ]
         );
         $this->assertContains((string) $globResource, $resources);
         $resources = array_map('strval', $resources);
@@ -638,7 +638,7 @@ class XmlFileLoaderTest extends TestCase
 
         $ids = array_keys($container->getDefinitions());
         sort($ids);
-        $this->assertSame(array(Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'), $ids);
+        $this->assertSame([Prototype\Foo::class, Prototype\Sub\Bar::class, 'service_container'], $ids);
 
         $resources = $container->getResources();
 
@@ -651,10 +651,10 @@ class XmlFileLoaderTest extends TestCase
             '/*',
             true,
             false,
-            array(
+            [
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'BadClasses') => true,
                 str_replace(\DIRECTORY_SEPARATOR, '/', $prototypeRealPath.\DIRECTORY_SEPARATOR.'OtherDir') => true,
-            )
+            ]
         );
         $this->assertContains((string) $globResource, $resources);
         $resources = array_map('strval', $resources);
@@ -849,7 +849,7 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services_lazy_fqcn.xml');
 
         $definition = $container->getDefinition('foo');
-        $this->assertSame(array(array('interface' => 'SomeInterface')), $definition->getTag('proxy'));
+        $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
 
     public function testTsantosContainer()

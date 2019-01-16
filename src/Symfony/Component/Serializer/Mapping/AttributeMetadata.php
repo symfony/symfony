@@ -30,7 +30,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $groups = array();
+    public $groups = [];
 
     /**
      * @var int|null
@@ -115,6 +115,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return array('name', 'groups', 'maxDepth');
+        return ['name', 'groups', 'maxDepth'];
     }
 }

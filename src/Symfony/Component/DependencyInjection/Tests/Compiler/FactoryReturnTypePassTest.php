@@ -31,15 +31,15 @@ class FactoryReturnTypePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $factory = $container->register('factory');
-        $factory->setFactory(array(FactoryDummy::class, 'createFactory'));
+        $factory->setFactory([FactoryDummy::class, 'createFactory']);
 
         $container->setAlias('alias_factory', 'factory');
 
         $foo = $container->register('foo');
-        $foo->setFactory(array(new Reference('alias_factory'), 'create'));
+        $foo->setFactory([new Reference('alias_factory'), 'create']);
 
         $bar = $container->register('bar', __CLASS__);
-        $bar->setFactory(array(new Reference('factory'), 'create'));
+        $bar->setFactory([new Reference('factory'), 'create']);
 
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
@@ -80,13 +80,13 @@ class FactoryReturnTypePassTest extends TestCase
 
     public function returnTypesProvider()
     {
-        return array(
+        return [
             // must be loaded before the function as they are in the same file
-            array(array(FactoryDummy::class, 'createBuiltin'), null, false),
-            array(array(FactoryDummy::class, 'createParent'), FactoryParent::class),
-            array(array(FactoryDummy::class, 'createSelf'), FactoryDummy::class),
-            array(factoryFunction::class, FactoryDummy::class),
-        );
+            [[FactoryDummy::class, 'createBuiltin'], null, false],
+            [[FactoryDummy::class, 'createParent'], FactoryParent::class],
+            [[FactoryDummy::class, 'createSelf'], FactoryDummy::class],
+            [factoryFunction::class, FactoryDummy::class],
+        ];
     }
 
     public function testCircularReference()
@@ -94,10 +94,10 @@ class FactoryReturnTypePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $factory = $container->register('factory');
-        $factory->setFactory(array(new Reference('factory2'), 'createSelf'));
+        $factory->setFactory([new Reference('factory2'), 'createSelf']);
 
         $factory2 = $container->register('factory2');
-        $factory2->setFactory(array(new Reference('factory'), 'create'));
+        $factory2->setFactory([new Reference('factory'), 'create']);
 
         $pass = new FactoryReturnTypePass();
         $pass->process($container);
@@ -115,7 +115,7 @@ class FactoryReturnTypePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $factory = $container->register('factory');
-        $factory->setFactory(array(FactoryDummy::class, 'createFactory'));
+        $factory->setFactory([FactoryDummy::class, 'createFactory']);
         $container->compile();
 
         $this->assertEquals(FactoryDummy::class, $container->getDefinition('factory')->getClass());

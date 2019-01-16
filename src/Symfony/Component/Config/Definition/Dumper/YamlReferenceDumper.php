@@ -77,7 +77,7 @@ class YamlReferenceDumper
      */
     private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, $depth = 0, $prototypedArray = false)
     {
-        $comments = array();
+        $comments = [];
         $default = '';
         $defaultArray = null;
         $children = null;
@@ -251,6 +251,6 @@ class YamlReferenceDumper
         }
         $keyNode->setInfo($info);
 
-        return array($key => $keyNode);
+        return [$key => $keyNode];
     }
 }

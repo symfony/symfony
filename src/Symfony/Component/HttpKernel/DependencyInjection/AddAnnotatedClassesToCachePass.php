@@ -36,8 +36,8 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $classes = array();
-        $annotatedClasses = array();
+        $classes = [];
+        $annotatedClasses = [];
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof Extension) {
                 if (\PHP_VERSION_ID < 70000) {
@@ -67,7 +67,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
      */
     private function expandClasses(array $patterns, array $classes)
     {
-        $expanded = array();
+        $expanded = [];
 
         // Explicit classes declared in the patterns are returned directly
         foreach ($patterns as $key => $pattern) {
@@ -93,7 +93,7 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function getClassesInComposerClassMaps()
     {
-        $classes = array();
+        $classes = [];
 
         foreach (spl_autoload_functions() as $function) {
             if (!\is_array($function)) {
@@ -114,14 +114,14 @@ class AddAnnotatedClassesToCachePass implements CompilerPassInterface
 
     private function patternsToRegexps($patterns)
     {
-        $regexps = array();
+        $regexps = [];
 
         foreach ($patterns as $pattern) {
             // Escape user input
             $regex = preg_quote(ltrim($pattern, '\\'));
 
             // Wildcards * and **
-            $regex = strtr($regex, array('\\*\\*' => '.*?', '\\*' => '[^\\\\]*?'));
+            $regex = strtr($regex, ['\\*\\*' => '.*?', '\\*' => '[^\\\\]*?']);
 
             // If this class does not end by a slash, anchor the end
             if ('\\' !== substr($regex, -1)) {

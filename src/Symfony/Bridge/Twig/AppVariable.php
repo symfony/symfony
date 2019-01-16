@@ -159,13 +159,13 @@ class AppVariable
         try {
             $session = $this->getSession();
             if (null === $session) {
-                return array();
+                return [];
             }
         } catch (\RuntimeException $e) {
-            return array();
+            return [];
         }
 
-        if (null === $types || '' === $types || array() === $types) {
+        if (null === $types || '' === $types || [] === $types) {
             return $session->getFlashBag()->all();
         }
 
@@ -173,7 +173,7 @@ class AppVariable
             return $session->getFlashBag()->get($types);
         }
 
-        $result = array();
+        $result = [];
         foreach ($types as $type) {
             $result[$type] = $session->getFlashBag()->get($type);
         }

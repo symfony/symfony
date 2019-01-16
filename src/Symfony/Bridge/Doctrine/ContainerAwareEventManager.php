@@ -27,8 +27,8 @@ class ContainerAwareEventManager extends EventManager
      *
      * <event> => <listeners>
      */
-    private $listeners = array();
-    private $initialized = array();
+    private $listeners = [];
+    private $initialized = [];
     private $container;
 
     public function __construct(ContainerInterface $container)

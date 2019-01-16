@@ -45,7 +45,7 @@ class CacheClearCommandTest extends TestCase
 
     public function testCacheIsFreshAfterCacheClearedWithWarmup()
     {
-        $input = new ArrayInput(array('cache:clear'));
+        $input = new ArrayInput(['cache:clear']);
         $application = new Application($this->kernel);
         $application->setCatchExceptions(false);
 

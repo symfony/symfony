@@ -22,7 +22,7 @@ class EnumNode extends ScalarNode
 {
     private $values;
 
-    public function __construct($name, NodeInterface $parent = null, array $values = array())
+    public function __construct($name, NodeInterface $parent = null, array $values = [])
     {
         $values = array_unique($values);
         if (empty($values)) {

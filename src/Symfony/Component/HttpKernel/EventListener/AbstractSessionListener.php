@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
-    private $sessionUsageStack = array();
+    private $sessionUsageStack = [];
 
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -74,12 +74,12 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 128),
+        return [
+            KernelEvents::REQUEST => ['onKernelRequest', 128],
             // low priority to come after regular response listeners, same as SaveSessionListener
-            KernelEvents::RESPONSE => array('onKernelResponse', -1000),
-            KernelEvents::FINISH_REQUEST => array('onFinishRequest'),
-        );
+            KernelEvents::RESPONSE => ['onKernelResponse', -1000],
+            KernelEvents::FINISH_REQUEST => ['onFinishRequest'],
+        ];
     }
 
     /**

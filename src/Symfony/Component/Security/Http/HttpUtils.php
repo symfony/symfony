@@ -76,7 +76,7 @@ class HttpUtils
      */
     public function createRequest(Request $request, $path)
     {
-        $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
+        $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
         if ($request->hasSession()) {
             $newRequest->setSession($request->getSession());
         }

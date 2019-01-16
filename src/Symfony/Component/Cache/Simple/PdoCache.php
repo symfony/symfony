@@ -44,7 +44,7 @@ class PdoCache extends AbstractCache implements PruneableInterface
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, $namespace = '', $defaultLifetime = 0, array $options = array())
+    public function __construct($connOrDsn, $namespace = '', $defaultLifetime = 0, array $options = [])
     {
         $this->init($connOrDsn, $namespace, $defaultLifetime, $options);
     }

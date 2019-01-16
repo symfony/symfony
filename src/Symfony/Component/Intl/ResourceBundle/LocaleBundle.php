@@ -31,7 +31,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return parent::getLocales();
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 
@@ -55,7 +55,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 }

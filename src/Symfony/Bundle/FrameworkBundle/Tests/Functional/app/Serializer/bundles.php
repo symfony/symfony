@@ -11,6 +11,6 @@
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 
-return array(
+return [
     new FrameworkBundle(),
-);
+];

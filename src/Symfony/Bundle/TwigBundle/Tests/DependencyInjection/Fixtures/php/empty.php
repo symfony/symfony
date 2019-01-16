@@ -1,3 +1,3 @@
 <?php
 
-$container->loadFromExtension('twig', array());
+$container->loadFromExtension('twig', []);

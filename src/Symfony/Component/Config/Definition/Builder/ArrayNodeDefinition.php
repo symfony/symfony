@@ -25,7 +25,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $performDeepMerging = true;
     protected $ignoreExtraKeys = false;
     protected $removeExtraKeys = true;
-    protected $children = array();
+    protected $children = [];
     protected $prototype;
     protected $atLeastOne = false;
     protected $allowNewKeys = true;
@@ -43,8 +43,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     {
         parent::__construct($name, $parent);
 
-        $this->nullEquivalent = array();
-        $this->trueEquivalent = array();
+        $this->nullEquivalent = [];
+        $this->trueEquivalent = [];
     }
 
     /**
@@ -275,9 +275,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     {
         $this
             ->addDefaultsIfNotSet()
-            ->treatFalseLike(array('enabled' => false))
-            ->treatTrueLike(array('enabled' => true))
-            ->treatNullLike(array('enabled' => true))
+            ->treatFalseLike(['enabled' => false])
+            ->treatTrueLike(['enabled' => true])
+            ->treatNullLike(['enabled' => true])
             ->beforeNormalization()
                 ->ifArray()
                 ->then(function ($v) {
@@ -305,9 +305,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     {
         $this
             ->addDefaultsIfNotSet()
-            ->treatFalseLike(array('enabled' => false))
-            ->treatTrueLike(array('enabled' => true))
-            ->treatNullLike(array('enabled' => true))
+            ->treatFalseLike(['enabled' => false])
+            ->treatTrueLike(['enabled' => true])
+            ->treatNullLike(['enabled' => true])
             ->children()
                 ->booleanNode('enabled')
                     ->defaultTrue()

@@ -18,9 +18,9 @@ use Symfony\Component\Form\FormTypeInterface;
 
 class TestExtension implements FormExtensionInterface
 {
-    private $types = array();
+    private $types = [];
 
-    private $extensions = array();
+    private $extensions = [];
 
     private $guesser;
 
@@ -49,7 +49,7 @@ class TestExtension implements FormExtensionInterface
         $type = $extension->getExtendedType();
 
         if (!isset($this->extensions[$type])) {
-            $this->extensions[$type] = array();
+            $this->extensions[$type] = [];
         }
 
         $this->extensions[$type][] = $extension;
@@ -57,7 +57,7 @@ class TestExtension implements FormExtensionInterface
 
     public function getTypeExtensions($name)
     {
-        return isset($this->extensions[$name]) ? $this->extensions[$name] : array();
+        return isset($this->extensions[$name]) ? $this->extensions[$name] : [];
     }
 
     public function hasTypeExtensions($name)

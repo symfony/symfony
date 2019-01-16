@@ -45,7 +45,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = array());
+    public function renderBlock(FormView $view, $blockName, array $variables = []);
 
     /**
      * Searches and renders a block for a given name suffix.
@@ -63,7 +63,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array());
+    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = []);
 
     /**
      * Renders a CSRF token.

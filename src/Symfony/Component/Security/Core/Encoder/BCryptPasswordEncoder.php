@@ -65,7 +65,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
             throw new BadCredentialsException('Invalid password.');
         }
 
-        $options = array('cost' => $this->cost);
+        $options = ['cost' => $this->cost];
 
         if ($salt) {
             // Ignore $salt, the auto-generated one is always the best

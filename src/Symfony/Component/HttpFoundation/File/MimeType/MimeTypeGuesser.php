@@ -51,7 +51,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @var array
      */
-    protected $guessers = array();
+    protected $guessers = [];
 
     /**
      * Returns the singleton instance.

@@ -62,12 +62,12 @@ trait MicroKernelTrait
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(function (ContainerBuilder $container) use ($loader) {
-            $container->loadFromExtension('framework', array(
-                'router' => array(
+            $container->loadFromExtension('framework', [
+                'router' => [
                     'resource' => 'kernel:loadRoutes',
                     'type' => 'service',
-                ),
-            ));
+                ],
+            ]);
 
             if ($this instanceof EventSubscriberInterface) {
                 $container->register('kernel', static::class)

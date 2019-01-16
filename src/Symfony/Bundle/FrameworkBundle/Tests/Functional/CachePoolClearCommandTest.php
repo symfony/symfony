@@ -22,13 +22,13 @@ class CachePoolClearCommandTest extends WebTestCase
 {
     protected function setUp()
     {
-        static::bootKernel(array('test_case' => 'CachePoolClear', 'root_config' => 'config.yml'));
+        static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }
 
     public function testClearPrivatePool()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('pools' => array('cache.private_pool')), array('decorated' => false));
+        $tester->execute(['pools' => ['cache.private_pool']], ['decorated' => false]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
         $this->assertContains('Clearing cache pool: cache.private_pool', $tester->getDisplay());
@@ -38,7 +38,7 @@ class CachePoolClearCommandTest extends WebTestCase
     public function testClearPublicPool()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('pools' => array('cache.public_pool')), array('decorated' => false));
+        $tester->execute(['pools' => ['cache.public_pool']], ['decorated' => false]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
         $this->assertContains('Clearing cache pool: cache.public_pool', $tester->getDisplay());
@@ -48,7 +48,7 @@ class CachePoolClearCommandTest extends WebTestCase
     public function testClearPoolWithCustomClearer()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('pools' => array('cache.pool_with_clearer')), array('decorated' => false));
+        $tester->execute(['pools' => ['cache.pool_with_clearer']], ['decorated' => false]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
         $this->assertContains('Clearing cache pool: cache.pool_with_clearer', $tester->getDisplay());
@@ -58,7 +58,7 @@ class CachePoolClearCommandTest extends WebTestCase
     public function testCallClearer()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('pools' => array('cache.app_clearer')), array('decorated' => false));
+        $tester->execute(['pools' => ['cache.app_clearer']], ['decorated' => false]);
 
         $this->assertSame(0, $tester->getStatusCode(), 'cache:pool:clear exits with 0 in case of success');
         $this->assertContains('Calling cache clearer: cache.app_clearer', $tester->getDisplay());
@@ -72,7 +72,7 @@ class CachePoolClearCommandTest extends WebTestCase
     public function testClearUnexistingPool()
     {
         $this->createCommandTester()
-            ->execute(array('pools' => array('unknown_pool')), array('decorated' => false));
+            ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);
     }
 
     /**
@@ -86,7 +86,7 @@ class CachePoolClearCommandTest extends WebTestCase
 
         $tester = new CommandTester($application->find('cache:pool:clear'));
 
-        $tester->execute(array('pools' => array()));
+        $tester->execute(['pools' => []]);
 
         $this->assertContains('Cache was successfully cleared', $tester->getDisplay());
     }

@@ -24,9 +24,9 @@ class ServiceUnavailableHttpException extends HttpException
      */
     public function __construct($retryAfter = null, $message = null, \Exception $previous = null, $code = 0)
     {
-        $headers = array();
+        $headers = [];
         if ($retryAfter) {
-            $headers = array('Retry-After' => $retryAfter);
+            $headers = ['Retry-After' => $retryAfter];
         }
 
         parent::__construct(503, $message, $previous, $headers, $code);

@@ -58,16 +58,16 @@ class CrossCheckTest extends TestCase
 
         $r = new \ReflectionProperty(ContainerBuilder::class, 'normalizedIds');
         $r->setAccessible(true);
-        $r->setValue($container2, array());
-        $r->setValue($container1, array());
+        $r->setValue($container2, []);
+        $r->setValue($container1, []);
 
         $this->assertEquals(serialize($container2), serialize($container1), 'loading a dump from a previously loaded container returns the same container');
 
-        $services1 = array();
+        $services1 = [];
         foreach ($container1 as $id => $service) {
             $services1[$id] = serialize($service);
         }
-        $services2 = array();
+        $services2 = [];
         foreach ($container2 as $id => $service) {
             $services2[$id] = serialize($service);
         }
@@ -79,17 +79,17 @@ class CrossCheckTest extends TestCase
 
     public function crossCheckLoadersDumpers()
     {
-        return array(
-            array('services1.xml', 'xml'),
-            array('services2.xml', 'xml'),
-            array('services6.xml', 'xml'),
-            array('services8.xml', 'xml'),
-            array('services9.xml', 'xml'),
-            array('services1.yml', 'yaml'),
-            array('services2.yml', 'yaml'),
-            array('services6.yml', 'yaml'),
-            array('services8.yml', 'yaml'),
-            array('services9.yml', 'yaml'),
-        );
+        return [
+            ['services1.xml', 'xml'],
+            ['services2.xml', 'xml'],
+            ['services6.xml', 'xml'],
+            ['services8.xml', 'xml'],
+            ['services9.xml', 'xml'],
+            ['services1.yml', 'yaml'],
+            ['services2.yml', 'yaml'],
+            ['services6.yml', 'yaml'],
+            ['services8.yml', 'yaml'],
+            ['services9.yml', 'yaml'],
+        ];
     }
 }

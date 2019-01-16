@@ -31,9 +31,9 @@ class TransformationFailureListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            FormEvents::POST_SUBMIT => array('convertTransformationFailureToFormError', -1024),
-        );
+        return [
+            FormEvents::POST_SUBMIT => ['convertTransformationFailureToFormError', -1024],
+        ];
     }
 
     public function convertTransformationFailureToFormError(FormEvent $event)
@@ -54,11 +54,11 @@ class TransformationFailureListener implements EventSubscriberInterface
         $messageTemplate = 'The value {{ value }} is not valid.';
 
         if (null !== $this->translator) {
-            $message = $this->translator->trans($messageTemplate, array('{{ value }}' => $clientDataAsString));
+            $message = $this->translator->trans($messageTemplate, ['{{ value }}' => $clientDataAsString]);
         } else {
-            $message = strtr($messageTemplate, array('{{ value }}' => $clientDataAsString));
+            $message = strtr($messageTemplate, ['{{ value }}' => $clientDataAsString]);
         }
 
-        $form->addError(new FormError($message, $messageTemplate, array('{{ value }}' => $clientDataAsString), null, $form->getTransformationFailure()));
+        $form->addError(new FormError($message, $messageTemplate, ['{{ value }}' => $clientDataAsString], null, $form->getTransformationFailure()));
     }
 }

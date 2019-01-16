@@ -60,6 +60,6 @@ class DayOfWeekTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array();
+        return [];
     }
 }

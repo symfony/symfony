@@ -28,12 +28,12 @@ class Definition
     private $shared = true;
     private $deprecated = false;
     private $deprecationTemplate;
-    private $properties = array();
-    private $calls = array();
-    private $instanceof = array();
+    private $properties = [];
+    private $calls = [];
+    private $instanceof = [];
     private $autoconfigured = false;
     private $configurator;
-    private $tags = array();
+    private $tags = [];
     private $public = true;
     private $private = true;
     private $synthetic = false;
@@ -41,12 +41,12 @@ class Definition
     private $lazy = false;
     private $decoratedService;
     private $autowired = false;
-    private $autowiringTypes = array();
-    private $changes = array();
-    private $bindings = array();
-    private $errors = array();
+    private $autowiringTypes = [];
+    private $changes = [];
+    private $bindings = [];
+    private $errors = [];
 
-    protected $arguments = array();
+    protected $arguments = [];
 
     private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
@@ -54,7 +54,7 @@ class Definition
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
      */
-    public function __construct($class = null, array $arguments = array())
+    public function __construct($class = null, array $arguments = [])
     {
         if (null !== $class) {
             $this->setClass($class);
@@ -138,7 +138,7 @@ class Definition
         if (null === $id) {
             $this->decoratedService = null;
         } else {
-            $this->decoratedService = array($id, $renamedId, (int) $priority);
+            $this->decoratedService = [$id, $renamedId, (int) $priority];
         }
 
         return $this;
@@ -320,9 +320,9 @@ class Definition
      *
      * @return $this
      */
-    public function setMethodCalls(array $calls = array())
+    public function setMethodCalls(array $calls = [])
     {
-        $this->calls = array();
+        $this->calls = [];
         foreach ($calls as $call) {
             $this->addMethodCall($call[0], $call[1]);
         }
@@ -340,12 +340,12 @@ class Definition
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall($method, array $arguments = array())
+    public function addMethodCall($method, array $arguments = [])
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');
         }
-        $this->calls[] = array($method, $arguments);
+        $this->calls[] = [$method, $arguments];
 
         return $this;
     }
@@ -476,7 +476,7 @@ class Definition
      */
     public function getTag($name)
     {
-        return isset($this->tags[$name]) ? $this->tags[$name] : array();
+        return isset($this->tags[$name]) ? $this->tags[$name] : [];
     }
 
     /**
@@ -487,7 +487,7 @@ class Definition
      *
      * @return $this
      */
-    public function addTag($name, array $attributes = array())
+    public function addTag($name, array $attributes = [])
     {
         $this->tags[$name][] = $attributes;
 
@@ -527,7 +527,7 @@ class Definition
      */
     public function clearTags()
     {
-        $this->tags = array();
+        $this->tags = [];
 
         return $this;
     }
@@ -816,7 +816,7 @@ class Definition
     {
         @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
 
-        $this->autowiringTypes = array();
+        $this->autowiringTypes = [];
 
         foreach ($types as $type) {
             $this->autowiringTypes[$type] = true;

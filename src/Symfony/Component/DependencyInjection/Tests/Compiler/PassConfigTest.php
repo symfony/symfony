@@ -23,7 +23,7 @@ class PassConfigTest extends TestCase
     public function testPassOrdering()
     {
         $config = new PassConfig();
-        $config->setBeforeOptimizationPasses(array());
+        $config->setBeforeOptimizationPasses([]);
 
         $pass1 = $this->getMockBuilder(CompilerPassInterface::class)->getMock();
         $config->addPass($pass1, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);

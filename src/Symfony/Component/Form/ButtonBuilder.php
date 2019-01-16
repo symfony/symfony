@@ -45,7 +45,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * @var array
      */
-    private $attributes = array();
+    private $attributes = [];
 
     /**
      * @var array
@@ -60,7 +60,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws InvalidArgumentException if the name is empty
      */
-    public function __construct($name, array $options = array())
+    public function __construct($name, array $options = [])
     {
         $name = (string) $name;
         if ('' === $name) {
@@ -82,7 +82,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -98,7 +98,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @throws BadMethodCallException
      */
-    public function create($name, $type = null, array $options = array())
+    public function create($name, $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -150,7 +150,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function all()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -588,7 +588,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getViewTransformers()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -598,7 +598,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getModelTransformers()
     {
-        return array();
+        return [];
     }
 
     /**

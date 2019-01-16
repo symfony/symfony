@@ -13,12 +13,12 @@ class DefinitionBuilderTest extends TestCase
      */
     public function testAddPlaceInvalidName()
     {
-        $builder = new DefinitionBuilder(array('a"', 'b'));
+        $builder = new DefinitionBuilder(['a"', 'b']);
     }
 
     public function testSetInitialPlace()
     {
-        $builder = new DefinitionBuilder(array('a', 'b'));
+        $builder = new DefinitionBuilder(['a', 'b']);
         $builder->setInitialPlace('b');
         $definition = $builder->build();
 
@@ -31,7 +31,7 @@ class DefinitionBuilderTest extends TestCase
 
         $transition0 = new Transition('name0', $places[0], $places[1]);
         $transition1 = new Transition('name1', $places[0], $places[1]);
-        $builder = new DefinitionBuilder($places, array($transition0));
+        $builder = new DefinitionBuilder($places, [$transition0]);
         $builder->addTransition($transition1);
 
         $definition = $builder->build();
@@ -43,7 +43,7 @@ class DefinitionBuilderTest extends TestCase
 
     public function testAddPlace()
     {
-        $builder = new DefinitionBuilder(array('a'), array());
+        $builder = new DefinitionBuilder(['a'], []);
         $builder->addPlace('b');
 
         $definition = $builder->build();

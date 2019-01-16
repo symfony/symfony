@@ -23,41 +23,41 @@ class TraceableUrlMatcherTest extends TestCase
     public function test()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('POST')));
-        $coll->add('bar', new Route('/bar/{id}', array(), array('id' => '\d+')));
-        $coll->add('bar1', new Route('/bar/{name}', array(), array('id' => '\w+'), array(), '', array(), array('POST')));
-        $coll->add('bar2', new Route('/foo', array(), array(), array(), 'baz'));
-        $coll->add('bar3', new Route('/foo1', array(), array(), array(), 'baz'));
-        $coll->add('bar4', new Route('/foo2', array(), array(), array(), 'baz', array(), array(), 'context.getMethod() == "GET"'));
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], ['POST']));
+        $coll->add('bar', new Route('/bar/{id}', [], ['id' => '\d+']));
+        $coll->add('bar1', new Route('/bar/{name}', [], ['id' => '\w+'], [], '', [], ['POST']));
+        $coll->add('bar2', new Route('/foo', [], [], [], 'baz'));
+        $coll->add('bar3', new Route('/foo1', [], [], [], 'baz'));
+        $coll->add('bar4', new Route('/foo2', [], [], [], 'baz', [], [], 'context.getMethod() == "GET"'));
 
         $context = new RequestContext();
         $context->setHost('baz');
 
         $matcher = new TraceableUrlMatcher($coll, $context);
         $traces = $matcher->getTraces('/babar');
-        $this->assertSame(array(0, 0, 0, 0, 0, 0), $this->getLevels($traces));
+        $this->assertSame([0, 0, 0, 0, 0, 0], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/foo');
-        $this->assertSame(array(1, 0, 0, 2), $this->getLevels($traces));
+        $this->assertSame([1, 0, 0, 2], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/bar/12');
-        $this->assertSame(array(0, 2), $this->getLevels($traces));
+        $this->assertSame([0, 2], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/bar/dd');
-        $this->assertSame(array(0, 1, 1, 0, 0, 0), $this->getLevels($traces));
+        $this->assertSame([0, 1, 1, 0, 0, 0], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/foo1');
-        $this->assertSame(array(0, 0, 0, 0, 2), $this->getLevels($traces));
+        $this->assertSame([0, 0, 0, 0, 2], $this->getLevels($traces));
 
         $context->setMethod('POST');
         $traces = $matcher->getTraces('/foo');
-        $this->assertSame(array(2), $this->getLevels($traces));
+        $this->assertSame([2], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/bar/dd');
-        $this->assertSame(array(0, 1, 2), $this->getLevels($traces));
+        $this->assertSame([0, 1, 2], $this->getLevels($traces));
 
         $traces = $matcher->getTraces('/foo2');
-        $this->assertSame(array(0, 0, 0, 0, 0, 1), $this->getLevels($traces));
+        $this->assertSame([0, 0, 0, 0, 0, 1], $this->getLevels($traces));
     }
 
     public function testMatchRouteOnMultipleHosts()
@@ -65,17 +65,17 @@ class TraceableUrlMatcherTest extends TestCase
         $routes = new RouteCollection();
         $routes->add('first', new Route(
             '/mypath/',
-            array('_controller' => 'MainBundle:Info:first'),
-            array(),
-            array(),
+            ['_controller' => 'MainBundle:Info:first'],
+            [],
+            [],
             'some.example.com'
         ));
 
         $routes->add('second', new Route(
             '/mypath/',
-            array('_controller' => 'MainBundle:Info:second'),
-            array(),
-            array(),
+            ['_controller' => 'MainBundle:Info:second'],
+            [],
+            [],
             'another.example.com'
         ));
 
@@ -86,14 +86,14 @@ class TraceableUrlMatcherTest extends TestCase
 
         $traces = $matcher->getTraces('/mypath/');
         $this->assertSame(
-            array(TraceableUrlMatcher::ROUTE_ALMOST_MATCHES, TraceableUrlMatcher::ROUTE_ALMOST_MATCHES),
+            [TraceableUrlMatcher::ROUTE_ALMOST_MATCHES, TraceableUrlMatcher::ROUTE_ALMOST_MATCHES],
             $this->getLevels($traces)
         );
     }
 
     public function getLevels($traces)
     {
-        $levels = array();
+        $levels = [];
         foreach ($traces as $trace) {
             $levels[] = $trace['level'];
         }
@@ -104,7 +104,7 @@ class TraceableUrlMatcherTest extends TestCase
     public function testRoutesWithConditions()
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('/foo', array(), array(), array(), 'baz', array(), array(), "request.headers.get('User-Agent') matches '/firefox/i'"));
+        $routes->add('foo', new Route('/foo', [], [], [], 'baz', [], [], "request.headers.get('User-Agent') matches '/firefox/i'"));
 
         $context = new RequestContext();
         $context->setHost('baz');
@@ -115,7 +115,7 @@ class TraceableUrlMatcherTest extends TestCase
         $traces = $matcher->getTracesForRequest($notMatchingRequest);
         $this->assertEquals("Condition \"request.headers.get('User-Agent') matches '/firefox/i'\" does not evaluate to \"true\"", $traces[0]['log']);
 
-        $matchingRequest = Request::create('/foo', 'GET', array(), array(), array(), array('HTTP_USER_AGENT' => 'Firefox'));
+        $matchingRequest = Request::create('/foo', 'GET', [], [], [], ['HTTP_USER_AGENT' => 'Firefox']);
         $traces = $matcher->getTracesForRequest($matchingRequest);
         $this->assertEquals('Route matches!', $traces[0]['log']);
     }

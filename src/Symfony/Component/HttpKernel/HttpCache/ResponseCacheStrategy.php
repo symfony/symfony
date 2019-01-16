@@ -30,8 +30,8 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
 {
     private $cacheable = true;
     private $embeddedResponses = 0;
-    private $ttls = array();
-    private $maxAges = array();
+    private $ttls = [];
+    private $maxAges = [];
     private $isNotCacheableResponseEmbedded = false;
 
     /**

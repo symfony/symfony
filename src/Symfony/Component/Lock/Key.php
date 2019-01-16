@@ -20,7 +20,7 @@ final class Key
 {
     private $resource;
     private $expiringTime;
-    private $state = array();
+    private $state = [];
 
     /**
      * @param string $resource

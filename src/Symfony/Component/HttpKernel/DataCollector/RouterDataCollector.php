@@ -54,11 +54,11 @@ class RouterDataCollector extends DataCollector
     {
         $this->controllers = new \SplObjectStorage();
 
-        $this->data = array(
+        $this->data = [
             'redirect' => false,
             'url' => null,
             'route' => null,
-        );
+        ];
     }
 
     protected function guessRoute(Request $request, $controller)

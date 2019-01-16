@@ -11,9 +11,9 @@ trait WorkflowBuilderTrait
     {
         $places = range('a', 'g');
 
-        $transitions = array();
-        $transitions[] = new Transition('t1', 'a', array('b', 'c'));
-        $transitions[] = new Transition('t2', array('b', 'c'), 'd');
+        $transitions = [];
+        $transitions[] = new Transition('t1', 'a', ['b', 'c']);
+        $transitions[] = new Transition('t2', ['b', 'c'], 'd');
         $transitions[] = new Transition('t3', 'd', 'e');
         $transitions[] = new Transition('t4', 'd', 'f');
         $transitions[] = new Transition('t5', 'e', 'g');
@@ -37,7 +37,7 @@ trait WorkflowBuilderTrait
     {
         $places = range('a', 'c');
 
-        $transitions = array();
+        $transitions = [];
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t2', 'b', 'c');
 
@@ -53,8 +53,8 @@ trait WorkflowBuilderTrait
     {
         $places = range('a', 'c');
 
-        $transitions = array();
-        $transitions[] = new Transition('a_to_bc', 'a', array('b', 'c'));
+        $transitions = [];
+        $transitions[] = new Transition('a_to_bc', 'a', ['b', 'c']);
         $transitions[] = new Transition('b_to_c', 'b', 'c');
         $transitions[] = new Transition('to_a', 'b', 'a');
         $transitions[] = new Transition('to_a', 'c', 'a');
@@ -79,7 +79,7 @@ trait WorkflowBuilderTrait
 
     private function createComplexStateMachineDefinition()
     {
-        $places = array('a', 'b', 'c', 'd');
+        $places = ['a', 'b', 'c', 'd'];
 
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t1', 'd', 'b');

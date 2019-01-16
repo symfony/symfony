@@ -33,7 +33,7 @@ class SubRequestHandlerTest extends TestCase
 
     public function testTrustedHeadersAreKept()
     {
-        Request::setTrustedProxies(array('10.0.0.1'), -1);
+        Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
 
         $request = Request::create('/');
@@ -82,7 +82,7 @@ class SubRequestHandlerTest extends TestCase
 
     public function testTrustedForwardedHeader()
     {
-        Request::setTrustedProxies(array('10.0.0.1'), -1);
+        Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
 
         $request = Request::create('/');
@@ -104,7 +104,7 @@ class SubRequestHandlerTest extends TestCase
 
     public function testTrustedXForwardedForHeader()
     {
-        Request::setTrustedProxies(array('10.0.0.1'), -1);
+        Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
 
         $request = Request::create('/');
@@ -127,10 +127,10 @@ class SubRequestHandlerTest extends TestCase
 
     private function getGlobalState()
     {
-        return array(
+        return [
             Request::getTrustedProxies(),
             Request::getTrustedHeaderSet(),
-        );
+        ];
     }
 }
 

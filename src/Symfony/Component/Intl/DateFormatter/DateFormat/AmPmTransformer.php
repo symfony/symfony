@@ -41,8 +41,8 @@ class AmPmTransformer extends Transformer
      */
     public function extractDateOptions($matched, $length)
     {
-        return array(
+        return [
             'marker' => $matched,
-        );
+        ];
     }
 }

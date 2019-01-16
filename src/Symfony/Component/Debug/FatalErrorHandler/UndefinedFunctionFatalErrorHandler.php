@@ -53,7 +53,7 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
             $message = sprintf('Attempted to call function "%s" from the global namespace.', $functionName);
         }
 
-        $candidates = array();
+        $candidates = [];
         foreach (get_defined_functions() as $type => $definedFunctionNames) {
             foreach ($definedFunctionNames as $definedFunctionName) {
                 if (false !== $namespaceSeparatorIndex = strrpos($definedFunctionName, '\\')) {

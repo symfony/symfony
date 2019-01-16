@@ -178,8 +178,8 @@ $jsonDir = $baseDir;
 //$phpDir = $baseDir.'/'.Intl::PHP;
 //$resDir = $baseDir.'/'.Intl::RB_V2;
 
-$targetDirs = array($jsonDir/*, $resDir*/);
-$workingDirs = array($jsonDir/*, $txtDir, $resDir*/);
+$targetDirs = [$jsonDir/*, $resDir*/];
+$workingDirs = [$jsonDir/*, $txtDir, $resDir*/];
 
 //$config->addBundleWriter($txtDir, new TextBundleWriter());
 $config->addBundleWriter($jsonDir, new JsonBundleWriter());
@@ -189,13 +189,13 @@ echo "Starting resource bundle compilation. This may take a while...\n";
 $filesystem->remove($workingDirs);
 
 foreach ($workingDirs as $targetDir) {
-    $filesystem->mkdir(array(
+    $filesystem->mkdir([
         $targetDir.'/'.Intl::CURRENCY_DIR,
         $targetDir.'/'.Intl::LANGUAGE_DIR,
         $targetDir.'/'.Intl::LOCALE_DIR,
         $targetDir.'/'.Intl::REGION_DIR,
         $targetDir.'/'.Intl::SCRIPT_DIR,
-    ));
+    ]);
 }
 
 // We don't want to use fallback to English during generation

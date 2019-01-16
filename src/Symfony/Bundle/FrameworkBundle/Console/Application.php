@@ -31,7 +31,7 @@ class Application extends BaseApplication
 {
     private $kernel;
     private $commandsRegistered = false;
-    private $registrationErrors = array();
+    private $registrationErrors = [];
 
     public function __construct(KernelInterface $kernel)
     {
@@ -166,7 +166,7 @@ class Application extends BaseApplication
         }
 
         if ($container->hasParameter('console.command.ids')) {
-            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : array();
+            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : [];
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {
@@ -193,6 +193,6 @@ class Application extends BaseApplication
             $this->doRenderException($error, $output);
         }
 
-        $this->registrationErrors = array();
+        $this->registrationErrors = [];
     }
 }

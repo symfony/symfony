@@ -68,10 +68,10 @@ class FormRegistryTest extends TestCase
         $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->extension1 = new TestExtension($this->guesser1);
         $this->extension2 = new TestExtension($this->guesser2);
-        $this->registry = new FormRegistry(array(
+        $this->registry = new FormRegistry([
             $this->extension1,
             $this->extension2,
-        ), $this->resolvedTypeFactory);
+        ], $this->resolvedTypeFactory);
     }
 
     public function testGetTypeFromExtension()
@@ -123,7 +123,7 @@ class FormRegistryTest extends TestCase
         $type = new FooType();
         $ext1 = new FooTypeBarExtension();
         $ext2 = new FooTypeBazExtension();
-        $resolvedType = new ResolvedFormType($type, array($ext1, $ext2));
+        $resolvedType = new ResolvedFormType($type, [$ext1, $ext2]);
 
         $this->extension2->addType($type);
         $this->extension1->addTypeExtension($ext1);
@@ -131,7 +131,7 @@ class FormRegistryTest extends TestCase
 
         $this->resolvedTypeFactory->expects($this->once())
             ->method('createResolvedType')
-            ->with($type, array($ext1, $ext2))
+            ->with($type, [$ext1, $ext2])
             ->willReturn($resolvedType);
 
         $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
@@ -154,7 +154,7 @@ class FormRegistryTest extends TestCase
 
         $this->resolvedTypeFactory->expects($this->at(1))
             ->method('createResolvedType')
-            ->with($type, array(), $parentResolvedType)
+            ->with($type, [], $parentResolvedType)
             ->willReturn($resolvedType);
 
         $this->assertSame($resolvedType, $this->registry->getType(\get_class($type)));
@@ -230,12 +230,12 @@ class FormRegistryTest extends TestCase
 
     public function testGetTypeGuesser()
     {
-        $expectedGuesser = new FormTypeGuesserChain(array($this->guesser1, $this->guesser2));
+        $expectedGuesser = new FormTypeGuesserChain([$this->guesser1, $this->guesser2]);
 
         $this->assertEquals($expectedGuesser, $this->registry->getTypeGuesser());
 
         $registry = new FormRegistry(
-            array($this->getMockBuilder('Symfony\Component\Form\FormExtensionInterface')->getMock()),
+            [$this->getMockBuilder('Symfony\Component\Form\FormExtensionInterface')->getMock()],
             $this->resolvedTypeFactory
         );
 
@@ -244,7 +244,7 @@ class FormRegistryTest extends TestCase
 
     public function testGetExtensions()
     {
-        $expectedExtensions = array($this->extension1, $this->extension2);
+        $expectedExtensions = [$this->extension1, $this->extension2];
 
         $this->assertEquals($expectedExtensions, $this->registry->getExtensions());
     }

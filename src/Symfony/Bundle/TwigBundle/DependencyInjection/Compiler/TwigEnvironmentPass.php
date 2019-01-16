@@ -35,10 +35,10 @@ class TwigEnvironmentPass implements CompilerPassInterface
         // afterward. If not, the globals from the extensions will never
         // be registered.
         $currentMethodCalls = $definition->getMethodCalls();
-        $twigBridgeExtensionsMethodCalls = array();
-        $othersExtensionsMethodCalls = array();
+        $twigBridgeExtensionsMethodCalls = [];
+        $othersExtensionsMethodCalls = [];
         foreach ($container->findTaggedServiceIds('twig.extension', true) as $id => $attributes) {
-            $methodCall = array('addExtension', array(new Reference($id)));
+            $methodCall = ['addExtension', [new Reference($id)]];
             $extensionClass = $container->getDefinition($id)->getClass();
 
             if (\is_string($extensionClass) && 0 === strpos($extensionClass, 'Symfony\Bridge\Twig\Extension')) {

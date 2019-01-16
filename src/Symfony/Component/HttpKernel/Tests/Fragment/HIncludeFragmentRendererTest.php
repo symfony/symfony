@@ -25,14 +25,14 @@ class HIncludeFragmentRendererTest extends TestCase
     public function testRenderExceptionWhenControllerAndNoSigner()
     {
         $strategy = new HIncludeFragmentRenderer();
-        $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'));
+        $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }
 
     public function testRenderWithControllerAndSigner()
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
-        $this->assertEquals('<hx:include src="/_fragment?_hash=BP%2BOzCD5MRUI%2BHJpgPDOmoju00FnzLhP3TGcSHbbBLs%3D&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+        $this->assertEquals('<hx:include src="/_fragment?_hash=BP%2BOzCD5MRUI%2BHJpgPDOmoju00FnzLhP3TGcSHbbBLs%3D&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()
@@ -48,30 +48,30 @@ class HIncludeFragmentRendererTest extends TestCase
     {
         // only default
         $strategy = new HIncludeFragmentRenderer();
-        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default'))->getContent());
+        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
 
         // only global default
         $strategy = new HIncludeFragmentRenderer(null, null, 'global_default');
-        $this->assertEquals('<hx:include src="/foo">global_default</hx:include>', $strategy->render('/foo', Request::create('/'), array())->getContent());
+        $this->assertEquals('<hx:include src="/foo">global_default</hx:include>', $strategy->render('/foo', Request::create('/'), [])->getContent());
 
         // global default and default
         $strategy = new HIncludeFragmentRenderer(null, null, 'global_default');
-        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default'))->getContent());
+        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
     }
 
     public function testRenderWithAttributesOptions()
     {
         // with id
         $strategy = new HIncludeFragmentRenderer();
-        $this->assertEquals('<hx:include src="/foo" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default', 'id' => 'bar'))->getContent());
+        $this->assertEquals('<hx:include src="/foo" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default', 'id' => 'bar'])->getContent());
 
         // with attributes
         $strategy = new HIncludeFragmentRenderer();
-        $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default', 'attributes' => array('p1' => 'v1', 'p2' => 'v2')))->getContent());
+        $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default', 'attributes' => ['p1' => 'v1', 'p2' => 'v2']])->getContent());
 
         // with id & attributes
         $strategy = new HIncludeFragmentRenderer();
-        $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default', 'id' => 'bar', 'attributes' => array('p1' => 'v1', 'p2' => 'v2')))->getContent());
+        $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default', 'id' => 'bar', 'attributes' => ['p1' => 'v1', 'p2' => 'v2']])->getContent());
     }
 
     public function testRenderWithDefaultText()
@@ -84,7 +84,7 @@ class HIncludeFragmentRendererTest extends TestCase
 
         // only default
         $strategy = new HIncludeFragmentRenderer($engine);
-        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default'))->getContent());
+        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
     }
 
     public function testRenderWithEngineAndDefaultText()
@@ -97,6 +97,6 @@ class HIncludeFragmentRendererTest extends TestCase
 
         // only default
         $strategy = new HIncludeFragmentRenderer($engine);
-        $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'loading...'))->getContent());
+        $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
     }
 }

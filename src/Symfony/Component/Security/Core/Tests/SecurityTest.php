@@ -60,12 +60,12 @@ class SecurityTest extends TestCase
 
     public function getUserTests()
     {
-        yield array(null, null);
+        yield [null, null];
 
-        yield array('string_username', null);
+        yield ['string_username', null];
 
         $user = new User('nice_user', 'foo');
-        yield array($user, $user);
+        yield [$user, $user];
     }
 
     public function testIsGranted()

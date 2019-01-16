@@ -100,13 +100,13 @@ class ControllerNameParserTest extends TestCase
     public function getMissingControllersTest()
     {
         // a normal bundle
-        $bundles = array(
-            array('FooBundle:Fake:index'),
-        );
+        $bundles = [
+            ['FooBundle:Fake:index'],
+        ];
 
         // a bundle with children
         if (Kernel::VERSION_ID < 40000) {
-            $bundles[] = array('SensioFooBundle:Fake:index');
+            $bundles[] = ['SensioFooBundle:Fake:index'];
         }
 
         return $bundles;
@@ -136,21 +136,21 @@ class ControllerNameParserTest extends TestCase
 
     public function getInvalidBundleNameTests()
     {
-        return array(
-            'Alternative will be found using levenshtein' => array('FoodBundle:Default:index', 'FooBundle:Default:index'),
-            'Alternative will be found using partial match' => array('FabpotFooBund:Default:index', 'FabpotFooBundle:Default:index'),
-            'Bundle does not exist at all' => array('CrazyBundle:Default:index', false),
-        );
+        return [
+            'Alternative will be found using levenshtein' => ['FoodBundle:Default:index', 'FooBundle:Default:index'],
+            'Alternative will be found using partial match' => ['FabpotFooBund:Default:index', 'FabpotFooBundle:Default:index'],
+            'Bundle does not exist at all' => ['CrazyBundle:Default:index', false],
+        ];
     }
 
     private function createParser()
     {
-        $bundles = array(
-            'SensioFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
-            'SensioCmsFooBundle' => array($this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle')),
-            'FooBundle' => array($this->getBundle('TestBundle\FooBundle', 'FooBundle')),
-            'FabpotFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
-        );
+        $bundles = [
+            'SensioFooBundle' => [$this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')],
+            'SensioCmsFooBundle' => [$this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle')],
+            'FooBundle' => [$this->getBundle('TestBundle\FooBundle', 'FooBundle')],
+            'FabpotFooBundle' => [$this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')],
+        ];
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel
@@ -165,13 +165,13 @@ class ControllerNameParserTest extends TestCase
             }))
         ;
 
-        $bundles = array(
+        $bundles = [
             'SensioFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
             'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
             'FoooooBundle' => $this->getBundle('TestBundle\FooBundle', 'FoooooBundle'),
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
             'FabpotFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
-        );
+        ];
         $kernel
             ->expects($this->any())
             ->method('getBundles')

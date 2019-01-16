@@ -55,7 +55,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private $propertyAccessor;
     private $sessionStrategy;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = [], LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
@@ -65,7 +65,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $this->failureHandler = $failureHandler;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
-        $this->options = array_merge(array('username_path' => 'username', 'password_path' => 'password'), $options);
+        $this->options = array_merge(['username_path' => 'username', 'password_path' => 'password'], $options);
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -138,7 +138,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private function onSuccess(Request $request, TokenInterface $token)
     {
         if (null !== $this->logger) {
-            $this->logger->info('User has been authenticated successfully.', array('username' => $token->getUsername()));
+            $this->logger->info('User has been authenticated successfully.', ['username' => $token->getUsername()]);
         }
 
         $this->migrateSession($request, $token);
@@ -166,7 +166,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private function onFailure(Request $request, AuthenticationException $failed)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Authentication request failed.', array('exception' => $failed));
+            $this->logger->info('Authentication request failed.', ['exception' => $failed]);
         }
 
         $token = $this->tokenStorage->getToken();
@@ -175,7 +175,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         }
 
         if (!$this->failureHandler) {
-            return new JsonResponse(array('error' => $failed->getMessageKey()), 401);
+            return new JsonResponse(['error' => $failed->getMessageKey()], 401);
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);

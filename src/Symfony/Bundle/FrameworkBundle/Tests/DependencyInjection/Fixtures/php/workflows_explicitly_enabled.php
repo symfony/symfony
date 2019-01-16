@@ -1,19 +1,19 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'workflows' => array(
+$container->loadFromExtension('framework', [
+    'workflows' => [
         'enabled' => true,
-        'foo' => array(
+        'foo' => [
             'type' => 'workflow',
-            'supports' => array('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest'),
+            'supports' => ['Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest'],
             'initial_place' => 'bar',
-            'places' => array('bar', 'baz'),
-            'transitions' => array(
-                'bar_baz' => array(
-                    'from' => array('foo'),
-                    'to' => array('bar'),
-                ),
-            ),
-        ),
-    ),
-));
+            'places' => ['bar', 'baz'],
+            'transitions' => [
+                'bar_baz' => [
+                    'from' => ['foo'],
+                    'to' => ['bar'],
+                ],
+            ],
+        ],
+    ],
+]);

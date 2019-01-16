@@ -42,14 +42,14 @@ class GraphvizDumperTest extends TestCase
 
         $container = include self::$fixturesPath.'/containers/container10.php';
         $dumper = new GraphvizDumper($container);
-        $this->assertEquals($dumper->dump(array(
-            'graph' => array('ratio' => 'normal'),
-            'node' => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
-            'edge' => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
-            'node.instance' => array('fillcolor' => 'green', 'style' => 'empty'),
-            'node.definition' => array('fillcolor' => 'grey'),
-            'node.missing' => array('fillcolor' => 'red', 'style' => 'empty'),
-        )), file_get_contents(self::$fixturesPath.'/graphviz/services10-1.dot'), '->dump() dumps services');
+        $this->assertEquals($dumper->dump([
+            'graph' => ['ratio' => 'normal'],
+            'node' => ['fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'],
+            'edge' => ['fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1],
+            'node.instance' => ['fillcolor' => 'green', 'style' => 'empty'],
+            'node.definition' => ['fillcolor' => 'grey'],
+            'node.missing' => ['fillcolor' => 'red', 'style' => 'empty'],
+        ]), file_get_contents(self::$fixturesPath.'/graphviz/services10-1.dot'), '->dump() dumps services');
     }
 
     public function testDumpWithFrozenContainer()

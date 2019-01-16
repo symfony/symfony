@@ -84,13 +84,13 @@ class FrameworkBundle extends Bundle
     {
         parent::build($container);
 
-        $hotPathEvents = array(
+        $hotPathEvents = [
             KernelEvents::REQUEST,
             KernelEvents::CONTROLLER,
             KernelEvents::CONTROLLER_ARGUMENTS,
             KernelEvents::RESPONSE,
             KernelEvents::FINISH_REQUEST,
-        );
+        ];
 
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());

@@ -37,8 +37,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @var array
      */
-    protected $sequences = array(
-        array(
+    protected $sequences = [
+        [
             '->',
             'trans',
             '(',
@@ -47,8 +47,8 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             self::METHOD_ARGUMENTS_TOKEN,
             ',',
             self::DOMAIN_TOKEN,
-        ),
-        array(
+        ],
+        [
             '->',
             'transChoice',
             '(',
@@ -59,20 +59,20 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
             self::METHOD_ARGUMENTS_TOKEN,
             ',',
             self::DOMAIN_TOKEN,
-        ),
-        array(
+        ],
+        [
             '->',
             'trans',
             '(',
             self::MESSAGE_TOKEN,
-        ),
-        array(
+        ],
+        [
             '->',
             'transChoice',
             '(',
             self::MESSAGE_TOKEN,
-        ),
-    );
+        ],
+    ];
 
     /**
      * {@inheritdoc}

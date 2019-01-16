@@ -2,20 +2,20 @@
 
 $this->load('merge_import.php', $container);
 
-$container->loadFromExtension('security', array(
-    'providers' => array(
-        'default' => array('id' => 'foo'),
-    ),
+$container->loadFromExtension('security', [
+    'providers' => [
+        'default' => ['id' => 'foo'],
+    ],
 
-    'firewalls' => array(
-        'main' => array(
+    'firewalls' => [
+        'main' => [
             'form_login' => false,
             'http_basic' => null,
             'logout_on_user_change' => true,
-        ),
-    ),
+        ],
+    ],
 
-    'role_hierarchy' => array(
-        'FOO' => array('MOO'),
-    ),
-));
+    'role_hierarchy' => [
+        'FOO' => ['MOO'],
+    ],
+]);

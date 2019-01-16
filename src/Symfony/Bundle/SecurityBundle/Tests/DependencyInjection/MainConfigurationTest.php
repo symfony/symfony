@@ -21,32 +21,32 @@ class MainConfigurationTest extends TestCase
      * The minimal, required config needed to not have any required validation
      * issues.
      */
-    protected static $minimalConfig = array(
-        'providers' => array(
-            'stub' => array(
+    protected static $minimalConfig = [
+        'providers' => [
+            'stub' => [
                 'id' => 'foo',
-            ),
-        ),
-        'firewalls' => array(
-            'stub' => array(),
+            ],
+        ],
+        'firewalls' => [
+            'stub' => [],
             'logout_on_user_change' => true,
-        ),
-    );
+        ],
+    ];
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testNoConfigForProvider()
     {
-        $config = array(
-            'providers' => array(
-                'stub' => array(),
-            ),
-        );
+        $config = [
+            'providers' => [
+                'stub' => [],
+            ],
+        ];
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processor->processConfiguration($configuration, array($config));
+        $configuration = new MainConfiguration([], []);
+        $processor->processConfiguration($configuration, [$config]);
     }
 
     /**
@@ -54,38 +54,38 @@ class MainConfigurationTest extends TestCase
      */
     public function testManyConfigForProvider()
     {
-        $config = array(
-            'providers' => array(
-                'stub' => array(
+        $config = [
+            'providers' => [
+                'stub' => [
                     'id' => 'foo',
-                    'chain' => array(),
-                ),
-            ),
-        );
+                    'chain' => [],
+                ],
+            ],
+        ];
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processor->processConfiguration($configuration, array($config));
+        $configuration = new MainConfiguration([], []);
+        $processor->processConfiguration($configuration, [$config]);
     }
 
     public function testCsrfAliases()
     {
-        $config = array(
-            'firewalls' => array(
-                'stub' => array(
-                    'logout' => array(
+        $config = [
+            'firewalls' => [
+                'stub' => [
+                    'logout' => [
                         'csrf_token_generator' => 'a_token_generator',
                         'csrf_token_id' => 'a_token_id',
-                    ),
+                    ],
                     'logout_on_user_change' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $config = array_merge(static::$minimalConfig, $config);
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processedConfig = $processor->processConfiguration($configuration, array($config));
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
         $this->assertArrayHasKey('csrf_token_generator', $processedConfig['firewalls']['stub']['logout']);
         $this->assertEquals('a_token_generator', $processedConfig['firewalls']['stub']['logout']['csrf_token_generator']);
         $this->assertArrayHasKey('csrf_token_id', $processedConfig['firewalls']['stub']['logout']);
@@ -95,27 +95,27 @@ class MainConfigurationTest extends TestCase
     public function testDefaultUserCheckers()
     {
         $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processedConfig = $processor->processConfiguration($configuration, array(static::$minimalConfig));
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [static::$minimalConfig]);
 
         $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
     public function testUserCheckers()
     {
-        $config = array(
-            'firewalls' => array(
-                'stub' => array(
+        $config = [
+            'firewalls' => [
+                'stub' => [
                     'user_checker' => 'app.henk_checker',
                     'logout_on_user_change' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
         $config = array_merge(static::$minimalConfig, $config);
 
         $processor = new Processor();
-        $configuration = new MainConfiguration(array(), array());
-        $processedConfig = $processor->processConfiguration($configuration, array($config));
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
         $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }

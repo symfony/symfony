@@ -1,29 +1,29 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'cache' => array(
-        'pools' => array(
-            'cache.foo' => array(
+$container->loadFromExtension('framework', [
+    'cache' => [
+        'pools' => [
+            'cache.foo' => [
                 'adapter' => 'cache.adapter.apcu',
                 'default_lifetime' => 30,
-            ),
-            'cache.bar' => array(
+            ],
+            'cache.bar' => [
                 'adapter' => 'cache.adapter.doctrine',
                 'default_lifetime' => 5,
                 'provider' => 'app.doctrine_cache_provider',
-            ),
-            'cache.baz' => array(
+            ],
+            'cache.baz' => [
                 'adapter' => 'cache.adapter.filesystem',
                 'default_lifetime' => 7,
-            ),
-            'cache.foobar' => array(
+            ],
+            'cache.foobar' => [
                 'adapter' => 'cache.adapter.psr6',
                 'default_lifetime' => 10,
                 'provider' => 'app.cache_pool',
-            ),
-            'cache.def' => array(
+            ],
+            'cache.def' => [
                 'default_lifetime' => 11,
-            ),
-        ),
-    ),
-));
+            ],
+        ],
+    ],
+]);

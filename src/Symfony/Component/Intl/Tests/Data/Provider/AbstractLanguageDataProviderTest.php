@@ -22,7 +22,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $languages = array(
+    protected static $languages = [
         'aa',
         'ab',
         'ace',
@@ -643,9 +643,9 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'zun',
         'zxx',
         'zza',
-    );
+    ];
 
-    protected static $alpha2ToAlpha3 = array(
+    protected static $alpha2ToAlpha3 = [
         'aa' => 'aar',
         'ab' => 'abk',
         'af' => 'afr',
@@ -826,7 +826,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'yo' => 'yor',
         'za' => 'zha',
         'zu' => 'zul',
-    );
+    ];
 
     /**
      * @var LanguageDataProvider
@@ -913,7 +913,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     public function provideLanguagesWithAlpha3Equivalent()
     {
         return array_map(
-            function ($value) { return array($value); },
+            function ($value) { return [$value]; },
             array_keys(static::$alpha2ToAlpha3)
         );
     }
@@ -929,7 +929,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     public function provideLanguagesWithoutAlpha3Equivalent()
     {
         return array_map(
-            function ($value) { return array($value); },
+            function ($value) { return [$value]; },
             array_diff(static::$languages, array_keys(static::$alpha2ToAlpha3))
         );
     }

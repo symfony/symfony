@@ -42,7 +42,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
                 throw new TransformationFailedException('Expected an array.');
             }
 
-            return array_map(array(new self(), 'transform'), $dateTimeZone);
+            return array_map([new self(), 'transform'], $dateTimeZone);
         }
 
         if (!$dateTimeZone instanceof \DateTimeZone) {
@@ -66,7 +66,7 @@ class DateTimeZoneToStringTransformer implements DataTransformerInterface
                 throw new TransformationFailedException('Expected an array.');
             }
 
-            return array_map(array(new self(), 'reverseTransform'), $value);
+            return array_map([new self(), 'reverseTransform'], $value);
         }
 
         if (!\is_string($value)) {

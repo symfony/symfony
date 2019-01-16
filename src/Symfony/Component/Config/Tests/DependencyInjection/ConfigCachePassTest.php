@@ -27,18 +27,18 @@ class ConfigCachePassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register('config_cache_factory')->addArgument(null);
-        $container->register('checker_2')->addTag('config_cache.resource_checker', array('priority' => 100));
-        $container->register('checker_1')->addTag('config_cache.resource_checker', array('priority' => 200));
+        $container->register('checker_2')->addTag('config_cache.resource_checker', ['priority' => 100]);
+        $container->register('checker_1')->addTag('config_cache.resource_checker', ['priority' => 200]);
         $container->register('checker_3')->addTag('config_cache.resource_checker');
 
         $pass = new ConfigCachePass();
         $pass->process($container);
 
-        $expected = new IteratorArgument(array(
+        $expected = new IteratorArgument([
             new Reference('checker_1'),
             new Reference('checker_2'),
             new Reference('checker_3'),
-        ));
+        ]);
         $this->assertEquals($expected, $definition->getArgument(0));
     }
 

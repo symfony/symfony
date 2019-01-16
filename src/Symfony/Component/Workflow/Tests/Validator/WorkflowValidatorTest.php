@@ -41,7 +41,7 @@ class WorkflowValidatorTest extends TestCase
     {
         $places = range('a', 'c');
 
-        $transitions = array();
+        $transitions = [];
         $transitions[] = new Transition('t0', 'c', 'b');
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t1', 'a', 'c');
@@ -55,7 +55,7 @@ class WorkflowValidatorTest extends TestCase
     {
         $places = range('a', 'd');
 
-        $transitions = array();
+        $transitions = [];
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t1', 'b', 'c');
         $transitions[] = new Transition('t1', 'd', 'c');

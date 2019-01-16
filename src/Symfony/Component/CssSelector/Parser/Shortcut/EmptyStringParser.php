@@ -38,9 +38,9 @@ class EmptyStringParser implements ParserInterface
     {
         // Matches an empty string
         if ('' == $source) {
-            return array(new SelectorNode(new ElementNode(null, '*')));
+            return [new SelectorNode(new ElementNode(null, '*'))];
         }
 
-        return array();
+        return [];
     }
 }

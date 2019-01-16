@@ -39,13 +39,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @var array
      */
-    private static $allowedMethods = array(
+    private static $allowedMethods = [
         'GET',
         'PUT',
         'POST',
         'DELETE',
         'PATCH',
-    );
+    ];
 
     /**
      * @var bool
@@ -95,12 +95,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var array
      */
-    private $viewTransformers = array();
+    private $viewTransformers = [];
 
     /**
      * @var array
      */
-    private $modelTransformers = array();
+    private $modelTransformers = [];
 
     /**
      * @var DataMapperInterface
@@ -130,7 +130,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var array
      */
-    private $attributes = array();
+    private $attributes = [];
 
     /**
      * @var mixed
@@ -188,7 +188,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
+    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
     {
         self::validateName($name);
 
@@ -257,7 +257,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->viewTransformers = array();
+        $this->viewTransformers = [];
 
         return $this;
     }
@@ -289,7 +289,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->modelTransformers = array();
+        $this->modelTransformers = [];
 
         return $this;
     }

@@ -17,10 +17,10 @@ class FileFormFieldTest extends FormFieldTestCase
 {
     public function testInitialize()
     {
-        $node = $this->createNode('input', '', array('type' => 'file'));
+        $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
 
-        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), '->initialize() sets the value of the field to no file uploaded');
+        $this->assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), '->initialize() sets the value of the field to no file uploaded');
 
         $node = $this->createNode('textarea', '');
         try {
@@ -30,7 +30,7 @@ class FileFormFieldTest extends FormFieldTestCase
             $this->assertTrue(true, '->initialize() throws a \LogicException if the node is not an input field');
         }
 
-        $node = $this->createNode('input', '', array('type' => 'text'));
+        $node = $this->createNode('input', '', ['type' => 'text']);
         try {
             $field = new FileFormField($node);
             $this->fail('->initialize() throws a \LogicException if the node is not a file input field');
@@ -44,11 +44,11 @@ class FileFormFieldTest extends FormFieldTestCase
      */
     public function testSetValue($method)
     {
-        $node = $this->createNode('input', '', array('type' => 'file'));
+        $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
 
         $field->$method(null);
-        $this->assertEquals(array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0), $field->getValue(), "->$method() clears the uploaded file if the value is null");
+        $this->assertEquals(['name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0], $field->getValue(), "->$method() clears the uploaded file if the value is null");
 
         $field->$method(__FILE__);
         $value = $field->getValue();
@@ -80,15 +80,15 @@ class FileFormFieldTest extends FormFieldTestCase
 
     public function getSetValueMethods()
     {
-        return array(
-            array('setValue'),
-            array('upload'),
-        );
+        return [
+            ['setValue'],
+            ['upload'],
+        ];
     }
 
     public function testSetErrorCode()
     {
-        $node = $this->createNode('input', '', array('type' => 'file'));
+        $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
 
         $field->setErrorCode(UPLOAD_ERR_FORM_SIZE);
@@ -105,7 +105,7 @@ class FileFormFieldTest extends FormFieldTestCase
 
     public function testSetRawFilePath()
     {
-        $node = $this->createNode('input', '', array('type' => 'file'));
+        $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
         $field->setFilePath(__FILE__);
 

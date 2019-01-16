@@ -46,8 +46,8 @@ class PropertyPathMapperTest extends TestCase
     private function getPropertyPath($path)
     {
         return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->setConstructorArgs(array($path))
-            ->setMethods(array('getValue', 'setValue'))
+            ->setConstructorArgs([$path])
+            ->setMethods(['getValue', 'setValue'])
             ->getMock();
     }
 
@@ -61,8 +61,8 @@ class PropertyPathMapperTest extends TestCase
     private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->setConstructorArgs(array($config))
-            ->setMethods(array('isSynchronized', 'isSubmitted'))
+            ->setConstructorArgs([$config])
+            ->setMethods(['isSynchronized', 'isSubmitted'])
             ->getMock();
 
         $form->expects($this->any())
@@ -92,7 +92,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, array($form));
+        $this->mapper->mapDataToForms($car, [$form]);
 
         // Can't use isIdentical() above because mocks always clone their
         // arguments which can't be disabled in PHPUnit 3.6
@@ -115,7 +115,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, array($form));
+        $this->mapper->mapDataToForms($car, [$form]);
 
         $this->assertNotSame($engine, $form->getData());
         $this->assertEquals($engine, $form->getData());
@@ -131,7 +131,7 @@ class PropertyPathMapperTest extends TestCase
 
         $this->assertNull($form->getPropertyPath());
 
-        $this->mapper->mapDataToForms($car, array($form));
+        $this->mapper->mapDataToForms($car, [$form]);
 
         $this->assertNull($form->getData());
     }
@@ -150,7 +150,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setPropertyPath($propertyPath);
         $form = $this->getForm($config);
 
-        $this->mapper->mapDataToForms($car, array($form));
+        $this->mapper->mapDataToForms($car, [$form]);
 
         $this->assertNull($form->getData());
     }
@@ -169,15 +169,15 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($default);
 
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->setConstructorArgs(array($config))
-            ->setMethods(array('setData'))
+            ->setConstructorArgs([$config])
+            ->setMethods(['setData'])
             ->getMock();
 
         $form->expects($this->once())
             ->method('setData')
             ->with($default);
 
-        $this->mapper->mapDataToForms(null, array($form));
+        $this->mapper->mapDataToForms(null, [$form]);
     }
 
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray()
@@ -194,15 +194,15 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($default);
 
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->setConstructorArgs(array($config))
-            ->setMethods(array('setData'))
+            ->setConstructorArgs([$config])
+            ->setMethods(['setData'])
             ->getMock();
 
         $form->expects($this->once())
             ->method('setData')
             ->with($default);
 
-        $this->mapper->mapDataToForms(array(), array($form));
+        $this->mapper->mapDataToForms([], [$form]);
     }
 
     public function testMapFormsToDataWritesBackIfNotByReference()
@@ -221,7 +221,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
@@ -240,7 +240,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataWritesBackIfByReferenceAndReference()
@@ -264,7 +264,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($engine);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataIgnoresUnmapped()
@@ -283,7 +283,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setMapped(false);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataIgnoresUnsubmittedForms()
@@ -301,7 +301,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($engine);
         $form = $this->getForm($config, true, false);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataIgnoresEmptyData()
@@ -318,7 +318,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData(null);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataIgnoresUnsynchronized()
@@ -336,7 +336,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($engine);
         $form = $this->getForm($config, false);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     public function testMapFormsToDataIgnoresDisabled()
@@ -355,7 +355,7 @@ class PropertyPathMapperTest extends TestCase
         $config->setDisabled(true);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $car);
+        $this->mapper->mapFormsToData([$form], $car);
     }
 
     /**
@@ -363,7 +363,7 @@ class PropertyPathMapperTest extends TestCase
      */
     public function testMapFormsToDataDoesNotChangeEqualDateTimeInstance($date)
     {
-        $article = array();
+        $article = [];
         $publishedAt = $date;
         $article['publishedAt'] = clone $publishedAt;
         $propertyPath = $this->getPropertyPath('[publishedAt]');
@@ -382,14 +382,14 @@ class PropertyPathMapperTest extends TestCase
         $config->setData($publishedAt);
         $form = $this->getForm($config);
 
-        $this->mapper->mapFormsToData(array($form), $article);
+        $this->mapper->mapFormsToData([$form], $article);
     }
 
     public function provideDate()
     {
-        return array(
-            array(new \DateTime()),
-            array(new \DateTimeImmutable()),
-        );
+        return [
+            [new \DateTime()],
+            [new \DateTimeImmutable()],
+        ];
     }
 }

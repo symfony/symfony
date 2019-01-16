@@ -34,7 +34,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $trueEquivalent = true;
     protected $falseEquivalent = false;
     protected $parent;
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * @param string|null              $name   The name of the node

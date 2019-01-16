@@ -39,7 +39,7 @@ class ActionsHelper extends Helper
      *
      * @see FragmentHandler::render()
      */
-    public function render($uri, array $options = array())
+    public function render($uri, array $options = [])
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -47,7 +47,7 @@ class ActionsHelper extends Helper
         return $this->handler->render($uri, $strategy, $options);
     }
 
-    public function controller($controller, $attributes = array(), $query = array())
+    public function controller($controller, $attributes = [], $query = [])
     {
         return new ControllerReference($controller, $attributes, $query);
     }

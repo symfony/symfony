@@ -72,39 +72,39 @@ class LoggerTest extends TestCase
      */
     public function testLogsAtAllLevels($level, $message)
     {
-        $this->logger->{$level}($message, array('user' => 'Bob'));
-        $this->logger->log($level, $message, array('user' => 'Bob'));
+        $this->logger->{$level}($message, ['user' => 'Bob']);
+        $this->logger->log($level, $message, ['user' => 'Bob']);
 
-        $expected = array(
+        $expected = [
             "[$level] message of level $level with context: Bob",
             "[$level] message of level $level with context: Bob",
-        );
+        ];
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
     public function provideLevelsAndMessages()
     {
-        return array(
-            LogLevel::EMERGENCY => array(LogLevel::EMERGENCY, 'message of level emergency with context: {user}'),
-            LogLevel::ALERT => array(LogLevel::ALERT, 'message of level alert with context: {user}'),
-            LogLevel::CRITICAL => array(LogLevel::CRITICAL, 'message of level critical with context: {user}'),
-            LogLevel::ERROR => array(LogLevel::ERROR, 'message of level error with context: {user}'),
-            LogLevel::WARNING => array(LogLevel::WARNING, 'message of level warning with context: {user}'),
-            LogLevel::NOTICE => array(LogLevel::NOTICE, 'message of level notice with context: {user}'),
-            LogLevel::INFO => array(LogLevel::INFO, 'message of level info with context: {user}'),
-            LogLevel::DEBUG => array(LogLevel::DEBUG, 'message of level debug with context: {user}'),
-        );
+        return [
+            LogLevel::EMERGENCY => [LogLevel::EMERGENCY, 'message of level emergency with context: {user}'],
+            LogLevel::ALERT => [LogLevel::ALERT, 'message of level alert with context: {user}'],
+            LogLevel::CRITICAL => [LogLevel::CRITICAL, 'message of level critical with context: {user}'],
+            LogLevel::ERROR => [LogLevel::ERROR, 'message of level error with context: {user}'],
+            LogLevel::WARNING => [LogLevel::WARNING, 'message of level warning with context: {user}'],
+            LogLevel::NOTICE => [LogLevel::NOTICE, 'message of level notice with context: {user}'],
+            LogLevel::INFO => [LogLevel::INFO, 'message of level info with context: {user}'],
+            LogLevel::DEBUG => [LogLevel::DEBUG, 'message of level debug with context: {user}'],
+        ];
     }
 
     public function testLogLevelDisabled()
     {
         $this->logger = new Logger(LogLevel::INFO, $this->tmpFile);
 
-        $this->logger->debug('test', array('user' => 'Bob'));
-        $this->logger->log(LogLevel::DEBUG, 'test', array('user' => 'Bob'));
+        $this->logger->debug('test', ['user' => 'Bob']);
+        $this->logger->log(LogLevel::DEBUG, 'test', ['user' => 'Bob']);
 
         // Will always be true, but asserts than an exception isn't thrown
-        $this->assertSame(array(), $this->getLogs());
+        $this->assertSame([], $this->getLogs());
     }
 
     /**
@@ -134,18 +134,18 @@ class LoggerTest extends TestCase
     public function testContextReplacement()
     {
         $logger = $this->logger;
-        $logger->info('{Message {nothing} {user} {foo.bar} a}', array('user' => 'Bob', 'foo.bar' => 'Bar'));
+        $logger->info('{Message {nothing} {user} {foo.bar} a}', ['user' => 'Bob', 'foo.bar' => 'Bar']);
 
-        $expected = array('[info] {Message {nothing} Bob Bar a}');
+        $expected = ['[info] {Message {nothing} Bob Bar a}'];
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testObjectCastToString()
     {
         if (method_exists($this, 'createPartialMock')) {
-            $dummy = $this->createPartialMock(DummyTest::class, array('__toString'));
+            $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
         } else {
-            $dummy = $this->getMock(DummyTest::class, array('__toString'));
+            $dummy = $this->getMock(DummyTest::class, ['__toString']);
         }
         $dummy->expects($this->atLeastOnce())
             ->method('__toString')
@@ -153,54 +153,54 @@ class LoggerTest extends TestCase
 
         $this->logger->warning($dummy);
 
-        $expected = array('[warning] DUMMY');
+        $expected = ['[warning] DUMMY'];
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testContextCanContainAnything()
     {
-        $context = array(
+        $context = [
             'bool' => true,
             'null' => null,
             'string' => 'Foo',
             'int' => 0,
             'float' => 0.5,
-            'nested' => array('with object' => new DummyTest()),
+            'nested' => ['with object' => new DummyTest()],
             'object' => new \DateTime(),
             'resource' => fopen('php://memory', 'r'),
-        );
+        ];
 
         $this->logger->warning('Crazy context data', $context);
 
-        $expected = array('[warning] Crazy context data');
+        $expected = ['[warning] Crazy context data'];
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testContextExceptionKeyCanBeExceptionOrOtherValues()
     {
         $logger = $this->logger;
-        $logger->warning('Random message', array('exception' => 'oops'));
-        $logger->critical('Uncaught Exception!', array('exception' => new \LogicException('Fail')));
+        $logger->warning('Random message', ['exception' => 'oops']);
+        $logger->critical('Uncaught Exception!', ['exception' => new \LogicException('Fail')]);
 
-        $expected = array(
+        $expected = [
             '[warning] Random message',
             '[critical] Uncaught Exception!',
-        );
+        ];
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
     public function testFormatter()
     {
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile, function ($level, $message, $context) {
-            return json_encode(array('level' => $level, 'message' => $message, 'context' => $context)).\PHP_EOL;
+            return json_encode(['level' => $level, 'message' => $message, 'context' => $context]).\PHP_EOL;
         });
 
-        $this->logger->error('An error', array('foo' => 'bar'));
-        $this->logger->warning('A warning', array('baz' => 'bar'));
-        $this->assertSame(array(
+        $this->logger->error('An error', ['foo' => 'bar']);
+        $this->logger->warning('A warning', ['baz' => 'bar']);
+        $this->assertSame([
             '{"level":"error","message":"An error","context":{"foo":"bar"}}',
             '{"level":"warning","message":"A warning","context":{"baz":"bar"}}',
-        ), $this->getLogs());
+        ], $this->getLogs());
     }
 }
 

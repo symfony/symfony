@@ -95,6 +95,6 @@ class AuthorizationCheckerTest extends TestCase
 
     public function isGrantedProvider()
     {
-        return array(array(true), array(false));
+        return [[true], [false]];
     }
 }

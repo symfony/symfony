@@ -27,12 +27,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = array();
+    private $lists = [];
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = array();
+    private $views = [];
 
     /**
      * Generates a SHA-256 hash for the given value.
@@ -89,7 +89,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // The value is not validated on purpose. The decorated factory may
         // decide which values to accept and which not.
 
-        $hash = self::generateHash(array($choices, $value), 'fromChoices');
+        $hash = self::generateHash([$choices, $value], 'fromChoices');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);
@@ -103,7 +103,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        $hash = self::generateHash(array($loader, $value), 'fromLoader');
+        $hash = self::generateHash([$loader, $value], 'fromLoader');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromLoader($loader, $value);
@@ -119,7 +119,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
-        $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr));
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(

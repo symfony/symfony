@@ -92,7 +92,7 @@ class KernelTest extends TestCase
 
     public function testBootInitializesBundlesAndContainer()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
         $kernel->expects($this->once())
             ->method('initializeBundles');
         $kernel->expects($this->once())
@@ -107,10 +107,10 @@ class KernelTest extends TestCase
         $bundle->expects($this->once())
             ->method('setContainer');
 
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'getBundles'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'getBundles']);
         $kernel->expects($this->once())
             ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
+            ->will($this->returnValue([$bundle]));
 
         $kernel->boot();
     }
@@ -118,7 +118,7 @@ class KernelTest extends TestCase
     public function testBootSetsTheBootedFlagToTrue()
     {
         // use test kernel to access isBooted()
-        $kernel = $this->getKernelForTest(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernelForTest(['initializeBundles', 'initializeContainer']);
         $kernel->boot();
 
         $this->assertTrue($kernel->isBooted());
@@ -129,7 +129,7 @@ class KernelTest extends TestCase
      */
     public function testClassCacheIsLoaded()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'doLoadClassCache']);
         $kernel->loadClassCache('name', '.extension');
         $kernel->expects($this->once())
             ->method('doLoadClassCache')
@@ -140,7 +140,7 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'doLoadClassCache']);
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -152,7 +152,7 @@ class KernelTest extends TestCase
      */
     public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer', 'doLoadClassCache']);
         $kernel->loadClassCache();
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
@@ -163,7 +163,7 @@ class KernelTest extends TestCase
         $container = new ContainerBuilder();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
             ->disableOriginalConstructor()
-            ->setMethods(array('getContainerBuilder', 'prepareContainer', 'getCacheDir', 'getLogDir'))
+            ->setMethods(['getContainerBuilder', 'prepareContainer', 'getCacheDir', 'getLogDir'])
             ->getMock();
         $kernel->expects($this->any())
             ->method('getContainerBuilder')
@@ -196,7 +196,7 @@ class KernelTest extends TestCase
 
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
         $kernel->expects($this->once())
             ->method('initializeBundles');
 
@@ -210,7 +210,7 @@ class KernelTest extends TestCase
         $bundle->expects($this->once())
             ->method('shutdown');
 
-        $kernel = $this->getKernel(array(), array($bundle));
+        $kernel = $this->getKernel([], [$bundle]);
 
         $kernel->boot();
         $kernel->shutdown();
@@ -223,10 +223,10 @@ class KernelTest extends TestCase
             ->method('setContainer')
             ->with(null);
 
-        $kernel = $this->getKernel(array('getBundles'));
+        $kernel = $this->getKernel(['getBundles']);
         $kernel->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue(array($bundle)));
+            ->will($this->returnValue([$bundle]));
 
         $kernel->boot();
         $kernel->shutdown();
@@ -246,7 +246,7 @@ class KernelTest extends TestCase
             ->method('handle')
             ->with($request, $type, $catch);
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -264,7 +264,7 @@ class KernelTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $kernel = $this->getKernel(array('getHttpKernel', 'boot'));
+        $kernel = $this->getKernel(['getHttpKernel', 'boot']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -384,7 +384,7 @@ EOF;
         $debug = true;
         $kernel = new KernelForTest($env, $debug);
 
-        $expected = serialize(array($env, $debug));
+        $expected = serialize([$env, $debug]);
         $this->assertEquals($expected, $kernel->serialize());
     }
 
@@ -417,11 +417,11 @@ EOF;
      */
     public function testLocateResourceThrowsExceptionWhenResourceDoesNotExist()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle')]))
         ;
 
         $kernel->locateResource('@Bundle1Bundle/config/routing.xml');
@@ -429,11 +429,11 @@ EOF;
 
     public function testLocateResourceReturnsTheFirstThatMatches()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle')]))
         ;
 
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
@@ -447,11 +447,11 @@ EOF;
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
         $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
 
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->will($this->returnValue(array($child, $parent)))
+            ->will($this->returnValue([$child, $parent]))
         ;
 
         $this->assertEquals(__DIR__.'/Fixtures/Bundle2Bundle/foo.txt', $kernel->locateResource('@ParentAABundle/foo.txt'));
@@ -466,16 +466,16 @@ EOF;
         $parent = $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle');
         $child = $this->getBundle(__DIR__.'/Fixtures/Bundle2Bundle');
 
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($child, $parent)))
+            ->will($this->returnValue([$child, $parent]))
         ;
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             __DIR__.'/Fixtures/Bundle2Bundle/foo.txt',
-            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt', ),
+            __DIR__.'/Fixtures/Bundle1Bundle/foo.txt', ],
             $kernel->locateResource('@Bundle1Bundle/foo.txt', null, false));
     }
 
@@ -484,29 +484,29 @@ EOF;
      */
     public function testLocateResourceReturnsAllMatchesBis()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array(
+            ->will($this->returnValue([
                 $this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'),
                 $this->getBundle(__DIR__.'/Foobar'),
-            )))
+            ]))
         ;
 
         $this->assertEquals(
-            array(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt'),
+            [__DIR__.'/Fixtures/Bundle1Bundle/foo.txt'],
             $kernel->locateResource('@Bundle1Bundle/foo.txt', null, false)
         );
     }
 
     public function testLocateResourceIgnoresDirOnNonResource()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle')]))
         ;
 
         $this->assertEquals(
@@ -517,11 +517,11 @@ EOF;
 
     public function testLocateResourceReturnsTheDirOneForResources()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle')]))
         ;
 
         $this->assertEquals(
@@ -535,16 +535,16 @@ EOF;
      */
     public function testLocateResourceReturnsTheDirOneForResourcesAndBundleOnes()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->once())
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle')]))
         ;
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             __DIR__.'/Fixtures/Resources/Bundle1Bundle/foo.txt',
-            __DIR__.'/Fixtures/Bundle1Bundle/Resources/foo.txt', ),
+            __DIR__.'/Fixtures/Bundle1Bundle/Resources/foo.txt', ],
             $kernel->locateResource('@Bundle1Bundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
         );
     }
@@ -557,18 +557,18 @@ EOF;
         $parent = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'BaseBundle', 'BaseBundle');
         $child = $this->getBundle(__DIR__.'/Fixtures/ChildBundle', 'ParentBundle', 'ChildBundle', 'ChildBundle');
 
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->exactly(4))
             ->method('getBundle')
-            ->will($this->returnValue(array($child, $parent)))
+            ->will($this->returnValue([$child, $parent]))
         ;
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             __DIR__.'/Fixtures/Resources/ChildBundle/foo.txt',
             __DIR__.'/Fixtures/ChildBundle/Resources/foo.txt',
             __DIR__.'/Fixtures/BaseBundle/Resources/foo.txt',
-            ),
+            ],
             $kernel->locateResource('@BaseBundle/Resources/foo.txt', __DIR__.'/Fixtures/Resources', false)
         );
 
@@ -592,11 +592,11 @@ EOF;
 
     public function testLocateResourceOnDirectories()
     {
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/FooBundle', null, null, 'FooBundle')]))
         ;
 
         $this->assertEquals(
@@ -608,11 +608,11 @@ EOF;
             $kernel->locateResource('@FooBundle/Resources', __DIR__.'/Fixtures/Resources')
         );
 
-        $kernel = $this->getKernel(array('getBundle'));
+        $kernel = $this->getKernel(['getBundle']);
         $kernel
             ->expects($this->exactly(2))
             ->method('getBundle')
-            ->will($this->returnValue(array($this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle'))))
+            ->will($this->returnValue([$this->getBundle(__DIR__.'/Fixtures/Bundle1Bundle', null, null, 'Bundle1Bundle')]))
         ;
 
         $this->assertEquals(
@@ -634,16 +634,16 @@ EOF;
         $child = $this->getBundle(null, 'ParentABundle', 'ChildABundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(['registerBundles']);
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
-            ->will($this->returnValue(array($parent, $child)))
+            ->will($this->returnValue([$parent, $child]))
         ;
         $kernel->boot();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent), $map['ParentABundle']);
+        $this->assertEquals([$child, $parent], $map['ParentABundle']);
     }
 
     /**
@@ -656,18 +656,18 @@ EOF;
         $child = $this->getBundle(null, 'ParentBBundle', 'ChildBBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(['registerBundles']);
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
-            ->will($this->returnValue(array($grandparent, $parent, $child)))
+            ->will($this->returnValue([$grandparent, $parent, $child]))
         ;
         $kernel->boot();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentBBundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentBBundle']);
-        $this->assertEquals(array($child), $map['ChildBBundle']);
+        $this->assertEquals([$child, $parent, $grandparent], $map['GrandParentBBundle']);
+        $this->assertEquals([$child, $parent], $map['ParentBBundle']);
+        $this->assertEquals([$child], $map['ChildBBundle']);
     }
 
     /**
@@ -678,7 +678,7 @@ EOF;
     public function testInitializeBundlesThrowsExceptionWhenAParentDoesNotExists()
     {
         $child = $this->getBundle(null, 'FooBar', 'ChildCBundle');
-        $kernel = $this->getKernel(array(), array($child));
+        $kernel = $this->getKernel([], [$child]);
         $kernel->boot();
     }
 
@@ -692,18 +692,18 @@ EOF;
         $child = $this->getBundle(null, 'ParentCBundle', 'ChildCBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(['registerBundles']);
         $kernel
             ->expects($this->once())
             ->method('registerBundles')
-            ->will($this->returnValue(array($parent, $grandparent, $child)))
+            ->will($this->returnValue([$parent, $grandparent, $child]))
         ;
         $kernel->boot();
 
         $map = $kernel->getBundleMap();
-        $this->assertEquals(array($child, $parent, $grandparent), $map['GrandParentCBundle']);
-        $this->assertEquals(array($child, $parent), $map['ParentCBundle']);
-        $this->assertEquals(array($child), $map['ChildCBundle']);
+        $this->assertEquals([$child, $parent, $grandparent], $map['GrandParentCBundle']);
+        $this->assertEquals([$child, $parent], $map['ParentCBundle']);
+        $this->assertEquals([$child], $map['ChildCBundle']);
     }
 
     /**
@@ -717,7 +717,7 @@ EOF;
         $child1 = $this->getBundle(null, 'ParentCBundle', 'ChildC1Bundle');
         $child2 = $this->getBundle(null, 'ParentCBundle', 'ChildC2Bundle');
 
-        $kernel = $this->getKernel(array(), array($parent, $child1, $child2));
+        $kernel = $this->getKernel([], [$parent, $child1, $child2]);
         $kernel->boot();
     }
 
@@ -731,7 +731,7 @@ EOF;
         $fooBundle = $this->getBundle(null, null, 'FooBundle', 'DuplicateName');
         $barBundle = $this->getBundle(null, null, 'BarBundle', 'DuplicateName');
 
-        $kernel = $this->getKernel(array(), array($fooBundle, $barBundle));
+        $kernel = $this->getKernel([], [$fooBundle, $barBundle]);
         $kernel->boot();
     }
 
@@ -744,13 +744,13 @@ EOF;
     {
         $circularRef = $this->getBundle(null, 'CircularRefBundle', 'CircularRefBundle');
 
-        $kernel = $this->getKernel(array(), array($circularRef));
+        $kernel = $this->getKernel([], [$circularRef]);
         $kernel->boot();
     }
 
     public function testTerminateReturnsSilentlyIfKernelIsNotBooted()
     {
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->never())
             ->method('getHttpKernel');
 
@@ -762,7 +762,7 @@ EOF;
         // does not implement TerminableInterface
         $httpKernel = new TestKernel();
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->once())
             ->method('getHttpKernel')
             ->willReturn($httpKernel);
@@ -775,14 +775,14 @@ EOF;
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
             ->disableOriginalConstructor()
-            ->setMethods(array('terminate'))
+            ->setMethods(['terminate'])
             ->getMock();
 
         $httpKernelMock
             ->expects($this->once())
             ->method('terminate');
 
-        $kernel = $this->getKernel(array('getHttpKernel'));
+        $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->exactly(2))
             ->method('getHttpKernel')
             ->will($this->returnValue($httpKernelMock));
@@ -882,7 +882,7 @@ EOF;
             $container->addCompilerPass(new ResettableServicePass());
             $container->register('one', ResettableService::class)
                 ->setPublic(true)
-                ->addTag('kernel.reset', array('method' => 'reset'));
+                ->addTag('kernel.reset', ['method' => 'reset']);
             $container->register('services_resetter', ServicesResetter::class)->setPublic(true);
         }, $httpKernelMock, 'resetting');
 
@@ -906,7 +906,7 @@ EOF;
      */
     public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
     {
-        $kernel = $this->getKernelForTest(array('initializeBundles'), true);
+        $kernel = $this->getKernelForTest(['initializeBundles'], true);
         $kernel->boot();
         $preReBoot = $kernel->getStartTime();
 
@@ -925,7 +925,7 @@ EOF;
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
-            ->setMethods(array('getPath', 'getParent', 'getName'))
+            ->setMethods(['getPath', 'getParent', 'getName'])
             ->disableOriginalConstructor()
         ;
 
@@ -964,14 +964,14 @@ EOF;
      *
      * @return Kernel
      */
-    protected function getKernel(array $methods = array(), array $bundles = array())
+    protected function getKernel(array $methods = [], array $bundles = [])
     {
         $methods[] = 'registerBundles';
 
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
             ->setMethods($methods)
-            ->setConstructorArgs(array('test', false))
+            ->setConstructorArgs(['test', false])
             ->getMockForAbstractClass()
         ;
         $kernel->expects($this->any())
@@ -985,10 +985,10 @@ EOF;
         return $kernel;
     }
 
-    protected function getKernelForTest(array $methods = array(), $debug = false)
+    protected function getKernelForTest(array $methods = [], $debug = false)
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(array('test', $debug))
+            ->setConstructorArgs(['test', $debug])
             ->setMethods($methods)
             ->getMock();
         $p = new \ReflectionProperty($kernel, 'rootDir');
@@ -1030,7 +1030,7 @@ class CustomProjectDirKernel extends Kernel
 
     public function registerBundles()
     {
-        return array();
+        return [];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

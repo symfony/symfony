@@ -103,7 +103,7 @@ class ArrayInput extends Input
      */
     public function __toString()
     {
-        $params = array();
+        $params = [];
         foreach ($this->parameters as $param => $val) {
             if ($param && '-' === $param[0]) {
                 if (\is_array($val)) {
@@ -114,7 +114,7 @@ class ArrayInput extends Input
                     $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
                 }
             } else {
-                $params[] = \is_array($val) ? implode(' ', array_map(array($this, 'escapeToken'), $val)) : $this->escapeToken($val);
+                $params[] = \is_array($val) ? implode(' ', array_map([$this, 'escapeToken'], $val)) : $this->escapeToken($val);
             }
         }
 

@@ -41,8 +41,8 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 24),
-        );
+        return [
+            KernelEvents::REQUEST => ['onKernelRequest', 24],
+        ];
     }
 }

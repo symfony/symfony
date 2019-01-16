@@ -1,30 +1,30 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('framework', [
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
     'csrf_protection' => true,
-    'form' => array(
-        'csrf_protection' => array(
+    'form' => [
+        'csrf_protection' => [
             'field_name' => '_csrf',
-        ),
-    ),
+        ],
+    ],
     'http_method_override' => false,
-    'esi' => array(
+    'esi' => [
         'enabled' => true,
-    ),
-    'ssi' => array(
+    ],
+    'ssi' => [
         'enabled' => true,
-    ),
-    'profiler' => array(
+    ],
+    'profiler' => [
         'only_exceptions' => true,
         'enabled' => false,
-    ),
-    'router' => array(
+    ],
+    'router' => [
         'resource' => '%kernel.project_dir%/config/routing.xml',
         'type' => 'xml',
-    ),
-    'session' => array(
+    ],
+    'session' => [
         'storage_id' => 'session.storage.native',
         'handler_id' => 'session.handler.native_file',
         'name' => '_SYMFONY',
@@ -38,47 +38,47 @@ $container->loadFromExtension('framework', array(
         'gc_divisor' => 108,
         'gc_probability' => 1,
         'save_path' => '/path/to/sessions',
-    ),
-    'templating' => array(
+    ],
+    'templating' => [
         'cache' => '/path/to/cache',
-        'engines' => array('php', 'twig'),
-        'loader' => array('loader.foo', 'loader.bar'),
-        'form' => array(
-            'resources' => array('theme1', 'theme2'),
-        ),
+        'engines' => ['php', 'twig'],
+        'loader' => ['loader.foo', 'loader.bar'],
+        'form' => [
+            'resources' => ['theme1', 'theme2'],
+        ],
         'hinclude_default_template' => 'global_hinclude_template',
-    ),
-    'assets' => array(
+    ],
+    'assets' => [
         'version' => 'v1',
-    ),
-    'translator' => array(
+    ],
+    'translator' => [
         'enabled' => true,
         'fallback' => 'fr',
-        'paths' => array('%kernel.project_dir%/Fixtures/translations'),
-    ),
-    'validation' => array(
+        'paths' => ['%kernel.project_dir%/Fixtures/translations'],
+    ],
+    'validation' => [
         'enabled' => true,
-    ),
-    'annotations' => array(
+    ],
+    'annotations' => [
         'cache' => 'file',
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
-    ),
-    'serializer' => array(
+    ],
+    'serializer' => [
         'enabled' => true,
         'enable_annotations' => true,
         'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
         'circular_reference_handler' => 'my.circular.reference.handler',
-    ),
+    ],
     'property_info' => true,
     'ide' => 'file%%link%%format',
-    'request' => array(
-        'formats' => array(
-            'csv' => array(
+    'request' => [
+        'formats' => [
+            'csv' => [
                 'text/csv',
                 'text/plain',
-            ),
+            ],
             'pdf' => 'application/pdf',
-        ),
-    ),
-));
+        ],
+    ],
+]);

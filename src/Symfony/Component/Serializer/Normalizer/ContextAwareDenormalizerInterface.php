@@ -23,5 +23,5 @@ interface ContextAwareDenormalizerInterface extends DenormalizerInterface
      *
      * @param array $context options that denormalizers have access to
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array());
+    public function supportsDenormalization($data, $type, $format = null, array $context = []);
 }

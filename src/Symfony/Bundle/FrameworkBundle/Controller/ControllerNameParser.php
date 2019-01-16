@@ -49,7 +49,7 @@ class ControllerNameParser
         $originalController = $controller;
         list($bundle, $controller, $action) = $parts;
         $controller = str_replace('/', '\\', $controller);
-        $bundles = array();
+        $bundles = [];
 
         try {
             // this throws an exception if there is no such bundle
@@ -70,7 +70,7 @@ class ControllerNameParser
 
         if (!\is_array($allBundles)) {
             // happens when HttpKernel is version 4+
-            $allBundles = array($allBundles);
+            $allBundles = [$allBundles];
         }
 
         foreach ($allBundles as $b) {

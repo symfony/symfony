@@ -38,21 +38,21 @@ class DateTimeType extends AbstractType
      */
     const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private static $acceptedFormats = array(
+    private static $acceptedFormats = [
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
-    );
+    ];
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $parts = array('year', 'month', 'day', 'hour');
-        $dateParts = array('year', 'month', 'day');
-        $timeParts = array('hour');
+        $parts = ['year', 'month', 'day', 'hour'];
+        $dateParts = ['year', 'month', 'day'];
+        $timeParts = ['hour'];
 
         if ($options['with_minutes']) {
             $parts[] = 'minute';
@@ -92,9 +92,9 @@ class DateTimeType extends AbstractType
         } else {
             // when the form is compound the entries of the array are ignored in favor of children data
             // so we need to handle the cascade setting here
-            $emptyData = $builder->getEmptyData() ?: array();
+            $emptyData = $builder->getEmptyData() ?: [];
             // Only pass a subset of the options to children
-            $dateOptions = array_intersect_key($options, array_flip(array(
+            $dateOptions = array_intersect_key($options, array_flip([
                 'years',
                 'months',
                 'days',
@@ -105,13 +105,13 @@ class DateTimeType extends AbstractType
                 'html5',
                 'invalid_message',
                 'invalid_message_parameters',
-            )));
+            ]));
 
             if (isset($emptyData['date'])) {
                 $dateOptions['empty_data'] = $emptyData['date'];
             }
 
-            $timeOptions = array_intersect_key($options, array_flip(array(
+            $timeOptions = array_intersect_key($options, array_flip([
                 'hours',
                 'minutes',
                 'seconds',
@@ -124,7 +124,7 @@ class DateTimeType extends AbstractType
                 'html5',
                 'invalid_message',
                 'invalid_message_parameters',
-            )));
+            ]));
 
             if (isset($emptyData['time'])) {
                 $timeOptions['empty_data'] = $emptyData['time'];
@@ -151,13 +151,13 @@ class DateTimeType extends AbstractType
             $dateOptions['error_bubbling'] = $timeOptions['error_bubbling'] = true;
 
             $builder
-                ->addViewTransformer(new DataTransformerChain(array(
+                ->addViewTransformer(new DataTransformerChain([
                     new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
-                    new ArrayToPartsTransformer(array(
+                    new ArrayToPartsTransformer([
                         'date' => $dateParts,
                         'time' => $timeParts,
-                    )),
-                )))
+                    ]),
+                ]))
                 ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
                 ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
             ;
@@ -213,7 +213,7 @@ class DateTimeType extends AbstractType
             return $options['widget'];
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'input' => 'datetime',
             'model_timezone' => null,
             'view_timezone' => null,
@@ -236,13 +236,13 @@ class DateTimeType extends AbstractType
             'data_class' => null,
             'compound' => $compound,
             'empty_data' => function (Options $options) {
-                return $options['compound'] ? array() : '';
+                return $options['compound'] ? [] : '';
             },
-        ));
+        ]);
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
-        $resolver->setDefined(array(
+        $resolver->setDefined([
             'placeholder',
             'choice_translation_domain',
             'years',
@@ -251,33 +251,33 @@ class DateTimeType extends AbstractType
             'hours',
             'minutes',
             'seconds',
-        ));
+        ]);
 
-        $resolver->setAllowedValues('input', array(
+        $resolver->setAllowedValues('input', [
             'datetime',
             'string',
             'timestamp',
             'array',
-        ));
-        $resolver->setAllowedValues('date_widget', array(
+        ]);
+        $resolver->setAllowedValues('date_widget', [
             null, // inherit default from DateType
             'single_text',
             'text',
             'choice',
-        ));
-        $resolver->setAllowedValues('time_widget', array(
+        ]);
+        $resolver->setAllowedValues('time_widget', [
             null, // inherit default from TimeType
             'single_text',
             'text',
             'choice',
-        ));
+        ]);
         // This option will overwrite "date_widget" and "time_widget" options
-        $resolver->setAllowedValues('widget', array(
+        $resolver->setAllowedValues('widget', [
             null, // default, don't overwrite options
             'single_text',
             'text',
             'choice',
-        ));
+        ]);
     }
 
     /**

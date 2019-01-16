@@ -47,12 +47,12 @@ class ServerStartCommand extends ServerCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
-            ))
+            ])
             ->setDescription('Starts a local web server in the background')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> runs a local web server: By default, the server
@@ -90,10 +90,10 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         if (!\extension_loaded('pcntl')) {
-            $io->error(array(
+            $io->error([
                 'This command needs the pcntl extension to run.',
                 'You can either install it or use the "server:run" command instead.',
-            ));
+            ]);
 
             if ($io->confirm('Do you want to execute <info>server:run</info> immediately?', false)) {
                 return $this->getApplication()->find('server:run')->run($input, $output);

@@ -66,7 +66,7 @@ class FatalErrorException extends \ErrorException
                     array_splice($trace, 0, $traceOffset);
                 }
             } else {
-                $trace = array();
+                $trace = [];
             }
 
             $this->setTrace($trace);

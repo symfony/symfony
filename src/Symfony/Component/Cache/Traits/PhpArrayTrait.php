@@ -116,7 +116,7 @@ EOF;
      */
     public function clear()
     {
-        $this->values = array();
+        $this->values = [];
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
 
@@ -132,7 +132,7 @@ EOF;
             $zmb = ini_set('zend.detect_unicode', 0);
         }
         try {
-            $this->values = file_exists($this->file) ? (include $this->file ?: array()) : array();
+            $this->values = file_exists($this->file) ? (include $this->file ?: []) : [];
         } finally {
             if ($this->zendDetectUnicode) {
                 ini_set('zend.detect_unicode', $zmb);

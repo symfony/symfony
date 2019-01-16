@@ -32,7 +32,7 @@ class ProfilerControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, []);
 
         $response = $controller->toolbarAction(Request::create('/_wdt/empty'), $token);
         $this->assertEquals(200, $response->getStatusCode());
@@ -40,11 +40,11 @@ class ProfilerControllerTest extends TestCase
 
     public function getEmptyTokenCases()
     {
-        return array(
-            array(null),
+        return [
+            [null],
             // "empty" is also a valid empty token case, see https://github.com/symfony/symfony/issues/10806
-            array('empty'),
-        );
+            ['empty'],
+        ];
     }
 
     /**
@@ -59,10 +59,10 @@ class ProfilerControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array(), 'bottom', null, __DIR__.'/../..');
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, [], 'bottom', null, __DIR__.'/../..');
 
         try {
-            $response = $controller->openAction(Request::create('/_wdt/open', Request::METHOD_GET, array('file' => $path)));
+            $response = $controller->openAction(Request::create('/_wdt/open', Request::METHOD_GET, ['file' => $path]));
             $this->assertEquals(200, $response->getStatusCode());
             $this->assertTrue($isAllowed);
         } catch (NotFoundHttpException $e) {
@@ -72,15 +72,15 @@ class ProfilerControllerTest extends TestCase
 
     public function getOpenFileCases()
     {
-        return array(
-            array('README.md', true),
-            array('composer.json', true),
-            array('Controller/ProfilerController.php', true),
-            array('.gitignore', false),
-            array('../TwigBundle/README.md', false),
-            array('Controller/../README.md', false),
-            array('Controller/./ProfilerController.php', false),
-        );
+        return [
+            ['README.md', true],
+            ['composer.json', true],
+            ['Controller/ProfilerController.php', true],
+            ['.gitignore', false],
+            ['../TwigBundle/README.md', false],
+            ['Controller/../README.md', false],
+            ['Controller/./ProfilerController.php', false],
+        ];
     }
 
     /**
@@ -126,8 +126,8 @@ class ProfilerControllerTest extends TestCase
 
         $controller = $this->createController($profiler, $twig, $withCsp);
 
-        $tokens = array(
-            array(
+        $tokens = [
+            [
                 'token' => 'token1',
                 'ip' => '127.0.0.1',
                 'method' => 'GET',
@@ -135,8 +135,8 @@ class ProfilerControllerTest extends TestCase
                 'time' => 0,
                 'parent' => null,
                 'status_code' => 200,
-            ),
-            array(
+            ],
+            [
                 'token' => 'token2',
                 'ip' => '127.0.0.1',
                 'method' => 'GET',
@@ -144,23 +144,23 @@ class ProfilerControllerTest extends TestCase
                 'time' => 0,
                 'parent' => null,
                 'status_code' => 404,
-            ),
-        );
+            ],
+        ];
         $profiler
             ->expects($this->once())
             ->method('find')
             ->will($this->returnValue($tokens));
 
-        $request = Request::create('/_profiler/empty/search/results', 'GET', array(
+        $request = Request::create('/_profiler/empty/search/results', 'GET', [
             'limit' => 2,
             'ip' => '127.0.0.1',
             'method' => 'GET',
             'url' => 'http://example.com/',
-        ));
+        ]);
 
         $twig->expects($this->once())
             ->method('render')
-            ->with($this->stringEndsWith('results.html.twig'), $this->equalTo(array(
+            ->with($this->stringEndsWith('results.html.twig'), $this->equalTo([
                 'token' => 'empty',
                 'profile' => null,
                 'tokens' => $tokens,
@@ -173,7 +173,7 @@ class ProfilerControllerTest extends TestCase
                 'limit' => 2,
                 'panel' => null,
                 'request' => $request,
-            )));
+            ]));
 
         $response = $controller->searchResultsAction($request, 'empty');
         $this->assertEquals(200, $response->getStatusCode());
@@ -181,10 +181,10 @@ class ProfilerControllerTest extends TestCase
 
     public function provideCspVariants()
     {
-        return array(
-            array(true),
-            array(false),
-        );
+        return [
+            [true],
+            [false],
+        ];
     }
 
     private function createController($profiler, $twig, $withCSP)
@@ -194,9 +194,9 @@ class ProfilerControllerTest extends TestCase
         if ($withCSP) {
             $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
 
-            return new ProfilerController($urlGenerator, $profiler, $twig, array(), 'bottom', new ContentSecurityPolicyHandler($nonceGenerator));
+            return new ProfilerController($urlGenerator, $profiler, $twig, [], 'bottom', new ContentSecurityPolicyHandler($nonceGenerator));
         }
 
-        return new ProfilerController($urlGenerator, $profiler, $twig, array());
+        return new ProfilerController($urlGenerator, $profiler, $twig, []);
     }
 }

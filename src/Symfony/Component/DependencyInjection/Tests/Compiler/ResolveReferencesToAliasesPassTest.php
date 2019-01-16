@@ -26,7 +26,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->setAlias('bar', 'foo');
         $def = $container
             ->register('moo')
-            ->setArguments(array(new Reference('bar')))
+            ->setArguments([new Reference('bar')])
         ;
 
         $this->process($container);
@@ -42,7 +42,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->setAlias('moo', 'bar');
         $def = $container
             ->register('foobar')
-            ->setArguments(array(new Reference('moo')))
+            ->setArguments([new Reference('moo')])
         ;
 
         $this->process($container);
@@ -68,10 +68,10 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $container->register('factory', 'Factory');
         $container->setAlias('factory_alias', new Alias('factory'));
         $foo = new Definition();
-        $foo->setFactory(array(new Reference('factory_alias'), 'createFoo'));
+        $foo->setFactory([new Reference('factory_alias'), 'createFoo']);
         $container->setDefinition('foo', $foo);
         $bar = new Definition();
-        $bar->setFactory(array('Factory', 'createFoo'));
+        $bar->setFactory(['Factory', 'createFoo']);
         $container->setDefinition('bar', $bar);
 
         $this->process($container);

@@ -60,7 +60,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         }
 
         if (!\is_array($attributes)) {
-            $attributes = array($attributes);
+            $attributes = [$attributes];
         }
 
         return $this->accessDecisionManager->decide($token, $attributes, $subject);

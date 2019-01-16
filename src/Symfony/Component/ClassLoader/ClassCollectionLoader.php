@@ -108,7 +108,7 @@ class ClassCollectionLoader
 
         if ($autoReload) {
             // save the resources
-            self::writeCacheFile($metadata, serialize(array(array_values($files), $classes)));
+            self::writeCacheFile($metadata, serialize([array_values($files), $classes]));
         }
     }
 
@@ -125,7 +125,7 @@ class ClassCollectionLoader
      */
     public static function inline($classes, $cache, array $excluded)
     {
-        $declared = array();
+        $declared = [];
         foreach (self::getOrderedClasses($excluded) as $class) {
             $declared[$class->getName()] = true;
         }
@@ -147,7 +147,7 @@ REGEX;
         $dontInlineRegex = str_replace('.', $spacesRegex, $dontInlineRegex);
 
         $cacheDir = explode('/', str_replace(\DIRECTORY_SEPARATOR, '/', $cacheDir));
-        $files = array();
+        $files = [];
         $content = '';
         foreach (self::getOrderedClasses($classes) as $class) {
             if (isset($declared[$class->getName()])) {
@@ -176,7 +176,7 @@ REGEX;
 
                 $c = "\nnamespace {require $file;}";
             } else {
-                $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', $c);
+                $c = preg_replace(['/^\s*<\?php/', '/\?>\s*$/'], '', $c);
 
                 // fakes namespace declaration for global code
                 if (!$class->inNamespace()) {
@@ -220,7 +220,7 @@ REGEX;
             $token = $tokens[$i];
             if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
-            } elseif (\in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
+            } elseif (\in_array($token[0], [T_COMMENT, T_DOC_COMMENT])) {
                 // strip comments
                 continue;
             } elseif (T_NAMESPACE === $token[0]) {
@@ -230,7 +230,7 @@ REGEX;
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                while (isset($tokens[++$i][1]) && \in_array($tokens[$i][0], [T_WHITESPACE, T_NS_SEPARATOR, T_STRING])) {
                     $rawChunk .= $tokens[$i][1];
                 }
                 if ('{' === $tokens[$i]) {
@@ -289,8 +289,8 @@ REGEX;
     private static function compressCode($code)
     {
         return preg_replace(
-            array('/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'),
-            array('', '', "\n", ' '),
+            ['/^\s+/m', '/\s+$/m', '/([\n\r]+ *[\n\r]+)+/', '/[ \t]+/'],
+            ['', '', "\n", ' '],
             $code
         );
     }
@@ -330,8 +330,8 @@ REGEX;
      */
     private static function getOrderedClasses(array $classes)
     {
-        $map = array();
-        self::$seen = array();
+        $map = [];
+        self::$seen = [];
         foreach ($classes as $class) {
             try {
                 $reflectionClass = new \ReflectionClass($class);
@@ -348,12 +348,12 @@ REGEX;
     private static function getClassHierarchy(\ReflectionClass $class)
     {
         if (isset(self::$seen[$class->getName()])) {
-            return array();
+            return [];
         }
 
         self::$seen[$class->getName()] = true;
 
-        $classes = array($class);
+        $classes = [$class];
         $parent = $class;
         while (($parent = $parent->getParentClass()) && $parent->isUserDefined() && !isset(self::$seen[$parent->getName()])) {
             self::$seen[$parent->getName()] = true;
@@ -361,7 +361,7 @@ REGEX;
             array_unshift($classes, $parent);
         }
 
-        $traits = array();
+        $traits = [];
 
         foreach ($classes as $c) {
             foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
@@ -376,7 +376,7 @@ REGEX;
 
     private static function getInterfaces(\ReflectionClass $class)
     {
-        $classes = array();
+        $classes = [];
 
         foreach ($class->getInterfaces() as $interface) {
             $classes = array_merge($classes, self::getInterfaces($interface));
@@ -394,7 +394,7 @@ REGEX;
     private static function computeTraitDeps(\ReflectionClass $class)
     {
         $traits = $class->getTraits();
-        $deps = array($class->getName() => $traits);
+        $deps = [$class->getName() => $traits];
         while ($trait = array_pop($traits)) {
             if ($trait->isUserDefined() && !isset(self::$seen[$trait->getName()])) {
                 self::$seen[$trait->getName()] = true;

@@ -44,7 +44,7 @@ interface FlashBagInterface extends SessionBagInterface
      *
      * @return array
      */
-    public function peek($type, array $default = array());
+    public function peek($type, array $default = []);
 
     /**
      * Gets all flash messages.
@@ -61,7 +61,7 @@ interface FlashBagInterface extends SessionBagInterface
      *
      * @return array
      */
-    public function get($type, array $default = array());
+    public function get($type, array $default = []);
 
     /**
      * Gets and clears flashes from the stack.

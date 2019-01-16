@@ -99,10 +99,10 @@ class Firewall implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 8),
+        return [
+            KernelEvents::REQUEST => ['onKernelRequest', 8],
             KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
-        );
+        ];
     }
 
     protected function handleRequest(GetResponseEvent $event, $listeners)

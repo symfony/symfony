@@ -22,7 +22,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
  */
 class ArrayParserCache implements ParserCacheInterface
 {
-    private $cache = array();
+    private $cache = [];
 
     /**
      * {@inheritdoc}

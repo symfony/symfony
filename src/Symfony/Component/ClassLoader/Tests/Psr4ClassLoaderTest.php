@@ -39,12 +39,12 @@ class Psr4ClassLoaderTest extends TestCase
      */
     public function getLoadClassTests()
     {
-        return array(
-            array('Acme\\DemoLib\\Foo'),
-            array('Acme\\DemoLib\\Class_With_Underscores'),
-            array('Acme\\DemoLib\\Lets\\Go\\Deeper\\Foo'),
-            array('Acme\\DemoLib\\Lets\\Go\\Deeper\\Class_With_Underscores'),
-        );
+        return [
+            ['Acme\\DemoLib\\Foo'],
+            ['Acme\\DemoLib\\Class_With_Underscores'],
+            ['Acme\\DemoLib\\Lets\\Go\\Deeper\\Foo'],
+            ['Acme\\DemoLib\\Lets\\Go\\Deeper\\Class_With_Underscores'],
+        ];
     }
 
     /**
@@ -67,9 +67,9 @@ class Psr4ClassLoaderTest extends TestCase
      */
     public function getLoadNonexistentClassTests()
     {
-        return array(
-            array('Acme\\DemoLib\\I_Do_Not_Exist'),
-            array('UnknownVendor\\SomeLib\\I_Do_Not_Exist'),
-        );
+        return [
+            ['Acme\\DemoLib\\I_Do_Not_Exist'],
+            ['UnknownVendor\\SomeLib\\I_Do_Not_Exist'],
+        ];
     }
 }

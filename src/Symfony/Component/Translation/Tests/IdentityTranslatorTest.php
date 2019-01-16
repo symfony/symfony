@@ -74,23 +74,23 @@ class IdentityTranslatorTest extends TestCase
 
     public function getTransTests()
     {
-        return array(
-            array('Symfony is great!', 'Symfony is great!', array()),
-            array('Symfony is awesome!', 'Symfony is %what%!', array('%what%' => 'awesome')),
-        );
+        return [
+            ['Symfony is great!', 'Symfony is great!', []],
+            ['Symfony is awesome!', 'Symfony is %what%!', ['%what%' => 'awesome']],
+        ];
     }
 
     public function getTransChoiceTests()
     {
-        return array(
-            array('There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0, array('%count%' => 0)),
-            array('There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1, array('%count%' => 1)),
-            array('There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10, array('%count%' => 10)),
-            array('There are 0 apples', 'There is 1 apple|There are %count% apples', 0, array('%count%' => 0)),
-            array('There is 1 apple', 'There is 1 apple|There are %count% apples', 1, array('%count%' => 1)),
-            array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10, array('%count%' => 10)),
+        return [
+            ['There are no apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 0, ['%count%' => 0]],
+            ['There is one apple', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 1, ['%count%' => 1]],
+            ['There are 10 apples', '{0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples', 10, ['%count%' => 10]],
+            ['There are 0 apples', 'There is 1 apple|There are %count% apples', 0, ['%count%' => 0]],
+            ['There is 1 apple', 'There is 1 apple|There are %count% apples', 1, ['%count%' => 1]],
+            ['There are 10 apples', 'There is 1 apple|There are %count% apples', 10, ['%count%' => 10]],
             // custom validation messages may be coded with a fixed value
-            array('There are 2 apples', 'There are 2 apples', 2, array('%count%' => 2)),
-        );
+            ['There are 2 apples', 'There are 2 apples', 2, ['%count%' => 2]],
+        ];
     }
 }

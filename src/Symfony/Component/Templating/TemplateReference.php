@@ -22,10 +22,10 @@ class TemplateReference implements TemplateReferenceInterface
 
     public function __construct($name = null, $engine = null)
     {
-        $this->parameters = array(
+        $this->parameters = [
             'name' => $name,
             'engine' => $engine,
-        );
+        ];
     }
 
     /**

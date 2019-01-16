@@ -19,26 +19,26 @@ class NumberHandlerTest extends AbstractHandlerTest
 {
     public function getHandleValueTestData()
     {
-        return array(
-            array('12', new Token(Token::TYPE_NUMBER, '12', 0), ''),
-            array('12.34', new Token(Token::TYPE_NUMBER, '12.34', 0), ''),
-            array('+12.34', new Token(Token::TYPE_NUMBER, '+12.34', 0), ''),
-            array('-12.34', new Token(Token::TYPE_NUMBER, '-12.34', 0), ''),
+        return [
+            ['12', new Token(Token::TYPE_NUMBER, '12', 0), ''],
+            ['12.34', new Token(Token::TYPE_NUMBER, '12.34', 0), ''],
+            ['+12.34', new Token(Token::TYPE_NUMBER, '+12.34', 0), ''],
+            ['-12.34', new Token(Token::TYPE_NUMBER, '-12.34', 0), ''],
 
-            array('12 arg', new Token(Token::TYPE_NUMBER, '12', 0), ' arg'),
-            array('12]', new Token(Token::TYPE_NUMBER, '12', 0), ']'),
-        );
+            ['12 arg', new Token(Token::TYPE_NUMBER, '12', 0), ' arg'],
+            ['12]', new Token(Token::TYPE_NUMBER, '12', 0), ']'],
+        ];
     }
 
     public function getDontHandleValueTestData()
     {
-        return array(
-            array('hello'),
-            array('>'),
-            array('+'),
-            array(' '),
-            array('/* comment */'),
-        );
+        return [
+            ['hello'],
+            ['>'],
+            ['+'],
+            [' '],
+            ['/* comment */'],
+        ];
     }
 
     protected function generateHandler()

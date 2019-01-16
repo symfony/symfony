@@ -27,12 +27,12 @@ class PrototypedArrayNode extends ArrayNode
     protected $keyAttribute;
     protected $removeKeyAttribute = false;
     protected $minNumberOfElements = 0;
-    protected $defaultValue = array();
+    protected $defaultValue = [];
     protected $defaultChildren;
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */
-    private $valuePrototypes = array();
+    private $valuePrototypes = [];
 
     /**
      * Sets the minimum number of elements that a prototype based node must
@@ -114,10 +114,10 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param int|string|array|null $children The number of children|The child name|The children names to be added
      */
-    public function setAddChildrenIfNoneSet($children = array('defaults'))
+    public function setAddChildrenIfNoneSet($children = ['defaults'])
     {
         if (null === $children) {
-            $this->defaultChildren = array('defaults');
+            $this->defaultChildren = ['defaults'];
         } else {
             $this->defaultChildren = \is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
@@ -132,8 +132,8 @@ class PrototypedArrayNode extends ArrayNode
     public function getDefaultValue()
     {
         if (null !== $this->defaultChildren) {
-            $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : array();
-            $defaults = array();
+            $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : [];
+            $defaults = [];
             foreach (array_values($this->defaultChildren) as $i => $name) {
                 $defaults[null === $this->keyAttribute ? $i : $name] = $default;
             }
@@ -226,7 +226,7 @@ class PrototypedArrayNode extends ArrayNode
         $value = $this->remapXml($value);
 
         $isAssoc = array_keys($value) !== range(0, \count($value) - 1);
-        $normalized = array();
+        $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && \is_int($k) && !$isAssoc) {
@@ -243,7 +243,7 @@ class PrototypedArrayNode extends ArrayNode
                     }
 
                     // if only "value" is left
-                    if (array_keys($v) === array('value')) {
+                    if (array_keys($v) === ['value']) {
                         $v = $v['value'];
                         if ($this->prototype instanceof ArrayNode && ($children = $this->prototype->getChildren()) && array_key_exists('value', $children)) {
                             $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];

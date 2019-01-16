@@ -166,7 +166,7 @@ abstract class Bundle implements BundleInterface
             }
             $class = $ns.'\\'.$file->getBasename('.php');
             if ($this->container) {
-                $commandIds = $this->container->hasParameter('console.command.ids') ? $this->container->getParameter('console.command.ids') : array();
+                $commandIds = $this->container->hasParameter('console.command.ids') ? $this->container->getParameter('console.command.ids') : [];
                 $alias = 'console.command.'.strtolower(str_replace('\\', '_', $class));
                 if (isset($commandIds[$alias]) || $this->container->has($alias)) {
                     continue;

@@ -64,7 +64,7 @@ class PdoSessionHandlerTest extends TestCase
      */
     public function testInexistentTable()
     {
-        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table'));
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), ['db_table' => 'inexistent_table']);
         $storage->open('', 'sid');
         $storage->read('id');
         $storage->write('id', 'data');
@@ -147,7 +147,7 @@ class PdoSessionHandlerTest extends TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->will($this->returnValue(array(array($stream, 42, time()))));
+            ->will($this->returnValue([[$stream, 42, time()]]));
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -178,7 +178,7 @@ class PdoSessionHandlerTest extends TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->will($this->returnCallback(function () use (&$exception, $stream) {
-                return $exception ? array(array($stream, 42, time())) : array();
+                return $exception ? [[$stream, 42, time()]] : [];
             }));
 
         $insertStmt->expects($this->once())->method('execute')
@@ -344,19 +344,19 @@ class PdoSessionHandlerTest extends TestCase
 
     public function provideUrlDsnPairs()
     {
-        yield array('mysql://localhost/test', 'mysql:host=localhost;dbname=test;');
-        yield array('mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;');
-        yield array('mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd');
-        yield array('postgres://localhost/test', 'pgsql:host=localhost;dbname=test;');
-        yield array('postgresql://localhost:5634/test', 'pgsql:host=localhost;port=5634;dbname=test;');
-        yield array('postgres://root:pwd@localhost/test', 'pgsql:host=localhost;dbname=test;', 'root', 'pwd');
-        yield 'sqlite relative path' => array('sqlite://localhost/tmp/test', 'sqlite:tmp/test');
-        yield 'sqlite absolute path' => array('sqlite://localhost//tmp/test', 'sqlite:/tmp/test');
-        yield 'sqlite relative path without host' => array('sqlite:///tmp/test', 'sqlite:tmp/test');
-        yield 'sqlite absolute path without host' => array('sqlite3:////tmp/test', 'sqlite:/tmp/test');
-        yield array('sqlite://localhost/:memory:', 'sqlite::memory:');
-        yield array('mssql://localhost/test', 'sqlsrv:server=localhost;Database=test');
-        yield array('mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test');
+        yield ['mysql://localhost/test', 'mysql:host=localhost;dbname=test;'];
+        yield ['mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;'];
+        yield ['mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd'];
+        yield ['postgres://localhost/test', 'pgsql:host=localhost;dbname=test;'];
+        yield ['postgresql://localhost:5634/test', 'pgsql:host=localhost;port=5634;dbname=test;'];
+        yield ['postgres://root:pwd@localhost/test', 'pgsql:host=localhost;dbname=test;', 'root', 'pwd'];
+        yield 'sqlite relative path' => ['sqlite://localhost/tmp/test', 'sqlite:tmp/test'];
+        yield 'sqlite absolute path' => ['sqlite://localhost//tmp/test', 'sqlite:/tmp/test'];
+        yield 'sqlite relative path without host' => ['sqlite:///tmp/test', 'sqlite:tmp/test'];
+        yield 'sqlite absolute path without host' => ['sqlite3:////tmp/test', 'sqlite:/tmp/test'];
+        yield ['sqlite://localhost/:memory:', 'sqlite::memory:'];
+        yield ['mssql://localhost/test', 'sqlsrv:server=localhost;Database=test'];
+        yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
     private function createStream($content)
@@ -394,7 +394,7 @@ class MockPdo extends \PDO
         return parent::getAttribute($attribute);
     }
 
-    public function prepare($statement, $driverOptions = array())
+    public function prepare($statement, $driverOptions = [])
     {
         return \is_callable($this->prepareResult)
             ? \call_user_func($this->prepareResult, $statement, $driverOptions)

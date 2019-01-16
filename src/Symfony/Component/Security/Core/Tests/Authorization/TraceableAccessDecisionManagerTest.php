@@ -25,7 +25,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     public function testDecideLog($expectedLog, $object)
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
-        $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
+        $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), ['ATTRIBUTE_1'], $object);
 
         $this->assertSame($expectedLog, $adm->getDecisionLog());
     }
@@ -34,13 +34,13 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $object = new \stdClass();
 
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => null, 'result' => false)), null);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => true, 'result' => false)), true);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'jolie string', 'result' => false)), 'jolie string');
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 12345, 'result' => false)), 12345);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = fopen(__FILE__, 'r'), 'result' => false)), $x);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = array(), 'result' => false)), $x);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => null, 'result' => false]], null];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => true, 'result' => false]], true];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => 'jolie string', 'result' => false]], 'jolie string'];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => 12345, 'result' => false]], 12345];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => $x = fopen(__FILE__, 'r'), 'result' => false]], $x];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => $x = [], 'result' => false]], $x];
+        yield [[['attributes' => ['ATTRIBUTE_1'], 'object' => $object, 'result' => false]], $object];
     }
 
     public function testDebugAccessDecisionManagerAliasExistsForBC()

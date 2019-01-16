@@ -129,7 +129,7 @@ EOF
                 $template .= fread(STDIN, 1024);
             }
 
-            return $this->display($input, $output, $io, array($this->validate($template, uniqid('sf_', true))));
+            return $this->display($input, $output, $io, [$this->validate($template, uniqid('sf_', true))]);
         }
 
         $filesInfo = $this->getFilesInfo($filenames);
@@ -139,7 +139,7 @@ EOF
 
     private function getFilesInfo(array $filenames)
     {
-        $filesInfo = array();
+        $filesInfo = [];
         foreach ($filenames as $filename) {
             foreach ($this->findFiles($filename) as $file) {
                 $filesInfo[] = $this->validate(file_get_contents($file), $file);
@@ -152,7 +152,7 @@ EOF
     protected function findFiles($filename)
     {
         if (is_file($filename)) {
-            return array($filename);
+            return [$filename];
         } elseif (is_dir($filename)) {
             return Finder::create()->files()->in($filename)->name('*.twig');
         }
@@ -164,7 +164,7 @@ EOF
     {
         $realLoader = $this->twig->getLoader();
         try {
-            $temporaryLoader = new ArrayLoader(array((string) $file => $template));
+            $temporaryLoader = new ArrayLoader([(string) $file => $template]);
             $this->twig->setLoader($temporaryLoader);
             $nodeTree = $this->twig->parse($this->twig->tokenize(new Source($template, (string) $file)));
             $this->twig->compile($nodeTree);
@@ -172,10 +172,10 @@ EOF
         } catch (Error $e) {
             $this->twig->setLoader($realLoader);
 
-            return array('template' => $template, 'file' => $file, 'line' => $e->getTemplateLine(), 'valid' => false, 'exception' => $e);
+            return ['template' => $template, 'file' => $file, 'line' => $e->getTemplateLine(), 'valid' => false, 'exception' => $e];
         }
 
-        return array('template' => $template, 'file' => $file, 'valid' => true);
+        return ['template' => $template, 'file' => $file, 'valid' => true];
     }
 
     private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, $files)
@@ -261,7 +261,7 @@ EOF
         $position = max(0, $line - $context);
         $max = min(\count($lines), $line - 1 + $context);
 
-        $result = array();
+        $result = [];
         while ($position < $max) {
             $result[$position + 1] = $lines[$position];
             ++$position;

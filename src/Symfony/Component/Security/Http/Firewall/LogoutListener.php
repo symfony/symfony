@@ -44,18 +44,18 @@ class LogoutListener implements ListenerInterface
      * @param array                          $options          An array of options to process a logout attempt
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
      */
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), CsrfTokenManagerInterface $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = [], CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
-        $this->options = array_merge(array(
+        $this->options = array_merge([
             'csrf_parameter' => '_csrf_token',
             'csrf_token_id' => 'logout',
             'logout_path' => '/logout',
-        ), $options);
+        ], $options);
         $this->successHandler = $successHandler;
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->handlers = array();
+        $this->handlers = [];
     }
 
     public function addHandler(LogoutHandlerInterface $handler)

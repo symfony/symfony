@@ -52,7 +52,7 @@ trait ApcuTrait
     protected function doFetch(array $ids)
     {
         try {
-            foreach (apcu_fetch($ids, $ok) ?: array() as $k => $v) {
+            foreach (apcu_fetch($ids, $ok) ?: [] as $k => $v) {
                 if (null !== $v || $ok) {
                     yield $k => $v;
                 }

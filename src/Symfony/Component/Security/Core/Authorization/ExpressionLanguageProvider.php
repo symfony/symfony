@@ -23,7 +23,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
     public function getFunctions()
     {
-        return array(
+        return [
             new ExpressionFunction('is_anonymous', function () {
                 return '$trust_resolver->isAnonymous($token)';
             }, function (array $variables) {
@@ -53,6 +53,6 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }, function (array $variables, $role) {
                 return \in_array($role, $variables['roles']);
             }),
-        );
+        ];
     }
 }

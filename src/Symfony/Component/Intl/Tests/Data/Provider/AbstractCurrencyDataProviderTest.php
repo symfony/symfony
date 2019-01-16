@@ -22,7 +22,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $currencies = array(
+    protected static $currencies = [
         'ADP',
         'AED',
         'AFA',
@@ -313,9 +313,9 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         'ZWD',
         'ZWL',
         'ZWR',
-    );
+    ];
 
-    protected static $alpha3ToNumeric = array(
+    protected static $alpha3ToNumeric = [
         'AFA' => 4,
         'ALK' => 8,
         'ALL' => 8,
@@ -584,7 +584,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         'ESA' => 996,
         'USN' => 997,
         'USS' => 998,
-    );
+    ];
 
     /**
      * @var CurrencyDataProvider
@@ -659,7 +659,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     public function testGetName($displayLocale)
     {
         $expected = $this->dataProvider->getNames($displayLocale);
-        $actual = array();
+        $actual = [];
 
         foreach ($expected as $currency => $name) {
             $actual[$currency] = $this->dataProvider->getName($currency, $displayLocale);
@@ -673,7 +673,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         Locale::setDefault('de_AT');
 
         $expected = $this->dataProvider->getNames('de_AT');
-        $actual = array();
+        $actual = [];
 
         foreach ($expected as $currency => $name) {
             $actual[$currency] = $this->dataProvider->getName($currency);
@@ -697,7 +697,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     public function provideCurrencies()
     {
         return array_map(
-            function ($currency) { return array($currency); },
+            function ($currency) { return [$currency]; },
             static::$currencies
         );
     }
@@ -721,7 +721,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     public function provideCurrenciesWithNumericEquivalent()
     {
         return array_map(
-            function ($value) { return array($value); },
+            function ($value) { return [$value]; },
             array_keys(static::$alpha3ToNumeric)
         );
     }
@@ -737,7 +737,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     public function provideCurrenciesWithoutNumericEquivalent()
     {
         return array_map(
-            function ($value) { return array($value); },
+            function ($value) { return [$value]; },
             array_diff(static::$currencies, array_keys(static::$alpha3ToNumeric))
         );
     }
@@ -756,7 +756,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         $numericToAlpha3 = $this->getNumericToAlpha3Mapping();
 
         return array_map(
-            function ($numeric, $alpha3) { return array($numeric, $alpha3); },
+            function ($numeric, $alpha3) { return [$numeric, $alpha3]; },
             array_keys($numericToAlpha3),
             $numericToAlpha3
         );
@@ -782,7 +782,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         $invalidNumericCodes = array_diff(range(0, 1000), $validNumericCodes);
 
         return array_map(
-            function ($value) { return array($value); },
+            function ($value) { return [$value]; },
             $invalidNumericCodes
         );
     }
@@ -798,11 +798,11 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 
     private function getNumericToAlpha3Mapping()
     {
-        $numericToAlpha3 = array();
+        $numericToAlpha3 = [];
 
         foreach (static::$alpha3ToNumeric as $alpha3 => $numeric) {
             if (!isset($numericToAlpha3[$numeric])) {
-                $numericToAlpha3[$numeric] = array();
+                $numericToAlpha3[$numeric] = [];
             }
 
             $numericToAlpha3[$numeric][] = $alpha3;

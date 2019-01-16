@@ -125,7 +125,7 @@ EOF
         }
 
         // Parse arguments
-        $objectIdentities = array();
+        $objectIdentities = [];
         $maskBuilder = $this->getMaskBuilder();
         foreach ($input->getArgument('arguments') as $argument) {
             $data = explode(':', $argument, 2);
@@ -149,7 +149,7 @@ EOF
         }
 
         // Create security identities
-        $securityIdentities = array();
+        $securityIdentities = [];
 
         if ($userOption) {
             foreach ($userOption as $user) {

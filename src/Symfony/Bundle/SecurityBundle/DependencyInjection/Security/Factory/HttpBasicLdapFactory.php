@@ -41,7 +41,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
 
         if (!empty($config['query_string'])) {
-            $definition->addMethodCall('setQueryString', array($config['query_string']));
+            $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }
 
         // listener
@@ -50,7 +50,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($entryPointId));
 
-        return array($provider, $listenerId, $entryPointId);
+        return [$provider, $listenerId, $entryPointId];
     }
 
     public function addConfiguration(NodeDefinition $node)

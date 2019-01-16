@@ -30,7 +30,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->listener = new AddRequestFormatsListener(array('csv' => array('text/csv', 'text/plain')));
+        $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
     }
 
     protected function tearDown()
@@ -46,7 +46,7 @@ class AddRequestFormatsListenerTest extends TestCase
     public function testRegisteredEvent()
     {
         $this->assertEquals(
-            array(KernelEvents::REQUEST => array('onKernelRequest', 1)),
+            [KernelEvents::REQUEST => ['onKernelRequest', 1]],
             AddRequestFormatsListener::getSubscribedEvents()
         );
     }
@@ -58,7 +58,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
         $request->expects($this->once())
             ->method('setFormat')
-            ->with('csv', array('text/csv', 'text/plain'));
+            ->with('csv', ['text/csv', 'text/plain']);
 
         $this->listener->onKernelRequest($event);
     }

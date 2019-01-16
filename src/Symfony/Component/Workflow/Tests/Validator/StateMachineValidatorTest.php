@@ -15,7 +15,7 @@ class StateMachineValidatorTest extends TestCase
      */
     public function testWithMultipleTransitionWithSameNameShareInput()
     {
-        $places = array('a', 'b', 'c');
+        $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t1', 'a', 'c');
         $definition = new Definition($places, $transitions);
@@ -41,8 +41,8 @@ class StateMachineValidatorTest extends TestCase
      */
     public function testWithMultipleTos()
     {
-        $places = array('a', 'b', 'c');
-        $transitions[] = new Transition('t1', 'a', array('b', 'c'));
+        $places = ['a', 'b', 'c'];
+        $transitions[] = new Transition('t1', 'a', ['b', 'c']);
         $definition = new Definition($places, $transitions);
 
         (new StateMachineValidator())->validate($definition, 'foo');
@@ -66,8 +66,8 @@ class StateMachineValidatorTest extends TestCase
      */
     public function testWithMultipleFroms()
     {
-        $places = array('a', 'b', 'c');
-        $transitions[] = new Transition('t1', array('a', 'b'), 'c');
+        $places = ['a', 'b', 'c'];
+        $transitions[] = new Transition('t1', ['a', 'b'], 'c');
         $definition = new Definition($places, $transitions);
 
         (new StateMachineValidator())->validate($definition, 'foo');
@@ -87,7 +87,7 @@ class StateMachineValidatorTest extends TestCase
 
     public function testValid()
     {
-        $places = array('a', 'b', 'c');
+        $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
         $transitions[] = new Transition('t2', 'a', 'c');
         $definition = new Definition($places, $transitions);

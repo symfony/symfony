@@ -53,17 +53,17 @@ class RedirectControllerTest extends TestCase
 
         $route = 'new-route';
         $url = '/redirect-url';
-        $attributes = array(
+        $attributes = [
             'route' => $route,
             'permanent' => $permanent,
             '_route' => 'current-route',
-            '_route_params' => array(
+            '_route_params' => [
                 'route' => $route,
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
-            ),
-        );
+            ],
+        ];
 
         $request->attributes = new ParameterBag($attributes);
 
@@ -84,12 +84,12 @@ class RedirectControllerTest extends TestCase
 
     public function provider()
     {
-        return array(
-            array(true, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, 302, array('additional-parameter' => 'value')),
-            array(false, true, 302, array()),
-            array(false, array('additional-parameter'), 302, array()),
-        );
+        return [
+            [true, false, 301, ['additional-parameter' => 'value']],
+            [false, false, 302, ['additional-parameter' => 'value']],
+            [false, true, 302, []],
+            [false, ['additional-parameter'], 302, []],
+        ];
     }
 
     public function testEmptyPath()
@@ -169,33 +169,33 @@ class RedirectControllerTest extends TestCase
 
     public function urlRedirectProvider()
     {
-        return array(
+        return [
             // Standard ports
-            array('http',  null, null,  'http',  80,   ''),
-            array('http',  80,   null,  'http',  80,   ''),
-            array('https', null, null,  'http',  80,   ''),
-            array('https', 80,   null,  'http',  80,   ''),
+            ['http',  null, null,  'http',  80,   ''],
+            ['http',  80,   null,  'http',  80,   ''],
+            ['https', null, null,  'http',  80,   ''],
+            ['https', 80,   null,  'http',  80,   ''],
 
-            array('http',  null,  null, 'https', 443,  ''),
-            array('http',  null,  443,  'https', 443,  ''),
-            array('https', null,  null, 'https', 443,  ''),
-            array('https', null,  443,  'https', 443,  ''),
+            ['http',  null,  null, 'https', 443,  ''],
+            ['http',  null,  443,  'https', 443,  ''],
+            ['https', null,  null, 'https', 443,  ''],
+            ['https', null,  443,  'https', 443,  ''],
 
             // Non-standard ports
-            array('http',  null,  null, 'http',  8080, ':8080'),
-            array('http',  4080,  null, 'http',  8080, ':4080'),
-            array('http',  80,    null, 'http',  8080, ''),
-            array('https', null,  null, 'http',  8080, ''),
-            array('https', null,  8443, 'http',  8080, ':8443'),
-            array('https', null,  443,  'http',  8080, ''),
+            ['http',  null,  null, 'http',  8080, ':8080'],
+            ['http',  4080,  null, 'http',  8080, ':4080'],
+            ['http',  80,    null, 'http',  8080, ''],
+            ['https', null,  null, 'http',  8080, ''],
+            ['https', null,  8443, 'http',  8080, ':8443'],
+            ['https', null,  443,  'http',  8080, ''],
 
-            array('https', null,  null, 'https', 8443, ':8443'),
-            array('https', null,  4443, 'https', 8443, ':4443'),
-            array('https', null,  443,  'https', 8443, ''),
-            array('http',  null,  null, 'https', 8443, ''),
-            array('http',  8080,  4443, 'https', 8443, ':8080'),
-            array('http',  80,    4443, 'https', 8443, ''),
-        );
+            ['https', null,  null, 'https', 8443, ':8443'],
+            ['https', null,  4443, 'https', 8443, ':4443'],
+            ['https', null,  443,  'https', 8443, ''],
+            ['http',  null,  null, 'https', 8443, ''],
+            ['http',  8080,  4443, 'https', 8443, ':8080'],
+            ['http',  80,    4443, 'https', 8443, ''],
+        ];
     }
 
     /**
@@ -217,13 +217,13 @@ class RedirectControllerTest extends TestCase
 
     public function pathQueryParamsProvider()
     {
-        return array(
-            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
-        );
+        return [
+            ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],
+            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''],
+            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'],
+            ['http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'],
+            ['http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'],
+        ];
     }
 
     /**

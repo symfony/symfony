@@ -24,7 +24,7 @@ class ExceptionCaster
 {
     public static $srcContext = 1;
     public static $traceArgs = true;
-    public static $errorTypes = array(
+    public static $errorTypes = [
         E_DEPRECATED => 'E_DEPRECATED',
         E_USER_DEPRECATED => 'E_USER_DEPRECATED',
         E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
@@ -40,9 +40,9 @@ class ExceptionCaster
         E_USER_WARNING => 'E_USER_WARNING',
         E_USER_NOTICE => 'E_USER_NOTICE',
         E_STRICT => 'E_STRICT',
-    );
+    ];
 
-    private static $framesCache = array();
+    private static $framesCache = [];
 
     public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
@@ -92,10 +92,10 @@ class ExceptionCaster
             $a[$s] = new ConstStub(self::$errorTypes[$a[$s]], $a[$s]);
         }
 
-        $trace = array(array(
+        $trace = [[
             'file' => $a[$sPrefix.'file'],
             'line' => $a[$sPrefix.'line'],
-        ));
+        ]];
 
         if (isset($a[$sPrefix.'trace'])) {
             $trace = array_merge($trace, $a[$sPrefix.'trace']);
@@ -117,16 +117,16 @@ class ExceptionCaster
         $frames = $trace->value;
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        $a = array();
+        $a = [];
         $j = \count($frames);
         if (0 > $i = $trace->sliceOffset) {
             $i = max(0, $j + $i);
         }
         if (!isset($trace->value[$i])) {
-            return array();
+            return [];
         }
         $lastCall = isset($frames[$i]['function']) ? (isset($frames[$i]['class']) ? $frames[0]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '';
-        $frames[] = array('function' => '');
+        $frames[] = ['function' => ''];
         $collapse = false;
 
         for ($j += $trace->numberingOffset - $i++; isset($frames[$i]); ++$i, --$j) {
@@ -134,16 +134,16 @@ class ExceptionCaster
             $call = isset($f['function']) ? (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'] : '???';
 
             $frame = new FrameStub(
-                array(
+                [
                     'object' => isset($f['object']) ? $f['object'] : null,
                     'class' => isset($f['class']) ? $f['class'] : null,
                     'type' => isset($f['type']) ? $f['type'] : null,
                     'function' => isset($f['function']) ? $f['function'] : null,
-                ) + $frames[$i - 1],
+                ] + $frames[$i - 1],
                 false,
                 true
             );
-            $f = self::castFrameStub($frame, array(), $frame, true);
+            $f = self::castFrameStub($frame, [], $frame, true);
             if (isset($f[$prefix.'src'])) {
                 foreach ($f[$prefix.'src']->value as $label => $frame) {
                     if (0 === strpos($label, "\0~collapse=0")) {
@@ -239,7 +239,7 @@ class ExceptionCaster
                     $srcAttr .= '&separator=:';
                 }
                 $srcAttr .= $ellipsis ? '&ellipsis-type=path&ellipsis='.$ellipsis.'&ellipsis-tail='.$ellipsisTail : '';
-                self::$framesCache[$cacheKey] = $a[$prefix.'src'] = new EnumStub(array("\0~$srcAttr\0$srcKey" => $src));
+                self::$framesCache[$cacheKey] = $a[$prefix.'src'] = new EnumStub(["\0~$srcAttr\0$srcKey" => $src]);
             }
         }
 
@@ -265,7 +265,7 @@ class ExceptionCaster
             $trace = $a[$xPrefix.'trace'];
             unset($a[$xPrefix.'trace']); // Ensures the trace is always last
         } else {
-            $trace = array();
+            $trace = [];
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE) && $trace) {
@@ -291,23 +291,23 @@ class ExceptionCaster
         if (isset($trace[0]['file'], $trace[0]['line']) && $trace[0]['file'] === $file && $trace[0]['line'] === $line) {
             return;
         }
-        array_unshift($trace, array(
+        array_unshift($trace, [
             'function' => $class ? 'new '.$class : null,
             'file' => $file,
             'line' => $line,
-        ));
+        ]);
     }
 
     private static function extractSource($srcLines, $line, $srcContext, $title, $lang, $file = null)
     {
         $srcLines = explode("\n", $srcLines);
-        $src = array();
+        $src = [];
 
         for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
             $src[] = (isset($srcLines[$i]) ? $srcLines[$i] : '')."\n";
         }
 
-        $srcLines = array();
+        $srcLines = [];
         $ltrim = 0;
         do {
             $pad = null;

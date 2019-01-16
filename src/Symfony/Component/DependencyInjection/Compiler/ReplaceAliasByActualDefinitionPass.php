@@ -33,8 +33,8 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
     public function process(ContainerBuilder $container)
     {
         // First collect all alias targets that need to be replaced
-        $seenAliasTargets = array();
-        $replacements = array();
+        $seenAliasTargets = [];
+        $replacements = [];
         foreach ($container->getAliases() as $definitionId => $target) {
             $targetId = $container->normalizeId($target);
             // Special case: leave this target alone
@@ -69,7 +69,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         $this->replacements = $replacements;
 
         parent::process($container);
-        $this->replacements = array();
+        $this->replacements = [];
     }
 
     /**

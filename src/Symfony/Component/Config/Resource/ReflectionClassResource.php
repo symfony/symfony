@@ -19,13 +19,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface, \Serializable
 {
-    private $files = array();
+    private $files = [];
     private $className;
     private $classReflector;
-    private $excludedVendors = array();
+    private $excludedVendors = [];
     private $hash;
 
-    public function __construct(\ReflectionClass $classReflector, $excludedVendors = array())
+    public function __construct(\ReflectionClass $classReflector, $excludedVendors = [])
     {
         $this->className = $classReflector->name;
         $this->classReflector = $classReflector;
@@ -64,7 +64,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             $this->loadFiles($this->classReflector);
         }
 
-        return serialize(array($this->files, $this->className, $this->hash));
+        return serialize([$this->files, $this->className, $this->hash]);
     }
 
     public function unserialize($serialized)
@@ -147,7 +147,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
                 yield preg_replace('/^  @@.*/m', '', $m);
 
-                $defaults = array();
+                $defaults = [];
                 foreach ($m->getParameters() as $p) {
                     $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
                 }
@@ -161,12 +161,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
         if (interface_exists(EventSubscriberInterface::class, false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
             yield EventSubscriberInterface::class;
-            yield print_r(\call_user_func(array($class->name, 'getSubscribedEvents')), true);
+            yield print_r(\call_user_func([$class->name, 'getSubscribedEvents']), true);
         }
 
         if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
-            yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
+            yield print_r(\call_user_func([$class->name, 'getSubscribedServices']), true);
         }
     }
 }
@@ -178,10 +178,10 @@ class ReflectionMethodHhvmWrapper extends \ReflectionMethod
 {
     public function getParameters()
     {
-        $params = array();
+        $params = [];
 
         foreach (parent::getParameters() as $i => $p) {
-            $params[] = new ReflectionParameterHhvmWrapper(array($this->class, $this->name), $i);
+            $params[] = new ReflectionParameterHhvmWrapper([$this->class, $this->name], $i);
         }
 
         return $params;
@@ -195,6 +195,6 @@ class ReflectionParameterHhvmWrapper extends \ReflectionParameter
 {
     public function getDefaultValue()
     {
-        return array($this->isVariadic(), $this->isDefaultValueAvailable() ? parent::getDefaultValue() : null);
+        return [$this->isVariadic(), $this->isDefaultValueAvailable() ? parent::getDefaultValue() : null];
     }
 }

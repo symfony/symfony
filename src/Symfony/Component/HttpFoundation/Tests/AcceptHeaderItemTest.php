@@ -28,24 +28,24 @@ class AcceptHeaderItemTest extends TestCase
 
     public function provideFromStringData()
     {
-        return array(
-            array(
+        return [
+            [
                 'text/html',
-                'text/html', array(),
-            ),
-            array(
+                'text/html', [],
+            ],
+            [
                 '"this;should,not=matter"',
-                'this;should,not=matter', array(),
-            ),
-            array(
+                'this;should,not=matter', [],
+            ],
+            [
                 "text/plain; charset=utf-8;param=\"this;should,not=matter\";\tfootnotes=true",
-                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
-            ),
-            array(
+                'text/plain', ['charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'],
+            ],
+            [
                 '"this;should,not=matter";charset=utf-8',
-                'this;should,not=matter', array('charset' => 'utf-8'),
-            ),
-        );
+                'this;should,not=matter', ['charset' => 'utf-8'],
+            ],
+        ];
     }
 
     /**
@@ -59,21 +59,21 @@ class AcceptHeaderItemTest extends TestCase
 
     public function provideToStringData()
     {
-        return array(
-            array(
-                'text/html', array(),
+        return [
+            [
+                'text/html', [],
                 'text/html',
-            ),
-            array(
-                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
+            ],
+            [
+                'text/plain', ['charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'],
                 'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true',
-            ),
-        );
+            ],
+        ];
     }
 
     public function testValue()
     {
-        $item = new AcceptHeaderItem('value', array());
+        $item = new AcceptHeaderItem('value', []);
         $this->assertEquals('value', $item->getValue());
 
         $item->setValue('new value');
@@ -85,7 +85,7 @@ class AcceptHeaderItemTest extends TestCase
 
     public function testQuality()
     {
-        $item = new AcceptHeaderItem('value', array());
+        $item = new AcceptHeaderItem('value', []);
         $this->assertEquals(1.0, $item->getQuality());
 
         $item->setQuality(0.5);
@@ -98,14 +98,14 @@ class AcceptHeaderItemTest extends TestCase
 
     public function testAttribute()
     {
-        $item = new AcceptHeaderItem('value', array());
-        $this->assertEquals(array(), $item->getAttributes());
+        $item = new AcceptHeaderItem('value', []);
+        $this->assertEquals([], $item->getAttributes());
         $this->assertFalse($item->hasAttribute('test'));
         $this->assertNull($item->getAttribute('test'));
         $this->assertEquals('default', $item->getAttribute('test', 'default'));
 
         $item->setAttribute('test', 'value');
-        $this->assertEquals(array('test' => 'value'), $item->getAttributes());
+        $this->assertEquals(['test' => 'value'], $item->getAttributes());
         $this->assertTrue($item->hasAttribute('test'));
         $this->assertEquals('value', $item->getAttribute('test'));
         $this->assertEquals('value', $item->getAttribute('test', 'default'));

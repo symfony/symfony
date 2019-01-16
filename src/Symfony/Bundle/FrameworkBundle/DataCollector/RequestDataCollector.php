@@ -38,10 +38,10 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
             }
         }
         if ($request->attributes->has('_forward_controller')) {
-            $this->data['forward'] = array(
+            $this->data['forward'] = [
                 'token' => $request->attributes->get('_forward_token'),
                 'controller' => $this->parseController($request->attributes->get('_forward_controller')),
-            );
+            ];
         }
     }
 

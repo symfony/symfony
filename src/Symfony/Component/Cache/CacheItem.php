@@ -25,8 +25,8 @@ final class CacheItem implements CacheItemInterface
     protected $isHit = false;
     protected $expiry;
     protected $defaultLifetime;
-    protected $tags = array();
-    protected $prevTags = array();
+    protected $tags = [];
+    protected $prevTags = [];
     protected $innerItem;
     protected $poolHash;
 
@@ -110,7 +110,7 @@ final class CacheItem implements CacheItemInterface
     public function tag($tags)
     {
         if (!\is_array($tags)) {
-            $tags = array($tags);
+            $tags = [$tags];
         }
         foreach ($tags as $tag) {
             if (!\is_string($tag)) {
@@ -170,12 +170,12 @@ final class CacheItem implements CacheItemInterface
      *
      * @internal
      */
-    public static function log(LoggerInterface $logger = null, $message, $context = array())
+    public static function log(LoggerInterface $logger = null, $message, $context = [])
     {
         if ($logger) {
             $logger->warning($message, $context);
         } else {
-            $replace = array();
+            $replace = [];
             foreach ($context as $k => $v) {
                 if (is_scalar($v)) {
                     $replace['{'.$k.'}'] = $v;

@@ -34,10 +34,10 @@ class WorkflowDumpCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
-            ))
+            ])
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the graphical representation of a

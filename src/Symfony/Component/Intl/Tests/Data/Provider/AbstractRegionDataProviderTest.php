@@ -22,7 +22,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $territories = array(
+    protected static $territories = [
         'AC',
         'AD',
         'AE',
@@ -278,7 +278,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         'ZA',
         'ZM',
         'ZW',
-    );
+    ];
 
     /**
      * @var RegionDataProvider

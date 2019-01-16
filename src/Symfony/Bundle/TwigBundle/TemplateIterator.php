@@ -33,7 +33,7 @@ class TemplateIterator implements \IteratorAggregate
      * @param array           $paths       Additional Twig paths to warm
      * @param string          $defaultPath The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, $rootDir, array $paths = array(), $defaultPath = null)
+    public function __construct(KernelInterface $kernel, $rootDir, array $paths = [], $defaultPath = null)
     {
         $this->kernel = $kernel;
         $this->rootDir = $rootDir;
@@ -52,7 +52,7 @@ class TemplateIterator implements \IteratorAggregate
 
         $this->templates = array_merge(
             $this->findTemplatesInDirectory($this->rootDir.'/Resources/views'),
-            $this->findTemplatesInDirectory($this->defaultPath, null, array('bundles'))
+            $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles'])
         );
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
@@ -83,13 +83,13 @@ class TemplateIterator implements \IteratorAggregate
      *
      * @return array
      */
-    private function findTemplatesInDirectory($dir, $namespace = null, array $excludeDirs = array())
+    private function findTemplatesInDirectory($dir, $namespace = null, array $excludeDirs = [])
     {
         if (!is_dir($dir)) {
-            return array();
+            return [];
         }
 
-        $templates = array();
+        $templates = [];
         foreach (Finder::create()->files()->followLinks()->in($dir)->exclude($excludeDirs) as $file) {
             $templates[] = (null !== $namespace ? '@'.$namespace.'/' : '').str_replace('\\', '/', $file->getRelativePathname());
         }

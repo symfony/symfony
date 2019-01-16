@@ -70,12 +70,12 @@ class LocaleDataGenerator
         // Generate a list of (existing) locale fallbacks
         $fallbackMapping = $this->generateFallbackMapping($displayLocales, $aliases);
 
-        $localeNames = array();
+        $localeNames = [];
 
         // Generate locale names for all locales that have translations in
         // at least the language or the region bundle
         foreach ($displayLocales as $displayLocale => $_) {
-            $localeNames[$displayLocale] = array();
+            $localeNames[$displayLocale] = [];
 
             foreach ($locales as $locale) {
                 try {
@@ -111,9 +111,9 @@ class LocaleDataGenerator
             }
 
             foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, $displayLocale, array(
+                $writer->write($targetDir.'/'.$this->dirName, $displayLocale, [
                     'Names' => $localeNames[$displayLocale],
-                ));
+                ]);
             }
         }
 
@@ -121,18 +121,18 @@ class LocaleDataGenerator
         // target
         foreach ($aliases as $alias => $aliasOf) {
             foreach ($writers as $targetDir => $writer) {
-                $writer->write($targetDir.'/'.$this->dirName, $alias, array(
+                $writer->write($targetDir.'/'.$this->dirName, $alias, [
                     '%%ALIAS' => $aliasOf,
-                ));
+                ]);
             }
         }
 
         // Create root file which maps locale codes to locale codes, for fallback
         foreach ($writers as $targetDir => $writer) {
-            $writer->write($targetDir.'/'.$this->dirName, 'meta', array(
+            $writer->write($targetDir.'/'.$this->dirName, 'meta', [
                 'Locales' => $locales,
                 'Aliases' => $aliases,
-            ));
+            ]);
         }
     }
 
@@ -168,7 +168,7 @@ class LocaleDataGenerator
         //    continue;
         //}
 
-        $extras = array();
+        $extras = [];
 
         // Discover the name of the script part of the locale
         // i.e. in zh_Hans_MO, "Hans" is the script
@@ -209,7 +209,7 @@ class LocaleDataGenerator
 
     private function generateFallbackMapping(array $displayLocales, array $aliases)
     {
-        $mapping = array();
+        $mapping = [];
 
         foreach ($displayLocales as $displayLocale => $_) {
             $mapping[$displayLocale] = null;

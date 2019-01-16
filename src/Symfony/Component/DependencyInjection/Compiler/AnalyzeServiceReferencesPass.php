@@ -87,7 +87,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
             return $value;
         }
         if ($value instanceof Expression) {
-            $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
+            $this->getExpressionLanguage()->compile((string) $value, ['this' => 'container']);
 
             return $value;
         }

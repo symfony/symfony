@@ -1,8 +1,8 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('framework', [
     'translator' => false,
-    'templating' => array(
-        'engines' => array('php'),
-    ),
-));
+    'templating' => [
+        'engines' => ['php'],
+    ],
+]);

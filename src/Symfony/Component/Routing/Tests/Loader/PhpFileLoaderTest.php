@@ -33,7 +33,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testLoadWithRoute()
     {
-        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validpattern.php');
         $routes = $routeCollection->all();
 
@@ -45,14 +45,14 @@ class PhpFileLoaderTest extends TestCase
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
-            $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
+            $this->assertEquals(['https'], $route->getSchemes());
         }
     }
 
     public function testLoadWithImport()
     {
-        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validresource.php');
         $routes = $routeCollection->all();
 
@@ -64,14 +64,14 @@ class PhpFileLoaderTest extends TestCase
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
             $this->assertSame('{locale}.example.com', $route->getHost());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
-            $this->assertEquals(array('https'), $route->getSchemes());
+            $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
+            $this->assertEquals(['https'], $route->getSchemes());
         }
     }
 
     public function testThatDefiningVariableInConfigFileHasNoSideEffects()
     {
-        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
         $routeCollection = $loader->load('with_define_path_variable.php');
         $resources = $routeCollection->getResources();
@@ -86,30 +86,30 @@ class PhpFileLoaderTest extends TestCase
 
     public function testRoutingConfigurator()
     {
-        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
         $routeCollection = $loader->load('php_dsl.php');
 
         $expectedCollection = new RouteCollection();
 
         $expectedCollection->add('foo', (new Route('/foo'))
-            ->setOptions(array('utf8' => true))
+            ->setOptions(['utf8' => true])
             ->setCondition('abc')
         );
         $expectedCollection->add('buz', (new Route('/zub'))
-            ->setDefaults(array('_controller' => 'foo:act'))
+            ->setDefaults(['_controller' => 'foo:act'])
         );
         $expectedCollection->add('c_bar', (new Route('/sub/pub/bar'))
-            ->setRequirements(array('id' => '\d+'))
+            ->setRequirements(['id' => '\d+'])
         );
         $expectedCollection->add('c_pub_buz', (new Route('/sub/pub/buz'))
             ->setHost('host')
-            ->setRequirements(array('id' => '\d+'))
+            ->setRequirements(['id' => '\d+'])
         );
         $expectedCollection->add('ouf', (new Route('/ouf'))
-            ->setSchemes(array('https'))
-            ->setMethods(array('GET'))
-            ->setDefaults(array('id' => 0))
+            ->setSchemes(['https'])
+            ->setMethods(['GET'])
+            ->setDefaults(['id' => 0])
         );
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));
@@ -120,7 +120,7 @@ class PhpFileLoaderTest extends TestCase
 
     public function testRoutingConfiguratorCanImportGlobPatterns()
     {
-        $locator = new FileLocator(array(__DIR__.'/../Fixtures/glob'));
+        $locator = new FileLocator([__DIR__.'/../Fixtures/glob']);
         $loader = new PhpFileLoader($locator);
         $routeCollection = $loader->load('php_dsl.php');
 

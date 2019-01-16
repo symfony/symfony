@@ -16,11 +16,11 @@ use Symfony\Component\Cache\Simple\MemcachedCache;
 
 class MemcachedCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',
         'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
-    );
+    ];
 
     protected static $client;
 
@@ -40,29 +40,29 @@ class MemcachedCacheTest extends CacheTestCase
 
     public function createSimpleCache($defaultLifetime = 0)
     {
-        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
+        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['binary_protocol' => false]) : self::$client;
 
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
     public function testCreatePersistentConnectionShouldNotDupServerList()
     {
-        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['persistent_id' => 'persistent']);
         $this->assertCount(1, $instance->getServerList());
 
-        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('persistent_id' => 'persistent'));
+        $instance = MemcachedCache::createConnection('memcached://'.getenv('MEMCACHED_HOST'), ['persistent_id' => 'persistent']);
         $this->assertCount(1, $instance->getServerList());
     }
 
     public function testOptions()
     {
-        $client = MemcachedCache::createConnection(array(), array(
+        $client = MemcachedCache::createConnection([], [
             'libketama_compatible' => false,
             'distribution' => 'modula',
             'compression' => true,
             'serializer' => 'php',
             'hash' => 'md5',
-        ));
+        ]);
 
         $this->assertSame(\Memcached::SERIALIZER_PHP, $client->getOption(\Memcached::OPT_SERIALIZER));
         $this->assertSame(\Memcached::HASH_MD5, $client->getOption(\Memcached::OPT_HASH));
@@ -78,24 +78,24 @@ class MemcachedCacheTest extends CacheTestCase
      */
     public function testBadOptions($name, $value)
     {
-        MemcachedCache::createConnection(array(), array($name => $value));
+        MemcachedCache::createConnection([], [$name => $value]);
     }
 
     public function provideBadOptions()
     {
-        return array(
-            array('foo', 'bar'),
-            array('hash', 'zyx'),
-            array('serializer', 'zyx'),
-            array('distribution', 'zyx'),
-        );
+        return [
+            ['foo', 'bar'],
+            ['hash', 'zyx'],
+            ['serializer', 'zyx'],
+            ['distribution', 'zyx'],
+        ];
     }
 
     public function testDefaultOptions()
     {
         $this->assertTrue(MemcachedCache::isSupported());
 
-        $client = MemcachedCache::createConnection(array());
+        $client = MemcachedCache::createConnection([]);
 
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
@@ -112,7 +112,7 @@ class MemcachedCacheTest extends CacheTestCase
             $this->markTestSkipped('Memcached::HAVE_JSON required');
         }
 
-        new MemcachedCache(MemcachedCache::createConnection(array(), array('serializer' => 'json')));
+        new MemcachedCache(MemcachedCache::createConnection([], ['serializer' => 'json']));
     }
 
     /**
@@ -121,54 +121,54 @@ class MemcachedCacheTest extends CacheTestCase
     public function testServersSetting($dsn, $host, $port)
     {
         $client1 = MemcachedCache::createConnection($dsn);
-        $client2 = MemcachedCache::createConnection(array($dsn));
-        $client3 = MemcachedCache::createConnection(array(array($host, $port)));
-        $expect = array(
+        $client2 = MemcachedCache::createConnection([$dsn]);
+        $client3 = MemcachedCache::createConnection([[$host, $port]]);
+        $expect = [
             'host' => $host,
             'port' => $port,
-        );
+        ];
 
-        $f = function ($s) { return array('host' => $s['host'], 'port' => $s['port']); };
-        $this->assertSame(array($expect), array_map($f, $client1->getServerList()));
-        $this->assertSame(array($expect), array_map($f, $client2->getServerList()));
-        $this->assertSame(array($expect), array_map($f, $client3->getServerList()));
+        $f = function ($s) { return ['host' => $s['host'], 'port' => $s['port']]; };
+        $this->assertSame([$expect], array_map($f, $client1->getServerList()));
+        $this->assertSame([$expect], array_map($f, $client2->getServerList()));
+        $this->assertSame([$expect], array_map($f, $client3->getServerList()));
     }
 
     public function provideServersSetting()
     {
-        yield array(
+        yield [
             'memcached://127.0.0.1/50',
             '127.0.0.1',
             11211,
-        );
-        yield array(
+        ];
+        yield [
             'memcached://localhost:11222?weight=25',
             'localhost',
             11222,
-        );
+        ];
         if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
-            yield array(
+            yield [
                 'memcached://user:password@127.0.0.1?weight=50',
                 '127.0.0.1',
                 11211,
-            );
+            ];
         }
-        yield array(
+        yield [
             'memcached:///var/run/memcached.sock?weight=25',
             '/var/run/memcached.sock',
             0,
-        );
-        yield array(
+        ];
+        yield [
             'memcached:///var/local/run/memcached.socket?weight=25',
             '/var/local/run/memcached.socket',
             0,
-        );
+        ];
         if (filter_var(ini_get('memcached.use_sasl'), FILTER_VALIDATE_BOOLEAN)) {
-            yield array(
+            yield [
                 'memcached://user:password@/var/local/run/memcached.socket?weight=25',
                 '/var/local/run/memcached.socket',
                 0,
-            );
+            ];
         }
     }
 }

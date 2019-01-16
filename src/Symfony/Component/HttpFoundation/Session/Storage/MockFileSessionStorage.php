@@ -98,7 +98,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
                 unset($data[$key]);
             }
         }
-        if (array($key = $this->metadataBag->getStorageKey()) === array_keys($data)) {
+        if ([$key = $this->metadataBag->getStorageKey()] === array_keys($data)) {
             unset($data[$key]);
         }
 
@@ -145,7 +145,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     private function read()
     {
         $filePath = $this->getFilePath();
-        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : array();
+        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : [];
 
         $this->loadSession();
     }

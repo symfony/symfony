@@ -51,7 +51,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     {
         $this->profile->reset();
         $this->computed = null;
-        $this->data = array();
+        $this->data = [];
     }
 
     /**
@@ -60,7 +60,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     public function lateCollect()
     {
         $this->data['profile'] = serialize($this->profile);
-        $this->data['template_paths'] = array();
+        $this->data['template_paths'] = [];
 
         if (null === $this->twig) {
             return;
@@ -122,15 +122,15 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $dump = $dumper->dump($this->getProfile());
 
         // needed to remove the hardcoded CSS styles
-        $dump = str_replace(array(
+        $dump = str_replace([
             '<span style="background-color: #ffd">',
             '<span style="color: #d44">',
             '<span style="background-color: #dfd">',
-        ), array(
+        ], [
             '<span class="status-warning">',
             '<span class="status-error">',
             '<span class="status-success">',
-        ), $dump);
+        ], $dump);
 
         return new Markup($dump, 'UTF-8');
     }
@@ -139,7 +139,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     {
         if (null === $this->profile) {
             if (\PHP_VERSION_ID >= 70000) {
-                $this->profile = unserialize($this->data['profile'], array('allowed_classes' => array('Twig_Profiler_Profile', 'Twig\Profiler\Profile')));
+                $this->profile = unserialize($this->data['profile'], ['allowed_classes' => ['Twig_Profiler_Profile', 'Twig\Profiler\Profile']]);
             } else {
                 $this->profile = unserialize($this->data['profile']);
             }
@@ -159,13 +159,13 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
 
     private function computeData(Profile $profile)
     {
-        $data = array(
+        $data = [
             'template_count' => 0,
             'block_count' => 0,
             'macro_count' => 0,
-        );
+        ];
 
-        $templates = array();
+        $templates = [];
         foreach ($profile as $p) {
             $d = $this->computeData($p);
 

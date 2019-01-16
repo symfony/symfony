@@ -191,7 +191,7 @@ class LogoutListenerTest extends TestCase
             ->method('getRequest')
             ->will($this->returnValue($request = new Request()));
 
-        return array($event, $request);
+        return [$event, $request];
     }
 
     private function getHandler()
@@ -212,16 +212,16 @@ class LogoutListenerTest extends TestCase
             $tokenStorage = $this->getTokenStorage(),
             $httpUtils = $this->getHttpUtils(),
             $successHandler ?: $this->getSuccessHandler(),
-            $options = array(
+            $options = [
                 'csrf_parameter' => '_csrf_token',
                 'csrf_token_id' => 'logout',
                 'logout_path' => '/logout',
                 'target_url' => '/',
-            ),
+            ],
             $tokenManager
         );
 
-        return array($listener, $tokenStorage, $httpUtils, $options);
+        return [$listener, $tokenStorage, $httpUtils, $options];
     }
 
     private function getSuccessHandler()

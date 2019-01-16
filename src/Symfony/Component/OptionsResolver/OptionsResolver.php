@@ -29,51 +29,51 @@ class OptionsResolver implements Options
     /**
      * The names of all defined options.
      */
-    private $defined = array();
+    private $defined = [];
 
     /**
      * The default option values.
      */
-    private $defaults = array();
+    private $defaults = [];
 
     /**
      * The names of required options.
      */
-    private $required = array();
+    private $required = [];
 
     /**
      * The resolved option values.
      */
-    private $resolved = array();
+    private $resolved = [];
 
     /**
      * A list of normalizer closures.
      *
      * @var \Closure[]
      */
-    private $normalizers = array();
+    private $normalizers = [];
 
     /**
      * A list of accepted values for each option.
      */
-    private $allowedValues = array();
+    private $allowedValues = [];
 
     /**
      * A list of accepted types for each option.
      */
-    private $allowedTypes = array();
+    private $allowedTypes = [];
 
     /**
      * A list of closures for evaluating lazy options.
      */
-    private $lazy = array();
+    private $lazy = [];
 
     /**
      * A list of lazy options whose closure is currently being called.
      *
      * This list helps detecting circular dependencies between lazy options.
      */
-    private $calling = array();
+    private $calling = [];
 
     /**
      * Whether the instance is locked for reading.
@@ -85,11 +85,11 @@ class OptionsResolver implements Options
      */
     private $locked = false;
 
-    private static $typeAliases = array(
+    private static $typeAliases = [
         'boolean' => 'bool',
         'integer' => 'int',
         'double' => 'float',
-    );
+    ];
 
     /**
      * Sets the default value of a given option.
@@ -154,7 +154,7 @@ class OptionsResolver implements Options
 
                 // Ignore previous lazy options if the closure has no second parameter
                 if (!isset($this->lazy[$option]) || !isset($params[1])) {
-                    $this->lazy[$option] = array();
+                    $this->lazy[$option] = [];
                 }
 
                 // Store closure for later evaluation
@@ -423,7 +423,7 @@ class OptionsResolver implements Options
             throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
-        $this->allowedValues[$option] = \is_array($allowedValues) ? $allowedValues : array($allowedValues);
+        $this->allowedValues[$option] = \is_array($allowedValues) ? $allowedValues : [$allowedValues];
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -465,7 +465,7 @@ class OptionsResolver implements Options
         }
 
         if (!\is_array($allowedValues)) {
-            $allowedValues = array($allowedValues);
+            $allowedValues = [$allowedValues];
         }
 
         if (!isset($this->allowedValues[$option])) {
@@ -590,14 +590,14 @@ class OptionsResolver implements Options
             throw new AccessException('Options cannot be cleared from a lazy option or normalizer.');
         }
 
-        $this->defined = array();
-        $this->defaults = array();
-        $this->required = array();
-        $this->resolved = array();
-        $this->lazy = array();
-        $this->normalizers = array();
-        $this->allowedTypes = array();
-        $this->allowedValues = array();
+        $this->defined = [];
+        $this->defaults = [];
+        $this->required = [];
+        $this->resolved = [];
+        $this->lazy = [];
+        $this->normalizers = [];
+        $this->allowedTypes = [];
+        $this->allowedValues = [];
 
         return $this;
     }
@@ -626,7 +626,7 @@ class OptionsResolver implements Options
      * @throws NoSuchOptionException     If a lazy option reads an unavailable option
      * @throws AccessException           If called from a lazy option or normalizer
      */
-    public function resolve(array $options = array())
+    public function resolve(array $options = [])
     {
         if ($this->locked) {
             throw new AccessException('Options cannot be resolved from a lazy option or normalizer.');
@@ -735,7 +735,7 @@ class OptionsResolver implements Options
         // Validate the type of the resolved option
         if (isset($this->allowedTypes[$option])) {
             $valid = false;
-            $invalidTypes = array();
+            $invalidTypes = [];
 
             foreach ($this->allowedTypes[$option] as $type) {
                 $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
@@ -759,7 +759,7 @@ class OptionsResolver implements Options
         // Validate the value of the resolved option
         if (isset($this->allowedValues[$option])) {
             $success = false;
-            $printableAllowedValues = array();
+            $printableAllowedValues = [];
 
             foreach ($this->allowedValues[$option] as $allowedValue) {
                 if ($allowedValue instanceof \Closure) {
@@ -981,7 +981,7 @@ class OptionsResolver implements Options
             }
 
             if (\is_array($value)) {
-                $subTypes = array();
+                $subTypes = [];
                 foreach ($value as $val) {
                     $subTypes[$this->formatTypeOf($val, null)] = true;
                 }

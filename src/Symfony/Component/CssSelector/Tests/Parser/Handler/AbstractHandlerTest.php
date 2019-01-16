@@ -54,7 +54,7 @@ abstract class AbstractHandlerTest extends TestCase
         $property = new \ReflectionProperty($stream, 'tokens');
         $property->setAccessible(true);
 
-        $this->assertEquals(array(), $property->getValue($stream));
+        $this->assertEquals([], $property->getValue($stream));
     }
 
     protected function assertRemainingContent(Reader $reader, $remainingContent)

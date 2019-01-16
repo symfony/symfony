@@ -20,7 +20,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  */
 abstract class AbstractPipes implements PipesInterface
 {
-    public $pipes = array();
+    public $pipes = [];
 
     private $inputBuffer = '';
     private $input;
@@ -49,7 +49,7 @@ abstract class AbstractPipes implements PipesInterface
         foreach ($this->pipes as $pipe) {
             fclose($pipe);
         }
-        $this->pipes = array();
+        $this->pipes = [];
     }
 
     /**
@@ -117,8 +117,8 @@ abstract class AbstractPipes implements PipesInterface
             }
         }
 
-        $r = $e = array();
-        $w = array($this->pipes[0]);
+        $r = $e = [];
+        $w = [$this->pipes[0]];
 
         // let's have a look if something changed in streams
         if (false === @stream_select($r, $w, $e, 0, 0)) {
@@ -130,7 +130,7 @@ abstract class AbstractPipes implements PipesInterface
                 $written = fwrite($stdin, $this->inputBuffer);
                 $this->inputBuffer = substr($this->inputBuffer, $written);
                 if (isset($this->inputBuffer[0])) {
-                    return array($this->pipes[0]);
+                    return [$this->pipes[0]];
                 }
             }
 
@@ -145,7 +145,7 @@ abstract class AbstractPipes implements PipesInterface
                     if (isset($data[0])) {
                         $this->inputBuffer = $data;
 
-                        return array($this->pipes[0]);
+                        return [$this->pipes[0]];
                     }
                 }
                 if (feof($input)) {
@@ -164,7 +164,7 @@ abstract class AbstractPipes implements PipesInterface
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
         } elseif (!$w) {
-            return array($this->pipes[0]);
+            return [$this->pipes[0]];
         }
     }
 

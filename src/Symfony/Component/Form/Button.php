@@ -132,7 +132,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -182,7 +182,7 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function all()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -190,7 +190,7 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getErrors($deep = false, $flatten = true)
     {
-        return new FormErrorIterator($this, array());
+        return new FormErrorIterator($this, []);
     }
 
     /**
@@ -234,7 +234,7 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function getExtraData()
     {
-        return array();
+        return [];
     }
 
     /**

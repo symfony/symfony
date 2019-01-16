@@ -22,10 +22,10 @@ class FileDumperTest extends TestCase
         $tempDir = sys_get_temp_dir();
 
         $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
+        $catalogue->add(['foo' => 'bar']);
 
         $dumper = new ConcreteFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, ['path' => $tempDir]);
 
         $this->assertFileExists($tempDir.'/messages.en.concrete');
 
@@ -63,11 +63,11 @@ class FileDumperTest extends TestCase
         $file = $translationsDir.'/messages.en.concrete';
 
         $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
+        $catalogue->add(['foo' => 'bar']);
 
         $dumper = new ConcreteFileDumper();
         $dumper->setRelativePathTemplate('test/translations/%domain%.%locale%.%extension%');
-        $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, ['path' => $tempDir]);
 
         $this->assertFileExists($file);
 
@@ -78,7 +78,7 @@ class FileDumperTest extends TestCase
 
 class ConcreteFileDumper extends FileDumper
 {
-    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = [])
     {
         return http_build_query($messages->all($domain), '', '&');
     }

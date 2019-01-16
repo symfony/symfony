@@ -27,7 +27,7 @@ class SymfonyTestsListenerForV6 extends BaseTestListener
 {
     private $trait;
 
-    public function __construct(array $mockedNamespaces = array())
+    public function __construct(array $mockedNamespaces = [])
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }

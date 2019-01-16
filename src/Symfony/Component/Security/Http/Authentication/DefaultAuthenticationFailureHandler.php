@@ -35,14 +35,14 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     protected $httpUtils;
     protected $logger;
     protected $options;
-    protected $defaultOptions = array(
+    protected $defaultOptions = [
         'failure_path' => null,
         'failure_forward' => false,
         'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
-    );
+    ];
 
-    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options = array(), LoggerInterface $logger = null)
+    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options = [], LoggerInterface $logger = null)
     {
         $this->httpKernel = $httpKernel;
         $this->httpUtils = $httpUtils;
@@ -80,7 +80,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
 
         if ($this->options['failure_forward']) {
             if (null !== $this->logger) {
-                $this->logger->debug('Authentication failure, forward triggered.', array('failure_path' => $this->options['failure_path']));
+                $this->logger->debug('Authentication failure, forward triggered.', ['failure_path' => $this->options['failure_path']]);
             }
 
             $subRequest = $this->httpUtils->createRequest($request, $this->options['failure_path']);
@@ -90,7 +90,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug('Authentication failure, redirect triggered.', array('failure_path' => $this->options['failure_path']));
+            $this->logger->debug('Authentication failure, redirect triggered.', ['failure_path' => $this->options['failure_path']]);
         }
 
         $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);

@@ -45,7 +45,7 @@ class FormThemeTokenParser extends AbstractTokenParser
                 $only = true;
             }
         } else {
-            $resources = new ArrayExpression(array(), $stream->getCurrent()->getLine());
+            $resources = new ArrayExpression([], $stream->getCurrent()->getLine());
             do {
                 $resources->addElement($this->parser->getExpressionParser()->parseExpression());
             } while (!$stream->test(Token::BLOCK_END_TYPE));

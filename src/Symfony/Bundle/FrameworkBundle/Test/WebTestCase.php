@@ -29,7 +29,7 @@ abstract class WebTestCase extends KernelTestCase
      *
      * @return Client A Client instance
      */
-    protected static function createClient(array $options = array(), array $server = array())
+    protected static function createClient(array $options = [], array $server = [])
     {
         $kernel = static::bootKernel($options);
 

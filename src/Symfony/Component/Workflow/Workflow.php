@@ -147,7 +147,7 @@ class Workflow implements WorkflowInterface
 
         $transitionBlockerList = null;
         $applied = false;
-        $approvedTransitionQueue = array();
+        $approvedTransitionQueue = [];
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -195,7 +195,7 @@ class Workflow implements WorkflowInterface
      */
     public function getEnabledTransitions($subject)
     {
-        $enabledTransitions = array();
+        $enabledTransitions = [];
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {
@@ -244,9 +244,9 @@ class Workflow implements WorkflowInterface
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
-                return new TransitionBlockerList(array(
+                return new TransitionBlockerList([
                     TransitionBlocker::createBlockedByMarking($marking),
-                ));
+                ]);
             }
         }
 

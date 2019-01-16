@@ -32,7 +32,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         return $this->encodingImpl->encode($data, self::FORMAT, $context);
     }
@@ -40,7 +40,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         return $this->decodingImpl->decode($data, self::FORMAT, $context);
     }

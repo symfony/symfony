@@ -22,8 +22,8 @@ use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
  */
 class DefinitionBuilder
 {
-    private $places = array();
-    private $transitions = array();
+    private $places = [];
+    private $transitions = [];
     private $initialPlace;
     private $metadataStore;
 
@@ -31,7 +31,7 @@ class DefinitionBuilder
      * @param string[]     $places
      * @param Transition[] $transitions
      */
-    public function __construct(array $places = array(), array $transitions = array())
+    public function __construct(array $places = [], array $transitions = [])
     {
         $this->addPlaces($places);
         $this->addTransitions($transitions);
@@ -52,8 +52,8 @@ class DefinitionBuilder
      */
     public function clear()
     {
-        $this->places = array();
-        $this->transitions = array();
+        $this->places = [];
+        $this->transitions = [];
         $this->initialPlace = null;
         $this->metadataStore = null;
 

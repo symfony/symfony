@@ -19,7 +19,7 @@ class ClassDiscriminatorMapping
     private $typeProperty;
     private $typesMapping;
 
-    public function __construct(string $typeProperty, array $typesMapping = array())
+    public function __construct(string $typeProperty, array $typesMapping = [])
     {
         $this->typeProperty = $typeProperty;
         $this->typesMapping = $typesMapping;

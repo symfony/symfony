@@ -47,7 +47,7 @@ EODUMP;
     {
         $stub = new Stub();
         $date = new \DateTime($time, new \DateTimeZone($timezone));
-        $cast = DateCaster::castDateTime($date, array('foo' => 'bar'), $stub, false, 0);
+        $cast = DateCaster::castDateTime($date, ['foo' => 'bar'], $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -75,18 +75,18 @@ EODUMP;
 
     public function provideDateTimes()
     {
-        return array(
-            array('2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'),
-            array('2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'),
-            array('2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'),
+        return [
+            ['2017-04-30 00:00:00.000000', 'Europe/Zurich', '2017-04-30 00:00:00.0 Europe/Zurich (+02:00)', 1493503200, 'Sunday, April 30, 2017%Afrom now%ADST On'],
+            ['2017-12-31 00:00:00.000000', 'Europe/Zurich', '2017-12-31 00:00:00.0 Europe/Zurich (+01:00)', 1514674800, 'Sunday, December 31, 2017%Afrom now%ADST Off'],
+            ['2017-04-30 00:00:00.000000', '+02:00', '2017-04-30 00:00:00.0 +02:00', 1493503200, 'Sunday, April 30, 2017%Afrom now'],
 
-            array('2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-            array('2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'),
-        );
+            ['2017-04-30 00:00:00.100000', '+00:00', '2017-04-30 00:00:00.100 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.120000', '+00:00', '2017-04-30 00:00:00.120 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123000', '+00:00', '2017-04-30 00:00:00.123 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123400', '+00:00', '2017-04-30 00:00:00.123400 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123450', '+00:00', '2017-04-30 00:00:00.123450 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+            ['2017-04-30 00:00:00.123456', '+00:00', '2017-04-30 00:00:00.123456 +00:00', 1493510400, 'Sunday, April 30, 2017%Afrom now'],
+        ];
     }
 
     /**
@@ -141,7 +141,7 @@ EODUMP;
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
 
-        $cast = DateCaster::castInterval($interval, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+        $cast = DateCaster::castInterval($interval, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -173,35 +173,35 @@ EODUMP;
 
     public function provideIntervals()
     {
-        return array(
-            array('PT0S', 0, 0, '0s', '0s'),
-            array('PT0S', 0.1, 0, '+ 00:00:00.100', '%is'),
-            array('PT1S', 0, 0, '+ 00:00:01.0', '%is'),
-            array('PT2M', 0, 0, '+ 00:02:00.0', '%is'),
-            array('PT3H', 0, 0, '+ 03:00:00.0', '%ss'),
-            array('P4D', 0, 0, '+ 4d', '%ss'),
-            array('P5M', 0, 0, '+ 5m', null),
-            array('P6Y', 0, 0, '+ 6y', null),
-            array('P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06.0', null),
-            array('PT1M60S', 0, 0, '+ 00:02:00.0', null),
-            array('PT1H60M', 0, 0, '+ 02:00:00.0', null),
-            array('P1DT24H', 0, 0, '+ 2d', null),
-            array('P1M32D', 0, 0, '+ 1m 32d', null),
+        return [
+            ['PT0S', 0, 0, '0s', '0s'],
+            ['PT0S', 0.1, 0, '+ 00:00:00.100', '%is'],
+            ['PT1S', 0, 0, '+ 00:00:01.0', '%is'],
+            ['PT2M', 0, 0, '+ 00:02:00.0', '%is'],
+            ['PT3H', 0, 0, '+ 03:00:00.0', '%ss'],
+            ['P4D', 0, 0, '+ 4d', '%ss'],
+            ['P5M', 0, 0, '+ 5m', null],
+            ['P6Y', 0, 0, '+ 6y', null],
+            ['P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06.0', null],
+            ['PT1M60S', 0, 0, '+ 00:02:00.0', null],
+            ['PT1H60M', 0, 0, '+ 02:00:00.0', null],
+            ['P1DT24H', 0, 0, '+ 2d', null],
+            ['P1M32D', 0, 0, '+ 1m 32d', null],
 
-            array('PT0S', 0, 1, '0s', '0s'),
-            array('PT0S', 0.1, 1, '- 00:00:00.100', '%is'),
-            array('PT1S', 0, 1, '- 00:00:01.0', '%is'),
-            array('PT2M', 0, 1, '- 00:02:00.0', '%is'),
-            array('PT3H', 0, 1, '- 03:00:00.0', '%ss'),
-            array('P4D', 0, 1, '- 4d', '%ss'),
-            array('P5M', 0, 1, '- 5m', null),
-            array('P6Y', 0, 1, '- 6y', null),
-            array('P1Y2M3DT4H5M6S', 0, 1, '- 1y 2m 3d 04:05:06.0', null),
-            array('PT1M60S', 0, 1, '- 00:02:00.0', null),
-            array('PT1H60M', 0, 1, '- 02:00:00.0', null),
-            array('P1DT24H', 0, 1, '- 2d', null),
-            array('P1M32D', 0, 1, '- 1m 32d', null),
-        );
+            ['PT0S', 0, 1, '0s', '0s'],
+            ['PT0S', 0.1, 1, '- 00:00:00.100', '%is'],
+            ['PT1S', 0, 1, '- 00:00:01.0', '%is'],
+            ['PT2M', 0, 1, '- 00:02:00.0', '%is'],
+            ['PT3H', 0, 1, '- 03:00:00.0', '%ss'],
+            ['P4D', 0, 1, '- 4d', '%ss'],
+            ['P5M', 0, 1, '- 5m', null],
+            ['P6Y', 0, 1, '- 6y', null],
+            ['P1Y2M3DT4H5M6S', 0, 1, '- 1y 2m 3d 04:05:06.0', null],
+            ['PT1M60S', 0, 1, '- 00:02:00.0', null],
+            ['PT1H60M', 0, 1, '- 02:00:00.0', null],
+            ['P1DT24H', 0, 1, '- 2d', null],
+            ['P1M32D', 0, 1, '- 1m 32d', null],
+        ];
     }
 
     /**
@@ -244,7 +244,7 @@ EODUMP;
         $timezone = new \DateTimeZone($timezone);
         $stub = new Stub();
 
-        $cast = DateCaster::castTimeZone($timezone, array('foo' => 'bar'), $stub, false, Caster::EXCLUDE_VERBOSE);
+        $cast = DateCaster::castTimeZone($timezone, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -274,27 +274,27 @@ EODUMP;
     {
         $xRegion = \extension_loaded('intl') ? '%s' : '';
 
-        return array(
+        return [
             // type 1 (UTC offset)
-            array('-12:00', '-12:00', ''),
-            array('+00:00', '+00:00', ''),
-            array('+14:00', '+14:00', ''),
+            ['-12:00', '-12:00', ''],
+            ['+00:00', '+00:00', ''],
+            ['+14:00', '+14:00', ''],
 
             // type 2 (timezone abbreviation)
-            array('GMT', '+00:00', ''),
-            array('a', '+01:00', ''),
-            array('b', '+02:00', ''),
-            array('z', '+00:00', ''),
+            ['GMT', '+00:00', ''],
+            ['a', '+01:00', ''],
+            ['b', '+02:00', ''],
+            ['z', '+00:00', ''],
 
             // type 3 (timezone identifier)
-            array('Africa/Tunis', 'Africa/Tunis (%s:00)', $xRegion),
-            array('America/Panama', 'America/Panama (%s:00)', $xRegion),
-            array('Asia/Jerusalem', 'Asia/Jerusalem (%s:00)', $xRegion),
-            array('Atlantic/Canary', 'Atlantic/Canary (%s:00)', $xRegion),
-            array('Australia/Perth', 'Australia/Perth (%s:00)', $xRegion),
-            array('Europe/Zurich', 'Europe/Zurich (%s:00)', $xRegion),
-            array('Pacific/Tahiti', 'Pacific/Tahiti (%s:00)', $xRegion),
-        );
+            ['Africa/Tunis', 'Africa/Tunis (%s:00)', $xRegion],
+            ['America/Panama', 'America/Panama (%s:00)', $xRegion],
+            ['Asia/Jerusalem', 'Asia/Jerusalem (%s:00)', $xRegion],
+            ['Atlantic/Canary', 'Atlantic/Canary (%s:00)', $xRegion],
+            ['Australia/Perth', 'Australia/Perth (%s:00)', $xRegion],
+            ['Europe/Zurich', 'Europe/Zurich (%s:00)', $xRegion],
+            ['Pacific/Tahiti', 'Pacific/Tahiti (%s:00)', $xRegion],
+        ];
     }
 
     /**
@@ -321,7 +321,7 @@ EODUMP;
         $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
 
-        $cast = DateCaster::castPeriod($p, array(), $stub, false, 0);
+        $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
 
         $xDump = <<<EODUMP
 array:1 [
@@ -349,28 +349,28 @@ EODUMP;
 
     public function providePeriods()
     {
-        $periods = array(
-            array('2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02'),
-            array('2017-01-01', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01%a2) 2017-01-02'),
+        $periods = [
+            ['2017-01-01', 'P1D', '2017-01-03', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02'],
+            ['2017-01-01', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01%a2) 2017-01-02'],
 
-            array('2017-01-01', 'P1D', '2017-01-04', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-04 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
-            array('2017-01-01', 'P1D', 2, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 3 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'),
+            ['2017-01-01', 'P1D', '2017-01-04', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-04 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'],
+            ['2017-01-01', 'P1D', 2, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 3 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03'],
 
-            array('2017-01-01', 'P1D', '2017-01-05', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-05 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a1 more'),
-            array('2017-01-01', 'P1D', 3, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 4 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'),
+            ['2017-01-01', 'P1D', '2017-01-05', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-05 00:00:00.0', '1) 2017-01-01%a2) 2017-01-02%a1 more'],
+            ['2017-01-01', 'P1D', 3, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 4 time/s', '1) 2017-01-01%a2) 2017-01-02%a3) 2017-01-03%a1 more'],
 
-            array('2017-01-01', 'P1D', '2017-01-21', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-21 00:00:00.0', '1) 2017-01-01%a17 more'),
-            array('2017-01-01', 'P1D', 19, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 20 time/s', '1) 2017-01-01%a17 more'),
+            ['2017-01-01', 'P1D', '2017-01-21', 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) to 2017-01-21 00:00:00.0', '1) 2017-01-01%a17 more'],
+            ['2017-01-01', 'P1D', 19, 0, 'every + 1d, from 2017-01-01 00:00:00.0 (included) recurring 20 time/s', '1) 2017-01-01%a17 more'],
 
-            array('2017-01-01 01:00:00', 'P1D', '2017-01-03 01:00:00', 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) to 2017-01-03 01:00:00.0', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'),
-            array('2017-01-01 01:00:00', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'),
+            ['2017-01-01 01:00:00', 'P1D', '2017-01-03 01:00:00', 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) to 2017-01-03 01:00:00.0', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'],
+            ['2017-01-01 01:00:00', 'P1D', 1, 0, 'every + 1d, from 2017-01-01 01:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 01:00:00.0%a2) 2017-01-02 01:00:00.0'],
 
-            array('2017-01-01', 'P1DT1H', '2017-01-03', 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'),
-            array('2017-01-01', 'P1DT1H', 1, 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'),
+            ['2017-01-01', 'P1DT1H', '2017-01-03', 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) to 2017-01-03 00:00:00.0', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'],
+            ['2017-01-01', 'P1DT1H', 1, 0, 'every + 1d 01:00:00.0, from 2017-01-01 00:00:00.0 (included) recurring 2 time/s', '1) 2017-01-01 00:00:00.0%a2) 2017-01-02 01:00:00.0'],
 
-            array('2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0', '1) 2017-01-02%a2) 2017-01-03'),
-            array('2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'),
-        );
+            ['2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) to 2017-01-04 00:00:00.0', '1) 2017-01-02%a2) 2017-01-03'],
+            ['2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from 2017-01-01 00:00:00.0 (excluded) recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'],
+        ];
 
         if (\PHP_VERSION_ID < 70107) {
             array_walk($periods, function (&$i) { $i[5] = ''; });

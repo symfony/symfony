@@ -19,13 +19,13 @@ class AbstractFactoryTest extends TestCase
 {
     public function testCreate()
     {
-        list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', array(
+        list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', [
             'use_forward' => true,
             'failure_path' => '/foo',
             'success_handler' => 'custom_success_handler',
             'failure_handler' => 'custom_failure_handler',
             'remember_me' => true,
-        ), 'user_provider', 'entry_point');
+        ], 'user_provider', 'entry_point');
 
         // auth provider
         $this->assertEquals('auth_provider', $authProviderId);
@@ -34,14 +34,14 @@ class AbstractFactoryTest extends TestCase
         $this->assertEquals('abstract_listener.foo', $listenerId);
         $this->assertTrue($container->hasDefinition('abstract_listener.foo'));
         $definition = $container->getDefinition('abstract_listener.foo');
-        $this->assertEquals(array(
+        $this->assertEquals([
             'index_4' => 'foo',
             'index_5' => new Reference('security.authentication.success_handler.foo.abstract_factory'),
             'index_6' => new Reference('security.authentication.failure_handler.foo.abstract_factory'),
-            'index_7' => array(
+            'index_7' => [
                 'use_forward' => true,
-            ),
-        ), $definition->getArguments());
+            ],
+        ], $definition->getArguments());
 
         // entry point
         $this->assertEquals('entry_point', $entryPointId, '->create() does not change the default entry point.');
@@ -52,10 +52,10 @@ class AbstractFactoryTest extends TestCase
      */
     public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection)
     {
-        $options = array(
+        $options = [
             'remember_me' => true,
             'login_path' => '/bar',
-        );
+        ];
 
         if ($serviceId) {
             $options['failure_handler'] = $serviceId;
@@ -71,7 +71,7 @@ class AbstractFactoryTest extends TestCase
         $methodCalls = $failureHandler->getMethodCalls();
         if ($defaultHandlerInjection) {
             $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(array('login_path' => '/bar'), $methodCalls[0][1][0]);
+            $this->assertEquals(['login_path' => '/bar'], $methodCalls[0][1][0]);
         } else {
             $this->assertCount(0, $methodCalls);
         }
@@ -79,10 +79,10 @@ class AbstractFactoryTest extends TestCase
 
     public function getFailureHandlers()
     {
-        return array(
-            array(null, true),
-            array('custom_failure_handler', false),
-        );
+        return [
+            [null, true],
+            ['custom_failure_handler', false],
+        ];
     }
 
     /**
@@ -90,10 +90,10 @@ class AbstractFactoryTest extends TestCase
      */
     public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection)
     {
-        $options = array(
+        $options = [
             'remember_me' => true,
             'default_target_path' => '/bar',
-        );
+        ];
 
         if ($serviceId) {
             $options['success_handler'] = $serviceId;
@@ -109,9 +109,9 @@ class AbstractFactoryTest extends TestCase
 
         if ($defaultHandlerInjection) {
             $this->assertEquals('setOptions', $methodCalls[0][0]);
-            $this->assertEquals(array('default_target_path' => '/bar'), $methodCalls[0][1][0]);
+            $this->assertEquals(['default_target_path' => '/bar'], $methodCalls[0][1][0]);
             $this->assertEquals('setProviderKey', $methodCalls[1][0]);
-            $this->assertEquals(array('foo'), $methodCalls[1][1]);
+            $this->assertEquals(['foo'], $methodCalls[1][1]);
         } else {
             $this->assertCount(0, $methodCalls);
         }
@@ -119,15 +119,15 @@ class AbstractFactoryTest extends TestCase
 
     public function getSuccessHandlers()
     {
-        return array(
-            array(null, true),
-            array('custom_success_handler', false),
-        );
+        return [
+            [null, true],
+            ['custom_success_handler', false],
+        ];
     }
 
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
-        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());
+        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', []);
 
         $factory
             ->expects($this->once())
@@ -152,6 +152,6 @@ class AbstractFactoryTest extends TestCase
 
         list($authProviderId, $listenerId, $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 
-        return array($container, $authProviderId, $listenerId, $entryPointId);
+        return [$container, $authProviderId, $listenerId, $entryPointId];
     }
 }

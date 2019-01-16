@@ -36,9 +36,9 @@ class MergeCollectionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::SUBMIT => 'onSubmit',
-        );
+        ];
     }
 
     public function onSubmit(FormEvent $event)
@@ -47,7 +47,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         $data = $event->getData();
 
         if (null === $data) {
-            $data = array();
+            $data = [];
         }
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
@@ -73,7 +73,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         } else {
             // Calculate delta
             $itemsToAdd = \is_object($data) ? clone $data : $data;
-            $itemsToDelete = array();
+            $itemsToDelete = [];
 
             foreach ($dataToMergeInto as $beforeKey => $beforeItem) {
                 foreach ($data as $afterKey => $afterItem) {

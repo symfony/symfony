@@ -50,7 +50,7 @@ class UserCheckerTest extends TestCase
     public function testCheckPostAuthCredentialsExpired()
     {
         $checker = new UserChecker();
-        $checker->checkPostAuth(new User('John', 'password', array(), true, true, false, true));
+        $checker->checkPostAuth(new User('John', 'password', [], true, true, false, true));
     }
 
     /**
@@ -90,7 +90,7 @@ class UserCheckerTest extends TestCase
     public function testCheckPreAuthAccountLocked()
     {
         $checker = new UserChecker();
-        $checker->checkPreAuth(new User('John', 'password', array(), true, true, false, false));
+        $checker->checkPreAuth(new User('John', 'password', [], true, true, false, false));
     }
 
     /**
@@ -114,7 +114,7 @@ class UserCheckerTest extends TestCase
     public function testCheckPreAuthDisabled()
     {
         $checker = new UserChecker();
-        $checker->checkPreAuth(new User('John', 'password', array(), false, true, false, true));
+        $checker->checkPreAuth(new User('John', 'password', [], false, true, false, true));
     }
 
     /**
@@ -139,7 +139,7 @@ class UserCheckerTest extends TestCase
     public function testCheckPreAuthAccountExpired()
     {
         $checker = new UserChecker();
-        $checker->checkPreAuth(new User('John', 'password', array(), true, false, true, true));
+        $checker->checkPreAuth(new User('John', 'password', [], true, false, true, true));
     }
 
     /**

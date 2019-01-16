@@ -24,7 +24,7 @@ class RequestHelperTest extends TestCase
     {
         $this->requestStack = new RequestStack();
         $request = new Request();
-        $request->initialize(array('foobar' => 'bar'));
+        $request->initialize(['foobar' => 'bar']);
         $this->requestStack->push($request);
     }
 

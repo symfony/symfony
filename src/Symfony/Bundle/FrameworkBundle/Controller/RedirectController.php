@@ -60,7 +60,7 @@ class RedirectController
             throw new HttpException($permanent ? 410 : 404);
         }
 
-        $attributes = array();
+        $attributes = [];
         if (false === $ignoreAttributes || \is_array($ignoreAttributes)) {
             $attributes = $request->attributes->get('_route_params');
             $attributes = $keepQueryParams ? array_merge($request->query->all(), $attributes) : $attributes;

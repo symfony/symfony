@@ -31,24 +31,24 @@ class PlantUmlDumper implements DumperInterface
 
     const STATEMACHINE_TRANSITION = 'arrow';
     const WORKFLOW_TRANSITION = 'square';
-    const TRANSITION_TYPES = array(self::STATEMACHINE_TRANSITION, self::WORKFLOW_TRANSITION);
-    const DEFAULT_OPTIONS = array(
-        'skinparams' => array(
+    const TRANSITION_TYPES = [self::STATEMACHINE_TRANSITION, self::WORKFLOW_TRANSITION];
+    const DEFAULT_OPTIONS = [
+        'skinparams' => [
             'titleBorderRoundCorner' => 15,
             'titleBorderThickness' => 2,
-            'state' => array(
+            'state' => [
                 'BackgroundColor'.self::INITIAL => '#87b741',
                 'BackgroundColor'.self::MARKED => '#3887C6',
                 'BorderColor' => '#3887C6',
                 'BorderColor'.self::MARKED => 'Black',
                 'FontColor'.self::MARKED => 'White',
-            ),
-            'agent' => array(
+            ],
+            'agent' => [
                 'BackgroundColor' => '#ffffff',
                 'BorderColor' => '#3887C6',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     private $transitionType = self::STATEMACHINE_TRANSITION;
 
@@ -60,7 +60,7 @@ class PlantUmlDumper implements DumperInterface
         $this->transitionType = $transitionType;
     }
 
-    public function dump(Definition $definition, Marking $marking = null, array $options = array()): string
+    public function dump(Definition $definition, Marking $marking = null, array $options = []): string
     {
         $options = array_replace_recursive(self::DEFAULT_OPTIONS, $options);
         $code = $this->initialize($options);
@@ -84,10 +84,10 @@ class PlantUmlDumper implements DumperInterface
                 foreach ($transition->getTos() as $to) {
                     $toEscaped = $this->escape($to);
                     if ($this->isWorkflowTransitionType()) {
-                        $lines = array(
+                        $lines = [
                             "$fromEscaped --> $transitionEscaped",
                             "$transitionEscaped --> $toEscaped",
-                        );
+                        ];
                         foreach ($lines as $line) {
                             if (!\in_array($line, $code)) {
                                 $code[] = $line;
@@ -128,7 +128,7 @@ class PlantUmlDumper implements DumperInterface
 
     private function initialize(array $options): array
     {
-        $code = array();
+        $code = [];
         if (isset($options['title'])) {
             $code[] = "title {$options['title']}";
         }

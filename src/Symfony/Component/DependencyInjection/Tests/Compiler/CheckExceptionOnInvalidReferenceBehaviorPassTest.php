@@ -77,7 +77,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
         $container
             ->register('b')
-            ->setBindings(array(new BoundArgument(new Reference('a'))))
+            ->setBindings([new BoundArgument(new Reference('a'))])
         ;
 
         $this->process($container);

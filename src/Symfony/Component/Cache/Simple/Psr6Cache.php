@@ -147,7 +147,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         } catch (Psr6CacheException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
-        $values = array();
+        $values = [];
 
         if (!$this->pool instanceof AdapterInterface) {
             foreach ($items as $key => $item) {
@@ -186,7 +186,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         if (!$valuesIsArray && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
-        $items = array();
+        $items = [];
 
         try {
             if (null !== $f = $this->createCacheItem) {
@@ -195,7 +195,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                     $items[$key] = $f($key, $value, true);
                 }
             } elseif ($valuesIsArray) {
-                $items = array();
+                $items = [];
                 foreach ($values as $key => $value) {
                     $items[] = (string) $key;
                 }

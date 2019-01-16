@@ -68,7 +68,7 @@ class LocaleScanner
     public function scanAliases($sourceDir)
     {
         $locales = $this->scanLocales($sourceDir);
-        $aliases = array();
+        $aliases = [];
 
         // Delete locales that are no aliases
         foreach ($locales as $locale) {

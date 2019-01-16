@@ -30,11 +30,11 @@ class RouterTest extends TestCase
 
     public function testSetOptionsWithSupportedOptions()
     {
-        $this->router->setOptions(array(
+        $this->router->setOptions([
             'cache_dir' => './cache',
             'debug' => true,
             'resource_type' => 'ResourceType',
-        ));
+        ]);
 
         $this->assertSame('./cache', $this->router->getOption('cache_dir'));
         $this->assertTrue($this->router->getOption('debug'));
@@ -47,12 +47,12 @@ class RouterTest extends TestCase
      */
     public function testSetOptionsWithUnsupportedOptions()
     {
-        $this->router->setOptions(array(
+        $this->router->setOptions([
             'cache_dir' => './cache',
             'option_foo' => true,
             'option_bar' => 'baz',
             'resource_type' => 'ResourceType',
-        ));
+        ]);
     }
 
     public function testSetOptionWithSupportedOption()
@@ -109,10 +109,10 @@ class RouterTest extends TestCase
 
     public function provideMatcherOptionsPreventingCaching()
     {
-        return array(
-            array('cache_dir'),
-            array('matcher_cache_class'),
-        );
+        return [
+            ['cache_dir'],
+            ['matcher_cache_class'],
+        ];
     }
 
     /**
@@ -131,10 +131,10 @@ class RouterTest extends TestCase
 
     public function provideGeneratorOptionsPreventingCaching()
     {
-        return array(
-            array('cache_dir'),
-            array('generator_cache_class'),
-        );
+        return [
+            ['cache_dir'],
+            ['generator_cache_class'],
+        ];
     }
 
     public function testMatchRequestWithUrlMatcherInterface()

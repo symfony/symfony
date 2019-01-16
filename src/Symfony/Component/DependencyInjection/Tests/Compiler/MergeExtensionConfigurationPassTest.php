@@ -25,7 +25,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 {
     public function testExpressionLanguageProviderForwarding()
     {
-        $tmpProviders = array();
+        $tmpProviders = [];
 
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
         $extension->expects($this->any())
@@ -46,18 +46,18 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $provider = $this->getMockBuilder('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface')->getMock();
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
-        $container->prependExtensionConfig('foo', array('bar' => true));
+        $container->prependExtensionConfig('foo', ['bar' => true]);
         $container->addExpressionLanguageProvider($provider);
 
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertEquals(array($provider), $tmpProviders);
+        $this->assertEquals([$provider], $tmpProviders);
     }
 
     public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('load'))->getMock();
+        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['load'])->getMock();
         $extension->expects($this->once())
             ->method('load')
             ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
@@ -65,7 +65,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
-        $container->prependExtensionConfig('foo', array());
+        $container->prependExtensionConfig('foo', []);
 
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
@@ -73,14 +73,14 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
     public function testExtensionConfigurationIsTrackedByDefault()
     {
-        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('getConfiguration'))->getMock();
+        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
         $extension->expects($this->exactly(2))
             ->method('getConfiguration')
             ->will($this->returnValue(new FooConfiguration()));
 
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
-        $container->prependExtensionConfig('foo', array('bar' => true));
+        $container->prependExtensionConfig('foo', ['bar' => true]);
 
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
@@ -92,14 +92,14 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new FooExtension());
-        $container->prependExtensionConfig('foo', array('bar' => '%env(FOO)%'));
-        $container->prependExtensionConfig('foo', array('bar' => '%env(BAR)%', 'baz' => '%env(BAZ)%'));
+        $container->prependExtensionConfig('foo', ['bar' => '%env(FOO)%']);
+        $container->prependExtensionConfig('foo', ['bar' => '%env(BAR)%', 'baz' => '%env(BAZ)%']);
 
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertSame(array('BAZ', 'FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
-        $this->assertSame(array('BAZ' => 1, 'FOO' => 0), $container->getEnvCounters());
+        $this->assertSame(['BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
     }
 
     /**
@@ -110,7 +110,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
-        $container->prependExtensionConfig('bar', array());
+        $container->prependExtensionConfig('bar', []);
 
         (new MergeExtensionConfigurationPass())->process($container);
     }
@@ -119,7 +119,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new ThrowingExtension());
-        $container->prependExtensionConfig('throwing', array('bar' => '%env(FOO)%'));
+        $container->prependExtensionConfig('throwing', ['bar' => '%env(FOO)%']);
 
         try {
             $pass = new MergeExtensionConfigurationPass();
@@ -128,7 +128,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         } catch (\Exception $e) {
         }
 
-        $this->assertSame(array('FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
 }
 

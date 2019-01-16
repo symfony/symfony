@@ -33,9 +33,9 @@ array:1 [
   "\\x00~\\x00value" => %s
 ]
 EODUMP;
-        $this->assertDumpEquals(sprintf($gmpDump, $gmpString), GmpCaster::castGmp($gmpString, array(), new Stub(), false, 0));
-        $this->assertDumpEquals(sprintf($gmpDump, $gmpOctal), GmpCaster::castGmp($gmpOctal, array(), new Stub(), false, 0));
-        $this->assertDumpEquals(sprintf($gmpDump, $gmp), GmpCaster::castGmp($gmp, array(), new Stub(), false, 0));
+        $this->assertDumpEquals(sprintf($gmpDump, $gmpString), GmpCaster::castGmp($gmpString, [], new Stub(), false, 0));
+        $this->assertDumpEquals(sprintf($gmpDump, $gmpOctal), GmpCaster::castGmp($gmpOctal, [], new Stub(), false, 0));
+        $this->assertDumpEquals(sprintf($gmpDump, $gmp), GmpCaster::castGmp($gmp, [], new Stub(), false, 0));
 
         $dump = <<<EODUMP
 GMP {

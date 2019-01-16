@@ -91,9 +91,9 @@ class DelegatingLoaderTest extends TestCase
             ->willReturn($loader);
 
         $routeCollection = new RouteCollection();
-        $routeCollection->add('foo', new Route('/', array('_controller' => 'foo:bar:baz')));
-        $routeCollection->add('bar', new Route('/', array('_controller' => 'foo::baz')));
-        $routeCollection->add('baz', new Route('/', array('_controller' => 'foo:baz')));
+        $routeCollection->add('foo', new Route('/', ['_controller' => 'foo:bar:baz']));
+        $routeCollection->add('bar', new Route('/', ['_controller' => 'foo::baz']));
+        $routeCollection->add('baz', new Route('/', ['_controller' => 'foo:baz']));
 
         $loader->expects($this->once())
             ->method('load')

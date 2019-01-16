@@ -27,7 +27,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
             return;
         }
 
-        $privateServices = array();
+        $privateServices = [];
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {

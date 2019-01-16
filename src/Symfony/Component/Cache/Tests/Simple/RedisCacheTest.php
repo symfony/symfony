@@ -33,13 +33,13 @@ class RedisCacheTest extends AbstractRedisCacheTest
         $redis = RedisCache::createConnection('redis://'.$redisHost.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
-        $redis = RedisCache::createConnection('redis://'.$redisHost, array('timeout' => 3));
+        $redis = RedisCache::createConnection('redis://'.$redisHost, ['timeout' => 3]);
         $this->assertEquals(3, $redis->getTimeout());
 
         $redis = RedisCache::createConnection('redis://'.$redisHost.'?timeout=4');
         $this->assertEquals(4, $redis->getTimeout());
 
-        $redis = RedisCache::createConnection('redis://'.$redisHost, array('read_timeout' => 5));
+        $redis = RedisCache::createConnection('redis://'.$redisHost, ['read_timeout' => 5]);
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 
@@ -55,11 +55,11 @@ class RedisCacheTest extends AbstractRedisCacheTest
 
     public function provideFailedCreateConnection()
     {
-        return array(
-            array('redis://localhost:1234'),
-            array('redis://foo@localhost'),
-            array('redis://localhost/123'),
-        );
+        return [
+            ['redis://localhost:1234'],
+            ['redis://foo@localhost'],
+            ['redis://localhost/123'],
+        ];
     }
 
     /**
@@ -74,9 +74,9 @@ class RedisCacheTest extends AbstractRedisCacheTest
 
     public function provideInvalidCreateConnection()
     {
-        return array(
-            array('foo://localhost'),
-            array('redis://'),
-        );
+        return [
+            ['foo://localhost'],
+            ['redis://'],
+        ];
     }
 }

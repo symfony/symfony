@@ -85,15 +85,15 @@ class DebugProcessorTest extends TestCase
 
     private function getRecord($level = Logger::WARNING, $message = 'test')
     {
-        return array(
+        return [
             'message' => $message,
-            'context' => array(),
+            'context' => [],
             'level' => $level,
             'level_name' => Logger::getLevelName($level),
             'channel' => 'test',
             'datetime' => new \DateTime(),
-            'extra' => array(),
-        );
+            'extra' => [],
+        ];
     }
 }
 

@@ -26,13 +26,13 @@ class ExpressionLanguage
     private $parser;
     private $compiler;
 
-    protected $functions = array();
+    protected $functions = [];
 
     /**
      * @param CacheItemPoolInterface                $cache
      * @param ExpressionFunctionProviderInterface[] $providers
      */
-    public function __construct(CacheItemPoolInterface $cache = null, array $providers = array())
+    public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
     {
         $this->cache = $cache ?: new ArrayAdapter();
         $this->registerFunctions();
@@ -49,7 +49,7 @@ class ExpressionLanguage
      *
      * @return string The compiled PHP source code
      */
-    public function compile($expression, $names = array())
+    public function compile($expression, $names = [])
     {
         return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
@@ -62,7 +62,7 @@ class ExpressionLanguage
      *
      * @return mixed The result of the evaluation of the expression
      */
-    public function evaluate($expression, $values = array())
+    public function evaluate($expression, $values = [])
     {
         return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
     }
@@ -82,7 +82,7 @@ class ExpressionLanguage
         }
 
         asort($names);
-        $cacheKeyItems = array();
+        $cacheKeyItems = [];
 
         foreach ($names as $nameKey => $name) {
             $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey.':'.$name;
@@ -118,7 +118,7 @@ class ExpressionLanguage
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
         }
 
-        $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
+        $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
     }
 
     public function addFunction(ExpressionFunction $function)

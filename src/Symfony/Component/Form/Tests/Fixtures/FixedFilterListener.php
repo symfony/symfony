@@ -21,11 +21,11 @@ class FixedFilterListener implements EventSubscriberInterface
 
     public function __construct(array $mapping)
     {
-        $this->mapping = array_merge(array(
-            'preSubmit' => array(),
-            'onSubmit' => array(),
-            'preSetData' => array(),
-        ), $mapping);
+        $this->mapping = array_merge([
+            'preSubmit' => [],
+            'onSubmit' => [],
+            'preSetData' => [],
+        ], $mapping);
     }
 
     public function preSubmit(FormEvent $event)
@@ -57,10 +57,10 @@ class FixedFilterListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::PRE_SUBMIT => 'preSubmit',
             FormEvents::SUBMIT => 'onSubmit',
             FormEvents::PRE_SET_DATA => 'preSetData',
-        );
+        ];
     }
 }

@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 $serializer = new Serializer(
-    new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+    new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
 );
 
 $connection = Connection::fromDsn(getenv('DSN'));

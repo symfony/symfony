@@ -44,7 +44,7 @@ interface LdapInterface
      *
      * @return QueryInterface
      */
-    public function query($dn, $query, array $options = array());
+    public function query($dn, $query, array $options = []);
 
     /**
      * @return EntryManagerInterface

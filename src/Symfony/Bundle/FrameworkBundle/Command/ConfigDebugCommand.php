@@ -37,10 +37,10 @@ class ConfigDebugCommand extends AbstractConfigCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
-            ))
+            ])
             ->setDescription('Dumps the current configuration for an extension')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
@@ -95,7 +95,7 @@ EOF
                 sprintf('Current configuration for %s', ($name === $extensionAlias ? sprintf('extension with alias "%s"', $extensionAlias) : sprintf('"%s"', $name)))
             );
 
-            $io->writeln(Yaml::dump(array($extensionAlias => $config), 10));
+            $io->writeln(Yaml::dump([$extensionAlias => $config], 10));
 
             return;
         }

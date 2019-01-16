@@ -32,7 +32,7 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
     {
         foreach ($this->extensions as $extension) {
             if (!\count($container->getExtensionConfig($extension))) {
-                $container->loadFromExtension($extension, array());
+                $container->loadFromExtension($extension, []);
             }
         }
 

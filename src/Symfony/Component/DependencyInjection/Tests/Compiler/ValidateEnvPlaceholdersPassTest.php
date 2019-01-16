@@ -29,12 +29,12 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container->setParameter('env(NULLED)', null);
         $container->setParameter('env(FLOATISH)', 3.2);
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'scalar_node' => '%env(NULLED)%',
             'scalar_node_not_empty' => '%env(FLOATISH)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -46,10 +46,10 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('env(FLOATISH)', 3.2);
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'float_node' => '%env(FLOATISH)%',
             'string_node' => '%env(UNDEFINED)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -64,9 +64,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'bool_node' => '%env(const:BAZ)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -81,9 +81,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'int_node' => '%env(json:FOO)%',
-        ));
+        ]);
 
         $this->doProcess($container);
     }
@@ -97,9 +97,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
         $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'int_node' => '%env(NULLED)%',
-        ));
+        ]);
 
         $this->doProcess($container);
     }
@@ -108,23 +108,23 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'int_node' => '%env(int:const:FOO)%',
             'bool_node' => true,
-        ));
-        $container->prependExtensionConfig('env_extension', array(
+        ]);
+        $container->prependExtensionConfig('env_extension', [
             'int_node' => '%env(int:BAR)%',
             'bool_node' => '%env(bool:int:BAZ)%',
             'scalar_node' => '%env(BAZ)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
-        $expected = array(
+        $expected = [
             'int_node' => '%env(int:const:FOO)%',
             'bool_node' => true,
             'scalar_node' => '%env(BAZ)%',
-        );
+        ];
 
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
@@ -133,13 +133,13 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'scalar_node' => $expected = 'foo %env(BAR)% baz',
-        ));
+        ]);
 
         $this->doProcess($container);
 
-        $this->assertSame(array('scalar_node' => $expected), $container->resolveEnvPlaceholders($ext->getConfig()));
+        $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     /**
@@ -150,9 +150,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'enum_node' => '%env(FOO)%',
-        ));
+        ]);
 
         $this->doProcess($container);
     }
@@ -165,9 +165,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'simple_array_node' => '%env(json:FOO)%',
-        ));
+        ]);
 
         $this->doProcess($container);
     }
@@ -176,22 +176,22 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
+        $container->prependExtensionConfig('env_extension', [
             'array_node' => $expected = '%env(CHILD)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
-        $this->assertSame(array('array_node' => array('child_node' => $expected)), $container->resolveEnvPlaceholders($ext->getConfig()));
+        $this->assertSame(['array_node' => ['child_node' => $expected]], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     public function testEnvIsNotUnset()
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
-            'array_node' => array('int_unset_at_zero' => '%env(int:CHILD)%'),
-        ));
+        $container->prependExtensionConfig('env_extension', $expected = [
+            'array_node' => ['int_unset_at_zero' => '%env(int:CHILD)%'],
+        ]);
 
         $this->doProcess($container);
 
@@ -202,9 +202,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'scalar_node_not_empty' => '%env(SOME)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -215,9 +215,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'variable_node' => '%env(SOME)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -242,8 +242,8 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
-        $container->loadFromExtension('env_extension', array());
-        $container->loadFromExtension('env_extension', array());
+        $container->loadFromExtension('env_extension', []);
+        $container->loadFromExtension('env_extension', []);
 
         $this->doProcess($container);
 
@@ -256,9 +256,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container->setParameter('env(BOOLISH)', '1');
         $container->setParameter('boolish', '%env(BOOLISH)%');
         $container->registerExtension(new EnvExtension());
-        $container->prependExtensionConfig('env_extension', array(
-            'array_node' => array('bool_force_cast' => '%boolish%'),
-        ));
+        $container->prependExtensionConfig('env_extension', [
+            'array_node' => ['bool_force_cast' => '%boolish%'],
+        ]);
 
         $container->compile(true);
 
@@ -288,7 +288,7 @@ class EnvConfiguration implements ConfigurationInterface
                 ->arrayNode('array_node')
                     ->beforeNormalization()
                         ->ifTrue(function ($value) { return !\is_array($value); })
-                        ->then(function ($value) { return array('child_node' => $value); })
+                        ->then(function ($value) { return ['child_node' => $value]; })
                     ->end()
                     ->beforeNormalization()
                         ->ifArray()
@@ -312,7 +312,7 @@ class EnvConfiguration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('simple_array_node')->end()
-                ->enumNode('enum_node')->values(array('a', 'b'))->end()
+                ->enumNode('enum_node')->values(['a', 'b'])->end()
                 ->variableNode('variable_node')->end()
                 ->scalarNode('string_node')
                     ->validate()

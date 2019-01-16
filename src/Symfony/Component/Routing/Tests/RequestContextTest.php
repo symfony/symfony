@@ -68,16 +68,16 @@ class RequestContextTest extends TestCase
     public function testGetParameters()
     {
         $requestContext = new RequestContext();
-        $this->assertEquals(array(), $requestContext->getParameters());
+        $this->assertEquals([], $requestContext->getParameters());
 
-        $requestContext->setParameters(array('foo' => 'bar'));
-        $this->assertEquals(array('foo' => 'bar'), $requestContext->getParameters());
+        $requestContext->setParameters(['foo' => 'bar']);
+        $this->assertEquals(['foo' => 'bar'], $requestContext->getParameters());
     }
 
     public function testHasParameter()
     {
         $requestContext = new RequestContext();
-        $requestContext->setParameters(array('foo' => 'bar'));
+        $requestContext->setParameters(['foo' => 'bar']);
 
         $this->assertTrue($requestContext->hasParameter('foo'));
         $this->assertFalse($requestContext->hasParameter('baz'));
@@ -86,7 +86,7 @@ class RequestContextTest extends TestCase
     public function testGetParameter()
     {
         $requestContext = new RequestContext();
-        $requestContext->setParameters(array('foo' => 'bar'));
+        $requestContext->setParameters(['foo' => 'bar']);
 
         $this->assertEquals('bar', $requestContext->getParameter('foo'));
         $this->assertNull($requestContext->getParameter('baz'));
@@ -154,7 +154,7 @@ class RequestContextTest extends TestCase
         $this->assertSame($requestContext, $requestContext->setQueryString('foo=bar'));
         $this->assertSame($requestContext, $requestContext->setHttpPort(80));
         $this->assertSame($requestContext, $requestContext->setHttpsPort(443));
-        $this->assertSame($requestContext, $requestContext->setParameters(array()));
+        $this->assertSame($requestContext, $requestContext->setParameters([]));
         $this->assertSame($requestContext, $requestContext->setParameter('foo', 'bar'));
     }
 }

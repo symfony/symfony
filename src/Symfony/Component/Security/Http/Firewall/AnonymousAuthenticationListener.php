@@ -49,7 +49,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = new AnonymousToken($this->secret, 'anon.', array());
+            $token = new AnonymousToken($this->secret, 'anon.', []);
             if (null !== $this->authenticationManager) {
                 $token = $this->authenticationManager->authenticate($token);
             }
@@ -61,7 +61,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->info('Anonymous authentication failed.', array('exception' => $failed));
+                $this->logger->info('Anonymous authentication failed.', ['exception' => $failed]);
             }
         }
     }

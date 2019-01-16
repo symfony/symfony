@@ -204,10 +204,10 @@ class PropertyPathBuilderTest extends TestCase
 
     public function provideInvalidOffsets()
     {
-        return array(
-            array(6),
-            array(-7),
-        );
+        return [
+            [6],
+            [-7],
+        ];
     }
 
     public function testReplaceWithLengthGreaterOne()

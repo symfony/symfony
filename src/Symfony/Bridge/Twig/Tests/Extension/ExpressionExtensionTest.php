@@ -21,7 +21,7 @@ class ExpressionExtensionTest extends TestCase
     public function testExpressionCreation()
     {
         $template = "{{ expression('1 == 1') }}";
-        $twig = new Environment(new ArrayLoader(array('template' => $template)), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));
+        $twig = new Environment(new ArrayLoader(['template' => $template]), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
         $twig->addExtension(new ExpressionExtension());
 
         $output = $twig->render('template');

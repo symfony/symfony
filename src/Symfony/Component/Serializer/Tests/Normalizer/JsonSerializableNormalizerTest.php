@@ -56,7 +56,7 @@ class JsonSerializableNormalizerTest extends TestCase
             ->expects($this->once())
             ->method('normalize')
             ->will($this->returnCallback(function ($data) {
-                $this->assertArraySubset(array('foo' => 'a', 'bar' => 'b', 'baz' => 'c'), $data);
+                $this->assertArraySubset(['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], $data);
 
                 return 'string_object';
             }))

@@ -1,24 +1,24 @@
 <?php
 
-$container->loadFromExtension('security', array(
-    'providers' => array(
-        'default' => array(
-            'memory' => $memory = array(
-                'users' => array('foo' => array('password' => 'foo', 'roles' => 'ROLE_USER')),
-            ),
-        ),
-        'with-dash' => array(
+$container->loadFromExtension('security', [
+    'providers' => [
+        'default' => [
+            'memory' => $memory = [
+                'users' => ['foo' => ['password' => 'foo', 'roles' => 'ROLE_USER']],
+            ],
+        ],
+        'with-dash' => [
             'memory' => $memory,
-        ),
-    ),
-    'firewalls' => array(
-        'main' => array(
+        ],
+    ],
+    'firewalls' => [
+        'main' => [
             'provider' => 'default',
             'form_login' => true,
-        ),
-        'other' => array(
+        ],
+        'other' => [
             'provider' => 'with-dash',
             'form_login' => true,
-        ),
-    ),
-));
+        ],
+    ],
+]);

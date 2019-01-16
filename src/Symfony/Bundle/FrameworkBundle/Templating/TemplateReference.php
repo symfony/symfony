@@ -22,13 +22,13 @@ class TemplateReference extends BaseTemplateReference
 {
     public function __construct(string $bundle = null, string $controller = null, string $name = null, string $format = null, string $engine = null)
     {
-        $this->parameters = array(
+        $this->parameters = [
             'bundle' => $bundle,
             'controller' => $controller,
             'name' => $name,
             'format' => $format,
             'engine' => $engine,
-        );
+        ];
     }
 
     /**

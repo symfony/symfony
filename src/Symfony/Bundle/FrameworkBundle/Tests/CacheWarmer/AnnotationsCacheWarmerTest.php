@@ -33,7 +33,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     public function testAnnotationsCacheWarmerWithDebugDisabled()
     {
-        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
+        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile);
@@ -53,7 +53,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     public function testAnnotationsCacheWarmerWithDebugEnabled()
     {
-        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
+        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
         $warmer = new AnnotationsCacheWarmer($reader, $cacheFile, null, true);

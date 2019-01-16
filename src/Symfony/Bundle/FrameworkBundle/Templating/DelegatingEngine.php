@@ -43,7 +43,7 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     /**
      * {@inheritdoc}
      */
-    public function renderResponse($view, array $parameters = array(), Response $response = null)
+    public function renderResponse($view, array $parameters = [], Response $response = null)
     {
         $engine = $this->getEngine($view);
 

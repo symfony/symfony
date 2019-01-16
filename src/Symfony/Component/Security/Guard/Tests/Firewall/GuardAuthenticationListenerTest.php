@@ -39,7 +39,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
         $providerKey = 'my_firewall';
 
-        $credentials = array('username' => 'weaverryan', 'password' => 'all_your_base');
+        $credentials = ['username' => 'weaverryan', 'password' => 'all_your_base'];
 
         $authenticator
             ->expects($this->once())
@@ -75,7 +75,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             $providerKey,
-            array($authenticator),
+            [$authenticator],
             $this->logger
         );
 
@@ -115,7 +115,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             'my_firewall',
-            array($authenticator1, $authenticator2),
+            [$authenticator1, $authenticator2],
             $this->logger
         );
 
@@ -137,7 +137,7 @@ class GuardAuthenticationListenerTest extends TestCase
             ->expects($this->once())
             ->method('getCredentials')
             ->with($this->equalTo($this->request))
-            ->will($this->returnValue(array('username' => 'anything_not_empty')));
+            ->will($this->returnValue(['username' => 'anything_not_empty']));
 
         $this->authenticationManager
             ->expects($this->once())
@@ -154,7 +154,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             $providerKey,
-            array($authenticator),
+            [$authenticator],
             $this->logger
         );
 
@@ -199,7 +199,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             $providerKey,
-            array($authenticator),
+            [$authenticator],
             $this->logger
         );
 
@@ -225,7 +225,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             $providerKey,
-            array($authenticator),
+            [$authenticator],
             $this->logger
         );
 
@@ -255,7 +255,7 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->guardAuthenticatorHandler,
             $this->authenticationManager,
             $providerKey,
-            array($authenticator),
+            [$authenticator],
             $this->logger
         );
 
@@ -272,11 +272,11 @@ class GuardAuthenticationListenerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->request = new Request(array(), array(), array(), array(), array(), array());
+        $this->request = new Request([], [], [], [], [], []);
 
         $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
+            ->setMethods(['getRequest'])
             ->getMock();
         $this->event
             ->expects($this->any())

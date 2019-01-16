@@ -20,22 +20,22 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testContainsNoChildByDefault()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
-        ));
+        ]);
 
         $this->assertCount(0, $form);
     }
 
     public function testSetDataAdjustsSize()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
-            'entry_options' => array(
-                'attr' => array('maxlength' => 20),
-            ),
-        ));
-        $form->setData(array('foo@foo.com', 'foo@bar.com'));
+            'entry_options' => [
+                'attr' => ['maxlength' => 20],
+            ],
+        ]);
+        $form->setData(['foo@foo.com', 'foo@bar.com']);
 
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[1]);
@@ -47,7 +47,7 @@ class CollectionTypeTest extends BaseTypeTest
         $this->assertEquals(20, $formAttrs0['maxlength']);
         $this->assertEquals(20, $formAttrs1['maxlength']);
 
-        $form->setData(array('foo@baz.com'));
+        $form->setData(['foo@baz.com']);
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertArrayNotHasKey(1, $form);
         $this->assertCount(1, $form);
@@ -58,20 +58,20 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
-        ));
+        ]);
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $form->setData(new \stdClass());
     }
 
     public function testNotResizedIfSubmittedWithMissingData()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
-        ));
-        $form->setData(array('foo@foo.com', 'bar@bar.com'));
-        $form->submit(array('foo@bar.com'));
+        ]);
+        $form->setData(['foo@foo.com', 'bar@bar.com']);
+        $form->submit(['foo@bar.com']);
 
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('1'));
@@ -81,106 +81,106 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testResizedDownIfSubmittedWithMissingDataAndAllowDelete()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => true,
-        ));
-        $form->setData(array('foo@foo.com', 'bar@bar.com'));
-        $form->submit(array('foo@foo.com'));
+        ]);
+        $form->setData(['foo@foo.com', 'bar@bar.com']);
+        $form->submit(['foo@foo.com']);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(array('foo@foo.com'), $form->getData());
+        $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => true,
             'delete_empty' => true,
-        ));
+        ]);
 
-        $form->setData(array('foo@foo.com', 'bar@bar.com'));
-        $form->submit(array('foo@foo.com', ''));
+        $form->setData(['foo@foo.com', 'bar@bar.com']);
+        $form->submit(['foo@foo.com', '']);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(array('foo@foo.com'), $form->getData());
+        $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testResizedDownWithDeleteEmptyCallable()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => AuthorType::class,
             'allow_delete' => true,
             'delete_empty' => function (Author $obj = null) {
                 return null === $obj || empty($obj->firstName);
             },
-        ));
+        ]);
 
-        $form->setData(array(new Author('Bob'), new Author('Alice')));
-        $form->submit(array(array('firstName' => 'Bob'), array('firstName' => '')));
+        $form->setData([new Author('Bob'), new Author('Alice')]);
+        $form->submit([['firstName' => 'Bob'], ['firstName' => '']]);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals(new Author('Bob'), $form[0]->getData());
-        $this->assertEquals(array(new Author('Bob')), $form->getData());
+        $this->assertEquals([new Author('Bob')], $form->getData());
     }
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataDeleteEmptyAndNoDataClass()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => AuthorType::class,
             // If the field is not required, no new Author will be created if the
             // form is completely empty
-            'entry_options' => array('data_class' => null),
+            'entry_options' => ['data_class' => null],
             'allow_add' => true,
             'allow_delete' => true,
             'delete_empty' => function ($author) {
                 return empty($author['firstName']);
             },
-        ));
-        $form->setData(array(array('firstName' => 'first', 'lastName' => 'last')));
-        $form->submit(array(
-            array('firstName' => 's_first', 'lastName' => 's_last'),
-            array('firstName' => '', 'lastName' => ''),
-        ));
+        ]);
+        $form->setData([['firstName' => 'first', 'lastName' => 'last']]);
+        $form->submit([
+            ['firstName' => 's_first', 'lastName' => 's_last'],
+            ['firstName' => '', 'lastName' => ''],
+        ]);
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
-        $this->assertEquals(array('firstName' => 's_first', 'lastName' => 's_last'), $form[0]->getData());
-        $this->assertEquals(array(array('firstName' => 's_first', 'lastName' => 's_last')), $form->getData());
+        $this->assertEquals(['firstName' => 's_first', 'lastName' => 's_last'], $form[0]->getData());
+        $this->assertEquals([['firstName' => 's_first', 'lastName' => 's_last']], $form->getData());
     }
 
     public function testDontAddEmptyDataIfDeleteEmpty()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'delete_empty' => true,
-        ));
+        ]);
 
-        $form->setData(array('foo@foo.com'));
-        $form->submit(array('foo@foo.com', ''));
+        $form->setData(['foo@foo.com']);
+        $form->submit(['foo@foo.com', '']);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
-        $this->assertEquals(array('foo@foo.com'), $form->getData());
+        $this->assertEquals(['foo@foo.com'], $form->getData());
     }
 
     public function testNoDeleteEmptyIfDeleteNotAllowed()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
             'allow_delete' => false,
             'delete_empty' => true,
-        ));
+        ]);
 
-        $form->setData(array('foo@foo.com'));
-        $form->submit(array(''));
+        $form->setData(['foo@foo.com']);
+        $form->submit(['']);
 
         $this->assertTrue($form->has('0'));
         $this->assertEquals('', $form[0]->getData());
@@ -188,34 +188,34 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => 'Symfony\Component\Form\Tests\Fixtures\AuthorType',
             // If the field is not required, no new Author will be created if the
             // form is completely empty
-            'entry_options' => array('required' => false),
+            'entry_options' => ['required' => false],
             'allow_add' => true,
             'delete_empty' => true,
-        ));
+        ]);
 
-        $form->setData(array(new Author('first', 'last')));
-        $form->submit(array(
-            array('firstName' => 's_first', 'lastName' => 's_last'),
-            array('firstName' => '', 'lastName' => ''),
-        ));
+        $form->setData([new Author('first', 'last')]);
+        $form->submit([
+            ['firstName' => 's_first', 'lastName' => 's_last'],
+            ['firstName' => '', 'lastName' => ''],
+        ]);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
         $this->assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
-        $this->assertEquals(array(new Author('s_first', 's_last')), $form->getData());
+        $this->assertEquals([new Author('s_first', 's_last')], $form->getData());
     }
 
     public function testNotResizedIfSubmittedWithExtraData()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
-        ));
-        $form->setData(array('foo@bar.com'));
-        $form->submit(array('foo@foo.com', 'bar@bar.com'));
+        ]);
+        $form->setData(['foo@bar.com']);
+        $form->submit(['foo@foo.com', 'bar@bar.com']);
 
         $this->assertTrue($form->has('0'));
         $this->assertFalse($form->has('1'));
@@ -224,27 +224,27 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testResizedUpIfSubmittedWithExtraDataAndAllowAdd()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => TextTypeTest::TESTED_TYPE,
             'allow_add' => true,
-        ));
-        $form->setData(array('foo@bar.com'));
-        $form->submit(array('foo@bar.com', 'bar@bar.com'));
+        ]);
+        $form->setData(['foo@bar.com']);
+        $form->submit(['foo@bar.com', 'bar@bar.com']);
 
         $this->assertTrue($form->has('0'));
         $this->assertTrue($form->has('1'));
         $this->assertEquals('foo@bar.com', $form[0]->getData());
         $this->assertEquals('bar@bar.com', $form[1]->getData());
-        $this->assertEquals(array('foo@bar.com', 'bar@bar.com'), $form->getData());
+        $this->assertEquals(['foo@bar.com', 'bar@bar.com'], $form->getData());
     }
 
     public function testAllowAddButNoPrototype()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => FormTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => false,
-        ));
+        ]);
 
         $this->assertFalse($form->has('__name__'));
     }
@@ -252,11 +252,11 @@ class CollectionTypeTest extends BaseTypeTest
     public function testPrototypeMultipartPropagation()
     {
         $form = $this->factory
-            ->create(static::TESTED_TYPE, null, array(
+            ->create(static::TESTED_TYPE, null, [
                 'entry_type' => FileTypeTest::TESTED_TYPE,
                 'allow_add' => true,
                 'prototype' => true,
-            ))
+            ])
         ;
 
         $this->assertTrue($form->createView()->vars['multipart']);
@@ -264,11 +264,11 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
-        ));
+        ]);
 
         $data = $form->getData();
         $this->assertArrayNotHasKey('__name__', $data);
@@ -276,61 +276,61 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
-        ));
+        ]);
 
-        $form->setData(array('foobar.png'));
+        $form->setData(['foobar.png']);
         $data = $form->getData();
         $this->assertArrayNotHasKey('__name__', $data);
     }
 
     public function testPrototypeNameOption()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => FormTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
-        ));
+        ]);
 
         $this->assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
 
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'entry_type' => FormTypeTest::TESTED_TYPE,
             'prototype' => true,
             'allow_add' => true,
             'prototype_name' => '__test__',
-        ));
+        ]);
 
         $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
     }
 
     public function testPrototypeDefaultLabel()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
-        ));
+        ]);
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
 
     public function testPrototypeData()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'allow_add' => true,
             'prototype' => true,
             'prototype_data' => 'foo',
             'entry_type' => TextTypeTest::TESTED_TYPE,
-            'entry_options' => array(
+            'entry_options' => [
                 'data' => 'bar',
                 'label' => false,
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
         $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
@@ -338,25 +338,25 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testPrototypeDefaultRequired()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
-        ));
+        ]);
 
         $this->assertTrue($form->createView()->vars['prototype']->vars['required']);
     }
 
     public function testPrototypeSetNotRequired()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $form = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
             'required' => false,
-        ));
+        ]);
 
         $this->assertFalse($form->createView()->vars['required'], 'collection is not required');
         $this->assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
@@ -364,16 +364,16 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testPrototypeSetNotRequiredIfParentNotRequired()
     {
-        $child = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $child = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
-        ));
+        ]);
 
-        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, array(), array(
+        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, [], [
             'required' => false,
-        ));
+        ]);
 
         $child->setParent($parent);
         $this->assertFalse($parent->createView()->vars['required'], 'Parent is not required');
@@ -383,19 +383,19 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testPrototypeNotOverrideRequiredByEntryOptionsInFavorOfParent()
     {
-        $child = $this->factory->create(static::TESTED_TYPE, array(), array(
+        $child = $this->factory->create(static::TESTED_TYPE, [], [
             'entry_type' => FileTypeTest::TESTED_TYPE,
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
-            'entry_options' => array(
+            'entry_options' => [
                 'required' => true,
-            ),
-        ));
+            ],
+        ]);
 
-        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, array(), array(
+        $parent = $this->factory->create(FormTypeTest::TESTED_TYPE, [], [
             'required' => false,
-        ));
+        ]);
 
         $child->setParent($parent);
 
@@ -406,10 +406,10 @@ class CollectionTypeTest extends BaseTypeTest
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        parent::testSubmitNull(array(), array(), array());
+        parent::testSubmitNull([], [], []);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = array(), $expectedData = array())
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = [])
     {
         // resize form listener always set an empty array
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);

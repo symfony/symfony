@@ -147,13 +147,13 @@ class UploadedFileTest extends TestCase
 
     public function failedUploadedFile()
     {
-        foreach (array(UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_EXTENSION, -1) as $error) {
-            yield array(new UploadedFile(
+        foreach ([UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE, UPLOAD_ERR_PARTIAL, UPLOAD_ERR_NO_FILE, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_EXTENSION, -1] as $error) {
+            yield [new UploadedFile(
                 __DIR__.'/Fixtures/test.gif',
                 'original.gif',
                 'image/gif',
                 $error
-            ));
+            )];
         }
     }
 
@@ -323,13 +323,13 @@ class UploadedFileTest extends TestCase
 
     public function uploadedFileErrorProvider()
     {
-        return array(
-            array(UPLOAD_ERR_INI_SIZE),
-            array(UPLOAD_ERR_FORM_SIZE),
-            array(UPLOAD_ERR_PARTIAL),
-            array(UPLOAD_ERR_NO_TMP_DIR),
-            array(UPLOAD_ERR_EXTENSION),
-        );
+        return [
+            [UPLOAD_ERR_INI_SIZE],
+            [UPLOAD_ERR_FORM_SIZE],
+            [UPLOAD_ERR_PARTIAL],
+            [UPLOAD_ERR_NO_TMP_DIR],
+            [UPLOAD_ERR_EXTENSION],
+        ];
     }
 
     public function testIsInvalidIfNotHttpUpload()

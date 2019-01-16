@@ -163,7 +163,7 @@ class CsrfTokenManagerTest extends TestCase
         $storage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock();
 
         $requestStack = new RequestStack();
-        $requestStack->push(new Request(array(), array(), array(), array(), array(), array('HTTPS' => 'on')));
+        $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
 
         $manager = new CsrfTokenManager($generator, $storage, null, $requestStack);
 
@@ -173,41 +173,41 @@ class CsrfTokenManagerTest extends TestCase
 
     public function getManagerGeneratorAndStorage()
     {
-        $data = array();
+        $data = [];
 
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('', new CsrfTokenManager($generator, $storage, ''), $storage, $generator);
+        $data[] = ['', new CsrfTokenManager($generator, $storage, ''), $storage, $generator];
 
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('https-', new CsrfTokenManager($generator, $storage), $storage, $generator);
+        $data[] = ['https-', new CsrfTokenManager($generator, $storage), $storage, $generator];
 
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('aNamespace-', new CsrfTokenManager($generator, $storage, 'aNamespace-'), $storage, $generator);
+        $data[] = ['aNamespace-', new CsrfTokenManager($generator, $storage, 'aNamespace-'), $storage, $generator];
 
         $requestStack = new RequestStack();
-        $requestStack->push(new Request(array(), array(), array(), array(), array(), array('HTTPS' => 'on')));
+        $requestStack->push(new Request([], [], [], [], [], ['HTTPS' => 'on']));
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('https-', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator);
+        $data[] = ['https-', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('generated-', new CsrfTokenManager($generator, $storage, function () {
+        $data[] = ['generated-', new CsrfTokenManager($generator, $storage, function () {
             return 'generated-';
-        }), $storage, $generator);
+        }), $storage, $generator];
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
         list($generator, $storage) = $this->getGeneratorAndStorage();
-        $data[] = array('', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator);
+        $data[] = ['', new CsrfTokenManager($generator, $storage, $requestStack), $storage, $generator];
 
         return $data;
     }
 
     private function getGeneratorAndStorage()
     {
-        return array(
+        return [
             $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock(),
             $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock(),
-        );
+        ];
     }
 
     protected function setUp()

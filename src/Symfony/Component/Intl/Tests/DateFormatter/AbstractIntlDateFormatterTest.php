@@ -77,185 +77,185 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     {
         $dateTime = new \DateTime('@0');
 
-        $formatData = array(
+        $formatData = [
             /* general */
-            array('y-M-d', 0, '1970-1-1'),
-            array("EEE, MMM d, ''yy", 0, "Thu, Jan 1, '70"),
-            array('h:mm a', 0, '12:00 AM'),
-            array('yyyyy.MMMM.dd hh:mm aaa', 0, '01970.January.01 12:00 AM'),
+            ['y-M-d', 0, '1970-1-1'],
+            ["EEE, MMM d, ''yy", 0, "Thu, Jan 1, '70"],
+            ['h:mm a', 0, '12:00 AM'],
+            ['yyyyy.MMMM.dd hh:mm aaa', 0, '01970.January.01 12:00 AM'],
 
             /* escaping */
-            array("'M'", 0, 'M'),
-            array("'yy'", 0, 'yy'),
-            array("'''yy'", 0, "'yy"),
-            array("''y", 0, "'1970"),
-            array("''yy", 0, "'70"),
-            array("H 'o'' clock'", 0, "0 o' clock"),
+            ["'M'", 0, 'M'],
+            ["'yy'", 0, 'yy'],
+            ["'''yy'", 0, "'yy"],
+            ["''y", 0, "'1970"],
+            ["''yy", 0, "'70"],
+            ["H 'o'' clock'", 0, "0 o' clock"],
 
             /* month */
-            array('M', 0, '1'),
-            array('MM', 0, '01'),
-            array('MMM', 0, 'Jan'),
-            array('MMMM', 0, 'January'),
-            array('MMMMM', 0, 'J'),
-            array('MMMMMM', 0, '000001'),
+            ['M', 0, '1'],
+            ['MM', 0, '01'],
+            ['MMM', 0, 'Jan'],
+            ['MMMM', 0, 'January'],
+            ['MMMMM', 0, 'J'],
+            ['MMMMMM', 0, '000001'],
 
-            array('L', 0, '1'),
-            array('LL', 0, '01'),
-            array('LLL', 0, 'Jan'),
-            array('LLLL', 0, 'January'),
-            array('LLLLL', 0, 'J'),
-            array('LLLLLL', 0, '000001'),
+            ['L', 0, '1'],
+            ['LL', 0, '01'],
+            ['LLL', 0, 'Jan'],
+            ['LLLL', 0, 'January'],
+            ['LLLLL', 0, 'J'],
+            ['LLLLLL', 0, '000001'],
 
             /* year */
-            array('y', 0, '1970'),
-            array('yy', 0, '70'),
-            array('yyy', 0, '1970'),
-            array('yyyy', 0, '1970'),
-            array('yyyyy', 0, '01970'),
-            array('yyyyyy', 0, '001970'),
+            ['y', 0, '1970'],
+            ['yy', 0, '70'],
+            ['yyy', 0, '1970'],
+            ['yyyy', 0, '1970'],
+            ['yyyyy', 0, '01970'],
+            ['yyyyyy', 0, '001970'],
 
             /* day */
-            array('d', 0, '1'),
-            array('dd', 0, '01'),
-            array('ddd', 0, '001'),
+            ['d', 0, '1'],
+            ['dd', 0, '01'],
+            ['ddd', 0, '001'],
 
             /* quarter */
-            array('Q', 0, '1'),
-            array('QQ', 0, '01'),
-            array('QQQ', 0, 'Q1'),
-            array('QQQQ', 0, '1st quarter'),
-            array('QQQQQ', 0, '1st quarter'),
+            ['Q', 0, '1'],
+            ['QQ', 0, '01'],
+            ['QQQ', 0, 'Q1'],
+            ['QQQQ', 0, '1st quarter'],
+            ['QQQQQ', 0, '1st quarter'],
 
-            array('q', 0, '1'),
-            array('qq', 0, '01'),
-            array('qqq', 0, 'Q1'),
-            array('qqqq', 0, '1st quarter'),
-            array('qqqqq', 0, '1st quarter'),
+            ['q', 0, '1'],
+            ['qq', 0, '01'],
+            ['qqq', 0, 'Q1'],
+            ['qqqq', 0, '1st quarter'],
+            ['qqqqq', 0, '1st quarter'],
 
             // 4 months
-            array('Q', 7776000, '2'),
-            array('QQ', 7776000, '02'),
-            array('QQQ', 7776000, 'Q2'),
-            array('QQQQ', 7776000, '2nd quarter'),
+            ['Q', 7776000, '2'],
+            ['QQ', 7776000, '02'],
+            ['QQQ', 7776000, 'Q2'],
+            ['QQQQ', 7776000, '2nd quarter'],
 
             // 7 months
-            array('QQQQ', 15638400, '3rd quarter'),
+            ['QQQQ', 15638400, '3rd quarter'],
 
             // 10 months
-            array('QQQQ', 23587200, '4th quarter'),
+            ['QQQQ', 23587200, '4th quarter'],
 
             /* 12-hour (1-12) */
-            array('h', 0, '12'),
-            array('hh', 0, '12'),
-            array('hhh', 0, '012'),
+            ['h', 0, '12'],
+            ['hh', 0, '12'],
+            ['hhh', 0, '012'],
 
-            array('h', 1, '12'),
-            array('h', 3600, '1'),
-            array('h', 43200, '12'), // 12 hours
+            ['h', 1, '12'],
+            ['h', 3600, '1'],
+            ['h', 43200, '12'], // 12 hours
 
             /* day of year */
-            array('D', 0, '1'),
-            array('D', 86400, '2'), // 1 day
-            array('D', 31536000, '1'), // 1 year
-            array('D', 31622400, '2'), // 1 year + 1 day
+            ['D', 0, '1'],
+            ['D', 86400, '2'], // 1 day
+            ['D', 31536000, '1'], // 1 year
+            ['D', 31622400, '2'], // 1 year + 1 day
 
             /* day of week */
-            array('E', 0, 'Thu'),
-            array('EE', 0, 'Thu'),
-            array('EEE', 0, 'Thu'),
-            array('EEEE', 0, 'Thursday'),
-            array('EEEEE', 0, 'T'),
-            array('EEEEEE', 0, 'Th'),
+            ['E', 0, 'Thu'],
+            ['EE', 0, 'Thu'],
+            ['EEE', 0, 'Thu'],
+            ['EEEE', 0, 'Thursday'],
+            ['EEEEE', 0, 'T'],
+            ['EEEEEE', 0, 'Th'],
 
-            array('E', 1296540000, 'Tue'), // 2011-02-01
-            array('E', 1296950400, 'Sun'), // 2011-02-06
+            ['E', 1296540000, 'Tue'], // 2011-02-01
+            ['E', 1296950400, 'Sun'], // 2011-02-06
 
             /* am/pm marker */
-            array('a', 0, 'AM'),
-            array('aa', 0, 'AM'),
-            array('aaa', 0, 'AM'),
-            array('aaaa', 0, 'AM'),
+            ['a', 0, 'AM'],
+            ['aa', 0, 'AM'],
+            ['aaa', 0, 'AM'],
+            ['aaaa', 0, 'AM'],
 
             // 12 hours
-            array('a', 43200, 'PM'),
-            array('aa', 43200, 'PM'),
-            array('aaa', 43200, 'PM'),
-            array('aaaa', 43200, 'PM'),
+            ['a', 43200, 'PM'],
+            ['aa', 43200, 'PM'],
+            ['aaa', 43200, 'PM'],
+            ['aaaa', 43200, 'PM'],
 
             /* 24-hour (0-23) */
-            array('H', 0, '0'),
-            array('HH', 0, '00'),
-            array('HHH', 0, '000'),
+            ['H', 0, '0'],
+            ['HH', 0, '00'],
+            ['HHH', 0, '000'],
 
-            array('H', 1, '0'),
-            array('H', 3600, '1'),
-            array('H', 43200, '12'),
-            array('H', 46800, '13'),
+            ['H', 1, '0'],
+            ['H', 3600, '1'],
+            ['H', 43200, '12'],
+            ['H', 46800, '13'],
 
             /* 24-hour (1-24) */
-            array('k', 0, '24'),
-            array('kk', 0, '24'),
-            array('kkk', 0, '024'),
+            ['k', 0, '24'],
+            ['kk', 0, '24'],
+            ['kkk', 0, '024'],
 
-            array('k', 1, '24'),
-            array('k', 3600, '1'),
-            array('k', 43200, '12'),
-            array('k', 46800, '13'),
+            ['k', 1, '24'],
+            ['k', 3600, '1'],
+            ['k', 43200, '12'],
+            ['k', 46800, '13'],
 
             /* 12-hour (0-11) */
-            array('K', 0, '0'),
-            array('KK', 0, '00'),
-            array('KKK', 0, '000'),
+            ['K', 0, '0'],
+            ['KK', 0, '00'],
+            ['KKK', 0, '000'],
 
-            array('K', 1, '0'),
-            array('K', 3600, '1'),
-            array('K', 43200, '0'), // 12 hours
+            ['K', 1, '0'],
+            ['K', 3600, '1'],
+            ['K', 43200, '0'], // 12 hours
 
             /* minute */
-            array('m', 0, '0'),
-            array('mm', 0, '00'),
-            array('mmm', 0, '000'),
+            ['m', 0, '0'],
+            ['mm', 0, '00'],
+            ['mmm', 0, '000'],
 
-            array('m', 1, '0'),
-            array('m', 60, '1'),
-            array('m', 120, '2'),
-            array('m', 180, '3'),
-            array('m', 3600, '0'),
-            array('m', 3660, '1'),
-            array('m', 43200, '0'), // 12 hours
+            ['m', 1, '0'],
+            ['m', 60, '1'],
+            ['m', 120, '2'],
+            ['m', 180, '3'],
+            ['m', 3600, '0'],
+            ['m', 3660, '1'],
+            ['m', 43200, '0'], // 12 hours
 
             /* second */
-            array('s', 0, '0'),
-            array('ss', 0, '00'),
-            array('sss', 0, '000'),
+            ['s', 0, '0'],
+            ['ss', 0, '00'],
+            ['sss', 0, '000'],
 
-            array('s', 1, '1'),
-            array('s', 2, '2'),
-            array('s', 5, '5'),
-            array('s', 30, '30'),
-            array('s', 59, '59'),
-            array('s', 60, '0'),
-            array('s', 120, '0'),
-            array('s', 180, '0'),
-            array('s', 3600, '0'),
-            array('s', 3601, '1'),
-            array('s', 3630, '30'),
-            array('s', 43200, '0'), // 12 hours
-        );
+            ['s', 1, '1'],
+            ['s', 2, '2'],
+            ['s', 5, '5'],
+            ['s', 30, '30'],
+            ['s', 59, '59'],
+            ['s', 60, '0'],
+            ['s', 120, '0'],
+            ['s', 180, '0'],
+            ['s', 3600, '0'],
+            ['s', 3601, '1'],
+            ['s', 3630, '30'],
+            ['s', 43200, '0'], // 12 hours
+        ];
 
         /* general, DateTime */
-        $formatData[] = array('y-M-d', $dateTime, '1970-1-1');
-        $formatData[] = array("EEE, MMM d, ''yy", $dateTime, "Thu, Jan 1, '70");
-        $formatData[] = array('h:mm a', $dateTime, '12:00 AM');
-        $formatData[] = array('yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM');
+        $formatData[] = ['y-M-d', $dateTime, '1970-1-1'];
+        $formatData[] = ["EEE, MMM d, ''yy", $dateTime, "Thu, Jan 1, '70"];
+        $formatData[] = ['h:mm a', $dateTime, '12:00 AM'];
+        $formatData[] = ['yyyyy.MMMM.dd hh:mm aaa', $dateTime, '01970.January.01 12:00 AM'];
 
         if (IcuVersion::compare(Intl::getIcuVersion(), '59.1', '>=', 1)) {
             // Before ICU 59.1 GMT was used instead of UTC
-            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 UTC');
-            $formatData[] = array('K:mm a, z', 0, '0:00 AM, UTC');
-            $formatData[] = array("yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 UTC');
-            $formatData[] = array('K:mm a, z', $dateTime, '0:00 AM, UTC');
+            $formatData[] = ["yyyy.MM.dd 'at' HH:mm:ss zzz", 0, '1970.01.01 at 00:00:00 UTC'];
+            $formatData[] = ['K:mm a, z', 0, '0:00 AM, UTC'];
+            $formatData[] = ["yyyy.MM.dd 'at' HH:mm:ss zzz", $dateTime, '1970.01.01 at 00:00:00 UTC'];
+            $formatData[] = ['K:mm a, z', $dateTime, '0:00 AM, UTC'];
         }
 
         return $formatData;
@@ -285,9 +285,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function formatErrorProvider()
     {
-        return array(
-            array('y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'),
-        );
+        return [
+            ['y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'],
+        ];
     }
 
     /**
@@ -302,31 +302,31 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function formatWithTimezoneProvider()
     {
-        $data = array(
-            array(0, 'UTC', '1970-01-01 00:00:00'),
-            array(0, 'GMT', '1970-01-01 00:00:00'),
-            array(0, 'GMT-03:00', '1969-12-31 21:00:00'),
-            array(0, 'GMT+03:00', '1970-01-01 03:00:00'),
-            array(0, 'Europe/Zurich', '1970-01-01 01:00:00'),
-            array(0, 'Europe/Paris', '1970-01-01 01:00:00'),
-            array(0, 'Africa/Cairo', '1970-01-01 02:00:00'),
-            array(0, 'Africa/Casablanca', '1970-01-01 00:00:00'),
-            array(0, 'Africa/Djibouti', '1970-01-01 03:00:00'),
-            array(0, 'Africa/Johannesburg', '1970-01-01 02:00:00'),
-            array(0, 'America/Antigua', '1969-12-31 20:00:00'),
-            array(0, 'America/Toronto', '1969-12-31 19:00:00'),
-            array(0, 'America/Vancouver', '1969-12-31 16:00:00'),
-            array(0, 'Asia/Aqtau', '1970-01-01 05:00:00'),
-            array(0, 'Asia/Bangkok', '1970-01-01 07:00:00'),
-            array(0, 'Asia/Dubai', '1970-01-01 04:00:00'),
-            array(0, 'Australia/Brisbane', '1970-01-01 10:00:00'),
-            array(0, 'Australia/Eucla', '1970-01-01 08:45:00'),
-            array(0, 'Australia/Melbourne', '1970-01-01 10:00:00'),
-            array(0, 'Europe/Berlin', '1970-01-01 01:00:00'),
-            array(0, 'Europe/Dublin', '1970-01-01 01:00:00'),
-            array(0, 'Europe/Warsaw', '1970-01-01 01:00:00'),
-            array(0, 'Pacific/Fiji', '1970-01-01 12:00:00'),
-        );
+        $data = [
+            [0, 'UTC', '1970-01-01 00:00:00'],
+            [0, 'GMT', '1970-01-01 00:00:00'],
+            [0, 'GMT-03:00', '1969-12-31 21:00:00'],
+            [0, 'GMT+03:00', '1970-01-01 03:00:00'],
+            [0, 'Europe/Zurich', '1970-01-01 01:00:00'],
+            [0, 'Europe/Paris', '1970-01-01 01:00:00'],
+            [0, 'Africa/Cairo', '1970-01-01 02:00:00'],
+            [0, 'Africa/Casablanca', '1970-01-01 00:00:00'],
+            [0, 'Africa/Djibouti', '1970-01-01 03:00:00'],
+            [0, 'Africa/Johannesburg', '1970-01-01 02:00:00'],
+            [0, 'America/Antigua', '1969-12-31 20:00:00'],
+            [0, 'America/Toronto', '1969-12-31 19:00:00'],
+            [0, 'America/Vancouver', '1969-12-31 16:00:00'],
+            [0, 'Asia/Aqtau', '1970-01-01 05:00:00'],
+            [0, 'Asia/Bangkok', '1970-01-01 07:00:00'],
+            [0, 'Asia/Dubai', '1970-01-01 04:00:00'],
+            [0, 'Australia/Brisbane', '1970-01-01 10:00:00'],
+            [0, 'Australia/Eucla', '1970-01-01 08:45:00'],
+            [0, 'Australia/Melbourne', '1970-01-01 10:00:00'],
+            [0, 'Europe/Berlin', '1970-01-01 01:00:00'],
+            [0, 'Europe/Dublin', '1970-01-01 01:00:00'],
+            [0, 'Europe/Warsaw', '1970-01-01 01:00:00'],
+            [0, 'Pacific/Fiji', '1970-01-01 12:00:00'],
+        ];
 
         return $data;
     }
@@ -344,52 +344,52 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function formatTimezoneProvider()
     {
-        return array(
-            array('z', 'GMT', 'GMT'),
-            array('zz', 'GMT', 'GMT'),
-            array('zzz', 'GMT', 'GMT'),
-            array('zzzz', 'GMT', 'Greenwich Mean Time'),
-            array('zzzzz', 'GMT', 'Greenwich Mean Time'),
+        return [
+            ['z', 'GMT', 'GMT'],
+            ['zz', 'GMT', 'GMT'],
+            ['zzz', 'GMT', 'GMT'],
+            ['zzzz', 'GMT', 'Greenwich Mean Time'],
+            ['zzzzz', 'GMT', 'Greenwich Mean Time'],
 
-            array('z', 'Etc/GMT', 'GMT'),
-            array('zz', 'Etc/GMT', 'GMT'),
-            array('zzz', 'Etc/GMT', 'GMT'),
-            array('zzzz', 'Etc/GMT', 'Greenwich Mean Time'),
-            array('zzzzz', 'Etc/GMT', 'Greenwich Mean Time'),
+            ['z', 'Etc/GMT', 'GMT'],
+            ['zz', 'Etc/GMT', 'GMT'],
+            ['zzz', 'Etc/GMT', 'GMT'],
+            ['zzzz', 'Etc/GMT', 'Greenwich Mean Time'],
+            ['zzzzz', 'Etc/GMT', 'Greenwich Mean Time'],
 
-            array('z', 'Etc/GMT+3', 'GMT-3'),
-            array('zz', 'Etc/GMT+3', 'GMT-3'),
-            array('zzz', 'Etc/GMT+3', 'GMT-3'),
-            array('zzzz', 'Etc/GMT+3', 'GMT-03:00'),
-            array('zzzzz', 'Etc/GMT+3', 'GMT-03:00'),
+            ['z', 'Etc/GMT+3', 'GMT-3'],
+            ['zz', 'Etc/GMT+3', 'GMT-3'],
+            ['zzz', 'Etc/GMT+3', 'GMT-3'],
+            ['zzzz', 'Etc/GMT+3', 'GMT-03:00'],
+            ['zzzzz', 'Etc/GMT+3', 'GMT-03:00'],
 
-            array('z', 'UTC', 'UTC'),
-            array('zz', 'UTC', 'UTC'),
-            array('zzz', 'UTC', 'UTC'),
-            array('zzzz', 'UTC', 'Coordinated Universal Time'),
-            array('zzzzz', 'UTC', 'Coordinated Universal Time'),
+            ['z', 'UTC', 'UTC'],
+            ['zz', 'UTC', 'UTC'],
+            ['zzz', 'UTC', 'UTC'],
+            ['zzzz', 'UTC', 'Coordinated Universal Time'],
+            ['zzzzz', 'UTC', 'Coordinated Universal Time'],
 
-            array('z', 'Etc/UTC', 'UTC'),
-            array('zz', 'Etc/UTC', 'UTC'),
-            array('zzz', 'Etc/UTC', 'UTC'),
-            array('zzzz', 'Etc/UTC', 'Coordinated Universal Time'),
-            array('zzzzz', 'Etc/UTC', 'Coordinated Universal Time'),
+            ['z', 'Etc/UTC', 'UTC'],
+            ['zz', 'Etc/UTC', 'UTC'],
+            ['zzz', 'Etc/UTC', 'UTC'],
+            ['zzzz', 'Etc/UTC', 'Coordinated Universal Time'],
+            ['zzzzz', 'Etc/UTC', 'Coordinated Universal Time'],
 
-            array('z', 'Etc/Universal', 'UTC'),
-            array('z', 'Etc/Zulu', 'UTC'),
-            array('z', 'Etc/UCT', 'UTC'),
-            array('z', 'Etc/Greenwich', 'GMT'),
-            array('zzzzz', 'Etc/Universal', 'Coordinated Universal Time'),
-            array('zzzzz', 'Etc/Zulu', 'Coordinated Universal Time'),
-            array('zzzzz', 'Etc/UCT', 'Coordinated Universal Time'),
-            array('zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'),
+            ['z', 'Etc/Universal', 'UTC'],
+            ['z', 'Etc/Zulu', 'UTC'],
+            ['z', 'Etc/UCT', 'UTC'],
+            ['z', 'Etc/Greenwich', 'GMT'],
+            ['zzzzz', 'Etc/Universal', 'Coordinated Universal Time'],
+            ['zzzzz', 'Etc/Zulu', 'Coordinated Universal Time'],
+            ['zzzzz', 'Etc/UCT', 'Coordinated Universal Time'],
+            ['zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'],
 
-            array('z', 'GMT+03:00', 'GMT+3'),
-            array('zz', 'GMT+03:00', 'GMT+3'),
-            array('zzz', 'GMT+03:00', 'GMT+3'),
-            array('zzzz', 'GMT+03:00', 'GMT+03:00'),
-            array('zzzzz', 'GMT+03:00', 'GMT+03:00'),
-        );
+            ['z', 'GMT+03:00', 'GMT+3'],
+            ['zz', 'GMT+03:00', 'GMT+3'],
+            ['zzz', 'GMT+03:00', 'GMT+3'],
+            ['zzzz', 'GMT+03:00', 'GMT+03:00'],
+            ['zzzzz', 'GMT+03:00', 'GMT+03:00'],
+        ];
     }
 
     public function testFormatWithGmtTimezone()
@@ -485,16 +485,16 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function dateAndTimeTypeProvider()
     {
-        return array(
-            array(0, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Thursday, January 1, 1970'),
-            array(0, IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'January 1, 1970'),
-            array(0, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Jan 1, 1970'),
-            array(0, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, '1/1/70'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM Coordinated Universal Time'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM UTC'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, '12:00:00 AM'),
-            array(0, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, '12:00 AM'),
-        );
+        return [
+            [0, IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Thursday, January 1, 1970'],
+            [0, IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'January 1, 1970'],
+            [0, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Jan 1, 1970'],
+            [0, IntlDateFormatter::SHORT, IntlDateFormatter::NONE, '1/1/70'],
+            [0, IntlDateFormatter::NONE, IntlDateFormatter::FULL, '12:00:00 AM Coordinated Universal Time'],
+            [0, IntlDateFormatter::NONE, IntlDateFormatter::LONG, '12:00:00 AM UTC'],
+            [0, IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, '12:00:00 AM'],
+            [0, IntlDateFormatter::NONE, IntlDateFormatter::SHORT, '12:00 AM'],
+        ];
     }
 
     public function testGetCalendar()
@@ -567,263 +567,263 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function parseYearProvider()
     {
-        return array(
-            array('y-M-d', '1970-1-1', 0),
-            array('yy-M-d', '70-1-1', 0),
-        );
+        return [
+            ['y-M-d', '1970-1-1', 0],
+            ['yy-M-d', '70-1-1', 0],
+        ];
     }
 
     public function parseQuarterProvider()
     {
-        return array(
-            array('Q', '1', 0),
-            array('QQ', '01', 0),
-            array('QQQ', 'Q1', 0),
-            array('QQQQ', '1st quarter', 0),
-            array('QQQQQ', '1st quarter', 0),
+        return [
+            ['Q', '1', 0],
+            ['QQ', '01', 0],
+            ['QQQ', 'Q1', 0],
+            ['QQQQ', '1st quarter', 0],
+            ['QQQQQ', '1st quarter', 0],
 
-            array('Q', '2', 7776000),
-            array('QQ', '02', 7776000),
-            array('QQQ', 'Q2', 7776000),
-            array('QQQQ', '2nd quarter', 7776000),
-            array('QQQQQ', '2nd quarter', 7776000),
+            ['Q', '2', 7776000],
+            ['QQ', '02', 7776000],
+            ['QQQ', 'Q2', 7776000],
+            ['QQQQ', '2nd quarter', 7776000],
+            ['QQQQQ', '2nd quarter', 7776000],
 
-            array('q', '1', 0),
-            array('qq', '01', 0),
-            array('qqq', 'Q1', 0),
-            array('qqqq', '1st quarter', 0),
-            array('qqqqq', '1st quarter', 0),
-        );
+            ['q', '1', 0],
+            ['qq', '01', 0],
+            ['qqq', 'Q1', 0],
+            ['qqqq', '1st quarter', 0],
+            ['qqqqq', '1st quarter', 0],
+        ];
     }
 
     public function parseMonthProvider()
     {
-        return array(
-            array('y-M-d', '1970-1-1', 0),
-            array('y-MMM-d', '1970-Jan-1', 0),
-            array('y-MMMM-d', '1970-January-1', 0),
-        );
+        return [
+            ['y-M-d', '1970-1-1', 0],
+            ['y-MMM-d', '1970-Jan-1', 0],
+            ['y-MMMM-d', '1970-January-1', 0],
+        ];
     }
 
     public function parseStandaloneMonthProvider()
     {
-        return array(
-            array('y-L-d', '1970-1-1', 0),
-            array('y-LLL-d', '1970-Jan-1', 0),
-            array('y-LLLL-d', '1970-January-1', 0),
-        );
+        return [
+            ['y-L-d', '1970-1-1', 0],
+            ['y-LLL-d', '1970-Jan-1', 0],
+            ['y-LLLL-d', '1970-January-1', 0],
+        ];
     }
 
     public function parseDayProvider()
     {
-        return array(
-            array('y-M-d', '1970-1-1', 0),
-            array('y-M-dd', '1970-1-01', 0),
-            array('y-M-ddd', '1970-1-001', 0),
-        );
+        return [
+            ['y-M-d', '1970-1-1', 0],
+            ['y-M-dd', '1970-1-01', 0],
+            ['y-M-ddd', '1970-1-001', 0],
+        ];
     }
 
     public function parseDayOfWeekProvider()
     {
-        return array(
-            array('E', 'Thu', 0),
-            array('EE', 'Thu', 0),
-            array('EEE', 'Thu', 0),
-            array('EEEE', 'Thursday', 0),
-            array('EEEEE', 'T', 432000),
-            array('EEEEEE', 'Th', 0),
-        );
+        return [
+            ['E', 'Thu', 0],
+            ['EE', 'Thu', 0],
+            ['EEE', 'Thu', 0],
+            ['EEEE', 'Thursday', 0],
+            ['EEEEE', 'T', 432000],
+            ['EEEEEE', 'Th', 0],
+        ];
     }
 
     public function parseDayOfYearProvider()
     {
-        return array(
-            array('D', '1', 0),
-            array('D', '2', 86400),
-        );
+        return [
+            ['D', '1', 0],
+            ['D', '2', 86400],
+        ];
     }
 
     public function parseHour12ClockOneBasedProvider()
     {
-        return array(
+        return [
             // 12 hours (1-12)
-            array('y-M-d h', '1970-1-1 1', 3600),
-            array('y-M-d h', '1970-1-1 10', 36000),
-            array('y-M-d hh', '1970-1-1 11', 39600),
-            array('y-M-d hh', '1970-1-1 12', 0),
-            array('y-M-d hh a', '1970-1-1 0 AM', 0),
-            array('y-M-d hh a', '1970-1-1 1 AM', 3600),
-            array('y-M-d hh a', '1970-1-1 10 AM', 36000),
-            array('y-M-d hh a', '1970-1-1 11 AM', 39600),
-            array('y-M-d hh a', '1970-1-1 12 AM', 0),
-            array('y-M-d hh a', '1970-1-1 23 AM', 82800),
-            array('y-M-d hh a', '1970-1-1 24 AM', 86400),
-            array('y-M-d hh a', '1970-1-1 0 PM', 43200),
-            array('y-M-d hh a', '1970-1-1 1 PM', 46800),
-            array('y-M-d hh a', '1970-1-1 10 PM', 79200),
-            array('y-M-d hh a', '1970-1-1 11 PM', 82800),
-            array('y-M-d hh a', '1970-1-1 12 PM', 43200),
-            array('y-M-d hh a', '1970-1-1 23 PM', 126000),
-            array('y-M-d hh a', '1970-1-1 24 PM', 129600),
-        );
+            ['y-M-d h', '1970-1-1 1', 3600],
+            ['y-M-d h', '1970-1-1 10', 36000],
+            ['y-M-d hh', '1970-1-1 11', 39600],
+            ['y-M-d hh', '1970-1-1 12', 0],
+            ['y-M-d hh a', '1970-1-1 0 AM', 0],
+            ['y-M-d hh a', '1970-1-1 1 AM', 3600],
+            ['y-M-d hh a', '1970-1-1 10 AM', 36000],
+            ['y-M-d hh a', '1970-1-1 11 AM', 39600],
+            ['y-M-d hh a', '1970-1-1 12 AM', 0],
+            ['y-M-d hh a', '1970-1-1 23 AM', 82800],
+            ['y-M-d hh a', '1970-1-1 24 AM', 86400],
+            ['y-M-d hh a', '1970-1-1 0 PM', 43200],
+            ['y-M-d hh a', '1970-1-1 1 PM', 46800],
+            ['y-M-d hh a', '1970-1-1 10 PM', 79200],
+            ['y-M-d hh a', '1970-1-1 11 PM', 82800],
+            ['y-M-d hh a', '1970-1-1 12 PM', 43200],
+            ['y-M-d hh a', '1970-1-1 23 PM', 126000],
+            ['y-M-d hh a', '1970-1-1 24 PM', 129600],
+        ];
     }
 
     public function parseHour12ClockZeroBasedProvider()
     {
-        return array(
+        return [
             // 12 hours (0-11)
-            array('y-M-d K', '1970-1-1 1', 3600),
-            array('y-M-d K', '1970-1-1 10', 36000),
-            array('y-M-d KK', '1970-1-1 11', 39600),
-            array('y-M-d KK', '1970-1-1 12', 43200),
-            array('y-M-d KK a', '1970-1-1 0 AM', 0),
-            array('y-M-d KK a', '1970-1-1 1 AM', 3600),
-            array('y-M-d KK a', '1970-1-1 10 AM', 36000),
-            array('y-M-d KK a', '1970-1-1 11 AM', 39600),
-            array('y-M-d KK a', '1970-1-1 12 AM', 43200),
-            array('y-M-d KK a', '1970-1-1 23 AM', 82800),
-            array('y-M-d KK a', '1970-1-1 24 AM', 86400),
-            array('y-M-d KK a', '1970-1-1 0 PM', 43200),
-            array('y-M-d KK a', '1970-1-1 1 PM', 46800),
-            array('y-M-d KK a', '1970-1-1 10 PM', 79200),
-            array('y-M-d KK a', '1970-1-1 11 PM', 82800),
-            array('y-M-d KK a', '1970-1-1 12 PM', 86400),
-            array('y-M-d KK a', '1970-1-1 23 PM', 126000),
-            array('y-M-d KK a', '1970-1-1 24 PM', 129600),
-        );
+            ['y-M-d K', '1970-1-1 1', 3600],
+            ['y-M-d K', '1970-1-1 10', 36000],
+            ['y-M-d KK', '1970-1-1 11', 39600],
+            ['y-M-d KK', '1970-1-1 12', 43200],
+            ['y-M-d KK a', '1970-1-1 0 AM', 0],
+            ['y-M-d KK a', '1970-1-1 1 AM', 3600],
+            ['y-M-d KK a', '1970-1-1 10 AM', 36000],
+            ['y-M-d KK a', '1970-1-1 11 AM', 39600],
+            ['y-M-d KK a', '1970-1-1 12 AM', 43200],
+            ['y-M-d KK a', '1970-1-1 23 AM', 82800],
+            ['y-M-d KK a', '1970-1-1 24 AM', 86400],
+            ['y-M-d KK a', '1970-1-1 0 PM', 43200],
+            ['y-M-d KK a', '1970-1-1 1 PM', 46800],
+            ['y-M-d KK a', '1970-1-1 10 PM', 79200],
+            ['y-M-d KK a', '1970-1-1 11 PM', 82800],
+            ['y-M-d KK a', '1970-1-1 12 PM', 86400],
+            ['y-M-d KK a', '1970-1-1 23 PM', 126000],
+            ['y-M-d KK a', '1970-1-1 24 PM', 129600],
+        ];
     }
 
     public function parseHour24ClockOneBasedProvider()
     {
-        return array(
+        return [
             // 24 hours (1-24)
-            array('y-M-d k', '1970-1-1 1', 3600),
-            array('y-M-d k', '1970-1-1 10', 36000),
-            array('y-M-d kk', '1970-1-1 11', 39600),
-            array('y-M-d kk', '1970-1-1 12', 43200),
-            array('y-M-d kk', '1970-1-1 23', 82800),
-            array('y-M-d kk', '1970-1-1 24', 0),
-            array('y-M-d kk a', '1970-1-1 0 AM', 0),
-            array('y-M-d kk a', '1970-1-1 1 AM', 0),
-            array('y-M-d kk a', '1970-1-1 10 AM', 0),
-            array('y-M-d kk a', '1970-1-1 11 AM', 0),
-            array('y-M-d kk a', '1970-1-1 12 AM', 0),
-            array('y-M-d kk a', '1970-1-1 23 AM', 0),
-            array('y-M-d kk a', '1970-1-1 24 AM', 0),
-            array('y-M-d kk a', '1970-1-1 0 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 1 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 10 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 11 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 12 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 23 PM', 43200),
-            array('y-M-d kk a', '1970-1-1 24 PM', 43200),
-        );
+            ['y-M-d k', '1970-1-1 1', 3600],
+            ['y-M-d k', '1970-1-1 10', 36000],
+            ['y-M-d kk', '1970-1-1 11', 39600],
+            ['y-M-d kk', '1970-1-1 12', 43200],
+            ['y-M-d kk', '1970-1-1 23', 82800],
+            ['y-M-d kk', '1970-1-1 24', 0],
+            ['y-M-d kk a', '1970-1-1 0 AM', 0],
+            ['y-M-d kk a', '1970-1-1 1 AM', 0],
+            ['y-M-d kk a', '1970-1-1 10 AM', 0],
+            ['y-M-d kk a', '1970-1-1 11 AM', 0],
+            ['y-M-d kk a', '1970-1-1 12 AM', 0],
+            ['y-M-d kk a', '1970-1-1 23 AM', 0],
+            ['y-M-d kk a', '1970-1-1 24 AM', 0],
+            ['y-M-d kk a', '1970-1-1 0 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 1 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 10 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 11 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 12 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 23 PM', 43200],
+            ['y-M-d kk a', '1970-1-1 24 PM', 43200],
+        ];
     }
 
     public function parseHour24ClockZeroBasedProvider()
     {
-        return array(
+        return [
             // 24 hours (0-23)
-            array('y-M-d H', '1970-1-1 0', 0),
-            array('y-M-d H', '1970-1-1 1', 3600),
-            array('y-M-d H', '1970-1-1 10', 36000),
-            array('y-M-d HH', '1970-1-1 11', 39600),
-            array('y-M-d HH', '1970-1-1 12', 43200),
-            array('y-M-d HH', '1970-1-1 23', 82800),
-            array('y-M-d HH a', '1970-1-1 0 AM', 0),
-            array('y-M-d HH a', '1970-1-1 1 AM', 0),
-            array('y-M-d HH a', '1970-1-1 10 AM', 0),
-            array('y-M-d HH a', '1970-1-1 11 AM', 0),
-            array('y-M-d HH a', '1970-1-1 12 AM', 0),
-            array('y-M-d HH a', '1970-1-1 23 AM', 0),
-            array('y-M-d HH a', '1970-1-1 24 AM', 0),
-            array('y-M-d HH a', '1970-1-1 0 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 1 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 10 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 11 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 12 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 23 PM', 43200),
-            array('y-M-d HH a', '1970-1-1 24 PM', 43200),
-        );
+            ['y-M-d H', '1970-1-1 0', 0],
+            ['y-M-d H', '1970-1-1 1', 3600],
+            ['y-M-d H', '1970-1-1 10', 36000],
+            ['y-M-d HH', '1970-1-1 11', 39600],
+            ['y-M-d HH', '1970-1-1 12', 43200],
+            ['y-M-d HH', '1970-1-1 23', 82800],
+            ['y-M-d HH a', '1970-1-1 0 AM', 0],
+            ['y-M-d HH a', '1970-1-1 1 AM', 0],
+            ['y-M-d HH a', '1970-1-1 10 AM', 0],
+            ['y-M-d HH a', '1970-1-1 11 AM', 0],
+            ['y-M-d HH a', '1970-1-1 12 AM', 0],
+            ['y-M-d HH a', '1970-1-1 23 AM', 0],
+            ['y-M-d HH a', '1970-1-1 24 AM', 0],
+            ['y-M-d HH a', '1970-1-1 0 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 1 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 10 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 11 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 12 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 23 PM', 43200],
+            ['y-M-d HH a', '1970-1-1 24 PM', 43200],
+        ];
     }
 
     public function parseMinuteProvider()
     {
-        return array(
-            array('y-M-d HH:m', '1970-1-1 0:1', 60),
-            array('y-M-d HH:mm', '1970-1-1 0:10', 600),
-        );
+        return [
+            ['y-M-d HH:m', '1970-1-1 0:1', 60],
+            ['y-M-d HH:mm', '1970-1-1 0:10', 600],
+        ];
     }
 
     public function parseSecondProvider()
     {
-        return array(
-            array('y-M-d HH:mm:s', '1970-1-1 00:01:1', 61),
-            array('y-M-d HH:mm:ss', '1970-1-1 00:01:10', 70),
-        );
+        return [
+            ['y-M-d HH:mm:s', '1970-1-1 00:01:1', 61],
+            ['y-M-d HH:mm:ss', '1970-1-1 00:01:10', 70],
+        ];
     }
 
     public function parseTimezoneProvider()
     {
-        return array(
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-03:00', 10800),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-04:00', 14400),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-00:00', 0),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+03:00', -10800),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-0300', 10800),
-            array('y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+0300', -10800),
+        return [
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-03:00', 10800],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-04:00', 14400],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-00:00', 0],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+03:00', -10800],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+04:00', -14400],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT-0300', 10800],
+            ['y-M-d HH:mm:ss zzzz', '1970-1-1 00:00:00 GMT+0300', -10800],
 
             // a previous timezone parsing should not change the timezone for the next parsing
-            array('y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0),
-        );
+            ['y-M-d HH:mm:ss', '1970-1-1 00:00:00', 0],
+        ];
     }
 
     public function parseAmPmProvider()
     {
-        return array(
+        return [
             // AM/PM (already covered by hours tests)
-            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 AM', 0),
-            array('y-M-d HH:mm:ss a', '1970-1-1 00:00:00 PM', 43200),
-        );
+            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 AM', 0],
+            ['y-M-d HH:mm:ss a', '1970-1-1 00:00:00 PM', 43200],
+        ];
     }
 
     public function parseStandaloneAmPmProvider()
     {
-        return array(
-            array('a', 'AM', 0),
-            array('a', 'PM', 43200),
-        );
+        return [
+            ['a', 'AM', 0],
+            ['a', 'PM', 43200],
+        ];
     }
 
     public function parseRegexMetaCharsProvider()
     {
-        return array(
+        return [
             // regexp meta chars in the pattern string
-            array('y[M-d', '1970[1-1', 0),
-            array('y[M/d', '1970[1/1', 0),
-        );
+            ['y[M-d', '1970[1-1', 0],
+            ['y[M/d', '1970[1/1', 0],
+        ];
     }
 
     public function parseQuoteCharsProvider()
     {
-        return array(
-            array("'M'", 'M', 0),
-            array("'yy'", 'yy', 0),
-            array("'''yy'", "'yy", 0),
-            array("''y", "'1970", 0),
-            array("H 'o'' clock'", "0 o' clock", 0),
-        );
+        return [
+            ["'M'", 'M', 0],
+            ["'yy'", 'yy', 0],
+            ["'''yy'", "'yy", 0],
+            ["''y", "'1970", 0],
+            ["H 'o'' clock'", "0 o' clock", 0],
+        ];
     }
 
     public function parseDashSlashProvider()
     {
-        return array(
-            array('y-M-d', '1970/1/1', 0),
-            array('yy-M-d', '70/1/1', 0),
-            array('y/M/d', '1970-1-1', 0),
-            array('yy/M/d', '70-1-1', 0),
-        );
+        return [
+            ['y-M-d', '1970/1/1', 0],
+            ['yy-M-d', '70/1/1', 0],
+            ['y/M/d', '1970-1-1', 0],
+            ['yy/M/d', '70-1-1', 0],
+        ];
     }
 
     /**
@@ -841,15 +841,15 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function parseErrorProvider()
     {
-        return array(
+        return [
             // 1 char month
-            array('y-MMMMM-d', '1970-J-1'),
-            array('y-MMMMM-d', '1970-S-1'),
+            ['y-MMMMM-d', '1970-J-1'],
+            ['y-MMMMM-d', '1970-S-1'],
 
             // standalone 1 char month
-            array('y-LLLLL-d', '1970-J-1'),
-            array('y-LLLLL-d', '1970-S-1'),
-        );
+            ['y-LLLLL-d', '1970-J-1'],
+            ['y-LLLLL-d', '1970-S-1'],
+        ];
     }
 
     /*
@@ -892,16 +892,16 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function setTimeZoneIdProvider()
     {
-        return array(
-            array('UTC', 'UTC'),
-            array('GMT', 'GMT'),
-            array('GMT-03:00', 'GMT-03:00'),
-            array('Europe/Zurich', 'Europe/Zurich'),
-            array(null, date_default_timezone_get()),
-            array('Foo/Bar', 'UTC'),
-            array('GMT+00:AA', 'UTC'),
-            array('GMT+00AA', 'UTC'),
-        );
+        return [
+            ['UTC', 'UTC'],
+            ['GMT', 'GMT'],
+            ['GMT-03:00', 'GMT-03:00'],
+            ['Europe/Zurich', 'Europe/Zurich'],
+            [null, date_default_timezone_get()],
+            ['Foo/Bar', 'UTC'],
+            ['GMT+00:AA', 'UTC'],
+            ['GMT+00AA', 'UTC'],
+        ];
     }
 
     protected function getDefaultDateFormatter($pattern = null)

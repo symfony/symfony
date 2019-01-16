@@ -52,7 +52,7 @@ class FormPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition($this->formExtensionService);
-        if (new IteratorArgument(array()) != $definition->getArgument(2)) {
+        if (new IteratorArgument([]) != $definition->getArgument(2)) {
             return;
         }
         $definition->replaceArgument(0, $this->processFormTypes($container));
@@ -63,8 +63,8 @@ class FormPass implements CompilerPassInterface
     private function processFormTypes(ContainerBuilder $container)
     {
         // Get service locator argument
-        $servicesMap = array();
-        $namespaces = array('Symfony\Component\Form\Extension\Core\Type' => true);
+        $servicesMap = [];
+        $namespaces = ['Symfony\Component\Form\Extension\Core\Type' => true];
 
         // Builds an array with fully-qualified type class names as keys and service IDs as values
         foreach ($container->findTaggedServiceIds($this->formTypeTag, true) as $serviceId => $tag) {
@@ -85,8 +85,8 @@ class FormPass implements CompilerPassInterface
 
     private function processFormTypeExtensions(ContainerBuilder $container)
     {
-        $typeExtensions = array();
-        $typeExtensionsClasses = array();
+        $typeExtensions = [];
+        $typeExtensionsClasses = [];
         foreach ($this->findAndSortTaggedServices($this->formTypeExtensionTag, $container) as $reference) {
             $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
@@ -130,8 +130,8 @@ class FormPass implements CompilerPassInterface
 
     private function processFormTypeGuessers(ContainerBuilder $container)
     {
-        $guessers = array();
-        $guessersClasses = array();
+        $guessers = [];
+        $guessersClasses = [];
         foreach ($container->findTaggedServiceIds($this->formTypeGuesserTag, true) as $serviceId => $tags) {
             $guessers[] = new Reference($serviceId);
 

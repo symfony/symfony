@@ -20,53 +20,53 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class PdoCaster
 {
-    private static $pdoAttributes = array(
-        'CASE' => array(
+    private static $pdoAttributes = [
+        'CASE' => [
             \PDO::CASE_LOWER => 'LOWER',
             \PDO::CASE_NATURAL => 'NATURAL',
             \PDO::CASE_UPPER => 'UPPER',
-        ),
-        'ERRMODE' => array(
+        ],
+        'ERRMODE' => [
             \PDO::ERRMODE_SILENT => 'SILENT',
             \PDO::ERRMODE_WARNING => 'WARNING',
             \PDO::ERRMODE_EXCEPTION => 'EXCEPTION',
-        ),
+        ],
         'TIMEOUT',
         'PREFETCH',
         'AUTOCOMMIT',
         'PERSISTENT',
         'DRIVER_NAME',
         'SERVER_INFO',
-        'ORACLE_NULLS' => array(
+        'ORACLE_NULLS' => [
             \PDO::NULL_NATURAL => 'NATURAL',
             \PDO::NULL_EMPTY_STRING => 'EMPTY_STRING',
             \PDO::NULL_TO_STRING => 'TO_STRING',
-        ),
+        ],
         'CLIENT_VERSION',
         'SERVER_VERSION',
         'STATEMENT_CLASS',
         'EMULATE_PREPARES',
         'CONNECTION_STATUS',
         'STRINGIFY_FETCHES',
-        'DEFAULT_FETCH_MODE' => array(
+        'DEFAULT_FETCH_MODE' => [
             \PDO::FETCH_ASSOC => 'ASSOC',
             \PDO::FETCH_BOTH => 'BOTH',
             \PDO::FETCH_LAZY => 'LAZY',
             \PDO::FETCH_NUM => 'NUM',
             \PDO::FETCH_OBJ => 'OBJ',
-        ),
-    );
+        ],
+    ];
 
     public static function castPdo(\PDO $c, array $a, Stub $stub, $isNested)
     {
-        $attr = array();
+        $attr = [];
         $errmode = $c->getAttribute(\PDO::ATTR_ERRMODE);
         $c->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         foreach (self::$pdoAttributes as $k => $v) {
             if (!isset($k[0])) {
                 $k = $v;
-                $v = array();
+                $v = [];
             }
 
             try {
@@ -85,11 +85,11 @@ class PdoCaster
         }
 
         $prefix = Caster::PREFIX_VIRTUAL;
-        $a += array(
+        $a += [
             $prefix.'inTransaction' => method_exists($c, 'inTransaction'),
             $prefix.'errorInfo' => $c->errorInfo(),
             $prefix.'attributes' => new EnumStub($attr),
-        );
+        ];
 
         if ($a[$prefix.'inTransaction']) {
             $a[$prefix.'inTransaction'] = $c->inTransaction();

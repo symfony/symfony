@@ -85,7 +85,7 @@ class Esi extends AbstractSurrogate
 
         $i = 1;
         while (isset($chunks[$i])) {
-            $options = array();
+            $options = [];
             preg_match_all('/(src|onerror|alt)="([^"]*?)"/', $chunks[$i], $matches, PREG_SET_ORDER);
             foreach ($matches as $set) {
                 $options[$set[1]] = $set[2];

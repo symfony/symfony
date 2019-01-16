@@ -32,14 +32,14 @@ class GraphvizDumper extends Dumper
 {
     private $nodes;
     private $edges;
-    private $options = array(
-            'graph' => array('ratio' => 'compress'),
-            'node' => array('fontsize' => 11, 'fontname' => 'Arial', 'shape' => 'record'),
-            'edge' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => 0.5),
-            'node.instance' => array('fillcolor' => '#9999ff', 'style' => 'filled'),
-            'node.definition' => array('fillcolor' => '#eeeeee'),
-            'node.missing' => array('fillcolor' => '#ff9999', 'style' => 'filled'),
-        );
+    private $options = [
+            'graph' => ['ratio' => 'compress'],
+            'node' => ['fontsize' => 11, 'fontname' => 'Arial', 'shape' => 'record'],
+            'edge' => ['fontsize' => 9, 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => 0.5],
+            'node.instance' => ['fillcolor' => '#9999ff', 'style' => 'filled'],
+            'node.definition' => ['fillcolor' => '#eeeeee'],
+            'node.missing' => ['fillcolor' => '#ff9999', 'style' => 'filled'],
+        ];
 
     /**
      * Dumps the service container as a graphviz graph.
@@ -55,9 +55,9 @@ class GraphvizDumper extends Dumper
      *
      * @return string The dot representation of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
-        foreach (array('graph', 'node', 'edge', 'node.instance', 'node.definition', 'node.missing') as $key) {
+        foreach (['graph', 'node', 'edge', 'node.instance', 'node.definition', 'node.missing'] as $key) {
             if (isset($options[$key])) {
                 $this->options[$key] = array_merge($this->options[$key], $options[$key]);
             }
@@ -65,7 +65,7 @@ class GraphvizDumper extends Dumper
 
         $this->nodes = $this->findNodes();
 
-        $this->edges = array();
+        $this->edges = [];
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->edges[$id] = array_merge(
                 $this->findEdges($id, $definition->getArguments(), true, ''),
@@ -112,7 +112,7 @@ class GraphvizDumper extends Dumper
      */
     private function findEdges(string $id, array $arguments, bool $required, string $name, bool $lazy = false): array
     {
-        $edges = array();
+        $edges = [];
         foreach ($arguments as $argument) {
             if ($argument instanceof Parameter) {
                 $argument = $this->container->hasParameter($argument) ? $this->container->getParameter($argument) : null;
@@ -124,12 +124,12 @@ class GraphvizDumper extends Dumper
                 $lazyEdge = $lazy;
 
                 if (!$this->container->has((string) $argument)) {
-                    $this->nodes[(string) $argument] = array('name' => $name, 'required' => $required, 'class' => '', 'attributes' => $this->options['node.missing']);
+                    $this->nodes[(string) $argument] = ['name' => $name, 'required' => $required, 'class' => '', 'attributes' => $this->options['node.missing']];
                 } elseif ('service_container' !== (string) $argument) {
                     $lazyEdge = $lazy || $this->container->getDefinition((string) $argument)->isLazy();
                 }
 
-                $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge);
+                $edges[] = ['name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge];
             } elseif ($argument instanceof ArgumentInterface) {
                 $edges = array_merge($edges, $this->findEdges($id, $argument->getValues(), $required, $name, true));
             } elseif ($argument instanceof Definition) {
@@ -150,7 +150,7 @@ class GraphvizDumper extends Dumper
 
     private function findNodes(): array
     {
-        $nodes = array();
+        $nodes = [];
 
         $container = $this->cloneContainer();
 
@@ -166,7 +166,7 @@ class GraphvizDumper extends Dumper
             } catch (ParameterNotFoundException $e) {
             }
 
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
+            $nodes[$id] = ['class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], ['style' => $definition->isShared() ? 'filled' : 'dotted'])];
             $container->setDefinition($id, new Definition('stdClass'));
         }
 
@@ -176,7 +176,7 @@ class GraphvizDumper extends Dumper
             }
 
             if (!$container->hasDefinition($id)) {
-                $nodes[$id] = array('class' => str_replace('\\', '\\\\', \get_class($container->get($id))), 'attributes' => $this->options['node.instance']);
+                $nodes[$id] = ['class' => str_replace('\\', '\\\\', \get_class($container->get($id))), 'attributes' => $this->options['node.instance']];
             }
         }
 
@@ -214,7 +214,7 @@ class GraphvizDumper extends Dumper
 
     private function addAttributes(array $attributes): string
     {
-        $code = array();
+        $code = [];
         foreach ($attributes as $k => $v) {
             $code[] = sprintf('%s="%s"', $k, $v);
         }
@@ -224,7 +224,7 @@ class GraphvizDumper extends Dumper
 
     private function addOptions(array $options): string
     {
-        $code = array();
+        $code = [];
         foreach ($options as $k => $v) {
             $code[] = sprintf('%s="%s"', $k, $v);
         }
@@ -239,7 +239,7 @@ class GraphvizDumper extends Dumper
 
     private function getAliases(string $id): array
     {
-        $aliases = array();
+        $aliases = [];
         foreach ($this->container->getAliases() as $alias => $origin) {
             if ($id == $origin) {
                 $aliases[] = $alias;

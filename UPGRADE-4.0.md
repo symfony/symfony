@@ -92,7 +92,7 @@ Console
    ```php
    $commandTester = new CommandTester($command);
 
-   $commandTester->setInputs(array('AppBundle', 'Yes'));
+   $commandTester->setInputs(['AppBundle', 'Yes']);
 
    $commandTester->execute();
    ```
@@ -343,23 +343,23 @@ Form
 
    Before:
    ```php
-   $builder->add('custom_locales', LocaleType::class, array(
+   $builder->add('custom_locales', LocaleType::class, [
        'choices' => $availableLocales,
-   ));
+   ]);
    ```
 
    After:
    ```php
-   $builder->add('custom_locales', LocaleType::class, array(
+   $builder->add('custom_locales', LocaleType::class, [
        'choices' => $availableLocales,
        'choice_loader' => null,
-   ));
+   ]);
    // or
-   $builder->add('custom_locales', LocaleType::class, array(
+   $builder->add('custom_locales', LocaleType::class, [
        'choice_loader' => new CallbackChoiceLoader(function () {
            return $this->getAvailableLocales();
        }),
-   ));
+   ]);
    ```
 
  * Removed `ChoiceLoaderInterface` implementation in `TimezoneType`. Use the "choice_loader" option instead.
@@ -844,7 +844,7 @@ TwigBridge
    use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 
    // ...
-   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'));
+   $rendererEngine = new TwigRendererEngine(['form_div_layout.html.twig']);
    $rendererEngine->setEnvironment($twig);
    $twig->addExtension(new FormExtension(new TwigRenderer($rendererEngine, $csrfTokenManager)));
    ```
@@ -852,12 +852,12 @@ TwigBridge
    After:
 
    ```php
-   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
-   $twig->addRuntimeLoader(new \Twig_FactoryRuntimeLoader(array(
+   $rendererEngine = new TwigRendererEngine(['form_div_layout.html.twig'], $twig);
+   $twig->addRuntimeLoader(new \Twig_FactoryRuntimeLoader([
        TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
            return new TwigRenderer($rendererEngine, $csrfTokenManager);
        },
-   )));
+   ]));
    $twig->addExtension(new FormExtension());
    ```
 
@@ -1092,13 +1092,13 @@ Yaml
    Before:
 
    ```php
-   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, true);
+   Yaml::dump(['foo' => new A(), 'bar' => 1], 0, 0, true);
    ```
 
    After:
 
    ```php
-   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
+   Yaml::dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
    ```
 
  * Removed support for passing `true`/`false` as the fifth argument to the
@@ -1107,13 +1107,13 @@ Yaml
    Before:
 
    ```php
-   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
+   Yaml::dump(['foo' => new A(), 'bar' => 1], 0, 0, false, true);
    ```
 
    After:
 
    ```php
-   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+   Yaml::dump(['foo' => new A(), 'bar' => 1], 0, 0, false, Yaml::DUMP_OBJECT);
    ```
 
  * The `!!php/object` tag to indicate dumped PHP objects was removed in favor of

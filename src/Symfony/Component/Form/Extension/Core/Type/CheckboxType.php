@@ -40,10 +40,10 @@ class CheckboxType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'value' => $options['value'],
             'checked' => null !== $form->getViewData(),
-        ));
+        ]);
     }
 
     /**
@@ -55,12 +55,12 @@ class CheckboxType extends AbstractType
             return $viewData;
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'value' => '1',
             'empty_data' => $emptyData,
             'compound' => false,
-            'false_values' => array(null),
-        ));
+            'false_values' => [null],
+        ]);
 
         $resolver->setAllowedTypes('false_values', 'array');
     }

@@ -25,7 +25,7 @@ class HttpCodeActivationStrategyTest extends TestCase
      */
     public function testExclusionsWithoutCode()
     {
-        new HttpCodeActivationStrategy(new RequestStack(), array(array('urls' => array())), Logger::WARNING);
+        new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], Logger::WARNING);
     }
 
     /**
@@ -33,7 +33,7 @@ class HttpCodeActivationStrategyTest extends TestCase
      */
     public function testExclusionsWithoutUrls()
     {
-        new HttpCodeActivationStrategy(new RequestStack(), array(array('code' => 404)), Logger::WARNING);
+        new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], Logger::WARNING);
     }
 
     /**
@@ -46,12 +46,12 @@ class HttpCodeActivationStrategyTest extends TestCase
 
         $strategy = new HttpCodeActivationStrategy(
             $requestStack,
-            array(
-                array('code' => 403, 'urls' => array()),
-                array('code' => 404, 'urls' => array()),
-                array('code' => 405, 'urls' => array()),
-                array('code' => 400, 'urls' => array('^/400/a', '^/400/b')),
-            ),
+            [
+                ['code' => 403, 'urls' => []],
+                ['code' => 404, 'urls' => []],
+                ['code' => 405, 'urls' => []],
+                ['code' => 400, 'urls' => ['^/400/a', '^/400/b']],
+            ],
             Logger::WARNING
         );
 
@@ -60,22 +60,22 @@ class HttpCodeActivationStrategyTest extends TestCase
 
     public function isActivatedProvider()
     {
-        return array(
-            array('/test',  array('level' => Logger::ERROR), true),
-            array('/400',   array('level' => Logger::ERROR, 'context' => $this->getContextException(400)), true),
-            array('/400/a', array('level' => Logger::ERROR, 'context' => $this->getContextException(400)), false),
-            array('/400/b', array('level' => Logger::ERROR, 'context' => $this->getContextException(400)), false),
-            array('/400/c', array('level' => Logger::ERROR, 'context' => $this->getContextException(400)), true),
-            array('/401',   array('level' => Logger::ERROR, 'context' => $this->getContextException(401)), true),
-            array('/403',   array('level' => Logger::ERROR, 'context' => $this->getContextException(403)), false),
-            array('/404',   array('level' => Logger::ERROR, 'context' => $this->getContextException(404)), false),
-            array('/405',   array('level' => Logger::ERROR, 'context' => $this->getContextException(405)), false),
-            array('/500',   array('level' => Logger::ERROR, 'context' => $this->getContextException(500)), true),
-        );
+        return [
+            ['/test',  ['level' => Logger::ERROR], true],
+            ['/400',   ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], true],
+            ['/400/a', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], false],
+            ['/400/b', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], false],
+            ['/400/c', ['level' => Logger::ERROR, 'context' => $this->getContextException(400)], true],
+            ['/401',   ['level' => Logger::ERROR, 'context' => $this->getContextException(401)], true],
+            ['/403',   ['level' => Logger::ERROR, 'context' => $this->getContextException(403)], false],
+            ['/404',   ['level' => Logger::ERROR, 'context' => $this->getContextException(404)], false],
+            ['/405',   ['level' => Logger::ERROR, 'context' => $this->getContextException(405)], false],
+            ['/500',   ['level' => Logger::ERROR, 'context' => $this->getContextException(500)], true],
+        ];
     }
 
     protected function getContextException($code)
     {
-        return array('exception' => new HttpException($code));
+        return ['exception' => new HttpException($code)];
     }
 }

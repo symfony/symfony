@@ -27,11 +27,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     private $defaultContext;
 
-    private static $supportedTypes = array(
+    private static $supportedTypes = [
         \DateTimeInterface::class => true,
         \DateTimeImmutable::class => true,
         \DateTime::class => true,
-    );
+    ];
 
     /**
      * @param array $defaultContext
@@ -58,7 +58,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
@@ -88,7 +88,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
@@ -145,7 +145,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      */
     private function formatDateTimeErrors(array $errors)
     {
-        $formattedErrors = array();
+        $formattedErrors = [];
 
         foreach ($errors as $pos => $message) {
             $formattedErrors[] = sprintf('at position %d: %s', $pos, $message);

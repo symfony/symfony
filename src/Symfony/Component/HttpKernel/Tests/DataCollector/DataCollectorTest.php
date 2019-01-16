@@ -30,7 +30,7 @@ class DataCollectorTest extends TestCase
 
     public function testCloneVarExistingFilePath()
     {
-        $c = new CloneVarDataCollector(array($filePath = tempnam(sys_get_temp_dir(), 'clone_var_data_collector_')));
+        $c = new CloneVarDataCollector([$filePath = tempnam(sys_get_temp_dir(), 'clone_var_data_collector_')]);
         $c->collect(new Request(), new Response());
 
         $this->assertSame($filePath, $c->getData()[0]);

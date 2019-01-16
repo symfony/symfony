@@ -28,24 +28,24 @@ class PathPackageTest extends TestCase
 
     public function getConfigs()
     {
-        return array(
-            array('/foo', '', 'http://example.com/foo', 'http://example.com/foo'),
-            array('/foo', '', 'https://example.com/foo', 'https://example.com/foo'),
-            array('/foo', '', '//example.com/foo', '//example.com/foo'),
+        return [
+            ['/foo', '', 'http://example.com/foo', 'http://example.com/foo'],
+            ['/foo', '', 'https://example.com/foo', 'https://example.com/foo'],
+            ['/foo', '', '//example.com/foo', '//example.com/foo'],
 
-            array('', '', '/foo', '/foo?v1'),
+            ['', '', '/foo', '/foo?v1'],
 
-            array('/foo', '', '/bar', '/bar?v1'),
-            array('/foo', '', 'bar', '/foo/bar?v1'),
-            array('foo', '', 'bar', '/foo/bar?v1'),
-            array('foo/', '', 'bar', '/foo/bar?v1'),
-            array('/foo/', '', 'bar', '/foo/bar?v1'),
+            ['/foo', '', '/bar', '/bar?v1'],
+            ['/foo', '', 'bar', '/foo/bar?v1'],
+            ['foo', '', 'bar', '/foo/bar?v1'],
+            ['foo/', '', 'bar', '/foo/bar?v1'],
+            ['/foo/', '', 'bar', '/foo/bar?v1'],
 
-            array('/foo', 'version-%2$s/%1$s', '/bar', '/version-v1/bar'),
-            array('/foo', 'version-%2$s/%1$s', 'bar', '/foo/version-v1/bar'),
-            array('/foo', 'version-%2$s/%1$s', 'bar/', '/foo/version-v1/bar/'),
-            array('/foo', 'version-%2$s/%1$s', '/bar/', '/version-v1/bar/'),
-        );
+            ['/foo', 'version-%2$s/%1$s', '/bar', '/version-v1/bar'],
+            ['/foo', 'version-%2$s/%1$s', 'bar', '/foo/version-v1/bar'],
+            ['/foo', 'version-%2$s/%1$s', 'bar/', '/foo/version-v1/bar/'],
+            ['/foo', 'version-%2$s/%1$s', '/bar/', '/version-v1/bar/'],
+        ];
     }
 
     /**
@@ -60,19 +60,19 @@ class PathPackageTest extends TestCase
 
     public function getContextConfigs()
     {
-        return array(
-            array('', '/foo', '', '/baz', '/baz?v1'),
-            array('', '/foo', '', 'baz', '/foo/baz?v1'),
-            array('', 'foo', '', 'baz', '/foo/baz?v1'),
-            array('', 'foo/', '', 'baz', '/foo/baz?v1'),
-            array('', '/foo/', '', 'baz', '/foo/baz?v1'),
+        return [
+            ['', '/foo', '', '/baz', '/baz?v1'],
+            ['', '/foo', '', 'baz', '/foo/baz?v1'],
+            ['', 'foo', '', 'baz', '/foo/baz?v1'],
+            ['', 'foo/', '', 'baz', '/foo/baz?v1'],
+            ['', '/foo/', '', 'baz', '/foo/baz?v1'],
 
-            array('/bar', '/foo', '', '/baz', '/baz?v1'),
-            array('/bar', '/foo', '', 'baz', '/bar/foo/baz?v1'),
-            array('/bar', 'foo', '', 'baz', '/bar/foo/baz?v1'),
-            array('/bar', 'foo/', '', 'baz', '/bar/foo/baz?v1'),
-            array('/bar', '/foo/', '', 'baz', '/bar/foo/baz?v1'),
-        );
+            ['/bar', '/foo', '', '/baz', '/baz?v1'],
+            ['/bar', '/foo', '', 'baz', '/bar/foo/baz?v1'],
+            ['/bar', 'foo', '', 'baz', '/bar/foo/baz?v1'],
+            ['/bar', 'foo/', '', 'baz', '/bar/foo/baz?v1'],
+            ['/bar', '/foo/', '', 'baz', '/bar/foo/baz?v1'],
+        ];
     }
 
     public function testVersionStrategyGivesAbsoluteURL()

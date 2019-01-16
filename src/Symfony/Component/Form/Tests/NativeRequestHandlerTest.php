@@ -29,22 +29,22 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         parent::setUp();
 
-        $_GET = array();
-        $_POST = array();
-        $_FILES = array();
-        $_SERVER = array(
+        $_GET = [];
+        $_POST = [];
+        $_FILES = [];
+        $_SERVER = [
             // PHPUnit needs this entry
             'SCRIPT_NAME' => self::$serverBackup['SCRIPT_NAME'],
-        );
+        ];
     }
 
     protected function tearDown()
     {
         parent::tearDown();
 
-        $_GET = array();
-        $_POST = array();
-        $_FILES = array();
+        $_GET = [];
+        $_POST = [];
+        $_FILES = [];
         $_SERVER = self::$serverBackup;
     }
 
@@ -60,9 +60,9 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         $form = $this->getMockForm('param1', 'PUT');
 
-        $this->setRequestData('POST', array(
+        $this->setRequestData('POST', [
             'param1' => 'DATA',
-        ));
+        ]);
 
         $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'PUT';
 
@@ -77,13 +77,13 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         $form = $this->getMockForm('param1', 'POST', false);
 
-        $this->setRequestData('POST', array(), array('param1' => array(
+        $this->setRequestData('POST', [], ['param1' => [
             'name' => '',
             'type' => '',
             'tmp_name' => '',
             'error' => UPLOAD_ERR_NO_FILE,
             'size' => 0,
-        )));
+        ]]);
 
         $form->expects($this->once())
             ->method('submit')
@@ -96,35 +96,35 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         $form = $this->getMockForm('param1', 'POST', false);
 
-        $this->setRequestData('POST', array(), array('param1' => array(
-            'name' => array(
+        $this->setRequestData('POST', [], ['param1' => [
+            'name' => [
                 'field' => 'upload.txt',
-            ),
-            'type' => array(
+            ],
+            'type' => [
                 'field' => 'text/plain',
-            ),
-            'tmp_name' => array(
+            ],
+            'tmp_name' => [
                 'field' => 'owfdskjasdfsa',
-            ),
-            'error' => array(
+            ],
+            'error' => [
                 'field' => UPLOAD_ERR_OK,
-            ),
-            'size' => array(
+            ],
+            'size' => [
                 'field' => 100,
-            ),
-        )));
+            ],
+        ]]);
 
         $form->expects($this->once())
             ->method('submit')
-            ->with(array(
-                'field' => array(
+            ->with([
+                'field' => [
                     'name' => 'upload.txt',
                     'type' => 'text/plain',
                     'tmp_name' => 'owfdskjasdfsa',
                     'error' => UPLOAD_ERR_OK,
                     'size' => 100,
-                ),
-            ));
+                ],
+            ]);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -133,37 +133,37 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         $form = $this->getMockForm('param1', 'POST');
 
-        $this->setRequestData('POST', array(), array('param1' => array(
-            'name' => array(
-                'field' => array('subfield' => 'upload.txt'),
-            ),
-            'type' => array(
-                'field' => array('subfield' => 'text/plain'),
-            ),
-            'tmp_name' => array(
-                'field' => array('subfield' => 'owfdskjasdfsa'),
-            ),
-            'error' => array(
-                'field' => array('subfield' => UPLOAD_ERR_OK),
-            ),
-            'size' => array(
-                'field' => array('subfield' => 100),
-            ),
-        )));
+        $this->setRequestData('POST', [], ['param1' => [
+            'name' => [
+                'field' => ['subfield' => 'upload.txt'],
+            ],
+            'type' => [
+                'field' => ['subfield' => 'text/plain'],
+            ],
+            'tmp_name' => [
+                'field' => ['subfield' => 'owfdskjasdfsa'],
+            ],
+            'error' => [
+                'field' => ['subfield' => UPLOAD_ERR_OK],
+            ],
+            'size' => [
+                'field' => ['subfield' => 100],
+            ],
+        ]]);
 
         $form->expects($this->once())
             ->method('submit')
-            ->with(array(
-                'field' => array(
-                    'subfield' => array(
+            ->with([
+                'field' => [
+                    'subfield' => [
                         'name' => 'upload.txt',
                         'type' => 'text/plain',
                         'tmp_name' => 'owfdskjasdfsa',
                         'error' => UPLOAD_ERR_OK,
                         'size' => 100,
-                    ),
-                ),
-            ));
+                    ],
+                ],
+            ]);
 
         $this->requestHandler->handleRequest($form, $this->request);
     }
@@ -172,9 +172,9 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     {
         $form = $this->getMockForm('param1', 'POST');
 
-        $this->setRequestData('GET', array(
+        $this->setRequestData('GET', [
                 'param1' => 'DATA',
-            ));
+            ]);
 
         $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] = 'PUT';
 
@@ -184,21 +184,21 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    protected function setRequestData($method, $data, $files = array())
+    protected function setRequestData($method, $data, $files = [])
     {
         if ('GET' === $method) {
             $_GET = $data;
-            $_FILES = array();
+            $_FILES = [];
         } else {
             $_POST = $data;
             $_FILES = $files;
         }
 
-        $_SERVER = array(
+        $_SERVER = [
             'REQUEST_METHOD' => $method,
             // PHPUnit needs this entry
             'SCRIPT_NAME' => self::$serverBackup['SCRIPT_NAME'],
-        );
+        ];
     }
 
     protected function getRequestHandler()
@@ -208,23 +208,23 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
     protected function getMockFile($suffix = '')
     {
-        return array(
+        return [
             'name' => 'upload'.$suffix.'.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa'.$suffix,
             'error' => UPLOAD_ERR_OK,
             'size' => 100,
-        );
+        ];
     }
 
     protected function getInvalidFile()
     {
-        return array(
+        return [
             'name' => 'upload.txt',
             'type' => 'text/plain',
             'tmp_name' => 'owfdskjasdfsa',
             'error' => '0',
             'size' => '100',
-        );
+        ];
     }
 }

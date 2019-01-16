@@ -35,15 +35,15 @@ class NumberType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             // default scale is locale specific (usually around 3)
             'scale' => null,
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'compound' => false,
-        ));
+        ]);
 
-        $resolver->setAllowedValues('rounding_mode', array(
+        $resolver->setAllowedValues('rounding_mode', [
             NumberToLocalizedStringTransformer::ROUND_FLOOR,
             NumberToLocalizedStringTransformer::ROUND_DOWN,
             NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
@@ -51,9 +51,9 @@ class NumberType extends AbstractType
             NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             NumberToLocalizedStringTransformer::ROUND_UP,
             NumberToLocalizedStringTransformer::ROUND_CEILING,
-        ));
+        ]);
 
-        $resolver->setAllowedTypes('scale', array('null', 'int'));
+        $resolver->setAllowedTypes('scale', ['null', 'int']);
     }
 
     /**

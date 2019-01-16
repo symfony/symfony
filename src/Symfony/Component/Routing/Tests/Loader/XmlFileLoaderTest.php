@@ -31,7 +31,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadWithRoute()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validpattern.xml');
         $route = $routeCollection->get('blog_show');
 
@@ -41,14 +41,14 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertSame('\w+', $route->getRequirement('locale'));
         $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-        $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
-        $this->assertEquals(array('https'), $route->getSchemes());
+        $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
+        $this->assertEquals(['https'], $route->getSchemes());
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
     public function testLoadWithNamespacePrefix()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('namespaceprefix.xml');
 
         $this->assertCount(1, $routeCollection->all(), 'One route is loaded');
@@ -66,7 +66,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadWithImport()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
@@ -85,7 +85,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadLocalized()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('localized.xml');
         $routes = $routeCollection->all();
 
@@ -98,7 +98,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLocalizedImports()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routeCollection = $loader->load('importer-with-locale.xml');
         $routes = $routeCollection->all();
 
@@ -111,7 +111,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLocalizedImportsOfNotLocalizedRoutes()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');
         $routes = $routeCollection->all();
 
@@ -128,7 +128,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFile($filePath)
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
 
@@ -138,13 +138,13 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
     {
-        $loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new CustomXmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load($filePath);
     }
 
     public function getPathsToInvalidFiles()
     {
-        return array(array('nonvalidnode.xml'), array('nonvalidroute.xml'), array('nonvalid.xml'), array('missing_id.xml'), array('missing_path.xml'));
+        return [['nonvalidnode.xml'], ['nonvalidroute.xml'], ['nonvalid.xml'], ['missing_id.xml'], ['missing_path.xml']];
     }
 
     /**
@@ -153,13 +153,13 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testDocTypeIsNotAllowed()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $loader->load('withdoctype.xml');
     }
 
     public function testNullValues()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('null_values.xml');
         $route = $routeCollection->get('blog_show');
 
@@ -173,12 +173,12 @@ class XmlFileLoaderTest extends TestCase
 
     public function testScalarDataTypeDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('scalar_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
                 'slug' => null,
                 'published' => true,
@@ -189,147 +189,147 @@ class XmlFileLoaderTest extends TestCase
                 'locked' => false,
                 'foo' => null,
                 'bar' => null,
-            ),
+            ],
             $route->getDefaults()
         );
     }
 
     public function testListDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('list_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array(true, 1, 3.5, 'foo'),
-            ),
+                'values' => [true, 1, 3.5, 'foo'],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testListInListDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('list_in_list_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array(array(true, 1, 3.5, 'foo')),
-            ),
+                'values' => [[true, 1, 3.5, 'foo']],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testListInMapDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('list_in_map_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array('list' => array(true, 1, 3.5, 'foo')),
-            ),
+                'values' => ['list' => [true, 1, 3.5, 'foo']],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testMapDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('map_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array(
+                'values' => [
                     'public' => true,
                     'page' => 1,
                     'price' => 3.5,
                     'title' => 'foo',
-                ),
-            ),
+                ],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testMapInListDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('map_in_list_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array(array(
+                'values' => [[
                     'public' => true,
                     'page' => 1,
                     'price' => 3.5,
                     'title' => 'foo',
-                )),
-            ),
+                ]],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testMapInMapDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('map_in_map_defaults.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 '_controller' => 'AcmeBlogBundle:Blog:index',
-                'values' => array('map' => array(
+                'values' => ['map' => [
                     'public' => true,
                     'page' => 1,
                     'price' => 3.5,
                     'title' => 'foo',
-                )),
-            ),
+                ]],
+            ],
             $route->getDefaults()
         );
     }
 
     public function testNullValuesInList()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('list_null_values.xml');
         $route = $routeCollection->get('blog');
 
-        $this->assertSame(array(null, null, null, null, null, null), $route->getDefault('list'));
+        $this->assertSame([null, null, null, null, null, null], $route->getDefault('list'));
     }
 
     public function testNullValuesInMap()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('map_null_values.xml');
         $route = $routeCollection->get('blog');
 
         $this->assertSame(
-            array(
+            [
                 'boolean' => null,
                 'integer' => null,
                 'float' => null,
                 'string' => null,
                 'list' => null,
                 'map' => null,
-            ),
+            ],
             $route->getDefault('map')
         );
     }
 
     public function testLoadRouteWithControllerAttribute()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.xml');
 
         $route = $routeCollection->get('app_homepage');
@@ -339,7 +339,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadRouteWithoutControllerAttribute()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.xml');
 
         $route = $routeCollection->get('app_logout');
@@ -349,7 +349,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testLoadRouteWithControllerSetInDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.xml');
 
         $route = $routeCollection->get('app_blog');
@@ -363,7 +363,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testOverrideControllerInDefaults()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('override_defaults.xml');
     }
 
@@ -372,7 +372,7 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testImportRouteWithController($file)
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load($file);
 
         $route = $routeCollection->get('app_homepage');
@@ -387,8 +387,8 @@ class XmlFileLoaderTest extends TestCase
 
     public function provideFilesImportingRoutesWithControllers()
     {
-        yield array('import_controller.xml');
-        yield array('import__controller.xml');
+        yield ['import_controller.xml'];
+        yield ['import__controller.xml'];
     }
 
     /**
@@ -397,13 +397,13 @@ class XmlFileLoaderTest extends TestCase
      */
     public function testImportWithOverriddenController()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $loader->load('import_override_defaults.xml');
     }
 
     public function testImportRouteWithGlobMatchingSingleFile()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/glob']));
         $routeCollection = $loader->load('import_single.xml');
 
         $route = $routeCollection->get('bar_route');
@@ -412,7 +412,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportRouteWithGlobMatchingMultipleFiles()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/glob')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/glob']));
         $routeCollection = $loader->load('import_multiple.xml');
 
         $route = $routeCollection->get('bar_route');
@@ -424,7 +424,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNamePrefix()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));
         $routeCollection = $loader->load('routing.xml');
 
         $this->assertNotNull($routeCollection->get('app_blog'));
@@ -435,7 +435,7 @@ class XmlFileLoaderTest extends TestCase
 
     public function testImportRouteWithNoTrailingSlash()
     {
-        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_no_trailing_slash']));
         $routeCollection = $loader->load('routing.xml');
 
         $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());

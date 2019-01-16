@@ -226,7 +226,7 @@ class FileProfilerStorageTest extends TestCase
 
     public function testRetrieveByMethodAndLimit()
     {
-        foreach (array('POST', 'GET') as $method) {
+        foreach (['POST', 'GET'] as $method) {
             for ($i = 0; $i < 5; ++$i) {
                 $profile = new Profile('token_'.$i.$method);
                 $profile->setMethod($method);
@@ -293,8 +293,8 @@ class FileProfilerStorageTest extends TestCase
 
         $tokens = $this->storage->find('', '', 10, '');
         $this->assertCount(2, $tokens);
-        $this->assertContains($tokens[0]['status_code'], array(200, 404));
-        $this->assertContains($tokens[1]['status_code'], array(200, 404));
+        $this->assertContains($tokens[0]['status_code'], [200, 404]);
+        $this->assertContains($tokens[1]['status_code'], [200, 404]);
     }
 
     public function testMultiRowIndexFile()

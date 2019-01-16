@@ -28,7 +28,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     private $flashName;
     private $attributeName;
-    private $data = array();
+    private $data = [];
     private $usageIndex = 0;
 
     /**

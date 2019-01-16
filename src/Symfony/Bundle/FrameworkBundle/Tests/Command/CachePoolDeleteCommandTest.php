@@ -42,7 +42,7 @@ class CachePoolDeleteCommandTest extends TestCase
             ->willReturn(true);
 
         $tester = $this->getCommandTester($this->getKernel());
-        $tester->execute(array('pool' => 'foo', 'key' => 'bar'));
+        $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
         $this->assertContains('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
     }
@@ -59,7 +59,7 @@ class CachePoolDeleteCommandTest extends TestCase
             ->with('bar');
 
         $tester = $this->getCommandTester($this->getKernel());
-        $tester->execute(array('pool' => 'foo', 'key' => 'bar'));
+        $tester->execute(['pool' => 'foo', 'key' => 'bar']);
 
         $this->assertContains('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
     }
@@ -83,7 +83,7 @@ class CachePoolDeleteCommandTest extends TestCase
         }
 
         $tester = $this->getCommandTester($this->getKernel());
-        $tester->execute(array('pool' => 'foo', 'key' => 'bar'));
+        $tester->execute(['pool' => 'foo', 'key' => 'bar']);
     }
 
     /**
@@ -107,7 +107,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $kernel
             ->expects($this->once())
             ->method('getBundles')
-            ->willReturn(array());
+            ->willReturn([]);
 
         return $kernel;
     }
@@ -115,7 +115,7 @@ class CachePoolDeleteCommandTest extends TestCase
     private function getCommandTester(KernelInterface $kernel): CommandTester
     {
         $application = new Application($kernel);
-        $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(array('foo' => $this->cachePool))));
+        $application->add(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => $this->cachePool])));
 
         return new CommandTester($application->find('cache:pool:delete'));
     }

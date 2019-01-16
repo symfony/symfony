@@ -72,19 +72,19 @@ class HttpKernelExtensionTest extends TestCase
 
         $context->expects($this->any())->method('getCurrentRequest')->will($this->returnValue(Request::create('/')));
 
-        return new FragmentHandler($context, array($strategy), false);
+        return new FragmentHandler($context, [$strategy], false);
     }
 
     protected function renderTemplate(FragmentHandler $renderer, $template = '{{ render("foo") }}')
     {
-        $loader = new ArrayLoader(array('index' => $template));
-        $twig = new Environment($loader, array('debug' => true, 'cache' => false));
+        $loader = new ArrayLoader(['index' => $template]);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
         $loader = $this->getMockBuilder('Twig\RuntimeLoader\RuntimeLoaderInterface')->getMock();
-        $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
-            array('Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)),
-        )));
+        $loader->expects($this->any())->method('load')->will($this->returnValueMap([
+            ['Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)],
+        ]));
         $twig->addRuntimeLoader($loader);
 
         return $twig->render('index');

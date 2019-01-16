@@ -21,9 +21,9 @@ class AcceptHeaderItem
     private $value;
     private $quality = 1.0;
     private $index = 0;
-    private $attributes = array();
+    private $attributes = [];
 
-    public function __construct(string $value, array $attributes = array())
+    public function __construct(string $value, array $attributes = [])
     {
         $this->value = $value;
         foreach ($attributes as $name => $value) {

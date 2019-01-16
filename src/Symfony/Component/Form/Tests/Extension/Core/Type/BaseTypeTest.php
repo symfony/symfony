@@ -22,7 +22,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassDisabledAsOption()
     {
-        $form = $this->factory->create($this->getTestedType(), null, array('disabled' => true));
+        $form = $this->factory->create($this->getTestedType(), null, ['disabled' => true]);
 
         $this->assertTrue($form->isDisabled());
     }
@@ -73,9 +73,9 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassTranslationDomainToView()
     {
-        $view = $this->factory->create($this->getTestedType(), null, array(
+        $view = $this->factory->create($this->getTestedType(), null, [
             'translation_domain' => 'domain',
-        ))
+        ])
             ->createView();
 
         $this->assertSame('domain', $view->vars['translation_domain']);
@@ -84,9 +84,9 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testInheritTranslationDomainFromParent()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'translation_domain' => 'domain',
-            ))
+            ])
             ->add('child', $this->getTestedType())
             ->getForm()
             ->createView();
@@ -97,12 +97,12 @@ abstract class BaseTypeTest extends TypeTestCase
     public function testPreferOwnTranslationDomain()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'translation_domain' => 'parent_domain',
-            ))
-            ->add('child', $this->getTestedType(), array(
+            ])
+            ->add('child', $this->getTestedType(), [
                 'translation_domain' => 'domain',
-            ))
+            ])
             ->getForm()
             ->createView();
 
@@ -121,7 +121,7 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassLabelToView()
     {
-        $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'))
+        $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, ['label' => 'My label'])
             ->createView();
 
         $this->assertSame('My label', $view->vars['label']);
@@ -150,7 +150,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $builder = $this->factory->createBuilder($this->getTestedType());
 
         if ($builder->getCompound()) {
-            $emptyData = array();
+            $emptyData = [];
             foreach ($builder as $field) {
                 // empty children should map null (model data) in the compound view data
                 $emptyData[$field->getName()] = null;

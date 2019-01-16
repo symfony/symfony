@@ -46,13 +46,13 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     {
         $arrayAdapter = new ArrayAdapter();
 
-        spl_autoload_register(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
+        spl_autoload_register([PhpArrayAdapter::class, 'throwOnRequiredClass']);
         try {
             if (!$this->doWarmUp($cacheDir, $arrayAdapter)) {
                 return;
             }
         } finally {
-            spl_autoload_unregister(array(PhpArrayAdapter::class, 'throwOnRequiredClass'));
+            spl_autoload_unregister([PhpArrayAdapter::class, 'throwOnRequiredClass']);
         }
 
         // the ArrayAdapter stores the values serialized

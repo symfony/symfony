@@ -38,7 +38,7 @@ class UserPasswordEncoderCommand extends Command
     private $encoderFactory;
     private $userClasses;
 
-    public function __construct(EncoderFactoryInterface $encoderFactory, array $userClasses = array())
+    public function __construct(EncoderFactoryInterface $encoderFactory, array $userClasses = [])
     {
         $this->encoderFactory = $encoderFactory;
         $this->userClasses = $userClasses;
@@ -146,14 +146,14 @@ EOF
 
         $encodedPassword = $encoder->encodePassword($password, $salt);
 
-        $rows = array(
-            array('Encoder used', \get_class($encoder)),
-            array('Encoded password', $encodedPassword),
-        );
+        $rows = [
+            ['Encoder used', \get_class($encoder)],
+            ['Encoded password', $encodedPassword],
+        ];
         if (!$emptySalt) {
-            $rows[] = array('Generated salt', $salt);
+            $rows[] = ['Generated salt', $salt];
         }
-        $io->table(array('Key', 'Value'), $rows);
+        $io->table(['Key', 'Value'], $rows);
 
         if (!$emptySalt) {
             $errorIo->note(sprintf('Make sure that your salt storage field fits the salt length: %s chars', \strlen($salt)));

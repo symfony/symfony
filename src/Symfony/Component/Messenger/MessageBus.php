@@ -28,7 +28,7 @@ class MessageBus implements MessageBusInterface
     /**
      * @param MiddlewareInterface[]|iterable $middlewareHandlers
      */
-    public function __construct(iterable $middlewareHandlers = array())
+    public function __construct(iterable $middlewareHandlers = [])
     {
         if ($middlewareHandlers instanceof \IteratorAggregate) {
             $this->middlewareAggregate = $middlewareHandlers;

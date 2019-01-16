@@ -9,22 +9,22 @@ class HttpExceptionTest extends TestCase
 {
     public function headerDataProvider()
     {
-        return array(
-            array(array('X-Test' => 'Test')),
-            array(array('X-Test' => 1)),
-            array(
-                array(
-                    array('X-Test' => 'Test'),
-                    array('X-Test-2' => 'Test-2'),
-                ),
-            ),
-        );
+        return [
+            [['X-Test' => 'Test']],
+            [['X-Test' => 1]],
+            [
+                [
+                    ['X-Test' => 'Test'],
+                    ['X-Test-2' => 'Test-2'],
+                ],
+            ],
+        ];
     }
 
     public function testHeadersDefault()
     {
         $exception = $this->createException();
-        $this->assertSame(array(), $exception->getHeaders());
+        $this->assertSame([], $exception->getHeaders());
     }
 
     /**

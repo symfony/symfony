@@ -36,9 +36,9 @@ class CsrfValidationListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::PRE_SUBMIT => 'preSubmit',
-        );
+        ];
     }
 
     /**
@@ -71,7 +71,7 @@ class CsrfValidationListener implements EventSubscriberInterface
                 $errorMessage = $this->errorMessage;
 
                 if (null !== $this->translator) {
-                    $errorMessage = $this->translator->trans($errorMessage, array(), $this->translationDomain);
+                    $errorMessage = $this->translator->trans($errorMessage, [], $this->translationDomain);
                 }
 
                 $form->addError(new FormError($errorMessage, $errorMessage, array(), null, $csrfToken));

@@ -71,7 +71,7 @@ class RetryTillSaveStore implements StoreInterface, LoggerAwareInterface
             }
         } while (++$retry < $this->retryCount);
 
-        $this->logger->warning('Failed to store the "{resource}" lock. Abort after {retry} retry.', array('resource' => $key, 'retry' => $retry));
+        $this->logger->warning('Failed to store the "{resource}" lock. Abort after {retry} retry.', ['resource' => $key, 'retry' => $retry]);
 
         throw new LockConflictedException();
     }

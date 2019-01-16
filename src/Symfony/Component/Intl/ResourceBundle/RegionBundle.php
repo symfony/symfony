@@ -54,7 +54,7 @@ class RegionBundle extends RegionDataProvider implements RegionBundleInterface
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 
@@ -66,7 +66,7 @@ class RegionBundle extends RegionDataProvider implements RegionBundleInterface
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return array();
+            return [];
         }
     }
 }

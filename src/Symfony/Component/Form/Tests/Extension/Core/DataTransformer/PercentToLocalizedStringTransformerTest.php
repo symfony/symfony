@@ -226,8 +226,8 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, false);
 
         $transformer = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\PercentToLocalizedStringTransformer')
-            ->setMethods(array('getNumberFormatter'))
-            ->setConstructorArgs(array(1, 'integer'))
+            ->setMethods(['getNumberFormatter'])
+            ->setConstructorArgs([1, 'integer'])
             ->getMock();
         $transformer->expects($this->any())
             ->method('getNumberFormatter')

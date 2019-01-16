@@ -62,13 +62,13 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function guessRequiredProvider()
     {
-        return array(
-            array(new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
-            array(new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
-            array(new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
-            array(new Length(10), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
-            array(new Range(array('min' => 1, 'max' => 20)), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
-        );
+        return [
+            [new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
+            [new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
+            [new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)],
+            [new Length(10), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+            [new Range(['min' => 1, 'max' => 20]), new ValueGuess(false, Guess::LOW_CONFIDENCE)],
+        ];
     }
 
     /**
@@ -92,7 +92,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMaxLengthForConstraintWithMaxValue()
     {
-        $constraint = new Length(array('max' => '2'));
+        $constraint = new Length(['max' => '2']);
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertInstanceOf('Symfony\Component\Form\Guess\ValueGuess', $result);
@@ -102,7 +102,7 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function testGuessMaxLengthForConstraintWithMinValue()
     {
-        $constraint = new Length(array('min' => '2'));
+        $constraint = new Length(['min' => '2']);
 
         $result = $this->guesser->guessMaxLengthForConstraint($constraint);
         $this->assertNull($result);
@@ -110,12 +110,12 @@ class ValidatorTypeGuesserTest extends TestCase
 
     public function maxLengthTypeProvider()
     {
-        return array(
-            array('double'),
-            array('float'),
-            array('numeric'),
-            array('real'),
-        );
+        return [
+            ['double'],
+            ['float'],
+            ['numeric'],
+            ['real'],
+        ];
     }
 
     /**

@@ -24,10 +24,10 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class ChainEncoder implements ContextAwareEncoderInterface
 {
-    protected $encoders = array();
-    protected $encoderByFormat = array();
+    protected $encoders = [];
+    protected $encoderByFormat = [];
 
-    public function __construct(array $encoders = array())
+    public function __construct(array $encoders = [])
     {
         $this->encoders = $encoders;
     }
@@ -35,7 +35,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     /**
      * {@inheritdoc}
      */
-    final public function encode($data, $format, array $context = array())
+    final public function encode($data, $format, array $context = [])
     {
         return $this->getEncoder($format, $context)->encode($data, $format, $context);
     }
@@ -43,7 +43,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format, array $context = array())
+    public function supportsEncoding($format, array $context = [])
     {
         try {
             $this->getEncoder($format, $context);
@@ -62,7 +62,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
      *
      * @return bool
      */
-    public function needsNormalization($format, array $context = array())
+    public function needsNormalization($format, array $context = [])
     {
         $encoder = $this->getEncoder($format, $context);
 

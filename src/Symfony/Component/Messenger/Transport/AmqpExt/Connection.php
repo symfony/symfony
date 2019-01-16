@@ -54,24 +54,24 @@ class Connection
         $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
     }
 
-    public static function fromDsn(string $dsn, array $options = array(), bool $debug = false, AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(string $dsn, array $options = [], bool $debug = false, AmqpFactory $amqpFactory = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
         }
 
-        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : array();
-        $amqpOptions = array_replace_recursive(array(
+        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+        $amqpOptions = array_replace_recursive([
             'host' => $parsedUrl['host'] ?? 'localhost',
             'port' => $parsedUrl['port'] ?? 5672,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
-            'queue' => array(
+            'queue' => [
                 'name' => $queueName = $pathParts[1] ?? 'messages',
-            ),
-            'exchange' => array(
+            ],
+            'exchange' => [
                 'name' => $queueName,
-            ),
-        ), $options);
+            ],
+        ], $options);
 
         if (isset($parsedUrl['user'])) {
             $amqpOptions['login'] = $parsedUrl['user'];
@@ -98,13 +98,13 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = array()): void
+    public function publish(string $body, array $headers = []): void
     {
         if ($this->debug && $this->shouldSetup()) {
             $this->setup();
         }
 
-        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, array('headers' => $headers));
+        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, ['headers' => $headers]);
     }
 
     /**
@@ -224,6 +224,6 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        return !array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], array(false, 'false'), true);
+        return !array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], [false, 'false'], true);
     }
 }

@@ -165,7 +165,7 @@ class Stopwatch implements ResetInterface
      */
     public function getSectionEvents($id)
     {
-        return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
+        return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : [];
     }
 
     /**
@@ -173,6 +173,6 @@ class Stopwatch implements ResetInterface
      */
     public function reset()
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
+        $this->sections = $this->activeSections = ['__root__' => new Section(null, $this->morePrecision)];
     }
 }

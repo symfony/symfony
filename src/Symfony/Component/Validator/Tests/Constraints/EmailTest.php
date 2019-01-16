@@ -22,14 +22,14 @@ class EmailTest extends TestCase
      */
     public function testLegacyConstructorStrict()
     {
-        $subject = new Email(array('strict' => true));
+        $subject = new Email(['strict' => true]);
 
         $this->assertTrue($subject->strict);
     }
 
     public function testConstructorStrict()
     {
-        $subject = new Email(array('mode' => Email::VALIDATION_MODE_STRICT));
+        $subject = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);
 
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
@@ -40,6 +40,6 @@ class EmailTest extends TestCase
      */
     public function testUnknownModesTriggerException()
     {
-        new Email(array('mode' => 'Unknown Mode'));
+        new Email(['mode' => 'Unknown Mode']);
     }
 }

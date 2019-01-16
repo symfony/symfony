@@ -63,21 +63,21 @@ class ExceptionController
         if (!$this->twig->getLoader()->exists($template)) {
             $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
-            return new Response($handler->getContent($exception), 200, array('Content-Type' => 'text/html'));
+            return new Response($handler->getContent($exception), 200, ['Content-Type' => 'text/html']);
         }
 
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
             $template,
-            array(
+            [
                 'status_code' => $code,
                 'status_text' => Response::$statusTexts[$code],
                 'exception' => $exception,
                 'logger' => null,
                 'currentContent' => '',
-            )
-        ), 200, array('Content-Type' => 'text/html'));
+            ]
+        ), 200, ['Content-Type' => 'text/html']);
     }
 
     /**
@@ -103,10 +103,10 @@ class ExceptionController
         if (!$this->templateExists($template)) {
             $handler = new ExceptionHandler($this->debug, $this->twig->getCharset(), $this->fileLinkFormat);
 
-            return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
+            return new Response($handler->getStylesheet($exception), 200, ['Content-Type' => 'text/css']);
         }
 
-        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, ['Content-Type' => 'text/css']);
     }
 
     protected function getTemplate()

@@ -14,26 +14,26 @@ use Symfony\Component\ExpressionLanguage\Expression;
 $container = new ContainerBuilder();
 $container
     ->register('foo', '\Bar\FooClass')
-    ->addTag('foo', array('foo' => 'foo'))
-    ->addTag('foo', array('bar' => 'bar', 'baz' => 'baz'))
-    ->setFactory(array('Bar\\FooClass', 'getInstance'))
-    ->setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))
-    ->setProperties(array('foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%')))
-    ->addMethodCall('setBar', array(new Reference('bar')))
+    ->addTag('foo', ['foo' => 'foo'])
+    ->addTag('foo', ['bar' => 'bar', 'baz' => 'baz'])
+    ->setFactory(['Bar\\FooClass', 'getInstance'])
+    ->setArguments(['foo', new Reference('foo.baz'), ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%'], true, new Reference('service_container')])
+    ->setProperties(['foo' => 'bar', 'moo' => new Reference('foo.baz'), 'qux' => ['%foo%' => 'foo is %foo%', 'foobar' => '%foo%']])
+    ->addMethodCall('setBar', [new Reference('bar')])
     ->addMethodCall('initialize')
     ->setConfigurator('sc_configure')
     ->setPublic(true)
 ;
 $container
     ->register('foo.baz', '%baz_class%')
-    ->setFactory(array('%baz_class%', 'getInstance'))
-    ->setConfigurator(array('%baz_class%', 'configureStatic1'))
+    ->setFactory(['%baz_class%', 'getInstance'])
+    ->setConfigurator(['%baz_class%', 'configureStatic1'])
     ->setPublic(true)
 ;
 $container
     ->register('bar', 'Bar\FooClass')
-    ->setArguments(array('foo', new Reference('foo.baz'), new Parameter('foo_bar')))
-    ->setConfigurator(array(new Reference('foo.baz'), 'configure'))
+    ->setArguments(['foo', new Reference('foo.baz'), new Parameter('foo_bar')])
+    ->setConfigurator([new Reference('foo.baz'), 'configure'])
     ->setPublic(true)
 ;
 $container
@@ -43,35 +43,35 @@ $container
     ->setPublic(true)
 ;
 $container->getParameterBag()->clear();
-$container->getParameterBag()->add(array(
+$container->getParameterBag()->add([
     'baz_class' => 'BazClass',
     'foo_class' => 'Bar\FooClass',
     'foo' => 'bar',
-));
+]);
 $container
     ->register('method_call1', 'Bar\FooClass')
     ->setFile(realpath(__DIR__.'/../includes/foo.php'))
-    ->addMethodCall('setBar', array(new Reference('foo')))
-    ->addMethodCall('setBar', array(new Reference('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE)))
-    ->addMethodCall('setBar', array(new Reference('foo3', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
-    ->addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
-    ->addMethodCall('setBar', array(new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')))
+    ->addMethodCall('setBar', [new Reference('foo')])
+    ->addMethodCall('setBar', [new Reference('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE)])
+    ->addMethodCall('setBar', [new Reference('foo3', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
+    ->addMethodCall('setBar', [new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)])
+    ->addMethodCall('setBar', [new Expression('service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")')])
     ->setPublic(true)
 ;
 $container
     ->register('foo_with_inline', 'Foo')
-    ->addMethodCall('setBar', array(new Reference('inlined')))
+    ->addMethodCall('setBar', [new Reference('inlined')])
     ->setPublic(true)
 ;
 $container
     ->register('inlined', 'Bar')
     ->setProperty('pub', 'pub')
-    ->addMethodCall('setBaz', array(new Reference('baz')))
+    ->addMethodCall('setBaz', [new Reference('baz')])
     ->setPublic(false)
 ;
 $container
     ->register('baz', 'Baz')
-    ->addMethodCall('setFoo', array(new Reference('foo_with_inline')))
+    ->addMethodCall('setFoo', [new Reference('foo_with_inline')])
     ->setPublic(true)
 ;
 $container
@@ -82,11 +82,11 @@ $container
 $container
     ->register('configurator_service', 'ConfClass')
     ->setPublic(false)
-    ->addMethodCall('setFoo', array(new Reference('baz')))
+    ->addMethodCall('setFoo', [new Reference('baz')])
 ;
 $container
     ->register('configured_service', 'stdClass')
-    ->setConfigurator(array(new Reference('configurator_service'), 'configureStdClass'))
+    ->setConfigurator([new Reference('configurator_service'), 'configureStdClass'])
     ->setPublic(true)
 ;
 $container
@@ -96,7 +96,7 @@ $container
 ;
 $container
     ->register('configured_service_simple', 'stdClass')
-    ->setConfigurator(array(new Reference('configurator_service_simple'), 'configureStdClass'))
+    ->setConfigurator([new Reference('configurator_service_simple'), 'configureStdClass'])
     ->setPublic(true)
 ;
 $container
@@ -125,18 +125,18 @@ $container
 ;
 $container
     ->register('factory_service', 'Bar')
-    ->setFactory(array(new Reference('foo.baz'), 'getInstance'))
+    ->setFactory([new Reference('foo.baz'), 'getInstance'])
     ->setPublic(true)
 ;
 $container
     ->register('new_factory_service', 'FooBarBaz')
     ->setProperty('foo', 'bar')
-    ->setFactory(array(new Reference('new_factory'), 'getInstance'))
+    ->setFactory([new Reference('new_factory'), 'getInstance'])
     ->setPublic(true)
 ;
 $container
     ->register('service_from_static_method', 'Bar\FooClass')
-    ->setFactory(array('Bar\FooClass', 'getInstance'))
+    ->setFactory(['Bar\FooClass', 'getInstance'])
     ->setPublic(true)
 ;
 $container
@@ -147,17 +147,17 @@ $container
 ;
 $container
     ->register('factory_service_simple', 'Bar')
-    ->setFactory(array(new Reference('factory_simple'), 'getInstance'))
+    ->setFactory([new Reference('factory_simple'), 'getInstance'])
     ->setPublic(true)
 ;
 $container
     ->register('lazy_context', 'LazyContext')
-    ->setArguments(array(new IteratorArgument(array('k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container'))), new IteratorArgument(array())))
+    ->setArguments([new IteratorArgument(['k1' => new Reference('foo.baz'), 'k2' => new Reference('service_container')]), new IteratorArgument([])])
     ->setPublic(true)
 ;
 $container
     ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
-    ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))), new IteratorArgument(array())))
+    ->setArguments([new IteratorArgument([new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]), new IteratorArgument([])])
     ->setPublic(true)
 ;
 $container

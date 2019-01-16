@@ -22,7 +22,7 @@ class ExceptionControllerTest extends TestCase
 {
     public function testShowActionCanBeForcedToShowErrorPage()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error404.html.twig' => '<html>not found</html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error404.html.twig' => '<html>not found</html>']);
 
         $request = $this->createRequest('html');
         $request->attributes->set('showException', false);
@@ -37,7 +37,7 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error.html.twig' => '<html></html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error.html.twig' => '<html></html>']);
 
         $request = $this->createRequest('txt');
         $exception = FlattenException::create(new \Exception());
@@ -50,7 +50,7 @@ class ExceptionControllerTest extends TestCase
 
     public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/exception_full.html.twig' => '<html></html>'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/exception_full.html.twig' => '<html></html>']);
 
         $request = $this->createRequest('txt');
         $request->attributes->set('showException', true);
@@ -64,7 +64,7 @@ class ExceptionControllerTest extends TestCase
 
     public function testResponseHasRequestedMimeType()
     {
-        $twig = $this->createTwigEnv(array('@Twig/Exception/error.json.twig' => '{}'));
+        $twig = $this->createTwigEnv(['@Twig/Exception/error.json.twig' => '{}']);
 
         $request = $this->createRequest('json');
         $exception = FlattenException::create(new \Exception());

@@ -16,11 +16,11 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 
 class ApcuAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testExpiration' => 'Testing expiration slows down the test suite',
         'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
-    );
+    ];
 
     public function createCachePool($defaultLifetime = 0)
     {

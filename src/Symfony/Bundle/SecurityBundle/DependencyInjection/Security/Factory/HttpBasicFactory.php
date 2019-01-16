@@ -41,9 +41,9 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.basic'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($entryPointId));
-        $listener->addMethodCall('setSessionAuthenticationStrategy', array(new Reference('security.authentication.session_strategy.'.$id)));
+        $listener->addMethodCall('setSessionAuthenticationStrategy', [new Reference('security.authentication.session_strategy.'.$id)]);
 
-        return array($provider, $listenerId, $entryPointId);
+        return [$provider, $listenerId, $entryPointId];
     }
 
     public function getPosition()

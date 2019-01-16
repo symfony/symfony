@@ -36,7 +36,7 @@ class FormUtil
      */
     public static function isEmpty($data)
     {
-        // Should not do a check for array() === $data!!!
+        // Should not do a check for [] === $data!!!
         // This method is used in occurrences where arrays are
         // not considered to be empty, ever.
         return null === $data || '' === $data;

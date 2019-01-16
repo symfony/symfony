@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        bind:
+            $abc: abcSecondValue
+
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Foo
+
+    factory:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy

@@ -299,7 +299,9 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('Parameter "bind" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
             }
 
-            $defaults['bind'] = array_map(function ($v) { return new BoundArgument($v); }, $this->resolveServices($defaults['bind'], $file));
+            foreach ($this->resolveServices($defaults['bind'], $file) as $argument => $value) {
+                $defaults['bind'][$argument] = new BoundArgument($value, BoundArgument::DEFAULT_BIND, $file);
+            }
         }
 
         return $defaults;
@@ -558,6 +560,12 @@ class YamlFileLoader extends FileLoader
                 }
 
                 $bindings = array_merge($bindings, $this->resolveServices($service['bind'], $file));
+
+                $bindingType = $this->isLoadingInstanceof ? BoundArgument::INSTANCE_BIND : BoundArgument::SERVICE_BIND;
+
+                foreach ($bindings as $argument => $value) {
+                    $bindings[$argument] = new BoundArgument($value, $bindingType, $file);
+                }
             }
 
             $definition->setBindings($bindings);

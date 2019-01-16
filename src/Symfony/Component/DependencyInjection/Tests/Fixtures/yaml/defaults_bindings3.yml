@@ -1,0 +1,8 @@
+services:
+    _defaults:
+        bind:
+            $abc: abcThirdValue
+
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Foo
+        bind:

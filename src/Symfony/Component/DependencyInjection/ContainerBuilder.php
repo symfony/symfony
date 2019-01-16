@@ -123,6 +123,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $removedIds = [];
 
+    /**
+     * @var bool[][][] a map of values bound to arguments in definitions
+     */
+    private $bindings = [];
+
     private static $internalTypes = [
         'int' => true,
         'float' => true,
@@ -1021,6 +1026,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
 
+        $bindings = $definition->getBindings();
+        if (!empty($bindings)) {
+            foreach ($bindings as $argument => $binding) {
+                list(, $identifier) = $binding->getValues();
+                $this->bindings[$id][$argument][$identifier] = true;
+            }
+        }
+
         return $this->definitions[$id] = $definition;
     }
 
@@ -1655,5 +1668,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return false;
+    }
+
+    public function getBindings(): array
+    {
+        return $this->bindings;
     }
 }

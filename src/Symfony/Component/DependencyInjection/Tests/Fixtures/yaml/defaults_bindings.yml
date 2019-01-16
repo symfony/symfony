@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        bind:
+            $quz: quzFirstValue
+            $abc: abcFirstValue
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+
+    factory:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy
+
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Foo

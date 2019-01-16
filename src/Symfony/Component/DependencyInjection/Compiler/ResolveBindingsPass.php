@@ -34,11 +34,34 @@ class ResolveBindingsPass extends AbstractRecursivePass
      */
     public function process(ContainerBuilder $container)
     {
+        foreach ($container->getBindings() as $definition) {
+            foreach ($definition as $argument => $values) {
+                if (1 < \count($values)) {
+                    foreach (\array_slice(array_keys($values), 0, -1) as $value) {
+                        $this->usedBindings[$value] = true;
+                    }
+                }
+            }
+        }
+
         try {
             parent::process($container);
 
-            foreach ($this->unusedBindings as list($key, $serviceId)) {
-                $message = sprintf('Unused binding "%s" in service "%s".', $key, $serviceId);
+            foreach ($this->unusedBindings as list($key, $serviceId, $type, $file)) {
+                $message = sprintf('You have a "bind" configured for an argument named "%s" ', $key);
+
+                if ($type) {
+                    $message .= BoundArgument::MESSAGES[$type];
+                } else {
+                    $message .= sprintf('in service "%s"', $serviceId);
+                }
+
+                if ($file) {
+                    $message .= sprintf(' in file "%s"', $file);
+                }
+
+                $message .= '. But, this argument was not found in any of the services it was applied to. It may be unused and can be removed, or it may have a typo.';
+
                 if ($this->errorMessages) {
                     $message .= sprintf("\nCould be related to%s:", 1 < \count($this->errorMessages) ? ' one of' : '');
                 }
@@ -75,12 +98,12 @@ class ResolveBindingsPass extends AbstractRecursivePass
         }
 
         foreach ($bindings as $key => $binding) {
-            list($bindingValue, $bindingId, $used) = $binding->getValues();
+            list($bindingValue, $bindingId, $used, $bindingType, $file) = $binding->getValues();
             if ($used) {
                 $this->usedBindings[$bindingId] = true;
                 unset($this->unusedBindings[$bindingId]);
             } elseif (!isset($this->usedBindings[$bindingId])) {
-                $this->unusedBindings[$bindingId] = [$key, $this->currentId];
+                $this->unusedBindings[$bindingId] = [$key, $this->currentId, $bindingType, $file];
             }
 
             if (isset($key[0]) && '$' === $key[0]) {

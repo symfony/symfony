@@ -98,7 +98,7 @@ EOF;
         return <<<EOF
     public function match(\$rawPathinfo)
     {
-        \$allow = array();
+        \$allow = [];
         \$pathinfo = rawurldecode(\$rawPathinfo);
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
@@ -290,7 +290,7 @@ EOF;
             if ($matches) {
                 $vars[] = '$matches';
             }
-            $vars[] = "array('_route' => '$name')";
+            $vars[] = "['_route' => '$name']";
 
             $code .= sprintf(
                 "            \$ret = \$this->mergeDefaults(array_replace(%s), %s);\n",
@@ -300,7 +300,7 @@ EOF;
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            \$ret = %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), ['_route' => $name]), true)));
         } else {
-            $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
+            $code .= sprintf("            \$ret = ['_route' => '%s'];\n", $name);
         }
 
         if ($hasTrailingSlash) {
@@ -331,9 +331,9 @@ EOF;
                 $code .= <<<EOF
             \$requiredSchemes = $schemes;
             \$hasRequiredScheme = isset(\$requiredSchemes[\$context->getScheme()]);
-            if (!in_array($methodVariable, array('$methods'))) {
+            if (!in_array($methodVariable, ['$methods'])) {
                 if (\$hasRequiredScheme) {
-                    \$allow = array_merge(\$allow, array('$methods'));
+                    \$allow = array_merge(\$allow, ['$methods']);
                 }
                 goto $gotoname;
             }
@@ -363,8 +363,8 @@ EOF;
             }
         } elseif ($methods) {
             $code .= <<<EOF
-            if (!in_array($methodVariable, array('$methods'))) {
-                \$allow = array_merge(\$allow, array('$methods'));
+            if (!in_array($methodVariable, ['$methods'])) {
+                \$allow = array_merge(\$allow, ['$methods']);
                 goto $gotoname;
             }
 

@@ -178,10 +178,10 @@ class DoctrineExtensionTest extends TestCase
             ['doctrine.orm.cache.apcu.class',      ['type' => 'apcu']],
             ['doctrine.orm.cache.array.class',     ['type' => 'array']],
             ['doctrine.orm.cache.xcache.class',    ['type' => 'xcache']],
-            ['doctrine.orm.cache.wincache.class',  ['type' => 'wincache']],
-            ['doctrine.orm.cache.zenddata.class',  ['type' => 'zenddata']],
+            ['doctrine.orm.cache.wincache.class', array ('type' => 'wincache')],
+            ['doctrine.orm.cache.zenddata.class', array ('type' => 'zenddata')],
             ['doctrine.orm.cache.redis.class',     ['type' => 'redis'],     ['setRedis']],
-            ['doctrine.orm.cache.memcache.class',  ['type' => 'memcache'],  ['setMemcache']],
+            ['doctrine.orm.cache.memcache.class', array ('type' => 'memcache'), array ('setMemcache')],
             ['doctrine.orm.cache.memcached.class', ['type' => 'memcached'], ['setMemcached']],
         ];
     }

@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($rawPathinfo)
     {
-        $allow = array();
+        $allow = [];
         $pathinfo = rawurldecode($rawPathinfo);
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
@@ -30,9 +30,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // just_head
         if ('/just_head' === $pathinfo) {
-            $ret = array('_route' => 'just_head');
-            if (!in_array($requestMethod, array('HEAD'))) {
-                $allow = array_merge($allow, array('HEAD'));
+            $ret = ['_route' => 'just_head'];
+            if (!in_array($requestMethod, ['HEAD'])) {
+                $allow = array_merge($allow, ['HEAD']);
                 goto not_just_head;
             }
 
@@ -42,9 +42,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // head_and_get
         if ('/head_and_get' === $pathinfo) {
-            $ret = array('_route' => 'head_and_get');
-            if (!in_array($canonicalMethod, array('HEAD', 'GET'))) {
-                $allow = array_merge($allow, array('HEAD', 'GET'));
+            $ret = ['_route' => 'head_and_get'];
+            if (!in_array($canonicalMethod, ['HEAD', 'GET'])) {
+                $allow = array_merge($allow, ['HEAD', 'GET']);
                 goto not_head_and_get;
             }
 
@@ -54,9 +54,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // get_and_head
         if ('/get_and_head' === $pathinfo) {
-            $ret = array('_route' => 'get_and_head');
-            if (!in_array($canonicalMethod, array('GET', 'HEAD'))) {
-                $allow = array_merge($allow, array('GET', 'HEAD'));
+            $ret = ['_route' => 'get_and_head'];
+            if (!in_array($canonicalMethod, ['GET', 'HEAD'])) {
+                $allow = array_merge($allow, ['GET', 'HEAD']);
                 goto not_get_and_head;
             }
 
@@ -66,9 +66,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
         // post_and_head
         if ('/post_and_head' === $pathinfo) {
-            $ret = array('_route' => 'post_and_head');
-            if (!in_array($requestMethod, array('POST', 'HEAD'))) {
-                $allow = array_merge($allow, array('POST', 'HEAD'));
+            $ret = ['_route' => 'post_and_head'];
+            if (!in_array($requestMethod, ['POST', 'HEAD'])) {
+                $allow = array_merge($allow, ['POST', 'HEAD']);
                 goto not_post_and_head;
             }
 
@@ -79,9 +79,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         if (0 === strpos($pathinfo, '/put_and_post')) {
             // put_and_post
             if ('/put_and_post' === $pathinfo) {
-                $ret = array('_route' => 'put_and_post');
-                if (!in_array($requestMethod, array('PUT', 'POST'))) {
-                    $allow = array_merge($allow, array('PUT', 'POST'));
+                $ret = ['_route' => 'put_and_post'];
+                if (!in_array($requestMethod, ['PUT', 'POST'])) {
+                    $allow = array_merge($allow, ['PUT', 'POST']);
                     goto not_put_and_post;
                 }
 
@@ -91,9 +91,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             // put_and_get_and_head
             if ('/put_and_post' === $pathinfo) {
-                $ret = array('_route' => 'put_and_get_and_head');
-                if (!in_array($canonicalMethod, array('PUT', 'GET', 'HEAD'))) {
-                    $allow = array_merge($allow, array('PUT', 'GET', 'HEAD'));
+                $ret = ['_route' => 'put_and_get_and_head'];
+                if (!in_array($canonicalMethod, ['PUT', 'GET', 'HEAD'])) {
+                    $allow = array_merge($allow, ['PUT', 'GET', 'HEAD']);
                     goto not_put_and_get_and_head;
                 }
 

@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
     public function match($rawPathinfo)
     {
-        $allow = array();
+        $allow = [];
         $pathinfo = rawurldecode($rawPathinfo);
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
@@ -31,7 +31,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         if (0 === strpos($pathinfo, '/trailing/simple')) {
             // simple_trailing_slash_no_methods
             if ('/trailing/simple/no-methods' === $trimmedPathinfo) {
-                $ret = array('_route' => 'simple_trailing_slash_no_methods');
+                $ret = ['_route' => 'simple_trailing_slash_no_methods'];
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
@@ -46,7 +46,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // simple_trailing_slash_GET_method
             if ('/trailing/simple/get-method' === $trimmedPathinfo) {
-                $ret = array('_route' => 'simple_trailing_slash_GET_method');
+                $ret = ['_route' => 'simple_trailing_slash_GET_method'];
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
@@ -55,8 +55,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'simple_trailing_slash_GET_method'));
                 }
 
-                if (!in_array($canonicalMethod, array('GET'))) {
-                    $allow = array_merge($allow, array('GET'));
+                if (!in_array($canonicalMethod, ['GET'])) {
+                    $allow = array_merge($allow, ['GET']);
                     goto not_simple_trailing_slash_GET_method;
                 }
 
@@ -66,9 +66,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // simple_trailing_slash_HEAD_method
             if ('/trailing/simple/head-method/' === $pathinfo) {
-                $ret = array('_route' => 'simple_trailing_slash_HEAD_method');
-                if (!in_array($requestMethod, array('HEAD'))) {
-                    $allow = array_merge($allow, array('HEAD'));
+                $ret = ['_route' => 'simple_trailing_slash_HEAD_method'];
+                if (!in_array($requestMethod, ['HEAD'])) {
+                    $allow = array_merge($allow, ['HEAD']);
                     goto not_simple_trailing_slash_HEAD_method;
                 }
 
@@ -78,9 +78,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // simple_trailing_slash_POST_method
             if ('/trailing/simple/post-method/' === $pathinfo) {
-                $ret = array('_route' => 'simple_trailing_slash_POST_method');
-                if (!in_array($requestMethod, array('POST'))) {
-                    $allow = array_merge($allow, array('POST'));
+                $ret = ['_route' => 'simple_trailing_slash_POST_method'];
+                if (!in_array($requestMethod, ['POST'])) {
+                    $allow = array_merge($allow, ['POST']);
                     goto not_simple_trailing_slash_POST_method;
                 }
 
@@ -93,7 +93,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         elseif (0 === strpos($pathinfo, '/trailing/regex')) {
             // regex_trailing_slash_no_methods
             if (0 === strpos($pathinfo, '/trailing/regex/no-methods') && preg_match('#^/trailing/regex/no\\-methods/(?P<param>[^/]++)/?$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_trailing_slash_no_methods')), array ());
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_trailing_slash_no_methods']), array ());
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
@@ -108,7 +108,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // regex_trailing_slash_GET_method
             if (0 === strpos($pathinfo, '/trailing/regex/get-method') && preg_match('#^/trailing/regex/get\\-method/(?P<param>[^/]++)/?$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_trailing_slash_GET_method')), array ());
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_trailing_slash_GET_method']), array ());
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
@@ -117,8 +117,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'regex_trailing_slash_GET_method'));
                 }
 
-                if (!in_array($canonicalMethod, array('GET'))) {
-                    $allow = array_merge($allow, array('GET'));
+                if (!in_array($canonicalMethod, ['GET'])) {
+                    $allow = array_merge($allow, ['GET']);
                     goto not_regex_trailing_slash_GET_method;
                 }
 
@@ -128,9 +128,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // regex_trailing_slash_HEAD_method
             if (0 === strpos($pathinfo, '/trailing/regex/head-method') && preg_match('#^/trailing/regex/head\\-method/(?P<param>[^/]++)/$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_trailing_slash_HEAD_method')), array ());
-                if (!in_array($requestMethod, array('HEAD'))) {
-                    $allow = array_merge($allow, array('HEAD'));
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_trailing_slash_HEAD_method']), array ());
+                if (!in_array($requestMethod, ['HEAD'])) {
+                    $allow = array_merge($allow, ['HEAD']);
                     goto not_regex_trailing_slash_HEAD_method;
                 }
 
@@ -140,9 +140,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // regex_trailing_slash_POST_method
             if (0 === strpos($pathinfo, '/trailing/regex/post-method') && preg_match('#^/trailing/regex/post\\-method/(?P<param>[^/]++)/$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_trailing_slash_POST_method')), array ());
-                if (!in_array($requestMethod, array('POST'))) {
-                    $allow = array_merge($allow, array('POST'));
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_trailing_slash_POST_method']), array ());
+                if (!in_array($requestMethod, ['POST'])) {
+                    $allow = array_merge($allow, ['POST']);
                     goto not_regex_trailing_slash_POST_method;
                 }
 
@@ -155,14 +155,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         elseif (0 === strpos($pathinfo, '/not-trailing/simple')) {
             // simple_not_trailing_slash_no_methods
             if ('/not-trailing/simple/no-methods' === $pathinfo) {
-                return array('_route' => 'simple_not_trailing_slash_no_methods');
+                return ['_route' => 'simple_not_trailing_slash_no_methods'];
             }
 
             // simple_not_trailing_slash_GET_method
             if ('/not-trailing/simple/get-method' === $pathinfo) {
-                $ret = array('_route' => 'simple_not_trailing_slash_GET_method');
-                if (!in_array($canonicalMethod, array('GET'))) {
-                    $allow = array_merge($allow, array('GET'));
+                $ret = ['_route' => 'simple_not_trailing_slash_GET_method'];
+                if (!in_array($canonicalMethod, ['GET'])) {
+                    $allow = array_merge($allow, ['GET']);
                     goto not_simple_not_trailing_slash_GET_method;
                 }
 
@@ -172,9 +172,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // simple_not_trailing_slash_HEAD_method
             if ('/not-trailing/simple/head-method' === $pathinfo) {
-                $ret = array('_route' => 'simple_not_trailing_slash_HEAD_method');
-                if (!in_array($requestMethod, array('HEAD'))) {
-                    $allow = array_merge($allow, array('HEAD'));
+                $ret = ['_route' => 'simple_not_trailing_slash_HEAD_method'];
+                if (!in_array($requestMethod, ['HEAD'])) {
+                    $allow = array_merge($allow, ['HEAD']);
                     goto not_simple_not_trailing_slash_HEAD_method;
                 }
 
@@ -184,9 +184,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // simple_not_trailing_slash_POST_method
             if ('/not-trailing/simple/post-method' === $pathinfo) {
-                $ret = array('_route' => 'simple_not_trailing_slash_POST_method');
-                if (!in_array($requestMethod, array('POST'))) {
-                    $allow = array_merge($allow, array('POST'));
+                $ret = ['_route' => 'simple_not_trailing_slash_POST_method'];
+                if (!in_array($requestMethod, ['POST'])) {
+                    $allow = array_merge($allow, ['POST']);
                     goto not_simple_not_trailing_slash_POST_method;
                 }
 
@@ -199,14 +199,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         elseif (0 === strpos($pathinfo, '/not-trailing/regex')) {
             // regex_not_trailing_slash_no_methods
             if (0 === strpos($pathinfo, '/not-trailing/regex/no-methods') && preg_match('#^/not\\-trailing/regex/no\\-methods/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_not_trailing_slash_no_methods')), array ());
+                return $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_not_trailing_slash_no_methods']), array ());
             }
 
             // regex_not_trailing_slash_GET_method
             if (0 === strpos($pathinfo, '/not-trailing/regex/get-method') && preg_match('#^/not\\-trailing/regex/get\\-method/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_not_trailing_slash_GET_method')), array ());
-                if (!in_array($canonicalMethod, array('GET'))) {
-                    $allow = array_merge($allow, array('GET'));
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_not_trailing_slash_GET_method']), array ());
+                if (!in_array($canonicalMethod, ['GET'])) {
+                    $allow = array_merge($allow, ['GET']);
                     goto not_regex_not_trailing_slash_GET_method;
                 }
 
@@ -216,9 +216,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // regex_not_trailing_slash_HEAD_method
             if (0 === strpos($pathinfo, '/not-trailing/regex/head-method') && preg_match('#^/not\\-trailing/regex/head\\-method/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_not_trailing_slash_HEAD_method')), array ());
-                if (!in_array($requestMethod, array('HEAD'))) {
-                    $allow = array_merge($allow, array('HEAD'));
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_not_trailing_slash_HEAD_method']), array ());
+                if (!in_array($requestMethod, ['HEAD'])) {
+                    $allow = array_merge($allow, ['HEAD']);
                     goto not_regex_not_trailing_slash_HEAD_method;
                 }
 
@@ -228,9 +228,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // regex_not_trailing_slash_POST_method
             if (0 === strpos($pathinfo, '/not-trailing/regex/post-method') && preg_match('#^/not\\-trailing/regex/post\\-method/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
-                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'regex_not_trailing_slash_POST_method')), array ());
-                if (!in_array($requestMethod, array('POST'))) {
-                    $allow = array_merge($allow, array('POST'));
+                $ret = $this->mergeDefaults(array_replace($matches, ['_route' => 'regex_not_trailing_slash_POST_method']), array ());
+                if (!in_array($requestMethod, ['POST'])) {
+                    $allow = array_merge($allow, ['POST']);
                     goto not_regex_not_trailing_slash_POST_method;
                 }
 

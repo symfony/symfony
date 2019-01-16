@@ -21,6 +21,30 @@ foreach (explode("\n", $data) as $line) {
     $new[$mimeType] = $extensions;
 }
 
+$xml = simplexml_load_string(file_get_contents('https://raw.github.com/minad/mimemagic/master/script/freedesktop.org.xml'));
+foreach ($xml as $node) {
+    $exts = [];
+    foreach ($node->glob as $glob) {
+        $pattern = (string) $glob['pattern'];
+        if ('*' != $pattern[0] || '.' != $pattern[1]) {
+            continue;
+        }
+
+        $exts[] = substr($pattern, 2);
+    }
+
+    if (!$exts) {
+        continue;
+    }
+
+    $mt = strtolower((string) $node['type']);
+    $new[$mt] = array_merge($new[$mt] ?? [], $exts);
+    foreach ($node->alias as $alias) {
+        $mt = strtolower((string) $alias['type']);
+        $new[$mt] = array_merge($new[$mt] ?? [], $exts);
+    }
+}
+
 // load current map
 $data = file_get_contents($output = __DIR__.'/../../MimeTypes.php');
 $current = [];
@@ -44,7 +68,7 @@ ksort($map);
 
 $data = $pre;
 foreach ($map as $mimeType => $exts) {
-    $data .= sprintf("        '%s' => ['%s'],\n", $mimeType, implode("', '", $exts));
+    $data .= sprintf("        '%s' => ['%s'],\n", $mimeType, implode("', '", array_unique($exts)));
 }
 $data .= $post;
 
@@ -64,7 +88,7 @@ foreach (explode("\n", $data) as $line) {
         if (1 === $state) {
             $state = 2;
             foreach ($exts as $ext => $mimeTypes) {
-                $updated .= sprintf("        '%s' => ['%s'],\n", $ext, implode("', '", $mimeTypes));
+                $updated .= sprintf("        '%s' => ['%s'],\n", $ext, implode("', '", array_unique($mimeTypes)));
             }
         }
         $updated .= $line."\n";
@@ -73,6 +97,8 @@ foreach (explode("\n", $data) as $line) {
     $state = 1;
 }
 
-file_put_contents($output, $updated);
+$updated = preg_replace('{Updated from upstream on .+?\.}', 'Updated from upstream on '.date('Y-m-d'), $updated, -1);
+
+file_put_contents($output, rtrim($updated, "\n")."\n");
 
 echo "Done.\n";

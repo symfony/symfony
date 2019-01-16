@@ -53,8 +53,8 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
     {
         $mt = new MimeTypes();
         $this->assertSame(['application/mbox'], $mt->getMimeTypes('mbox'));
-        $this->assertSame(['application/postscript'], $mt->getMimeTypes('ai'));
-        $this->assertSame(['application/postscript'], $mt->getMimeTypes('ps'));
+        $this->assertContains('application/postscript', $mt->getMimeTypes('ai'));
+        $this->assertContains('application/postscript', $mt->getMimeTypes('ps'));
         $this->assertSame([], $mt->getMimeTypes('symfony'));
     }
 }

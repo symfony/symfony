@@ -37,7 +37,7 @@ class ConstantNodeTest extends AbstractNodeTest
             ['3', new ConstantNode(3)],
             ['3.3', new ConstantNode(3.3)],
             ['"foo"', new ConstantNode('foo')],
-            ['array(0 => 1, "b" => "a")', new ConstantNode([1, 'b' => 'a'])],
+            ['[0 => 1, "b" => "a"]', new ConstantNode([1, 'b' => 'a'])],
         ];
     }
 

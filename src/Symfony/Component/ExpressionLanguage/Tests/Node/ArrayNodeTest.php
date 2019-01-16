@@ -38,7 +38,7 @@ class ArrayNodeTest extends AbstractNodeTest
     public function getCompileData()
     {
         return [
-            ['array("b" => "a", 0 => "b")', $this->getArrayNode()],
+            ['["b" => "a", 0 => "b"]', $this->getArrayNode()],
         ];
     }
 

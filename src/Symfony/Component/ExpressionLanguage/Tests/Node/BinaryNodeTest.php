@@ -104,10 +104,10 @@ class BinaryNodeTest extends AbstractNodeTest
             ['pow(5, 2)', new BinaryNode('**', new ConstantNode(5), new ConstantNode(2))],
             ['("a" . "b")', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))],
 
-            ['in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('a'), $array)],
-            ['in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('c'), $array)],
-            ['!in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('c'), $array)],
-            ['!in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('a'), $array)],
+            ['in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('a'), $array)],
+            ['in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('in', new ConstantNode('c'), $array)],
+            ['!in_array("c", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('c'), $array)],
+            ['!in_array("a", [0 => "a", 1 => "b"])', new BinaryNode('not in', new ConstantNode('a'), $array)],
 
             ['range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
 

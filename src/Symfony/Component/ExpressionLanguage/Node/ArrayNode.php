@@ -41,9 +41,9 @@ class ArrayNode extends Node
      */
     public function compile(Compiler $compiler)
     {
-        $compiler->raw('array(');
+        $compiler->raw('[');
         $this->compileArguments($compiler);
-        $compiler->raw(')');
+        $compiler->raw(']');
     }
 
     public function evaluate($functions, $values)

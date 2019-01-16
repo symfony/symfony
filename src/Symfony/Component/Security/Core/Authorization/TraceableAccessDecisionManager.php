@@ -26,9 +26,9 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
     private $strategy;
-    private $voters = array();
-    private $decisionLog = array(); // All decision logs
-    private $currentLog = array();  // Logs being filled in
+    private $voters = [];
+    private $decisionLog = []; // All decision logs
+    private $currentLog = [];  // Logs being filled in
 
     public function __construct(AccessDecisionManagerInterface $manager)
     {
@@ -50,11 +50,11 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
-        $currentDecisionLog = array(
+        $currentDecisionLog = [
             'attributes' => $attributes,
             'object' => $object,
-            'voterDetails' => array(),
-        );
+            'voterDetails' => [],
+        ];
 
         $this->currentLog[] = &$currentDecisionLog;
 
@@ -77,11 +77,11 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     public function addVoterVote(VoterInterface $voter, array $attributes, int $vote)
     {
         $currentLogIndex = \count($this->currentLog) - 1;
-        $this->currentLog[$currentLogIndex]['voterDetails'][] = array(
+        $this->currentLog[$currentLogIndex]['voterDetails'][] = [
             'voter' => $voter,
             'attributes' => $attributes,
             'vote' => $vote,
-        );
+        ];
     }
 
     /**

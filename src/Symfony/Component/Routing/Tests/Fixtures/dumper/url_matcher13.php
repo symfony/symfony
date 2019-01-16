@@ -15,7 +15,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $this->context = $context;
         $this->matchHost = true;
-        $this->regexpList = array(
+        $this->regexpList = [
             0 => '{^(?'
                 .'|(?i:([^\\.]++)\\.exampple\\.com)\\.(?'
                     .'|/abc([^/]++)(?'
@@ -23,12 +23,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     .')'
                 .')'
                 .')/?$}sD',
-        );
-        $this->dynamicRoutes = array(
-            56 => array(
-                array(array('_route' => 'r1'), array('foo', 'foo'), null, null, false, true, null),
-                array(array('_route' => 'r2'), array('foo', 'foo'), null, null, false, true, null),
-            ),
-        );
+        ];
+        $this->dynamicRoutes = [
+            56 => [
+                [['_route' => 'r1'], ['foo', 'foo'], null, null, false, true, null],
+                [['_route' => 'r2'], ['foo', 'foo'], null, null, false, true, null],
+            ],
+        ];
     }
 }

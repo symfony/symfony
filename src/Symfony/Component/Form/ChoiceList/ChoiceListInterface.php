@@ -48,19 +48,19 @@ interface ChoiceListInterface
      * keys of the choices. If the original array contained nested arrays, these
      * nested arrays are represented here as well:
      *
-     *     $form->add('field', 'choice', array(
-     *         'choices' => array(
-     *             'Decided' => array('Yes' => true, 'No' => false),
-     *             'Undecided' => array('Maybe' => null),
-     *         ),
-     *     ));
+     *     $form->add('field', 'choice', [
+     *         'choices' => [
+     *             'Decided' => ['Yes' => true, 'No' => false],
+     *             'Undecided' => ['Maybe' => null],
+     *         ],
+     *     ]);
      *
      * In this example, the result of this method is:
      *
-     *     array(
-     *         'Decided' => array('Yes' => '0', 'No' => '1'),
-     *         'Undecided' => array('Maybe' => '2'),
-     *     )
+     *     [
+     *         'Decided' => ['Yes' => '0', 'No' => '1'],
+     *         'Undecided' => ['Maybe' => '2'],
+     *     ]
      *
      * @return string[] The choice values
      */
@@ -73,12 +73,12 @@ interface ChoiceListInterface
      * "choice" option of the choice type. Note that this array may contain
      * duplicates if the "choice" option contained choice groups:
      *
-     *     $form->add('field', 'choice', array(
-     *         'choices' => array(
-     *             'Decided' => array(true, false),
-     *             'Undecided' => array(null),
-     *         ),
-     *     ));
+     *     $form->add('field', 'choice', [
+     *         'choices' => [
+     *             'Decided' => [true, false],
+     *             'Undecided' => [null],
+     *         ],
+     *     ]);
      *
      * In this example, the original key 0 appears twice, once for `true` and
      * once for `null`.

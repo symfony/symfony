@@ -29,7 +29,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
 
         $admMock = $this
             ->getMockBuilder(AccessDecisionManager::class)
-            ->setMethods(array('decide'))
+            ->setMethods(['decide'])
             ->getMock();
 
         $adm = new TraceableAccessDecisionManager($admMock);
@@ -58,120 +58,120 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $voter1 = $this->getMockForAbstractClass(VoterInterface::class);
         $voter2 = $this->getMockForAbstractClass(VoterInterface::class);
 
-        yield array(
-            array(array(
-                'attributes' => array('ATTRIBUTE_1'),
+        yield [
+            [[
+                'attributes' => ['ATTRIBUTE_1'],
                 'object' => null,
                 'result' => true,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('ATTRIBUTE_1'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                    array('voter' => $voter2, 'attributes' => array('ATTRIBUTE_1'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                ),
-            )),
-            array('ATTRIBUTE_1'),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                    ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
+            ]],
+            ['ATTRIBUTE_1'],
             null,
-            array(
-                array($voter1, VoterInterface::ACCESS_GRANTED),
-                array($voter2, VoterInterface::ACCESS_GRANTED),
-            ),
+            [
+                [$voter1, VoterInterface::ACCESS_GRANTED],
+                [$voter2, VoterInterface::ACCESS_GRANTED],
+            ],
             true,
-        );
-        yield array(
-            array(array(
-                'attributes' => array('ATTRIBUTE_1', 'ATTRIBUTE_2'),
+        ];
+        yield [
+            [[
+                'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
                 'object' => true,
                 'result' => false,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('ATTRIBUTE_1', 'ATTRIBUTE_2'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array('ATTRIBUTE_1', 'ATTRIBUTE_2'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                ),
-            )),
-            array('ATTRIBUTE_1', 'ATTRIBUTE_2'),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_1', 'ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
+            ]],
+            ['ATTRIBUTE_1', 'ATTRIBUTE_2'],
             true,
-            array(
-                array($voter1, VoterInterface::ACCESS_ABSTAIN),
-                array($voter2, VoterInterface::ACCESS_GRANTED),
-            ),
+            [
+                [$voter1, VoterInterface::ACCESS_ABSTAIN],
+                [$voter2, VoterInterface::ACCESS_GRANTED],
+            ],
             false,
-        );
-        yield array(
-            array(array(
-                'attributes' => array(null),
+        ];
+        yield [
+            [[
+                'attributes' => [null],
                 'object' => 'jolie string',
                 'result' => false,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array(null), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array(null), 'vote' => VoterInterface::ACCESS_DENIED),
-                ),
-            )),
-            array(null),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => [null], 'vote' => VoterInterface::ACCESS_DENIED],
+                ],
+            ]],
+            [null],
             'jolie string',
-            array(
-                array($voter1, VoterInterface::ACCESS_ABSTAIN),
-                array($voter2, VoterInterface::ACCESS_DENIED),
-            ),
+            [
+                [$voter1, VoterInterface::ACCESS_ABSTAIN],
+                [$voter2, VoterInterface::ACCESS_DENIED],
+            ],
             false,
-        );
-        yield array(
-            array(array(
-                'attributes' => array(12),
+        ];
+        yield [
+            [[
+                'attributes' => [12],
                 'object' => 12345,
                 'result' => true,
-                'voterDetails' => array(),
-            )),
-            'attributes' => array(12),
+                'voterDetails' => [],
+            ]],
+            'attributes' => [12],
             12345,
-            array(),
+            [],
             true,
-        );
-        yield array(
-            array(array(
-                'attributes' => array(new \stdClass()),
+        ];
+        yield [
+            [[
+                'attributes' => [new \stdClass()],
                 'object' => $x = fopen(__FILE__, 'rb'),
                 'result' => true,
-                'voterDetails' => array(),
-            )),
-            array(new \stdClass()),
+                'voterDetails' => [],
+            ]],
+            [new \stdClass()],
             $x,
-            array(),
+            [],
             true,
-        );
-        yield array(
-            array(array(
-                'attributes' => array('ATTRIBUTE_2'),
-                'object' => $x = array(),
+        ];
+        yield [
+            [[
+                'attributes' => ['ATTRIBUTE_2'],
+                'object' => $x = [],
                 'result' => false,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('ATTRIBUTE_2'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array('ATTRIBUTE_2'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                ),
-            )),
-            array('ATTRIBUTE_2'),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['ATTRIBUTE_2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                ],
+            ]],
+            ['ATTRIBUTE_2'],
             $x,
-            array(
-                array($voter1, VoterInterface::ACCESS_ABSTAIN),
-                array($voter2, VoterInterface::ACCESS_ABSTAIN),
-            ),
+            [
+                [$voter1, VoterInterface::ACCESS_ABSTAIN],
+                [$voter2, VoterInterface::ACCESS_ABSTAIN],
+            ],
             false,
-        );
-        yield array(
-            array(array(
-                'attributes' => array(12.13),
+        ];
+        yield [
+            [[
+                'attributes' => [12.13],
                 'object' => new \stdClass(),
                 'result' => false,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array(12.13), 'vote' => VoterInterface::ACCESS_DENIED),
-                    array('voter' => $voter2, 'attributes' => array(12.13), 'vote' => VoterInterface::ACCESS_DENIED),
-                ),
-            )),
-            array(12.13),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => [12.13], 'vote' => VoterInterface::ACCESS_DENIED],
+                    ['voter' => $voter2, 'attributes' => [12.13], 'vote' => VoterInterface::ACCESS_DENIED],
+                ],
+            ]],
+            [12.13],
             new \stdClass(),
-            array(
-                array($voter1, VoterInterface::ACCESS_DENIED),
-                array($voter2, VoterInterface::ACCESS_DENIED),
-            ),
+            [
+                [$voter1, VoterInterface::ACCESS_DENIED],
+                [$voter2, VoterInterface::ACCESS_DENIED],
+            ],
             false,
-        );
+        ];
     }
 
     public function testDebugAccessDecisionManagerAliasExistsForBC()
@@ -188,20 +188,20 @@ class TraceableAccessDecisionManagerTest extends TestCase
     {
         $voter1 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(array('vote'))
+            ->setMethods(['vote'])
             ->getMock();
 
         $voter2 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(array('vote'))
+            ->setMethods(['vote'])
             ->getMock();
 
         $voter3 = $this
             ->getMockBuilder(VoterInterface::class)
-            ->setMethods(array('vote'))
+            ->setMethods(['vote'])
             ->getMock();
 
-        $sut = new TraceableAccessDecisionManager(new AccessDecisionManager(array($voter1, $voter2, $voter3)));
+        $sut = new TraceableAccessDecisionManager(new AccessDecisionManager([$voter1, $voter2, $voter3]));
 
         $voter1
             ->expects($this->any())
@@ -244,37 +244,37 @@ class TraceableAccessDecisionManagerTest extends TestCase
             });
 
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $sut->decide($token, array('attr1'), null);
-        $sut->decide($token, array('attr2'), $obj = new \stdClass());
+        $sut->decide($token, ['attr1'], null);
+        $sut->decide($token, ['attr2'], $obj = new \stdClass());
 
-        $this->assertEquals(array(
-            array(
-                'attributes' => array('attr1'),
+        $this->assertEquals([
+            [
+                'attributes' => ['attr1'],
                 'object' => null,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('attr1'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                ),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['attr1'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
                 'result' => true,
-            ),
-            array(
-                'attributes' => array('attr2'),
+            ],
+            [
+                'attributes' => ['attr2'],
                 'object' => null,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('attr2'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array('attr2'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                ),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
                 'result' => true,
-            ),
-            array(
-                'attributes' => array('attr2'),
+            ],
+            [
+                'attributes' => ['attr2'],
                 'object' => $obj,
-                'voterDetails' => array(
-                    array('voter' => $voter1, 'attributes' => array('attr2'), 'vote' => VoterInterface::ACCESS_ABSTAIN),
-                    array('voter' => $voter2, 'attributes' => array('attr2'), 'vote' => VoterInterface::ACCESS_DENIED),
-                    array('voter' => $voter3, 'attributes' => array('attr2'), 'vote' => VoterInterface::ACCESS_GRANTED),
-                ),
+                'voterDetails' => [
+                    ['voter' => $voter1, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_ABSTAIN],
+                    ['voter' => $voter2, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_DENIED],
+                    ['voter' => $voter3, 'attributes' => ['attr2'], 'vote' => VoterInterface::ACCESS_GRANTED],
+                ],
                 'result' => true,
-            ),
-        ), $sut->getDecisionLog());
+            ],
+        ], $sut->getDecisionLog());
     }
 }

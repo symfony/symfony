@@ -147,7 +147,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         }
 
         $deleted = true;
-        $fallbackKeys = array();
+        $fallbackKeys = [];
 
         foreach ($keys as $key) {
             if (!\is_string($key)) {
@@ -196,7 +196,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
         }
 
         $saved = true;
-        $fallbackValues = array();
+        $fallbackValues = [];
 
         foreach ($values as $key => $value) {
             if (!\is_string($key) && !\is_int($key)) {
@@ -219,7 +219,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
 
     private function generateItems(array $keys, $default)
     {
-        $fallbackKeys = array();
+        $fallbackKeys = [];
 
         foreach ($keys as $key) {
             if (isset($this->keys[$key])) {

@@ -39,22 +39,22 @@ class Email extends Constraint
      */
     const HOST_CHECK_FAILED_ERROR = '7da53a8b-56f3-4288-bb3e-ee9ede4ef9a1';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::INVALID_FORMAT_ERROR => 'STRICT_CHECK_FAILED_ERROR',
         self::MX_CHECK_FAILED_ERROR => 'MX_CHECK_FAILED_ERROR',
         self::HOST_CHECK_FAILED_ERROR => 'HOST_CHECK_FAILED_ERROR',
-    );
+    ];
 
     /**
      * @var string[]
      *
      * @internal
      */
-    public static $validationModes = array(
+    public static $validationModes = [
         self::VALIDATION_MODE_HTML5,
         self::VALIDATION_MODE_STRICT,
         self::VALIDATION_MODE_LOOSE,
-    );
+    ];
 
     public $message = 'This value is not a valid email address.';
 

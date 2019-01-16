@@ -29,12 +29,12 @@ class TokenStream
     /**
      * @var Token[]
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * @var Token[]
      */
-    private $used = array();
+    private $used = [];
 
     /**
      * @var int
@@ -154,7 +154,7 @@ class TokenStream
             return $next->getValue();
         }
 
-        if ($next->isDelimiter(array('*'))) {
+        if ($next->isDelimiter(['*'])) {
             return;
         }
 

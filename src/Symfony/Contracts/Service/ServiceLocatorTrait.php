@@ -23,7 +23,7 @@ use Psr\Container\NotFoundExceptionInterface;
 trait ServiceLocatorTrait
 {
     private $factories;
-    private $loading = array();
+    private $loading = [];
 
     /**
      * @param callable[] $factories

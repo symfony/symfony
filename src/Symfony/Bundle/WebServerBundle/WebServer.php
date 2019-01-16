@@ -150,14 +150,14 @@ class WebServer
             throw new \RuntimeException('Unable to find the PHP binary.');
         }
 
-        $xdebugArgs = ini_get('xdebug.profiler_enable_trigger') ? array('-dxdebug.profiler_enable_trigger=1') : array();
+        $xdebugArgs = ini_get('xdebug.profiler_enable_trigger') ? ['-dxdebug.profiler_enable_trigger=1'] : [];
 
-        $process = new Process(array_merge(array($binary), $finder->findArguments(), $xdebugArgs, array('-dvariables_order=EGPCS', '-S', $config->getAddress(), $config->getRouter())));
+        $process = new Process(array_merge([$binary], $finder->findArguments(), $xdebugArgs, ['-dvariables_order=EGPCS', '-S', $config->getAddress(), $config->getRouter()]));
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 
         if (\in_array('APP_ENV', explode(',', getenv('SYMFONY_DOTENV_VARS')))) {
-            $process->setEnv(array('APP_ENV' => false));
+            $process->setEnv(['APP_ENV' => false]);
             $process->inheritEnvironmentVariables();
         }
 

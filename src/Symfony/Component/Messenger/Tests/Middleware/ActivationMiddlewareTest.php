@@ -42,7 +42,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
 
-        $activated = $this->createPartialMock(\stdClass::class, array('__invoke'));
+        $activated = $this->createPartialMock(\stdClass::class, ['__invoke']);
         $activated->expects($this->once())->method('__invoke')->with($envelope)->willReturn(true);
 
         $stack = $this->getStackMock(false);

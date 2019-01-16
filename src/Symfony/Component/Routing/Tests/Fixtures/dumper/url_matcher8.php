@@ -14,7 +14,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->regexpList = array(
+        $this->regexpList = [
             0 => '{^(?'
                     .'|/(a)(*:11)'
                 .')/?$}sD',
@@ -24,11 +24,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             22 => '{^(?'
                     .'|/(.)(*:33)'
                 .')/?$}sD',
-        );
-        $this->dynamicRoutes = array(
-            11 => array(array(array('_route' => 'a'), array('a'), null, null, false, true, null)),
-            22 => array(array(array('_route' => 'b'), array('a'), null, null, false, true, null)),
-            33 => array(array(array('_route' => 'c'), array('a'), null, null, false, true, null)),
-        );
+        ];
+        $this->dynamicRoutes = [
+            11 => [[['_route' => 'a'], ['a'], null, null, false, true, null]],
+            22 => [[['_route' => 'b'], ['a'], null, null, false, true, null]],
+            33 => [[['_route' => 'c'], ['a'], null, null, false, true, null]],
+        ];
     }
 }

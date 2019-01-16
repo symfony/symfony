@@ -76,23 +76,23 @@ class IntlDateFormatter
     /**
      * Patterns used to format the date when no pattern is provided.
      */
-    private $defaultDateFormats = array(
+    private $defaultDateFormats = [
         self::NONE => '',
         self::FULL => 'EEEE, LLLL d, y',
         self::LONG => 'LLLL d, y',
         self::MEDIUM => 'LLL d, y',
         self::SHORT => 'M/d/yy',
-    );
+    ];
 
     /**
      * Patterns used to format the time when no pattern is provided.
      */
-    private $defaultTimeFormats = array(
+    private $defaultTimeFormats = [
         self::FULL => 'h:mm:ss a zzzz',
         self::LONG => 'h:mm:ss a z',
         self::MEDIUM => 'h:mm:ss a',
         self::SHORT => 'h:mm a',
-    );
+    ];
 
     private $datetype;
     private $timetype;
@@ -600,7 +600,7 @@ class IntlDateFormatter
      */
     protected function getDefaultPattern()
     {
-        $patternParts = array();
+        $patternParts = [];
         if (self::NONE !== $this->datetype) {
             $patternParts[] = $this->defaultDateFormats[$this->datetype];
         }

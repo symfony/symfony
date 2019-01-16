@@ -26,7 +26,7 @@ abstract class AbstractDataProviderTest extends TestCase
     // not loaded, because it is NOT possible to skip the execution of data
     // providers.
 
-    private static $locales = array(
+    private static $locales = [
         'af',
         'af_NA',
         'af_ZA',
@@ -633,9 +633,9 @@ abstract class AbstractDataProviderTest extends TestCase
         'zh_TW',
         'zu',
         'zu_ZA',
-    );
+    ];
 
-    private static $localeAliases = array(
+    private static $localeAliases = [
         'az_AZ' => 'az_Latn_AZ',
         'bs_BA' => 'bs_Latn_BA',
         'en_NH' => 'en_VU',
@@ -673,7 +673,7 @@ abstract class AbstractDataProviderTest extends TestCase
         'zh_MO' => 'zh_Hant_MO',
         'zh_SG' => 'zh_Hans_SG',
         'zh_TW' => 'zh_Hant_TW',
-    );
+    ];
 
     private static $rootLocales;
 
@@ -686,7 +686,7 @@ abstract class AbstractDataProviderTest extends TestCase
     public function provideLocales()
     {
         return array_map(
-            function ($locale) { return array($locale); },
+            function ($locale) { return [$locale]; },
             $this->getLocales()
         );
     }
@@ -694,7 +694,7 @@ abstract class AbstractDataProviderTest extends TestCase
     public function provideLocaleAliases()
     {
         return array_map(
-            function ($alias, $ofLocale) { return array($alias, $ofLocale); },
+            function ($alias, $ofLocale) { return [$alias, $ofLocale]; },
             array_keys($this->getLocaleAliases()),
             $this->getLocaleAliases()
         );
@@ -703,7 +703,7 @@ abstract class AbstractDataProviderTest extends TestCase
     public function provideRootLocales()
     {
         return array_map(
-            function ($locale) { return array($locale); },
+            function ($locale) { return [$locale]; },
             $this->getRootLocales()
         );
     }

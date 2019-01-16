@@ -112,12 +112,12 @@ class ExceptionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::EXCEPTION => array(
-                array('logKernelException', 0),
-                array('onKernelException', -128),
-            ),
-        );
+        return [
+            KernelEvents::EXCEPTION => [
+                ['logKernelException', 0],
+                ['onKernelException', -128],
+            ],
+        ];
     }
 
     /**
@@ -130,9 +130,9 @@ class ExceptionListener implements EventSubscriberInterface
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                $this->logger->critical($message, array('exception' => $exception));
+                $this->logger->critical($message, ['exception' => $exception]);
             } else {
-                $this->logger->error($message, array('exception' => $exception));
+                $this->logger->error($message, ['exception' => $exception]);
             }
         }
     }
@@ -147,7 +147,7 @@ class ExceptionListener implements EventSubscriberInterface
      */
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
-        $attributes = array(
+        $attributes = [
             'exception' => $exception = FlattenException::create($exception),
             '_controller' => $this->controller ?: function () use ($exception) {
                 $handler = new ExceptionHandler($this->debug, $this->charset, $this->fileLinkFormat);
@@ -155,7 +155,7 @@ class ExceptionListener implements EventSubscriberInterface
                 return new Response($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders());
             },
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-        );
+        ];
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');
 

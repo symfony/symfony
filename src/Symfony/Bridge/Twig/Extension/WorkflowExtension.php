@@ -32,13 +32,13 @@ class WorkflowExtension extends AbstractExtension
 
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('workflow_can', array($this, 'canTransition')),
-            new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
-            new TwigFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
-            new TwigFunction('workflow_marked_places', array($this, 'getMarkedPlaces')),
-            new TwigFunction('workflow_metadata', array($this, 'getMetadata')),
-        );
+        return [
+            new TwigFunction('workflow_can', [$this, 'canTransition']),
+            new TwigFunction('workflow_transitions', [$this, 'getEnabledTransitions']),
+            new TwigFunction('workflow_has_marked_place', [$this, 'hasMarkedPlace']),
+            new TwigFunction('workflow_marked_places', [$this, 'getMarkedPlaces']),
+            new TwigFunction('workflow_metadata', [$this, 'getMetadata']),
+        ];
     }
 
     /**

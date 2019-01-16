@@ -37,10 +37,10 @@ class HandlersLocator implements HandlersLocatorInterface
      */
     public function getHandlers(Envelope $envelope): iterable
     {
-        $seen = array();
+        $seen = [];
 
         foreach (self::listTypes($envelope) as $type) {
-            foreach ($this->handlers[$type] ?? array() as $alias => $handler) {
+            foreach ($this->handlers[$type] ?? [] as $alias => $handler) {
                 if (!\in_array($handler, $seen, true)) {
                     yield $alias => $seen[] = $handler;
                 }
@@ -55,9 +55,9 @@ class HandlersLocator implements HandlersLocatorInterface
     {
         $class = \get_class($envelope->getMessage());
 
-        return array($class => $class)
+        return [$class => $class]
             + class_parents($class)
             + class_implements($class)
-            + array('*' => '*');
+            + ['*' => '*'];
     }
 }

@@ -32,7 +32,7 @@ use Symfony\Component\Routing\Router as BaseRouter;
 class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberInterface
 {
     private $container;
-    private $collectedParameters = array();
+    private $collectedParameters = [];
     private $paramFetcher;
 
     /**
@@ -43,7 +43,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * @param ContainerInterface|null $parameters A ContainerInterface instance allowing to fetch parameters
      * @param LoggerInterface|null    $logger
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container, $resource, array $options = [], RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null)
     {
         $this->container = $container;
         $this->resource = $resource;
@@ -52,9 +52,9 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
         $this->setOptions($options);
 
         if ($parameters) {
-            $this->paramFetcher = array($parameters, 'get');
+            $this->paramFetcher = [$parameters, 'get'];
         } elseif ($container instanceof SymfonyContainerInterface) {
-            $this->paramFetcher = array($container, 'getParameter');
+            $this->paramFetcher = [$container, 'getParameter'];
         } else {
             throw new \LogicException(sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
         }
@@ -112,13 +112,13 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
 
-            $schemes = array();
+            $schemes = [];
             foreach ($route->getSchemes() as $scheme) {
                 $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
             }
             $route->setSchemes($schemes);
 
-            $methods = array();
+            $methods = [];
             foreach ($route->getMethods() as $method) {
                 $methods = array_merge($methods, explode('|', $this->resolve($method)));
             }
@@ -181,8 +181,8 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'routing.loader' => LoaderInterface::class,
-        );
+        ];
     }
 }

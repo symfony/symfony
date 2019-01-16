@@ -49,7 +49,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties($class, array $context = [])
     {
         try {
             $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
@@ -75,7 +75,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = [])
     {
         try {
             $metadata = $this->entityManager ? $this->entityManager->getClassMetadata($class) : $this->classMetadataFactory->getMetadataFor($class);
@@ -97,7 +97,7 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     $nullable = false;
                 }
 
-                return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class));
+                return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class)];
             }
 
             $collectionKeyType = Type::BUILTIN_TYPE_INT;
@@ -124,18 +124,18 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 }
             }
 
-            return array(new Type(
+            return [new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
                 new Type($collectionKeyType),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
-            ));
+            )];
         }
 
         if ($metadata instanceof ClassMetadataInfo && class_exists('Doctrine\ORM\Mapping\Embedded') && isset($metadata->embeddedClasses[$property])) {
-            return array(new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class']));
+            return [new Type(Type::BUILTIN_TYPE_OBJECT, false, $metadata->embeddedClasses[$property]['class'])];
         }
 
         if ($metadata->hasField($property)) {
@@ -148,30 +148,30 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 case DBALType::DATETIMETZ:
                 case 'vardatetime':
                 case DBALType::TIME:
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
 
                 case 'date_immutable':
                 case 'datetime_immutable':
                 case 'datetimetz_immutable':
                 case 'time_immutable':
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
 
                 case 'dateinterval':
-                    return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval'));
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateInterval')];
 
                 case DBALType::TARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                 case DBALType::SIMPLE_ARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))];
 
                 case DBALType::JSON_ARRAY:
-                    return array(new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true));
+                    return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
 
                 default:
                     $builtinType = $this->getPhpType($typeOfField);
 
-                    return $builtinType ? array(new Type($builtinType, $nullable)) : null;
+                    return $builtinType ? [new Type($builtinType, $nullable)] : null;
             }
         }
     }

@@ -35,5 +35,5 @@ interface NormalizableInterface
      *
      * @return array|string|int|float|bool
      */
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []);
 }

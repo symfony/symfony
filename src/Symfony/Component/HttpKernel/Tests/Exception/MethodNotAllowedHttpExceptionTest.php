@@ -8,17 +8,17 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
 {
     public function testHeadersDefault()
     {
-        $exception = new MethodNotAllowedHttpException(array('GET', 'PUT'));
-        $this->assertSame(array('Allow' => 'GET, PUT'), $exception->getHeaders());
+        $exception = new MethodNotAllowedHttpException(['GET', 'PUT']);
+        $this->assertSame(['Allow' => 'GET, PUT'], $exception->getHeaders());
     }
 
     public function testWithHeaderConstruct()
     {
-        $headers = array(
+        $headers = [
             'Cache-Control' => 'public, s-maxage=1200',
-        );
+        ];
 
-        $exception = new MethodNotAllowedHttpException(array('get'), null, null, null, $headers);
+        $exception = new MethodNotAllowedHttpException(['get'], null, null, null, $headers);
 
         $headers['Allow'] = 'GET';
 
@@ -30,7 +30,7 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
      */
     public function testHeadersSetter($headers)
     {
-        $exception = new MethodNotAllowedHttpException(array('GET'));
+        $exception = new MethodNotAllowedHttpException(['GET']);
         $exception->setHeaders($headers);
         $this->assertSame($headers, $exception->getHeaders());
     }

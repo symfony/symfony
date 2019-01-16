@@ -107,7 +107,7 @@ class ControllerResolver implements ControllerResolverInterface
         list($class, $method) = explode('::', $controller, 2);
 
         try {
-            return array($this->instantiateController($class), $method);
+            return [$this->instantiateController($class), $method];
         } catch (\Error | \LogicException $e) {
             try {
                 if ((new \ReflectionMethod($class, $method))->isStatic()) {
@@ -155,7 +155,7 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (!isset($callable[0]) || !isset($callable[1]) || 2 !== \count($callable)) {
-            return 'Invalid array callable, expected array(controller, method).';
+            return 'Invalid array callable, expected [controller, method].';
         }
 
         list($controller, $method) = $callable;
@@ -172,7 +172,7 @@ class ControllerResolver implements ControllerResolverInterface
 
         $collection = $this->getClassMethodsWithoutMagicMethods($controller);
 
-        $alternatives = array();
+        $alternatives = [];
 
         foreach ($collection as $item) {
             $lev = levenshtein($method, $item);

@@ -36,13 +36,13 @@ class AddValidatorInitializersPassTest extends TestCase
         ;
         $container
             ->register('validator.builder')
-            ->addArgument(array())
+            ->addArgument([])
         ;
 
         (new AddValidatorInitializersPass())->process($container);
 
         $this->assertEquals(
-            array(array('addObjectInitializers', array(array(new Reference('initializer1'), new Reference('initializer2'))))),
+            [['addObjectInitializers', [[new Reference('initializer1'), new Reference('initializer2')]]]],
             $container->getDefinition('validator.builder')->getMethodCalls()
         );
     }
@@ -59,7 +59,7 @@ class AddValidatorInitializersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('validator.builder')
-            ->addMethodCall('setTranslator', array(new Reference('translator')))
+            ->addMethodCall('setTranslator', [new Reference('translator')])
         ;
 
         $container->register('translator', TestTranslator::class);
@@ -67,7 +67,7 @@ class AddValidatorInitializersPassTest extends TestCase
         (new AddValidatorInitializersPass())->process($container);
 
         $this->assertEquals(
-            array(array('setTranslator', array((new Definition(LegacyTranslatorProxy::class))->addArgument(new Reference('translator'))))),
+            [['setTranslator', [(new Definition(LegacyTranslatorProxy::class))->addArgument(new Reference('translator'))]]],
             $container->getDefinition('validator.builder')->removeMethodCall('addObjectInitializers')->getMethodCalls()
         );
     }

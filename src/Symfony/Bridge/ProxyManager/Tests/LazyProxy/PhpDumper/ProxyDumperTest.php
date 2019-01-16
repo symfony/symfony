@@ -94,18 +94,18 @@ class ProxyDumperTest extends TestCase
 
     public function getPrivatePublicDefinitions()
     {
-        return array(
-            array(
+        return [
+            [
                 (new Definition(__CLASS__))
                     ->setPublic(false),
                 'privates',
-            ),
-            array(
+            ],
+            [
                 (new Definition(__CLASS__))
                     ->setPublic(true),
                 'services',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -125,8 +125,8 @@ class ProxyDumperTest extends TestCase
         $definition = new Definition($class);
 
         $definition->setLazy(true);
-        $definition->addTag('proxy', array('interface' => DummyInterface::class));
-        $definition->addTag('proxy', array('interface' => SunnyInterface::class));
+        $definition->addTag('proxy', ['interface' => DummyInterface::class]);
+        $definition->addTag('proxy', ['interface' => SunnyInterface::class]);
 
         $implem = "<?php\n\n".$this->dumper->getProxyCode($definition);
         $factory = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFooService(false)');
@@ -136,7 +136,7 @@ class ProxyDumperTest extends TestCase
 return new class
 {
     public \$proxyClass;
-    private \$privates = array();
+    private \$privates = [];
 
     public function getFooService(\$lazyLoad = true)
     {
@@ -179,12 +179,12 @@ EOPHP;
      */
     public function getProxyCandidates()
     {
-        $definitions = array(
-            array(new Definition(__CLASS__), true),
-            array(new Definition('stdClass'), true),
-            array(new Definition(uniqid('foo', true)), false),
-            array(new Definition(), false),
-        );
+        $definitions = [
+            [new Definition(__CLASS__), true],
+            [new Definition('stdClass'), true],
+            [new Definition(uniqid('foo', true)), false],
+            [new Definition(), false],
+        ];
 
         array_map(
             function ($definition) {

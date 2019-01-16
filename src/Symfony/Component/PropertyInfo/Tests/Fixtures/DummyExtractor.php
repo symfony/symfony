@@ -26,7 +26,7 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = array())
+    public function getShortDescription($class, $property, array $context = [])
     {
         return 'short';
     }
@@ -34,7 +34,7 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = array())
+    public function getLongDescription($class, $property, array $context = [])
     {
         return 'long';
     }
@@ -42,23 +42,15 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = [])
     {
-        return array(new Type(Type::BUILTIN_TYPE_INT));
+        return [new Type(Type::BUILTIN_TYPE_INT)];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = array())
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isWritable($class, $property, array $context = array())
+    public function isReadable($class, $property, array $context = [])
     {
         return true;
     }
@@ -66,15 +58,23 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function isWritable($class, $property, array $context = [])
     {
-        return array('a', 'b');
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isInitializable(string $class, string $property, array $context = array()): ?bool
+    public function getProperties($class, array $context = [])
+    {
+        return ['a', 'b'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInitializable(string $class, string $property, array $context = []): ?bool
     {
         return true;
     }

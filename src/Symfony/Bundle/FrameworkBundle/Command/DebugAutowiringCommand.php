@@ -35,10 +35,10 @@ class DebugAutowiringCommand extends ContainerDebugCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('search', InputArgument::OPTIONAL, 'A search filter'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Show also services that are not aliased'),
-            ))
+            ])
             ->setDescription('Lists classes/interfaces you can use for autowiring')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays the classes and interfaces that
@@ -65,7 +65,7 @@ EOF
 
         $builder = $this->getContainerBuilder();
         $serviceIds = $builder->getServiceIds();
-        $serviceIds = array_filter($serviceIds, array($this, 'filterToServiceTypes'));
+        $serviceIds = array_filter($serviceIds, [$this, 'filterToServiceTypes']);
 
         if ($search = $input->getArgument('search')) {
             $serviceIds = array_filter($serviceIds, function ($serviceId) use ($search) {
@@ -86,11 +86,11 @@ EOF
         if ($search) {
             $io->text(sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
-        $hasAlias = array();
+        $hasAlias = [];
         $all = $input->getOption('all');
         $previousId = '-';
         foreach ($serviceIds as $serviceId) {
-            $text = array();
+            $text = [];
             if (0 !== strpos($serviceId, $previousId)) {
                 $text[] = '';
                 if ('' !== $description = Descriptor::getClassDescription($serviceId, $serviceId)) {

@@ -1,21 +1,21 @@
 <?php
 
-$container->loadFromExtension('security', array(
-    'providers' => array(
-        'default' => array(
-            'memory' => array(
-                'users' => array(
-                    'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
-                ),
-            ),
-        ),
-    ),
+$container->loadFromExtension('security', [
+    'providers' => [
+        'default' => [
+            'memory' => [
+                'users' => [
+                    'foo' => ['password' => 'foo', 'roles' => 'ROLE_USER'],
+                ],
+            ],
+        ],
+    ],
 
-    'firewalls' => array(
-        'simple_auth' => array(
+    'firewalls' => [
+        'simple_auth' => [
             'provider' => 'default',
             'anonymous' => true,
-            'simple_form' => array('authenticator' => 'simple_authenticator'),
-        ),
-    ),
-));
+            'simple_form' => ['authenticator' => 'simple_authenticator'],
+        ],
+    ],
+]);

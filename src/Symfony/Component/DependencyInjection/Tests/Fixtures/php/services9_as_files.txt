@@ -2,7 +2,7 @@ Array
 (
     [Container%s/removed-ids.php] => <?php
 
-return array(
+return [
     'Psr\\Container\\ContainerInterface' => true,
     'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
     'configurator_service' => true,
@@ -15,7 +15,7 @@ return array(
     'inlined' => true,
     'new_factory' => true,
     'tagged_iterator_foo' => true,
-);
+];
 
     [Container%s/getBAR2Service.php] => <?php
 
@@ -170,11 +170,11 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 $a = ($this->services['foo.baz'] ?? $this->load('getFoo_BazService.php'));
 
-$this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
+$this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $this);
 
 $instance->foo = 'bar';
 $instance->moo = $a;
-$instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
+$instance->qux = ['bar' => 'foo is bar', 'foobar' => 'bar'];
 $instance->setBar(($this->services['bar'] ?? $this->getBarService()));
 $instance->initialize();
 sc_configure($instance);
@@ -374,9 +374,9 @@ class ProjectServiceContainer extends Container
     private $buildParameters;
     private $containerDir;
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
-    public function __construct(array $buildParameters = array(), $containerDir = __DIR__)
+    public function __construct(array $buildParameters = [], $containerDir = __DIR__)
     {
         $dir = $this->targetDirs[0] = \dirname($containerDir);
         for ($i = 1; $i <= 5; ++$i) {
@@ -386,14 +386,14 @@ class ProjectServiceContainer extends Container
         $this->containerDir = $containerDir;
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->syntheticIds = array(
+        $this->services = $this->privates = [];
+        $this->syntheticIds = [
             'request' => true,
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'bar' => 'getBarService',
-        );
-        $this->fileMap = array(
+        ];
+        $this->fileMap = [
             'BAR' => 'getBAR2Service.php',
             'BAR2' => 'getBAR22Service.php',
             'bar2' => 'getBar23Service.php',
@@ -418,12 +418,12 @@ class ProjectServiceContainer extends Container
             'service_from_static_method' => 'getServiceFromStaticMethodService.php',
             'tagged_iterator' => 'getTaggedIteratorService.php',
             'throwing_one' => 'getThrowingOneService.php',
-        );
-        $this->aliases = array(
+        ];
+        $this->aliases = [
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
-        );
+        ];
     }
 
     public function compile()
@@ -510,8 +510,8 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -534,11 +534,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'baz_class' => 'BazClass',
             'foo_class' => 'Bar\\FooClass',
             'foo' => 'bar',
-        );
+        ];
     }
 
     protected function throw($message)
@@ -563,10 +563,10 @@ if (!\class_exists(ProjectServiceContainer::class, false)) {
     \class_alias(\Container%s\ProjectServiceContainer::class, ProjectServiceContainer::class, false);
 }
 
-return new \Container%s\ProjectServiceContainer(array(
+return new \Container%s\ProjectServiceContainer([
     'container.build_hash' => '%s',
     'container.build_id' => '%s',
     'container.build_time' => %d,
-), __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
+], __DIR__.\DIRECTORY_SEPARATOR.'Container%s');
 
 )

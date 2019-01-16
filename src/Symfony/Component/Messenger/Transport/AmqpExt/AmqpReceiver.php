@@ -54,10 +54,10 @@ class AmqpReceiver implements ReceiverInterface
             }
 
             try {
-                $handler($this->serializer->decode(array(
+                $handler($this->serializer->decode([
                     'body' => $AMQPEnvelope->getBody(),
                     'headers' => $AMQPEnvelope->getHeaders(),
-                )));
+                ]));
 
                 $this->connection->ack($AMQPEnvelope);
             } catch (RejectMessageExceptionInterface $e) {

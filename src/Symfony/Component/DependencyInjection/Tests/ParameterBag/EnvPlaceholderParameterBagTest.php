@@ -137,7 +137,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
-        $bag->set('env(ARRAY_VAR)', array());
+        $bag->set('env(ARRAY_VAR)', []);
         $bag->resolve();
     }
 
@@ -158,7 +158,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     public function testGetThrowsOnBadDefaultValue()
     {
         $bag = new EnvPlaceholderParameterBag();
-        $bag->set('env(ARRAY_VAR)', array());
+        $bag->set('env(ARRAY_VAR)', []);
         $bag->get('env(ARRAY_VAR)');
         $bag->resolve();
     }

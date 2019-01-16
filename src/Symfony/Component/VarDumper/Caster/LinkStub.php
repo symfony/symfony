@@ -66,7 +66,7 @@ class LinkStub extends ConstStub
     private function getComposerRoot($file, &$inVendor)
     {
         if (null === self::$vendorRoots) {
-            self::$vendorRoots = array();
+            self::$vendorRoots = [];
 
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {

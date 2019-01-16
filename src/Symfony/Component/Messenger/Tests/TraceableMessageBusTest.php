@@ -31,15 +31,15 @@ class TraceableMessageBusTest extends TestCase
         $line = __LINE__ + 1;
         $traceableBus->dispatch($message);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
-            'stamps' => array(),
-            'caller' => array(
+            'stamps' => [],
+            'caller' => [
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
                 'line' => $line,
-            ),
-        ), $tracedMessages[0], true);
+            ],
+        ], $tracedMessages[0], true);
     }
 
     public function testItTracesDispatchWithEnvelope()
@@ -54,15 +54,15 @@ class TraceableMessageBusTest extends TestCase
         $line = __LINE__ + 1;
         $traceableBus->dispatch($envelope);
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
-            'stamps' => array(array($stamp)),
-            'caller' => array(
+            'stamps' => [[$stamp]],
+            'caller' => [
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
                 'line' => $line,
-            ),
-        ), $tracedMessages[0], true);
+            ],
+        ], $tracedMessages[0], true);
     }
 
     public function testItTracesExceptions()
@@ -82,15 +82,15 @@ class TraceableMessageBusTest extends TestCase
         }
 
         $this->assertCount(1, $tracedMessages = $traceableBus->getDispatchedMessages());
-        $this->assertArraySubset(array(
+        $this->assertArraySubset([
             'message' => $message,
             'exception' => $exception,
-            'stamps' => array(),
-            'caller' => array(
+            'stamps' => [],
+            'caller' => [
                 'name' => 'TraceableMessageBusTest.php',
                 'file' => __FILE__,
                 'line' => $line,
-            ),
-        ), $tracedMessages[0], true);
+            ],
+        ], $tracedMessages[0], true);
     }
 }

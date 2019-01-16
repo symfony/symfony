@@ -33,16 +33,16 @@ class ClassStub extends ConstStub
                 if ($callable instanceof \Closure) {
                     $r = new \ReflectionFunction($callable);
                 } elseif (\is_object($callable)) {
-                    $r = array($callable, '__invoke');
+                    $r = [$callable, '__invoke'];
                 } elseif (\is_array($callable)) {
                     $r = $callable;
                 } elseif (false !== $i = strpos($callable, '::')) {
-                    $r = array(substr($callable, 0, $i), substr($callable, 2 + $i));
+                    $r = [substr($callable, 0, $i), substr($callable, 2 + $i)];
                 } else {
                     $r = new \ReflectionFunction($callable);
                 }
             } elseif (0 < $i = strpos($identifier, '::') ?: strpos($identifier, '->')) {
-                $r = array(substr($identifier, 0, $i), substr($identifier, 2 + $i));
+                $r = [substr($identifier, 0, $i), substr($identifier, 2 + $i)];
             } else {
                 $r = new \ReflectionClass($identifier);
             }
@@ -62,7 +62,7 @@ class ClassStub extends ConstStub
             }
 
             if (null !== $callable && $r instanceof \ReflectionFunctionAbstract) {
-                $s = ReflectionCaster::castFunctionAbstract($r, array(), new Stub(), true);
+                $s = ReflectionCaster::castFunctionAbstract($r, [], new Stub(), true);
                 $s = ReflectionCaster::getSignature($s);
 
                 if ('()' === substr($identifier, -2)) {

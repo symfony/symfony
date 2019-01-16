@@ -26,7 +26,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     private $optionalsEnabled = false;
     private $onlyOptionalsEnabled = false;
 
-    public function __construct(iterable $warmers = array(), bool $debug = false, string $deprecationLogsFilepath = null)
+    public function __construct(iterable $warmers = [], bool $debug = false, string $deprecationLogsFilepath = null)
     {
         $this->warmers = $warmers;
         $this->debug = $debug;
@@ -51,7 +51,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     public function warmUp($cacheDir)
     {
         if ($this->debug) {
-            $collectedLogs = array();
+            $collectedLogs = [];
             $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL');
             $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                 if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
@@ -73,14 +73,14 @@ class CacheWarmerAggregate implements CacheWarmerInterface
                     }
                 }
 
-                $collectedLogs[$message] = array(
+                $collectedLogs[$message] = [
                     'type' => $type,
                     'message' => $message,
                     'file' => $file,
                     'line' => $line,
                     'trace' => $backtrace,
                     'count' => 1,
-                );
+                ];
             });
         }
 

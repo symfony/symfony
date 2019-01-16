@@ -46,7 +46,7 @@ trait CacheTrait
 
         $item = $pool->getItem($key);
         $recompute = !$item->isHit() || INF === $beta;
-        $metadata = $item instanceof ItemInterface ? $item->getMetadata() : array();
+        $metadata = $item instanceof ItemInterface ? $item->getMetadata() : [];
 
         if (!$recompute && $metadata) {
             $expiry = $metadata[ItemInterface::METADATA_EXPIRY] ?? false;

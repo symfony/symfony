@@ -25,7 +25,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
 {
     private $pool;
     private $miss;
-    private $calls = array();
+    private $calls = [];
 
     public function __construct(CacheInterface $pool)
     {
@@ -100,7 +100,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
     public function setMultiple($values, $ttl = null)
     {
         $event = $this->start(__FUNCTION__);
-        $event->result['keys'] = array();
+        $event->result['keys'] = [];
 
         if ($values instanceof \Traversable) {
             $values = function () use ($values, $event) {
@@ -134,7 +134,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
             $event->end = microtime(true);
         }
         $f = function () use ($result, $event, $miss, $default) {
-            $event->result = array();
+            $event->result = [];
             foreach ($result as $key => $value) {
                 if ($event->result[$key] = $miss !== $value) {
                     ++$event->hits;
@@ -217,7 +217,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
         try {
             return $this->calls;
         } finally {
-            $this->calls = array();
+            $this->calls = [];
         }
     }
 

@@ -44,7 +44,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         $debug = $container->getParameter('kernel.debug');
-        $voterServices = array();
+        $voterServices = [];
         foreach ($voters as $voter) {
             $voterServiceId = (string) $voter;
             $definition = $container->getDefinition($voterServiceId);

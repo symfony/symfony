@@ -43,11 +43,11 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
-    private $initializers = array();
-    private $loaders = array();
-    private $xmlMappings = array();
-    private $yamlMappings = array();
-    private $methodMappings = array();
+    private $initializers = [];
+    private $loaders = [];
+    private $xmlMappings = [];
+    private $yamlMappings = [];
+    private $methodMappings = [];
 
     /**
      * @var Reader|null
@@ -288,7 +288,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function getLoaders()
     {
-        $loaders = array();
+        $loaders = [];
 
         foreach ($this->xmlMappings as $xmlMapping) {
             $loaders[] = new XmlFileLoader($xmlMapping);

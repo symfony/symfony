@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  */
 class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
 {
-    private $config = array();
+    private $config = [];
 
     /**
      * Argon2iPasswordEncoder constructor.
@@ -33,11 +33,11 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
     public function __construct(int $memoryCost = null, int $timeCost = null, int $threads = null)
     {
         if (\defined('PASSWORD_ARGON2I')) {
-            $this->config = array(
+            $this->config = [
                 'memory_cost' => $memoryCost ?? \PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
                 'time_cost' => $timeCost ?? \PASSWORD_ARGON2_DEFAULT_TIME_COST,
                 'threads' => $threads ?? \PASSWORD_ARGON2_DEFAULT_THREADS,
-            );
+            ];
         }
     }
 

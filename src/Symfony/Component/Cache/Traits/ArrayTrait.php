@@ -24,8 +24,8 @@ trait ArrayTrait
     use LoggerAwareTrait;
 
     private $storeSerialized;
-    private $values = array();
-    private $expiries = array();
+    private $values = [];
+    private $expiries = [];
 
     /**
      * Returns all cached values, with cache miss as null.
@@ -69,7 +69,7 @@ trait ArrayTrait
      */
     public function clear()
     {
-        $this->values = $this->expiries = array();
+        $this->values = $this->expiries = [];
 
         return true;
     }
@@ -128,7 +128,7 @@ trait ArrayTrait
                 $serialized = serialize($value);
             } catch (\Exception $e) {
                 $type = \is_object($value) ? \get_class($value) : \gettype($value);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => $key, 'type' => $type, 'exception' => $e));
+                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => $key, 'type' => $type, 'exception' => $e]);
 
                 return;
             }
@@ -150,7 +150,7 @@ trait ArrayTrait
             try {
                 $value = unserialize($value);
             } catch (\Exception $e) {
-                CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
+                CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', ['key' => $key, 'exception' => $e]);
                 $value = false;
             }
             if (false === $value) {

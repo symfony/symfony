@@ -38,7 +38,7 @@ class ClassMetadataTest extends TestCase
         $classMetadata->addAttributeMetadata($a1);
         $classMetadata->addAttributeMetadata($a2);
 
-        $this->assertEquals(array('a1' => $a1, 'a2' => $a2), $classMetadata->getAttributesMetadata());
+        $this->assertEquals(['a1' => $a1, 'a2' => $a2], $classMetadata->getAttributesMetadata());
     }
 
     public function testMerge()
@@ -48,11 +48,11 @@ class ClassMetadataTest extends TestCase
 
         $ac1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $ac1->method('getName')->willReturn('a1');
-        $ac1->method('getGroups')->willReturn(array('a', 'b'));
+        $ac1->method('getGroups')->willReturn(['a', 'b']);
 
         $ac2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $ac2->method('getName')->willReturn('a1');
-        $ac2->method('getGroups')->willReturn(array('b', 'c'));
+        $ac2->method('getGroups')->willReturn(['b', 'c']);
 
         $classMetadata1->addAttributeMetadata($ac1);
         $classMetadata2->addAttributeMetadata($ac2);
@@ -61,7 +61,7 @@ class ClassMetadataTest extends TestCase
 
         $ac1->method('getGroups')->willReturn('a', 'b', 'c');
 
-        $this->assertEquals(array('a1' => $ac1), $classMetadata2->getAttributesMetadata());
+        $this->assertEquals(['a1' => $ac1], $classMetadata2->getAttributesMetadata());
     }
 
     public function testSerialize()

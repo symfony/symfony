@@ -34,9 +34,9 @@ class ServerStopCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
-            ))
+            ])
             ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> stops the local web server:

@@ -19,15 +19,15 @@ class ConfigurationTest extends TestCase
 {
     public function testDoNoDuplicateDefaultFormResources()
     {
-        $input = array(
+        $input = [
             'strict_variables' => false, // to be removed in 5.0 relying on default
-            'form_themes' => array('form_div_layout.html.twig'),
-        );
+            'form_themes' => ['form_div_layout.html.twig'],
+        ];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array($input));
+        $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertEquals(array('form_div_layout.html.twig'), $config['form_themes']);
+        $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
     }
 
     /**
@@ -37,34 +37,34 @@ class ConfigurationTest extends TestCase
     public function testGetStrictVariablesDefaultFalse()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array(array()));
+        $config = $processor->processConfiguration(new Configuration(), [[]]);
 
         $this->assertFalse($config['strict_variables']);
     }
 
     public function testGlobalsAreNotNormalized()
     {
-        $input = array(
+        $input = [
             'strict_variables' => false, // to be removed in 5.0 relying on default
-            'globals' => array('some-global' => true),
-        );
+            'globals' => ['some-global' => true],
+        ];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array($input));
+        $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertSame(array('some-global' => array('value' => true)), $config['globals']);
+        $this->assertSame(['some-global' => ['value' => true]], $config['globals']);
     }
 
     public function testArrayKeysInGlobalsAreNotNormalized()
     {
-        $input = array(
+        $input = [
             'strict_variables' => false, // to be removed in 5.0 relying on default
-            'globals' => array('global' => array('some-key' => 'some-value')),
-        );
+            'globals' => ['global' => ['some-key' => 'some-value']],
+        ];
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), array($input));
+        $config = $processor->processConfiguration(new Configuration(), [$input]);
 
-        $this->assertSame(array('global' => array('value' => array('some-key' => 'some-value'))), $config['globals']);
+        $this->assertSame(['global' => ['value' => ['some-key' => 'some-value']]], $config['globals']);
     }
 }

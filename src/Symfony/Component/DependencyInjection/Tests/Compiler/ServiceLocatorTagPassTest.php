@@ -48,9 +48,9 @@ class ServiceLocatorTagPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments(array(array(
+            ->setArguments([[
                 'dummy',
-            )))
+            ]])
             ->addTag('container.service_locator')
         ;
 
@@ -65,11 +65,11 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', CustomDefinition::class);
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments(array(array(
+            ->setArguments([[
                 new Reference('bar'),
                 new Reference('baz'),
                 'some.service' => new Reference('bar'),
-            )))
+            ]])
             ->addTag('container.service_locator')
         ;
 
@@ -91,10 +91,10 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', TestDefinition2::class);
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments(array(array(
+            ->setArguments([[
                 new Reference('bar'),
                 'bar' => new Reference('baz'),
-            )))
+            ]])
             ->addTag('container.service_locator')
         ;
 
@@ -114,10 +114,10 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', TestDefinition2::class);
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments(array(array(
+            ->setArguments([[
                 'bar' => new Reference('baz'),
                 new Reference('bar'),
-            )))
+            ]])
             ->addTag('container.service_locator')
         ;
 

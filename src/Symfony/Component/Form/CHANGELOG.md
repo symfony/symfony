@@ -33,7 +33,7 @@ CHANGELOG
    {
        public static function getExtendedTypes(): iterable
        {
-           return array(FormType::class);
+           return [FormType::class];
        }
 
        // ...

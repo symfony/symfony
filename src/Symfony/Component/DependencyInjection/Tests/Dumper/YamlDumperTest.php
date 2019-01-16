@@ -75,7 +75,7 @@ class YamlDumperTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_dump_load.yml');
 
-        $this->assertEquals(array(new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)), $container->getDefinition('foo')->getArguments());
+        $this->assertEquals([new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $container->getDefinition('foo')->getArguments());
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_dump_load.yml', $dumper->dump());

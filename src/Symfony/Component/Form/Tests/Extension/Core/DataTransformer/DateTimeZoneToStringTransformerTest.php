@@ -34,8 +34,8 @@ class DateTimeZoneToStringTransformerTest extends TestCase
         $this->assertNull($transformer->transform(null));
         $this->assertNull($transformer->reverseTransform(null));
 
-        $this->assertSame(array('Europe/Amsterdam'), $transformer->transform(array(new \DateTimeZone('Europe/Amsterdam'))));
-        $this->assertEquals(array(new \DateTimeZone('Europe/Amsterdam')), $transformer->reverseTransform(array('Europe/Amsterdam')));
+        $this->assertSame(['Europe/Amsterdam'], $transformer->transform([new \DateTimeZone('Europe/Amsterdam')]));
+        $this->assertEquals([new \DateTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
     }
 
     /**
@@ -51,6 +51,6 @@ class DateTimeZoneToStringTransformerTest extends TestCase
      */
     public function testUnknownTimezone()
     {
-        (new DateTimeZoneToStringTransformer(true))->reverseTransform(array('Foo/Bar'));
+        (new DateTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
     }
 }

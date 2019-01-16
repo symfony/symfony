@@ -1,15 +1,15 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('framework', [
     'serializer' => true,
-    'messenger' => array(
+    'messenger' => [
         'serializer' => 'messenger.transport.symfony_serializer',
-        'transports' => array(
+        'transports' => [
             'default' => 'amqp://localhost/%2f/messages',
-            'customised' => array(
+            'customised' => [
                 'dsn' => 'amqp://localhost/%2f/messages?exchange_name=exchange_name',
-                'options' => array('queue' => array('name' => 'Queue')),
-            ),
-        ),
-    ),
-));
+                'options' => ['queue' => ['name' => 'Queue']],
+            ],
+        ],
+    ],
+]);

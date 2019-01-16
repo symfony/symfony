@@ -34,8 +34,8 @@ class ResolveClassPassTest extends TestCase
 
     public function provideValidClassId()
     {
-        yield array('Acme\UnknownClass');
-        yield array(CaseSensitiveClass::class);
+        yield ['Acme\UnknownClass'];
+        yield [CaseSensitiveClass::class];
     }
 
     /**
@@ -53,9 +53,9 @@ class ResolveClassPassTest extends TestCase
 
     public function provideInvalidClassId()
     {
-        yield array(\stdClass::class);
-        yield array('bar');
-        yield array('\DateTime');
+        yield [\stdClass::class];
+        yield ['bar'];
+        yield ['\DateTime'];
     }
 
     public function testNonFqcnChildDefinition()

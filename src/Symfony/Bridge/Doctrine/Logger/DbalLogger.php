@@ -42,7 +42,7 @@ class DbalLogger implements SQLLogger
         }
 
         if (null !== $this->logger) {
-            $this->log($sql, null === $params ? array() : $this->normalizeParams($params));
+            $this->log($sql, null === $params ? [] : $this->normalizeParams($params));
         }
     }
 

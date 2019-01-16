@@ -28,12 +28,12 @@ class ControllerDoesNotReturnResponseException extends \LogicException
         $this->line = $controllerDefinition['line'];
         $r = new \ReflectionProperty(\Exception::class, 'trace');
         $r->setAccessible(true);
-        $r->setValue($this, array_merge(array(
-            array(
+        $r->setValue($this, array_merge([
+            [
                 'line' => $line,
                 'file' => $file,
-            ),
-        ), $this->getTrace()));
+            ],
+        ], $this->getTrace()));
     }
 
     private function parseControllerDefinition(callable $controller): ?array
@@ -46,10 +46,10 @@ class ControllerDoesNotReturnResponseException extends \LogicException
             try {
                 $r = new \ReflectionMethod($controller[0], $controller[1]);
 
-                return array(
+                return [
                     'file' => $r->getFileName(),
                     'line' => $r->getEndLine(),
-                );
+                ];
             } catch (\ReflectionException $e) {
                 return null;
             }
@@ -58,19 +58,19 @@ class ControllerDoesNotReturnResponseException extends \LogicException
         if ($controller instanceof \Closure) {
             $r = new \ReflectionFunction($controller);
 
-            return array(
+            return [
                 'file' => $r->getFileName(),
                 'line' => $r->getEndLine(),
-            );
+            ];
         }
 
         if (\is_object($controller)) {
             $r = new \ReflectionClass($controller);
 
-            return array(
+            return [
                 'file' => $r->getFileName(),
                 'line' => $r->getEndLine(),
-            );
+            ];
         }
 
         return null;

@@ -54,7 +54,7 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -62,8 +62,8 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
-        return $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+        return $this->translator->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
     }
 }

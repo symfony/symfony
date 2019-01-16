@@ -32,7 +32,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var array
      */
-    private $elements = array();
+    private $elements = [];
 
     /**
      * The number of elements in the property path.
@@ -47,7 +47,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @var array
      */
-    private $isIndex = array();
+    private $isIndex = [];
 
     /**
      * String representation of the path.

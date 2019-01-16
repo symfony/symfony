@@ -32,7 +32,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
     private $sessionId;
     private $sessionOptions;
 
-    public function __construct(array $sessionOptions = array())
+    public function __construct(array $sessionOptions = [])
     {
         $this->sessionOptions = $sessionOptions;
     }
@@ -78,7 +78,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         }
 
         if ($session instanceof Session ? !$session->isEmpty() || (null !== $this->sessionId && $session->getId() !== $this->sessionId) : $wasStarted) {
-            $params = session_get_cookie_params() + array('samesite' => null);
+            $params = session_get_cookie_params() + ['samesite' => null];
             foreach ($this->sessionOptions as $k => $v) {
                 if (0 === strpos($k, 'cookie_')) {
                     $params[substr($k, 7)] = $v;
@@ -98,10 +98,10 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 192),
-            KernelEvents::RESPONSE => array('onKernelResponse', -128),
-        );
+        return [
+            KernelEvents::REQUEST => ['onKernelRequest', 192],
+            KernelEvents::RESPONSE => ['onKernelResponse', -128],
+        ];
     }
 
     /**

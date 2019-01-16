@@ -19,14 +19,14 @@ class DefaultMarshallerTest extends TestCase
     public function testSerialize()
     {
         $marshaller = new DefaultMarshaller();
-        $values = array(
+        $values = [
             'a' => 123,
             'b' => function () {},
-        );
+        ];
 
-        $expected = array('a' => \extension_loaded('igbinary') ? igbinary_serialize(123) : serialize(123));
+        $expected = ['a' => \extension_loaded('igbinary') ? igbinary_serialize(123) : serialize(123)];
         $this->assertSame($expected, $marshaller->marshall($values, $failed));
-        $this->assertSame(array('b'), $failed);
+        $this->assertSame(['b'], $failed);
     }
 
     public function testNativeUnserialize()

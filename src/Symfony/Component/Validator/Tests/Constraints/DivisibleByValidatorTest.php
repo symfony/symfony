@@ -39,16 +39,16 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisons()
     {
-        return array(
-            array(-7, 1),
-            array(0, 3.1415),
-            array(42, 42),
-            array(42, 21),
-            array(3.25, 0.25),
-            array('100', '10'),
-            array(4.1, 0.1),
-            array(-4.1, 0.1),
-        );
+        return [
+            [-7, 1],
+            [0, 3.1415],
+            [42, 42],
+            [42, 21],
+            [3.25, 0.25],
+            ['100', '10'],
+            [4.1, 0.1],
+            [-4.1, 0.1],
+        ];
     }
 
     /**
@@ -56,9 +56,9 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideValidComparisonsToPropertyPath()
     {
-        return array(
-            array(25),
-        );
+        return [
+            [25],
+        ];
     }
 
     /**
@@ -66,13 +66,13 @@ class DivisibleByValidatorTest extends AbstractComparisonValidatorTestCase
      */
     public function provideInvalidComparisons()
     {
-        return array(
-            array(1, '1', 2, '2', 'integer'),
-            array(10, '10', 3, '3', 'integer'),
-            array(10, '10', 0, '0', 'integer'),
-            array(42, '42', INF, 'INF', 'double'),
-            array(4.15, '4.15', 0.1, '0.1', 'double'),
-            array('22', '"22"', '10', '"10"', 'string'),
-        );
+        return [
+            [1, '1', 2, '2', 'integer'],
+            [10, '10', 3, '3', 'integer'],
+            [10, '10', 0, '0', 'integer'],
+            [42, '42', INF, 'INF', 'double'],
+            [4.15, '4.15', 0.1, '0.1', 'double'],
+            ['22', '"22"', '10', '"10"', 'string'],
+        ];
     }
 }

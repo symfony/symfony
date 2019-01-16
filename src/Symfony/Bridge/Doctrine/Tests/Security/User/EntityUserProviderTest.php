@@ -145,7 +145,7 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', array('id1' => 1, 'id2' => 1));
+        $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', ['id1' => 1, 'id2' => 1]);
         $this->assertTrue($provider->supportsClass(\get_class($user2)));
     }
 
@@ -196,7 +196,7 @@ class EntityUserProviderTest extends TestCase
     private function getObjectManager($repository)
     {
         $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
-            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->setMethods(['getClassMetadata', 'getRepository'])
             ->getMockForAbstractClass();
         $em->expects($this->any())
             ->method('getRepository')
@@ -208,8 +208,8 @@ class EntityUserProviderTest extends TestCase
     private function createSchema($em)
     {
         $schemaTool = new SchemaTool($em);
-        $schemaTool->createSchema(array(
+        $schemaTool->createSchema([
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\User'),
-        ));
+        ]);
     }
 }

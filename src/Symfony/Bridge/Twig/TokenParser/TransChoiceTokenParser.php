@@ -42,7 +42,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         @trigger_error(sprintf('The "transchoice" tag is deprecated since Symfony 4.2, use the "trans" one instead with a "%%count%%" parameter in %s line %d.', $stream->getSourceContext()->getName(), $lineno), E_USER_DEPRECATED);
 
-        $vars = new ArrayExpression(array(), $lineno);
+        $vars = new ArrayExpression([], $lineno);
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
@@ -69,7 +69,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+        $body = $this->parser->subparse([$this, 'decideTransChoiceFork'], true);
 
         if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
             throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
@@ -82,7 +82,7 @@ class TransChoiceTokenParser extends TransTokenParser
 
     public function decideTransChoiceFork($token)
     {
-        return $token->test(array('endtranschoice'));
+        return $token->test(['endtranschoice']);
     }
 
     /**

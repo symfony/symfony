@@ -38,7 +38,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $serviceKeywords = array(
+    private static $serviceKeywords = [
         'alias' => 'alias',
         'parent' => 'parent',
         'class' => 'class',
@@ -61,9 +61,9 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
-    );
+    ];
 
-    private static $prototypeKeywords = array(
+    private static $prototypeKeywords = [
         'resource' => 'resource',
         'namespace' => 'namespace',
         'exclude' => 'exclude',
@@ -82,9 +82,9 @@ class YamlFileLoader extends FileLoader
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
-    );
+    ];
 
-    private static $instanceofKeywords = array(
+    private static $instanceofKeywords = [
         'shared' => 'shared',
         'lazy' => 'lazy',
         'public' => 'public',
@@ -94,15 +94,15 @@ class YamlFileLoader extends FileLoader
         'tags' => 'tags',
         'autowire' => 'autowire',
         'bind' => 'bind',
-    );
+    ];
 
-    private static $defaultsKeywords = array(
+    private static $defaultsKeywords = [
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
-    );
+    ];
 
     private $yamlParser;
 
@@ -149,7 +149,7 @@ class YamlFileLoader extends FileLoader
         try {
             $this->parseDefinitions($content, $path);
         } finally {
-            $this->instanceof = array();
+            $this->instanceof = [];
         }
     }
 
@@ -162,11 +162,11 @@ class YamlFileLoader extends FileLoader
             return false;
         }
 
-        if (null === $type && \in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yaml', 'yml'), true)) {
+        if (null === $type && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yaml', 'yml'], true)) {
             return true;
         }
 
-        return \in_array($type, array('yaml', 'yml'), true);
+        return \in_array($type, ['yaml', 'yml'], true);
     }
 
     private function parseImports(array $content, string $file)
@@ -182,7 +182,7 @@ class YamlFileLoader extends FileLoader
         $defaultDirectory = \dirname($file);
         foreach ($content['imports'] as $import) {
             if (!\is_array($import)) {
-                $import = array('resource' => $import);
+                $import = ['resource' => $import];
             }
             if (!isset($import['resource'])) {
                 throw new InvalidArgumentException(sprintf('An import should provide a resource in %s. Check your YAML syntax.', $file));
@@ -210,7 +210,7 @@ class YamlFileLoader extends FileLoader
             if (!\is_array($instanceof)) {
                 throw new InvalidArgumentException(sprintf('Service "_instanceof" key must be an array, "%s" given in "%s".', \gettype($instanceof), $file));
             }
-            $this->instanceof = array();
+            $this->instanceof = [];
             $this->isLoadingInstanceof = true;
             foreach ($instanceof as $id => $service) {
                 if (!$service || !\is_array($service)) {
@@ -219,7 +219,7 @@ class YamlFileLoader extends FileLoader
                 if (\is_string($service) && 0 === strpos($service, '@')) {
                     throw new InvalidArgumentException(sprintf('Type definition "%s" cannot be an alias within "_instanceof" in %s. Check your YAML syntax.', $id, $file));
                 }
-                $this->parseDefinition($id, $service, $file, array());
+                $this->parseDefinition($id, $service, $file, []);
             }
         }
 
@@ -236,7 +236,7 @@ class YamlFileLoader extends FileLoader
     private function parseDefaults(array &$content, string $file): array
     {
         if (!array_key_exists('_defaults', $content['services'])) {
-            return array();
+            return [];
         }
         $defaults = $content['services']['_defaults'];
         unset($content['services']['_defaults']);
@@ -258,7 +258,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($tags as $tag) {
                 if (!\is_array($tag)) {
-                    $tag = array('name' => $tag);
+                    $tag = ['name' => $tag];
                 }
 
                 if (!isset($tag['name'])) {
@@ -327,11 +327,11 @@ class YamlFileLoader extends FileLoader
         }
 
         if (\is_array($service) && $this->isUsingShortSyntax($service)) {
-            $service = array('arguments' => $service);
+            $service = ['arguments' => $service];
         }
 
         if (null === $service) {
-            $service = array();
+            $service = [];
         }
 
         if (!\is_array($service)) {
@@ -349,7 +349,7 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service as $key => $value) {
-                if (!\in_array($key, array('alias', 'public'))) {
+                if (!\in_array($key, ['alias', 'public'])) {
                     throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public".', $key, $id, $file));
                 }
             }
@@ -396,7 +396,7 @@ class YamlFileLoader extends FileLoader
                 $definition->setAutoconfigured($defaults['autoconfigure']);
             }
 
-            $definition->setChanges(array());
+            $definition->setChanges([]);
         }
 
         if (isset($service['class'])) {
@@ -414,7 +414,7 @@ class YamlFileLoader extends FileLoader
         if (isset($service['lazy'])) {
             $definition->setLazy((bool) $service['lazy']);
             if (\is_string($service['lazy'])) {
-                $definition->addTag('proxy', array('interface' => $service['lazy']));
+                $definition->addTag('proxy', ['interface' => $service['lazy']]);
             }
         }
 
@@ -458,10 +458,10 @@ class YamlFileLoader extends FileLoader
             foreach ($service['calls'] as $call) {
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : array();
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : [];
                 } else {
                     $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : array();
+                    $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : [];
                 }
 
                 if (!\is_array($args)) {
@@ -471,7 +471,7 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $tags = isset($service['tags']) ? $service['tags'] : array();
+        $tags = isset($service['tags']) ? $service['tags'] : [];
         if (!\is_array($tags)) {
             throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
         }
@@ -482,7 +482,7 @@ class YamlFileLoader extends FileLoader
 
         foreach ($tags as $tag) {
             if (!\is_array($tag)) {
-                $tag = array('name' => $tag);
+                $tag = ['name' => $tag];
             }
 
             if (!isset($tag['name'])) {
@@ -520,7 +520,7 @@ class YamlFileLoader extends FileLoader
 
         if (isset($defaults['bind']) || isset($service['bind'])) {
             // deep clone, to avoid multiple process of the same instance in the passes
-            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : array();
+            $bindings = isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
 
             if (isset($service['bind'])) {
                 if (!\is_array($service['bind'])) {
@@ -579,7 +579,7 @@ class YamlFileLoader extends FileLoader
             if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
                 $parts = explode(':', $callable);
 
-                return array($this->resolveServices('@'.$parts[0], $file), $parts[1]);
+                return [$this->resolveServices('@'.$parts[0], $file), $parts[1]];
             }
 
             return $callable;
@@ -587,7 +587,7 @@ class YamlFileLoader extends FileLoader
 
         if (\is_array($callable)) {
             if (isset($callable[0]) && isset($callable[1])) {
-                return array($this->resolveServices($callable[0], $file), $callable[1]);
+                return [$this->resolveServices($callable[0], $file), $callable[1]];
             }
 
             if ('factory' === $parameter && isset($callable[1]) && null === $callable[0]) {
@@ -657,7 +657,7 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($content as $namespace => $data) {
-            if (\in_array($namespace, array('imports', 'parameters', 'services'))) {
+            if (\in_array($namespace, ['imports', 'parameters', 'services'])) {
                 continue;
             }
 
@@ -720,10 +720,10 @@ class YamlFileLoader extends FileLoader
                 $isLoadingInstanceof = $this->isLoadingInstanceof;
                 $this->isLoadingInstanceof = false;
                 $instanceof = $this->instanceof;
-                $this->instanceof = array();
+                $this->instanceof = [];
 
                 $id = sprintf('.%d_%s', ++$this->anonymousServicesCount, preg_replace('/^.*\\\\/', '', isset($argument['class']) ? $argument['class'] : '').$this->anonymousServicesSuffix);
-                $this->parseDefinition($id, $argument, $file, array());
+                $this->parseDefinition($id, $argument, $file, []);
 
                 if (!$this->container->hasDefinition($id)) {
                     throw new InvalidArgumentException(sprintf('Creating an alias using the tag "!service" is not allowed in "%s".', $file));
@@ -779,12 +779,12 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions(array $content)
     {
         foreach ($content as $namespace => $values) {
-            if (\in_array($namespace, array('imports', 'parameters', 'services'))) {
+            if (\in_array($namespace, ['imports', 'parameters', 'services'])) {
                 continue;
             }
 
             if (!\is_array($values) && null !== $values) {
-                $values = array();
+                $values = [];
             }
 
             $this->container->loadFromExtension($namespace, $values);

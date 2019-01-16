@@ -112,11 +112,11 @@ class LazyChoiceListTest extends TestCase
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
-            ->with(array('a', 'b'))
+            ->with(['a', 'b'])
             ->will($this->returnValue('RESULT'));
 
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
     }
 
     public function testGetChoicesForValuesUsesLoadedList()
@@ -128,14 +128,14 @@ class LazyChoiceListTest extends TestCase
 
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
-            ->with(array('a', 'b'))
+            ->with(['a', 'b'])
             ->will($this->returnValue('RESULT'));
 
         // load choice list
         $this->list->getChoices();
 
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
-        $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
+        $this->assertSame('RESULT', $this->list->getChoicesForValues(['a', 'b']));
     }
 
     public function testGetValuesForChoicesUsesLoadedList()
@@ -147,13 +147,13 @@ class LazyChoiceListTest extends TestCase
 
         $this->loader->expects($this->exactly(2))
             ->method('loadValuesForChoices')
-            ->with(array('a', 'b'))
+            ->with(['a', 'b'])
             ->will($this->returnValue('RESULT'));
 
         // load choice list
         $this->list->getChoices();
 
-        $this->assertSame('RESULT', $this->list->getValuesForChoices(array('a', 'b')));
-        $this->assertSame('RESULT', $this->list->getValuesForChoices(array('a', 'b')));
+        $this->assertSame('RESULT', $this->list->getValuesForChoices(['a', 'b']));
+        $this->assertSame('RESULT', $this->list->getValuesForChoices(['a', 'b']));
     }
 }

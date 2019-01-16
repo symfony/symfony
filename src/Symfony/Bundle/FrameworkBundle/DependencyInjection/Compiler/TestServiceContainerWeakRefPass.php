@@ -28,7 +28,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
             return;
         }
 
-        $privateServices = array();
+        $privateServices = [];
         $definitions = $container->getDefinitions();
         $hasErrors = method_exists(Definition::class, 'hasErrors') ? 'hasErrors' : 'getErrors';
 

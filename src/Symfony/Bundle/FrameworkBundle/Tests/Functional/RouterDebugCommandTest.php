@@ -23,14 +23,14 @@ class RouterDebugCommandTest extends WebTestCase
 
     protected function setUp()
     {
-        $kernel = static::createKernel(array('test_case' => 'RouterDebug', 'root_config' => 'config.yml'));
+        $kernel = static::createKernel(['test_case' => 'RouterDebug', 'root_config' => 'config.yml']);
         $this->application = new Application($kernel);
     }
 
     public function testDumpAllRoutes()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array());
+        $ret = $tester->execute([]);
         $display = $tester->getDisplay();
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
@@ -42,7 +42,7 @@ class RouterDebugCommandTest extends WebTestCase
     public function testDumpOneRoute()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(array('name' => 'routerdebug_session_welcome'));
+        $ret = $tester->execute(['name' => 'routerdebug_session_welcome']);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('routerdebug_session_welcome', $tester->getDisplay());
@@ -52,8 +52,8 @@ class RouterDebugCommandTest extends WebTestCase
     public function testSearchMultipleRoutes()
     {
         $tester = $this->createCommandTester();
-        $tester->setInputs(array(3));
-        $ret = $tester->execute(array('name' => 'routerdebug'), array('interactive' => true));
+        $tester->setInputs([3]);
+        $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => true]);
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
         $this->assertContains('Select one of the matching routes:', $tester->getDisplay());
@@ -68,7 +68,7 @@ class RouterDebugCommandTest extends WebTestCase
     public function testSearchWithThrow()
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array('name' => 'gerard'), array('interactive' => true));
+        $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 
     private function createCommandTester(): CommandTester

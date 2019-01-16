@@ -33,7 +33,7 @@ class JsonDescriptor extends Descriptor
         $this->writeData($data, $options);
     }
 
-    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array())
+    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = [])
     {
         $this->collectOptions($resolvedFormType);
 
@@ -41,22 +41,22 @@ class JsonDescriptor extends Descriptor
             $this->filterOptionsByDeprecated($resolvedFormType);
         }
 
-        $formOptions = array(
+        $formOptions = [
             'own' => $this->ownOptions,
             'overridden' => $this->overriddenOptions,
             'parent' => $this->parentOptions,
             'extension' => $this->extensionOptions,
             'required' => $this->requiredOptions,
-        );
+        ];
         $this->sortOptions($formOptions);
 
-        $data = array(
+        $data = [
             'class' => \get_class($resolvedFormType->getInnerType()),
             'block_prefix' => $resolvedFormType->getInnerType()->getBlockPrefix(),
             'options' => $formOptions,
             'parent_types' => $this->parents,
             'type_extensions' => $this->extensions,
-        );
+        ];
 
         $this->writeData($data, $options);
     }
@@ -65,19 +65,19 @@ class JsonDescriptor extends Descriptor
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 
-        $map = array();
+        $map = [];
         if ($definition['deprecated']) {
             $map['deprecated'] = 'deprecated';
             if (\is_string($definition['deprecationMessage'])) {
                 $map['deprecation_message'] = 'deprecationMessage';
             }
         }
-        $map += array(
+        $map += [
             'required' => 'required',
             'default' => 'default',
             'allowed_types' => 'allowedTypes',
             'allowed_values' => 'allowedValues',
-        );
+        ];
         foreach ($map as $label => $name) {
             if (array_key_exists($name, $definition)) {
                 $data[$label] = $definition[$name];

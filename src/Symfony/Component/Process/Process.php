@@ -60,7 +60,7 @@ class Process implements \IteratorAggregate
     private $timeout;
     private $idleTimeout;
     private $exitcode;
-    private $fallbackStatus = array();
+    private $fallbackStatus = [];
     private $processInformation;
     private $outputDisabled = false;
     private $stdout;
@@ -85,7 +85,7 @@ class Process implements \IteratorAggregate
      *
      * User-defined errors must use exit codes in the 64-113 range.
      */
-    public static $exitCodes = array(
+    public static $exitCodes = [
         0 => 'OK',
         1 => 'General error',
         2 => 'Misuse of shell builtins',
@@ -126,7 +126,7 @@ class Process implements \IteratorAggregate
         157 => 'Pollable event',
         // 158 - not defined
         159 => 'Bad syscall',
-    );
+    ];
 
     /**
      * @param array          $command The command to run and its arguments listed as separate entries
@@ -190,7 +190,7 @@ class Process implements \IteratorAggregate
      */
     public static function fromShellCommandline(string $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
-        $process = new static(array(), $cwd, $env, $input, $timeout);
+        $process = new static([], $cwd, $env, $input, $timeout);
         $process->commandline = $command;
 
         return $process;
@@ -228,7 +228,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function run(callable $callback = null, array $env = array()): int
+    public function run(callable $callback = null, array $env = []): int
     {
         $this->start($callback, $env);
 
@@ -250,7 +250,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function mustRun(callable $callback = null, array $env = array())
+    public function mustRun(callable $callback = null, array $env = [])
     {
         if (0 !== $this->run($callback, $env)) {
             throw new ProcessFailedException($this);
@@ -279,7 +279,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null, array $env = array())
+    public function start(callable $callback = null, array $env = [])
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -292,7 +292,7 @@ class Process implements \IteratorAggregate
         $descriptors = $this->getDescriptors();
 
         if (\is_array($commandline = $this->commandline)) {
-            $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
+            $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
 
             if ('\\' !== \DIRECTORY_SEPARATOR) {
                 // exec is mandatory to deal with sending a signal to the process
@@ -305,14 +305,14 @@ class Process implements \IteratorAggregate
         }
         $env += $this->getDefaultEnv();
 
-        $options = array('suppress_errors' => true);
+        $options = ['suppress_errors' => true];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $options['bypass_shell'] = true;
             $commandline = $this->prepareWindowsCommandLine($commandline, $env);
         } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-            $descriptors[3] = array('pipe', 'w');
+            $descriptors[3] = ['pipe', 'w'];
 
             // See https://unix.stackexchange.com/questions/71205/background-process-pipe-input
             $commandline = '{ ('.$commandline.') <&3 3<&- 3>/dev/null & } 3<&0;';
@@ -323,7 +323,7 @@ class Process implements \IteratorAggregate
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
-        $envPairs = array();
+        $envPairs = [];
         foreach ($env as $k => $v) {
             if (false !== $v) {
                 $envPairs[] = $k.'='.$v;
@@ -371,7 +371,7 @@ class Process implements \IteratorAggregate
      *
      * @final
      */
-    public function restart(callable $callback = null, array $env = array())
+    public function restart(callable $callback = null, array $env = [])
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -961,7 +961,7 @@ class Process implements \IteratorAggregate
      */
     public function getCommandLine()
     {
-        return \is_array($this->commandline) ? implode(' ', array_map(array($this, 'escapeArgument'), $this->commandline)) : $this->commandline;
+        return \is_array($this->commandline) ? implode(' ', array_map([$this, 'escapeArgument'], $this->commandline)) : $this->commandline;
     }
 
     /**
@@ -1251,7 +1251,7 @@ class Process implements \IteratorAggregate
         static $isTtySupported;
 
         if (null === $isTtySupported) {
-            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', array(array('file', '/dev/tty', 'r'), array('file', '/dev/tty', 'w'), array('file', '/dev/tty', 'w')), $pipes);
+            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
         }
 
         return $isTtySupported;
@@ -1274,7 +1274,7 @@ class Process implements \IteratorAggregate
             return $result = false;
         }
 
-        return $result = (bool) @proc_open('echo 1 >/dev/null', array(array('pty'), array('pty'), array('pty')), $pipes);
+        return $result = (bool) @proc_open('echo 1 >/dev/null', [['pty'], ['pty'], ['pty']], $pipes);
     }
 
     /**
@@ -1472,7 +1472,7 @@ class Process implements \IteratorAggregate
         $this->starttime = null;
         $this->callback = null;
         $this->exitcode = null;
-        $this->fallbackStatus = array();
+        $this->fallbackStatus = [];
         $this->processInformation = null;
         $this->stdout = fopen('php://temp/maxmemory:'.(1024 * 1024), 'w+b');
         $this->stderr = fopen('php://temp/maxmemory:'.(1024 * 1024), 'w+b');
@@ -1519,7 +1519,7 @@ class Process implements \IteratorAggregate
                 $ok = @proc_terminate($this->process, $signal);
             } elseif (\function_exists('posix_kill')) {
                 $ok = @posix_kill($pid, $signal);
-            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $pid), array(2 => array('pipe', 'w')), $pipes)) {
+            } elseif ($ok = proc_open(sprintf('kill -%d %d', $signal, $pid), [2 => ['pipe', 'w']], $pipes)) {
                 $ok = false === fgets($pipes[2]);
             }
             if (!$ok) {
@@ -1543,7 +1543,7 @@ class Process implements \IteratorAggregate
     {
         $uid = uniqid('', true);
         $varCount = 0;
-        $varCache = array();
+        $varCache = [];
         $cmd = preg_replace_callback(
             '/"(?:(
                 [^"%!^]*+
@@ -1566,7 +1566,7 @@ class Process implements \IteratorAggregate
                     return '"'.$value.'"';
                 }
 
-                $value = str_replace(array('!LF!', '"^!"', '"^%"', '"^^"', '""'), array("\n", '!', '%', '^', '"'), $value);
+                $value = str_replace(['!LF!', '"^!"', '"^%"', '"^^"', '""'], ["\n", '!', '%', '^', '"'], $value);
                 $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
                 $var = $uid.++$varCount;
 
@@ -1628,12 +1628,12 @@ class Process implements \IteratorAggregate
         }
         $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
 
-        return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
+        return '"'.str_replace(['"', '^', '%', '!', "\n"], ['""', '"^^"', '"^%"', '"^!"', '!LF!'], $argument).'"';
     }
 
     private function getDefaultEnv()
     {
-        $env = array();
+        $env = [];
 
         foreach ($_SERVER as $k => $v) {
             if (\is_string($v) && false !== $v = getenv($k)) {

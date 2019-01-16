@@ -42,9 +42,9 @@ class CurrencyTypeTest extends BaseTypeTest
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory
-            ->create(static::TESTED_TYPE, null, array(
+            ->create(static::TESTED_TYPE, null, [
                 'choice_translation_locale' => 'uk',
-            ))
+            ])
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
@@ -70,6 +70,6 @@ class CurrencyTypeTest extends BaseTypeTest
     {
         $type = new CurrencyType();
 
-        $this->assertSame(array(), $type->loadChoicesForValues(array('foo')));
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

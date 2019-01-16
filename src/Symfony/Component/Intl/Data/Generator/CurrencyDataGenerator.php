@@ -42,7 +42,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     /**
      * Monetary units excluded from generation.
      */
-    private static $blacklist = array(
+    private static $blacklist = [
         self::UNKNOWN_CURRENCY_ID => true,
         self::EUROPEAN_COMPOSITE_UNIT_ID => true,
         self::EUROPEAN_MONETARY_UNIT_ID => true,
@@ -56,14 +56,14 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         self::PALLADIUM_ID => true,
         self::SUCRE_ID => true,
         self::SPECIAL_DRAWING_RIGHTS_ID => true,
-    );
+    ];
 
     /**
      * Collects all available currency codes.
      *
      * @var string[]
      */
-    private $currencyCodes = array();
+    private $currencyCodes = [];
 
     /**
      * {@inheritdoc}
@@ -87,7 +87,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->currencyCodes = array();
+        $this->currencyCodes = [];
     }
 
     /**
@@ -98,10 +98,10 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         if (isset($localeBundle['Currencies']) && null !== $localeBundle['Currencies']) {
-            $data = array(
+            $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => $this->generateSymbolNamePairs($localeBundle),
-            );
+            ];
 
             $this->currencyCodes = array_merge($this->currencyCodes, array_keys($data['Names']));
 
@@ -116,10 +116,10 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
-        return array(
+        return [
             'Version' => $rootBundle['Version'],
             'Names' => $this->generateSymbolNamePairs($rootBundle),
-        );
+        ];
     }
 
     /**
@@ -135,12 +135,12 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
         sort($this->currencyCodes);
 
-        $data = array(
+        $data = [
             'Version' => $rootBundle['Version'],
             'Currencies' => $this->currencyCodes,
             'Meta' => $this->generateCurrencyMeta($supplementalDataBundle),
             'Alpha3ToNumeric' => $this->generateAlpha3ToNumericMapping($numericCodesBundle, $this->currencyCodes),
-        );
+        ];
 
         $data['NumericToAlpha3'] = $this->generateNumericToAlpha3Mapping($data['Alpha3ToNumeric']);
 
@@ -181,14 +181,14 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
     private function generateNumericToAlpha3Mapping(array $alpha3ToNumericMapping)
     {
-        $numericToAlpha3Mapping = array();
+        $numericToAlpha3Mapping = [];
 
         foreach ($alpha3ToNumericMapping as $alpha3 => $numeric) {
             // Make sure that the mapping is stored as table and not as array
             $numeric = (string) $numeric;
 
             if (!isset($numericToAlpha3Mapping[$numeric])) {
-                $numericToAlpha3Mapping[$numeric] = array();
+                $numericToAlpha3Mapping[$numeric] = [];
             }
 
             $numericToAlpha3Mapping[$numeric][] = $alpha3;

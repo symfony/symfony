@@ -20,7 +20,7 @@ use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
  */
 class Hydrator
 {
-    public static $hydrators = array();
+    public static $hydrators = [];
 
     public $registry;
     public $values;
@@ -77,7 +77,7 @@ class Hydrator
         switch ($class) {
             case 'ArrayIterator':
             case 'ArrayObject':
-                $constructor = \Closure::fromCallable(array($classReflector->getConstructor(), 'invokeArgs'));
+                $constructor = \Closure::fromCallable([$classReflector->getConstructor(), 'invokeArgs']);
 
                 return self::$hydrators[$class] = static function ($properties, $objects) use ($constructor) {
                     foreach ($properties as $name => $values) {
@@ -87,7 +87,7 @@ class Hydrator
                             }
                         }
                     }
-                    foreach ($properties["\0"] ?? array() as $i => $v) {
+                    foreach ($properties["\0"] ?? [] as $i => $v) {
                         $constructor($objects[$i], $v);
                     }
                 };
@@ -118,11 +118,11 @@ class Hydrator
                 };
         }
 
-        $propertySetters = array();
+        $propertySetters = [];
         foreach ($classReflector->getProperties() as $propertyReflector) {
             if (!$propertyReflector->isStatic()) {
                 $propertyReflector->setAccessible(true);
-                $propertySetters[$propertyReflector->name] = \Closure::fromCallable(array($propertyReflector, 'setValue'));
+                $propertySetters[$propertyReflector->name] = \Closure::fromCallable([$propertyReflector, 'setValue']);
             }
         }
 

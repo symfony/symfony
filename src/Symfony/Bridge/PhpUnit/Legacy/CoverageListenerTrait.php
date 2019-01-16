@@ -31,7 +31,7 @@ class CoverageListenerTrait
     {
         $this->sutFqcnResolver = $sutFqcnResolver;
         $this->warningOnSutNotFound = $warningOnSutNotFound;
-        $this->warnings = array();
+        $this->warnings = [];
     }
 
     public function startTest($test)
@@ -42,7 +42,7 @@ class CoverageListenerTrait
 
         $annotations = $test->getAnnotations();
 
-        $ignoredAnnotations = array('covers', 'coversDefaultClass', 'coversNothing');
+        $ignoredAnnotations = ['covers', 'coversDefaultClass', 'coversNothing'];
 
         foreach ($ignoredAnnotations as $annotation) {
             if (isset($annotations['class'][$annotation]) || isset($annotations['method'][$annotation])) {
@@ -74,11 +74,11 @@ class CoverageListenerTrait
         $r->setAccessible(true);
 
         $cache = $r->getValue();
-        $cache = array_replace_recursive($cache, array(
-            \get_class($test) => array(
-                'covers' => array($sutFqcn),
-            ),
-        ));
+        $cache = array_replace_recursive($cache, [
+            \get_class($test) => [
+                'covers' => [$sutFqcn],
+            ],
+        ]);
         $r->setValue($testClass, $cache);
     }
 

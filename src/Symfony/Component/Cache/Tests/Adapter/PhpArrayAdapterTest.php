@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
  */
 class PhpArrayAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testGet' => 'PhpArrayAdapter is read-only.',
         'testBasicUsage' => 'PhpArrayAdapter is read-only.',
         'testBasicUsageWithLongKey' => 'PhpArrayAdapter is read-only.',
@@ -53,7 +53,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
         'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
         'testPrune' => 'PhpArrayAdapter just proxies',
-    );
+    ];
 
     protected static $file;
 
@@ -80,22 +80,22 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     public function testStore()
     {
-        $arrayWithRefs = array();
+        $arrayWithRefs = [];
         $arrayWithRefs[0] = 123;
         $arrayWithRefs[1] = &$arrayWithRefs[0];
 
-        $object = (object) array(
+        $object = (object) [
             'foo' => 'bar',
             'foo2' => 'bar2',
-        );
+        ];
 
-        $expected = array(
+        $expected = [
             'null' => null,
             'serializedString' => serialize($object),
             'arrayWithRefs' => $arrayWithRefs,
             'object' => $object,
-            'arrayWithObject' => array('bar' => $object),
-        );
+            'arrayWithObject' => ['bar' => $object],
+        ];
 
         $adapter = $this->createCachePool();
         $adapter->warmUp($expected);
@@ -107,29 +107,29 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     public function testStoredFile()
     {
-        $data = array(
+        $data = [
             'integer' => 42,
             'float' => 42.42,
             'boolean' => true,
-            'array_simple' => array('foo', 'bar'),
-            'array_associative' => array('foo' => 'bar', 'foo2' => 'bar2'),
-        );
-        $expected = array(
-            array(
+            'array_simple' => ['foo', 'bar'],
+            'array_associative' => ['foo' => 'bar', 'foo2' => 'bar2'],
+        ];
+        $expected = [
+            [
                 'integer' => 0,
                 'float' => 1,
                 'boolean' => 2,
                 'array_simple' => 3,
                 'array_associative' => 4,
-            ),
-            array(
+            ],
+            [
                 0 => 42,
                 1 => 42.42,
                 2 => true,
-                3 => array('foo', 'bar'),
-                4 => array('foo' => 'bar', 'foo2' => 'bar2'),
-            ),
-        );
+                3 => ['foo', 'bar'],
+                4 => ['foo' => 'bar', 'foo2' => 'bar2'],
+            ],
+        ];
 
         $adapter = $this->createCachePool();
         $adapter->warmUp($data);
@@ -142,7 +142,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
 class PhpArrayAdapterWrapper extends PhpArrayAdapter
 {
-    protected $data = array();
+    protected $data = [];
 
     public function save(CacheItemInterface $item)
     {

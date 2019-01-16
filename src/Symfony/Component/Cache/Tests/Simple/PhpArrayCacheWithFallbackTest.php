@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
  */
 class PhpArrayCacheWithFallbackTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testGetInvalidKeys' => 'PhpArrayCache does no validation',
         'testGetMultipleInvalidKeys' => 'PhpArrayCache does no validation',
         'testDeleteInvalidKeys' => 'PhpArrayCache does no validation',
@@ -32,7 +32,7 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
         'testSetMultipleInvalidTtl' => 'PhpArrayCache does no validation',
         'testHasInvalidKeys' => 'PhpArrayCache does no validation',
         'testPrune' => 'PhpArrayCache just proxies',
-    );
+    ];
 
     protected static $file;
 

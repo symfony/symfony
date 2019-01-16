@@ -20,7 +20,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     public static function setupBeforeClass()
     {
         parent::setupBeforeClass();
-        self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), array('lazy' => true));
+        self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), ['lazy' => true]);
     }
 
     public function createCachePool($defaultLifetime = 0)
@@ -35,7 +35,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     {
         $redis = RedisAdapter::createConnection('redis:?host[h1]&host[h2]&host[/foo:]');
         $this->assertInstanceOf(\RedisArray::class, $redis);
-        $this->assertSame(array('h1:6379', 'h2:6379', '/foo'), $redis->_hosts());
+        $this->assertSame(['h1:6379', 'h2:6379', '/foo'], $redis->_hosts());
         @$redis = null; // some versions of phpredis connect on destruct, let's silence the warning
 
         $redisHost = getenv('REDIS_HOST');
@@ -48,13 +48,13 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('timeout' => 3));
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost, ['timeout' => 3]);
         $this->assertEquals(3, $redis->getTimeout());
 
         $redis = RedisAdapter::createConnection('redis://'.$redisHost.'?timeout=4');
         $this->assertEquals(4, $redis->getTimeout());
 
-        $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('read_timeout' => 5));
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost, ['read_timeout' => 5]);
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 
@@ -70,11 +70,11 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     public function provideFailedCreateConnection()
     {
-        return array(
-            array('redis://localhost:1234'),
-            array('redis://foo@localhost'),
-            array('redis://localhost/123'),
-        );
+        return [
+            ['redis://localhost:1234'],
+            ['redis://foo@localhost'],
+            ['redis://localhost/123'],
+        ];
     }
 
     /**
@@ -89,9 +89,9 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     public function provideInvalidCreateConnection()
     {
-        return array(
-            array('foo://localhost'),
-            array('redis://'),
-        );
+        return [
+            ['foo://localhost'],
+            ['redis://'],
+        ];
     }
 }

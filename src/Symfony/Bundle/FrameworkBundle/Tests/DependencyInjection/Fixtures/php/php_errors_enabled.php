@@ -1,8 +1,8 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'php_errors' => array(
+$container->loadFromExtension('framework', [
+    'php_errors' => [
         'log' => true,
         'throw' => true,
-    ),
-));
+    ],
+]);

@@ -13,7 +13,7 @@ class ProjectExtension implements ExtensionInterface
         if ($configs) {
             $config = array_merge(...$configs);
         } else {
-            $config = array();
+            $config = [];
         }
 
         $configuration->register('project.service.bar', 'FooClass')->setPublic(true);

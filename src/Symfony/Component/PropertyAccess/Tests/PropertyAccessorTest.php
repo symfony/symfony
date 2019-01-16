@@ -40,47 +40,47 @@ class PropertyAccessorTest extends TestCase
 
     public function getPathsWithUnexpectedType()
     {
-        return array(
-            array('', 'foobar'),
-            array('foo', 'foobar'),
-            array(null, 'foobar'),
-            array(123, 'foobar'),
-            array((object) array('prop' => null), 'prop.foobar'),
-            array((object) array('prop' => (object) array('subProp' => null)), 'prop.subProp.foobar'),
-            array(array('index' => null), '[index][foobar]'),
-            array(array('index' => array('subIndex' => null)), '[index][subIndex][foobar]'),
-        );
+        return [
+            ['', 'foobar'],
+            ['foo', 'foobar'],
+            [null, 'foobar'],
+            [123, 'foobar'],
+            [(object) ['prop' => null], 'prop.foobar'],
+            [(object) ['prop' => (object) ['subProp' => null]], 'prop.subProp.foobar'],
+            [['index' => null], '[index][foobar]'],
+            [['index' => ['subIndex' => null]], '[index][subIndex][foobar]'],
+        ];
     }
 
     public function getPathsWithMissingProperty()
     {
-        return array(
-            array((object) array('firstName' => 'Bernhard'), 'lastName'),
-            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.lastName'),
-            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].lastName'),
-            array(new TestClass('Bernhard'), 'protectedProperty'),
-            array(new TestClass('Bernhard'), 'privateProperty'),
-            array(new TestClass('Bernhard'), 'protectedAccessor'),
-            array(new TestClass('Bernhard'), 'protectedIsAccessor'),
-            array(new TestClass('Bernhard'), 'protectedHasAccessor'),
-            array(new TestClass('Bernhard'), 'privateAccessor'),
-            array(new TestClass('Bernhard'), 'privateIsAccessor'),
-            array(new TestClass('Bernhard'), 'privateHasAccessor'),
+        return [
+            [(object) ['firstName' => 'Bernhard'], 'lastName'],
+            [(object) ['property' => (object) ['firstName' => 'Bernhard']], 'property.lastName'],
+            [['index' => (object) ['firstName' => 'Bernhard']], '[index].lastName'],
+            [new TestClass('Bernhard'), 'protectedProperty'],
+            [new TestClass('Bernhard'), 'privateProperty'],
+            [new TestClass('Bernhard'), 'protectedAccessor'],
+            [new TestClass('Bernhard'), 'protectedIsAccessor'],
+            [new TestClass('Bernhard'), 'protectedHasAccessor'],
+            [new TestClass('Bernhard'), 'privateAccessor'],
+            [new TestClass('Bernhard'), 'privateIsAccessor'],
+            [new TestClass('Bernhard'), 'privateHasAccessor'],
 
             // Properties are not camelized
-            array(new TestClass('Bernhard'), 'public_property'),
-        );
+            [new TestClass('Bernhard'), 'public_property'],
+        ];
     }
 
     public function getPathsWithMissingIndex()
     {
-        return array(
-            array(array('firstName' => 'Bernhard'), '[lastName]'),
-            array(array(), '[index][lastName]'),
-            array(array('index' => array()), '[index][lastName]'),
-            array(array('index' => array('firstName' => 'Bernhard')), '[index][lastName]'),
-            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[lastName]'),
-        );
+        return [
+            [['firstName' => 'Bernhard'], '[lastName]'],
+            [[], '[index][lastName]'],
+            [['index' => []], '[index][lastName]'],
+            [['index' => ['firstName' => 'Bernhard']], '[index][lastName]'],
+            [(object) ['property' => ['firstName' => 'Bernhard']], 'property[lastName]'],
+        ];
     }
 
     /**
@@ -134,10 +134,10 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
     {
         $object = new \ArrayObject();
-        $array = array('child' => array('index' => $object));
+        $array = ['child' => ['index' => $object]];
 
         $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][foo][bar]'));
-        $this->assertSame(array(), $object->getArrayCopy());
+        $this->assertSame([], $object->getArrayCopy());
     }
 
     // https://github.com/symfony/symfony/pull/4450
@@ -149,24 +149,24 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueNotModifyObject()
     {
         $object = new \stdClass();
-        $object->firstName = array('Bernhard');
+        $object->firstName = ['Bernhard'];
 
         $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
-        $this->assertSame(array('Bernhard'), $object->firstName);
+        $this->assertSame(['Bernhard'], $object->firstName);
     }
 
     public function testGetValueNotModifyObjectException()
     {
         $propertyAccessor = new PropertyAccessor(false, true);
         $object = new \stdClass();
-        $object->firstName = array('Bernhard');
+        $object->firstName = ['Bernhard'];
 
         try {
             $propertyAccessor->getValue($object, 'firstName[1]');
         } catch (NoSuchIndexException $e) {
         }
 
-        $this->assertSame(array('Bernhard'), $object->firstName);
+        $this->assertSame(['Bernhard'], $object->firstName);
     }
 
     /**
@@ -289,7 +289,7 @@ class PropertyAccessorTest extends TestCase
 
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
 
-        $this->assertEquals('Updated', $author->__call('getMagicCallProperty', array()));
+        $this->assertEquals('Updated', $author->__call('getMagicCallProperty', []));
     }
 
     /**
@@ -305,7 +305,7 @@ class PropertyAccessorTest extends TestCase
     public function testGetValueWhenArrayValueIsNull()
     {
         $this->propertyAccessor = new PropertyAccessor(false, true);
-        $this->assertNull($this->propertyAccessor->getValue(array('index' => array('nullable' => null)), '[index][nullable]'));
+        $this->assertNull($this->propertyAccessor->getValue(['index' => ['nullable' => null]], '[index][nullable]'));
     }
 
     /**
@@ -432,47 +432,47 @@ class PropertyAccessorTest extends TestCase
 
     public function getValidPropertyPaths()
     {
-        return array(
-            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
-            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
-            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
-            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
-            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
-            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
-            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
-            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+        return [
+            [['Bernhard', 'Schussek'], '[0]', 'Bernhard'],
+            [['Bernhard', 'Schussek'], '[1]', 'Schussek'],
+            [['firstName' => 'Bernhard'], '[firstName]', 'Bernhard'],
+            [['index' => ['firstName' => 'Bernhard']], '[index][firstName]', 'Bernhard'],
+            [(object) ['firstName' => 'Bernhard'], 'firstName', 'Bernhard'],
+            [(object) ['property' => ['firstName' => 'Bernhard']], 'property[firstName]', 'Bernhard'],
+            [['index' => (object) ['firstName' => 'Bernhard']], '[index].firstName', 'Bernhard'],
+            [(object) ['property' => (object) ['firstName' => 'Bernhard']], 'property.firstName', 'Bernhard'],
 
             // Accessor methods
-            array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'),
+            [new TestClass('Bernhard'), 'publicProperty', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'],
 
             // Methods are camelized
-            array(new TestClass('Bernhard'), 'public_accessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), '_public_accessor', 'Bernhard'),
+            [new TestClass('Bernhard'), 'public_accessor', 'Bernhard'],
+            [new TestClass('Bernhard'), '_public_accessor', 'Bernhard'],
 
             // Missing indices
-            array(array('index' => array()), '[index][firstName]', null),
-            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
+            [['index' => []], '[index][firstName]', null],
+            [['root' => ['index' => []]], '[root][index][firstName]', null],
 
             // Special chars
-            array(array('%!@$§.' => 'Bernhard'), '[%!@$§.]', 'Bernhard'),
-            array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
-            array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
-            array((object) array('property' => (object) array('%!@$§' => 'Bernhard')), 'property.%!@$§', 'Bernhard'),
+            [['%!@$§.' => 'Bernhard'], '[%!@$§.]', 'Bernhard'],
+            [['index' => ['%!@$§.' => 'Bernhard']], '[index][%!@$§.]', 'Bernhard'],
+            [(object) ['%!@$§' => 'Bernhard'], '%!@$§', 'Bernhard'],
+            [(object) ['property' => (object) ['%!@$§' => 'Bernhard']], 'property.%!@$§', 'Bernhard'],
 
             // nested objects and arrays
-            array(array('foo' => new TestClass('bar')), '[foo].publicGetSetter', 'bar'),
-            array(new TestClass(array('foo' => 'bar')), 'publicGetSetter[foo]', 'bar'),
-            array(new TestClass(new TestClass('bar')), 'publicGetter.publicGetSetter', 'bar'),
-            array(new TestClass(array('foo' => new TestClass('bar'))), 'publicGetter[foo].publicGetSetter', 'bar'),
-            array(new TestClass(new TestClass(new TestClass('bar'))), 'publicGetter.publicGetter.publicGetSetter', 'bar'),
-            array(new TestClass(array('foo' => array('baz' => new TestClass('bar')))), 'publicGetter[foo][baz].publicGetSetter', 'bar'),
-        );
+            [['foo' => new TestClass('bar')], '[foo].publicGetSetter', 'bar'],
+            [new TestClass(['foo' => 'bar']), 'publicGetSetter[foo]', 'bar'],
+            [new TestClass(new TestClass('bar')), 'publicGetter.publicGetSetter', 'bar'],
+            [new TestClass(['foo' => new TestClass('bar')]), 'publicGetter[foo].publicGetSetter', 'bar'],
+            [new TestClass(new TestClass(new TestClass('bar'))), 'publicGetter.publicGetter.publicGetSetter', 'bar'],
+            [new TestClass(['foo' => ['baz' => new TestClass('bar')]]), 'publicGetter[foo][baz].publicGetSetter', 'bar'],
+        ];
     }
 
     public function testTicket5755()
@@ -487,20 +487,20 @@ class PropertyAccessorTest extends TestCase
     public function testSetValueDeepWithMagicGetter()
     {
         $obj = new TestClassMagicGet('foo');
-        $obj->publicProperty = array('foo' => array('bar' => 'some_value'));
+        $obj->publicProperty = ['foo' => ['bar' => 'some_value']];
         $this->propertyAccessor->setValue($obj, 'publicProperty[foo][bar]', 'Updated');
         $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
     }
 
     public function getReferenceChainObjectsForSetValue()
     {
-        return array(
-            array(array('a' => array('b' => array('c' => 'old-value'))), '[a][b][c]', 'new-value'),
-            array(new TestClassSetValue(new TestClassSetValue('old-value')), 'value.value', 'new-value'),
-            array(new TestClassSetValue(array('a' => array('b' => array('c' => new TestClassSetValue('old-value'))))), 'value[a][b][c].value', 'new-value'),
-            array(new TestClassSetValue(array('a' => array('b' => 'old-value'))), 'value[a][b]', 'new-value'),
-            array(new \ArrayIterator(array('a' => array('b' => array('c' => 'old-value')))), '[a][b][c]', 'new-value'),
-        );
+        return [
+            [['a' => ['b' => ['c' => 'old-value']]], '[a][b][c]', 'new-value'],
+            [new TestClassSetValue(new TestClassSetValue('old-value')), 'value.value', 'new-value'],
+            [new TestClassSetValue(['a' => ['b' => ['c' => new TestClassSetValue('old-value')]]]), 'value[a][b][c].value', 'new-value'],
+            [new TestClassSetValue(['a' => ['b' => 'old-value']]), 'value[a][b]', 'new-value'],
+            [new \ArrayIterator(['a' => ['b' => ['c' => 'old-value']]]), '[a][b][c]', 'new-value'],
+        ];
     }
 
     /**
@@ -515,11 +515,11 @@ class PropertyAccessorTest extends TestCase
 
     public function getReferenceChainObjectsForIsWritable()
     {
-        return array(
-            array(new TestClassIsWritable(array('a' => array('b' => 'old-value'))), 'value[a][b]', false),
-            array(new TestClassIsWritable(new \ArrayIterator(array('a' => array('b' => 'old-value')))), 'value[a][b]', true),
-            array(new TestClassIsWritable(array('a' => array('b' => array('c' => new TestClassSetValue('old-value'))))), 'value[a][b][c].value', true),
-        );
+        return [
+            [new TestClassIsWritable(['a' => ['b' => 'old-value']]), 'value[a][b]', false],
+            [new TestClassIsWritable(new \ArrayIterator(['a' => ['b' => 'old-value']])), 'value[a][b]', true],
+            [new TestClassIsWritable(['a' => ['b' => ['c' => new TestClassSetValue('old-value')]]]), 'value[a][b][c].value', true],
+        ];
     }
 
     /**
@@ -563,12 +563,12 @@ class PropertyAccessorTest extends TestCase
 
     public function testArrayNotBeeingOverwritten()
     {
-        $value = array('value1' => 'foo', 'value2' => 'bar');
+        $value = ['value1' => 'foo', 'value2' => 'bar'];
         $object = new TestClass($value);
 
         $this->propertyAccessor->setValue($object, 'publicAccessor[value2]', 'baz');
         $this->assertSame('baz', $this->propertyAccessor->getValue($object, 'publicAccessor[value2]'));
-        $this->assertSame(array('value1' => 'foo', 'value2' => 'baz'), $object->getPublicAccessor());
+        $this->assertSame(['value1' => 'foo', 'value2' => 'baz'], $object->getPublicAccessor());
     }
 
     public function testCacheReadAccess()
@@ -677,7 +677,7 @@ class PropertyAccessorTest extends TestCase
     {
         $object = new ReturnTyped();
 
-        $this->propertyAccessor->setValue($object, 'foos', array(new \DateTime()));
+        $this->propertyAccessor->setValue($object, 'foos', [new \DateTime()]);
     }
 
     /**
@@ -706,9 +706,9 @@ class PropertyAccessorTest extends TestCase
         $object = new TestSingularAndPluralProps();
 
         $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
-        $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
+        $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
 
-        $this->assertEquals(array('test@email.com'), $object->getEmails());
+        $this->assertEquals(['test@email.com'], $object->getEmails());
         $this->assertNull($object->getEmail());
     }
 
@@ -717,9 +717,9 @@ class PropertyAccessorTest extends TestCase
         $object = new TestPluralAdderRemoverAndSetter();
 
         $this->propertyAccessor->isWritable($object, 'emails'); //cache access info
-        $this->propertyAccessor->setValue($object, 'emails', array('test@email.com'));
+        $this->propertyAccessor->setValue($object, 'emails', ['test@email.com']);
 
-        $this->assertEquals(array('test@email.com'), $object->getEmails());
+        $this->assertEquals(['test@email.com'], $object->getEmails());
     }
 
     public function testAdderAndRemoverArePreferredOverSetterForSameSingularAndPlural()
@@ -727,8 +727,8 @@ class PropertyAccessorTest extends TestCase
         $object = new TestPluralAdderRemoverAndSetterSameSingularAndPlural();
 
         $this->propertyAccessor->isWritable($object, 'aircraft'); //cache access info
-        $this->propertyAccessor->setValue($object, 'aircraft', array('aeroplane'));
+        $this->propertyAccessor->setValue($object, 'aircraft', ['aeroplane']);
 
-        $this->assertEquals(array('aeroplane'), $object->getAircraft());
+        $this->assertEquals(['aeroplane'], $object->getAircraft());
     }
 }

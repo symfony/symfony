@@ -26,14 +26,14 @@ class ConnectionTest extends TestCase
     {
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
-        $connection = new Connection(self::VAR_DUMPER_SERVER, array(
+        $connection = new Connection(self::VAR_DUMPER_SERVER, [
             'foo_provider' => new class() implements ContextProviderInterface {
                 public function getContext(): ?array
                 {
-                    return array('foo');
+                    return ['foo'];
                 }
             },
-        ));
+        ]);
 
         $dumped = null;
         $process = $this->getServerProcess();
@@ -77,10 +77,10 @@ DUMP
 
     private function getServerProcess(): Process
     {
-        $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, array(
+        $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, [
             'COMPONENT_ROOT' => __DIR__.'/../../',
             'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
-        ));
+        ]);
         $process->inheritEnvironmentVariables(true);
 
         return $process->setTimeout(9);

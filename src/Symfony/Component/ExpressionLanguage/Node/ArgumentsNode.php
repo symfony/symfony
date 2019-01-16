@@ -27,7 +27,7 @@ class ArgumentsNode extends ArrayNode
 
     public function toArray()
     {
-        $array = array();
+        $array = [];
 
         foreach ($this->getKeyValuePairs() as $pair) {
             $array[] = $pair['value'];

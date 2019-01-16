@@ -17,7 +17,7 @@ class FormFieldTest extends FormFieldTestCase
 {
     public function testGetName()
     {
-        $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
+        $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
         $this->assertEquals('name', $field->getName(), '->getName() returns the name of the field');
@@ -25,7 +25,7 @@ class FormFieldTest extends FormFieldTestCase
 
     public function testGetSetHasValue()
     {
-        $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
+        $node = $this->createNode('input', '', ['type' => 'text', 'name' => 'name', 'value' => 'value']);
         $field = new InputFormField($node);
 
         $this->assertEquals('value', $field->getValue(), '->getValue() returns the value of the field');

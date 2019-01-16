@@ -39,10 +39,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(iterable $voters = array(), string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(iterable $voters = [], string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
-        if (!\is_callable(array($this, $strategyMethod))) {
+        if (!\is_callable([$this, $strategyMethod])) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 
@@ -152,7 +152,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         foreach ($this->voters as $voter) {
             foreach ($attributes as $attribute) {
-                $result = $voter->vote($token, $object, array($attribute));
+                $result = $voter->vote($token, $object, [$attribute]);
 
                 switch ($result) {
                     case VoterInterface::ACCESS_GRANTED:

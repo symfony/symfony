@@ -42,7 +42,7 @@ interface DenormalizerInterface
      * @throws LogicException           Occurs when the normalizer is not supposed to denormalize
      * @throws RuntimeException         Occurs if the class cannot be instantiated
      */
-    public function denormalize($data, $class, $format = null, array $context = array());
+    public function denormalize($data, $class, $format = null, array $context = []);
 
     /**
      * Checks whether the given class is supported for denormalization by this normalizer.

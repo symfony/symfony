@@ -57,20 +57,20 @@ final class Instantiator
      *
      * @throws ExceptionInterface When the instance cannot be created
      */
-    public static function instantiate(string $class, array $properties = array(), array $privateProperties = array())
+    public static function instantiate(string $class, array $properties = [], array $privateProperties = [])
     {
         $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
 
         if (Registry::$cloneable[$class]) {
-            $wrappedInstance = array(clone Registry::$prototypes[$class]);
+            $wrappedInstance = [clone Registry::$prototypes[$class]];
         } elseif (Registry::$instantiableWithoutConstructor[$class]) {
-            $wrappedInstance = array($reflector->newInstanceWithoutConstructor());
+            $wrappedInstance = [$reflector->newInstanceWithoutConstructor()];
         } elseif (null === Registry::$prototypes[$class]) {
             throw new NotInstantiableTypeException($class);
         } elseif ($reflector->implementsInterface('Serializable')) {
-            $wrappedInstance = array(unserialize('C:'.\strlen($class).':"'.$class.'":0:{}'));
+            $wrappedInstance = [unserialize('C:'.\strlen($class).':"'.$class.'":0:{}')];
         } else {
-            $wrappedInstance = array(unserialize('O:'.\strlen($class).':"'.$class.'":0:{}'));
+            $wrappedInstance = [unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')];
         }
 
         if ($properties) {
@@ -84,7 +84,7 @@ final class Instantiator
             foreach ($properties as $name => $value) {
                 // because they're also used for "unserialization", hydrators
                 // deal with array of instances, so we need to wrap values
-                $properties[$name] = array($value);
+                $properties[$name] = [$value];
             }
             (Hydrator::$hydrators[$class] ?? Hydrator::getHydrator($class))($properties, $wrappedInstance);
         }

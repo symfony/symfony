@@ -17,15 +17,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
+        $this->services = $this->privates = [];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -40,10 +40,10 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     public function getParameter($name)
@@ -85,11 +85,11 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array(
+    private $loadedDynamicParameters = [
         'hello' => false,
         'hello-bar' => false,
-    );
-    private $dynamicParameters = array();
+    ];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -119,9 +119,9 @@ class Symfony_DI_PhpDumper_Test_JsonParameters extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'env(foo)' => '["foo","bar"]',
             'env(bar)' => 'null',
-        );
+        ];
     }
 }

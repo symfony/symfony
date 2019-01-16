@@ -86,7 +86,7 @@ class TestSessionListenerTest extends TestCase
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
 
-        $this->assertSame(array(), $response->headers->getCookies());
+        $this->assertSame([], $response->headers->getCookies());
     }
 
     public function testEmptySessionWithNewSessionIdDoesSendCookie()
@@ -96,7 +96,7 @@ class TestSessionListenerTest extends TestCase
         $this->fixSessionId('456');
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $request = Request::create('/', 'GET', array(), array('MOCKSESSID' => '123'));
+        $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
 
@@ -115,11 +115,11 @@ class TestSessionListenerTest extends TestCase
         $this->fixSessionId('456');
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $request = Request::create('/', 'GET', array(), array('MOCKSESSID' => '123'));
+        $request = Request::create('/', 'GET', [], ['MOCKSESSID' => '123']);
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
         $this->listener->onKernelRequest($event);
 
-        $response = new Response('', 200, array('Set-Cookie' => $existing));
+        $response = new Response('', 200, ['Set-Cookie' => $existing]);
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
 
@@ -128,11 +128,11 @@ class TestSessionListenerTest extends TestCase
 
     public function anotherCookieProvider()
     {
-        return array(
-            'same' => array('MOCKSESSID=789; path=/', array('MOCKSESSID=789; path=/')),
-            'different domain' => array('MOCKSESSID=789; path=/; domain=example.com', array('MOCKSESSID=789; path=/; domain=example.com', 'MOCKSESSID=456; path=/')),
-            'different path' => array('MOCKSESSID=789; path=/foo', array('MOCKSESSID=789; path=/foo', 'MOCKSESSID=456; path=/')),
-        );
+        return [
+            'same' => ['MOCKSESSID=789; path=/', ['MOCKSESSID=789; path=/']],
+            'different domain' => ['MOCKSESSID=789; path=/; domain=example.com', ['MOCKSESSID=789; path=/; domain=example.com', 'MOCKSESSID=456; path=/']],
+            'different path' => ['MOCKSESSID=789; path=/foo', ['MOCKSESSID=789; path=/foo', 'MOCKSESSID=456; path=/']],
+        ];
     }
 
     public function testUnstartedSessionIsNotSave()

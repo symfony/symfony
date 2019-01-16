@@ -18,7 +18,7 @@ class LockRegistryTest extends TestCase
 {
     public function testFiles()
     {
-        $lockFiles = LockRegistry::setFiles(array());
+        $lockFiles = LockRegistry::setFiles([]);
         LockRegistry::setFiles($lockFiles);
         $expected = array_map('realpath', glob(__DIR__.'/../Adapter/*'));
         $this->assertSame($expected, $lockFiles);

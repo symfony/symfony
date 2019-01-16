@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
-    private $connectedIds = array();
+    private $connectedIds = [];
 
     /**
      * {@inheritdoc}
@@ -40,7 +40,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
         try {
             $this->enableExpressionProcessing();
             $this->container = $container;
-            $connectedIds = array();
+            $connectedIds = [];
             $aliases = $container->getAliases();
 
             foreach ($aliases as $id => $alias) {
@@ -58,7 +58,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
 
             while ($this->connectedIds) {
                 $ids = $this->connectedIds;
-                $this->connectedIds = array();
+                $this->connectedIds = [];
                 foreach ($ids as $id) {
                     if (!isset($connectedIds[$id]) && $container->hasDefinition($id)) {
                         $connectedIds[$id] = true;
@@ -76,7 +76,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
             }
         } finally {
             $this->container = null;
-            $this->connectedIds = array();
+            $this->connectedIds = [];
         }
     }
 

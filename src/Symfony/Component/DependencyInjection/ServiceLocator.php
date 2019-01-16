@@ -79,14 +79,14 @@ class ServiceLocator implements PsrContainerInterface
         if ($this->loading) {
             $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s". This locator %s', end($this->loading), $id, $this->formatAlternatives());
 
-            return new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), $msg);
+            return new ServiceNotFoundException($id, end($this->loading) ?: null, null, [], $msg);
         }
 
         $class = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 4);
         $class = isset($class[3]['object']) ? \get_class($class[3]['object']) : null;
         $externalId = $this->externalId ?: $class;
 
-        $msg = array();
+        $msg = [];
         $msg[] = sprintf('Service "%s" not found:', $id);
 
         if (!$this->container) {
@@ -119,7 +119,7 @@ class ServiceLocator implements PsrContainerInterface
             $msg[] = 'Try using dependency injection instead.';
         }
 
-        return new ServiceNotFoundException($id, end($this->loading) ?: null, null, array(), implode(' ', $msg));
+        return new ServiceNotFoundException($id, end($this->loading) ?: null, null, [], implode(' ', $msg));
     }
 
     private function createCircularReferenceException(string $id, array $path): ContainerExceptionInterface

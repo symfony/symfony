@@ -26,7 +26,7 @@ class GuessTest extends TestCase
         $guess2 = new TestGuess(Guess::LOW_CONFIDENCE);
         $guess3 = new TestGuess(Guess::HIGH_CONFIDENCE);
 
-        $this->assertSame($guess3, Guess::getBestGuess(array($guess1, $guess2, $guess3)));
+        $this->assertSame($guess3, Guess::getBestGuess([$guess1, $guess2, $guess3]));
     }
 
     /**

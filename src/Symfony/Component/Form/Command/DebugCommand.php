@@ -38,7 +38,7 @@ class DebugCommand extends Command
     private $extensions;
     private $guessers;
 
-    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = array('Symfony\Component\Form\Extension\Core\Type'), array $types = array(), array $extensions = array(), array $guessers = array())
+    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [])
     {
         parent::__construct();
 
@@ -55,12 +55,12 @@ class DebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('class', InputArgument::OPTIONAL, 'The form type class'),
                 new InputArgument('option', InputArgument::OPTIONAL, 'The form type option'),
                 new InputOption('show-deprecated', null, InputOption::VALUE_NONE, 'Display deprecated options in form types'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
-            ))
+            ])
             ->setDescription('Displays form type information')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays information about form types.
@@ -153,7 +153,7 @@ EOF
 
     private function getFqcnTypeClass(InputInterface $input, SymfonyStyle $io, $shortClassName)
     {
-        $classes = array();
+        $classes = [];
         sort($this->namespaces);
         foreach ($this->namespaces as $namespace) {
             if (class_exists($fqcn = $namespace.'\\'.$shortClassName)) {
@@ -206,7 +206,7 @@ EOF
 
     private function filterTypesByDeprecated(array $types): array
     {
-        $typesWithDeprecatedOptions = array();
+        $typesWithDeprecatedOptions = [];
         foreach ($types as $class) {
             $optionsResolver = $this->formRegistry->getType($class)->getOptionsResolver();
             foreach ($optionsResolver->getDefinedOptions() as $option) {
@@ -222,7 +222,7 @@ EOF
 
     private function findAlternatives($name, array $collection)
     {
-        $alternatives = array();
+        $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
             if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {

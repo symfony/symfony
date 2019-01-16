@@ -27,7 +27,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
-    protected $data = array();
+    protected $data = [];
 
     /**
      * @var ClonerInterface
@@ -76,7 +76,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function getCasters()
     {
-        return array(
+        return [
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     foreach ($a as $k => $v) {
@@ -88,6 +88,6 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
 
                 return $a;
             },
-        );
+        ];
     }
 }

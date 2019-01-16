@@ -120,7 +120,7 @@ class OrderedHashMapIterator implements \Iterator
             return null;
         }
 
-        $array = array($this->key => null);
+        $array = [$this->key => null];
 
         return key($array);
     }

@@ -45,11 +45,11 @@ class EventDispatcherDebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
-            ))
+            ])
             ->setDescription('Displays configured listeners for an application')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command displays all configured listeners:
@@ -73,7 +73,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $options = array();
+        $options = [];
         if ($event = $input->getArgument('event')) {
             if (!$this->dispatcher->hasListeners($event)) {
                 $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
@@ -81,7 +81,7 @@ EOF
                 return;
             }
 
-            $options = array('event' => $event);
+            $options = ['event' => $event];
         }
 
         $helper = new DescriptorHelper();

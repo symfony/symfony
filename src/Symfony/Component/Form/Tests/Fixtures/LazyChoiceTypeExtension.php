@@ -25,10 +25,10 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('choice_loader', new CallbackChoiceLoader(function () {
-            return array(
+            return [
                 'Lazy A' => 'lazy_a',
                 'Lazy B' => 'lazy_b',
-            );
+            ];
         }));
     }
 
@@ -37,6 +37,6 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
      */
     public static function getExtendedTypes(): iterable
     {
-        return array(self::$extendedType);
+        return [self::$extendedType];
     }
 }

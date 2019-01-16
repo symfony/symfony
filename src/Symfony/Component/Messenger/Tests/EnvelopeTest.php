@@ -52,7 +52,7 @@ class EnvelopeTest extends TestCase
     {
         $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
             ->with($receivedStamp = new ReceivedStamp())
-            ->with($validationStamp = new ValidationStamp(array('foo')))
+            ->with($validationStamp = new ValidationStamp(['foo']))
         ;
 
         $stamps = $envelope->all();

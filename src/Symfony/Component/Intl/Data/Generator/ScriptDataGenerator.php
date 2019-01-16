@@ -29,7 +29,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
      *
      * @var string[]
      */
-    private $scriptCodes = array();
+    private $scriptCodes = [];
 
     /**
      * {@inheritdoc}
@@ -52,7 +52,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->scriptCodes = array();
+        $this->scriptCodes = [];
     }
 
     /**
@@ -64,10 +64,10 @@ class ScriptDataGenerator extends AbstractDataGenerator
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Scripts']) && null !== $localeBundle['Scripts']) {
-            $data = array(
+            $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => iterator_to_array($localeBundle['Scripts']),
-            );
+            ];
 
             $this->scriptCodes = array_merge($this->scriptCodes, array_keys($data['Names']));
 
@@ -93,9 +93,9 @@ class ScriptDataGenerator extends AbstractDataGenerator
 
         sort($this->scriptCodes);
 
-        return array(
+        return [
             'Version' => $rootBundle['Version'],
             'Scripts' => $this->scriptCodes,
-        );
+        ];
     }
 }

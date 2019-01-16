@@ -70,7 +70,7 @@ class FormBuilderTest extends TestCase
 
     public function testAddIsFluent()
     {
-        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', array('bar' => 'baz'));
+        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['bar' => 'baz']);
         $this->assertSame($builder, $this->builder);
     }
 
@@ -117,7 +117,7 @@ class FormBuilderTest extends TestCase
 
         $children = $this->builder->all();
 
-        $this->assertSame(array('foo', 'bar', 'baz'), array_keys($children));
+        $this->assertSame(['foo', 'bar', 'baz'], array_keys($children));
     }
 
     public function testAddFormType()
@@ -153,7 +153,7 @@ class FormBuilderTest extends TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array())
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [])
         ;
 
         $this->builder->create('foo');
@@ -183,7 +183,7 @@ class FormBuilderTest extends TestCase
     {
         $expectedType = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         $expectedName = 'foo';
-        $expectedOptions = array('bar' => 'baz');
+        $expectedOptions = ['bar' => 'baz'];
 
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
@@ -199,7 +199,7 @@ class FormBuilderTest extends TestCase
     public function testGetGuessedType()
     {
         $expectedName = 'foo';
-        $expectedOptions = array('bar' => 'baz');
+        $expectedOptions = ['bar' => 'baz'];
 
         $this->factory->expects($this->once())
             ->method('createBuilderForProperty')

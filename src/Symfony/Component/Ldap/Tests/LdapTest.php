@@ -62,9 +62,9 @@ class LdapTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('createQuery')
-            ->with('foo', 'bar', array('baz'))
+            ->with('foo', 'bar', ['baz'])
         ;
-        $this->ldap->query('foo', 'bar', array('baz'));
+        $this->ldap->query('foo', 'bar', ['baz']);
     }
 
     /**

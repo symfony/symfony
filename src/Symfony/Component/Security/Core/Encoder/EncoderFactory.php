@@ -86,46 +86,46 @@ class EncoderFactory implements EncoderFactoryInterface
     {
         switch ($config['algorithm']) {
             case 'plaintext':
-                return array(
+                return [
                     'class' => PlaintextPasswordEncoder::class,
-                    'arguments' => array($config['ignore_case']),
-                );
+                    'arguments' => [$config['ignore_case']],
+                ];
 
             case 'pbkdf2':
-                return array(
+                return [
                     'class' => Pbkdf2PasswordEncoder::class,
-                    'arguments' => array(
+                    'arguments' => [
                         $config['hash_algorithm'],
                         $config['encode_as_base64'],
                         $config['iterations'],
                         $config['key_length'],
-                    ),
-                );
+                    ],
+                ];
 
             case 'bcrypt':
-                return array(
+                return [
                     'class' => BCryptPasswordEncoder::class,
-                    'arguments' => array($config['cost']),
-                );
+                    'arguments' => [$config['cost']],
+                ];
 
             case 'argon2i':
-                return array(
+                return [
                     'class' => Argon2iPasswordEncoder::class,
-                    'arguments' => array(
+                    'arguments' => [
                         $config['memory_cost'],
                         $config['time_cost'],
                         $config['threads'],
-                    ),
-                );
+                    ],
+                ];
         }
 
-        return array(
+        return [
             'class' => MessageDigestPasswordEncoder::class,
-            'arguments' => array(
+            'arguments' => [
                 $config['algorithm'],
                 $config['encode_as_base64'],
                 $config['iterations'],
-            ),
-        );
+            ],
+        ];
     }
 }

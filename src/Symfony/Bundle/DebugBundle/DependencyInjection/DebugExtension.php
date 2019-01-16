@@ -39,9 +39,9 @@ class DebugExtension extends Extension
         $loader->load('services.xml');
 
         $container->getDefinition('var_dumper.cloner')
-            ->addMethodCall('setMaxItems', array($config['max_items']))
-            ->addMethodCall('setMinDepth', array($config['min_depth']))
-            ->addMethodCall('setMaxString', array($config['max_string_length']));
+            ->addMethodCall('setMaxItems', [$config['max_items']])
+            ->addMethodCall('setMinDepth', [$config['min_depth']])
+            ->addMethodCall('setMaxString', [$config['max_string_length']]);
 
         if (method_exists(HtmlDumper::class, 'setTheme') && 'dark' !== $config['theme']) {
             $container->getDefinition('var_dumper.html_dumper')

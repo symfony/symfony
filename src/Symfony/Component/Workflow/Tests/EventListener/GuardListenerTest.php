@@ -26,17 +26,17 @@ class GuardListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->configuration = array(
+        $this->configuration = [
             'test_is_granted' => 'is_granted("something")',
             'test_is_valid' => 'is_valid(subject)',
-            'test_expression' => array(
+            'test_expression' => [
                 new GuardExpression(new Transition('name', 'from', 'to'), '!is_valid(subject)'),
                 new GuardExpression(new Transition('name', 'from', 'to'), 'is_valid(subject)'),
-            ),
-        );
+            ],
+        ];
         $expressionLanguage = new ExpressionLanguage();
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token->expects($this->any())->method('getRoles')->willReturn(array(new Role('ROLE_USER')));
+        $token->expects($this->any())->method('getRoles')->willReturn([new Role('ROLE_USER')]);
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
         $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
@@ -173,7 +173,7 @@ class GuardListenerTest extends TestCase
         $this->validator
             ->expects($this->once())
             ->method('validate')
-            ->willReturn($valid ? array() : array('a violation'))
+            ->willReturn($valid ? [] : ['a violation'])
         ;
     }
 }

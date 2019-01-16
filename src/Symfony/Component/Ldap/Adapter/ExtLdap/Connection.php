@@ -100,10 +100,10 @@ class Connection extends AbstractConnection
                 $options->setDefault('debug_level', 7);
             }
 
-            $options->setDefaults(array(
+            $options->setDefaults([
                 'protocol_version' => $parent['version'],
                 'referrals' => $parent['referrals'],
-            ));
+            ]);
         });
     }
 

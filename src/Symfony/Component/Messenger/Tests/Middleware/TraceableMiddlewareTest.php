@@ -44,21 +44,21 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $stopwatch->expects($this->exactly(2))
             ->method('start')
             ->withConsecutive(
-                array($this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'),
-                array('Tail on "command_bus"', 'messenger.middleware')
+                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"'), 'messenger.middleware'],
+                ['Tail on "command_bus"', 'messenger.middleware']
             )
         ;
         $stopwatch->expects($this->exactly(2))
             ->method('stop')
             ->withConsecutive(
-                array($this->matches('"%sMiddlewareInterface%s" on "command_bus"')),
-                array('Tail on "command_bus"')
+                [$this->matches('"%sMiddlewareInterface%s" on "command_bus"')],
+                ['Tail on "command_bus"']
             )
         ;
 
         $traced = new TraceableMiddleware($stopwatch, $busId);
 
-        $traced->handle($envelope, new StackMiddleware(new \ArrayIterator(array(null, $middleware))));
+        $traced->handle($envelope, new StackMiddleware(new \ArrayIterator([null, $middleware])));
     }
 
     /**
@@ -88,6 +88,6 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         ;
 
         $traced = new TraceableMiddleware($stopwatch, $busId);
-        $traced->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator(array(null, $middleware))));
+        $traced->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator([null, $middleware])));
     }
 }

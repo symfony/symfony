@@ -141,7 +141,7 @@ class YamlFileLoader extends FileLoader
         $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
 
         if (empty($classes)) {
-            return array();
+            return [];
         }
 
         if (!\is_array($classes)) {

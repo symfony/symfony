@@ -23,21 +23,21 @@ class SendersLocatorTest extends TestCase
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $locator = new SendersLocator(array(
-            DummyMessage::class => array($sender),
-        ));
+        $locator = new SendersLocator([
+            DummyMessage::class => [$sender],
+        ]);
 
-        $this->assertSame(array($sender), iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
-        $this->assertSame(array(), iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
+        $this->assertSame([$sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame([], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
     }
 
     public function testItYieldsProvidedSenderAliasAsKey()
     {
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $locator = new SendersLocator(array(
-            DummyMessage::class => array('dummy' => $sender),
-        ));
+        $locator = new SendersLocator([
+            DummyMessage::class => ['dummy' => $sender],
+        ]);
 
-        $this->assertSame(array('dummy' => $sender), iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame(['dummy' => $sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
     }
 }

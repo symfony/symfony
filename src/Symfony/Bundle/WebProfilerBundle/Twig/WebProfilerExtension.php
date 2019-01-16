@@ -63,18 +63,18 @@ class WebProfilerExtension extends ProfilerExtension
      */
     public function getFunctions()
     {
-        return array(
-            new TwigFunction('profiler_dump', array($this, 'dumpData'), array('is_safe' => array('html'), 'needs_environment' => true)),
-            new TwigFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
-        );
+        return [
+            new TwigFunction('profiler_dump', [$this, 'dumpData'], ['is_safe' => ['html'], 'needs_environment' => true]),
+            new TwigFunction('profiler_dump_log', [$this, 'dumpLog'], ['is_safe' => ['html'], 'needs_environment' => true]),
+        ];
     }
 
     public function dumpData(Environment $env, Data $data, $maxDepth = 0)
     {
         $this->dumper->setCharset($env->getCharset());
-        $this->dumper->dump($data, null, array(
+        $this->dumper->dump($data, null, [
             'maxDepth' => $maxDepth,
-        ));
+        ]);
 
         $dump = stream_get_contents($this->output, -1, 0);
         rewind($this->output);
@@ -92,7 +92,7 @@ class WebProfilerExtension extends ProfilerExtension
             return '<span class="dump-inline">'.$message.'</span>';
         }
 
-        $replacements = array();
+        $replacements = [];
         foreach ($context as $k => $v) {
             $k = '{'.twig_escape_filter($env, $k).'}';
             $replacements['&quot;<b>'.$k.'</b>&quot;'] = $replacements['&quot;'.$k.'&quot;'] = $replacements[$k] = $this->dumpData($env, $v);

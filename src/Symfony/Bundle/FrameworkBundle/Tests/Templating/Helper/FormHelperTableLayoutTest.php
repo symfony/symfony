@@ -29,10 +29,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -41,10 +41,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '0',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -53,12 +53,12 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 
     public function testHelpAttr()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
-            'help_attr' => array(
+            'help_attr' => [
                 'class' => 'class-test',
-            ),
-        ));
+            ],
+        ]);
         $view = $form->createView();
         $html = $this->renderHelp($view);
 
@@ -79,20 +79,20 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $root = realpath(\dirname($reflClass->getFileName()).'/Resources/views');
         $rootTheme = realpath(__DIR__.'/Resources');
         $templateNameParser = new StubTemplateNameParser($root, $rootTheme);
-        $loader = new FilesystemLoader(array());
+        $loader = new FilesystemLoader([]);
 
         $this->engine = new PhpEngine($templateNameParser, $loader);
         $this->engine->addGlobal('global', '');
-        $this->engine->setHelpers(array(
+        $this->engine->setHelpers([
             new TranslatorHelper(new StubTranslator()),
-        ));
+        ]);
 
-        return array_merge(parent::getExtensions(), array(
-            new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
+        return array_merge(parent::getExtensions(), [
+            new TemplatingExtension($this->engine, $this->csrfTokenManager, [
                 'FrameworkBundle:Form',
                 'FrameworkBundle:FormTable',
-            )),
-        ));
+            ]),
+        ]);
     }
 
     protected function tearDown()
@@ -102,12 +102,12 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         parent::tearDown();
     }
 
-    protected function renderForm(FormView $view, array $vars = array())
+    protected function renderForm(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->form($view, $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = array())
+    protected function renderLabel(FormView $view, $label = null, array $vars = [])
     {
         return (string) $this->engine->get('form')->label($view, $label, $vars);
     }
@@ -122,27 +122,27 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->engine->get('form')->errors($view);
     }
 
-    protected function renderWidget(FormView $view, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->widget($view, $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->row($view, $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->rest($view, $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = array())
+    protected function renderStart(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->start($view, $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = array())
+    protected function renderEnd(FormView $view, array $vars = [])
     {
         return (string) $this->engine->get('form')->end($view, $vars);
     }

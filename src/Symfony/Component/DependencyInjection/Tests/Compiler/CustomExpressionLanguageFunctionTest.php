@@ -16,14 +16,14 @@ class CustomExpressionLanguageFunctionTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('test', 'stdClass')
             ->setPublic(true)
-            ->setArguments(array(new Expression('custom_func("foobar")')));
+            ->setArguments([new Expression('custom_func("foobar")')]);
 
         $container->addExpressionLanguageProvider(new class() implements ExpressionFunctionProviderInterface {
             public function getFunctions()
             {
-                return array(
+                return [
                     ExpressionFunction::fromPhp('strtolower', 'custom_func'),
-                );
+                ];
             }
         });
         $container->compile();

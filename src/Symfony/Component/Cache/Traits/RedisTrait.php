@@ -27,7 +27,7 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
  */
 trait RedisTrait
 {
-    private static $defaultConnectionOptions = array(
+    private static $defaultConnectionOptions = [
         'class' => null,
         'persistent' => 0,
         'persistent_id' => null,
@@ -40,7 +40,7 @@ trait RedisTrait
         'redis_cluster' => false,
         'dbindex' => 0,
         'failover' => 'none',
-    );
+    ];
     private $redis;
     private $marshaller;
 
@@ -78,7 +78,7 @@ trait RedisTrait
      *
      * @return \Redis|\RedisCluster|\Predis\Client According to the "class" option
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function createConnection($dsn, array $options = [])
     {
         if (0 !== strpos($dsn, 'redis:')) {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis:".', $dsn));
@@ -100,7 +100,7 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
         }
 
-        $query = $hosts = array();
+        $query = $hosts = [];
 
         if (isset($params['query'])) {
             parse_str($params['query'], $query);
@@ -114,11 +114,11 @@ trait RedisTrait
                         parse_str($parameters, $parameters);
                     }
                     if (false === $i = strrpos($host, ':')) {
-                        $hosts[$host] = array('scheme' => 'tcp', 'host' => $host, 'port' => 6379) + $parameters;
+                        $hosts[$host] = ['scheme' => 'tcp', 'host' => $host, 'port' => 6379] + $parameters;
                     } elseif ($port = (int) substr($host, 1 + $i)) {
-                        $hosts[$host] = array('scheme' => 'tcp', 'host' => substr($host, 0, $i), 'port' => $port) + $parameters;
+                        $hosts[$host] = ['scheme' => 'tcp', 'host' => substr($host, 0, $i), 'port' => $port] + $parameters;
                     } else {
-                        $hosts[$host] = array('scheme' => 'unix', 'path' => substr($host, 0, $i)) + $parameters;
+                        $hosts[$host] = ['scheme' => 'unix', 'path' => substr($host, 0, $i)] + $parameters;
                     }
                 }
                 $hosts = array_values($hosts);
@@ -132,9 +132,9 @@ trait RedisTrait
             }
 
             if (isset($params['host'])) {
-                array_unshift($hosts, array('scheme' => 'tcp', 'host' => $params['host'], 'port' => $params['port'] ?? 6379));
+                array_unshift($hosts, ['scheme' => 'tcp', 'host' => $params['host'], 'port' => $params['port'] ?? 6379]);
             } else {
-                array_unshift($hosts, array('scheme' => 'unix', 'path' => $params['path']));
+                array_unshift($hosts, ['scheme' => 'unix', 'path' => $params['path']]);
             }
         }
 
@@ -243,13 +243,13 @@ trait RedisTrait
             if ($params['redis_cluster']) {
                 $params['cluster'] = 'redis';
             }
-            $params += array('parameters' => array());
-            $params['parameters'] += array(
+            $params += ['parameters' => []];
+            $params['parameters'] += [
                 'persistent' => $params['persistent'],
                 'timeout' => $params['timeout'],
                 'read_write_timeout' => $params['read_timeout'],
                 'tcp_nodelay' => true,
-            );
+            ];
             if ($params['dbindex']) {
                 $params['parameters']['database'] = $params['dbindex'];
             }
@@ -258,9 +258,9 @@ trait RedisTrait
             }
             if (1 === \count($hosts) && !$params['redis_cluster']) {
                 $hosts = $hosts[0];
-            } elseif (\in_array($params['failover'], array('slaves', 'distribute'), true) && !isset($params['replication'])) {
+            } elseif (\in_array($params['failover'], ['slaves', 'distribute'], true) && !isset($params['replication'])) {
                 $params['replication'] = true;
-                $hosts[0] += array('alias' => 'master');
+                $hosts[0] += ['alias' => 'master'];
             }
 
             $redis = new $class($hosts, array_diff_key($params, self::$defaultConnectionOptions));
@@ -279,15 +279,15 @@ trait RedisTrait
     protected function doFetch(array $ids)
     {
         if (!$ids) {
-            return array();
+            return [];
         }
 
-        $result = array();
+        $result = [];
 
         if ($this->redis instanceof \Predis\Client) {
             $values = $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
-                    yield 'get' => array($id);
+                    yield 'get' => [$id];
                 }
             });
         } else {
@@ -317,26 +317,26 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         $cleared = true;
-        $hosts = array($this->redis);
-        $evalArgs = array(array($namespace), 0);
+        $hosts = [$this->redis];
+        $evalArgs = [[$namespace], 0];
 
         if ($this->redis instanceof \Predis\Client) {
-            $evalArgs = array(0, $namespace);
+            $evalArgs = [0, $namespace];
 
             $connection = $this->redis->getConnection();
             if ($connection instanceof ClusterInterface && $connection instanceof \Traversable) {
-                $hosts = array();
+                $hosts = [];
                 foreach ($connection as $c) {
                     $hosts[] = new \Predis\Client($c);
                 }
             }
         } elseif ($this->redis instanceof \RedisArray) {
-            $hosts = array();
+            $hosts = [];
             foreach ($this->redis->_hosts() as $host) {
                 $hosts[] = $this->redis->_instance($host);
             }
         } elseif ($this->redis instanceof RedisClusterProxy || $this->redis instanceof \RedisCluster) {
-            $hosts = array();
+            $hosts = [];
             foreach ($this->redis->_masters() as $host) {
                 $hosts[] = $h = new \Redis();
                 $h->connect($host[0], $host[1]);
@@ -388,7 +388,7 @@ trait RedisTrait
         if ($this->redis instanceof \Predis\Client) {
             $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
-                    yield 'del' => array($id);
+                    yield 'del' => [$id];
                 }
             })->rewind();
         } else {
@@ -410,9 +410,9 @@ trait RedisTrait
         $results = $this->pipeline(function () use ($values, $lifetime) {
             foreach ($values as $id => $value) {
                 if (0 >= $lifetime) {
-                    yield 'set' => array($id, $value);
+                    yield 'set' => [$id, $value];
                 } else {
-                    yield 'setEx' => array($id, $lifetime, $value);
+                    yield 'setEx' => [$id, $lifetime, $value];
                 }
             }
         });
@@ -427,13 +427,13 @@ trait RedisTrait
 
     private function pipeline(\Closure $generator)
     {
-        $ids = array();
+        $ids = [];
 
         if ($this->redis instanceof RedisClusterProxy || $this->redis instanceof \RedisCluster || ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof RedisCluster)) {
             // phpredis & predis don't support pipelining with RedisCluster
             // see https://github.com/phpredis/phpredis/blob/develop/cluster.markdown#pipelining
             // see https://github.com/nrk/predis/issues/267#issuecomment-123781423
-            $results = array();
+            $results = [];
             foreach ($generator() as $command => $args) {
                 $results[] = $this->redis->{$command}(...$args);
                 $ids[] = $args[0];
@@ -446,14 +446,14 @@ trait RedisTrait
                 }
             });
         } elseif ($this->redis instanceof \RedisArray) {
-            $connections = $results = $ids = array();
+            $connections = $results = $ids = [];
             foreach ($generator() as $command => $args) {
                 if (!isset($connections[$h = $this->redis->_target($args[0])])) {
-                    $connections[$h] = array($this->redis->_instance($h), -1);
+                    $connections[$h] = [$this->redis->_instance($h), -1];
                     $connections[$h][0]->multi(\Redis::PIPELINE);
                 }
                 $connections[$h][0]->{$command}(...$args);
-                $results[] = array($h, ++$connections[$h][1]);
+                $results[] = [$h, ++$connections[$h][1]];
                 $ids[] = $args[0];
             }
             foreach ($connections as $h => $c) {

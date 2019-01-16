@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 class Compiler
 {
     private $passConfig;
-    private $log = array();
+    private $log = [];
     private $serviceReferenceGraph;
 
     public function __construct()
@@ -95,7 +95,7 @@ class Compiler
                 $pass->process($container);
             }
         } catch (\Exception $e) {
-            $usedEnvs = array();
+            $usedEnvs = [];
             $prev = $e;
 
             do {

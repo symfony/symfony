@@ -31,11 +31,11 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
     {
         // Higher priority than core MergeCollectionListener so that this one
         // is called before
-        return array(
-            FormEvents::SUBMIT => array(
-                array('onSubmit', 5),
-            ),
-        );
+        return [
+            FormEvents::SUBMIT => [
+                ['onSubmit', 5],
+            ],
+        ];
     }
 
     public function onSubmit(FormEvent $event)

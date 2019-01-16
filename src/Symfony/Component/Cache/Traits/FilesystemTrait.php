@@ -54,7 +54,7 @@ trait FilesystemTrait
      */
     protected function doFetch(array $ids)
     {
-        $values = array();
+        $values = [];
         $now = time();
 
         foreach ($ids as $id) {
@@ -85,7 +85,7 @@ trait FilesystemTrait
     {
         $file = $this->getFile($id);
 
-        return file_exists($file) && (@filemtime($file) > time() || $this->doFetch(array($id)));
+        return file_exists($file) && (@filemtime($file) > time() || $this->doFetch([$id]));
     }
 
     /**

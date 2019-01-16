@@ -29,7 +29,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
     {
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_lock');
 
-        $store = new PdoStore(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
+        $store = new PdoStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
         $store->createTable();
     }
 
@@ -51,7 +51,7 @@ class PdoDbalStoreTest extends AbstractStoreTest
      */
     public function getStore()
     {
-        return new PdoStore(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
+        return new PdoStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
     }
 
     public function testAbortAfterExpiration()

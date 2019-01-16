@@ -30,7 +30,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     protected function setUp()
     {
-        $this->resource = new ContainerParametersResource(array('locales' => array('fr', 'en'), 'default_locale' => 'fr'));
+        $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
         $this->container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $this->resourceChecker = new ContainerParametersResourceChecker($this->container);
     }
@@ -52,26 +52,26 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     public function isFreshProvider()
     {
-        yield 'not fresh on missing parameter' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'not fresh on missing parameter' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
             $container->method('hasParameter')->with('locales')->willReturn(false);
-        }, false);
+        }, false];
 
-        yield 'not fresh on different value' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
-            $container->method('getParameter')->with('locales')->willReturn(array('nl', 'es'));
-        }, false);
+        yield 'not fresh on different value' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
+            $container->method('getParameter')->with('locales')->willReturn(['nl', 'es']);
+        }, false];
 
-        yield 'fresh on every identical parameters' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'fresh on every identical parameters' => [function (\PHPUnit_Framework_MockObject_MockObject $container) {
             $container->expects($this->exactly(2))->method('hasParameter')->willReturn(true);
             $container->expects($this->exactly(2))->method('getParameter')
                 ->withConsecutive(
-                    array($this->equalTo('locales')),
-                    array($this->equalTo('default_locale'))
+                    [$this->equalTo('locales')],
+                    [$this->equalTo('default_locale')]
                 )
-                ->will($this->returnValueMap(array(
-                    array('locales', array('fr', 'en')),
-                    array('default_locale', 'fr'),
-                )))
+                ->will($this->returnValueMap([
+                    ['locales', ['fr', 'en']],
+                    ['default_locale', 'fr'],
+                ]))
             ;
-        }, true);
+        }, true];
     }
 }

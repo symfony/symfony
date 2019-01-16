@@ -31,16 +31,16 @@ class AttributeMatchingExtension extends AbstractExtension
      */
     public function getAttributeMatchingTranslators()
     {
-        return array(
-            'exists' => array($this, 'translateExists'),
-            '=' => array($this, 'translateEquals'),
-            '~=' => array($this, 'translateIncludes'),
-            '|=' => array($this, 'translateDashMatch'),
-            '^=' => array($this, 'translatePrefixMatch'),
-            '$=' => array($this, 'translateSuffixMatch'),
-            '*=' => array($this, 'translateSubstringMatch'),
-            '!=' => array($this, 'translateDifferent'),
-        );
+        return [
+            'exists' => [$this, 'translateExists'],
+            '=' => [$this, 'translateEquals'],
+            '~=' => [$this, 'translateIncludes'],
+            '|=' => [$this, 'translateDashMatch'],
+            '^=' => [$this, 'translatePrefixMatch'],
+            '$=' => [$this, 'translateSuffixMatch'],
+            '*=' => [$this, 'translateSubstringMatch'],
+            '!=' => [$this, 'translateDifferent'],
+        ];
     }
 
     public function translateExists(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr

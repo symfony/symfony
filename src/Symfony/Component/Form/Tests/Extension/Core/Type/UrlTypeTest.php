@@ -27,9 +27,9 @@ class UrlTypeTest extends TextTypeTest
 
     public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
-        ));
+        ]);
 
         $form->submit('ftp://www.domain.com');
 
@@ -39,9 +39,9 @@ class UrlTypeTest extends TextTypeTest
 
     public function testSubmitAddsNoDefaultProtocolIfEmpty()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
-        ));
+        ]);
 
         $form->submit('');
 
@@ -51,9 +51,9 @@ class UrlTypeTest extends TextTypeTest
 
     public function testSubmitAddsNoDefaultProtocolIfNull()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
-        ));
+        ]);
 
         $form->submit(null);
 
@@ -63,9 +63,9 @@ class UrlTypeTest extends TextTypeTest
 
     public function testSubmitAddsNoDefaultProtocolIfSetToNull()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => null,
-        ));
+        ]);
 
         $form->submit('www.domain.com');
 
@@ -78,16 +78,16 @@ class UrlTypeTest extends TextTypeTest
      */
     public function testThrowExceptionIfDefaultProtocolIsInvalid()
     {
-        $this->factory->create(static::TESTED_TYPE, null, array(
-            'default_protocol' => array(),
-        ));
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'default_protocol' => [],
+        ]);
     }
 
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty')
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
-        ));
+        ]);
         $form->submit(null);
 
         // listener normalizes data on submit

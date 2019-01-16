@@ -11,7 +11,7 @@ class DefinitionTest extends TestCase
     public function testAddPlaces()
     {
         $places = range('a', 'e');
-        $definition = new Definition($places, array());
+        $definition = new Definition($places, []);
 
         $this->assertCount(5, $definition->getPlaces());
 
@@ -21,7 +21,7 @@ class DefinitionTest extends TestCase
     public function testSetInitialPlace()
     {
         $places = range('a', 'e');
-        $definition = new Definition($places, array(), $places[3]);
+        $definition = new Definition($places, [], $places[3]);
 
         $this->assertEquals($places[3], $definition->getInitialPlace());
     }
@@ -32,7 +32,7 @@ class DefinitionTest extends TestCase
      */
     public function testSetInitialPlaceAndPlaceIsNotDefined()
     {
-        $definition = new Definition(array(), array(), 'd');
+        $definition = new Definition([], [], 'd');
     }
 
     public function testAddTransition()
@@ -40,7 +40,7 @@ class DefinitionTest extends TestCase
         $places = range('a', 'b');
 
         $transition = new Transition('name', $places[0], $places[1]);
-        $definition = new Definition($places, array($transition));
+        $definition = new Definition($places, [$transition]);
 
         $this->assertCount(1, $definition->getTransitions());
         $this->assertSame($transition, $definition->getTransitions()[0]);
@@ -54,7 +54,7 @@ class DefinitionTest extends TestCase
     {
         $places = range('a', 'b');
 
-        new Definition($places, array(new Transition('name', 'c', $places[1])));
+        new Definition($places, [new Transition('name', 'c', $places[1])]);
     }
 
     /**
@@ -65,6 +65,6 @@ class DefinitionTest extends TestCase
     {
         $places = range('a', 'b');
 
-        new Definition($places, array(new Transition('name', $places[0], 'c')));
+        new Definition($places, [new Transition('name', $places[0], 'c')]);
     }
 }

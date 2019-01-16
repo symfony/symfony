@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class Envelope
 {
-    private $stamps = array();
+    private $stamps = [];
     private $message;
 
     /**
@@ -65,7 +65,7 @@ final class Envelope
     public function all(string $stampFqcn = null): array
     {
         if (null !== $stampFqcn) {
-            return $this->stamps[$stampFqcn] ?? array();
+            return $this->stamps[$stampFqcn] ?? [];
         }
 
         return $this->stamps;

@@ -57,7 +57,7 @@ class ResolveControllerNameSubscriberTest extends TestCase
 
     public function provideSkippedControllers()
     {
-        yield array('Other:format');
-        yield array(function () {});
+        yield ['Other:format'];
+        yield [function () {}];
     }
 }

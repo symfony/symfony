@@ -77,7 +77,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
         $container
             ->register('b')
-            ->setBindings(array(new BoundArgument(new Reference('a'))))
+            ->setBindings([new BoundArgument(new Reference('a'))])
         ;
 
         $this->process($container);
@@ -93,7 +93,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        ServiceLocatorTagPass::register($container, array('foo' => new Reference('baz')), 'bar');
+        ServiceLocatorTagPass::register($container, ['foo' => new Reference('baz')], 'bar');
 
         (new AnalyzeServiceReferencesPass())->process($container);
         (new InlineServiceDefinitionsPass())->process($container);
@@ -108,7 +108,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        ServiceLocatorTagPass::register($container, array('foo' => new Reference('foo')), 'bar');
+        ServiceLocatorTagPass::register($container, ['foo' => new Reference('foo')], 'bar');
 
         (new AnalyzeServiceReferencesPass())->process($container);
         (new InlineServiceDefinitionsPass())->process($container);

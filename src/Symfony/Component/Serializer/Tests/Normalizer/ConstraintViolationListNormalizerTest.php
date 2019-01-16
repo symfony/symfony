@@ -37,29 +37,29 @@ class ConstraintViolationListNormalizerTest extends TestCase
 
     public function testNormalize()
     {
-        $list = new ConstraintViolationList(array(
-            new ConstraintViolation('a', 'b', array(), 'c', 'd', 'e', null, 'f'),
-            new ConstraintViolation('1', '2', array(), '3', '4', '5', null, '6'),
-        ));
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'f'),
+            new ConstraintViolation('1', '2', [], '3', '4', '5', null, '6'),
+        ]);
 
-        $expected = array(
+        $expected = [
             'type' => 'https://symfony.com/errors/validation',
             'title' => 'Validation Failed',
             'detail' => 'd: a
 4: 1',
-            'violations' => array(
-                    array(
+            'violations' => [
+                    [
                         'propertyPath' => 'd',
                         'title' => 'a',
                         'type' => 'urn:uuid:f',
-                    ),
-                    array(
+                    ],
+                    [
                         'propertyPath' => '4',
                         'title' => '1',
                         'type' => 'urn:uuid:6',
-                    ),
-                ),
-        );
+                    ],
+                ],
+        ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
     }

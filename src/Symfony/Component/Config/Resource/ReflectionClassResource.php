@@ -20,13 +20,13 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface, \Serializable
 {
-    private $files = array();
+    private $files = [];
     private $className;
     private $classReflector;
-    private $excludedVendors = array();
+    private $excludedVendors = [];
     private $hash;
 
-    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = array())
+    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = [])
     {
         $this->className = $classReflector->name;
         $this->classReflector = $classReflector;
@@ -65,7 +65,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             $this->loadFiles($this->classReflector);
         }
 
-        return serialize(array($this->files, $this->className, $this->hash));
+        return serialize([$this->files, $this->className, $this->hash]);
     }
 
     public function unserialize($serialized)
@@ -142,7 +142,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
             yield preg_replace('/^  @@.*/m', '', $m);
 
-            $defaults = array();
+            $defaults = [];
             foreach ($m->getParameters() as $p) {
                 $defaults[$p->name] = $p->isDefaultValueAvailable() ? $p->getDefaultValue() : null;
             }
@@ -160,7 +160,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
         if (interface_exists(LegacyServiceSubscriberInterface::class, false) && $class->isSubclassOf(LegacyServiceSubscriberInterface::class)) {
             yield LegacyServiceSubscriberInterface::class;
-            yield print_r(array($class->name, 'getSubscribedServices')(), true);
+            yield print_r([$class->name, 'getSubscribedServices'](), true);
         } elseif (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
             yield print_r($class->name::getSubscribedServices(), true);

@@ -40,7 +40,7 @@ interface EngineInterface
      *
      * @throws \RuntimeException if the template cannot be rendered
      */
-    public function render($name, array $parameters = array());
+    public function render($name, array $parameters = []);
 
     /**
      * Returns true if the template exists.

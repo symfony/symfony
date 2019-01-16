@@ -34,18 +34,18 @@ class CachePoolClearerPassTest extends TestCase
 
         $publicPool = new Definition();
         $publicPool->addArgument('namespace');
-        $publicPool->addTag('cache.pool', array('clearer' => 'clearer_alias'));
+        $publicPool->addTag('cache.pool', ['clearer' => 'clearer_alias']);
         $container->setDefinition('public.pool', $publicPool);
 
         $publicPool = new Definition();
         $publicPool->addArgument('namespace');
-        $publicPool->addTag('cache.pool', array('clearer' => 'clearer_alias', 'name' => 'pool2'));
+        $publicPool->addTag('cache.pool', ['clearer' => 'clearer_alias', 'name' => 'pool2']);
         $container->setDefinition('public.pool2', $publicPool);
 
         $privatePool = new Definition();
         $privatePool->setPublic(false);
         $privatePool->addArgument('namespace');
-        $privatePool->addTag('cache.pool', array('clearer' => 'clearer_alias'));
+        $privatePool->addTag('cache.pool', ['clearer' => 'clearer_alias']);
         $container->setDefinition('private.pool', $privatePool);
 
         $clearer = new Definition();
@@ -55,18 +55,18 @@ class CachePoolClearerPassTest extends TestCase
         $pass = new RemoveUnusedDefinitionsPass();
         foreach ($container->getCompiler()->getPassConfig()->getRemovingPasses() as $removingPass) {
             if ($removingPass instanceof RepeatedPass) {
-                $pass->setRepeatedPass(new RepeatedPass(array($pass)));
+                $pass->setRepeatedPass(new RepeatedPass([$pass]));
                 break;
             }
         }
-        foreach (array(new CachePoolPass(), $pass, new CachePoolClearerPass()) as $pass) {
+        foreach ([new CachePoolPass(), $pass, new CachePoolClearerPass()] as $pass) {
             $pass->process($container);
         }
 
-        $expected = array(array(
+        $expected = [[
             'public.pool' => new Reference('public.pool'),
             'pool2' => new Reference('public.pool2'),
-        ));
+        ]];
         $this->assertEquals($expected, $clearer->getArguments());
         $this->assertEquals($expected, $globalClearer->getArguments());
     }

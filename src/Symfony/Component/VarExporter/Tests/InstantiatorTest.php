@@ -37,30 +37,30 @@ class InstantiatorTest extends TestCase
 
     public function provideFailingInstantiation()
     {
-        yield array('ReflectionClass');
-        yield array('SplHeap');
-        yield array('Throwable');
-        yield array('Closure');
-        yield array('SplFileInfo');
+        yield ['ReflectionClass'];
+        yield ['SplHeap'];
+        yield ['Throwable'];
+        yield ['Closure'];
+        yield ['SplFileInfo'];
     }
 
     public function testInstantiate()
     {
-        $this->assertEquals((object) array('p' => 123), Instantiator::instantiate('stdClass', array('p' => 123)));
-        $this->assertEquals((object) array('p' => 123), Instantiator::instantiate('STDcLASS', array('p' => 123)));
-        $this->assertEquals(new \ArrayObject(array(123)), Instantiator::instantiate(\ArrayObject::class, array("\0" => array(array(123)))));
+        $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('stdClass', ['p' => 123]));
+        $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('STDcLASS', ['p' => 123]));
+        $this->assertEquals(new \ArrayObject([123]), Instantiator::instantiate(\ArrayObject::class, ["\0" => [[123]]]));
 
-        $expected = array(
+        $expected = [
             "\0".__NAMESPACE__."\Bar\0priv" => 123,
             "\0".__NAMESPACE__."\Foo\0priv" => 234,
-        );
+        ];
 
-        $this->assertSame($expected, (array) Instantiator::instantiate(Bar::class, array('priv' => 123), array(Foo::class => array('priv' => 234))));
+        $this->assertSame($expected, (array) Instantiator::instantiate(Bar::class, ['priv' => 123], [Foo::class => ['priv' => 234]]));
 
-        $e = Instantiator::instantiate('Exception', array('foo' => 123, 'trace' => array(234)));
+        $e = Instantiator::instantiate('Exception', ['foo' => 123, 'trace' => [234]]);
 
         $this->assertSame(123, $e->foo);
-        $this->assertSame(array(234), $e->getTrace());
+        $this->assertSame([234], $e->getTrace());
     }
 }
 

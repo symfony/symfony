@@ -81,7 +81,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *  * id:         An optional hx:include tag id attribute
      *  * attributes: An optional array of hx:include tag attributes
      */
-    public function render($uri, Request $request, array $options = array())
+    public function render($uri, Request $request, array $options = [])
     {
         if ($uri instanceof ControllerReference) {
             if (null === $this->signer) {
@@ -102,7 +102,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             $content = $template;
         }
 
-        $attributes = isset($options['attributes']) && \is_array($options['attributes']) ? $options['attributes'] : array();
+        $attributes = isset($options['attributes']) && \is_array($options['attributes']) ? $options['attributes'] : [];
         if (isset($options['id']) && $options['id']) {
             $attributes['id'] = $options['id'];
         }

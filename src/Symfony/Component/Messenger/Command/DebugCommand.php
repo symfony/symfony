@@ -74,24 +74,24 @@ EOF
             if (!isset($mapping[$bus])) {
                 throw new RuntimeException(sprintf('Bus "%s" does not exist. Known buses are %s.', $bus, implode(', ', array_keys($this->mapping))));
             }
-            $mapping = array($bus => $mapping[$bus]);
+            $mapping = [$bus => $mapping[$bus]];
         }
 
         foreach ($mapping as $bus => $handlersByMessage) {
             $io->section($bus);
 
-            $tableRows = array();
+            $tableRows = [];
             foreach ($handlersByMessage as $message => $handlers) {
-                $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $message));
+                $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
-                    $tableRows[] = array(sprintf('    handled by <info>%s</>', $handler));
+                    $tableRows[] = [sprintf('    handled by <info>%s</>', $handler)];
                 }
             }
 
             if ($tableRows) {
                 $io->text('The following messages can be dispatched:');
                 $io->newLine();
-                $io->table(array(), $tableRows);
+                $io->table([], $tableRows);
             } else {
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }

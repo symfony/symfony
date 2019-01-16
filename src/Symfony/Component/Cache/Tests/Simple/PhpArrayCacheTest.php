@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
  */
 class PhpArrayCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testBasicUsageWithLongKey' => 'PhpArrayCache does no writes',
 
         'testDelete' => 'PhpArrayCache does no writes',
@@ -45,7 +45,7 @@ class PhpArrayCacheTest extends CacheTestCase
 
         'testDefaultLifeTime' => 'PhpArrayCache does not allow configuring a default lifetime.',
         'testPrune' => 'PhpArrayCache just proxies',
-    );
+    ];
 
     protected static $file;
 
@@ -68,22 +68,22 @@ class PhpArrayCacheTest extends CacheTestCase
 
     public function testStore()
     {
-        $arrayWithRefs = array();
+        $arrayWithRefs = [];
         $arrayWithRefs[0] = 123;
         $arrayWithRefs[1] = &$arrayWithRefs[0];
 
-        $object = (object) array(
+        $object = (object) [
             'foo' => 'bar',
             'foo2' => 'bar2',
-        );
+        ];
 
-        $expected = array(
+        $expected = [
             'null' => null,
             'serializedString' => serialize($object),
             'arrayWithRefs' => $arrayWithRefs,
             'object' => $object,
-            'arrayWithObject' => array('bar' => $object),
-        );
+            'arrayWithObject' => ['bar' => $object],
+        ];
 
         $cache = new PhpArrayCache(self::$file, new NullCache());
         $cache->warmUp($expected);
@@ -95,29 +95,29 @@ class PhpArrayCacheTest extends CacheTestCase
 
     public function testStoredFile()
     {
-        $data = array(
+        $data = [
             'integer' => 42,
             'float' => 42.42,
             'boolean' => true,
-            'array_simple' => array('foo', 'bar'),
-            'array_associative' => array('foo' => 'bar', 'foo2' => 'bar2'),
-        );
-        $expected = array(
-            array(
+            'array_simple' => ['foo', 'bar'],
+            'array_associative' => ['foo' => 'bar', 'foo2' => 'bar2'],
+        ];
+        $expected = [
+            [
                 'integer' => 0,
                 'float' => 1,
                 'boolean' => 2,
                 'array_simple' => 3,
                 'array_associative' => 4,
-            ),
-            array(
+            ],
+            [
                 0 => 42,
                 1 => 42.42,
                 2 => true,
-                3 => array('foo', 'bar'),
-                4 => array('foo' => 'bar', 'foo2' => 'bar2'),
-            ),
-        );
+                3 => ['foo', 'bar'],
+                4 => ['foo' => 'bar', 'foo2' => 'bar2'],
+            ],
+        ];
 
         $cache = new PhpArrayCache(self::$file, new NullCache());
         $cache->warmUp($data);
@@ -130,7 +130,7 @@ class PhpArrayCacheTest extends CacheTestCase
 
 class PhpArrayCacheWrapper extends PhpArrayCache
 {
-    protected $data = array();
+    protected $data = [];
 
     public function set($key, $value, $ttl = null)
     {

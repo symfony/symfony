@@ -28,7 +28,7 @@ class VarExporterTest extends TestCase
     {
         $unserializeCallback = ini_set('unserialize_callback_func', 'var_dump');
         try {
-            Registry::unserialize(array(), array('O:20:"SomeNotExistingClass":0:{}'));
+            Registry::unserialize([], ['O:20:"SomeNotExistingClass":0:{}']);
         } finally {
             $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
         }
@@ -51,25 +51,25 @@ class VarExporterTest extends TestCase
 
     public function provideFailingSerialization()
     {
-        yield array(hash_init('md5'));
-        yield array(new \ReflectionClass('stdClass'));
-        yield array((new \ReflectionFunction(function (): int {}))->getReturnType());
-        yield array(new \ReflectionGenerator((function () { yield 123; })()));
-        yield array(function () {});
-        yield array(function () { yield 123; });
-        yield array(new \SplFileInfo(__FILE__));
-        yield array($h = fopen(__FILE__, 'r'));
-        yield array(array($h));
+        yield [hash_init('md5')];
+        yield [new \ReflectionClass('stdClass')];
+        yield [(new \ReflectionFunction(function (): int {}))->getReturnType()];
+        yield [new \ReflectionGenerator((function () { yield 123; })())];
+        yield [function () {}];
+        yield [function () { yield 123; }];
+        yield [new \SplFileInfo(__FILE__)];
+        yield [$h = fopen(__FILE__, 'r')];
+        yield [[$h]];
 
         $a = new class() {
         };
 
-        yield array($a);
+        yield [$a];
 
-        $a = array(null, $h);
+        $a = [null, $h];
         $a[0] = &$a;
 
-        yield array($a);
+        yield [$a];
     }
 
     /**
@@ -108,26 +108,26 @@ class VarExporterTest extends TestCase
 
     public function provideExport()
     {
-        yield array('multiline-string', array("\0\0\r\nA" => "B\rC\n\n"), true);
+        yield ['multiline-string', ["\0\0\r\nA" => "B\rC\n\n"], true];
 
-        yield array('bool', true, true);
-        yield array('simple-array', array(123, array('abc')), true);
-        yield array('partially-indexed-array', array(5 => true, 1 => true, 2 => true, 6 => true), true);
-        yield array('datetime', \DateTime::createFromFormat('U', 0));
+        yield ['bool', true, true];
+        yield ['simple-array', [123, ['abc']], true];
+        yield ['partially-indexed-array', [5 => true, 1 => true, 2 => true, 6 => true], true];
+        yield ['datetime', \DateTime::createFromFormat('U', 0)];
 
         $value = new \ArrayObject();
         $value[0] = 1;
         $value->foo = new \ArrayObject();
         $value[1] = $value;
 
-        yield array('array-object', $value);
+        yield ['array-object', $value];
 
-        yield array('array-iterator', new \ArrayIterator(array(123), 1));
-        yield array('array-object-custom', new MyArrayObject(array(234)));
+        yield ['array-iterator', new \ArrayIterator([123], 1)];
+        yield ['array-object-custom', new MyArrayObject([234])];
 
         $value = new MySerializable();
 
-        yield array('serializable', array($value, $value));
+        yield ['serializable', [$value, $value]];
 
         $value = new MyWakeup();
         $value->sub = new MyWakeup();
@@ -135,33 +135,33 @@ class VarExporterTest extends TestCase
         $value->sub->bis = 123;
         $value->sub->baz = 123;
 
-        yield array('wakeup', $value);
+        yield ['wakeup', $value];
 
-        yield array('clone', array(new MyCloneable(), new MyNotCloneable()));
+        yield ['clone', [new MyCloneable(), new MyNotCloneable()]];
 
-        yield array('private', array(new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)));
+        yield ['private', [new MyPrivateValue(123, 234), new MyPrivateChildValue(123, 234)]];
 
         $value = new \SplObjectStorage();
         $value[new \stdClass()] = 345;
 
-        yield array('spl-object-storage', $value);
+        yield ['spl-object-storage', $value];
 
-        yield array('incomplete-class', unserialize('O:20:"SomeNotExistingClass":0:{}'));
+        yield ['incomplete-class', unserialize('O:20:"SomeNotExistingClass":0:{}')];
 
-        $value = array((object) array());
+        $value = [(object) []];
         $value[1] = &$value[0];
         $value[2] = $value[0];
 
-        yield array('hard-references', $value);
+        yield ['hard-references', $value];
 
-        $value = array();
+        $value = [];
         $value[0] = &$value;
 
-        yield array('hard-references-recursive', $value);
+        yield ['hard-references-recursive', $value];
 
-        static $value = array(123);
+        static $value = [123];
 
-        yield array('external-references', array(&$value), true);
+        yield ['external-references', [&$value], true];
 
         unset($value);
 
@@ -169,34 +169,34 @@ class VarExporterTest extends TestCase
 
         $rt = new \ReflectionProperty('Error', 'trace');
         $rt->setAccessible(true);
-        $rt->setValue($value, array('file' => __FILE__, 'line' => 123));
+        $rt->setValue($value, ['file' => __FILE__, 'line' => 123]);
 
         $rl = new \ReflectionProperty('Error', 'line');
         $rl->setAccessible(true);
         $rl->setValue($value, 234);
 
-        yield array('error', $value);
+        yield ['error', $value];
 
-        yield array('var-on-sleep', new GoodNight());
+        yield ['var-on-sleep', new GoodNight()];
 
         $value = new FinalError(false);
-        $rt->setValue($value, array());
+        $rt->setValue($value, []);
         $rl->setValue($value, 123);
 
-        yield array('final-error', $value);
+        yield ['final-error', $value];
 
-        yield array('final-array-iterator', new FinalArrayIterator());
+        yield ['final-array-iterator', new FinalArrayIterator()];
 
-        yield array('final-stdclass', new FinalStdClass());
+        yield ['final-stdclass', new FinalStdClass()];
 
         $value = new MyWakeup();
         $value->bis = new \ReflectionClass($value);
 
-        yield array('wakeup-refl', $value);
+        yield ['wakeup-refl', $value];
 
-        yield array('abstract-parent', new ConcreteClass());
+        yield ['abstract-parent', new ConcreteClass()];
 
-        yield array('foo-serializable', new FooSerializable('bar'));
+        yield ['foo-serializable', new FooSerializable('bar')];
     }
 }
 
@@ -222,7 +222,7 @@ class MyWakeup
 
     public function __sleep()
     {
-        return array('sub', 'baz');
+        return ['sub', 'baz'];
     }
 
     public function __wakeup()
@@ -287,7 +287,7 @@ class GoodNight
     {
         $this->good = 'night';
 
-        return array('good');
+        return ['good'];
     }
 }
 
@@ -305,7 +305,7 @@ final class FinalArrayIterator extends \ArrayIterator
 {
     public function serialize()
     {
-        return serialize(array(123, parent::serialize()));
+        return serialize([123, parent::serialize()]);
     }
 
     public function unserialize($data)
@@ -362,7 +362,7 @@ class FooSerializable implements \Serializable
 
     public function serialize(): string
     {
-        return serialize(array($this->getFoo()));
+        return serialize([$this->getFoo()]);
     }
 
     public function unserialize($str)

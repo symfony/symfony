@@ -196,7 +196,7 @@ class DateTimeToLocalizedStringTransformerTest extends TestCase
 
         // HOW TO REPRODUCE?
 
-        //$this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException');
+        //$this->expectException('Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException');
 
         //$transformer->transform(1.5);
     }

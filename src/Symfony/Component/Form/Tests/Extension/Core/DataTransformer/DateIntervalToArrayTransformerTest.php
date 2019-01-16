@@ -176,7 +176,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     {
         $transformer = new DateIntervalToArrayTransformer();
         $this->assertNull($transformer->reverseTransform(null));
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $transformer->reverseTransform('12345');
     }
 
@@ -184,7 +184,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     {
         $transformer = new DateIntervalToArrayTransformer();
         $input = array('years' => '1');
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $transformer->reverseTransform($input);
     }
 

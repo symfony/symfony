@@ -329,7 +329,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             $exceptionCode = 'PHPUnit_Framework_Error_Warning';
         }
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+        $this->expectException($exceptionCode);
 
         $formatter->format($value, NumberFormatter::TYPE_CURRENCY);
     }
@@ -712,7 +712,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             $exceptionCode = 'PHPUnit_Framework_Error_Warning';
         }
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+        $this->expectException($exceptionCode);
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_DEFAULT);
@@ -838,7 +838,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             $exceptionCode = 'PHPUnit_Framework_Error_Warning';
         }
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}($exceptionCode);
+        $this->expectException($exceptionCode);
 
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);

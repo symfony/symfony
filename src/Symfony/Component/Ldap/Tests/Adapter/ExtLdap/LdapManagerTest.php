@@ -61,7 +61,7 @@ class LdapManagerTest extends LdapTestCase
      */
     public function testLdapAddInvalidEntry()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
+        $this->expectException(LdapException::class);
         $this->executeSearchQuery(1);
 
         // The entry is missing a subject name
@@ -107,7 +107,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundAdd()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
+        $this->expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->add(new Entry(''));
     }
@@ -118,7 +118,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundRemove()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
+        $this->expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->remove(new Entry(''));
     }
@@ -129,7 +129,7 @@ class LdapManagerTest extends LdapTestCase
     public function testLdapUnboundUpdate()
     {
         $this->adapter = new Adapter($this->getLdapConfig());
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
+        $this->expectException(NotBoundException::class);
         $em = $this->adapter->getEntryManager();
         $em->update(new Entry(''));
     }
@@ -224,7 +224,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
+        $this->expectException(LdapException::class);
 
         $entryManager->removeAttributeValues($entry, 'mail', array('fabpot@example.org'));
     }
@@ -236,7 +236,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
+        $this->expectException(LdapException::class);
 
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
     }
@@ -248,7 +248,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UpdateOperationException::class);
+        $this->expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), array(new UpdateOperation(LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', array())));
     }
@@ -260,7 +260,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UpdateOperationException::class);
+        $this->expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), array(new UpdateOperation(512, 'mail', array())));
     }
@@ -337,7 +337,7 @@ class LdapManagerTest extends LdapTestCase
         $result = $this->executeSearchQuery(1);
         $entry = $result[0];
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UpdateOperationException::class);
+        $this->expectException(UpdateOperationException::class);
 
         $entryManager->applyOperations($entry->getDn(), $duplicateIterator);
     }

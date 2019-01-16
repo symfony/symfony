@@ -188,7 +188,7 @@ class CommandTest extends TestCase
     public function testSetAliasesNull()
     {
         $command = new \TestCommand();
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $command->setAliases(null);
     }
 

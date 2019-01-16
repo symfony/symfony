@@ -64,7 +64,7 @@ class FileTest extends TestCase
 
     public function testConstructWhenFileNotExists()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         new File(__DIR__.'/Fixtures/not_here');
     }

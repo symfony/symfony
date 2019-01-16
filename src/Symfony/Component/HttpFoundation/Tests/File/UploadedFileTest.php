@@ -33,7 +33,7 @@ class UploadedFileTest extends TestCase
 
     public function testConstructWhenFileNotExists()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         new UploadedFile(
             __DIR__.'/Fixtures/not_here',

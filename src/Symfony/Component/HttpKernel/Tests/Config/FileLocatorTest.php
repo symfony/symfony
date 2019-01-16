@@ -30,7 +30,7 @@ class FileLocatorTest extends TestCase
         $kernel
             ->expects($this->never())
             ->method('locateResource');
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
+        $this->expectException('LogicException');
         $locator->locate('/some/path');
     }
 

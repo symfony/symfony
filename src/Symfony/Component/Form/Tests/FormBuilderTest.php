@@ -51,13 +51,13 @@ class FormBuilderTest extends TestCase
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add(true);
     }
 
     public function testAddTypeNoString()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->expectException('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add('foo', 1234);
     }
 

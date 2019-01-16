@@ -307,7 +307,7 @@ class DebugClassLoaderTest extends TestCase
 
     public function testVirtualUse()
     {
-        $deprecations = array();
+        $deprecations = [];
         set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
         $e = error_reporting(E_USER_DEPRECATED);
 
@@ -316,7 +316,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array(
+        $this->assertSame([
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::sameLineInterfaceMethodNoBraces()".',
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::newLineInterfaceMethod()": Some description!',
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::newLineInterfaceMethodNoBraces()": Description.',
@@ -328,12 +328,12 @@ class DebugClassLoaderTest extends TestCase
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::staticMethodTyped(int $arg)": Description.',
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::staticMethodTypedNoBraces()".',
             'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtual" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualSubInterface::subInterfaceMethod()".',
-        ), $deprecations);
+        ], $deprecations);
     }
 
     public function testVirtualUseWithMagicCall()
     {
-        $deprecations = array();
+        $deprecations = [];
         set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
         $e = error_reporting(E_USER_DEPRECATED);
 
@@ -342,7 +342,7 @@ class DebugClassLoaderTest extends TestCase
         error_reporting($e);
         restore_error_handler();
 
-        $this->assertSame(array(), $deprecations);
+        $this->assertSame([], $deprecations);
     }
 }
 

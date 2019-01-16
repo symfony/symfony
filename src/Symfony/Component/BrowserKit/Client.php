@@ -313,10 +313,10 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = []/*, array $serverParameters = array()*/)
+    public function submit(Form $form, array $values = []/*, array $serverParameters = []*/)
     {
         if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $form->setValues($values);
@@ -330,7 +330,7 @@ abstract class Client
      * uses it to submit the given form field values.
      *
      * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
-     * @param array  $fieldValues      Use this syntax: array('my_form[name]' => '...', 'my_form[email]' => '...')
+     * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
      */

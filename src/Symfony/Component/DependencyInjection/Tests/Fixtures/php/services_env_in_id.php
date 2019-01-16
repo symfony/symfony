@@ -17,19 +17,19 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'foo' => 'getFooService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -44,12 +44,12 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar_%env(BAR)%' => true,
             'baz_%env(BAR)%' => true,
-        );
+        ];
     }
 
     /**
@@ -69,7 +69,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())), array('baz_'.$this->getEnv('string:BAR') => new \stdClass()));
+        return $this->services['foo'] = new \stdClass(($this->privates['bar_%env(BAR)%'] ?? ($this->privates['bar_%env(BAR)%'] = new \stdClass())), ['baz_'.$this->getEnv('string:BAR') => new \stdClass()]);
     }
 
     public function getParameter($name)
@@ -111,8 +111,8 @@ class ProjectServiceContainer extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = array();
-    private $dynamicParameters = array();
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
 
     /**
      * Computes a dynamic parameter.
@@ -135,8 +135,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getDefaultParameters()
     {
-        return array(
+        return [
             'env(BAR)' => 'bar',
-        );
+        ];
     }
 }

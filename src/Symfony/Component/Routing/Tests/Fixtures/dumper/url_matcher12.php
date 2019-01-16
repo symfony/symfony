@@ -14,7 +14,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->regexpList = array(
+        $this->regexpList = [
             0 => '{^(?'
                     .'|/abc([^/]++)/(?'
                         .'|1(?'
@@ -33,14 +33,14 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         .')'
                     .')'
                 .')/?$}sD',
-        );
-        $this->dynamicRoutes = array(
-            27 => array(array(array('_route' => 'r1'), array('foo'), null, null, false, false, null)),
-            38 => array(array(array('_route' => 'r10'), array('foo'), null, null, false, false, null)),
-            46 => array(array(array('_route' => 'r100'), array('foo'), null, null, false, false, null)),
-            59 => array(array(array('_route' => 'r2'), array('foo'), null, null, false, false, null)),
-            70 => array(array(array('_route' => 'r20'), array('foo'), null, null, false, false, null)),
-            78 => array(array(array('_route' => 'r200'), array('foo'), null, null, false, false, null)),
-        );
+        ];
+        $this->dynamicRoutes = [
+            27 => [[['_route' => 'r1'], ['foo'], null, null, false, false, null]],
+            38 => [[['_route' => 'r10'], ['foo'], null, null, false, false, null]],
+            46 => [[['_route' => 'r100'], ['foo'], null, null, false, false, null]],
+            59 => [[['_route' => 'r2'], ['foo'], null, null, false, false, null]],
+            70 => [[['_route' => 'r20'], ['foo'], null, null, false, false, null]],
+            78 => [[['_route' => 'r200'], ['foo'], null, null, false, false, null]],
+        ];
     }
 }

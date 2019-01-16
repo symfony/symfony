@@ -49,7 +49,7 @@ class TranslationExtensionTest extends TestCase
      * @group legacy
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoice($template, $expected, array $variables = array())
+    public function testTransChoice($template, $expected, array $variables = [])
     {
         $this->testTrans($template, $expected, $variables);
     }
@@ -98,48 +98,48 @@ class TranslationExtensionTest extends TestCase
             ['{% trans into "fr"%}Hello{% endtrans %}', 'Hello'],
 
             // trans with count
-            array(
+            [
                 '{% trans from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is no apples',
-                array('count' => 0),
-            ),
-            array(
+                ['count' => 0],
+            ],
+            [
                 '{% trans %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is 5 apples',
-                array('count' => 5),
-            ),
-            array(
+                ['count' => 5],
+            ],
+            [
                 '{% trans %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtrans %}',
                 'There is 5 apples (Symfony)',
-                array('count' => 5, 'name' => 'Symfony'),
-            ),
-            array(
+                ['count' => 5, 'name' => 'Symfony'],
+            ],
+            [
                 '{% trans with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtrans %}',
                 'There is 5 apples (Symfony)',
-                array('count' => 5),
-            ),
-            array(
+                ['count' => 5],
+            ],
+            [
                 '{% trans into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is no apples',
-                array('count' => 0),
-            ),
-            array(
+                ['count' => 0],
+            ],
+            [
                 '{% trans count 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtrans %}',
                 'There is 5 apples',
-            ),
+            ],
 
             // trans filter
-            array('{{ "Hello"|trans }}', 'Hello'),
-            array('{{ name|trans }}', 'Symfony', array('name' => 'Symfony')),
-            array('{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', array('hello' => 'Hello %name%')),
-            array('{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'),
+            ['{{ "Hello"|trans }}', 'Hello'],
+            ['{{ name|trans }}', 'Symfony', ['name' => 'Symfony']],
+            ['{{ hello|trans({ \'%name%\': \'Symfony\' }) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{{ hello|trans(vars) }}', 'Hello Symfony', ['hello' => 'Hello %name%']],
+            ['{{ "Hello"|trans({}, "messages", "fr") }}', 'Hello'],
 
             // trans filter with count
-            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans(count=count) }}', 'There is 5 apples', array('count' => 5)),
-            array('{{ text|trans(count=5, arguments={\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', array('text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)')),
-            array('{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans({}, "messages", "fr", count) }}', 'There is 5 apples', array('count' => 5)),
-        );
+            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans(count=count) }}', 'There is 5 apples', ['count' => 5]],
+            ['{{ text|trans(count=5, arguments={\'%name%\': \'Symfony\'}) }}', 'There is 5 apples (Symfony)', ['text' => '{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%)']],
+            ['{{ "{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples"|trans({}, "messages", "fr", count) }}', 'There is 5 apples', ['count' => 5]],
+        ];
     }
 
     /**
@@ -147,18 +147,18 @@ class TranslationExtensionTest extends TestCase
      */
     public function getTransChoiceTests()
     {
-        return array(
+        return [
             // trans tag
-            array('{% trans %}Hello{% endtrans %}', 'Hello'),
-            array('{% trans %}%name%{% endtrans %}', 'Symfony', array('name' => 'Symfony')),
+            ['{% trans %}Hello{% endtrans %}', 'Hello'],
+            ['{% trans %}%name%{% endtrans %}', 'Symfony', ['name' => 'Symfony']],
 
-            array('{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'),
+            ['{% trans from elsewhere %}Hello{% endtrans %}', 'Hello'],
 
-            array('{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony', array('name' => 'Symfony')),
-            array('{% trans with { \'%name%\': \'Symfony\' } %}Hello %name%{% endtrans %}', 'Hello Symfony'),
-            array('{% set vars = { \'%name%\': \'Symfony\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony'),
+            ['{% trans %}Hello %name%{% endtrans %}', 'Hello Symfony', ['name' => 'Symfony']],
+            ['{% trans with { \'%name%\': \'Symfony\' } %}Hello %name%{% endtrans %}', 'Hello Symfony'],
+            ['{% set vars = { \'%name%\': \'Symfony\' } %}{% trans with vars %}Hello %name%{% endtrans %}', 'Hello Symfony'],
 
-            array('{% trans into "fr"%}Hello{% endtrans %}', 'Hello'),
+            ['{% trans into "fr"%}Hello{% endtrans %}', 'Hello'],
 
             // transchoice
             [

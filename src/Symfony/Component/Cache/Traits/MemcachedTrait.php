@@ -68,7 +68,7 @@ trait MemcachedTrait
      *
      * Examples for servers:
      * - 'memcached://user:pass@localhost?weight=33'
-     * - array(array('localhost', 11211, 33))
+     * - [['localhost', 11211, 33]]
      *
      * @param array[]|string|string[] $servers An array of servers, a DSN, or an array of DSNs
      * @param array                   $options An array of options

@@ -146,7 +146,7 @@ class OptionsResolver implements Options
      * following signature:
      *
      *     $options->setDefault('database', function (OptionsResolver $resolver) {
-     *         $resolver->setDefined(array('dbname', 'host', 'port', 'user', 'pass'));
+     *         $resolver->setDefined(['dbname', 'host', 'port', 'user', 'pass']);
      *     }
      *
      * To get access to the parent options, add a second argument to the closure's

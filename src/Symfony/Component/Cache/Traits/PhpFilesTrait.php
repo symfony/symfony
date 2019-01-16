@@ -195,7 +195,7 @@ trait PhpFilesTrait
 
             $file = $this->files[$key] = $this->getFile($key, true);
             // Since OPcache only compiles files older than the script execution start, set the file's mtime in the past
-            $ok = $this->write($file, "<?php return array({$expiry}, {$value});\n", self::$startTime - 10) && $ok;
+            $ok = $this->write($file, "<?php return [{$expiry}, {$value}];\n", self::$startTime - 10) && $ok;
 
             if ($allowCompile) {
                 @opcache_invalidate($file, true);

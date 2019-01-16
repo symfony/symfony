@@ -17,12 +17,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'bar_service' => 'getBarServiceService',
             'foo_service' => 'getFooServiceService',
             'translator.loader_1' => 'getTranslator_Loader1Service',
@@ -31,9 +31,9 @@ class ProjectServiceContainer extends Container
             'translator_1' => 'getTranslator1Service',
             'translator_2' => 'getTranslator2Service',
             'translator_3' => 'getTranslator3Service',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -48,14 +48,14 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'baz_service' => true,
             'translator.loader_1_locator' => true,
             'translator.loader_2_locator' => true,
             'translator.loader_3_locator' => true,
-        );
+        ];
     }
 
     /**
@@ -75,13 +75,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooServiceService()
     {
-        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('bar' => function () {
+        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(['bar' => function () {
             return ($this->services['bar_service'] ?? $this->getBarServiceService());
         }, 'baz' => function (): \stdClass {
             return ($this->privates['baz_service'] ?? ($this->privates['baz_service'] = new \stdClass()));
         }, 'nil' => function () {
             return NULL;
-        }));
+        }]);
     }
 
     /**
@@ -121,9 +121,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getTranslator1Service()
     {
-        return $this->services['translator_1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_1' => function () {
+        return $this->services['translator_1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_1' => function () {
             return ($this->services['translator.loader_1'] ?? ($this->services['translator.loader_1'] = new \stdClass()));
-        })));
+        }]));
     }
 
     /**
@@ -133,9 +133,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getTranslator2Service()
     {
-        $this->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_2' => function () {
+        $this->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_2' => function () {
             return ($this->services['translator.loader_2'] ?? ($this->services['translator.loader_2'] = new \stdClass()));
-        })));
+        }]));
 
         $instance->addResource('db', ($this->services['translator.loader_2'] ?? ($this->services['translator.loader_2'] = new \stdClass())), 'nl');
 
@@ -149,9 +149,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getTranslator3Service()
     {
-        $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
+        $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_3' => function () {
             return ($this->services['translator.loader_3'] ?? ($this->services['translator.loader_3'] = new \stdClass()));
-        })));
+        }]));
 
         $a = ($this->services['translator.loader_3'] ?? ($this->services['translator.loader_3'] = new \stdClass()));
 

@@ -3,7 +3,7 @@
 return new class
 {
     public $proxyClass;
-    private $privates = array();
+    private $privates = [];
 
     public function getFooService($lazyLoad = true)
     {

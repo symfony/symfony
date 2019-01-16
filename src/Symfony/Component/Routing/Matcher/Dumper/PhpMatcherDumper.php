@@ -207,15 +207,15 @@ EOF;
         $code = '';
 
         foreach ($staticRoutes as $url => $routes) {
-            $code .= self::export($url)." => array(\n";
+            $code .= self::export($url)." => [\n";
             foreach ($routes as $name => list($route, $hasTrailingSlash)) {
                 $code .= $this->compileRoute($route, $name, !$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null, $hasTrailingSlash, false, $conditions);
             }
-            $code .= "),\n";
+            $code .= "],\n";
         }
 
         if ($code) {
-            return "\$this->staticRoutes = array(\n{$this->indent($code, 1)});\n";
+            return "\$this->staticRoutes = [\n{$this->indent($code, 1)}];\n";
         }
 
         return $code;
@@ -348,8 +348,8 @@ EOF;
 
         unset($state->getVars);
 
-        return "\$this->regexpList = array({$code}\n);\n"
-            ."\$this->dynamicRoutes = array(\n{$this->indent($state->routes, 1)});\n";
+        return "\$this->regexpList = [{$code}\n];\n"
+            ."\$this->dynamicRoutes = [\n{$this->indent($state->routes, 1)}];\n";
     }
 
     /**
@@ -394,7 +394,7 @@ EOF;
             $state->regex .= $rx;
 
             $prevRegex = $compiledRoute->getRegex();
-            $state->routes .= sprintf("%s => array(\n%s),\n", $state->mark, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $hasTrailingVar, $conditions));
+            $state->routes .= sprintf("%s => [\n%s],\n", $state->mark, $this->compileRoute($route, $name, $vars, $hasTrailingSlash, $hasTrailingVar, $conditions));
         }
 
         return $code;
@@ -420,7 +420,7 @@ EOF;
         }
 
         return sprintf(
-            "    array(%s, %s, %s, %s, %s, %s, %s),\n",
+            "    [%s, %s, %s, %s, %s, %s, %s],\n",
             self::export(['_route' => $name] + $defaults),
             self::export($vars),
             self::export(array_flip($route->getMethods()) ?: null),
@@ -445,7 +445,7 @@ EOF;
 
     private function indent($code, $level = 1)
     {
-        $code = preg_replace('/ => array\(\n    (array\(.+),\n\),/', ' => array($1),', $code);
+        $code = preg_replace('/ => \[\n    (\[.+),\n\],/', ' => [$1],', $code);
 
         return preg_replace('/^./m', str_repeat('    ', $level).'$0', $code);
     }
@@ -466,11 +466,11 @@ EOF;
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {
-            return 'array()';
+            return '[]';
         }
 
         $i = 0;
-        $export = 'array(';
+        $export = '[';
 
         foreach ($value as $k => $v) {
             if ($i === $k) {
@@ -486,6 +486,6 @@ EOF;
             $export .= self::export($v).', ';
         }
 
-        return substr_replace($export, ')', -2);
+        return substr_replace($export, ']', -2);
     }
 }

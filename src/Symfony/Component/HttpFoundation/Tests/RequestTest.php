@@ -1025,7 +1025,7 @@ class RequestTest extends TestCase
             // forwarded for with remote IPv6 addr not trusted
             [['1620:0:1cfe:face:b00c::3'], '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3',  null],
             // forwarded for with remote IPv6 addr trusted
-            [['2620:0:1cfe:face:b00c::3'], '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3', array ('1620:0:1cfe:face:b00c::3')],
+            [['2620:0:1cfe:face:b00c::3'], '1620:0:1cfe:face:b00c::3', '2620:0:1cfe:face:b00c::3', ['1620:0:1cfe:face:b00c::3']],
             // forwarded for with remote IPv6 range trusted
             [['88.88.88.88'],              '2a01:198:603:0:396e:4789:8e99:890f', '88.88.88.88',     ['2a01:198:603:0::/65']],
 

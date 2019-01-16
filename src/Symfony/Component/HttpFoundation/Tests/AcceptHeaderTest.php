@@ -95,9 +95,9 @@ class AcceptHeaderTest extends TestCase
     public function provideSortingData()
     {
         return [
-            'quality has priority' => ['*;q=0.3,ISO-8859-1,utf-8;q=0.7', array ('ISO-8859-1', 'utf-8', '*')],
-            'order matters when q is equal' => ['*;q=0.3,ISO-8859-1;q=0.7,utf-8;q=0.7', array ('ISO-8859-1', 'utf-8', '*')],
-            'order matters when q is equal2' => ['*;q=0.3,utf-8;q=0.7,ISO-8859-1;q=0.7', array ('utf-8', 'ISO-8859-1', '*')],
+            'quality has priority' => ['*;q=0.3,ISO-8859-1,utf-8;q=0.7', ['ISO-8859-1', 'utf-8', '*']],
+            'order matters when q is equal' => ['*;q=0.3,ISO-8859-1;q=0.7,utf-8;q=0.7', ['ISO-8859-1', 'utf-8', '*']],
+            'order matters when q is equal2' => ['*;q=0.3,utf-8;q=0.7,ISO-8859-1;q=0.7', ['utf-8', 'ISO-8859-1', '*']],
         ];
     }
 }

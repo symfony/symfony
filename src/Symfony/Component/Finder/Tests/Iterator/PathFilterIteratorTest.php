@@ -68,15 +68,15 @@ class PathFilterIteratorTest extends IteratorTestCase
             [$inner, ['/^A/'],       [], ['abc.dat', 'ab.dat', 'a.dat']],
             [$inner, ['/^A\/B/'],    [], ['abc.dat', 'ab.dat']],
             [$inner, ['/^A\/B\/C/'], [], ['abc.dat']],
-            [$inner, ['/A\/B\/C/'], array (), ['abc.dat', 'abc.dat.copy']],
+            [$inner, ['/A\/B\/C/'], [], ['abc.dat', 'abc.dat.copy']],
 
             [$inner, ['A'],      [], ['abc.dat', 'ab.dat', 'a.dat', 'abc.dat.copy', 'ab.dat.copy', 'a.dat.copy']],
             [$inner, ['A/B'],    [], ['abc.dat', 'ab.dat', 'abc.dat.copy', 'ab.dat.copy']],
-            [$inner, ['A/B/C'], array (), ['abc.dat', 'abc.dat.copy']],
+            [$inner, ['A/B/C'], [], ['abc.dat', 'abc.dat.copy']],
 
             [$inner, ['copy/A'],      [], ['abc.dat.copy', 'ab.dat.copy', 'a.dat.copy']],
             [$inner, ['copy/A/B'],    [], ['abc.dat.copy', 'ab.dat.copy']],
-            [$inner, ['copy/A/B/C'], array (), ['abc.dat.copy']],
+            [$inner, ['copy/A/B/C'], [], ['abc.dat.copy']],
         ];
     }
 }

@@ -221,9 +221,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'scalar_node_not_empty_validated' => '%env(SOME)%',
-        ));
+        ]);
 
         $this->doProcess($container);
 
@@ -234,9 +234,9 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
-        $container->prependExtensionConfig('env_extension', $expected = array(
+        $container->prependExtensionConfig('env_extension', $expected = [
             'scalar_node_not_empty_validated' => 'foo %env(SOME)% bar',
-        ));
+        ]);
 
         $this->doProcess($container);
 

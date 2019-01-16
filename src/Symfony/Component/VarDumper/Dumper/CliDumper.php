@@ -55,9 +55,9 @@ class CliDumper extends AbstractDumper
     protected $collapseNextHash = false;
     protected $expandNextHash = false;
 
-    private $displayOptions = array(
+    private $displayOptions = [
         'fileLinkFormat' => null,
-    );
+    ];
 
     private $handlesHrefGracefully;
 
@@ -632,7 +632,7 @@ class CliDumper extends AbstractDumper
     private function getSourceLink($file, $line)
     {
         if ($fmt = $this->displayOptions['fileLinkFormat']) {
-            return \is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
+            return \is_string($fmt) ? strtr($fmt, ['%f' => $file, '%l' => $line]) : $fmt->format($file, $line);
         }
 
         return false;

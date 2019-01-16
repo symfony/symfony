@@ -23,14 +23,14 @@ class ClassExistsMockTest extends TestCase
 
     protected function setUp()
     {
-        ClassExistsMock::withMockedClasses(array(
+        ClassExistsMock::withMockedClasses([
             ExistingClass::class => false,
             'NonExistingClass' => true,
             ExistingInterface::class => false,
             'NonExistingInterface' => true,
             ExistingTrait::class => false,
             'NonExistingTrait' => true,
-        ));
+        ]);
     }
 
     public function testClassExists()

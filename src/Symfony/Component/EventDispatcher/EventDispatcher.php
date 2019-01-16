@@ -28,14 +28,14 @@ namespace Symfony\Component\EventDispatcher;
  */
 class EventDispatcher implements EventDispatcherInterface
 {
-    private $listeners = array();
-    private $sorted = array();
+    private $listeners = [];
+    private $sorted = [];
     private $optimized;
 
     public function __construct()
     {
         if (__CLASS__ === \get_class($this)) {
-            $this->optimized = array();
+            $this->optimized = [];
         }
     }
 
@@ -49,7 +49,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         if (null !== $this->optimized && null !== $eventName) {
-            $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? array() : $this->optimizeListeners($eventName));
+            $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));
         } else {
             $listeners = $this->getListeners($eventName);
         }
@@ -68,7 +68,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         if (null !== $eventName) {
             if (empty($this->listeners[$eventName])) {
-                return array();
+                return [];
             }
 
             if (!isset($this->sorted[$eventName])) {
@@ -175,12 +175,12 @@ class EventDispatcher implements EventDispatcherInterface
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (\is_string($params)) {
-                $this->addListener($eventName, array($subscriber, $params));
+                $this->addListener($eventName, [$subscriber, $params]);
             } elseif (\is_string($params[0])) {
-                $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
+                $this->addListener($eventName, [$subscriber, $params[0]], isset($params[1]) ? $params[1] : 0);
             } else {
                 foreach ($params as $listener) {
-                    $this->addListener($eventName, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);
+                    $this->addListener($eventName, [$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
                 }
             }
         }
@@ -194,10 +194,10 @@ class EventDispatcher implements EventDispatcherInterface
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (\is_array($params) && \is_array($params[0])) {
                 foreach ($params as $listener) {
-                    $this->removeListener($eventName, array($subscriber, $listener[0]));
+                    $this->removeListener($eventName, [$subscriber, $listener[0]]);
                 }
             } else {
-                $this->removeListener($eventName, array($subscriber, \is_string($params) ? $params : $params[0]));
+                $this->removeListener($eventName, [$subscriber, \is_string($params) ? $params : $params[0]]);
             }
         }
     }
@@ -228,7 +228,7 @@ class EventDispatcher implements EventDispatcherInterface
     private function sortListeners(string $eventName)
     {
         krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = array();
+        $this->sorted[$eventName] = [];
 
         foreach ($this->listeners[$eventName] as &$listeners) {
             foreach ($listeners as $k => $listener) {
@@ -246,7 +246,7 @@ class EventDispatcher implements EventDispatcherInterface
     private function optimizeListeners(string $eventName): array
     {
         krsort($this->listeners[$eventName]);
-        $this->optimized[$eventName] = array();
+        $this->optimized[$eventName] = [];
 
         foreach ($this->listeners[$eventName] as &$listeners) {
             foreach ($listeners as &$listener) {

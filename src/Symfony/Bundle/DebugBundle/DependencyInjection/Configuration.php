@@ -60,7 +60,7 @@ class Configuration implements ConfigurationInterface
                     ->enumNode('theme')
                         ->info('Changes the color of the dump() output when rendered directly on the templating. "dark" (default) or "light"')
                         ->example('dark')
-                        ->values(array('dark', 'light'))
+                        ->values(['dark', 'light'])
                         ->defaultValue('dark')
                     ->end()
                 ->end()

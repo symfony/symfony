@@ -39,7 +39,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidComparisonToPropertyPath()
     {
-        $constraint = new Bic(array('ibanPropertyPath' => 'value'));
+        $constraint = new Bic(['ibanPropertyPath' => 'value']);
 
         $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
 
@@ -52,9 +52,9 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidComparisonToPropertyPathOnArray()
     {
-        $constraint = new Bic(array('ibanPropertyPath' => '[root][value]'));
+        $constraint = new Bic(['ibanPropertyPath' => '[root][value]']);
 
-        $this->setObject(array('root' => array('value' => 'FR14 2004 1010 0505 0001 3M02 606')));
+        $this->setObject(['root' => ['value' => 'FR14 2004 1010 0505 0001 3M02 606']]);
 
         $this->validator->validate('SOGEFRPP', $constraint);
 
@@ -63,7 +63,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidComparisonToPropertyPath()
     {
-        $constraint = new Bic(array('ibanPropertyPath' => 'value'));
+        $constraint = new Bic(['ibanPropertyPath' => 'value']);
         $constraint->ibanMessage = 'Constraint Message';
 
         $object = new BicComparisonTestClass('FR14 2004 1010 0505 0001 3M02 606');
@@ -81,7 +81,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidComparisonToValue()
     {
-        $constraint = new Bic(array('iban' => 'FR14 2004 1010 0505 0001 3M02 606'));
+        $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
         $constraint->ibanMessage = 'Constraint Message';
 
         $this->validator->validate('SOGEFRPP', $constraint);
@@ -91,7 +91,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidComparisonToValue()
     {
-        $constraint = new Bic(array('iban' => 'FR14 2004 1010 0505 0001 3M02 606'));
+        $constraint = new Bic(['iban' => 'FR14 2004 1010 0505 0001 3M02 606']);
         $constraint->ibanMessage = 'Constraint Message';
 
         $this->validator->validate('UNCRIT2B912', $constraint);
@@ -105,7 +105,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testNoViolationOnNullObjectWithPropertyPath()
     {
-        $constraint = new Bic(array('ibanPropertyPath' => 'propertyPath'));
+        $constraint = new Bic(['ibanPropertyPath' => 'propertyPath']);
 
         $this->setObject(null);
 
@@ -120,15 +120,15 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
     {
-        new Bic(array(
+        new Bic([
             'iban' => 'value',
             'ibanPropertyPath' => 'propertyPath',
-        ));
+        ]);
     }
 
     public function testInvalidValuePath()
     {
-        $constraint = new Bic(array('ibanPropertyPath' => 'foo'));
+        $constraint = new Bic(['ibanPropertyPath' => 'foo']);
 
         if (method_exists($this, 'expectException')) {
             $this->expectException(ConstraintDefinitionException::class);
@@ -230,7 +230,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidBicSpecialCases(string $bic, string $iban)
     {
-        $constraint = new Bic(array('iban' => $iban));
+        $constraint = new Bic(['iban' => $iban]);
         $this->validator->validate($bic, $constraint);
 
         $this->assertNoViolation();
@@ -239,22 +239,22 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function getValidBicSpecialCases()
     {
         // FR related special cases
-        yield array('BNPAGFGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAPFGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPATFGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAGPGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAMQGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAYTGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPANCGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAREGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAPMGX', 'FR14 2004 1010 0505 0001 3M02 606');
-        yield array('BNPAWFGX', 'FR14 2004 1010 0505 0001 3M02 606');
+        yield ['BNPAGFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAPFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPATFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAGPGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAMQGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAYTGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPANCGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAREGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAPMGX', 'FR14 2004 1010 0505 0001 3M02 606'];
+        yield ['BNPAWFGX', 'FR14 2004 1010 0505 0001 3M02 606'];
 
         // GB related special cases
-        yield array('BARCJESA', 'GB12 CPBK 0892 9965 0449 911');
-        yield array('BARCIMSA', 'GB12 CPBK 0892 9965 0449 911');
-        yield array('BARCGGSA', 'GB12 CPBK 0892 9965 0449 911');
-        yield array('BARCVGSA', 'GB12 CPBK 0892 9965 0449 911');
+        yield ['BARCJESA', 'GB12 CPBK 0892 9965 0449 911'];
+        yield ['BARCIMSA', 'GB12 CPBK 0892 9965 0449 911'];
+        yield ['BARCGGSA', 'GB12 CPBK 0892 9965 0449 911'];
+        yield ['BARCVGSA', 'GB12 CPBK 0892 9965 0449 911'];
     }
 }
 

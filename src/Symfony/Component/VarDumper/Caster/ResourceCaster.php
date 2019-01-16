@@ -81,17 +81,17 @@ class ResourceCaster
         $pin = base64_decode(implode('', $pin));
         $pin = base64_encode(hash('sha256', $pin, true));
 
-        $a += array(
-            'subject' => new EnumStub(array_intersect_key($info['subject'], array('organizationName' => true, 'commonName' => true))),
-            'issuer' => new EnumStub(array_intersect_key($info['issuer'], array('organizationName' => true, 'commonName' => true))),
+        $a += [
+            'subject' => new EnumStub(array_intersect_key($info['subject'], ['organizationName' => true, 'commonName' => true])),
+            'issuer' => new EnumStub(array_intersect_key($info['issuer'], ['organizationName' => true, 'commonName' => true])),
             'expiry' => new ConstStub(date(\DateTime::ISO8601, $info['validTo_time_t']), $info['validTo_time_t']),
-            'fingerprint' => new EnumStub(array(
+            'fingerprint' => new EnumStub([
                 'md5' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'md5')), 2, ':', true)),
                 'sha1' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'sha1')), 2, ':', true)),
                 'sha256' => new ConstStub(wordwrap(strtoupper(openssl_x509_fingerprint($h, 'sha256')), 2, ':', true)),
                 'pin-sha256' => new ConstStub($pin),
-            )),
-        );
+            ]),
+        ];
 
         return $a;
     }

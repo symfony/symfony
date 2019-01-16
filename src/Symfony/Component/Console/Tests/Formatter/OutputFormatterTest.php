@@ -256,15 +256,15 @@ class OutputFormatterTest extends TestCase
 
     public function provideDecoratedAndNonDecoratedOutput()
     {
-        return array(
-            array('<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"),
-            array('<info>some info</info>', 'some info', "\033[32msome info\033[39m"),
-            array('<comment>some comment</comment>', 'some comment', "\033[33msome comment\033[39m"),
-            array('<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"),
-            array('<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"),
-            array('<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"),
-            array('<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', 'JetBrains-JediTerm'),
-        );
+        return [
+            ['<error>some error</error>', 'some error', "\033[37;41msome error\033[39;49m"],
+            ['<info>some info</info>', 'some info', "\033[32msome info\033[39m"],
+            ['<comment>some comment</comment>', 'some comment', "\033[33msome comment\033[39m"],
+            ['<question>some question</question>', 'some question', "\033[30;46msome question\033[39;49m"],
+            ['<fg=red>some text with inline style</>', 'some text with inline style', "\033[31msome text with inline style\033[39m"],
+            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', "\033]8;;idea://open/?file=/path/SomeFile.php&line=12\033\\some URL\033]8;;\033\\"],
+            ['<href=idea://open/?file=/path/SomeFile.php&line=12>some URL</>', 'some URL', 'some URL', 'JetBrains-JediTerm'],
+        ];
     }
 
     public function testContentWithLineBreaks()

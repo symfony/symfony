@@ -45,7 +45,7 @@ class DebugExtension extends Extension
 
         if (method_exists(HtmlDumper::class, 'setTheme') && 'dark' !== $config['theme']) {
             $container->getDefinition('var_dumper.html_dumper')
-                ->addMethodCall('setTheme', array($config['theme']));
+                ->addMethodCall('setTheme', [$config['theme']]);
         }
 
         if (null === $config['dump_destination']) {
@@ -79,9 +79,9 @@ class DebugExtension extends Extension
 
         if (method_exists(CliDumper::class, 'setDisplayOptions')) {
             $container->getDefinition('var_dumper.cli_dumper')
-                ->addMethodCall('setDisplayOptions', array(array(
+                ->addMethodCall('setDisplayOptions', [[
                     'fileLinkFormat' => new Reference('debug.file_link_formatter', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
-                )))
+                ]])
             ;
         }
     }

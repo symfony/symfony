@@ -114,7 +114,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
                 if (method_exists($dumper, 'setDisplayOptions')) {
-                    $dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+                    $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
                 }
             }
 
@@ -219,7 +219,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
                 if (method_exists($dumper, 'setDisplayOptions')) {
-                    $dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+                    $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
                 }
             }
 

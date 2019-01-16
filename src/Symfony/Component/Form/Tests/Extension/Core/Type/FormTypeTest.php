@@ -643,12 +643,12 @@ class FormTypeTest extends BaseTypeTest
     public function testPassBlockPrefixToViewWithParent()
     {
         $view = $this->factory->createNamedBuilder('parent', static::TESTED_TYPE)
-            ->add('child', $this->getTestedType(), array(
+            ->add('child', $this->getTestedType(), [
                 'block_prefix' => 'child',
-            ))
+            ])
             ->getForm()
             ->createView();
 
-        $this->assertSame(array('form', 'child', '_parent_child'), $view['child']->vars['block_prefixes']);
+        $this->assertSame(['form', 'child', '_parent_child'], $view['child']->vars['block_prefixes']);
     }
 }

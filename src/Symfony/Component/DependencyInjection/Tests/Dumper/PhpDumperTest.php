@@ -453,7 +453,7 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
         $dumper->dump();
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_default_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_DefaultParameters')));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_default_env.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_DefaultParameters']));
 
         require self::$fixturesPath.'/php/services_default_env.php';
         $container = new \Symfony_DI_PhpDumper_Test_DefaultParameters();

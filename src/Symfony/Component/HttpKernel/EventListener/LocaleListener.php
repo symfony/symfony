@@ -79,13 +79,13 @@ class LocaleListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array(
-                array('setDefaultLocale', 100),
+        return [
+            KernelEvents::REQUEST => [
+                ['setDefaultLocale', 100],
                 // must be registered after the Router to have access to the _locale
-                array('onKernelRequest', 16),
-            ),
-            KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
-        );
+                ['onKernelRequest', 16],
+            ],
+            KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
+        ];
     }
 }

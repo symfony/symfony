@@ -36,10 +36,10 @@ class LocaleListenerTest extends TestCase
     public function testRegisteredEvent()
     {
         $this->assertEquals(
-            array(
-                KernelEvents::REQUEST => array(array('setDefaultLocale', 100), array('onKernelRequest', 16)),
-                KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
-            ),
+            [
+                KernelEvents::REQUEST => [['setDefaultLocale', 100], ['onKernelRequest', 16]],
+                KernelEvents::FINISH_REQUEST => [['onKernelFinishRequest', 0]],
+            ],
             LocaleListener::getSubscribedEvents()
         );
     }

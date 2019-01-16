@@ -49,21 +49,21 @@ class CliDescriptorTest extends TestCase
             return $s;
         }));
 
-        $descriptor->describe($output, new Data(array(array(123))), $context + array('timestamp' => 1544804268.3668), 1);
+        $descriptor->describe($output, new Data([[123]]), $context + ['timestamp' => 1544804268.3668], 1);
 
         $this->assertStringMatchesFormat(trim($expectedOutput), str_replace(PHP_EOL, "\n", trim($output->fetch())));
     }
 
     public function provideContext()
     {
-        yield 'source' => array(
-            array(
-                'source' => array(
+        yield 'source' => [
+            [
+                'source' => [
                     'name' => 'CliDescriptorTest.php',
                     'line' => 30,
                     'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 Received from client #1
 -----------------------
@@ -74,18 +74,18 @@ Received from client #1
   file     /Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php  
  -------- ---------------------------------------------------------------------------------------------------
 TXT
-        );
+        ];
 
-        yield 'source full' => array(
-            array(
-                'source' => array(
+        yield 'source full' => [
+            [
+                'source' => [
                     'name' => 'CliDescriptorTest.php',
                     'line' => 30,
                     'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                     'file' => '/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                     'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
-                ),
-            ),
+                ],
+            ],
             method_exists(OutputFormatterStyle::class, 'setHref') ?
                 <<<TXT
 Received from client #1
@@ -112,34 +112,34 @@ Received from client #1
 Open source in your IDE/browser:
 phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30
 TXT
-        );
+        ];
 
         if (method_exists(OutputFormatterStyle::class, 'setHref')) {
-            yield 'source with hyperlink' => array(
-                array(
-                    'source' => array(
+            yield 'source with hyperlink' => [
+                [
+                    'source' => [
                         'name' => 'CliDescriptorTest.php',
                         'line' => 30,
                         'file_relative' => 'src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php',
                         'file_link' => 'phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30',
-                    ),
-                ),
+                    ],
+                ],
                 <<<TXT
 %A
   source   \033]8;;phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30\033\CliDescriptorTest.php on line 30\033]8;;\033%A
 %A
 TXT
                 , true,
-            );
+            ];
         }
 
-        yield 'cli' => array(
-            array(
-                'cli' => array(
+        yield 'cli' => [
+            [
+                'cli' => [
                     'identifier' => 'd8bece1c',
                     'command_line' => 'bin/phpunit',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 $ bin/phpunit
 -------------
@@ -148,17 +148,17 @@ $ bin/phpunit
   date   Fri, 14 Dec 2018 16:17:48 +0000  
  ------ ---------------------------------
 TXT
-        );
+        ];
 
-        yield 'request' => array(
-            array(
-                'request' => array(
+        yield 'request' => [
+            [
+                'request' => [
                     'identifier' => 'd8bece1c',
-                    'controller' => new Data(array(array('FooController.php'))),
+                    'controller' => new Data([['FooController.php']]),
                     'method' => 'GET',
                     'uri' => 'http://localhost/foo',
-                ),
-            ),
+                ],
+            ],
             <<<TXT
 GET http://localhost/foo
 ------------------------
@@ -168,6 +168,6 @@ GET http://localhost/foo
   controller   "FooController.php"              
  ------------ --------------------------------- 
 TXT
-        );
+        ];
     }
 }

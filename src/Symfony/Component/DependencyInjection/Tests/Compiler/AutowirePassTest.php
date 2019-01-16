@@ -902,7 +902,7 @@ class AutowirePassTest extends TestCase
 
         (new AutowirePass())->process($container);
 
-        $this->assertSame(array('Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'), $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
+        $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
     }
 
     public function testNamedArgumentAliasResolveCollisions()

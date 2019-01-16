@@ -104,17 +104,17 @@ class XliffFileLoader implements LoaderInterface
 
                 $catalogue->set((string) $source, $target, $domain);
 
-                $metadata = array(
-                    'file' => array(
+                $metadata = [
+                    'file' => [
                         'original' => (string) $fileAttributes['original'],
-                    ),
-                );
+                    ],
+                ];
                 if ($notes = $this->parseNotesMetadata($translation->note, $encoding)) {
                     $metadata['notes'] = $notes;
                 }
 
                 if (isset($translation->target) && $translation->target->attributes()) {
-                    $metadata['target-attributes'] = array();
+                    $metadata['target-attributes'] = [];
                     foreach ($translation->target->attributes() as $key => $value) {
                         $metadata['target-attributes'][$key] = (string) $value;
                     }
@@ -146,18 +146,18 @@ class XliffFileLoader implements LoaderInterface
 
                 $catalogue->set((string) $source, $target, $domain);
 
-                $metadata = array();
+                $metadata = [];
                 if (isset($segment->target) && $segment->target->attributes()) {
-                    $metadata['target-attributes'] = array();
+                    $metadata['target-attributes'] = [];
                     foreach ($segment->target->attributes() as $key => $value) {
                         $metadata['target-attributes'][$key] = (string) $value;
                     }
                 }
 
                 if (isset($unit->notes)) {
-                    $metadata['notes'] = array();
+                    $metadata['notes'] = [];
                     foreach ($unit->notes->note as $noteNode) {
-                        $note = array();
+                        $note = [];
                         foreach ($noteNode->attributes() as $key => $value) {
                             $note[$key] = (string) $value;
                         }
@@ -185,7 +185,7 @@ class XliffFileLoader implements LoaderInterface
 
     private function parseNotesMetadata(\SimpleXMLElement $noteElement = null, string $encoding = null): array
     {
-        $notes = array();
+        $notes = [];
 
         if (null === $noteElement) {
             return $notes;
@@ -194,7 +194,7 @@ class XliffFileLoader implements LoaderInterface
         /** @var \SimpleXMLElement $xmlNote */
         foreach ($noteElement as $xmlNote) {
             $noteAttributes = $xmlNote->attributes();
-            $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));
+            $note = ['content' => $this->utf8ToCharset((string) $xmlNote, $encoding)];
             if (isset($noteAttributes['priority'])) {
                 $note['priority'] = (int) $noteAttributes['priority'];
             }

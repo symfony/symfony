@@ -316,9 +316,9 @@ a,b
 c,d
 
 CSV
-            , $this->encoder->encode(array(array('a', 'b'), array('c', 'd')), 'csv', array(
+            , $this->encoder->encode([['a', 'b'], ['c', 'd']], 'csv', [
                 CsvEncoder::NO_HEADERS_KEY => true,
-            )));
+            ]));
     }
 
     public function testSupportsDecoding()
@@ -495,13 +495,13 @@ CSV
 
     public function testDecodeWithoutHeader()
     {
-        $this->assertEquals(array(array('a', 'b'), array('c', 'd')), $this->encoder->decode(<<<'CSV'
+        $this->assertEquals([['a', 'b'], ['c', 'd']], $this->encoder->decode(<<<'CSV'
 a,b
 c,d
 
 CSV
-        , 'csv', array(
+        , 'csv', [
             CsvEncoder::NO_HEADERS_KEY => true,
-        )));
+        ]));
     }
 }

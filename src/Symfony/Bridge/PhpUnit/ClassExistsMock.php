@@ -16,7 +16,7 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class ClassExistsMock
 {
-    private static $classes = array();
+    private static $classes = [];
 
     /**
      * Configures the classes to be checked upon existence.
@@ -47,7 +47,7 @@ class ClassExistsMock
     {
         $self = \get_called_class();
 
-        $mockedNs = array(substr($class, 0, strrpos($class, '\\')));
+        $mockedNs = [substr($class, 0, strrpos($class, '\\'))];
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));
@@ -55,7 +55,7 @@ class ClassExistsMock
             $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
-            foreach (array('class', 'interface', 'trait') as $type) {
+            foreach (['class', 'interface', 'trait'] as $type) {
                 if (\function_exists($ns.'\\'.$type.'_exists')) {
                     continue;
                 }

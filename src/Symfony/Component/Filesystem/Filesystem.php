@@ -727,7 +727,7 @@ class Filesystem
     }
 
     /**
-     * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> array(file, tmp)).
+     * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> [file, tmp]).
      */
     private function getSchemeAndHierarchy(string $filename): array
     {

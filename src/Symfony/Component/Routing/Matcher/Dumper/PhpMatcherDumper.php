@@ -111,7 +111,7 @@ EOF;
 
         $code = <<<EOF
     {
-        \$allow = \$allowSchemes = array();
+        \$allow = \$allowSchemes = [];
         \$pathinfo = rawurldecode(\$pathinfo) ?: '/';
         \$trimmedPathinfo = rtrim(\$pathinfo, '/') ?: '/';
         \$context = \$this->context;
@@ -129,14 +129,14 @@ EOF;
             return <<<'EOF'
     public function match($pathinfo)
     {
-        $allow = $allowSchemes = array();
+        $allow = $allowSchemes = [];
         if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
             return $ret;
         }
         if ($allow) {
             throw new MethodNotAllowedException(array_keys($allow));
         }
-        if (!in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+        if (!in_array($this->context->getMethod(), ['HEAD', 'GET'], true)) {
             // no-op
         } elseif ($allowSchemes) {
             redirect_scheme:
@@ -162,10 +162,10 @@ EOF;
         throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $pathinfo, array &$allow = array(), array &$allowSchemes = array()): array
+    private function doMatch(string $pathinfo, array &$allow = [], array &$allowSchemes = []): array
 
 EOF
-                .$code."\n        return array();\n    }";
+                .$code."\n        return [];\n    }";
         }
 
         return "    public function match(\$pathinfo)\n".$code."\n        throw \$allow ? new MethodNotAllowedException(array_keys(\$allow)) : new ResourceNotFoundException();\n    }";
@@ -272,7 +272,7 @@ EOF
                         unset($defaults['_canonical_route']);
                     }
                     $default .= sprintf(
-                        "%s => array(%s, %s, %s, %s, %s),\n",
+                        "%s => [%s, %s, %s, %s, %s],\n",
                         self::export($url),
                         self::export(['_route' => $name] + $defaults),
                         self::export(!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null),
@@ -294,8 +294,8 @@ EOF
         if ($default) {
             $code .= <<<EOF
         default:
-            \$routes = array(
-{$this->indent($default, 4)}            );
+            \$routes = [
+{$this->indent($default, 4)}            ];
 
             if (!isset(\$routes[\$trimmedPathinfo])) {
                 break;
@@ -437,8 +437,8 @@ EOF;
         if ($state->default) {
             $state->switch .= <<<EOF
         default:
-            \$routes = array(
-{$this->indent($state->default, 4)}            );
+            \$routes = [
+{$this->indent($state->default, 4)}            ];
 
             list(\$ret, \$vars, \$requiredMethods, \$requiredSchemes, \$hasTrailingSlash, \$hasTrailingVar) = \$routes[\$m];
 {$this->compileSwitchDefault(true, $matchHost)}
@@ -450,8 +450,8 @@ EOF;
 
         return <<<EOF
         \$matchedPathinfo = {$matchedPathinfo};
-        \$regexList = array({$code}
-        );
+        \$regexList = [{$code}
+        ];
 
         foreach (\$regexList as \$offset => \$regex) {
             while (preg_match(\$regex, \$matchedPathinfo, \$matches)) {
@@ -518,7 +518,7 @@ EOF;
                     unset($defaults['_canonical_route']);
                 }
                 $state->default .= sprintf(
-                    "%s => array(%s, %s, %s, %s, %s, %s),\n",
+                    "%s => [%s, %s, %s, %s, %s, %s],\n",
                     $state->mark,
                     self::export(['_route' => $name] + $defaults),
                     self::export($vars),
@@ -551,7 +551,7 @@ EOF;
             $code = <<<'EOF'
 
                 if ('GET' === $canonicalMethod && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                    return $allow = $allowSchemes = array();
+                    return $allow = $allowSchemes = [];
                 }
 EOF;
         } else {
@@ -699,7 +699,7 @@ EOF;
             $code = sprintf($code, <<<'EOF'
 
             if ('GET' === $canonicalMethod) {
-                return $allow = $allowSchemes = array();
+                return $allow = $allowSchemes = [];
             }
 EOF
                 ,
@@ -710,11 +710,11 @@ EOF
         }
 
         if ($vars) {
-            $code .= '        $matches = array(';
+            $code .= '        $matches = [';
             foreach ($vars as $j => $m) {
                 $code .= sprintf('%s => $matches[%d] ?? null, ', self::export($m), 1 + $j);
             }
-            $code = substr_replace($code, ");\n\n", -2);
+            $code = substr_replace($code, "];\n\n", -2);
         }
 
         if ($route->getCondition()) {
@@ -755,7 +755,7 @@ EOF;
 
         // optimize parameters array
         if ($matches || $hostMatches) {
-            $vars = ["array('_route' => '$name')"];
+            $vars = ["['_route' => '$name']"];
             if ($matches || ($hostMatches && !$checkHost)) {
                 $vars[] = '$matches';
             }
@@ -771,7 +771,7 @@ EOF;
         } elseif ($defaults) {
             $code .= sprintf("            \$ret = %s;\n", self::export(['_route' => $name] + $defaults));
         } else {
-            $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
+            $code .= sprintf("            \$ret = ['_route' => '%s'];\n", $name);
         }
 
         if ($methods) {
@@ -865,11 +865,11 @@ EOF;
             return str_replace("\n", '\'."\n".\'', var_export($value, true));
         }
         if (!$value) {
-            return 'array()';
+            return '[]';
         }
 
         $i = 0;
-        $export = 'array(';
+        $export = '[';
 
         foreach ($value as $k => $v) {
             if ($i === $k) {
@@ -885,6 +885,6 @@ EOF;
             $export .= self::export($v).', ';
         }
 
-        return substr_replace($export, ')', -2);
+        return substr_replace($export, ']', -2);
     }
 }

@@ -39,9 +39,9 @@ trait MicroKernelTrait
      *
      * You can register extensions:
      *
-     *     $c->loadFromExtension('framework', array(
+     *     $c->loadFromExtension('framework', [
      *         'secret' => '%secret%'
-     *     ));
+     *     ]);
      *
      * Or services:
      *

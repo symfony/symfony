@@ -1133,8 +1133,8 @@ class ProcessTest extends TestCase
     {
         return [
             //expected output / getter / code to execute
-            //array(1,'getExitCode','exit(1);'),
-            //array(true,'isSuccessful','exit();'),
+            // [1,'getExitCode','exit(1);'],
+            // [true,'isSuccessful','exit();'],
             ['output', 'getOutput', 'echo \'output\';'],
         ];
     }

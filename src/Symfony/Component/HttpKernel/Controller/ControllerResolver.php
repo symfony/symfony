@@ -155,7 +155,7 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (!isset($callable[0]) || !isset($callable[1]) || 2 !== \count($callable)) {
-            return 'Invalid array callable, expected array(controller, method).';
+            return 'Invalid array callable, expected [controller, method].';
         }
 
         list($controller, $method) = $callable;

@@ -290,7 +290,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = []/*, array $serverParameters = array()*/)
+    public function submit(Form $form, array $values = []/*, array $serverParameters = []*/)
     {
         $form->setValues($values);
         $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : [];

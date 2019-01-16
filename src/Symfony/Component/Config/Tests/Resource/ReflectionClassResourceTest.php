@@ -71,7 +71,7 @@ class ReflectionClassResourceTest extends TestCase
 /* 2*/  {
 /* 3*/      const FOO = 123;
 /* 4*/
-/* 5*/      public $pub = array();
+/* 5*/      public $pub = [];
 /* 6*/
 /* 7*/      protected $prot;
 /* 8*/
@@ -79,7 +79,7 @@ class ReflectionClassResourceTest extends TestCase
 /*10*/
 /*11*/      public function pub($arg = null) {}
 /*12*/
-/*13*/      protected function prot($a = array()) {}
+/*13*/      protected function prot($a = []) {}
 /*14*/
 /*15*/      private function priv() {}
 /*16*/  }
@@ -119,8 +119,8 @@ EOPHP;
         yield [1, 3, 'const FOO = 456;'];
         yield [1, 3, 'const BAR = 123;'];
         yield [1, 4, '/** pub docblock */'];
-        yield [1, 5, 'protected $pub = array();'];
-        yield [1, 5, 'public $pub = array(123);'];
+        yield [1, 5, 'protected $pub = [];'];
+        yield [1, 5, 'public $pub = [123];'];
         yield [1, 6, '/** prot docblock */'];
         yield [1, 7, 'private $prot;'];
         yield [0, 8, '/** priv docblock */'];
@@ -130,7 +130,7 @@ EOPHP;
         yield [1, 11, 'public function pub($arg = null): Foo {}'];
         yield [0, 11, "public function pub(\$arg = null) {\nreturn 123;\n}"];
         yield [1, 12, '/** prot docblock */'];
-        yield [1, 13, 'protected function prot($a = array(123)) {}'];
+        yield [1, 13, 'protected function prot($a = [123]) {}'];
         yield [0, 14, '/** priv docblock */'];
         yield [0, 15, ''];
     }

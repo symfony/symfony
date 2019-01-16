@@ -50,7 +50,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * List of potential container parameters that hold the object manager name
      * to register the mappings with the correct metadata driver, for example
-     * array('acme.manager', 'doctrine.default_entity_manager').
+     * ['acme.manager', 'doctrine.default_entity_manager'].
      *
      * @var string[]
      */

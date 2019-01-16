@@ -368,7 +368,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                         /*
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
-                         * From array("item" => array(0,1));.
+                         * From ["item" => [0,1]];.
                          */
                         foreach ($data as $subData) {
                             $append = $this->appendNode($parentNode, $subData, $key);

@@ -497,7 +497,7 @@ class XmlFileLoader extends FileLoader
 
             switch ($arg->getAttribute('type')) {
                 case 'service':
-                    if (!$arg->getAttribute('id')) {
+                    if ('' === $arg->getAttribute('id')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service" has no or empty "id" attribute in "%s".', $name, $file));
                     }
 
@@ -561,7 +561,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMNode $node
      * @param mixed    $name
      *
-     * @return array
+     * @return \DOMElement[]
      */
     private function getChildren(\DOMNode $node, $name)
     {

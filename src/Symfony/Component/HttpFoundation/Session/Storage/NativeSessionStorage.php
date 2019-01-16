@@ -331,7 +331,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * For convenience we omit 'session.' from the beginning of the keys.
      * Explicitly ignores other ini keys.
      *
-     * @param array $options Session ini directives array(key => value)
+     * @param array $options Session ini directives [key => value]
      *
      * @see http://php.net/session.configuration
      */

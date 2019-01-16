@@ -647,7 +647,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * the parameters passed to the container constructor to have precedence
      * over the loaded ones.
      *
-     *     $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
+     *     $container = new ContainerBuilder(new ParameterBag(['foo' => 'bar']));
      *     $loader = new LoaderXXX($container);
      *     $loader->load('resource_name');
      *     $container->register('foo', 'stdClass');
@@ -1288,7 +1288,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * Example:
      *
-     *     $container->register('foo')->addTag('my.tag', array('hello' => 'world'));
+     *     $container->register('foo')->addTag('my.tag', ['hello' => 'world']);
      *
      *     $serviceIds = $container->findTaggedServiceIds('my.tag');
      *     foreach ($serviceIds as $serviceId => $tags) {

@@ -576,7 +576,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetCache()
     {
         $response = new Response();
-        //array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public')
+        // ['etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public']
         try {
             $response->setCache(['wrong option' => 'value']);
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');

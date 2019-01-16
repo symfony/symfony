@@ -161,7 +161,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *  * db_time_col: The column where to store the timestamp [default: sess_time]
      *  * db_username: The username when lazy-connect [default: '']
      *  * db_password: The password when lazy-connect [default: '']
-     *  * db_connection_options: An array of driver-specific connection options [default: array()]
+     *  * db_connection_options: An array of driver-specific connection options [default: []]
      *  * lock_mode: The strategy for locking, see constants [default: LOCK_TRANSACTIONAL]
      *
      * @param \PDO|string|null $pdoOrDsn A \PDO instance or DSN string or URL string or null

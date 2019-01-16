@@ -188,7 +188,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null/*, array $context = array()*/)
+    public function supportsNormalization($data, $format = null/*, array $context = []*/)
     {
         if (\func_num_args() > 2) {
             $context = \func_get_arg(2);
@@ -196,7 +196,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('The "%s()" method will have a third `$context = array()` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "%s()" method will have a third `$context = []` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
                 }
             }
 
@@ -209,7 +209,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null/*, array $context = []*/)
     {
         if (\func_num_args() > 3) {
             $context = \func_get_arg(3);
@@ -217,7 +217,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('The "%s()" method will have a fourth `$context = array()` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "%s()" method will have a fourth `$context = []` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
                 }
             }
 
@@ -283,7 +283,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format/*, array $context = array()*/)
+    public function supportsEncoding($format/*, array $context = []*/)
     {
         if (\func_num_args() > 1) {
             $context = \func_get_arg(1);
@@ -291,7 +291,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('The "%s()" method will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "%s()" method will have a second `$context = []` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
                 }
             }
 
@@ -304,7 +304,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format/*, array $context = array()*/)
+    public function supportsDecoding($format/*, array $context = []*/)
     {
         if (\func_num_args() > 1) {
             $context = \func_get_arg(1);
@@ -312,7 +312,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('The "%s()" method will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "%s()" method will have a second `$context = []` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
                 }
             }
 

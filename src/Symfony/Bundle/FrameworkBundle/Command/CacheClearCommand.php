@@ -338,7 +338,7 @@ namespace $namespace
 
             // filter container's resources, removing reference to temp kernel file
             \$resources = \$container->getResources();
-            \$filteredResources = array();
+            \$filteredResources = [];
             foreach (\$resources as \$resource) {
                 if ((string) \$resource !== __FILE__) {
                     \$filteredResources[] = \$resource;

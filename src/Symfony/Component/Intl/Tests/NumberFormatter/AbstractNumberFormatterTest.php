@@ -439,7 +439,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         return [
             [1.121, '1.12'],
             [1.123, '1.12'],
-            // array(1.125, '1.13'),
+            // [1.125, '1.13'],
             [1.127, '1.13'],
             [1.129, '1.13'],
             [1020 / 100, '10.20'],

@@ -204,7 +204,7 @@ class Process implements \IteratorAggregate
      *
      * @final since version 3.3
      */
-    public function run($callback = null/*, array $env = array()*/)
+    public function run($callback = null/*, array $env = []*/)
     {
         $env = 1 < \func_num_args() ? func_get_arg(1) : null;
         $this->start($callback, $env);
@@ -228,7 +228,7 @@ class Process implements \IteratorAggregate
      *
      * @final since version 3.3
      */
-    public function mustRun(callable $callback = null/*, array $env = array()*/)
+    public function mustRun(callable $callback = null/*, array $env = []*/)
     {
         if (!$this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
@@ -262,7 +262,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null/*, array $env = array()*/)
+    public function start(callable $callback = null/*, array $env = [*/)
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -378,7 +378,7 @@ class Process implements \IteratorAggregate
      *
      * @final since version 3.3
      */
-    public function restart(callable $callback = null/*, array $env = array()*/)
+    public function restart(callable $callback = null/*, array $env = []*/)
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');

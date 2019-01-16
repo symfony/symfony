@@ -19,10 +19,10 @@ use Symfony\Component\Console\Exception\LogicException;
  *
  * Usage:
  *
- *     $definition = new InputDefinition(array(
+ *     $definition = new InputDefinition([
  *         new InputArgument('name', InputArgument::REQUIRED),
  *         new InputOption('foo', 'f', InputOption::VALUE_REQUIRED),
- *     ));
+ *     ]);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

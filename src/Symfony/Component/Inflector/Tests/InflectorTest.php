@@ -149,9 +149,9 @@ class InflectorTest extends TestCase
             ['SubTrees', ['SubTre', 'SubTree']],
 
             // Known issues
-            //array('insignia', 'insigne'),
-            //array('insignias', 'insigne'),
-            //array('rattles', 'rattle'),
+            //['insignia', 'insigne'],
+            //['insignias', 'insigne'],
+            //['rattles', 'rattle'],
         ];
     }
 

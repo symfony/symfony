@@ -153,7 +153,7 @@ class RouteTest extends TestCase
     public function testScheme()
     {
         $route = new Route('/');
-        $this->assertEquals([], $route->getSchemes(), 'schemes is initialized with array()');
+        $this->assertEquals([], $route->getSchemes(), 'schemes is initialized with []');
         $this->assertFalse($route->hasScheme('http'));
         $route->setSchemes('hTTp');
         $this->assertEquals(['http'], $route->getSchemes(), '->setSchemes() accepts a single scheme string and lowercases it');
@@ -168,7 +168,7 @@ class RouteTest extends TestCase
     public function testMethod()
     {
         $route = new Route('/');
-        $this->assertEquals([], $route->getMethods(), 'methods is initialized with array()');
+        $this->assertEquals([], $route->getMethods(), 'methods is initialized with []');
         $route->setMethods('gEt');
         $this->assertEquals(['GET'], $route->getMethods(), '->setMethods() accepts a single method string and uppercases it');
         $route->setMethods(['gEt', 'PosT']);

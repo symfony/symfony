@@ -51,7 +51,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @param string $uri        The relation URI
      * @param string $rel        The relation type (e.g. "preload", "prefetch", "prerender" or "dns-prefetch")
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The relation URI
      */
@@ -76,7 +76,7 @@ class WebLinkExtension extends AbstractExtension
      * Preloads a resource.
      *
      * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('crossorigin' => 'use-credentials')")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['crossorigin' => 'use-credentials']")
      *
      * @return string The path of the asset
      */
@@ -89,7 +89,7 @@ class WebLinkExtension extends AbstractExtension
      * Resolves a resource origin as early as possible.
      *
      * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
@@ -102,7 +102,7 @@ class WebLinkExtension extends AbstractExtension
      * Initiates a early connection to a resource (DNS resolution, TCP handshake, TLS negotiation).
      *
      * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
@@ -115,7 +115,7 @@ class WebLinkExtension extends AbstractExtension
      * Indicates to the client that it should prefetch this resource.
      *
      * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */
@@ -128,7 +128,7 @@ class WebLinkExtension extends AbstractExtension
      * Indicates to the client that it should prerender this resource .
      *
      * @param string $uri        A public path
-     * @param array  $attributes The attributes of this link (e.g. "array('as' => true)", "array('pr' => 0.5)")
+     * @param array  $attributes The attributes of this link (e.g. "['as' => true]", "['pr' => 0.5]")
      *
      * @return string The path of the asset
      */

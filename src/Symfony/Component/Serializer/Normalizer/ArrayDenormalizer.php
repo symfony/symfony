@@ -66,7 +66,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null/*, array $context = []*/)
     {
         $context = \func_num_args() > 3 ? func_get_arg(3) : [];
 

@@ -626,7 +626,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * Example:
      *
-     *     $crawler->filter('h1 a')->extract(array('_text', 'href'));
+     *     $crawler->filter('h1 a')->extract(['_text', 'href']);
      *
      * @param array $attributes An array of attributes
      *

@@ -372,7 +372,7 @@ EOTXT
         $cloner->addCasters([
             ':stream' => eval('return function () use ($twig) {
                 try {
-                    $twig->render(array());
+                    $twig->render([]);
                 } catch (\Twig\Error\RuntimeError $e) {
                     throw $e->getPrevious();
                 }

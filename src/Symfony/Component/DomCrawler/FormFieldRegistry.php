@@ -133,7 +133,7 @@ class FormFieldRegistry
     /**
      * Returns the list of field with their value.
      *
-     * @return FormField[] The list of fields as array((string) Fully qualified name => (mixed) value)
+     * @return FormField[] The list of fields as [string] Fully qualified name => (mixed) value)
      */
     public function all()
     {
@@ -167,7 +167,7 @@ class FormFieldRegistry
      * @param string $base   The name of the base field
      * @param array  $output The initial values
      *
-     * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
+     * @return array The list of fields as [string] Fully qualified name => (mixed) value)
      */
     private function walk(array $array, $base = '', array &$output = [])
     {
@@ -186,7 +186,7 @@ class FormFieldRegistry
     /**
      * Splits a field name into segments as a web browser would do.
      *
-     *     getSegments('base[foo][3][]') = array('base', 'foo, '3', '');
+     *     getSegments('base[foo][3][]') = ['base', 'foo, '3', ''];
      *
      * @param string $name The name of the field
      *

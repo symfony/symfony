@@ -64,7 +64,7 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start(callable $callback = null/*, array $env = array()*/)
+    public function start(callable $callback = null/*, array $env = []*/)
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');

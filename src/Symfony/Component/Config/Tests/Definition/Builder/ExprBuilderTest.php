@@ -227,7 +227,7 @@ class ExprBuilderTest extends TestCase
      *
      * @param TreeBuilder $testBuilder The tree builder to finalize
      * @param array       $config      The config you want to use for the finalization, if nothing provided
-     *                                 a simple array('key'=>'value') will be used
+     *                                 a simple ['key'=>'value'] will be used
      *
      * @return array The finalized config values
      */

@@ -47,7 +47,7 @@ class StringUtilTest extends TestCase
             ['0020'],
             ['00A0'],
             ['1680'],
-//            array('180E'),
+//            ['180E'],
             ['2000'],
             ['2001'],
             ['2002'],
@@ -72,7 +72,7 @@ class StringUtilTest extends TestCase
             ['000D'],
             ['0085'],
             // zero width space
-//            array('200B'),
+//            ['200B'],
         ];
     }
 

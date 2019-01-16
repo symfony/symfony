@@ -66,12 +66,12 @@ class PrototypedArrayNodeTest extends TestCase
      * The above should finally be mapped to an array that looks like this
      * (because "id" is the key attribute).
      *
-     *     array(
-     *         'things' => array(
+     *     [
+     *         'things' => [
      *             'option1' => 'foo',
      *             'option2' => 'bar',
-     *         )
-     *     )
+     *         ]
+     *     ]
      */
     public function testMappedAttributeKeyIsRemoved()
     {
@@ -191,11 +191,11 @@ class PrototypedArrayNodeTest extends TestCase
      * The above should finally be mapped to an array that looks like this
      * (because "id" is the key attribute).
      *
-     *     array(
-     *         'things' => array(
+     *     [
+     *         'things' => [
      *             'option1' => 'value1'
-     *         )
-     *     )
+     *         ]
+     *     ]
      *
      * It's also possible to mix 'value-only' and 'non-value-only' elements in the array.
      *
@@ -206,15 +206,15 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * The above should finally be mapped to an array as follows
      *
-     * array(
-     *     'things' => array(
+     * [
+     *     'things' => [
      *         'option1' => 'value1',
-     *         'option2' => array(
+     *         'option2' => [
      *             'value' => 'value2',
      *             'foo' => 'foo2'
-     *         )
-     *     )
-     * )
+     *         ]
+     *     ]
+     * ]
      *
      * The 'value' element can also be ArrayNode:
      *
@@ -229,14 +229,14 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * The above should be finally be mapped to an array as follows
      *
-     * array(
-     *     'things' => array(
-     *         'option1' => array(
+     * [
+     *     'things' => [
+     *         'option1' => [
      *             'foo' => 'foo1',
      *             'bar' => 'bar1'
-     *         )
-     *     )
-     * )
+     *         ]
+     *     ]
+     * ]
      *
      * If using VariableNode for value node, it's also possible to mix different types of value nodes:
      *
@@ -252,15 +252,15 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * The above should be finally mapped to an array as follows
      *
-     * array(
-     *     'things' => array(
-     *         'option1' => array(
+     * [
+     *     'things' => [
+     *         'option1' => [
      *             'foo' => 'foo1',
      *             'bar' => 'bar1'
-     *         ),
+     *         ],
      *         'option2' => 'value2'
-     *     )
-     * )
+     *     ]
+     * ]
      *
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly

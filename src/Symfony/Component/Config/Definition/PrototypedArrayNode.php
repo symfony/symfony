@@ -53,15 +53,15 @@ class PrototypedArrayNode extends ArrayNode
      * to be the key of the particular item. For example, if "id" is the
      * "key", then:
      *
-     *     array(
-     *         array('id' => 'my_name', 'foo' => 'bar'),
-     *     );
+     *     [
+     *         ['id' => 'my_name', 'foo' => 'bar'],
+     *     ];
      *
      *  becomes
      *
-     *      array(
-     *          'my_name' => array('foo' => 'bar'),
-     *      );
+     *      [
+     *          'my_name' => ['foo' => 'bar'],
+     *      ];
      *
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
@@ -335,30 +335,30 @@ class PrototypedArrayNode extends ArrayNode
      *
      * For example, assume $this->keyAttribute is 'name' and the value array is as follows:
      *
-     *     array(
-     *         array(
+     *     [
+     *         [
      *             'name' => 'name001',
      *             'value' => 'value001'
-     *         )
-     *     )
+     *         ]
+     *     ]
      *
      * Now, the key is 0 and the child node is:
      *
-     *     array(
+     *     [
      *        'name' => 'name001',
      *        'value' => 'value001'
-     *     )
+     *     ]
      *
      * When normalizing the value array, the 'name' element will removed from the child node
      * and its value becomes the new key of the child node:
      *
-     *     array(
-     *         'name001' => array('value' => 'value001')
-     *     )
+     *     [
+     *         'name001' => ['value' => 'value001']
+     *     ]
      *
      * Now only 'value' element is left in the child node which can be further simplified into a string:
      *
-     *     array('name001' => 'value001')
+     *     ['name001' => 'value001']
      *
      * Now, the key becomes 'name001' and the child node becomes 'value001' and
      * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.

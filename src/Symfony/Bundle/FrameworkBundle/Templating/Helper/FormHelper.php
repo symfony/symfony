@@ -61,9 +61,9 @@ class FormHelper extends Helper
      *
      * You can pass options during the call:
      *
-     *     <?php echo view['form']->form($form, array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo view['form']->form($form, ['attr' => ['class' => 'foo']]) ?>
      *
-     *     <?php echo view['form']->form($form, array('separator' => '+++++')) ?>
+     *     <?php echo view['form']->form($form, ['separator' => '+++++']) ?>
      *
      * This method is mainly intended for prototyping purposes. If you want to
      * control the layout of a form in a more fine-grained manner, you are
@@ -124,9 +124,9 @@ class FormHelper extends Helper
      *
      * You can pass options during the call:
      *
-     *     <?php echo $view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
+     *     <?php echo $view['form']->widget($form, ['attr' => ['class' => 'foo']]) ?>
      *
-     *     <?php echo $view['form']->widget($form, array('separator' => '+++++')) ?>
+     *     <?php echo $view['form']->widget($form, ['separator' => '+++++']) ?>
      *
      * @param FormView $view      The view for which to render the widget
      * @param array    $variables Additional variables passed to the template

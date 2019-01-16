@@ -51,4 +51,9 @@ class PasswordTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, '');
     }
+
+    protected function supportsMultipleValues()
+    {
+        return false;
+    }
 }

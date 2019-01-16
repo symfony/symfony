@@ -273,6 +273,9 @@ class TimeType extends AbstractType
                 return $options['compound'] ? [] : '';
             },
             'compound' => $compound,
+            'accept_multiple_values' => function (Options $options) {
+                return $options['compound'];
+            },
             'choice_translation_domain' => false,
         ]);
 

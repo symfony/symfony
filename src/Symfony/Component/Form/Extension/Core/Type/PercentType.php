@@ -35,6 +35,7 @@ class PercentType extends AbstractType
             'scale' => 0,
             'type' => 'fractional',
             'compound' => false,
+            'accept_multiple_values' => false,
         ]);
 
         $resolver->setAllowedValues('type', [

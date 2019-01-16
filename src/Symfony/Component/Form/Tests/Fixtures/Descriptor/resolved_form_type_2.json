@@ -3,6 +3,7 @@
     "block_prefix": "form",
     "options": {
         "own": [
+            "accept_multiple_values",
             "action",
             "allow_file_upload",
             "attr",

@@ -34,4 +34,9 @@ class ButtonTypeTest extends BaseTypeTest
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
+
+    public function testSubmitArray()
+    {
+        $this->markTestSkipped();
+    }
 }

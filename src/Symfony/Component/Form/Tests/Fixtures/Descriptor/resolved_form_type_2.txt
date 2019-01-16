@@ -5,6 +5,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
  ------------------------- 
   Options                  
  ------------------------- 
+  accept_multiple_values   
   action                   
   allow_file_upload        
   attr                     

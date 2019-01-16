@@ -2053,4 +2053,12 @@ class ChoiceTypeTest extends BaseTypeTest
             'Multiple expanded' => [true, true],
         ];
     }
+
+    public function testSubmitArray()
+    {
+        $form = $this->factory->create($this->getTestedType());
+        $form->submit([]);
+
+        $this->assertFalse($form->isSynchronized());
+    }
 }

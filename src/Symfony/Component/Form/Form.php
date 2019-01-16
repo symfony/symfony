@@ -535,7 +535,7 @@ class Form implements \IteratorAggregate, FormInterface
         } elseif (!$this->config->getOption('allow_file_upload') && $this->config->getRequestHandler()->isFileUpload($submittedData)) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
-        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
+        } elseif (\is_array($submittedData) && !$this->config->getCompound() && false === $this->config->getOption('accept_multiple_values', null)) {
             $submittedData = null;
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }

@@ -105,6 +105,8 @@ class FileType extends AbstractType
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'multiple' => false,
+            // invalid submitted arrays will be detected when the submitted data are processed by the type
+            'accept_multiple_values' => true,
             'allow_file_upload' => true,
         ]);
     }

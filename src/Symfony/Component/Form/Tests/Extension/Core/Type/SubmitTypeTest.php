@@ -62,4 +62,9 @@ class SubmitTypeTest extends ButtonTypeTest
 
         $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
+
+    public function testSubmitArray()
+    {
+        $this->markTestSkipped();
+    }
 }

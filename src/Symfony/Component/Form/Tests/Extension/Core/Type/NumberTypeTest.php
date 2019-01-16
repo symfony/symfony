@@ -75,4 +75,9 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
+
+    protected function supportsMultipleValues()
+    {
+        return false;
+    }
 }

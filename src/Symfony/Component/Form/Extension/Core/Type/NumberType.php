@@ -41,6 +41,7 @@ class NumberType extends AbstractType
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'compound' => false,
+            'accept_multiple_values' => false,
         ]);
 
         $resolver->setAllowedValues('rounding_mode', [

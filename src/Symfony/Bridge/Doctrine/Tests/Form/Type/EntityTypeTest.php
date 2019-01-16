@@ -1521,4 +1521,18 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals($collection, $form->getNormData());
         $this->assertEquals($collection, $form->getData());
     }
+
+    public function testSubmitArray()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $this->persist([$entity1]);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ]);
+        $form->submit([]);
+
+        $this->assertFalse($form->isSynchronized());
+    }
 }

@@ -35,6 +35,7 @@ class PasswordType extends AbstractType
     {
         $resolver->setDefaults([
             'always_empty' => true,
+            'accept_multiple_values' => false,
             'trim' => false,
         ]);
     }

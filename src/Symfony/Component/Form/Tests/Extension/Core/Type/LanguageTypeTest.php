@@ -62,4 +62,12 @@ class LanguageTypeTest extends BaseTypeTest
 
         $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
+
+    public function testSubmitArray()
+    {
+        $form = $this->factory->create($this->getTestedType());
+        $form->submit([]);
+
+        $this->assertFalse($form->isSynchronized());
+    }
 }

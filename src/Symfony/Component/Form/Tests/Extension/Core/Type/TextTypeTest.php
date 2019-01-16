@@ -58,4 +58,9 @@ class TextTypeTest extends BaseTypeTest
         $this->assertSame($dataAsString, $view->vars['value']);
         $this->assertSame($dataAsString, $form->getData());
     }
+
+    protected function supportsMultipleValues()
+    {
+        return false;
+    }
 }

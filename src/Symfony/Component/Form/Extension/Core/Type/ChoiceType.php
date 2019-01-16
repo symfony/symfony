@@ -328,6 +328,8 @@ class ChoiceType extends AbstractType
             'placeholder' => $placeholderDefault,
             'error_bubbling' => false,
             'compound' => $compound,
+            // submitted arrays are dealt with in data transformers
+            'accept_multiple_values' => true,
             // The view data is always a string, even if the "data" option
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582

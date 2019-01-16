@@ -59,6 +59,7 @@ class CheckboxType extends AbstractType
             'value' => '1',
             'empty_data' => $emptyData,
             'compound' => false,
+            'accept_multiple_values' => false,
         ]);
     }
 

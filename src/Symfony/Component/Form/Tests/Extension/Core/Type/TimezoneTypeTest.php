@@ -72,4 +72,12 @@ class TimezoneTypeTest extends BaseTypeTest
 
         $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Amsterdam'), $choices, '', false, false);
     }
+
+    public function testSubmitArray()
+    {
+        $form = $this->factory->create($this->getTestedType());
+        $form->submit([]);
+
+        $this->assertFalse($form->isSynchronized());
+    }
 }

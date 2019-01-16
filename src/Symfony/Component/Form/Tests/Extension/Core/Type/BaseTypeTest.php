@@ -167,6 +167,14 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
+    public function testSubmitArray()
+    {
+        $form = $this->factory->create($this->getTestedType());
+        $form->submit([]);
+
+        $this->assertSame($form->getConfig()->getOption('accept_multiple_values'), $form->isSynchronized());
+    }
+
     protected function getTestedType()
     {
         return static::TESTED_TYPE;

@@ -233,6 +233,9 @@ class DateIntervalType extends AbstractType
                 // this option.
                 'data_class' => null,
                 'compound' => $compound,
+                'accept_multiple_values' => function (Options $options) {
+                    return $options['compound'];
+                },
                 'empty_data' => $emptyData,
                 'labels' => [],
             ]

@@ -56,6 +56,7 @@ class MoneyType extends AbstractType
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
+            'accept_multiple_values' => false,
         ]);
 
         $resolver->setAllowedTypes('scale', 'int');

@@ -19,6 +19,7 @@
         ],
         "overridden": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
+                "accept_multiple_values",
                 "compound",
                 "data_class",
                 "empty_data",

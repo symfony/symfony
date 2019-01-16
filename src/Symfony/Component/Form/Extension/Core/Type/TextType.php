@@ -37,6 +37,7 @@ class TextType extends AbstractType implements DataTransformerInterface
     {
         $resolver->setDefaults([
             'compound' => false,
+            'accept_multiple_values' => false,
         ]);
     }
 

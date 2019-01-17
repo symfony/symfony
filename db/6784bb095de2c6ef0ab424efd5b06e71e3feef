@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-01-16T08:34:05Z
+
+It'd be good to add a test for SVG: https://github.com/symfony/symfony/issues/15460#issuecomment-380138425
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-16T08:51:06Z
+
+Last question from me: should we provide autoconfiguration for the new `MimeTypeGuesserInterface`? thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-16T09:05:32Z
+
+Autoconfig is already there, so if you create a class with this interface, it will be tagged automatically and registered.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-16T09:18:33Z
+
+@teohhanhui The underlying guessers are the same as before, so that won't fix the mentioned issue.

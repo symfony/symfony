@@ -13,7 +13,6 @@ addons:
         - slapd
         - zookeeperd
         - libzookeeper-mt-dev
-        - libmemcached-dev
         - libsasl2-dev
 
 env:
@@ -28,7 +27,7 @@ matrix:
         - php: 7.2
           env: deps=high
         - php: 7.3
-          env: deps=low
+          env: deps=high
 
     fast_finish: true
 

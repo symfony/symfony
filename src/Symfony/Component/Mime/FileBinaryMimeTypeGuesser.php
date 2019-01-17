@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\Mime;
 
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
+use Symfony\Component\Mime\Exception\LogicException;
+
 /**
  * Guesses the MIME type with the binary "file" (only available on *nix).
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @experimental in 4.3
  */
 class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
 {
@@ -61,11 +66,11 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     public function guessMimeType(string $path): ?string
     {
         if (!is_file($path) || !is_readable($path)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" file does not exist or is not readable.', $path));
+            throw new InvalidArgumentException(sprintf('The "%s" file does not exist or is not readable.', $path));
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new \LogicException(sprintf('The "%s" guesser is not supported.', __CLASS__));
+            throw new LogicException(sprintf('The "%s" guesser is not supported.', __CLASS__));
         }
 
         ob_start();

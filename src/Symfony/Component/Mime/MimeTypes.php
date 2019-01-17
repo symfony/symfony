@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mime;
 
+use Symfony\Component\Mime\Exception\LogicException;
+
 /**
  * Manages MIME types and file extensions.
  *
@@ -31,6 +33,8 @@ namespace Symfony\Component\Mime;
  *     $guesser->registerGuesser(new FileinfoMimeTypeGuesser('/path/to/magic/file'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 4.3
  */
 final class MimeTypes implements MimeTypesInterface
 {
@@ -122,7 +126,7 @@ final class MimeTypes implements MimeTypesInterface
         }
 
         if (!$this->isGuesserSupported()) {
-            throw new \LogicException('Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).');
+            throw new LogicException('Unable to guess the MIME type as no guessers are available (have you enable the php_fileinfo extension?).');
         }
 
         return null;

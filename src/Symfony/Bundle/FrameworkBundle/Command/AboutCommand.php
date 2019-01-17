@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -29,6 +30,17 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class AboutCommand extends Command
 {
+    private const BUNDLES = [
+        'DoctrineBundle' => 'doctrine:database:create',
+        'DoctrineFixturesBundle' => 'doctrine:fixtures:load',
+        'DoctrineMigrationsBundle' => 'doctrine:migrations:status',
+        'DoctrineMongoDBBundle' => 'doctrine:mongodb:mapping:info',
+        'MakerBundle' => 'make:entity',
+        'SensioGeneratorBundle' => 'generate:doctrine:crud',
+        'VarDumper Component' => 'server:dump',
+        'WebServerBundle' => 'server:stop',
+    ];
+
     protected static $defaultName = 'about';
 
     /**
@@ -58,8 +70,9 @@ EOT
     {
         $io = new SymfonyStyle($input, $output);
 
+        $application = $this->getApplication();
         /** @var KernelInterface $kernel */
-        $kernel = $this->getApplication()->getKernel();
+        $kernel = $application->getKernel();
 
         $rows = [
             ['<info>Symfony</>'],
@@ -98,7 +111,23 @@ EOT
             }, $dotenv, array_keys($dotenv)));
         }
 
+        $rows = array_merge($rows, [
+            new TableSeparator(),
+            ['<info>Bundles</>'],
+            new TableSeparator(),
+        ], $this->getBundlesStatus($application));
         $io->table([], $rows);
+    }
+
+    private function getBundlesStatus(Application $application): array
+    {
+        $bundles = [];
+
+        foreach (self::BUNDLES as $bundle => $command) {
+            $bundles[] = [$bundle, ($application->has($command) ? 'installed' : '<comment>not installed</>')];
+        }
+
+        return $bundles;
     }
 
     private static function formatPath(string $path, string $baseDir): string

@@ -218,14 +218,14 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testGetRootReturnsRootOfParent()
     {
-        $parent = $this->getMockForm();
-        $parent->expects($this->once())
-            ->method('getRoot')
-            ->will($this->returnValue('ROOT'));
+        $root = $this->createForm();
+
+        $parent = $this->createForm();
+        $parent->setParent($root);
 
         $this->form->setParent($parent);
 
-        $this->assertEquals('ROOT', $this->form->getRoot());
+        $this->assertSame($root, $this->form->getRoot());
     }
 
     public function testGetRootReturnsSelfIfNoParent()
@@ -720,12 +720,13 @@ class SimpleFormTest extends AbstractFormTest
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
-        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $parentType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $parentForm = $this->getBuilder()->setType($parentType)->getForm();
         $parentView = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);
 
-        $parentForm->expects($this->once())
+        $parentType->expects($this->once())
             ->method('createView')
             ->will($this->returnValue($parentView));
 

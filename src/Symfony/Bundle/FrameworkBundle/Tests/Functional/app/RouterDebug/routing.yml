@@ -13,3 +13,17 @@ routerdebug_session_logout:
 routerdebug_test:
     path:     /test
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
+
+routerdebug_get:
+    path: /test/get
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
+    methods: [GET]
+    schemes: [http]
+    host: 'test.example.fr'
+
+routerdebug_post:
+    path: /test/post
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
+    methods: [POST]
+    schemes: [https]
+    host: 'test.example.com'

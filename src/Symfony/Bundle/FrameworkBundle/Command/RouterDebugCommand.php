@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -53,6 +54,9 @@ class RouterDebugCommand extends Command
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('method', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'To filter by method'),
+                new InputOption('scheme', null, InputOption::VALUE_REQUIRED, 'To filter by scheme (http or https)'),
+                new InputOption('match-host', null, InputOption::VALUE_REQUIRED, 'To filter by host with a regex'),
             ])
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
@@ -95,6 +99,8 @@ EOF
                 'output' => $io,
             ]);
         } else {
+            $routes = $this->filterRoutes($routes, $input);
+
             $helper->describe($io, $routes, [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
@@ -114,5 +120,42 @@ EOF
         }
 
         return $foundRoutesNames;
+    }
+
+    private function filterRoutes(RouteCollection $routes, InputInterface $input): RouteCollection
+    {
+        if (!empty($methods = $input->getOption('method'))) {
+            $routes = $this->filter($routes, function (Route $route) use ($methods) {
+                return \array_intersect($methods, $route->getMethods()) || empty($route->getMethods());
+            });
+        }
+
+        if (null !== ($scheme = $input->getOption('scheme'))) {
+            $routes = $this->filter($routes, function (Route $route) use ($scheme) {
+                return \in_array(\strtolower($scheme), $route->getSchemes(), true) || empty($route->getSchemes());
+            });
+        }
+
+        if (null !== ($hostRegex = $input->getOption('match-host'))) {
+            try {
+                $routes = $this->filter($routes, function (Route $route) use ($hostRegex) {
+                    return (bool) \preg_match('/'.$hostRegex.'/', $route->getHost()) || empty($route->getHost());
+                });
+            } catch (\Throwable $e) {
+                throw new InvalidArgumentException(\sprintf('"%s" does not seems to be a valid regex.', $hostRegex));
+            }
+        }
+
+        return $routes;
+    }
+
+    private function filter(RouteCollection $routes, \Closure $closure): RouteCollection
+    {
+        $filteredRoutes = new RouteCollection();
+        foreach (\array_filter($routes->all(), $closure) as $name => $route) {
+            $filteredRoutes->add($name, $route);
+        }
+
+        return $filteredRoutes;
     }
 }

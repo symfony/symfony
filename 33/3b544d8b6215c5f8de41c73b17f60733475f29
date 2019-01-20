@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-19T11:27:46Z
+
+We could implement an analogical change in **XMLFileLoader**, for users, who configure services using XML:
+
+https://github.com/symfony/symfony/blob/b972d15d52bbd5cb6c2acca3c569ea7e096d6b62/src/Symfony/Component/DependencyInjection/Loader/XmlFileLoader.php#L381-L392
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-20T08:08:35Z
+
+done

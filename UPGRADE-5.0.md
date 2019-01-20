@@ -172,6 +172,14 @@ HttpFoundation
  * The `getSession()` method of the `Request` class throws an exception when session is null.
  * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
+ * The `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` interfaces have been removed,
+   use `Symfony\Component\Mime\MimeTypesInterface` instead.
+ * The `MimeType` and `MimeTypeExtensionGuesser` classes have been removed,
+   use `Symfony\Component\Mime\MimeTypes` instead.
+ * The `FileBinaryMimeTypeGuesser` class has been removed,
+   use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
+ * The `FileinfoMimeTypeGuesser` class has been removed,
+   use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
 
 HttpKernel
 ----------

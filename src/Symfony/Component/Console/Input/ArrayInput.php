@@ -176,6 +176,10 @@ class ArrayInput extends Input
 
         $option = $this->definition->getOption($name);
 
+        if (!\in_array($value, [null, true], true) && !$option->acceptValue() && 'verbose' !== $name) {
+            throw new InvalidOptionException(sprintf('The "--%s" option does not accept a value.', $name));
+        }
+
         if (null === $value) {
             if ($option->isValueRequired()) {
                 throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $name));

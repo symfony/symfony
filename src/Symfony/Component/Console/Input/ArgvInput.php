@@ -225,7 +225,7 @@ class ArgvInput extends Input
 
         $option = $this->definition->getOption($name);
 
-        if (null !== $value && !$option->acceptValue()) {
+        if (null !== $value && !$option->acceptValue() && 'verbose' !== $name) {
             throw new RuntimeException(sprintf('The "--%s" option does not accept a value.', $name));
         }
 

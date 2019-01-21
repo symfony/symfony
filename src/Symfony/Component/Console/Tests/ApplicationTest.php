@@ -890,10 +890,10 @@ class ApplicationTest extends TestCase
         $this->assertSame(Output::VERBOSITY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
 
         $tester->run(['command' => 'list', '-vv' => true]);
-        $this->assertSame(Output::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
+        $this->assertSame(Output::VERBOSITY_VERY_VERBOSE, $tester->getOutput()->getVerbosity(), '->run() sets the output to very verbose if -vv is passed');
 
         $tester->run(['command' => 'list', '-vvv' => true]);
-        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to verbose if -v is passed');
+        $this->assertSame(Output::VERBOSITY_DEBUG, $tester->getOutput()->getVerbosity(), '->run() sets the output to debug if -vvv is passed');
 
         $application = new Application();
         $application->setAutoExit(false);
@@ -943,6 +943,27 @@ class ApplicationTest extends TestCase
         $this->addToAssertionCount(1);
 
         $input = new ArgvInput(['cli.php', '--verbose', 'foo:bar']);
+        $application->run($input, $output);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testVerboseOptionInFrontOfArguments()
+    {
+        require_once realpath(__DIR__.'/Fixtures/Foo7Command.php');
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->add(new \Foo7Command());
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false));
+
+        $input = new ArgvInput(['cli.php', 'foo7:bar', '-v', 'bar']);
+        $application->run($input, $output);
+
+        $this->addToAssertionCount(1);
+
+        $input = new ArgvInput(['cli.php', 'foo7:bar', '--verbose=2', 'bar']);
         $application->run($input, $output);
 
         $this->addToAssertionCount(1);

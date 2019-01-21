@@ -27,22 +27,22 @@ class InputTest extends TestCase
 
     public function testOptions()
     {
-        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name')]));
+        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name', null, InputOption::VALUE_OPTIONAL)]));
         $this->assertEquals('foo', $input->getOption('name'), '->getOption() returns the value for the given option');
 
         $input->setOption('name', 'bar');
         $this->assertEquals('bar', $input->getOption('name'), '->setOption() sets the value for a given option');
         $this->assertEquals(['name' => 'bar'], $input->getOptions(), '->getOptions() returns all option values');
 
-        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
+        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name', '', InputOption::VALUE_OPTIONAL), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(['name' => 'foo', 'bar' => 'default'], $input->getOptions(), '->getOptions() returns all option values, even optional ones');
 
-        $input = new ArrayInput(['--name' => 'foo', '--bar' => ''], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
+        $input = new ArrayInput(['--name' => 'foo', '--bar' => ''], new InputDefinition([new InputOption('name', '', InputOption::VALUE_OPTIONAL), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $this->assertEquals('', $input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
         $this->assertEquals(['name' => 'foo', 'bar' => ''], $input->getOptions(), '->getOptions() returns all option values.');
 
-        $input = new ArrayInput(['--name' => 'foo', '--bar' => null], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
+        $input = new ArrayInput(['--name' => 'foo', '--bar' => null], new InputDefinition([new InputOption('name', '', InputOption::VALUE_OPTIONAL), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $this->assertNull($input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
         $this->assertEquals(['name' => 'foo', 'bar' => null], $input->getOptions(), '->getOptions() returns all option values');
     }
@@ -51,7 +51,7 @@ class InputTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('The "foo" option does not exist.');
-        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
+        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name', '', InputOption::VALUE_OPTIONAL), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $input->setOption('foo', 'bar');
     }
 
@@ -59,7 +59,7 @@ class InputTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('The "foo" option does not exist.');
-        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
+        $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name', '', InputOption::VALUE_OPTIONAL), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
         $input->getOption('foo');
     }
 

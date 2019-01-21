@@ -79,7 +79,7 @@ class ArrayInputTest extends TestCase
         return [
             [
                 ['--foo' => 'bar'],
-                [new InputOption('foo')],
+                [new InputOption('foo', '', InputOption::VALUE_OPTIONAL)],
                 ['foo' => 'bar'],
                 '->parse() parses long options',
             ],
@@ -103,9 +103,15 @@ class ArrayInputTest extends TestCase
             ],
             [
                 ['-f' => 'bar'],
-                [new InputOption('foo', 'f')],
+                [new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL)],
                 ['foo' => 'bar'],
                 '->parse() parses short options',
+            ],
+            [
+                ['--verbose' => '2'],
+                [new InputOption('verbose', 'v', InputOption::VALUE_NONE)],
+                ['verbose' => '2'],
+                '->parse() allows verbose long option to have values',
             ],
             [
                 ['--' => null, '-f' => 'bar'],
@@ -145,6 +151,21 @@ class ArrayInputTest extends TestCase
                 ['--foo' => null],
                 new InputDefinition([new InputOption('foo', 'f', InputOption::VALUE_REQUIRED)]),
                 'The "--foo" option requires a value.',
+            ],
+            [
+                ['--foo' => 'bar'],
+                new InputDefinition([new InputOption('foo')]),
+                'The "--foo" option does not accept a value.',
+            ],
+            [
+                ['-f' => 'bar'],
+                new InputDefinition([new InputOption('foo', 'f')]),
+                'The "--foo" option does not accept a value.',
+            ],
+            [
+                ['--foo' => 'bar'],
+                new InputDefinition([new InputOption('foo', 'f', InputOption::VALUE_NONE)]),
+                'The "--foo" option does not accept a value.',
             ],
             [
                 ['--foo' => 'foo'],

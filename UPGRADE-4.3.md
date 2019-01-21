@@ -18,3 +18,15 @@ FrameworkBundle
 
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
+
+HttpFoundation
+--------------
+
+ * The `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` interfaces have been deprecated,
+   use `Symfony\Component\Mime\MimeTypesInterface` instead.
+ * The `MimeType` and `MimeTypeExtensionGuesser` classes have been deprecated,
+   use `Symfony\Component\Mime\MimeTypes` instead.
+ * The `FileBinaryMimeTypeGuesser` class has been deprecated,
+   use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
+ * The `FileinfoMimeTypeGuesser` class has been deprecated,
+   use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.

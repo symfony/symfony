@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
-use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * Guesses the file extension corresponding to a given mime type.
  *
- * @deprecated since Symfony 4.3, use {@link MimeTypes} instead
+ * @deprecated since Symfony 4.3, use {@link MimeTypesInterface} instead
  */
 interface ExtensionGuesserInterface
 {

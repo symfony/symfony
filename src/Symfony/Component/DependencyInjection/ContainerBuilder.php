@@ -123,6 +123,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $removedIds = [];
 
+    private $removedBindingIds = [];
+
     private static $internalTypes = [
         'int' => true,
         'float' => true,
@@ -1502,6 +1504,35 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return isset($this->definitions[$id]) || isset($this->aliasDefinitions[$id]) || isset($this->removedIds[$id]) ? $id : parent::normalizeId($id);
+    }
+
+    /**
+     * Gets removed binding ids.
+     *
+     * @return array
+     *
+     * @internal
+     */
+    public function getRemovedBindingIds()
+    {
+        return $this->removedBindingIds;
+    }
+
+    /**
+     * Adds a removed binding id.
+     *
+     * @param int $id
+     *
+     * @internal
+     */
+    public function addRemovedBindingIds($id)
+    {
+        if ($this->hasDefinition($id)) {
+            foreach ($this->getDefinition($id)->getBindings() as $key => $binding) {
+                list(, $bindingId) = $binding->getValues();
+                $this->removedBindingIds[(int) $bindingId] = true;
+            }
+        }
     }
 
     /**

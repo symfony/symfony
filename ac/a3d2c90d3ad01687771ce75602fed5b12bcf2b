@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-13T16:32:38Z
+
+Looks like it should be done on 3.4
+@michaelKaefer Can you rebase on 3.4 and fix the tests? Thank you.
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2019-01-13T17:14:46Z
+
+@fabpot Yes, this week :+1:
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2019-01-20T12:44:05Z
+
+@xabbuh Sorry, I'm not able. Can you help me?
+
+I wanted to rebase (never did that) with:
+
+    git clone https://github.com/michaelKaefer/symfony/
+    cd symfony
+    git fetch
+    git branch patch-2 origin/patch-2
+    git checkout patch-2
+    git branch 3.4 origin/3.4
+    git rebase 3.4
+
+--> the rebase tells me that there are confilcts (the first one in src/Symfony/Component/Console/Helper/SymfonyQuestionHelper.php) and I have to merge. This seems wrong to me, what am I doing wrong?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-21T08:04:59Z
+
+@michaelKaefer I did a rebase. :)

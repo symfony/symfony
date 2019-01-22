@@ -1529,7 +1529,7 @@ class FrameworkExtension extends Extension
         } else {
             if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
                 if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                    throw new LogicException('The default Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
+                    throw new LogicException('The Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
                 }
 
                 $container->getDefinition('messenger.transport.symfony_serializer')

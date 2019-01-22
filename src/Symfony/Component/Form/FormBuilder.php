@@ -41,7 +41,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      * Creates a new form builder.
      *
      * @param string                   $name
-     * @param string                   $dataClass
+     * @param string|null              $dataClass
      * @param EventDispatcherInterface $dispatcher
      * @param FormFactoryInterface     $factory
      * @param array                    $options

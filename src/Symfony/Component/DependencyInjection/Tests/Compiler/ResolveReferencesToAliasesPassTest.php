@@ -83,6 +83,48 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertSame('Factory', (string) $resolvedBarFactory[0]);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will soon be removed.
+     */
+    public function testDeprecationNoticeWhenReferencedByAlias()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated(true);
+        $container->setAlias('deprecated_foo_alias', $aliasDeprecated);
+
+        $alias = new Alias('deprecated_foo_alias');
+        $container->setAlias('alias', $alias);
+
+        $this->process($container);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "foo_aliased" service alias is deprecated. You should stop using it, as it will soon be removed.
+     */
+    public function testDeprecationNoticeWhenReferencedByDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass');
+
+        $aliasDeprecated = new Alias('foo');
+        $aliasDeprecated->setDeprecated(true);
+        $container->setAlias('foo_aliased', $aliasDeprecated);
+
+        $container
+            ->register('definition')
+            ->setArguments([new Reference('foo_aliased')])
+        ;
+
+        $this->process($container);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveReferencesToAliasesPass();

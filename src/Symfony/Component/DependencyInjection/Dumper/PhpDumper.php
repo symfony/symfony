@@ -218,6 +218,7 @@ class PhpDumper extends Dumper
         $code =
             $this->startClass($options['class'], $baseClass, $baseClassWithNamespace).
             $this->addServices($services).
+            $this->addDeprecatedAliases().
             $this->addDefaultParametersMethod()
         ;
 
@@ -1115,6 +1116,15 @@ EOF;
             }
         }
 
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $id) {
+            if (!$id->isDeprecated()) {
+                continue;
+            }
+            $id = (string) $id;
+            $code .= '            '.$this->doExport($alias).' => '.$this->doExport($this->generateMethodName($alias)).",\n";
+        }
+
         return $code ? "        \$this->methodMap = [\n{$code}        ];\n" : '';
     }
 
@@ -1141,6 +1151,10 @@ EOF;
         $code = "        \$this->aliases = [\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
+            if ($id->isDeprecated()) {
+                continue;
+            }
+
             $id = (string) $id;
             while (isset($aliases[$id])) {
                 $id = (string) $aliases[$id];
@@ -1149,6 +1163,39 @@ EOF;
         }
 
         return $code."        ];\n";
+    }
+
+    private function addDeprecatedAliases(): string
+    {
+        $code = '';
+        $aliases = $this->container->getAliases();
+        foreach ($aliases as $alias => $definition) {
+            if (!$definition->isDeprecated()) {
+                continue;
+            }
+            $public = $definition->isPublic() ? 'public' : 'private';
+            $id = (string) $definition;
+            $methodNameAlias = $this->generateMethodName($alias);
+            $idExported = $this->export($id);
+            $messageExported = $this->export($definition->getDeprecationMessage($alias));
+            $code = <<<EOF
+
+    /*{$this->docStar}
+     * Gets the $public '$alias' alias.
+     *
+     * @return object The "$id" service.
+     */
+    protected function {$methodNameAlias}()
+    {
+        @trigger_error($messageExported, E_USER_DEPRECATED);
+
+        return \$this->get($idExported);
+    }
+
+EOF;
+        }
+
+        return $code;
     }
 
     private function addInlineRequires(): string

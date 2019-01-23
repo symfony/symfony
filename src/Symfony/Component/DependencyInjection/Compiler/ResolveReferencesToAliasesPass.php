@@ -31,6 +31,7 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
+
             if ($aliasId !== $defId = $this->getDefinitionId($aliasId, $container)) {
                 $container->setAlias($id, $defId)->setPublic($alias->isPublic())->setPrivate($alias->isPrivate());
             }
@@ -60,8 +61,15 @@ class ResolveReferencesToAliasesPass extends AbstractRecursivePass
             if (isset($seen[$id])) {
                 throw new ServiceCircularReferenceException($id, array_merge(array_keys($seen), [$id]));
             }
+
             $seen[$id] = true;
-            $id = (string) $container->getAlias($id);
+            $alias = $container->getAlias($id);
+
+            if ($alias->isDeprecated()) {
+                @trigger_error($alias->getDeprecationMessage($id), E_USER_DEPRECATED);
+            }
+
+            $id = (string) $alias;
         }
 
         return $id;

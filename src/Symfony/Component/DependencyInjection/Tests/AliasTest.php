@@ -100,11 +100,11 @@ class AliasTest extends TestCase
 
     public function invalidDeprecationMessageProvider()
     {
-        return array(
-            "With \rs" => array("invalid \r message %service_id%"),
-            "With \ns" => array("invalid \n message %service_id%"),
-            'With */s' => array('invalid */ message %service_id%'),
-            'message not containing required %service_id% variable' => array('this is deprecated'),
-        );
+        return [
+            "With \rs" => ["invalid \r message %service_id%"],
+            "With \ns" => ["invalid \n message %service_id%"],
+            'With */s' => ['invalid */ message %service_id%'],
+            'message not containing required %service_id% variable' => ['this is deprecated'],
+        ];
     }
 }

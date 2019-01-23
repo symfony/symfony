@@ -671,12 +671,11 @@ EOF
             }
         }
 
-        $allowedTags = array('deprecated');
         foreach ($alias->childNodes as $child) {
             if (!$child instanceof \DOMElement && self::NS !== $child->namespaceURI) {
                 continue;
             }
-            if (!in_array($child->localName, $allowedTags, true)) {
+            if (!\in_array($child->localName, ['deprecated'], true)) {
                 throw new InvalidArgumentException(sprintf('Invalid child element "%s" defined for alias "%s" in "%s".', $child->localName, $alias->getAttribute('id'), $file));
             }
         }

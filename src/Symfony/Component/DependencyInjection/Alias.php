@@ -86,10 +86,10 @@ class Alias
     }
 
     /**
-     * Whether this alias is deprecated, that means it should not be called
+     * Whether this alias is deprecated, that means it should not be referenced
      * anymore.
      *
-     * @param bool   $status   Defaults to true
+     * @param bool   $status   Whether this alias is deprecated, defaults to true
      * @param string $template Optional template message to use if the alias is deprecated
      *
      * @return $this
@@ -115,24 +115,12 @@ class Alias
         return $this;
     }
 
-    /**
-     * Returns whether this alias is deprecated.
-     *
-     * @return bool
-     */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return $this->deprecated;
     }
 
-    /**
-     * Message to use if this alias is deprecated.
-     *
-     * @param string $id Service id relying on this alias
-     *
-     * @return string
-     */
-    public function getDeprecationMessage($id)
+    public function getDeprecationMessage(string $id): string
     {
         return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }

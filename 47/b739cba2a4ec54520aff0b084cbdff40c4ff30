@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2019-01-22T19:45:39Z
+
+Thanks, that will be really useful when using phpspec! (ping @tristanbes)
+
+---------------------------------------------------------------------------
+
+by raresserban at 2019-01-23T07:15:20Z
+
+Can this be made also for Symfony 4, 4.1 and up?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-23T08:22:47Z
+
+@raresserban The `3.4` branch is merged up to all other maintained branches regularly. So if this is accepted, it will be present in all other maintained Symfony versions too.

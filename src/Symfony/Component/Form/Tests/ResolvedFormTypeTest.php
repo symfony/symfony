@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -379,16 +378,5 @@ class ResolvedFormTypeTest extends TestCase
     private function getMockFormFactory()
     {
         return $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
-    }
-
-    /**
-     * @param string $name
-     * @param array  $options
-     *
-     * @return FormBuilder
-     */
-    protected function getBuilder($name = 'name', array $options = [])
-    {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
     }
 }

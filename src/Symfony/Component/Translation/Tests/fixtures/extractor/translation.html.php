@@ -32,6 +32,14 @@ EOF
     ['%count%' => 10]
 ); ?>
 
+<?php echo $view['translator']->trans('concatenated'.' message'.<<<EOF
+ with heredoc
+EOF
+.<<<'EOF'
+ and nowdoc
+EOF
+); ?>
+
 <?php echo $view['translator']->trans('other-domain-test-no-params-short-array', [], 'not_messages'); ?>
 
 <?php echo $view['translator']->trans('other-domain-test-no-params-long-array', [], 'not_messages'); ?>

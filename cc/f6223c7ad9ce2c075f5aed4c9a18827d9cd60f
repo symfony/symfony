@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-23T13:16:52Z
+
+Tests are broken, I suppose you should bump to a more recent release than 3.2.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-01-23T13:27:22Z
+
+@fabpot you are right, it's using the `count` property that was introduced in Symfony 3.3

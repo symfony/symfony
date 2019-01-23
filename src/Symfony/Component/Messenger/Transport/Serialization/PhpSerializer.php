@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
 /**
- * @author Ruyan Weaver<ryan@symfonycasts.com>
+ * @author Ryan Weaver<ryan@symfonycasts.com>
  *
  * @experimental in 4.2
  */

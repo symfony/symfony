@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Added `PhpSerializer` which uses PHP's native `serialize()` and
+   `unserialize()` to serialize messages to a transport
+
 4.2.0
 -----
 

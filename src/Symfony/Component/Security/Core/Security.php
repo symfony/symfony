@@ -17,8 +17,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Helper class for commonly-needed security tasks.
+ *
+ * @final
  */
-final class Security
+class Security
 {
     const ACCESS_DENIED_ERROR = '_security.403_error';
     const AUTHENTICATION_ERROR = '_security.last_error';

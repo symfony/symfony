@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `ObjectPropertyAccessorInterface` to read and write object properties.
+ * `PropertyAccessor` now implements the `ObjectPropertyAccessorInterface` interface.
+
 4.0.0
 -----
 

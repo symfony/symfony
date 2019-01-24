@@ -73,6 +73,7 @@ class TranslationUpdateCommand extends Command
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
+                new InputOption('xliff-version', null, InputOption::VALUE_OPTIONAL, 'Override the default xliff version', '1.2'),
             ])
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
@@ -262,7 +263,7 @@ EOF
             }
 
             if ('xlf' === $input->getOption('output-format')) {
-                $errorIo->comment('Xliff output version is <info>1.2</info>');
+                $errorIo->comment(sprintf('Xliff output version is <info>%s</info>', $input->getOption('xliff-version')));
             }
 
             $resultMessage = sprintf('%d message%s successfully extracted', $extractedMessagesCount, $extractedMessagesCount > 1 ? 's were' : ' was');
@@ -287,7 +288,7 @@ EOF
                 $bundleTransPath = end($transPaths);
             }
 
-            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale]);
+            $this->writer->write($operation->getResult(), $input->getOption('output-format'), ['path' => $bundleTransPath, 'default_locale' => $this->defaultLocale, 'xliff_version' => $input->getOption('xliff-version')]);
 
             if (true === $input->getOption('dump-messages')) {
                 $resultMessage .= ' and translation files were updated';

@@ -24,7 +24,7 @@
         </service>
         <service id="Symfony\Component\Messenger\Transport\Serialization\SerializerInterface" alias="messenger.transport.serializer" />
 
-        <service id="messenger.transport.native_php_serializer" class="Symfony\Component\Messenger\Transport\Serialization\Serializer" />
+        <service id="messenger.transport.native_php_serializer" class="Symfony\Component\Messenger\Transport\Serialization\PhpSerializer" />
 
         <!-- Middleware -->
         <service id="messenger.middleware.handle_message" class="Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" abstract="true">

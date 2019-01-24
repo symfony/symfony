@@ -45,14 +45,14 @@ class MergeDoctrineCollectionListenerTest extends TestCase
         $this->form = null;
     }
 
-    protected function getBuilder($name = 'name')
+    protected function getBuilder()
     {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
+        return new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
-    protected function getForm($name = 'name')
+    protected function getForm()
     {
-        return $this->getBuilder($name)
+        return $this->getBuilder()
             ->setData($this->collection)
             ->addEventSubscriber(new MergeDoctrineCollectionListener())
             ->getForm();

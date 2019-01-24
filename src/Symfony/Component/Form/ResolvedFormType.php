@@ -205,7 +205,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * Override this method if you want to customize the builder class.
      *
      * @param string               $name      The name of the builder
-     * @param string               $dataClass The data class
+     * @param string|null          $dataClass The data class
      * @param FormFactoryInterface $factory   The current form factory
      * @param array                $options   The builder options
      *

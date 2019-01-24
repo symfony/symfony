@@ -884,7 +884,9 @@ class Request
      */
     public function getScheme()
     {
-        return $this->isSecure() ? 'https' : 'http';
+        $scheme = $this->server->get('REQUEST_SCHEME');
+        empty($scheme) && $scheme = 'http';
+        return $scheme;
     }
 
     /**

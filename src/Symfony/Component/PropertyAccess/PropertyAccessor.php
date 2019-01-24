@@ -822,9 +822,9 @@ class PropertyAccessor implements PropertyAccessorInterface, ObjectPropertyAcces
      */
     public function getPropertyValue($object, string $property)
     {
-        $zval = array(
+        $zval = [
             self::VALUE => $object,
-        );
+        ];
 
         return $this->readProperty($zval, $property)[self::VALUE];
     }
@@ -834,9 +834,9 @@ class PropertyAccessor implements PropertyAccessorInterface, ObjectPropertyAcces
      */
     public function setPropertyValue($object, string $property, $value)
     {
-        $zval = array(
+        $zval = [
             self::VALUE => $object,
-        );
+        ];
 
         try {
             $this->writeProperty($zval, $property, $value);

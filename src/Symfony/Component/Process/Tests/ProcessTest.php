@@ -135,6 +135,10 @@ class ProcessTest extends TestCase
 
     public function testWaitUntilSpecificOutput()
     {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestIncomplete('This test is too transient on Windows, help wanted to improve it');
+        }
+
         $p = $this->getProcess([self::$phpBin, __DIR__.'/KillableProcessWithOutput.php']);
         $p->start();
 

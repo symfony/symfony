@@ -885,7 +885,9 @@ class Request
     public function getScheme()
     {
         $scheme = $this->server->get('REQUEST_SCHEME');
-        empty($scheme) && $scheme = 'http';
+        if (empty($scheme)) {
+            $scheme = 'http';
+        }
         return $scheme;
     }
 

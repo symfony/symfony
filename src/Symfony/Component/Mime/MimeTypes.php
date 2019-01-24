@@ -34,13 +34,14 @@ namespace Symfony\Component\Mime;
  */
 final class MimeTypes implements MimeTypesInterface
 {
+    private $extensions = [];
     private $guessers = [];
     private static $default;
 
     public function __construct(array $map = [])
     {
         foreach ($map as $mimeType => $extensions) {
-            self::$extensions[$mimeType] = $extensions;
+            $this->extensions[$mimeType] = $extensions;
         }
         $this->registerGuesser(new FileBinaryMimeTypeGuesser());
         $this->registerGuesser(new FileinfoMimeTypeGuesser());
@@ -71,7 +72,7 @@ final class MimeTypes implements MimeTypesInterface
      */
     public function getExtensions(string $mimeType): array
     {
-        return self::$map[$mimeType] ?? [];
+        return $this->extensions[$mimeType] ?? self::$map[$mimeType] ?? [];
     }
 
     /**

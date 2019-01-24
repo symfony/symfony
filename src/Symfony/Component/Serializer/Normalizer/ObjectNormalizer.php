@@ -43,11 +43,11 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         if (null !== $propertyAccessor && !$propertyAccessor instanceof ObjectPropertyAccessorInterface && !$propertyAccessor instanceof PropertyAccessorInterface) {
-            throw new InvalidArgumentException(sprintf('Argument 3 passed to %s() must be an instance of %s or an instance of %s or null, %s given.', __METHOD__, ObjectPropertyAccessorInterface::class, PropertyAccessorInterface::class, \gettype($propertyAccessor)));
+            throw new InvalidArgumentException(sprintf('Argument 3 passed to "%s()" must be an instance of "%s" or an instance of "%s" or null, "%s" given.', __METHOD__, ObjectPropertyAccessorInterface::class, PropertyAccessorInterface::class, \gettype($propertyAccessor)));
         }
 
         if (null !== $propertyAccessor && !$propertyAccessor instanceof ObjectPropertyAccessorInterface) {
-            @trigger_error(sprintf('Passing an instance of %s as the 3rd argument to "%s()" is deprecated since Symfony 4.3. Pass a %s instance instead.', PropertyAccessorInterface::class, __METHOD__, ObjectPropertyAccessorInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" as the 3rd argument to "%s()" is deprecated since Symfony 4.3. Pass a "%s" instance instead.', PropertyAccessorInterface::class, __METHOD__, ObjectPropertyAccessorInterface::class), E_USER_DEPRECATED);
         }
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

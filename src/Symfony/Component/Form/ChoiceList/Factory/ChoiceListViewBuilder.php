@@ -172,8 +172,8 @@ final class ChoiceListViewBuilder
                 continue;
             }
 
-            $preferredViewsForGroup = array();
-            $otherViewsForGroup = array();
+            $preferredViewsForGroup = [];
+            $otherViewsForGroup = [];
 
             $this->addViewsFromStructuredValues(
                 $preferredViewsForGroup,
@@ -268,6 +268,6 @@ final class ChoiceListViewBuilder
             return ($this->attr)($choice, $key, $value);
         }
 
-        return $this->attr[$key] ?? array();
+        return $this->attr[$key] ?? [];
     }
 }

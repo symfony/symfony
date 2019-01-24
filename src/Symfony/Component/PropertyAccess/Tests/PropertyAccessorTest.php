@@ -85,6 +85,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidObjectProperty
      */
     public function testGetValue($objectOrArray, $path, $value)
     {
@@ -204,6 +205,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidObjectProperty
      */
     public function testSetValue($objectOrArray, $path)
     {
@@ -310,6 +312,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidObjectProperty
      */
     public function testIsReadable($objectOrArray, $path)
     {
@@ -371,6 +374,7 @@ class PropertyAccessorTest extends TestCase
 
     /**
      * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidObjectProperty
      */
     public function testIsWritable($objectOrArray, $path)
     {
@@ -430,6 +434,42 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
+    /**
+     * @dataProvider getValidObjectProperty
+     */
+    public function testGetPropertyValue($object, $property, $value)
+    {
+        $this->assertSame($value, $this->propertyAccessor->getPropertyValue($object, $property));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testGetPropertyValueThrowsExceptionIfPropertyNotFound($object, $property)
+    {
+        $this->propertyAccessor->getPropertyValue($object, $property);
+    }
+
+    /**
+     * @dataProvider getValidObjectProperty
+     */
+    public function testSetPropertyValue($object, $property)
+    {
+        $this->propertyAccessor->setPropertyValue($object, $property, 'Updated');
+
+        $this->assertSame('Updated', $this->propertyAccessor->getPropertyValue($object, $property));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testSetPropertyValueThrowsExceptionIfPropertyNotFound($object, $property)
+    {
+        $this->propertyAccessor->setPropertyValue($object, $property, 'Updated');
+    }
+
     public function getValidPropertyPaths()
     {
         return [
@@ -441,19 +481,6 @@ class PropertyAccessorTest extends TestCase
             [(object) ['property' => ['firstName' => 'Bernhard']], 'property[firstName]', 'Bernhard'],
             [['index' => (object) ['firstName' => 'Bernhard']], '[index].firstName', 'Bernhard'],
             [(object) ['property' => (object) ['firstName' => 'Bernhard']], 'property.firstName', 'Bernhard'],
-
-            // Accessor methods
-            [new TestClass('Bernhard'), 'publicProperty', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'],
-            [new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'],
-
-            // Methods are camelized
-            [new TestClass('Bernhard'), 'public_accessor', 'Bernhard'],
-            [new TestClass('Bernhard'), '_public_accessor', 'Bernhard'],
 
             // Missing indices
             [['index' => []], '[index][firstName]', null],
@@ -472,6 +499,24 @@ class PropertyAccessorTest extends TestCase
             [new TestClass(['foo' => new TestClass('bar')]), 'publicGetter[foo].publicGetSetter', 'bar'],
             [new TestClass(new TestClass(new TestClass('bar'))), 'publicGetter.publicGetter.publicGetSetter', 'bar'],
             [new TestClass(['foo' => ['baz' => new TestClass('bar')]]), 'publicGetter[foo][baz].publicGetSetter', 'bar'],
+        ];
+    }
+
+    public function getValidObjectProperty()
+    {
+        return [
+            // Accessor methods
+            [new TestClass('Bernhard'), 'publicProperty', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'],
+
+            // Methods are camelized
+            [new TestClass('Bernhard'), 'public_accessor', 'Bernhard'],
+            [new TestClass('Bernhard'), '_public_accessor', 'Bernhard'],
         ];
     }
 

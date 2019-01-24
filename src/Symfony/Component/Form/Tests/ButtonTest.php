@@ -41,7 +41,7 @@ class ButtonTest extends TestCase
 
         $button->submit('');
 
-        $button->setParent($this->getFormBuilder('form')->getForm());
+        $button->setParent($this->getFormBuilder()->getForm());
     }
 
     /**
@@ -49,7 +49,7 @@ class ButtonTest extends TestCase
      */
     public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
     {
-        $form = $this->getFormBuilder('form')
+        $form = $this->getFormBuilder()
             ->setDisabled($parentDisabled)
             ->getForm()
         ;
@@ -80,8 +80,8 @@ class ButtonTest extends TestCase
         return new ButtonBuilder($name);
     }
 
-    private function getFormBuilder($name)
+    private function getFormBuilder()
     {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
+        return new FormBuilder('form', null, $this->dispatcher, $this->factory);
     }
 }

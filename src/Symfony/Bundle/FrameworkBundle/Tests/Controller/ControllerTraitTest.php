@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -486,7 +487,8 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testCreateForm()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+        $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')->getMock();
+        $form = new Form($config);
 
         $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $formFactory->expects($this->once())->method('create')->willReturn($form);

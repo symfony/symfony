@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by TysonAndre at 2019-01-05T15:58:47Z
+
+code to reproduce:
+
+```
+<?php
+require_once 'vendor/autoload.php';
+$x = new Symfony\Component\Cache\Adapter\NullAdapter();
+var_export($x->get('key', function (...$args) {}));  // would throw ArgumentCountError
+```

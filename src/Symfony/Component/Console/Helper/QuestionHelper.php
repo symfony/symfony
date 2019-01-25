@@ -256,6 +256,10 @@ class QuestionHelper extends Helper
             if ("\177" === $c) {
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
+                    if (\ord($ret[$i]) > 127) {
+                        // jump back one more byte if last character was double-byte character
+                        --$i;
+                    }
                     // Move cursor backwards
                     $output->write("\033[1D");
                 }
@@ -306,6 +310,11 @@ class QuestionHelper extends Helper
 
                 continue;
             } else {
+                if (\ord($c) > 127) {
+                    // read next byte for double-byte characters
+                    $c .= fread($inputStream, 1);
+                    ++$i;
+                }
                 $output->write($c);
                 $ret .= $c;
                 ++$i;

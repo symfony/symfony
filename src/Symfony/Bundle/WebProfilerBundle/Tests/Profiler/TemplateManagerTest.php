@@ -74,23 +74,6 @@ class TemplateManagerTest extends TestCase
         $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }
 
-    /**
-     * template should be loaded for 'foo' because other collectors are
-     * missing in profile or in profiler.
-     */
-    public function testGetTemplates()
-    {
-        $this->profiler->expects($this->any())
-            ->method('has')
-            ->withAnyParameters()
-            ->will($this->returnCallback([$this, 'profileHasCollectorCallback']));
-
-        $result = $this->templateManager->getTemplates(new ProfileDummy());
-        $this->assertArrayHasKey('foo', $result);
-        $this->assertArrayNotHasKey('bar', $result);
-        $this->assertArrayNotHasKey('baz', $result);
-    }
-
     public function profilerHasCallback($panel)
     {
         switch ($panel) {

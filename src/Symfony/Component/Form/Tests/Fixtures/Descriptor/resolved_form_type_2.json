@@ -18,6 +18,7 @@
             "error_bubbling",
             "help",
             "help_attr",
+            "help_html",
             "inherit_data",
             "label",
             "label_attr",

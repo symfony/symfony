@@ -6,6 +6,8 @@ CHANGELOG
 
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
+ * Added `ControllerTrait::isFormValid()`
+ * Added an `help_html` form option to display the `help` text as HTML
 
 4.2.0
 -----

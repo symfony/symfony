@@ -111,9 +111,10 @@ class RouteCompiler implements RouteCompilerInterface
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
-        preg_match_all('#\{!?\w+\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('#\{(!)?(\w+)\}#', $pattern, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $varName = substr($match[0][0], 1, -1);
+            $important = $match[1][1] >= 0;
+            $varName = $match[2][0];
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + \strlen($match[0][0]);
@@ -183,10 +184,13 @@ class RouteCompiler implements RouteCompilerInterface
                 $regexp = self::transformCapturingGroupsToNonCapturings($regexp);
             }
 
-            $tokens[] = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
-            if ('!' === $varName[0]) {
-                $varName = substr($varName, 1);
+            if ($important) {
+                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName, false, true];
+            } else {
+                $token = ['variable', $isSeparator ? $precedingChar : '', $regexp, $varName];
             }
+
+            $tokens[] = $token;
             $variables[] = $varName;
         }
 
@@ -199,7 +203,8 @@ class RouteCompiler implements RouteCompilerInterface
         if (!$isHost) {
             for ($i = \count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
-                if ('variable' === $token[0] && $route->hasDefault($token[3])) {
+                // variable is optional when it is not important and has a default value
+                if ('variable' === $token[0] && !($token[5] ?? false) && $route->hasDefault($token[3])) {
                     $firstOptional = $i;
                 } else {
                     break;
@@ -219,7 +224,7 @@ class RouteCompiler implements RouteCompilerInterface
             $regexp .= 'u';
             for ($i = 0, $nbToken = \count($tokens); $i < $nbToken; ++$i) {
                 if ('variable' === $tokens[$i][0]) {
-                    $tokens[$i][] = true;
+                    $tokens[$i][4] = true;
                 }
             }
         }
@@ -286,10 +291,6 @@ class RouteCompiler implements RouteCompilerInterface
             // Text tokens
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
-            if ('variable' === $token[0] && '!' === $token[3][0]) {
-                $token[3] = substr($token[3], 1);
-            }
-
             // Variable tokens
             if (0 === $index && 0 === $firstOptional) {
                 // When the only token is an optional variable token, the separator is required

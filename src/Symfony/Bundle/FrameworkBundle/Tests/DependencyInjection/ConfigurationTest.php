@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\Serializer;
 
 class ConfigurationTest extends TestCase
 {
@@ -295,7 +294,7 @@ class ConfigurationTest extends TestCase
                 'routing' => [],
                 'transports' => [],
                 'serializer' => [
-                    'id' => !class_exists(FullStack::class) && class_exists(Serializer::class) ? 'messenger.transport.symfony_serializer' : null,
+                    'id' => 'messenger.transport.native_php_serializer',
                     'format' => 'json',
                     'context' => [],
                 ],

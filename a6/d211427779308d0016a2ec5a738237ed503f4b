@@ -1,0 +1,269 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-01-22T21:18:33Z
+
+Also you need to modify https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/ConfigurationTest.php#L298 as well as https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php#L663.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-22T21:30:42Z
+
+Given the issues we currently face in the Security component related to PHP's `serialize()` implementation (see for example #29951) I am not sure if we should actively support this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-22T22:08:10Z
+
+#29951 is about the Serializable interface and parent::serialize(). We should activity discourage using it (the method call but also the interface) anywhere BTW.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-23T07:44:38Z
+
+I haven't used this component, but as an outsider, compatibility with third-party systems look like a huge and important feature to me. Are you sure it's OK to make us incompatible with anything not related to PHP?
+
+Somewhat related: for the future, we could consider using Google's Protobuf, which is what most cool and modern apps use nowadays (https://developers.google.com/protocol-buffers/docs/reference/php-generated).
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-01-23T07:56:48Z
+
+Both your points are about the serializer doing a bad job with DTOs. Why not improve the Serializer to support DTOs better instead, it fixes this problem by proxy, but also improves the other component.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T07:56:54Z
+
+In my opinion we should support both out of the box, and indeed default to PHP's `serialize()`. @weaverryan's arguments make sense, but only when the consumer is written in PHP. It often makes sense to use other languages for async consumers (Go or C for computations, Python for Machine Learning...), in such cases consuming JSON is easier than parsing the PHP internal format.
+
+Protobuf is also very interesting for this kind of use cases (but is not as popular than JSON). We could support both.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T08:00:08Z
+
+@dkarlovi we need to improve DTO support indeed (even if it has already been dramatically improved in 4.1/4.2), but it's not always the right tool anyway for messenger: `serialize` preserves private and protected states. It makes no senses to add this kind of features to the Symfony serializer (its goal is to transform the object in a **public** representation).
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2019-01-23T08:01:24Z
+
+I agree that using the Serializer Component makes has some drawbacks compared to using `serialize`.  On the other hand, it ensures that developers can choose a different serialisation method depending on their environment.
+
+I also agree with @dunglas that the only useful way to fix this is to make it configurable: Symfony has always encouraged a pluggable system where you could easily modify the system to your specific needs while providing a sensible default setup. I believe that's what should be done here: allow using any serialiser but default to one using PHPs built-in serialisation functionality.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-01-23T08:02:44Z
+
+@dunglas don't really understand: the message in Messenger context **is** in its public context.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T08:06:52Z
+
+@dkarlovi not really:
+
+* private states are preserved when using synchronous handlers
+* they aren't when a transport is configured
+
+It hurts DX (especially for those used to how Laravel works). Messaging could be considered internal (as done when using a sync handler) from an app level. The serialization is just an implementation detail, and so preserving states would improve both DX and performance (it just works).
+
+I would say that it's different if the message is intended to the current app (like when using a messenger handler) => private, or for another app (like one written in another language) => public.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-23T08:10:06Z
+
+> especially for those used to how Laravel works
+
+no need to write this. I've no idea what Laravel is, yet I spent an afternoon debugging that transport thing until I created #29163. We have a serious issue here.
+
+The serialization mechanism is already "pluggable", here we're talking about changing the default.
+I don't remember if we have a DI config integration to leverage this pluggability?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T08:14:06Z
+
+@nicolas-grekas I mean when you use Enqueue (it's the use case described by @weaverryan in the PR description), messaging is considered something purely internal and transparent. You don't even have to know that the message is serialized. It's "magic", but it works. When switching to Messenger, you have to think about using public properties, because JSON.
+
+> Seems it's time to revisit this convention of serializer and think about adding possibility to serialize such props as well
+
+It's easy to do (as showcased by the code you linked).
+
+> they don't use native serialization
+
+But why? native serialization is faster, and easy to use.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-01-23T08:14:57Z
+
+> I would say that it's different if the message is intended to the current app (like when using a messenger handler) => private, or for another app (like one written in another language) => public.
+
+It depends how you define "private", I guess. From Messenger's POV, the message passed is definitely in its **public representation** since it's going out of the local app's context onto a transport, it's irrelevant if the consumer is the same app again, that will be determined long **after** you've already serialized it.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T08:15:57Z
+
+> I don't remember if we have a DI config integration to leverage this pluggability?
+
+We have such kind of configs in other components at least. Could be something like:
+
+```yaml
+messenger:
+    # ...
+    serialize: private # default, can also be public (JSON) or a service name
+```
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-01-23T08:49:49Z
+
+> We have such kind of configs in other components at least. Could be something like:
+>
+> ```yaml
+> messenger:
+>     # ...
+>     serialize: private (default) # can also be public (JSON) or a service name
+> ```
+
+I agree with this point and instead of private/public I'd suggest `native|{service_id}`, referring to services sounds like the best IMO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-23T08:54:57Z
+
+> I don't remember if we have a DI config integration to leverage this pluggability?
+
+the answer is yes, I just needed to look at the first file in the PR :)
+There is nothing else to do here, by default we consider messages "private/internal", which we should.
+And ppl who need interop with third-party apps have more work to do.
+That's how things should be IMHO.
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-01-23T09:00:41Z
+
+> And ppl who need interop with third-party apps have more work to do.
+
+This will probably continue to be debated, we might need "stats" about what proportion of apps use or don't use 3rd-party apps 😕
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-23T09:13:29Z
+
+Let's agree the DX is seriously broken, up to the point where advocating the component to the masses is questionable currently.
+
+This PR is a serious solution to the problem.
+The Serializer component is really nice when compat with other techno is needed.
+But that comes AFTER.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-01-23T09:17:49Z
+
+> And ppl who need interop with third-party apps have more work to do.
+
+I'm fine with this conclusion, if you need to cover this use case, you shouldn't be too wary of it not being covered by default, as long as you can actually do it with condiguration.
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2019-01-23T09:20:21Z
+
+We're currently looking at using messenger for this use case of emitting messages to a third party but I'd always assumed we'd be writing a serialiser explicitly for that case (for instance having the FQCN in the headers of the AMQP message doesn't make sense)
+
+It'd be nice for 'soft BC' to have the JSON serlialiser as a config option even if the default is switched to native and users have to add something to their config to maintain the JSON behaviour.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-01-23T09:38:36Z
+
+I'm ok with this solution since it's just about default which can be (hopefully) easily switched. But this is not a correct solution to reasons given for this change. Correct solution is to improve Serializer. Better justification for this change is performance and simplification.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-01-23T10:25:29Z
+
+Just to reiterate my points made in a Slack thread: treating messages as "private" (or "internal") is misleading since they're leaving the current context (when sending) and coming from a source which shouldn't just be trusted by default.
+
+**The transport is an external resource** and any messages going to it / coming from it should be treated as such, security and all. The question is, can a bad actor somehow trick the consuming Symfony app into doing something it didn't expect to do by placing a message with a carefully constructed payload (ie. all the security implications of `unserialize` apply here).
+
+You can't rely on the message "being from yourself" no more than a firewall should trust a package coming from public Internet because it says:
+> It's me, ur package!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-23T10:37:02Z
+
+Here is the current config:
+
+```yaml
+    messenger:
+        enabled:              false
+        routing:
+
+            # Prototype
+            message_class:
+                senders:              []
+                send_and_handle:      false
+        serializer:
+            id:                   messenger.transport.symfony_serializer
+            format:               json
+            context:
+
+                # Prototype
+                name:                 ~
+        transports:
+
+            # Prototype
+            name:
+                dsn:                  ~
+                options:              []
+        default_bus:          null
+        buses:
+
+            # Prototype
+            name:
+                default_middleware:   true # One of true; false; "allow_no_handlers"
+                middleware:
+
+                    # Prototype
+                    -
+                        id:                   ~ # Required
+                        arguments:            []```
+```
+
+I suggest to move the `serializer` config under the `routing.message_class` key. Then it will be possible to configure a specific serializer (internal, public, porotbuf...) per message class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-23T10:52:53Z
+
+> I suggest to move the serializer config under the routing.message_class key.
+
+I agree it's strange to have it directly under "messenger". Under "transports" might be a better fit.
+But let's move this elsewhere and keep the focus of this PR :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-01-23T14:04:43Z
+
+Summarizing a few important points:
+
+1) The serialization is configurable and will always be configurable.
+
+2) There is no added security concern as the messages are currently serialized to JSON, but they are unserialized back to objects by using some class name metadata stored in the headers of the message. If a bad actor is able to add messages to your queue, you have a problem either way.
+
+Better DX for the 99% use-case, no added security problems, easy configurability for the 1% :).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-01-25T15:09:01Z
+
+> Oh, one last thing:
+Symfony\Component\Messenger\Transport\Serialization\Serializer::create() should return that new serializer, isn't it? Maybe not actually, can anyone confirm?
+
+I think no, because that's a factory to literally create an instance of THAT class. So, it should continue to create an instance of itself. However, there were 4 places in the code that used this factory function to create a default serializer if none was passed. I change those to create the new `PhpSerializer`. I think we should consistently use the same default serializer everywhere.

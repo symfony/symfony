@@ -14,6 +14,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UrlType extends AbstractType
@@ -25,6 +27,17 @@ class UrlType extends AbstractType
     {
         if (null !== $options['default_protocol']) {
             $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        if ($options['default_protocol']) {
+            $view->vars['attr']['inputmode'] = 'url';
+            $view->vars['type'] = 'text';
         }
     }
 

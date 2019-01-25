@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-24T19:48:46Z
+
+Hi @errogaht thanks for the PR, it looks good to me.
+Could you please rebase+retarget branch 4.2?
+You'll also need to fix the short array syntax we're using now.

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-01-04T09:17:23Z
+
+As discussed with @nicolas-grekas , https://github.com/symfony/symfony/issues/29763 will be implemented in this PR as well :)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-01-04T18:42:53Z
+
+@nicolas-grekas , ready!
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-01-04T18:46:39Z
+
+CI fails are not relevant (I see some Intl component errors), Routing is green locally :)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-01-15T15:41:52Z
+
+Finally green and ready!
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-01-25T07:57:33Z
+
+@nicolas-grekas , I managed to keep consistency with old tests!

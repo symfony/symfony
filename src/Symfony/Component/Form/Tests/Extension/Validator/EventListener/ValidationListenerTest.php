@@ -12,10 +12,14 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\EventListener;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\Extension\Validator\Constraints\Form;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -67,7 +71,7 @@ class ValidationListenerTest extends TestCase
 
     private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new Form());
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new FormConstraint());
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -86,9 +90,16 @@ class ValidationListenerTest extends TestCase
         return $this->getBuilder($name, $propertyPath, $dataClass)->getForm();
     }
 
-    private function getMockForm()
+    private function createForm($name = '', $compound = false)
     {
-        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $config = new FormBuilder($name, null, $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), $this->getMockBuilder(FormFactoryInterface::class)->getMock());
+        $config->setCompound($compound);
+
+        if ($compound) {
+            $config->setDataMapper(new PropertyPathMapper());
+        }
+
+        return new Form($config);
     }
 
     // More specific mapping tests can be found in ViolationMapperTest
@@ -110,7 +121,7 @@ class ValidationListenerTest extends TestCase
 
     public function testMapViolationAllowsNonSyncIfInvalid()
     {
-        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
+        $violation = $this->getConstraintViolation(FormConstraint::NOT_SYNCHRONIZED_ERROR);
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())
@@ -127,10 +138,10 @@ class ValidationListenerTest extends TestCase
 
     public function testValidateIgnoresNonRoot()
     {
-        $form = $this->getMockForm();
-        $form->expects($this->once())
-            ->method('isRoot')
-            ->will($this->returnValue(false));
+        $childForm = $this->createForm('child');
+
+        $form = $this->createForm('', true);
+        $form->add($childForm);
 
         $this->validator->expects($this->never())
             ->method('validate');
@@ -138,15 +149,12 @@ class ValidationListenerTest extends TestCase
         $this->violationMapper->expects($this->never())
             ->method('mapViolation');
 
-        $this->listener->validateForm(new FormEvent($form, null));
+        $this->listener->validateForm(new FormEvent($childForm, null));
     }
 
     public function testValidateWithEmptyViolationList()
     {
-        $form = $this->getMockForm();
-        $form->expects($this->once())
-            ->method('isRoot')
-            ->will($this->returnValue(true));
+        $form = $this->createForm();
 
         $this->validator
             ->expects($this->once())

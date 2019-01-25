@@ -523,6 +523,10 @@ class ErrorHandler
                 $this->loggers[$type][0]->log($level, $logMessage, $errorAsException ? ['exception' => $errorAsException] : []);
             } finally {
                 $this->isRecursive = false;
+
+                if (!\defined('HHVM_VERSION')) {
+                    set_error_handler([$this, __FUNCTION__]);
+                }
             }
         }
 

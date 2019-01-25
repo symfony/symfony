@@ -189,6 +189,17 @@ class UrlMatcherTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
+    public function testShortPathDoesNotMatchImportantVariable()
+    {
+        $collection = new RouteCollection();
+        $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
+
+        $this->getUrlMatcher($collection)->match('/index');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
     public function testTrailingEncodedNewlineIsNotOverlooked()
     {
         $collection = new RouteCollection();

@@ -157,9 +157,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
                 $varName = $token[3];
-                if ($important = ('!' === $varName[0])) {
-                    $varName = substr($varName, 1);
-                }
+                // variable is not important by default
+                $important = $token[5] ?? false;
 
                 if (!$optional || $important || !array_key_exists($varName, $defaults) || (null !== $mergedParams[$varName] && (string) $mergedParams[$varName] !== (string) $defaults[$varName])) {
                     // check requirement

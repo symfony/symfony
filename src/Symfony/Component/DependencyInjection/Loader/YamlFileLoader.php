@@ -349,8 +349,12 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service as $key => $value) {
-                if (!\in_array($key, ['alias', 'public'])) {
+                if (!\in_array($key, ['alias', 'public', 'deprecated'])) {
                     throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for the service "%s" which is defined as an alias in "%s". Allowed configuration keys for service aliases are "alias" and "public".', $key, $id, $file));
+                }
+
+                if ('deprecated' === $key) {
+                    $alias->setDeprecated(true, $value);
                 }
             }
 

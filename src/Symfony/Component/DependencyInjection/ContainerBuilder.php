@@ -579,7 +579,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior, $inlineServices, $isConstructorArgument);
+            $alias = $this->aliasDefinitions[$id];
+
+            if ($alias->isDeprecated()) {
+                @trigger_error($alias->getDeprecationMessage($id), E_USER_DEPRECATED);
+            }
+
+            return $this->doGet((string) $alias, $invalidBehavior, $inlineServices, $isConstructorArgument);
         }
 
         try {

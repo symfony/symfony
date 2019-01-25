@@ -259,6 +259,22 @@ class ContainerBuilderTest extends TestCase
         }
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will soon be removed.
+     */
+    public function testDeprecatedAlias()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass');
+
+        $alias = new Alias('foo');
+        $alias->setDeprecated();
+        $builder->setAlias('foobar', $alias);
+
+        $builder->get('foobar');
+    }
+
     public function testGetAliases()
     {
         $builder = new ContainerBuilder();

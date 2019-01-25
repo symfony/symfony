@@ -325,6 +325,24 @@ class PhpDumperTest extends TestCase
         $this->assertSame($foo, $container->get('alias_for_alias'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will soon be removed.
+     */
+    public function testAliasesDeprecation()
+    {
+        $container = include self::$fixturesPath.'/containers/container_alias_deprecation.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_alias_deprecation.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Aliases_Deprecation']));
+
+        require self::$fixturesPath.'/php/container_alias_deprecation.php';
+        $container = new \Symfony_DI_PhpDumper_Test_Aliases_Deprecation();
+        $container->get('alias_for_foo_non_deprecated');
+        $container->get('alias_for_foo_deprecated');
+    }
+
     public function testFrozenContainerWithoutAliases()
     {
         $container = new ContainerBuilder();

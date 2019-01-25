@@ -7,6 +7,10 @@ CHANGELOG
  * Added `PhpSerializer` which uses PHP's native `serialize()` and
    `unserialize()` to serialize messages to a transport
 
+ * [BC BREAK] If no serializer were passed, the default serializer
+   changed from `Serializer` to `PhpSerializer` inside `AmqpReceiver`,
+   `AmqpSender`, `AmqpTransport` and `AmqpTransportFactory`.
+
 4.2.0
 -----
 

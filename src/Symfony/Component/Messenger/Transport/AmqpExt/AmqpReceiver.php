@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -32,7 +32,7 @@ class AmqpReceiver implements ReceiverInterface
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
-        $this->serializer = $serializer ?? Serializer::create();
+        $this->serializer = $serializer ?? new PhpSerializer();
     }
 
     /**

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-04T15:14:34Z
+
+Alternatively we could lower all at once, before the foreach: `array_change_key_case($caster, \CASE_LOWER)`. But if we can preserve types as-is that be :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-04T15:14:52Z
+
+This breaks case insensitivity of PHP identifiers (class names).
+Can we reduce the number of calls to addCasters instead? What is calling it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-04T15:23:15Z
+
+If we can't reduce the number of calls to addCaster, we could instead maintain a cache of type => lowercase(type) - there aren't many of them
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-04T15:23:15Z
+
+@nicolas-grekas you are right ... but we already broke PHP class name insensitivity in 3.3 when we made service IDs (= PHP FQCN) case sensitive. That's why I was wondering if we could do the same here to gain a bit of performance (combining #29762 and this PR it gave me an 8% improvement in the Symfony Demo app).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-04T15:24:17Z
+
+@javiereguiluz we broke case insensitivity of service identifiers, not of PHP classes as they're out of reach: that's the behavior of the PHP engine, no ways around.

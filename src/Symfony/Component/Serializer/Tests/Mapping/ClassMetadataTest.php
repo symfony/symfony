@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Mapping;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 /**
@@ -29,11 +30,8 @@ class ClassMetadataTest extends TestCase
     {
         $classMetadata = new ClassMetadata('c');
 
-        $a1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $a1->method('getName')->willReturn('a1');
-
-        $a2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $a2->method('getName')->willReturn('a2');
+        $a1 = new AttributeMetadata('a1');
+        $a2 = new AttributeMetadata('a2');
 
         $classMetadata->addAttributeMetadata($a1);
         $classMetadata->addAttributeMetadata($a2);
@@ -46,33 +44,28 @@ class ClassMetadataTest extends TestCase
         $classMetadata1 = new ClassMetadata('c1');
         $classMetadata2 = new ClassMetadata('c2');
 
-        $ac1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $ac1->method('getName')->willReturn('a1');
-        $ac1->method('getGroups')->willReturn(['a', 'b']);
-
-        $ac2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $ac2->method('getName')->willReturn('a1');
-        $ac2->method('getGroups')->willReturn(['b', 'c']);
+        $ac1 = new AttributeMetadata('a1');
+        $ac1->addGroup('a');
+        $ac1->addGroup('b');
+        $ac2 = new AttributeMetadata('a1');
+        $ac2->addGroup('b');
+        $ac2->addGroup('c');
 
         $classMetadata1->addAttributeMetadata($ac1);
         $classMetadata2->addAttributeMetadata($ac2);
 
         $classMetadata1->merge($classMetadata2);
 
-        $ac1->method('getGroups')->willReturn('a', 'b', 'c');
-
-        $this->assertEquals(['a1' => $ac1], $classMetadata2->getAttributesMetadata());
+        $this->assertSame(['a', 'b', 'c'], $ac1->getGroups());
+        $this->assertEquals(['a1' => $ac1], $classMetadata1->getAttributesMetadata());
     }
 
     public function testSerialize()
     {
         $classMetadata = new ClassMetadata('a');
 
-        $a1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $a1->method('getName')->willReturn('b1');
-
-        $a2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
-        $a2->method('getName')->willReturn('b2');
+        $a1 = new AttributeMetadata('b1');
+        $a2 = new AttributeMetadata('b2');
 
         $classMetadata->addAttributeMetadata($a1);
         $classMetadata->addAttributeMetadata($a2);

@@ -154,9 +154,14 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     {
         $message = '';
         $docToken = '';
+        $docPart = '';
 
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
+            if ('.' === $t) {
+                // Concatenate with next token
+                continue;
+            }
             if (!isset($t[1])) {
                 break;
             }
@@ -167,17 +172,22 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
                     break;
                 case T_ENCAPSED_AND_WHITESPACE:
                 case T_CONSTANT_ENCAPSED_STRING:
-                    $message .= $t[1];
+                    if ('' === $docToken) {
+                        $message .= PhpStringTokenParser::parse($t[1]);
+                    } else {
+                        $docPart = $t[1];
+                    }
                     break;
                 case T_END_HEREDOC:
-                    return PhpStringTokenParser::parseDocString($docToken, $message);
+                    $message .= PhpStringTokenParser::parseDocString($docToken, $docPart);
+                    $docToken = '';
+                    $docPart = '';
+                    break;
+                case T_WHITESPACE:
+                    break;
                 default:
                     break 2;
             }
-        }
-
-        if ($message) {
-            $message = PhpStringTokenParser::parse($message);
         }
 
         return $message;

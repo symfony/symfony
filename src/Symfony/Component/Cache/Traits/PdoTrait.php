@@ -306,14 +306,7 @@ trait PdoTrait
 
         $now = time();
         $lifetime = $lifetime ?: null;
-        try {
-            $stmt = $conn->prepare($sql);
-        } catch (TableNotFoundException $e) {
-            if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
-                $this->createTable();
-            }
-            $stmt = $conn->prepare($sql);
-        }
+        $stmt = $conn->prepare($sql);
 
         if ('sqlsrv' === $driver || 'oci' === $driver) {
             $stmt->bindParam(1, $id);
@@ -340,8 +333,14 @@ trait PdoTrait
         }
 
         foreach ($values as $id => $data) {
-            $stmt->execute();
-
+            try {
+                $stmt->execute();
+            } catch (TableNotFoundException $e) {
+                if (!$conn->isTransactionActive() || \in_array($this->driver, ['pgsql', 'sqlite', 'sqlsrv'], true)) {
+                    $this->createTable();
+                }
+                $stmt->execute();
+            }
             if (null === $driver && !$stmt->rowCount()) {
                 try {
                     $insertStmt->execute();

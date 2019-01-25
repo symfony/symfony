@@ -66,26 +66,6 @@ abstract class AbstractFormTest extends TestCase
     }
 
     /**
-     * @param string $name
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockForm($name = 'name')
-    {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
-        $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')->getMock();
-
-        $form->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
-        $form->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($config));
-
-        return $form;
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDataMapper()

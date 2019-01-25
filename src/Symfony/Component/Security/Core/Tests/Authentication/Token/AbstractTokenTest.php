@@ -43,6 +43,9 @@ class ConcreteToken extends AbstractToken
         $this->setUser($user);
     }
 
+    /**
+     * @param bool $isCalledFromOverridingMethod Must be set to true when called from an overriding method
+     */
     public function serialize()
     {
         return serialize([$this->credentials, parent::serialize()]);

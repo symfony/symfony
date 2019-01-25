@@ -99,7 +99,7 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
+        list($this->credentials, $this->providerKey, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

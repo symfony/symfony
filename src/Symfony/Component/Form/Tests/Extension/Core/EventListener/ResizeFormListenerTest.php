@@ -58,11 +58,6 @@ class ResizeFormListenerTest extends TestCase
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
-    protected function getMockForm()
-    {
-        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
-    }
-
     public function testPreSetDataResizesForm()
     {
         $this->form->add($this->getForm('0'));

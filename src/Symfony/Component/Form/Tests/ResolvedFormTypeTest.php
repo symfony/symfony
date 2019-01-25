@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -220,7 +222,7 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateView()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
 
         $view = $this->resolvedType->createView($form);
 
@@ -230,7 +232,7 @@ class ResolvedFormTypeTest extends TestCase
 
     public function testCreateViewWithParent()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
         $parentView = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $view = $this->resolvedType->createView($form, $parentView);
@@ -242,7 +244,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testBuildView()
     {
         $options = ['a' => '1', 'b' => '2'];
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
         $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $i = 0;
@@ -284,7 +286,7 @@ class ResolvedFormTypeTest extends TestCase
     public function testFinishView()
     {
         $options = ['a' => '1', 'b' => '2'];
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
         $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $i = 0;

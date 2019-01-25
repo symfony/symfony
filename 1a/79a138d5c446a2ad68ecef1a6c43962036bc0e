@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-24T20:01:38Z
+
+Nice finding, LGTM. Could you please have a look at HHVM tests, are they related? (rebasing and checking other PRs on 3.4 might help decide).
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-01-24T21:06:36Z
+
+Failures were actually related.
+
+Turns out this bug does not exist on the tested HHVM version so we must not readd the error handler.

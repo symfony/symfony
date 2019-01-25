@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-17T18:42:11Z
+
+/cc @stof Can you have a look here as you did the opposite patch in the referenced PR?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2019-01-17T18:48:45Z
+
+Kindly note: in the linked PR the call to `Memcached#close` was removed (:+1: ), here however the call to [`Memcached#quit`](http://php.net/manual/en/memcached.quit.php) is proposed. That method is around since 2.0.0 but feature detection could be applied.

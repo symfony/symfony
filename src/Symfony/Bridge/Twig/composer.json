@@ -43,7 +43,7 @@
     },
     "conflict": {
         "symfony/console": "<3.4",
-        "symfony/form": "<4.2",
+        "symfony/form": "<4.2.3",
         "symfony/translation": "<4.2"
     },
     "suggest": {

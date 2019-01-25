@@ -44,11 +44,6 @@ abstract class MergeCollectionListenerTest extends TestCase
         return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
     }
 
-    protected function getMockForm()
-    {
-        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
-    }
-
     public function getBooleanMatrix1()
     {
         return [

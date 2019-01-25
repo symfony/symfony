@@ -51,11 +51,6 @@ class CsrfValidationListenerTest extends TestCase
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
-    protected function getMockForm()
-    {
-        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
-    }
-
     // https://github.com/symfony/symfony/pull/5838
     public function testStringFormData()
     {

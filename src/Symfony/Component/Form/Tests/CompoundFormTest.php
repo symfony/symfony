@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonBuilder;
@@ -69,40 +72,35 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
     {
-        $child = $this->getMockForm('firstName');
+        $child = $this->createForm('firstName', false);
 
         $this->form->add($child);
 
-        $child->expects($this->once())
-            ->method('submit')
-            ->with($this->equalTo(null));
-
         $this->form->submit(['firstName' => null], false);
+
+        $this->assertNull($this->form->get('firstName')->getData());
     }
 
     public function testSubmitForwardsNullIfValueIsMissing()
     {
-        $child = $this->getMockForm('firstName');
+        $child = $this->createForm('firstName', false);
 
         $this->form->add($child);
 
-        $child->expects($this->once())
-            ->method('submit')
-            ->with($this->equalTo(null));
-
         $this->form->submit([]);
+
+        $this->assertNull($this->form->get('firstName')->getData());
     }
 
     public function testSubmitDoesNotForwardNullIfNotClearMissing()
     {
-        $child = $this->getMockForm('firstName');
+        $child = $this->createForm('firstName', false);
 
         $this->form->add($child);
 
-        $child->expects($this->never())
-            ->method('submit');
-
         $this->form->submit([], false);
+
+        $this->assertFalse($child->isSubmitted());
     }
 
     public function testSubmitDoesNotAddExtraFieldForNullValues()
@@ -120,15 +118,22 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testClearMissingFlagIsForwarded()
     {
-        $child = $this->getMockForm('firstName');
+        $personForm = $this->createForm('person');
 
-        $this->form->add($child);
+        $firstNameForm = $this->createForm('firstName', false);
+        $personForm->add($firstNameForm);
 
-        $child->expects($this->once())
-            ->method('submit')
-            ->with($this->equalTo('foo'), false);
+        $lastNameForm = $this->createForm('lastName', false);
+        $lastNameForm->setData('last name');
+        $personForm->add($lastNameForm);
 
-        $this->form->submit(['firstName' => 'foo'], false);
+        $this->form->add($personForm);
+        $this->form->submit(['person' => ['firstName' => 'foo']], false);
+
+        $this->assertTrue($firstNameForm->isSubmitted());
+        $this->assertSame('foo', $firstNameForm->getData());
+        $this->assertFalse($lastNameForm->isSubmitted());
+        $this->assertSame('last name', $lastNameForm->getData());
     }
 
     public function testCloneChildren()
@@ -145,10 +150,8 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testNotEmptyIfChildNotEmpty()
     {
-        $child = $this->getMockForm();
-        $child->expects($this->once())
-            ->method('isEmpty')
-            ->will($this->returnValue(false));
+        $child = $this->createForm('name', false);
+        $child->setData('foo');
 
         $this->form->setData(null);
         $this->form->add($child);
@@ -400,29 +403,25 @@ class CompoundFormTest extends AbstractFormTest
             ->setDataMapper(new PropertyPathMapper())
             ->getForm();
 
-        $child = $this->getMockForm('child');
-        $childToBeRemoved = $this->getMockForm('removed');
-        $childToBeAdded = $this->getMockForm('added');
+        $childToBeRemoved = $this->createForm('removed', false);
+        $childToBeAdded = $this->createForm('added', false);
+        $child = $this->getBuilder('child', new EventDispatcher())
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            })
+            ->getForm();
 
         $form->add($child);
         $form->add($childToBeRemoved);
 
-        $child->expects($this->once())
-            ->method('setData')
-            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
-                $form->remove('removed');
-                $form->add($childToBeAdded);
-            }));
-
-        $childToBeRemoved->expects($this->never())
-            ->method('setData');
-
-        // once when it it is created, once when it is added
-        $childToBeAdded->expects($this->exactly(2))
-            ->method('setData');
-
         // pass NULL to all children
         $form->setData([]);
+
+        $this->assertFalse($form->has('removed'));
+        $this->assertTrue($form->has('added'));
     }
 
     public function testSetDataMapsViewDataToChildren()
@@ -453,30 +452,25 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testSubmitSupportsDynamicAdditionAndRemovalOfChildren()
     {
-        $child = $this->getMockForm('child');
-        $childToBeRemoved = $this->getMockForm('removed');
-        $childToBeAdded = $this->getMockForm('added');
+        $form = $this->form;
+
+        $childToBeRemoved = $this->createForm('removed');
+        $childToBeAdded = $this->createForm('added');
+        $child = $this->getBuilder('child')
+            ->addEventListener(FormEvents::PRE_SUBMIT, function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            })
+            ->getForm();
 
         $this->form->add($child);
         $this->form->add($childToBeRemoved);
 
-        $form = $this->form;
-
-        $child->expects($this->once())
-            ->method('submit')
-            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
-                $form->remove('removed');
-                $form->add($childToBeAdded);
-            }));
-
-        $childToBeRemoved->expects($this->never())
-            ->method('submit');
-
-        $childToBeAdded->expects($this->once())
-            ->method('submit');
-
         // pass NULL to all children
         $this->form->submit([]);
+
+        $this->assertFalse($childToBeRemoved->isSubmitted());
+        $this->assertTrue($childToBeAdded->isSubmitted());
     }
 
     public function testSubmitMapsSubmittedChildrenOntoExistingViewData()
@@ -925,12 +919,24 @@ class CompoundFormTest extends AbstractFormTest
     public function testCreateViewWithChildren()
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type1 = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $type2 = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $options = ['a' => 'Foo', 'b' => 'Bar'];
-        $field1 = $this->getMockForm('foo');
-        $field2 = $this->getMockForm('bar');
+        $field1 = $this->getBuilder('foo')
+            ->setType($type1)
+            ->getForm();
+        $field2 = $this->getBuilder('bar')
+            ->setType($type2)
+            ->getForm();
         $view = new FormView();
         $field1View = new FormView();
+        $type1
+            ->method('createView')
+            ->will($this->returnValue($field1View));
         $field2View = new FormView();
+        $type2
+            ->method('createView')
+            ->will($this->returnValue($field2View));
 
         $this->form = $this->getBuilder('form', null, null, $options)
             ->setCompound(true)
@@ -957,24 +963,8 @@ class CompoundFormTest extends AbstractFormTest
             ->with($view, $this->form, $options)
             ->will($this->returnCallback($assertChildViewsEqual([])));
 
-        // Then add the first child form
-        $field1->expects($this->once())
-            ->method('createView')
-            ->will($this->returnValue($field1View));
-
-        // Then the second child form
-        $field2->expects($this->once())
-            ->method('createView')
-            ->will($this->returnValue($field2View));
-
-        // Again build the view for the form itself. This time the child views
-        // exist.
-        $type->expects($this->once())
-            ->method('finishView')
-            ->with($view, $this->form, $options)
-            ->will($this->returnCallback($assertChildViewsEqual(['foo' => $field1View, 'bar' => $field2View])));
-
         $this->assertSame($view, $this->form->createView());
+        $this->assertSame(['foo' => $field1View, 'bar' => $field2View], $view->children);
     }
 
     public function testNoClickedButtonBeforeSubmission()
@@ -1067,7 +1057,7 @@ class CompoundFormTest extends AbstractFormTest
             ->getForm();
 
         $form = $this->createForm()
-            ->add($this->getBuilder('text')->getForm())
+            ->add($this->createForm('text', false))
             ->add($submit)
         ;
 
@@ -1112,11 +1102,17 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertNull($this->form->get('bar')->getData());
     }
 
-    protected function createForm()
+    protected function createForm($name = 'name', $compound = true)
     {
-        return $this->getBuilder()
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->getForm();
+        $builder = $this->getBuilder($name);
+
+        if ($compound) {
+            $builder
+                ->setCompound(true)
+                ->setDataMapper($this->getDataMapper())
+            ;
+        }
+
+        return $builder->getForm();
     }
 }

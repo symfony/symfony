@@ -19,7 +19,10 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 /**
  * A convenient builder for creating {@link ChoiceListView} instances.
  *
+ * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
+ *
+ * @internal
  */
 final class ChoiceListViewBuilder
 {

@@ -160,7 +160,7 @@ class Connection
         $this->exchange()->declareExchange();
 
         $this->queue()->declareQueue();
-        $this->queue()->bind($this->exchange()->getName(), $this->queueConfiguration['routing_key'] ?? null);
+        $this->queue()->bind($this->exchange()->getName(), $this->queueConfiguration['routing_key'] ?? null, $this->queueConfiguration['arguments'] ?? null);
     }
 
     public function channel(): \AMQPChannel

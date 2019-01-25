@@ -28,18 +28,20 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-            '/div
+'/div
     [
         ./label[@for="name"]
-        [
-            ./span[@class="alert alert-danger d-block"]
-                [./span[@class="d-block"]
-                    [./span[.="[trans]Error[/trans]"]]
-                    [./span[.="[trans]Error![/trans]"]]
-                ]
-                [count(./span)=1]
-        ]
-        /following-sibling::div[./input[@id="name"]]
+        /following-sibling::div[@class="col-sm-10"]
+            [
+                ./input[@id="name"]
+                /following-sibling::div[@class="alert alert-danger d-block"]
+                    [
+                        ./span[@class="d-block"]
+                            [
+                                ./span[.="[trans]Error![/trans]"]
+                            ][count(./span)=1]
+                    ]
+            ]
     ]
 '
         );

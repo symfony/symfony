@@ -33,6 +33,7 @@ col-sm-2
             <div class="{{ block('form_group_class') }}">
                 {{- form_widget(form, widget_attr) -}}
                 {{- form_help(form) -}}
+                {{- form_errors(form) -}}
             </div>
     {##}</div>
     {%- endif -%}
@@ -49,6 +50,7 @@ col-sm-2
             <div class="{{ block('form_group_class') }}">
                 {{- form_widget(form, widget_attr) -}}
                 {{- form_help(form) -}}
+                {{- form_errors(form) -}}
             </div>
         </div>
 {##}</fieldset>

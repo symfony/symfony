@@ -37,18 +37,17 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-            '/div
+'/div
     [
         ./label[@for="name"]
-        [
-            ./span[@class="alert alert-danger d-block"]
-                [./span[@class="d-block"]
-                    [./span[.="[trans]Error[/trans]"]]
-                    [./span[.="[trans]Error![/trans]"]]
-                ]
-                [count(./span)=1]
-        ]
         /following-sibling::input[@id="name"]
+        /following-sibling::div[@class="alert alert-danger d-block"]
+            [
+                ./span[@class="d-block"]
+                    [
+                        ./span[.="[trans]Error![/trans]"]
+                    ]
+            ][count(./span)=1]
     ]
 '
         );
@@ -289,30 +288,16 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $html = $this->renderErrors($view);
 
         $this->assertMatchesXpath($html,
-'/span
-    [@class="alert alert-danger d-block"]
+'/div[@class="alert alert-danger d-block"]
     [
         ./span[@class="d-block"]
-            [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error 1[/trans]"]]
-
         /following-sibling::span[@class="d-block"]
-            [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error 2[/trans]"]]
     ]
     [count(./span)=2]
 '
         );
-    }
-
-    public function testErrorWithNoLabel()
-    {
-        $form = $this->factory->createNamed('name', TextType::class, ['label' => false]);
-        $form->addError(new FormError('[trans]Error 1[/trans]'));
-        $view = $form->createView();
-        $html = $this->renderLabel($view);
-
-        $this->assertMatchesXpath($html, '//span[.="[trans]Error[/trans]"]');
     }
 
     public function testCheckedCheckbox()

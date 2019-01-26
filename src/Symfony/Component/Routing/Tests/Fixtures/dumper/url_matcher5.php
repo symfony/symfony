@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -9,7 +9,7 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
-    use PhpMatcherTrait;
+    use CompiledUrlMatcherTrait;
 
     public function __construct(RequestContext $context)
     {
@@ -36,7 +36,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         ];
         $this->dynamicRoutes = [
             16 => [[['_route' => 'a_wildcard'], ['param'], null, null, false, true, null]],
-            39 => [[['_route' => 'nested_wildcard'], ['param'], null, null, false, true, null]],
+            39 => [
+                [['_route' => 'nested_wildcard'], ['param'], null, null, false, true, null],
+                [null, null, null, null, false, false, 0],
+            ],
         ];
     }
 }

@@ -27,5 +27,4 @@ class BirthdayTypeTest extends DateTypeTest
             'years' => 'bad value',
         ]);
     }
-
 }

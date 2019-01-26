@@ -30,8 +30,8 @@ class HiddenType extends AbstractType
             'compound' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The hidden field is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The hidden field is invalid.';
             },
         ]);
     }

@@ -279,8 +279,8 @@ class TimeType extends AbstractType
             'choice_translation_domain' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The time is invalid' :
-                    $previousValue;
+                    $previousValue :
+                    'The time is invalid';
             },
         ]);
 

@@ -25,8 +25,8 @@ class ColorType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The color is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The color is invalid.';
             },
         ));
     }

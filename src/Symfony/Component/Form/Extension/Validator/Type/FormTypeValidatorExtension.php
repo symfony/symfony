@@ -58,7 +58,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         $resolver->setDefaults([
             'error_mapping' => [],
             'constraints' => [],
-            'invalid_message' => 'This value is not valid.',
+            'invalid_message' => function (Options $options, ?string $previousValue) {
+                return $options['legacy_error_messages'] ? 'This value is not valid.' : $previousValue;
+            },
             'invalid_message_parameters' => [],
             'legacy_error_messages' => $this->legacyErrorMessages,
             'allow_extra_fields' => false,

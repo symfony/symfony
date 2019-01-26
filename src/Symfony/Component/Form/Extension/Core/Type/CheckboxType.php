@@ -63,8 +63,8 @@ class CheckboxType extends AbstractType
             'false_values' => [null],
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The checkbox has an invalid value.' :
-                    $previousValue;
+                    $previousValue :
+                    'The checkbox has an invalid value.';
             },
         ]);
 

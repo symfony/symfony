@@ -44,8 +44,8 @@ class NumberType extends AbstractType
             'compound' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The number is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The number is invalid.';
             },
         ]);
 

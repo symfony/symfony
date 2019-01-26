@@ -61,8 +61,8 @@ class MoneyType extends AbstractType
             'compound' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The money amount is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The money amount is invalid.';
             },
         ]);
 

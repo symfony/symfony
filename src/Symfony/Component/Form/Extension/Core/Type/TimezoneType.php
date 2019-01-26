@@ -48,8 +48,8 @@ class TimezoneType extends AbstractType
             'regions' => \DateTimeZone::ALL,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The time zone is invalid' :
-                    $previousValue;
+                    $previousValue :
+                    'The time zone is invalid';
             },
         ]);
 

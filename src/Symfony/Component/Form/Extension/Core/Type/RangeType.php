@@ -25,8 +25,8 @@ class RangeType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The range is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The range is invalid.';
             },
         ));
     }

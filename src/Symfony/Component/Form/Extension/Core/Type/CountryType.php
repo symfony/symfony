@@ -51,8 +51,8 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
             'choice_translation_locale' => null,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The country is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The country is invalid.';
             },
         ]);
 

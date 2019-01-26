@@ -253,8 +253,8 @@ class DateTimeType extends AbstractType
             },
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The date and time are invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The date and time are invalid.';
             },
         ]);
 

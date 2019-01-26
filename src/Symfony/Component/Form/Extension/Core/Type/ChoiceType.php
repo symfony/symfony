@@ -319,8 +319,8 @@ class ChoiceType extends AbstractType
             'trim' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The selected choice is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The selected choice is invalid.';
             },
         ]);
 

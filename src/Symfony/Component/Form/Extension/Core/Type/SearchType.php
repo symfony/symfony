@@ -25,8 +25,8 @@ class SearchType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The search button is invalid' :
-                    $previousValue;
+                    $previousValue :
+                    'The search button is invalid';
             },
         ));
     }

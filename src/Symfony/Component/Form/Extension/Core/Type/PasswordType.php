@@ -39,8 +39,8 @@ class PasswordType extends AbstractType
             'trim' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The password is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The password is invalid.';
             },
         ]);
     }

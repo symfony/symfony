@@ -237,8 +237,8 @@ class DateIntervalType extends AbstractType
                 'labels' => [],
                 'invalid_message' => function (Options $options, $previousValue) {
                     return ($options['legacy_error_messages'] ?? true) ?
-                        'The date interval is invalid.' :
-                        $previousValue;
+                    $previousValue :
+                    'The date interval is invalid.';
                 },
             ]
         );

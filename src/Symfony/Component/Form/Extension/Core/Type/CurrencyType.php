@@ -51,8 +51,8 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
             'choice_translation_locale' => null,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The currency is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The currency is invalid.';
             },
         ]);
 

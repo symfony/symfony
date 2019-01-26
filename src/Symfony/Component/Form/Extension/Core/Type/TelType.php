@@ -25,8 +25,8 @@ class TelType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The telephone number is invalid' :
-                    $previousValue;
+                    $previousValue :
+                    'The telephone number is invalid';
             },
         ));
     }

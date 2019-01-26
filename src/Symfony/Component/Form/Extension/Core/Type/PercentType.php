@@ -38,8 +38,8 @@ class PercentType extends AbstractType
             'compound' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The percentage is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The percentage is invalid.';
             },
         ]);
 

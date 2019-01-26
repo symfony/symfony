@@ -33,10 +33,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $builder = $this->factory->createBuilder(
             FormTypeTest::TESTED_TYPE,
             null,
-            [
-                'validation_groups' => 'group',
-                'legacy_error_messages' => false,
-            ]
+            ['validation_groups' => 'group']
         );
         $builder->add('firstName', FormTypeTest::TESTED_TYPE);
         $form = $builder->getForm();

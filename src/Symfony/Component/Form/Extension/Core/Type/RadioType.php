@@ -25,8 +25,8 @@ class RadioType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The selected radio option is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The selected radio option is invalid.';
             },
         ));
     }

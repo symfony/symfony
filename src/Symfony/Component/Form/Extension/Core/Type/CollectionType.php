@@ -99,8 +99,8 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The collection is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The collection is invalid.';
             },
         ]);
 

@@ -24,8 +24,8 @@ class EmailType extends AbstractType
         $resolver->setDefaults(array(
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The email address is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The email address is invalid.';
             },
         ));
     }

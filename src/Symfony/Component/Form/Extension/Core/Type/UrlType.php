@@ -51,8 +51,8 @@ class UrlType extends AbstractType
             'default_protocol' => 'http',
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The URL is invalid' :
-                    $previousValue;
+                    $previousValue :
+                    'The URL is invalid';
             },
         ]);
 

@@ -23,7 +23,6 @@ use Symfony\Component\Form\SubmitButtonTypeInterface;
  */
 class SubmitType extends AbstractType implements SubmitButtonTypeInterface
 {
-
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['clicked'] = $form->isClicked();

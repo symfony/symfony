@@ -39,8 +39,8 @@ class IntegerType extends AbstractType
             'compound' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The integer is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The integer is invalid.';
             },
         ]);
 

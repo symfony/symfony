@@ -57,8 +57,8 @@ class RepeatedType extends AbstractType
             'error_bubbling' => false,
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
-                    'The repeated value is invalid.' :
-                    $previousValue;
+                    $previousValue :
+                    'The repeated value is invalid.';
             },
         ]);
 

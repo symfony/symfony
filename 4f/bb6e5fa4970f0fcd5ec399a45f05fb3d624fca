@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-12-19T12:10:00Z
+
+>     * removed `psr/simple-cache` dependency, run `composer require psr/simple-cache` if you need it
+
+isn't this broken ? Our exceptions implement both the PSR-6 and PSR-16 interfaces, and so both are hard requirements.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-19T13:09:13Z
+
+> Our exceptions implement both the PSR-6 and PSR-16 interfaces, and so both are hard requirements.
+
+Good catch. Fixed by conditionally implementing the PSR-16 one only when it's available.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-24T22:41:43Z
+
+Now rebased, ready.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-25T15:50:12Z
+
+Looks like we still need a rebase here :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T17:44:37Z
+
+oups, rebased.

@@ -161,9 +161,9 @@ class FormRenderer implements FormRendererInterface
         // to implement a custom "choice_widget" block (no matter in which theme),
         // or to fallback to the block of the parent type, which would be
         // "form_widget" in this example (again, no matter in which theme).
-        // If the designer wants to explicitly fallback to "form_widget" in his
-        // custom "choice_widget", for example because he only wants to wrap
-        // a <div> around the original implementation, he can simply call the
+        // If the designer wants to explicitly fallback to "form_widget" in their
+        // custom "choice_widget", for example because they only want to wrap
+        // a <div> around the original implementation, they can simply call the
         // widget() function again to render the block for the parent type.
         //
         // The second kind is implemented in the following blocks.

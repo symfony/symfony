@@ -280,7 +280,7 @@ class TimeType extends AbstractType
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
-                    'The time is invalid';
+                    'The time is invalid.';
             },
         ]);
 

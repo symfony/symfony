@@ -49,7 +49,7 @@ class TimezoneType extends AbstractType
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
-                    'The time zone is invalid';
+                    'The time zone is invalid.';
             },
         ]);
 

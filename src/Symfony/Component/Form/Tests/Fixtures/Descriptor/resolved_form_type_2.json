@@ -21,6 +21,7 @@
             "help_html",
             "inherit_data",
             "invalid_message",
+            "invalid_message_parameters",
             "label",
             "label_attr",
             "label_format",

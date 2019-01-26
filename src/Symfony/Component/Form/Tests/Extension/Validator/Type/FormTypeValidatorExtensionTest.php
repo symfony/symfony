@@ -81,17 +81,26 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertCount(1, $form->getErrors(true));
     }
 
-    protected function createForm(array $options = [])
+    public function testInvalidMessage()
     {
-        return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
+        $form = $this->createForm();
+
+        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
     }
 
     /**
      * @group legacy
      * @expectedDeprecation Setting the option 'legacy_error_messages' to 'true' is deprecated and will be disabled by default in Symfony 5.0
      */
-    public function testDeprecatedMessage()
+    public function testLegacyInvalidMessage()
     {
-        $this->factory->create(FormTypeTest::TESTED_TYPE, null, array('legacy_error_messages' => true));
+        $form = $this->createForm(array('legacy_error_messages' => true));
+
+        $this->assertEquals('This value is not valid.', $form->getConfig()->getOption('invalid_message'));
+    }
+
+    protected function createForm(array $options = [])
+    {
+        return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
     }
 }

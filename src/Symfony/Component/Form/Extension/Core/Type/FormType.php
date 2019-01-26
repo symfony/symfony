@@ -185,7 +185,8 @@ class FormType extends BaseType
             'help' => null,
             'help_attr' => [],
             'help_html' => false,
-            'invalid_message' => 'The form is invalid',
+            'invalid_message' => 'This value is not valid.',
+            'invalid_message_parameters' => [],
         ]);
 
         $resolver->setAllowedTypes('label_attr', 'array');

@@ -52,7 +52,7 @@ class UrlType extends AbstractType
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
-                    'The URL is invalid';
+                    'The URL is invalid.';
             },
         ]);
 

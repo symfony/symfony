@@ -26,7 +26,7 @@ class SearchType extends AbstractType
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
-                    'The search button is invalid';
+                    'The search button is invalid.';
             },
         ));
     }

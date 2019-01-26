@@ -106,6 +106,14 @@
                 <source>The URL is invalid.</source>
                 <target>The URL is invalid.</target>
             </trans-unit>
+            <trans-unit id="54">
+                <source>The search button is invalid.</source>
+                <target>The search button is invalid.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>The telephone number is invalid.</source>
+                <target>The telephone number is invalid.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

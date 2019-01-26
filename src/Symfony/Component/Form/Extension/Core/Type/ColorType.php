@@ -22,13 +22,13 @@ class ColorType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
                     'The color is invalid.';
             },
-        ));
+        ]);
     }
 
     /**

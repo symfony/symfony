@@ -174,8 +174,8 @@ class ConfigurationTest extends TestCase
                 ],
                 'legacy_error_messages' => true,
             ],
-            'esi' => array('enabled' => false),
-            'ssi' => array('enabled' => false),
+            'esi' => ['enabled' => false],
+            'ssi' => ['enabled' => false],
             'fragments' => [
                 'enabled' => false,
                 'path' => '/_fragment',

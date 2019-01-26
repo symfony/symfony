@@ -22,14 +22,14 @@ class BirthdayType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'years' => range(date('Y') - 120, date('Y')),
             'invalid_message' => function (Options $options, $previousValue) {
                 return ($options['legacy_error_messages'] ?? true) ?
                     $previousValue :
                     'Provided birth date is invalid.';
             },
-        ));
+        ]);
 
         $resolver->setAllowedTypes('years', 'array');
     }

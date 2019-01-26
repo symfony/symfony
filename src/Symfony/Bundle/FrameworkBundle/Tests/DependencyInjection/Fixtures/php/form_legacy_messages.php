@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'form' => array(
+$container->loadFromExtension('framework', [
+    'form' => [
         'legacy_error_messages' => true,
-    ),
-));
+    ],
+]);

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-16T15:52:17Z
+
+Ready, failure unrelated. As is, this PR will enable the much faster CompiledUrlMatcher/Generator by default, even when using a non-dumped one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-17T16:18:04Z
+
+Doc PR submitted and linked in the description.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chiqui3d at 2019-01-09T12:34:36Z
+
+Hello and excuse me, but don't forget this. Thank you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-22T22:01:13Z
+
+Without more feedback, I'm going to merge this PR this week.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-23T13:04:56Z
+
+Can you rebase please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-23T15:25:01Z
+
+rebased!

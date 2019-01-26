@@ -52,7 +52,7 @@ class AliasTest extends TestCase
     public function testCanDeprecateAnAlias()
     {
         $alias = new Alias('foo', false);
-        $alias->setDeprecated(true, 'The %service_id% service is deprecated.');
+        $alias->setDeprecated(true, 'The %alias_id% service is deprecated.');
 
         $this->assertTrue($alias->isDeprecated());
     }
@@ -62,14 +62,14 @@ class AliasTest extends TestCase
         $alias = new Alias('foo', false);
         $alias->setDeprecated();
 
-        $expectedMessage = 'The "foo" service alias is deprecated. You should stop using it, as it will soon be removed.';
+        $expectedMessage = 'The "foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
         $this->assertEquals($expectedMessage, $alias->getDeprecationMessage('foo'));
     }
 
     public function testReturnsCorrectDeprecationMessage()
     {
         $alias = new Alias('foo', false);
-        $alias->setDeprecated(true, 'The "%service_id%" is deprecated.');
+        $alias->setDeprecated(true, 'The "%alias_id%" is deprecated.');
 
         $expectedMessage = 'The "foo" is deprecated.';
         $this->assertEquals($expectedMessage, $alias->getDeprecationMessage('foo'));
@@ -101,10 +101,10 @@ class AliasTest extends TestCase
     public function invalidDeprecationMessageProvider()
     {
         return [
-            "With \rs" => ["invalid \r message %service_id%"],
-            "With \ns" => ["invalid \n message %service_id%"],
-            'With */s' => ['invalid */ message %service_id%'],
-            'message not containing required %service_id% variable' => ['this is deprecated'],
+            "With \rs" => ["invalid \r message %alias_id%"],
+            "With \ns" => ["invalid \n message %alias_id%"],
+            'With */s' => ['invalid */ message %alias_id%'],
+            'message not containing required %alias_id% variable' => ['this is deprecated'],
         ];
     }
 }

@@ -66,7 +66,7 @@ class Symfony_DI_PhpDumper_Test_Aliases_Deprecation extends Container
      */
     protected function getAliasForFooDeprecatedService()
     {
-        @trigger_error('The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+        @trigger_error('The "alias_for_foo_deprecated" service alias is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
 
         return $this->get('foo');
     }

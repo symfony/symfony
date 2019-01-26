@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Cache\Simple;
 
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', ChainCache::class, ChainAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 
 /**
  * Chains several caches together.
@@ -23,9 +27,9 @@ use Symfony\Contracts\Service\ResetInterface;
  * Cached items are fetched from the first cache having them in its data store.
  * They are saved and deleted in all caches at once.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+ * @deprecated since Symfony 4.3, use ChainAdapter and type-hint for CacheInterface instead.
  */
-class ChainCache implements CacheInterface, PruneableInterface, ResettableInterface
+class ChainCache implements Psr16CacheInterface, PruneableInterface, ResettableInterface
 {
     private $miss;
     private $caches = [];
@@ -33,8 +37,8 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
     private $cacheCount;
 
     /**
-     * @param CacheInterface[] $caches          The ordered list of caches used to fetch cached items
-     * @param int              $defaultLifetime The lifetime of items propagated from lower caches to upper ones
+     * @param Psr16CacheInterface[] $caches          The ordered list of caches used to fetch cached items
+     * @param int                   $defaultLifetime The lifetime of items propagated from lower caches to upper ones
      */
     public function __construct(array $caches, int $defaultLifetime = 0)
     {
@@ -43,8 +47,8 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
         }
 
         foreach ($caches as $cache) {
-            if (!$cache instanceof CacheInterface) {
-                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', \get_class($cache), CacheInterface::class));
+            if (!$cache instanceof Psr16CacheInterface) {
+                throw new InvalidArgumentException(sprintf('The class "%s" does not implement the "%s" interface.', \get_class($cache), Psr16CacheInterface::class));
             }
         }
 

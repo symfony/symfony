@@ -13,6 +13,9 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Simple\Psr6Cache;
 
+/**
+ * @group legacy
+ */
 abstract class Psr6CacheTest extends CacheTestCase
 {
     protected $skippedTests = [

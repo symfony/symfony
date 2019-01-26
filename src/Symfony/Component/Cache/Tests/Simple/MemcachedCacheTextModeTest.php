@@ -14,6 +14,9 @@ namespace Symfony\Component\Cache\Tests\Simple;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Simple\MemcachedCache;
 
+/**
+ * @group legacy
+ */
 class MemcachedCacheTextModeTest extends MemcachedCacheTest
 {
     public function createSimpleCache($defaultLifetime = 0)

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -24,6 +25,15 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
     use Traits\AutowireTrait;
     use Traits\BindTrait;
     use Traits\PublicTrait;
+
+    private $path;
+
+    public function __construct(ServicesConfigurator $parent, Definition $definition, string $path = null)
+    {
+        parent::__construct($parent, $definition, null, []);
+
+        $this->path = $path;
+    }
 
     /**
      * Adds a tag for this definition.

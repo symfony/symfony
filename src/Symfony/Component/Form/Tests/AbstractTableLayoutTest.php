@@ -470,7 +470,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         // Insert the start tag, the end tag should be rendered by the helper
         // Unfortunately this is not valid HTML, because the surrounding table
         // tag is missing. If someone renders a form with table layout
-        // manually, she should call form_rest() explicitly within the <table>
+        // manually, they should call form_rest() explicitly within the <table>
         // tag.
         $this->assertMatchesXpath('<form>'.$html,
 '/form

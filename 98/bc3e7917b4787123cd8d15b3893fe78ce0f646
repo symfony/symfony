@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-12-29T17:19:11Z
+
+Doing many commits for now, in case some of them cannot be merged. Will squash if everything is all good.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-12-30T09:19:56Z
+
+Prepended the commit list with one cs-fix commit (self accessor), apparently the code wasn't even valid before any changes. Got rid of the fabbot commit by dispatching changes to the right commits.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-12-30T11:37:07Z
+
+The Travis failure seems unrelated.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-01-03T16:43:57Z
+
+The build failures are unrelated, please review again @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T11:05:02Z
+
+rebase needed please, but before, I'd recommend you to squash+apply move to short arrays.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T18:00:10Z
+
+I pushed a 2nd commit here, that uses an internal instance instead of static properties to track the state.
+I also gave up preserving original ordering :)

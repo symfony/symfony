@@ -20,6 +20,12 @@ Config
 
  * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
 
+Form
+----
+
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is deprecated.
+
 FrameworkBundle
 ---------------
 

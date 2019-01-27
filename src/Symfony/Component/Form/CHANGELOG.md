@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * deprecated using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget`
+   option is set to `single_text`
  * added `block_prefix` option to `BaseType`.
  * added `help_html` option to display the `help` text as HTML.
 

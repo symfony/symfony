@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLanguageProvidersPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddMimeTypeGuesserPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DataCollectorTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
@@ -45,6 +44,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgume
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
+use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -124,7 +124,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ResettableServicePass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
-        $container->addCompilerPass(new AddMimeTypeGuesserPass());
+        $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
 
         if ($container->getParameter('kernel.debug')) {

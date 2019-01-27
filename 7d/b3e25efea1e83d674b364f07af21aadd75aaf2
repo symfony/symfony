@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-25T13:32:41Z
+
+made sure the first result wont be hidden under the search bar:
+
+![image](https://user-images.githubusercontent.com/1047696/51748864-ff875100-20ad-11e9-8735-d059a255e434.png)
+
+i think this nails it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-25T17:21:55Z
+
+Shouldn't we merge this one on an older branch?
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-01-26T21:19:03Z
+
+Is it possible to disable this search bar in general?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-27T08:24:13Z
+
+@Koc see #29748, IMHO it's developer preference so im not sure how to deal with it. Different topic though :)

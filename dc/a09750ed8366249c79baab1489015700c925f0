@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-01-28T10:00:21Z
+
+Nice improvement! Not sure if it's possible, but I'd reword the error message:
+
+```
+As referenced by "alias": the "deprecated_foo_alias" service alias
+is deprecated. You should stop using it, as it will soon be removed.
+```
+
+like this:
+
+```
+The "deprecated_foo_alias" service alias referenced by "alias"
+is deprecated. You should stop using it, as it will soon be removed.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-28T10:08:00Z
+
+I'd happily improve the message, but your suggestion is not possible, see L65 how the message is constructed. We can only append or prepend to the message conveyed by the alias.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-28T16:39:26Z
+
+Note that this PR is renaming the placeholder used in the message. When it gets merged, the blog post published today should be updated to reflect the change.

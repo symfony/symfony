@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\Mime\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,14 +22,23 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddMimeTypeGuesserPass implements CompilerPassInterface
 {
+    private $mimeTypesService;
+    private $mimeTypeGuesserTag;
+
+    public function __construct(string $mimeTypesService = 'mime_types', string $mimeTypeGuesserTag = 'mime.mime_type_guesser')
+    {
+        $this->mimeTypesService = $mimeTypesService;
+        $this->mimeTypeGuesserTag = $mimeTypeGuesserTag;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->has('mime_types')) {
-            $definition = $container->findDefinition('mime_types');
-            foreach ($container->findTaggedServiceIds('mime.mime_type_guesser', true) as $id => $attributes) {
+        if ($container->has($this->mimeTypesService)) {
+            $definition = $container->findDefinition($this->mimeTypesService);
+            foreach ($container->findTaggedServiceIds($this->mimeTypeGuesserTag, true) as $id => $attributes) {
                 $definition->addMethodCall('registerGuesser', [new Reference($id)]);
             }
         }

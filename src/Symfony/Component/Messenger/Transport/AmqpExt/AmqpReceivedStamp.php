@@ -21,14 +21,21 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 class AmqpReceivedStamp implements StampInterface
 {
     private $amqpEnvelope;
+    private $queueName;
 
-    public function __construct(\AMQPEnvelope $amqpEnvelope)
+    public function __construct(\AMQPEnvelope $amqpEnvelope, string $queueName)
     {
         $this->amqpEnvelope = $amqpEnvelope;
+        $this->queueName = $queueName;
     }
 
     public function getAmqpEnvelope(): \AMQPEnvelope
     {
         return $this->amqpEnvelope;
+    }
+
+    public function getQueueName(): string
+    {
+        return $this->queueName;
     }
 }

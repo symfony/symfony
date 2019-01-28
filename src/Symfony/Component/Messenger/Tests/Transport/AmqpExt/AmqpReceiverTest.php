@@ -36,7 +36,8 @@ class AmqpReceiverTest extends TestCase
 
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-        $connection->method('get')->willReturn($amqpEnvelope);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->get());
@@ -52,11 +53,12 @@ class AmqpReceiverTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-        $connection->method('get')->willReturn($amqpEnvelope);
-        $connection->method('ack')->with($amqpEnvelope)->willThrowException(new \AMQPException());
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->method('ack')->with($amqpEnvelope, 'queueName')->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
-        $receiver->ack(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope)]));
+        $receiver->ack(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
     /**
@@ -67,11 +69,12 @@ class AmqpReceiverTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-        $connection->method('get')->willReturn($amqpEnvelope);
-        $connection->method('nack')->with($amqpEnvelope, AMQP_NOPARAM)->willThrowException(new \AMQPException());
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->method('nack')->with($amqpEnvelope, 'queueName', AMQP_NOPARAM)->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
-        $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope)]));
+        $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
     private function createAMQPEnvelope()

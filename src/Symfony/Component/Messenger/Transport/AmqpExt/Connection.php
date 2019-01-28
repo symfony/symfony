@@ -35,7 +35,7 @@ class Connection
 
     private $connectionConfiguration;
     private $exchangeConfiguration;
-    private $queueConfiguration;
+    private $queuesConfiguration;
     private $amqpFactory;
 
     /**
@@ -49,9 +49,9 @@ class Connection
     private $amqpExchange;
 
     /**
-     * @var \AMQPQueue|null
+     * @var \AMQPQueue[]|null
      */
-    private $amqpQueue;
+    private $amqpQueues = [];
 
     /**
      * @var \AMQPExchange|null
@@ -68,14 +68,14 @@ class Connection
      *   * vhost: Virtual Host to use with the AMQP service
      *   * user: Username to use to connect the the AMQP service
      *   * password: Password to use the connect to the AMQP service
-     *   * queue:
-     *     * name: Name of the queue
-     *     * routing_key: The routing key (if any) to use to push the messages to
+     *   * queues[name]: An array of queues, keyed by the name
+     *     * binding_keys: The binding keys (if any) to bind to this queue
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * exchange:
      *     * name: Name of the exchange
      *     * type: Type of exchange (Default: fanout)
+     *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * delay:
@@ -86,7 +86,7 @@ class Connection
      *   * loop_sleep: Amount of micro-seconds to wait if no message are available (Default: 200000)
      *   * prefetch_count: set channel prefetch count
      */
-    public function __construct(array $connectionConfiguration, array $exchangeConfiguration, array $queueConfiguration, AmqpFactory $amqpFactory = null)
+    public function __construct(array $connectionConfiguration, array $exchangeConfiguration, array $queuesConfiguration, AmqpFactory $amqpFactory = null)
     {
         $this->connectionConfiguration = array_replace_recursive([
             'delay' => [
@@ -96,7 +96,7 @@ class Connection
             ],
         ], $connectionConfiguration);
         $this->exchangeConfiguration = $exchangeConfiguration;
-        $this->queueConfiguration = $queueConfiguration;
+        $this->queuesConfiguration = $queuesConfiguration;
         $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
     }
 
@@ -107,17 +107,17 @@ class Connection
         }
 
         $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+        $exchangeName = $pathParts[1] ?? 'messages';
+        parse_str($parsedUrl['query'] ?? '', $parsedQuery);
+
         $amqpOptions = array_replace_recursive([
             'host' => $parsedUrl['host'] ?? 'localhost',
             'port' => $parsedUrl['port'] ?? 5672,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
-            'queue' => [
-                'name' => $queueName = $pathParts[1] ?? 'messages',
-            ],
             'exchange' => [
-                'name' => $queueName,
+                'name' => $exchangeName,
             ],
-        ], $options);
+        ], $options, $parsedQuery);
 
         if (isset($parsedUrl['user'])) {
             $amqpOptions['login'] = $parsedUrl['user'];
@@ -127,21 +127,26 @@ class Connection
             $amqpOptions['password'] = $parsedUrl['pass'];
         }
 
-        if (isset($parsedUrl['query'])) {
-            parse_str($parsedUrl['query'], $parsedQuery);
-
-            $amqpOptions = array_replace_recursive($amqpOptions, $parsedQuery);
+        if (!isset($amqpOptions['queues'])) {
+            $amqpOptions['queues'][$exchangeName] = [];
         }
 
         $exchangeOptions = $amqpOptions['exchange'];
-        $queueOptions = $amqpOptions['queue'];
-        unset($amqpOptions['queue'], $amqpOptions['exchange']);
+        $queuesOptions = $amqpOptions['queues'];
+        unset($amqpOptions['queues'], $amqpOptions['exchange']);
 
-        if (\is_array($queueOptions['arguments'] ?? false)) {
-            $queueOptions['arguments'] = self::normalizeQueueArguments($queueOptions['arguments']);
-        }
+        $queuesOptions = array_map(function ($queueOptions) {
+            if (!\is_array($queueOptions)) {
+                $queueOptions = [];
+            }
+            if (\is_array($queueOptions['arguments'] ?? false)) {
+                $queueOptions['arguments'] = self::normalizeQueueArguments($queueOptions['arguments']);
+            }
 
-        return new self($amqpOptions, $exchangeOptions, $queueOptions, $amqpFactory);
+            return $queueOptions;
+        }, $queuesOptions);
+
+        return new self($amqpOptions, $exchangeOptions, $queuesOptions, $amqpFactory);
     }
 
     private static function normalizeQueueArguments(array $arguments): array
@@ -166,10 +171,10 @@ class Connection
      *
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = [], int $delay = 0): void
+    public function publish(string $body, array $headers = [], int $delay = 0, string $routingKey = null): void
     {
         if (0 !== $delay) {
-            $this->publishWithDelay($body, $headers, $delay);
+            $this->publishWithDelay($body, $headers, $delay, $routingKey);
 
             return;
         }
@@ -178,37 +183,50 @@ class Connection
             $this->setup();
         }
 
-        $flags = $this->queueConfiguration['flags'] ?? AMQP_NOPARAM;
-        $attributes = $this->getAttributes($headers);
+        // TODO - allow flag & attributes to be configured on the message
 
-        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, $flags, $attributes);
+        $this->exchange()->publish(
+            $body,
+            $routingKey ?? $this->getDefaultPublishRoutingKey(),
+            AMQP_NOPARAM,
+            [
+                'headers' => $headers,
+            ]
+        );
     }
 
     /**
-     * Returns an approximate count of the messages in a queue.
+     * Returns an approximate count of the messages in defined queues.
      */
-    public function countMessagesInQueue(): int
+    public function countMessagesInQueues(): int
     {
-        return $this->queue()->declareQueue();
+        return array_sum(array_map(function ($queueName) {
+            return $this->queue($queueName)->declareQueue();
+        }, $this->getQueueNames()));
     }
 
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers = [], int $delay)
+    private function publishWithDelay(string $body, array $headers, int $delay, ?string $exchangeRoutingKey)
     {
         if ($this->shouldSetup()) {
-            $this->setupDelay($delay);
+            $this->setupDelay($delay, $exchangeRoutingKey);
         }
 
-        $routingKey = $this->getRoutingKeyForDelay($delay);
-        $flags = $this->queueConfiguration['flags'] ?? AMQP_NOPARAM;
-        $attributes = $this->getAttributes($headers);
+        // TODO - allow flag & attributes to be configured on the message
 
-        $this->getDelayExchange()->publish($body, $routingKey, $flags, $attributes);
+        $this->getDelayExchange()->publish(
+            $body,
+            $this->getRoutingKeyForDelay($delay),
+            AMQP_NOPARAM,
+            [
+                'headers' => $headers,
+            ]
+        );
     }
 
-    private function setupDelay(int $delay)
+    private function setupDelay(int $delay, ?string $routingKey)
     {
         if (!$this->channel()->isConnected()) {
             $this->clear();
@@ -217,7 +235,7 @@ class Connection
         $exchange = $this->getDelayExchange();
         $exchange->declareExchange();
 
-        $queue = $this->createDelayQueue($delay);
+        $queue = $this->createDelayQueue($delay, $routingKey);
         $queue->declareQueue();
         $queue->bind($exchange->getName(), $this->getRoutingKeyForDelay($delay));
     }
@@ -242,7 +260,7 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay)
+    private function createDelayQueue(int $delay, ?string $routingKey)
     {
         $delayConfiguration = $this->connectionConfiguration['delay'];
 
@@ -253,9 +271,10 @@ class Connection
             'x-dead-letter-exchange' => $this->exchange()->getName(),
         ]);
 
-        if (isset($this->queueConfiguration['routing_key'])) {
+        $routingKey = $routingKey ?? $this->getDefaultPublishRoutingKey();
+        if (null !== $routingKey) {
             // after being released from to DLX, this routing key will be used
-            $queue->setArgument('x-dead-letter-routing-key', $this->queueConfiguration['routing_key']);
+            $queue->setArgument('x-dead-letter-routing-key', $routingKey);
         }
 
         return $queue;
@@ -267,18 +286,18 @@ class Connection
     }
 
     /**
-     * Waits and gets a message from the configured queue.
+     * Gets a message from the specified queue.
      *
      * @throws \AMQPException
      */
-    public function get(): ?\AMQPEnvelope
+    public function get(string $queueName): ?\AMQPEnvelope
     {
         if ($this->shouldSetup()) {
             $this->setup();
         }
 
         try {
-            if (false !== $message = $this->queue()->get()) {
+            if (false !== $message = $this->queue($queueName)->get()) {
                 return $message;
             }
         } catch (\AMQPQueueException $e) {
@@ -295,14 +314,14 @@ class Connection
         return null;
     }
 
-    public function ack(\AMQPEnvelope $message): bool
+    public function ack(\AMQPEnvelope $message, string $queueName): bool
     {
-        return $this->queue()->ack($message->getDeliveryTag());
+        return $this->queue($queueName)->ack($message->getDeliveryTag());
     }
 
-    public function nack(\AMQPEnvelope $message, int $flags = AMQP_NOPARAM): bool
+    public function nack(\AMQPEnvelope $message, string $queueName, int $flags = AMQP_NOPARAM): bool
     {
-        return $this->queue()->nack($message->getDeliveryTag(), $flags);
+        return $this->queue($queueName)->nack($message->getDeliveryTag(), $flags);
     }
 
     public function setup(): void
@@ -313,10 +332,25 @@ class Connection
 
         $this->exchange()->declareExchange();
 
-        $this->queue()->declareQueue();
-        $this->queue()->bind($this->exchange()->getName(), $this->queueConfiguration['routing_key'] ?? null);
+        foreach ($this->queuesConfiguration as $queueName => $queueConfig) {
+            $this->queue($queueName)->declareQueue();
+            foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
+                $this->queue($queueName)->bind($this->exchange()->getName(), $bindingKey);
+            }
+        }
     }
 
+    /**
+     * @return string[]
+     */
+    public function getQueueNames(): array
+    {
+        return array_keys($this->queuesConfiguration);
+    }
+
+    /**
+     * @internal
+     */
     public function channel(): \AMQPChannel
     {
         if (null === $this->amqpChannel) {
@@ -341,22 +375,26 @@ class Connection
         return $this->amqpChannel;
     }
 
-    public function queue(): \AMQPQueue
+    private function queue(string $queueName): \AMQPQueue
     {
-        if (null === $this->amqpQueue) {
-            $this->amqpQueue = $this->amqpFactory->createQueue($this->channel());
-            $this->amqpQueue->setName($this->queueConfiguration['name']);
-            $this->amqpQueue->setFlags($this->queueConfiguration['flags'] ?? AMQP_DURABLE);
+        if (!isset($this->amqpQueues[$queueName])) {
+            $queueConfig = $this->queuesConfiguration[$queueName];
 
-            if (isset($this->queueConfiguration['arguments'])) {
-                $this->amqpQueue->setArguments($this->queueConfiguration['arguments']);
+            $amqpQueue = $this->amqpFactory->createQueue($this->channel());
+            $amqpQueue->setName($queueName);
+            $amqpQueue->setFlags($queueConfig['flags'] ?? AMQP_DURABLE);
+
+            if (isset($queueConfig['arguments'])) {
+                $amqpQueue->setArguments($queueConfig['arguments']);
             }
+
+            $this->amqpQueues[$queueName] = $amqpQueue;
         }
 
-        return $this->amqpQueue;
+        return $this->amqpQueues[$queueName];
     }
 
-    public function exchange(): \AMQPExchange
+    private function exchange(): \AMQPExchange
     {
         if (null === $this->amqpExchange) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
@@ -380,7 +418,7 @@ class Connection
     private function clear(): void
     {
         $this->amqpChannel = null;
-        $this->amqpQueue = null;
+        $this->amqpQueues = [];
         $this->amqpExchange = null;
     }
 
@@ -397,8 +435,15 @@ class Connection
         return true;
     }
 
-    private function getAttributes(array $headers): array
+    private function getDefaultPublishRoutingKey(): ?string
     {
-        return array_merge_recursive($this->queueConfiguration['attributes'] ?? [], ['headers' => $headers]);
+        return $this->exchangeConfiguration['default_publish_routing_key'] ?? null;
+    }
+
+    public function purgeQueues()
+    {
+        foreach ($this->getQueueNames() as $queueName) {
+            $this->queue($queueName)->purge();
+        }
     }
 }

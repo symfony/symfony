@@ -76,8 +76,6 @@ class PreAuthenticatedToken extends AbstractToken
 
     /**
      * {@inheritdoc}
-     *
-     * @param bool $isCalledFromOverridingMethod Must be set to true when called from an overriding method
      */
     public function serialize()
     {

@@ -44,11 +44,13 @@ class ConcreteToken extends AbstractToken
     }
 
     /**
-     * @param bool $isCalledFromOverridingMethod Must be set to true when called from an overriding method
+     * {@inheritdoc}
      */
     public function serialize()
     {
-        return serialize([$this->credentials, parent::serialize()]);
+        $serialized = [$this->credentials, parent::serialize(true)];
+
+        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
     }
 
     public function unserialize($serialized)

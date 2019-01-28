@@ -134,10 +134,6 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param bool $isCalledFromOverridingMethod Must be set to true when called from an overriding method
-     *
-     * @return string|array Returns an array when $isCalledFromOverridingMethod is set to true
      */
     public function serialize()
     {

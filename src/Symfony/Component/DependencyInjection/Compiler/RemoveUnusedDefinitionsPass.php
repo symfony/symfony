@@ -86,7 +86,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
     protected function processValue($value, $isRoot = false)
     {
         if (!$value instanceof Reference) {
-            return parent::processValue($value);
+            return parent::processValue($value, $isRoot);
         }
 
         if (ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior()) {

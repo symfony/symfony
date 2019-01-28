@@ -206,11 +206,11 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      *
      * @return \stdClass
      *
-     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
+     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getDeprecatedServiceService()
     {
-        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
 
         return $this->services['deprecated_service'] = new \stdClass();
     }
@@ -400,11 +400,11 @@ class Symfony_DI_PhpDumper_Errored_Definition extends Container
      *
      * @return \SimpleFactoryClass
      *
-     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.
+     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     protected function getFactorySimpleService()
     {
-        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will be removed in the future.', E_USER_DEPRECATED);
 
         return new \SimpleFactoryClass('foo');
     }

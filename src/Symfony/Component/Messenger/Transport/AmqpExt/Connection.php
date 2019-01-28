@@ -166,10 +166,10 @@ class Connection
      *
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = [], int $delay = 0): void
+    public function publish(string $body, array $headers = [], int $delay = 0, string $routingKey = null): void
     {
         if (0 !== $delay) {
-            $this->publishWithDelay($body, $headers, $delay);
+            $this->publishWithDelay($body, $headers, $delay, $routingKey);
 
             return;
         }
@@ -180,17 +180,18 @@ class Connection
 
         $flags = $this->queueConfiguration['flags'] ?? AMQP_NOPARAM;
         $attributes = $this->getAttributes($headers);
+        $routingKey = $routingKey ?? $this->getExchangeRoutingKey();
 
-        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, $flags, $attributes);
+        $this->exchange()->publish($body, $routingKey, $flags, $attributes);
     }
 
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers = [], int $delay)
+    private function publishWithDelay(string $body, array $headers, int $delay, ?string $exchangeRoutingKey)
     {
         if ($this->shouldSetup()) {
-            $this->setupDelay($delay);
+            $this->setupDelay($delay, $exchangeRoutingKey);
         }
 
         $routingKey = $this->getRoutingKeyForDelay($delay);
@@ -200,7 +201,7 @@ class Connection
         $this->getDelayExchange()->publish($body, $routingKey, $flags, $attributes);
     }
 
-    private function setupDelay(int $delay)
+    private function setupDelay(int $delay, ?string $exchangeRoutingKey)
     {
         if (!$this->channel()->isConnected()) {
             $this->clear();
@@ -209,7 +210,7 @@ class Connection
         $exchange = $this->getDelayExchange();
         $exchange->declareExchange();
 
-        $queue = $this->createDelayQueue($delay);
+        $queue = $this->createDelayQueue($delay, $exchangeRoutingKey);
         $queue->declareQueue();
         $queue->bind($exchange->getName(), $this->getRoutingKeyForDelay($delay));
     }
@@ -234,7 +235,7 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay)
+    private function createDelayQueue(int $delay, ?string $exchangeRoutingKey)
     {
         $delayConfiguration = $this->connectionConfiguration['delay'];
 
@@ -245,9 +246,10 @@ class Connection
             'x-dead-letter-exchange' => $this->exchange()->getName(),
         ]);
 
-        if (isset($this->queueConfiguration['routing_key'])) {
+        $exchangeRoutingKey = $exchangeRoutingKey ?? $this->getExchangeRoutingKey();
+        if (null !== $exchangeRoutingKey) {
             // after being released from to DLX, this routing key will be used
-            $queue->setArgument('x-dead-letter-routing-key', $this->queueConfiguration['routing_key']);
+            $queue->setArgument('x-dead-letter-routing-key', $exchangeRoutingKey);
         }
 
         return $queue;
@@ -392,5 +394,16 @@ class Connection
     private function getAttributes(array $headers): array
     {
         return array_merge_recursive($this->queueConfiguration['attributes'] ?? [], ['headers' => $headers]);
+    }
+
+    private function getExchangeRoutingKey(): ?string
+    {
+        $routingKey = $this->exchangeConfiguration['routing_key'] ?? null;
+        if (null === $routingKey && isset($this->queueConfiguration['routing_key'])) {
+            $routingKey = $this->queueConfiguration['routing_key'];
+            @trigger_error('Routing key from "queue" configuration is deprecated. Use "exchange" configuration instead.', E_USER_DEPRECATED);
+        }
+
+        return $routingKey;
     }
 }

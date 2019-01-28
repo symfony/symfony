@@ -236,6 +236,7 @@ Messenger
 ---------
 
  * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+ * Routing key from queue configuration has been removed. Use exchange configuration instead (`exchange[routing_key]` in DSN).
 
 Monolog
 -------

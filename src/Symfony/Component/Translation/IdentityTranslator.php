@@ -34,7 +34,7 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
         $this->selector = $selector;
 
         if (__CLASS__ !== \get_class($this)) {
-            @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.'), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
     }
 
@@ -45,7 +45,7 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
      */
     public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%count%" parameter.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
 
         if ($this->selector) {
             return strtr($this->selector->choose((string) $id, $number, $locale ?: $this->getLocale()), $parameters);

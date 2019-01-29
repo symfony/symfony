@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2019-01-29T09:12:16Z
+
+@nicolas-grekas IIRC this (or really similar one) issue exists on `3.4` as well & was blocking update to recent versions: https://github.com/symfony/symfony/issues/29734#issuecomment-452685957
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-29T09:25:06Z
+
+Please provide a test case. The ones I added didn't highlight any similar issues.

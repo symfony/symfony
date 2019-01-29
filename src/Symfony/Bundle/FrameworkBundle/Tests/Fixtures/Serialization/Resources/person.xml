@@ -5,7 +5,7 @@
         http://symfony.com/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd"
 >
     <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serialization\Person">
-        <attribute name="gender">
+        <attribute name="eyeColor">
             <group>group1</group>
             <group>group2</group>
         </attribute>

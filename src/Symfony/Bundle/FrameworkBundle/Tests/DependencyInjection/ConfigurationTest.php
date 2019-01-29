@@ -103,6 +103,35 @@ class ConfigurationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideValidAssetsPackageNameConfigurationTests
+     */
+    public function testValidAssetsPackageNameConfiguration($packageName)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, [
+            [
+                'assets' => [
+                    'packages' => [
+                        $packageName => [],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey($packageName, $config['assets']['packages']);
+    }
+
+    public function provideValidAssetsPackageNameConfigurationTests()
+    {
+        return [
+            ['foobar'],
+            ['foo-bar'],
+            ['foo_bar'],
+        ];
+    }
+
+    /**
      * @dataProvider provideInvalidAssetConfigurationTests
      */
     public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)

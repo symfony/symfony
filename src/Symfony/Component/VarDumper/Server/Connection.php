@@ -91,7 +91,5 @@ class Connection
         } finally {
             restore_error_handler();
         }
-
-        return $socket;
     }
 }

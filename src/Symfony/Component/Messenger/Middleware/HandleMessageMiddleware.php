@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Middleware;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\ChainedHandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -52,10 +53,21 @@ class HandleMessageMiddleware implements MiddlewareInterface
             'class' => \get_class($message),
         ];
 
+        $exceptions = [];
         foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
-            $handledStamp = HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null);
-            $envelope = $envelope->with($handledStamp);
-            $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getCallableName()]);
+            $alias = \is_string($alias) ? $alias : null;
+
+            if ($this->messageHasAlreadyBeenHandled($envelope, $handler, $alias)) {
+                continue;
+            }
+
+            try {
+                $handledStamp = HandledStamp::fromCallable($handler, $handler($message), $alias);
+                $envelope = $envelope->with($handledStamp);
+                $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getCallableName()]);
+            } catch (\Throwable $e) {
+                $exceptions[] = $e;
+            }
         }
 
         if (null === $handler) {
@@ -66,6 +78,21 @@ class HandleMessageMiddleware implements MiddlewareInterface
             $this->logger->info('No handler for message "{class}"', $context);
         }
 
+        if (\count($exceptions)) {
+            throw new ChainedHandlerFailedException($envelope, ...$exceptions);
+        }
+
         return $stack->next()->handle($envelope, $stack);
+    }
+
+    private function messageHasAlreadyBeenHandled(Envelope $envelope, callable $handler, ?string $alias): bool
+    {
+        $some = array_filter($envelope
+            ->all(HandledStamp::class), function (HandledStamp $stamp) use ($handler, $alias) {
+                return $stamp->getCallableName() === HandledStamp::getNameFromCallable($handler) &&
+                    $stamp->getHandlerAlias() === $alias;
+            });
+
+        return \count($some) > 0;
     }
 }

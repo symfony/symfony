@@ -40,33 +40,38 @@ final class HandledStamp implements StampInterface
     /**
      * @param mixed $result The returned value of the message handler
      */
-    public static function fromCallable(callable $handler, $result, string $handlerAlias = null): self
+    public static function fromCallable(callable $handler, $result, ?string $handlerAlias = null): self
+    {
+        return new self($result, self::getNameFromCallable($handler), $handlerAlias);
+    }
+
+    public static function getNameFromCallable(callable $handler): string
     {
         if (\is_array($handler)) {
             if (\is_object($handler[0])) {
-                return new self($result, \get_class($handler[0]).'::'.$handler[1], $handlerAlias);
+                return \get_class($handler[0]).'::'.$handler[1];
             }
 
-            return new self($result, $handler[0].'::'.$handler[1], $handlerAlias);
+            return $handler[0].'::'.$handler[1];
         }
 
         if (\is_string($handler)) {
-            return new self($result, $handler, $handlerAlias);
+            return $handler;
         }
 
         if ($handler instanceof \Closure) {
             $r = new \ReflectionFunction($handler);
             if (false !== strpos($r->name, '{closure}')) {
-                return new self($result, 'Closure', $handlerAlias);
+                return 'Closure';
             }
             if ($class = $r->getClosureScopeClass()) {
-                return new self($result, $class->name.'::'.$r->name, $handlerAlias);
+                return $class->name.'::'.$r->name;
             }
 
-            return new self($result, $r->name, $handlerAlias);
+            return $r->name;
         }
 
-        return new self($result, \get_class($handler).'::__invoke', $handlerAlias);
+        return \get_class($handler).'::__invoke';
     }
 
     /**

@@ -7,6 +7,27 @@ in 4.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.1.0...v4.1.1
 
+* 4.1.11 (2019-01-29)
+
+ * bug #30013 [Routing] dont redirect routes with greedy trailing vars with no explicit slash (nicolas-grekas)
+ * bug #30006 [Security] don't do nested calls to serialize() (nicolas-grekas, Renan)
+ * bug #30007 [FrameworkBundle] Support use of hyphen in asset package name (damaya, XuruDragon)
+ * bug #29764 [HttpFoundation] Check file exists before unlink (adam-mospan)
+ * bug #29783 [HttpFoundation] MemcachedSessionHandler::close() must close connection (grachevko)
+ * bug #29844 [Console] Fixed #29835: ConfirmationQuestion with default true for answer '0' (mrthehud)
+ * bug #29869 [Debug][ErrorHandler] Preserve our error handler when a logger sets another one (fancyweb)
+ * bug #29926 [Form] Changed UrlType input type to text when default_protocol is not null (MatTheCat)
+ * bug #29961 [Translation] Concatenated translation messages (Stadly)
+ * bug #29920 [Debug][DebugClassLoader] Match more cases for final, deprecated and internal classes / methods extends (fancyweb)
+ * bug #29863 [Security] Do not mix password_*() API with libsodium one (chalasr)
+ * bug #29894 [DependencyInjection] the string "0" is a valid service identifier (xabbuh)
+ * bug #29885 Update MimeType extensions (fabpot)
+ * bug #29875 [TwigBridge] fix compatibility with Twig >= 2.6.1 (xabbuh)
+ * bug #29873 [Debug] remove return type hint for PHP 5 compatibility (xabbuh)
+ * bug #29837 Fix SwiftMailerHandler to support Monolog's latest reset functionality (Seldaek)
+ * bug #29853 Revert "bug #29597 [DI] fix reporting bindings on overriden services as unused" (mmarynich)
+ * bug #29833 [DebugClassLoader] expose proxyfied findFile() method (fancyweb)
+
 * 4.1.10 (2019-01-06)
 
  * bug #29494 [HttpFoundation] Fix request uri when it starts with double slashes (alquerci)

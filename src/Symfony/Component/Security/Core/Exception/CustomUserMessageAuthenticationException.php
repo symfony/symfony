@@ -60,11 +60,9 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      */
     public function serialize()
     {
-        return serialize([
-            parent::serialize(),
-            $this->messageKey,
-            $this->messageData,
-        ]);
+        return serialize([parent::serialize(true), $this->messageKey, $this->messageData]);
+
+        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
     }
 
     /**
@@ -72,7 +70,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      */
     public function unserialize($str)
     {
-        list($parentData, $this->messageKey, $this->messageData) = unserialize($str);
+        list($parentData, $this->messageKey, $this->messageData) = \is_array($str) ? $str : unserialize($str);
 
         parent::unserialize($parentData);
     }

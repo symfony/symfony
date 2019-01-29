@@ -42,12 +42,15 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
 
     public function serialize()
     {
-        return serialize($this->data);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+        $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
+
+        return $isCalledFromOverridingMethod ? $this->data : serialize($this->data);
     }
 
     public function unserialize($data)
     {
-        $this->data = unserialize($data);
+        $this->data = \is_array($data) ? $data : unserialize($data);
     }
 
     /**

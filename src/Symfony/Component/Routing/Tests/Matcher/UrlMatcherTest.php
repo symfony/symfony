@@ -502,6 +502,95 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/');
     }
 
+    public function testSiblingRoutes()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', (new Route('/a{a}'))->setMethods('POST'));
+        $coll->add('b', (new Route('/a{a}'))->setMethods('PUT'));
+        $coll->add('c', new Route('/a{a}'));
+        $coll->add('d', (new Route('/b{a}'))->setCondition('false'));
+        $coll->add('e', (new Route('/{b}{a}'))->setCondition('false'));
+        $coll->add('f', (new Route('/{b}{a}'))->setRequirements(['b' => 'b']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'c', 'a' => 'a'], $matcher->match('/aa'));
+        $this->assertEquals(['_route' => 'f', 'b' => 'b', 'a' => 'a'], $matcher->match('/ba'));
+    }
+
+    public function testRequirementWithCapturingGroup()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}/{b}', [], ['a' => '(a|b)']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'a', 'a' => 'a', 'b' => 'b'], $matcher->match('/a/b'));
+    }
+
+    public function testDotAllWithCatchAll()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{id}.html', [], ['id' => '.+']));
+        $coll->add('b', new Route('/{all}', [], ['all' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(['_route' => 'a', 'id' => 'foo/bar'], $matcher->match('/foo/bar.html'));
+    }
+
+    public function testHostPattern()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{app}/{action}/{unused}', [], [], [], '{host}'));
+
+        $expected = [
+            '_route' => 'a',
+            'app' => 'an_app',
+            'action' => 'an_action',
+            'unused' => 'unused',
+            'host' => 'foo',
+        ];
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'foo'));
+        $this->assertEquals($expected, $matcher->match('/an_app/an_action/unused'));
+    }
+
+    public function testHostWithDot()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo', [], [], [], 'foo.example.com'));
+        $coll->add('b', new Route('/bar/{baz}'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
+    }
+
+    public function testSlashVariant()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/foo/{bar}', [], ['bar' => '.*']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals('a', $matcher->match('/foo/')['_route']);
+    }
+
+    public function testSlashWithVerb()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{foo}', [], [], [], '', [], ['put', 'delete']));
+        $coll->add('b', new Route('/bar/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertSame(['_route' => 'b'], $matcher->match('/bar/'));
+
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/dav/{foo}', [], ['foo' => '.*'], [], '', [], ['GET', 'OPTIONS']));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'OPTIONS'));
+        $expected = [
+            '_route' => 'a',
+            'foo' => 'files/bar/',
+        ];
+        $this->assertEquals($expected, $matcher->match('/dav/files/bar/'));
+    }
+
     public function testSlashAndVerbPrecedence()
     {
         $coll = new RouteCollection();
@@ -525,6 +614,17 @@ class UrlMatcherTest extends TestCase
             'customerId' => '123',
         ];
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
+    }
+
+    public function testGreedyTrailingRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}', [], ['a' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo'], $matcher->match('/foo'));
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

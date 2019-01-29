@@ -4,14 +4,14 @@
                     xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping http://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
 
     <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Person">
-        <property name="gender">
+        <property name="eyeColor">
             <constraint name="Choice">
                 <option name="choices">
-                    <value>male</value>
-                    <value>female</value>
-                    <value>other</value>
+                    <value>brown</value>
+                    <value>green</value>
+                    <value>blue</value>
                 </option>
-                <option name="message">Choose a valid gender.</option>
+                <option name="message">Choose a valid eye color.</option>
             </constraint>
         </property>
     </class>

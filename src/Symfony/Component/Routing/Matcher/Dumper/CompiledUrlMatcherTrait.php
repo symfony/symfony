@@ -135,21 +135,16 @@ trait CompiledUrlMatcherTrait
                         }
                     }
 
-                    if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                        // no-op
-                    } elseif (preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
-                        $matches = $n;
-                    } else {
-                        $hasTrailingSlash = true;
-                    }
-
-                    if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                    $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
+                    if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                         if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
                             return $allow = $allowSchemes = [];
                         }
-                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                            continue;
-                        }
+                        continue;
+                    }
+
+                    if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        $matches = $n;
                     }
 
                     foreach ($vars as $i => $v) {

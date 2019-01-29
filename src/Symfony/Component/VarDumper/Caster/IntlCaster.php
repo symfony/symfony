@@ -132,7 +132,6 @@ class IntlCaster
             Caster::PREFIX_VIRTUAL.'repeated_wall_time_option' => $c->getRepeatedWallTimeOption(),
             Caster::PREFIX_VIRTUAL.'skipped_wall_time_option' => $c->getSkippedWallTimeOption(),
             Caster::PREFIX_VIRTUAL.'time' => $c->getTime(),
-            Caster::PREFIX_VIRTUAL.'type' => $c->getType(),
             Caster::PREFIX_VIRTUAL.'in_daylight_time' => $c->inDaylightTime(),
             Caster::PREFIX_VIRTUAL.'is_lenient' => $c->isLenient(),
             Caster::PREFIX_VIRTUAL.'time_zone' => ($filter & Caster::EXCLUDE_VERBOSE) ? new CutStub($c->getTimeZone()) : $c->getTimeZone(),

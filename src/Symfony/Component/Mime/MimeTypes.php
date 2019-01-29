@@ -35,6 +35,10 @@ namespace Symfony\Component\Mime;
 final class MimeTypes implements MimeTypesInterface
 {
     private $extensions = [];
+
+    /**
+     * @var MimeTypeGuesserInterface[]
+     */
     private $guessers = [];
     private static $default;
 

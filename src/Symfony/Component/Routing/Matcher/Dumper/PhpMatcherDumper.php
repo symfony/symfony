@@ -558,34 +558,27 @@ EOF;
             $code = '';
         }
 
-        $code .= $hasVars ? '
-                if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                    break;
-                }' : '
-                break;';
-
         $code = sprintf(<<<'EOF'
-            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {%s
+            if ('/' !== $pathinfo && %s$hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {%s
+                break;
             }
 
 EOF
             ,
+            $hasVars ? '!$hasTrailingVar && ' : '',
             $code
         );
 
         if ($hasVars) {
             $code = <<<'EOF'
 
-            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                // no-op
-            } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                $matches = $n;
-            } else {
-                $hasTrailingSlash = true;
-            }
+            $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
 
 EOF
                 .$code.<<<'EOF'
+            if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
+                $matches = $n;
+            }
 
             foreach ($vars as $i => $v) {
                 if (isset($matches[1 + $i])) {
@@ -666,30 +659,9 @@ EOF
             $matches = $n;
         }
 EOF;
-        } elseif ($this->supportsRedirections && (!$methods || isset($methods['GET']))) {
-            $code .= <<<'EOF'
-        $hasTrailingSlash = false;
-        if ($trimmedPathinfo === $pathinfo) {
-            // no-op
-        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-            $matches = $n;
-        } else {
-            $hasTrailingSlash = true;
-        }
-
-        if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {%s
-            if ($trimmedPathinfo === $pathinfo) {
-                goto %s;
-            }
-        }
-EOF;
         } else {
             $code .= <<<'EOF'
-        if ($trimmedPathinfo === $pathinfo) {
-            // no-op
-        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-            $matches = $n;
-        } elseif ('/' !== $pathinfo) {
+        if ($trimmedPathinfo !== $pathinfo) {
             goto %2$s;
         }
 EOF;

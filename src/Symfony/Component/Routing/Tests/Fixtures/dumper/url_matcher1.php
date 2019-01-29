@@ -187,11 +187,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         break;
                     case 160:
                         // foo1
-                        if ($trimmedPathinfo === $pathinfo) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } elseif ('/' !== $pathinfo) {
+                        if ($trimmedPathinfo !== $pathinfo) {
                             goto not_foo1;
                         }
 
@@ -209,11 +205,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         break;
                     case 204:
                         // foo2
-                        if ($trimmedPathinfo === $pathinfo) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } elseif ('/' !== $pathinfo) {
+                        if ($trimmedPathinfo !== $pathinfo) {
                             goto not_foo2;
                         }
 
@@ -225,11 +217,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         break;
                     case 279:
                         // foo3
-                        if ($trimmedPathinfo === $pathinfo) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } elseif ('/' !== $pathinfo) {
+                        if ($trimmedPathinfo !== $pathinfo) {
                             goto not_foo3;
                         }
 
@@ -262,17 +250,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar) = $routes[$m];
 
-                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } else {
-                            $hasTrailingSlash = true;
+                        $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
+                        if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                            break;
                         }
-                        if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                                break;
-                            }
+                        if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
+                            $matches = $n;
                         }
 
                         foreach ($vars as $i => $v) {

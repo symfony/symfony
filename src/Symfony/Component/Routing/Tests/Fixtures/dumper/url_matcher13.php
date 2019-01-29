@@ -44,11 +44,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     case 56:
                         // r1
-                        if ($trimmedPathinfo === $pathinfo) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } elseif ('/' !== $pathinfo) {
+                        if ($trimmedPathinfo !== $pathinfo) {
                             goto not_r1;
                         }
 
@@ -58,11 +54,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         not_r1:
 
                         // r2
-                        if ($trimmedPathinfo === $pathinfo) {
-                            // no-op
-                        } elseif (preg_match($regex, rtrim($matchedPathinfo, '/') ?: '/', $n) && $m === (int) $n['MARK']) {
-                            $matches = $n;
-                        } elseif ('/' !== $pathinfo) {
+                        if ($trimmedPathinfo !== $pathinfo) {
                             goto not_r2;
                         }
 

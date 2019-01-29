@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by thePanz at 2018-12-16T12:06:29Z
+
+@alquerci added handling of null and not-integer values, maybe some more tests should be added?
+
+---------------------------------------------------------------------------
+
+by thePanz at 2018-12-17T12:38:36Z
+
+@alquerci is there any other change to be done? :)
+Still, I don't know why the @carsonbot added the `needs work` label :thinking:
+
+---------------------------------------------------------------------------
+
+by alquerci at 2018-12-17T16:07:08Z
+
+@thePanz
+> Still, I don't know why the @carsonbot added the needs work label :thinking:
+
+It was triggered by my last review pass https://github.com/symfony/symfony/pull/29532#pullrequestreview-185518870
+
+---
+
+Now the patch looks good except for the doubt I have:
+
+> I have a doubt about how to handle null, because it could mean that the value is not set. Then, in that case removing the key instead of throwing an exception will do the stuff.
+
+---------------------------------------------------------------------------
+
+by thePanz at 2019-01-16T12:52:23Z
+
+Any updates @alquerci @ro0NL @Toflar ?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-01-16T12:56:20Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by alquerci at 2019-01-16T13:12:00Z
+
+:ok_hand:

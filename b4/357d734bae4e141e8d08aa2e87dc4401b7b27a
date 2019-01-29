@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-28T16:46:51Z
+
+@stof I'd be happy to have your :+1: here :)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-28T16:52:19Z
+
+@nicolas-grekas Would this `@param bool $isCalledFromOverridingMethod` cause issue with the DebugClassLoader when overriding the method in a child class (asking people to add it in their own class), or is the deprecation based on magic parameters restricted to interfaces ?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-28T16:55:39Z
+
+> For master, we should deprecate extending serialize/unserialize and provide another API that returns/accepts arrays instead.
+
+I suggest looking at what the PHP RFC for `__unserialize/__serialize` would do for that. If it ends up being accepted, we could implement them, and provide a BC layer based on Serializable calling these methods internally, marking our Serializable as `@final` (so that child classes override `__unserialize/__serialize` instead, which would be necessary for PHP 7.4 anyway if the methods get called natively). What do you think @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-28T18:11:36Z
+
+> issue with the DebugClassLoader when overriding the method in a child class
+
+That's correct, `DebugClassLoader` 4.2 will trigger a deprecation notice.
+That might be desired as it can hint ppl to change their code in a place where they might have a bug (esp. if they extend their own token...) - but we can also decide we should not trigger the notice. Any preference?
+
+For master:
+
+> I suggest looking at what the PHP RFC for __unserialize/__serialize would do for that. If it ends up being accepted, we could implement them, and provide a BC layer based on Serializable calling these methods internally, marking our Serializable as @final
+
+I thought of a slightly different plan: we should mark `serialize`/`unserialize` `@final` *and* `@internal` to deprecate extending them (from core) and using them (for users). Then we should provide alternative methods to basically do what the proposed `__unserialize`/`__serialize` methods do, but in a way that would be decoupled from the underlying PHP mechanism that we decide to use. That would be the most flexible in the long run IMHO.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-28T18:15:31Z
+
+> That might be desired as it can hint ppl to change their code in a place where they might have a bug (esp. if they extend their own token...) - but we can also decide we should not trigger the notice. Any preference?
+
+But they probably cannot add an actual parameter there. We don't even expect them to do it (we expect them to add it when doing the `parent` call, but even that is optional as we handle the case where it is not done, so we may not even need that param)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-28T18:17:13Z
+
+So, we remove the annotation and we plan for master. Works for me. OK for you with my proposal for master?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-01-28T18:18:37Z
+
+So in your plan, switching to `__unserialize/__serialize` would also be done by marking them as final, and still telling people to override the protected methods we expose ? Fine with me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-28T19:11:27Z
+
+Correct.
+
+@renanbr could you please remove the added docblocks?

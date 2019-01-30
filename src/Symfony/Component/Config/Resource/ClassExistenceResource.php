@@ -97,7 +97,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function serialize()
     {
@@ -109,7 +109,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function unserialize($serialized)
     {

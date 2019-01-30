@@ -148,10 +148,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             return false;
         }
 
-        if ($isReferencedByConstructor && $this->container->getDefinition($ids[0])->isLazy() && ($definition->getProperties() || $definition->getMethodCalls() || $definition->getConfigurator())) {
-            return false;
-        }
-
         return $this->container->getDefinition($ids[0])->isShared();
     }
 }

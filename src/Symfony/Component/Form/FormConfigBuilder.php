@@ -179,6 +179,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     {
         self::validateName($name);
 
+        if (\is_int($name)) {
+            @trigger_error('Using integers as form names is deprecated in Symfony 4.3 and will lead to a type error in 5.0. Use strings instead.', E_USER_DEPRECATED);
+        }
+
         if (null !== $dataClass && !class_exists($dataClass) && !interface_exists($dataClass, false)) {
             throw new InvalidArgumentException(sprintf('Class "%s" not found. Is the "data_class" form option set correctly?', $dataClass));
         }

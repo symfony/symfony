@@ -23,6 +23,7 @@ Config
 Form
 ----
 
+ * Support for using integers as form names is deprecated and will lead to a type error in 5.0, use strings instead.
  * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
    set to `single_text` is deprecated.
 

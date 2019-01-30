@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormConfigBuilder;
 
 /**
@@ -52,9 +53,6 @@ class FormConfigTest extends TestCase
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
             ['_'],
-            // Integers are allowed
-            [0],
-            [123],
             // NULL is allowed
             [null],
             // Other types are not
@@ -81,6 +79,26 @@ class FormConfigTest extends TestCase
         $formConfigBuilder = new FormConfigBuilder($name, null, $dispatcher);
 
         $this->assertSame((string) $name, $formConfigBuilder->getName());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using integers as form names is deprecated in Symfony 4.3 and will lead to a type error in 5.0. Use strings instead.
+     * @dataProvider getHtml4IntegerIds
+     */
+    public function testNameContainingOnlyDigitsPassedAsInteger($name)
+    {
+        $formConfigBuilder = new FormConfigBuilder($name, null, new EventDispatcher());
+
+        $this->assertSame((string) $name, $formConfigBuilder->getName());
+    }
+
+    public function getHtml4IntegerIds()
+    {
+        return [
+            [0],
+            [123],
+        ];
     }
 
     public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()

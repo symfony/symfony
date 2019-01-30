@@ -23,6 +23,8 @@
         "symfony/contracts": "^1.1"
     },
     "require-dev": {
+        "nyholm/psr7": "^1.0",
+        "psr/http-client": "^1.0",
         "symfony/process": "~4.2"
     },
     "autoload": {

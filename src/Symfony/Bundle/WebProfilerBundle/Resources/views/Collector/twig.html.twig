@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label">
+    <span class="label {{ 0 == collector.templateCount ? 'disabled' }}">
         <span class="icon">{{ include('@WebProfiler/Icon/twig.svg') }}</span>
         <strong>Twig</strong>
     </span>

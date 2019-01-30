@@ -39,7 +39,7 @@ class ContainerParametersResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function serialize()
     {
@@ -47,7 +47,7 @@ class ContainerParametersResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function unserialize($serialized)
     {

@@ -56,7 +56,7 @@ class MockResponse implements ResponseInterface
             }
         }
 
-        $info['raw_headers'] = $rawHeaders;
+        $this->info['raw_headers'] = $rawHeaders;
     }
 
     /**

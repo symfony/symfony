@@ -64,6 +64,7 @@ interface HttpClientInterface
         'ciphers' => null,
         'peer_fingerprint' => null,
         'capture_peer_cert_chain' => false,
+        'extra' => [],          // array - additional options that can be ignored if unsupported, unlike regular options
     ];
 
     /**

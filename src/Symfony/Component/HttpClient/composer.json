@@ -26,7 +26,8 @@
     "require-dev": {
         "nyholm/psr7": "^1.0",
         "psr/http-client": "^1.0",
-        "symfony/process": "~4.2"
+        "symfony/http-kernel": "^4.3",
+        "symfony/process": "^4.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpClient\\": "" },

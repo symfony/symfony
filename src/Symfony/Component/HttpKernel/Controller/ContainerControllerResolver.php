@@ -54,6 +54,9 @@ class ContainerControllerResolver extends ControllerResolver
         try {
             return parent::instantiateController($class);
         } catch (\Error $e) {
+            if (0 === strpos($class, '\\')) {
+                @trigger_error(sprintf('The controller definition "%s" must not begin with "\"', $class), E_USER_DEPRECATED);
+            }
         }
 
         $this->throwExceptionIfControllerWasRemoved($class, $e);

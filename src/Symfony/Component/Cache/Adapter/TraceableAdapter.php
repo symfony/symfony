@@ -220,6 +220,11 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
 
         return $event;
     }
+    
+    public function __destruct()
+    {
+        unset($this->pool, $this->calls);
+    }
 }
 
 class TraceableAdapterEvent

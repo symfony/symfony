@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-30T08:11:03Z
+
+I have reverted all the `string|int` changes. Since the `FormConfigBuilder` is the only class accepting integers as form names we can probably better deprecate that in Symfony 4.3 and add a type hint in 5.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-30T11:32:08Z
+
+Isn't there some BC break potential here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-30T11:37:16Z
+
+The interface declares that the method must return a string. I wouldn't expect anyone to rely on `null` being returned. And the basic use case for this method is the block prefix for the form theming where `null` also doesn't make any sense.

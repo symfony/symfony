@@ -135,9 +135,7 @@ class FormError implements \Serializable
     }
 
     /**
-     * Serializes this error.
-     *
-     * @return string The serialized error
+     * @internal
      */
     public function serialize()
     {
@@ -151,9 +149,7 @@ class FormError implements \Serializable
     }
 
     /**
-     * Unserializes a serialized error.
-     *
-     * @param string $serialized The serialized error
+     * @internal
      */
     public function unserialize($serialized)
     {

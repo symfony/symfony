@@ -77,6 +77,9 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         return $this->hash === $hash;
     }
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         if (null === $this->hash) {
@@ -86,6 +89,9 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
         return serialize([$this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes]);
     }
 
+    /**
+     * @internal
+     */
     public function unserialize($serialized)
     {
         list($this->prefix, $this->pattern, $this->recursive, $this->hash, $this->forExclusion, $this->excludedPrefixes) = unserialize($serialized) + [4 => false, []];

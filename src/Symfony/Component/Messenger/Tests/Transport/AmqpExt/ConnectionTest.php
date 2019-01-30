@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 
@@ -96,17 +97,30 @@ class ConnectionTest extends TestCase
 
         $amqpQueue->expects($this->once())->method('setArguments')->with([
             'x-dead-letter-exchange' => 'dead-exchange',
-            'x-message-ttl' => '1200',
+            'x-delay' => 100,
+            'x-expires' => 150,
+            'x-max-length' => 200,
+            'x-max-length-bytes' => 300,
+            'x-max-priority' => 4,
+            'x-message-ttl' => 100,
         ]);
 
         $amqpExchange->expects($this->once())->method('setArguments')->with([
             'alternate-exchange' => 'alternate',
         ]);
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[arguments][x-dead-letter-exchange]=dead-exchange', [
+        $dsn = 'amqp://localhost/%2f/messages?'.
+            'queue[arguments][x-dead-letter-exchange]=dead-exchange&'.
+            'queue[arguments][x-message-ttl]=100&'.
+            'queue[arguments][x-delay]=100&'.
+            'queue[arguments][x-expires]=150&'
+        ;
+        $connection = Connection::fromDsn($dsn, [
             'queue' => [
                 'arguments' => [
-                    'x-message-ttl' => '1200',
+                    'x-max-length' => '200',
+                    'x-max-length-bytes' => '300',
+                    'x-max-priority' => '4',
                 ],
             ],
             'exchange' => [
@@ -116,6 +130,36 @@ class ConnectionTest extends TestCase
             ],
         ], true, $factory);
         $connection->publish('body');
+    }
+
+    public function invalidQueueArgumentsDataProvider(): iterable
+    {
+        $baseDsn = 'amqp://localhost/%2f/messages';
+        yield [$baseDsn.'?queue[arguments][x-delay]=not-a-number', []];
+        yield [$baseDsn.'?queue[arguments][x-expires]=not-a-number', []];
+        yield [$baseDsn.'?queue[arguments][x-max-length]=not-a-number', []];
+        yield [$baseDsn.'?queue[arguments][x-max-length-bytes]=not-a-number', []];
+        yield [$baseDsn.'?queue[arguments][x-max-priority]=not-a-number', []];
+        yield [$baseDsn.'?queue[arguments][x-message-ttl]=not-a-number', []];
+
+        // Ensure the exception is thrown when the arguments are passed via the array options
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-delay' => 'not-a-number']]]];
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-expires' => 'not-a-number']]]];
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-max-length' => 'not-a-number']]]];
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-max-length-bytes' => 'not-a-number']]]];
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-max-priority' => 'not-a-number']]]];
+        yield [$baseDsn, ['queue' => ['arguments' => ['x-message-ttl' => 'not-a-number']]]];
+    }
+
+    /**
+     * @dataProvider invalidQueueArgumentsDataProvider
+     */
+    public function testFromDsnWithInvalidValueOnQueueArguments(string $dsn, array $options)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Integer expected for queue argument');
+
+        Connection::fromDsn($dsn, $options);
     }
 
     public function testItUsesANormalConnectionByDefault()

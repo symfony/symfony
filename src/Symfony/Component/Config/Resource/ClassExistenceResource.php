@@ -95,7 +95,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function serialize()
     {
@@ -107,7 +107,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function unserialize($serialized)
     {
@@ -116,8 +116,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
 
     /**
      * @throws \ReflectionException When $class is not found and is required
+     *
+     * @internal
      */
-    private static function throwOnRequiredClass($class)
+    public static function throwOnRequiredClass($class)
     {
         if (self::$autoloadedClass === $class) {
             return;

@@ -92,19 +92,19 @@ class DeprecationErrorHandler
             return false;
         };
 
-        $deprecations = [
+        $deprecations = array(
             'unsilencedCount' => 0,
             'remainingCount' => 0,
             'legacyCount' => 0,
             'otherCount' => 0,
             'remaining vendorCount' => 0,
-            'unsilenced' => [],
-            'remaining' => [],
-            'legacy' => [],
-            'other' => [],
-            'remaining vendor' => [],
-        ];
-        $deprecationHandler = function ($type, $msg, $file, $line, $context = []) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
+            'unsilenced' => array(),
+            'remaining' => array(),
+            'legacy' => array(),
+            'other' => array(),
+            'remaining vendor' => array(),
+        );
+        $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || self::MODE_DISABLED === $mode) {
                 $ErrorHandler = $UtilPrefix.'ErrorHandler';
@@ -184,7 +184,7 @@ class DeprecationErrorHandler
 
         if (null !== $oldErrorHandler) {
             restore_error_handler();
-            if ([$UtilPrefix.'ErrorHandler', 'handleError'] === $oldErrorHandler) {
+            if (array($UtilPrefix.'ErrorHandler', 'handleError') === $oldErrorHandler) {
                 restore_error_handler();
                 self::register($mode);
             }
@@ -218,7 +218,7 @@ class DeprecationErrorHandler
                     return $b['count'] - $a['count'];
                 };
 
-                $groups = ['unsilenced', 'remaining'];
+                $groups = array('unsilenced', 'remaining');
                 if (self::MODE_WEAK_VENDORS === $mode) {
                     $groups[] = 'remaining vendor';
                 }
@@ -259,7 +259,7 @@ class DeprecationErrorHandler
 
                 // reset deprecations array
                 foreach ($deprecations as $group => $arrayOrInt) {
-                    $deprecations[$group] = \is_int($arrayOrInt) ? 0 : [];
+                    $deprecations[$group] = \is_int($arrayOrInt) ? 0 : array();
                 }
 
                 register_shutdown_function(function () use (&$deprecations, $isFailing, $displayDeprecations, $mode) {
@@ -280,8 +280,8 @@ class DeprecationErrorHandler
 
     public static function collectDeprecations($outputFile)
     {
-        $deprecations = [];
-        $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
+        $deprecations = array();
+        $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, &$previousErrorHandler) {
             if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
@@ -293,7 +293,7 @@ class DeprecationErrorHandler
 
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
-            $deprecations[] = [error_reporting(), $msg, $file];
+            $deprecations[] = array(error_reporting(), $msg, $file);
         });
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {

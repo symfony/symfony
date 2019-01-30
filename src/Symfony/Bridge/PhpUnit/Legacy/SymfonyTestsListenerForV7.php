@@ -30,7 +30,7 @@ class SymfonyTestsListenerForV7 implements TestListener
 
     private $trait;
 
-    public function __construct(array $mockedNamespaces = [])
+    public function __construct(array $mockedNamespaces = array())
     {
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }

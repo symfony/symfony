@@ -89,19 +89,17 @@ class UsernamePasswordToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        $serialized = [$this->credentials, $this->providerKey, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return [$this->credentials, $this->providerKey, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->credentials, $this->providerKey, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->credentials, $this->providerKey, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

@@ -57,19 +57,17 @@ class AnonymousToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        $serialized = [$this->secret, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return [$this->secret, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->secret, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->secret, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

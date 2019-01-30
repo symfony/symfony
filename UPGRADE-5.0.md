@@ -232,6 +232,37 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
+   thus `serialize()` and `unserialize()` aren't available.
+   Use `getState()` and `setState()` instead.
+
+   Before:
+   ```php
+   public function serialize()
+   {
+       return [$this->myLocalVar, parent::serialize()];
+   }
+
+   public function unserialize($serialized)
+   {
+       [$this->myLocalVar, $parentSerialized] = unserialize($serialized);
+       parent::unserialize($parentSerialized);
+   }
+   ```
+
+   After:
+   ```php
+   protected function getState(): array
+   {
+       return [$this->myLocalVar, parent::getState()];
+   }
+
+   protected function setState(array $data)
+   {
+       [$this->myLocalVar, $parentData] = $data;
+       parent::setState($parentData);
+   }
+   ```
 
 SecurityBundle
 --------------

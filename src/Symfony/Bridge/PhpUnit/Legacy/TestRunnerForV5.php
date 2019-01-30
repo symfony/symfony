@@ -27,7 +27,7 @@ class TestRunnerForV5 extends \PHPUnit_TextUI_TestRunner
 
         $result = parent::handleConfiguration($arguments);
 
-        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : [];
+        $arguments['listeners'] = isset($arguments['listeners']) ? $arguments['listeners'] : array();
 
         $registeredLocally = false;
 

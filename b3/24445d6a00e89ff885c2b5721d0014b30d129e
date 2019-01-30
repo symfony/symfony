@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-01-27T18:19:39Z
+
+As this provide almost identical performance boost (~ 20/30% perf improvement). I would prefer merging this and do further profiling to improve serializer performance.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-01-27T20:45:03Z
+
+Here is a profile of this PR (with @ostrolucky suggestions ; single `strpbrk` is slightly faster than two `strpos`) vs master : https://blackfire.io/profiles/compare/487eef43-6de6-4e82-954d-a08dc7c90e65/graph

@@ -21,7 +21,8 @@
     },
     "require-dev": {
         "symfony/process": "~3.4|~4.0",
-        "symfony/css-selector": "~3.4|~4.0"
+        "symfony/css-selector": "~3.4|~4.0",
+        "symfony/mime": "^4.3"
     },
     "suggest": {
         "symfony/process": ""

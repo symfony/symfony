@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added `HttpBrowser`, an implementation of a browser with the HttpClient component
  * Renamed `Client` to `AbstractBrowser`
  * Marked `Response` final.
  * Deprecated `Response::buildHeader()`

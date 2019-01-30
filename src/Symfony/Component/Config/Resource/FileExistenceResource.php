@@ -59,7 +59,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function serialize()
     {
@@ -67,7 +67,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
      */
     public function unserialize($serialized)
     {

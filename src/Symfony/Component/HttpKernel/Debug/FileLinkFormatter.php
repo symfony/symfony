@@ -61,11 +61,17 @@ class FileLinkFormatter implements \Serializable
         return false;
     }
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         return serialize($this->getFileLinkFormat());
     }
 
+    /**
+     * @internal
+     */
     public function unserialize($serialized)
     {
         if (\PHP_VERSION_ID >= 70000) {

@@ -284,9 +284,7 @@ abstract class Constraint
      *
      * @return array The properties to serialize
      *
-     * @internal This method may be replaced by an implementation of
-     *           {@link \Serializable} in the future. Please don't use or
-     *           overwrite it.
+     * @internal
      */
     public function __sleep()
     {

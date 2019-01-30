@@ -58,11 +58,17 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
         return 'service.autowire.'.$this->class;
     }
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         return serialize([$this->class, $this->filePath, $this->autowiringMetadata]);
     }
 
+    /**
+     * @internal
+     */
     public function unserialize($serialized)
     {
         if (\PHP_VERSION_ID >= 70000) {

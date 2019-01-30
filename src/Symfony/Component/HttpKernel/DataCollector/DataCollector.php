@@ -40,6 +40,9 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     private $cloner;
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
@@ -48,6 +51,9 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         return $isCalledFromOverridingMethod ? $this->data : serialize($this->data);
     }
 
+    /**
+     * @internal
+     */
     public function unserialize($data)
     {
         $this->data = \is_array($data) ? $data : unserialize($data);

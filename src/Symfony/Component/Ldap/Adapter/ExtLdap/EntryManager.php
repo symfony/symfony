@@ -20,6 +20,8 @@ use Symfony\Component\Ldap\Exception\UpdateOperationException;
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Bob van de Vijver <bobvandevijver@hotmail.com>
+ *
+ * @final since Symfony 4.3
  */
 class EntryManager implements EntryManagerInterface
 {
@@ -69,7 +71,8 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @throws NotBoundException
+     * @throws LdapException
      */
     public function addAttributeValues(Entry $entry, string $attribute, array $values)
     {
@@ -81,7 +84,8 @@ class EntryManager implements EntryManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @throws NotBoundException
+     * @throws LdapException
      */
     public function removeAttributeValues(Entry $entry, string $attribute, array $values)
     {

@@ -21,6 +21,9 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Bob van de Vijver <bobvandevijver@hotmail.com>
  * @author Kevin Schuurmans <kevin.schuurmans@freshheads.com>
+ *
+ * @method void addAttributeValues(Entry $entry, string $attribute, array $values)
+ * @method void removeAttributeValues(Entry $entry, string $attribute, array $values)
  */
 interface EntryManagerInterface
 {
@@ -62,28 +65,4 @@ interface EntryManagerInterface
      * @throws LdapException
      */
     public function remove(Entry $entry);
-
-    /**
-     * Adds values to an entry's multi-valued attribute from the LDAP server.
-     *
-     * @param Entry  $entry
-     * @param string $attribute
-     * @param array  $values
-     *
-     * @throws NotBoundException
-     * @throws LdapException
-     */
-    public function addAttributeValues(Entry $entry, string $attribute, array $values);
-
-    /**
-     * Removes values from an entry's multi-valued attribute from the LDAP server.
-     *
-     * @param Entry  $entry
-     * @param string $attribute
-     * @param array  $values
-     *
-     * @throws NotBoundException
-     * @throws LdapException
-     */
-    public function removeAttributeValues(Entry $entry, string $attribute, array $values);
 }

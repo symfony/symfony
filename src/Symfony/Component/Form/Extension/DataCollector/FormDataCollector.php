@@ -228,6 +228,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return $this->data;
     }
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         if ($this->hasVarDumper) {

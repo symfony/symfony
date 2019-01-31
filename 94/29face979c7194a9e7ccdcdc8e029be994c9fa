@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2019-01-03T19:28:27Z
+
+Updated the code to allow passing `$max` as a second argument instead of allowing to set the max before calling `iterate`.

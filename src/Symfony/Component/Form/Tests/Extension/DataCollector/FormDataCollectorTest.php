@@ -448,7 +448,7 @@ class FormDataCollectorTest extends TestCase
         $this->dataCollector->collectViewVariables($form2View);
         $this->dataCollector->buildFinalFormTree($form2, $form2View);
 
-        $this->dataCollector->serialize();
+        serialize($this->dataCollector);
     }
 
     public function testFinalFormReliesOnFormViewStructure()

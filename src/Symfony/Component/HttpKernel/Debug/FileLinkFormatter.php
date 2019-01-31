@@ -20,8 +20,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Formats debug file links.
  *
  * @author Jérémy Romey <jeremy@free-agent.fr>
+ *
+ * @final since Symfony 4.3
  */
-class FileLinkFormatter implements \Serializable
+class FileLinkFormatter
 {
     private $fileLinkFormat;
     private $requestStack;
@@ -64,17 +66,11 @@ class FileLinkFormatter implements \Serializable
     /**
      * @internal
      */
-    public function serialize()
+    public function __sleep(): array
     {
-        return serialize($this->getFileLinkFormat());
-    }
+        $this->getFileLinkFormat();
 
-    /**
-     * @internal
-     */
-    public function unserialize($serialized)
-    {
-        $this->fileLinkFormat = unserialize($serialized, ['allowed_classes' => false]);
+        return ['fileLinkFormat'];
     }
 
     /**

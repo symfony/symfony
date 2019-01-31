@@ -8,6 +8,7 @@ CHANGELOG
    option is set to `single_text`
  * added `block_prefix` option to `BaseType`.
  * added `help_html` option to display the `help` text as HTML.
+ * `FormError` doesn't implement `Serializable` anymore
  * added `label_translation_parameters`, `attr_translation_parameters`, `help_translation_parameters` options 
    to `FormType` to pass translation parameters to form labels, attributes (`placeholder` and `title`) and help text respectively.
    The passed parameters will replace placeholders in translation messages.
@@ -31,7 +32,6 @@ CHANGELOG
        }
    }
    ```
-
 
 4.2.0
 -----

@@ -8,6 +8,7 @@ CHANGELOG
  * added `%env(default:...)%` processor to fallback to a default value
  * added `%env(nullable:...)%` processor to allow empty variables to be processed as null values
  * added support for deprecating aliases
+ * made `ContainerParametersResource` final and not implement `Serializable` anymore
 
 4.2.0
 -----

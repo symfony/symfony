@@ -17,8 +17,10 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.3
  */
-class ReflectionClassResource implements SelfCheckingResourceInterface, \Serializable
+class ReflectionClassResource implements SelfCheckingResourceInterface
 {
     private $files = [];
     private $className;
@@ -61,22 +63,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
     /**
      * @internal
      */
-    public function serialize()
+    public function __sleep(): array
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
 
-        return serialize([$this->files, $this->className, $this->hash]);
-    }
-
-    /**
-     * @internal
-     */
-    public function unserialize($serialized)
-    {
-        list($this->files, $this->className, $this->hash) = unserialize($serialized);
+        return ['files', 'className', 'hash'];
     }
 
     private function loadFiles(\ReflectionClass $class)

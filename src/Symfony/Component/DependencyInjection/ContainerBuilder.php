@@ -1394,6 +1394,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $bag->resolveValue($value);
         }
 
+        if ($value instanceof Definition) {
+            $value = (array) $value;
+        }
+
         if (\is_array($value)) {
             $result = [];
             foreach ($value as $k => $v) {

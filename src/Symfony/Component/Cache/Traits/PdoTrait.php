@@ -165,8 +165,11 @@ trait PdoTrait
         if ('' !== $this->namespace) {
             $delete->bindValue(':namespace', sprintf('%s%%', $this->namespace), \PDO::PARAM_STR);
         }
-
-        return $delete->execute();
+        try {
+            return $delete->execute();
+        } catch (TableNotFoundException $e) {
+            return true;
+        }
     }
 
     /**

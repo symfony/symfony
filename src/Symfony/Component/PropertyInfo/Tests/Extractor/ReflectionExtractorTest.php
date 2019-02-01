@@ -263,4 +263,23 @@ class ReflectionExtractorTest extends TestCase
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'feet'));
         $this->assertEquals(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class));
     }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractConstructorTypes($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function constructorTypesProvider()
+    {
+        return [
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['date', null],
+            ['dateObject', null],
+            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['ddd', null],
+        ];
+    }
 }

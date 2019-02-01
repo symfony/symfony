@@ -159,6 +159,7 @@ EOF;
 
         foreach ($collection->all() as $name => $route) {
             $compiledRoute = $route->compile();
+            $staticPrefix = rtrim($compiledRoute->getStaticPrefix(), '/');
             $hostRegex = $compiledRoute->getHostRegex();
             $regex = $compiledRoute->getRegex();
             if ($hasTrailingSlash = '/' !== $route->getPath()) {
@@ -173,9 +174,9 @@ EOF;
                 if ($hasTrailingSlash) {
                     $url = substr($url, 0, -1);
                 }
-                foreach ($dynamicRegex as list($hostRx, $rx)) {
-                    if (preg_match($rx, $url) && (!$host || !$hostRx || preg_match($hostRx, $host))) {
-                        $dynamicRegex[] = [$hostRegex, $regex];
+                foreach ($dynamicRegex as list($hostRx, $rx, $prefix)) {
+                    if (('' === $prefix || 0 === strpos($url, $prefix)) && preg_match($rx, $url) && (!$host || !$hostRx || preg_match($hostRx, $host))) {
+                        $dynamicRegex[] = [$hostRegex, $regex, $staticPrefix];
                         $dynamicRoutes->add($name, $route);
                         continue 2;
                     }
@@ -183,7 +184,7 @@ EOF;
 
                 $staticRoutes[$url][$name] = [$route, $hasTrailingSlash];
             } else {
-                $dynamicRegex[] = [$hostRegex, $regex];
+                $dynamicRegex[] = [$hostRegex, $regex, $staticPrefix];
                 $dynamicRoutes->add($name, $route);
             }
         }

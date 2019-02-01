@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-31T13:50:39Z
+
+If I remember correctly, we're using closures here to run their logic lazily, because doing it earlier has other unwanted side effects.
+If that's confirmed (GitHub history to the rescue) then this patch is not correct.
+Could you please have a look?
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-01-31T13:58:59Z
+
+ok, will have a look
+
+@nicolas-grekas What about using the __sleep() method and resolves all potentials closures by calling the getErrors() (before my patch) inside it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-31T15:45:12Z
+
+That could work! A test case would definitely prove it :)
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-01-31T15:47:25Z
+
+I've to change some, __sleep have a strange behavior look at appveyor result...
+
+So I've change to the \Serializable interface and I'm currently implementing the two methods
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-31T15:52:58Z
+
+We're trying to kill Serializable, we should try understand what's being this strangeness before resorting to the interface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-31T15:55:09Z
+
+Ok, it's not strange, it's the specifications of __sleep(), see its doc.
+We need to use a dynamic property and implement __wakeup instead.

@@ -142,6 +142,24 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('not.defined'));
     }
 
+    public function testProcessWorksWithClosureErrorsInDefinitions()
+    {
+        $definition = new Definition();
+        $definition->addError(function () {
+            return 'foo bar';
+        });
+
+        $container = new ContainerBuilder();
+        $container
+            ->setDefinition('foo', $definition)
+            ->setPublic(false)
+        ;
+
+        $this->process($container);
+
+        $this->assertFalse($container->hasDefinition('foo'));
+    }
+
     protected function process(ContainerBuilder $container)
     {
         (new RemoveUnusedDefinitionsPass())->process($container);

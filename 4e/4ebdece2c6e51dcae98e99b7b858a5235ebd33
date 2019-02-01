@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-01-31T21:11:12Z
+
+Shouldnt be a test added/updated?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-01-31T21:17:28Z
+
+in honestly, i did not check for existing tests as previous fixes for this issue (linked above) added no tests.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-01T06:04:33Z
+
+Maybe this is the reason why this bug occurred afterwards 🙃
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-01T10:17:46Z
+
+This is already tested - just not on mysql - and we're not going to add a multi-DB infra for this :)

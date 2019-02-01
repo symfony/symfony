@@ -156,6 +156,7 @@ before_install:
           echo hhvm.jit = 0 >> $INI
           echo apc.enable_cli = 1 >> $INI
           echo extension = redis.so >> $INI
+          echo extension = memcached.so >> $INI
           if [[ $PHP = 5.* ]]; then
               echo extension = memcache.so >> $INI
               echo extension = mongo.so >> $INI
@@ -187,31 +188,6 @@ before_install:
               tfold ext.apcu tpecl apcu-5.1.16 apcu.so $INI
               tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
           fi
-
-          if [[ $PHP == 7.3 ]]; then
-              # System libmemcached is missing sasl
-              LIBMEMCACHED_VERSION=1.0.18
-              wget "https://launchpad.net/libmemcached/1.0/${LIBMEMCACHED_VERSION}/+download/libmemcached-${LIBMEMCACHED_VERSION}.tar.gz" -O libmemcached-${LIBMEMCACHED_VERSION}.tar.gz
-              tar xvfz libmemcached-${LIBMEMCACHED_VERSION}.tar.gz
-              cd "libmemcached-${LIBMEMCACHED_VERSION}"
-              mkdir -p /opt/libmemcached/${LIBMEMCACHED_VERSION}
-              ./configure --prefix="/opt/libmemcached/${LIBMEMCACHED_VERSION}" LDFLAGS="-lpthread"
-              make
-              make install
-              cd -
-
-              EXTMEMCACHED_VERSION=3.1.3
-              wget https://pecl.php.net/get/memcached-${EXTMEMCACHED_VERSION}.tgz
-              tar xzvf memcached-${EXTMEMCACHED_VERSION}.tgz
-              cd memcached-${EXTMEMCACHED_VERSION}
-              phpize
-              ./configure --with-libmemcached-dir=/opt/libmemcached/${LIBMEMCACHED_VERSION}
-              make
-              sudo make install
-              cd -
-          fi
-
-          echo extension = memcached.so >> $INI
       done
 
     - |

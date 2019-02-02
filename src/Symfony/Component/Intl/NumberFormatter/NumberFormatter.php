@@ -484,7 +484,7 @@ class NumberFormatter
      * @param string $currency Parameter to receive the currency name (reference)
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return bool|string The parsed numeric value of false on error
+     * @return bool|string The parsed numeric value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parsecurrency.php
      *
@@ -502,7 +502,7 @@ class NumberFormatter
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default.
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return int|float|false The parsed value of false on error
+     * @return int|float|false The parsed value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parse.php
      */

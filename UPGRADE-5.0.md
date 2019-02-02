@@ -134,6 +134,12 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `Symfony\Bundle\FrameworkBundle\Test\WebTestCase` class does not use the `client.test` service anymore and
+   creates its own `Client`.
+
+ * The `client.test`, `test.client.history`, and `test.client.cookiejar` services were removed
+   (the `test.client.parameters` parameter was also removed).
+
  * The project dir argument of the constructor of `AssetsInstallCommand` is required.
 
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`

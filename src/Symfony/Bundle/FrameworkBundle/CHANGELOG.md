@@ -4,6 +4,10 @@ CHANGELOG
 4.3.0
 -----
 
+ * Deprecated the `client.test`, `test.client.history`, and `test.client.cookiejar` services.
+   (the `test.client.parameters` parameter is also deprecated)
+ * The `Symfony\Bundle\FrameworkBundle\Test\WebTestCase` class does not use the `client.test` service anymore and
+   creates its own `Client`.
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead

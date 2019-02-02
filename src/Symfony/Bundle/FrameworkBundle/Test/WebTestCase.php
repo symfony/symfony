@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
@@ -33,14 +34,10 @@ abstract class WebTestCase extends KernelTestCase
     {
         $kernel = static::bootKernel($options);
 
-        try {
-            $client = $kernel->getContainer()->get('test.client');
-        } catch (ServiceNotFoundException $e) {
+        if (!class_exists(CookieJar::class)) {
             throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
         }
 
-        $client->setServerParameters($server);
-
-        return $client;
+        return new Client($kernel, $server);
     }
 }

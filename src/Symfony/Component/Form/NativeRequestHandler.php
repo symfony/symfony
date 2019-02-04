@@ -115,6 +115,10 @@ class NativeRequestHandler implements RequestHandlerInterface
             return;
         }
 
+        if (\is_array($data) && array_key_exists('_method', $data) && $method === $data['_method'] && !$form->has('_method')) {
+            unset($data['_method']);
+        }
+
         $form->submit($data, 'PATCH' !== $method);
     }
 

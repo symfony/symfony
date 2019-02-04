@@ -12,6 +12,7 @@ CHANGELOG
    PHP's native `serialize()` and `unserialize()` functions. To use the
    original serialization method, set the `framework.messenger.serializer.id`
    config option to `messenger.transport.symfony_serializer`.
+ * Added information about deprecated aliases in `debug:autowiring` 
 
 4.2.0
 -----

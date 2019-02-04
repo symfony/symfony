@@ -79,13 +79,10 @@ class AliasTest extends TestCase
     {
         $alias = new Alias('foo', false);
         $alias->setDeprecated();
+        $this->assertTrue($alias->isDeprecated());
 
-        $initial = $alias->isDeprecated();
         $alias->setDeprecated(false);
-        $final = $alias->isDeprecated();
-
-        $this->assertTrue($initial);
-        $this->assertFalse($final);
+        $this->assertFalse($alias->isDeprecated());
     }
 
     /**
@@ -105,6 +102,7 @@ class AliasTest extends TestCase
             "With \ns" => ["invalid \n message %alias_id%"],
             'With */s' => ['invalid */ message %alias_id%'],
             'message not containing required %alias_id% variable' => ['this is deprecated'],
+            'template not containing required %alias_id% variable' => [true],
         ];
     }
 }

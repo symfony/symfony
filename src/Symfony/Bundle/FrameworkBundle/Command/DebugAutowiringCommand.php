@@ -104,7 +104,12 @@ EOF
             $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
             if ($builder->hasAlias($serviceId)) {
                 $hasAlias[$serviceId] = true;
-                $serviceLine .= ' <fg=cyan>('.$builder->getAlias($serviceId).')</>';
+                $serviceAlias = $builder->getAlias($serviceId);
+                $serviceLine .= ' <fg=cyan>('.$serviceAlias.')</>';
+
+                if ($serviceAlias->isDeprecated()) {
+                    $serviceLine .= ' - <fg=magenta>deprecated</>';
+                }
             } elseif (!$all) {
                 continue;
             }

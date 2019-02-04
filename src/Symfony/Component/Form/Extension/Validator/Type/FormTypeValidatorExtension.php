@@ -65,9 +65,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'extra_fields_message' => 'This form should not contain extra fields.',
         ]);
         $resolver->setAllowedTypes('legacy_error_messages', 'bool');
-        $resolver->setDeprecated('legacy_error_messages', function (OptionsResolver $resolver, $value) {
+        $resolver->setDeprecated('legacy_error_messages', function (Options $options, $value) {
             if ($value === true) {
-                return 'Setting the option \'legacy_error_messages\' to \'true\' is deprecated and will be disabled by default in Symfony 5.0';
+                return 'Setting the option "legacy_error_messages" to "true" is deprecated and will be disabled by default in Symfony 5.0';
             }
 
             return '';

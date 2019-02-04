@@ -34,7 +34,7 @@ class LanguageTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the option 'legacy_error_messages' to 'true' is deprecated and will be disabled by default in Symfony 5.0
+     * @expectedDeprecation Setting the option "legacy_error_messages" to "true" is deprecated and will be disabled by default in Symfony 5.0
      */
     public function testLegacyInvalidMessage()
     {

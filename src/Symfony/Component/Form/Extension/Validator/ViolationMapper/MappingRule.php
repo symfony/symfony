@@ -17,17 +17,15 @@ use Symfony\Component\Form\FormInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class MappingRule
+class MappingRule extends AbstractMappingRule
 {
-    private $origin;
     private $propertyPath;
-    private $targetPath;
 
     public function __construct(FormInterface $origin, string $propertyPath, string $targetPath)
     {
-        $this->origin = $origin;
+        parent::__construct($origin, $targetPath);
+
         $this->propertyPath = $propertyPath;
-        $this->targetPath = $targetPath;
     }
 
     /**
@@ -39,28 +37,17 @@ class MappingRule
     }
 
     /**
-     * Matches a property path against the rule path.
-     *
-     * If the rule matches, the form mapped by the rule is returned.
-     * Otherwise this method returns false.
-     *
-     * @param string $propertyPath The property path to match against the rule
-     *
-     * @return FormInterface|null The mapped form or null
+     * {@inheritdoc}
      */
     public function match($propertyPath)
     {
-        if ($propertyPath === (string) $this->propertyPath) {
+        if ($propertyPath === $this->propertyPath) {
             return $this->getTarget();
         }
     }
 
     /**
-     * Matches a property path against a prefix of the rule path.
-     *
-     * @param string $propertyPath The property path to match against the rule
-     *
-     * @return bool Whether the property path is a prefix of the rule or not
+     * {@inheritdoc}
      */
     public function isPrefix($propertyPath)
     {
@@ -78,16 +65,6 @@ class MappingRule
      */
     public function getTarget()
     {
-        $childNames = explode('.', $this->targetPath);
-        $target = $this->origin;
-
-        foreach ($childNames as $childName) {
-            if (!$target->has($childName)) {
-                throw new ErrorMappingException(sprintf('The child "%s" of "%s" mapped by the rule "%s" in "%s" does not exist.', $childName, $target->getName(), $this->targetPath, $this->origin->getName()));
-            }
-            $target = $target->get($childName);
-        }
-
-        return $target;
+        return $this->doGetTarget($this->targetPath);
     }
 }

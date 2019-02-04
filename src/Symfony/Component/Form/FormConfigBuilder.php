@@ -28,6 +28,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
     /**
+     * @internal
+     */
+    public const VALID_NAME_PATTERN = '[a-zA-Z0-9_][a-zA-Z0-9_\-:]*';
+
+    /**
      * Caches a globally unique {@link NativeRequestHandler} instance.
      *
      * @var NativeRequestHandler
@@ -859,6 +864,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public static function isValidName($name)
     {
-        return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
+        return '' === $name || null === $name || preg_match('/^'.self::VALID_NAME_PATTERN.'$/D', $name);
     }
 }

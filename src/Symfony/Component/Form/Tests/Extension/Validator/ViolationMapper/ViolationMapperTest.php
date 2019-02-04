@@ -1575,4 +1575,57 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation2, $grandChild2)], iterator_to_array($grandChild2->getErrors()), $grandChild2->getName().' should have an error, but has none');
         $this->assertEquals([$this->getFormError($violation3, $grandChild3)], iterator_to_array($grandChild3->getErrors()), $grandChild3->getName().' should have an error, but has none');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\ErrorMappingException
+     * @expectedExceptionMessage The number of "*" must be equals on both sides for the dynamic mapping rule "ccc[*].foo[*] => *" in "form".
+     */
+    public function testDynamicRulesWhenWildcardNumberIsNotTheSame(): void
+    {
+        $form = $this->getForm('form', null, null, [
+            'ccc[*].foo[*]' => '*'
+        ]);
+
+        $form->submit([]);
+
+        $this->mapper->mapViolation($this->getConstraintViolation('data.bar'), $form);
+    }
+
+    /**
+     * @dataProvider dynamicRulesProvider
+     */
+    public function testDynamicRules(string $left, string $right): void
+    {
+        $parent = $this->getForm('parent', null, null, [
+            $left => $right,
+        ]);
+
+        $violations = [];
+        for ($i = 0; $i < 3; $i++) {
+            $violations[] = $this->getConstraintViolation('data.'.str_replace('*', $i, $left));
+
+            $parent->add($this->getForm(str_replace('*', $i, $right)));
+        }
+
+        $parent->submit([]);
+
+        foreach ($violations as $violation) {
+            $this->mapper->mapViolation($violation, $parent);
+        }
+
+        $this->assertCount(0, $parent->getErrors());
+
+        foreach ($parent as $child) {
+            $this->assertCount(1, $child->getErrors());
+        }
+    }
+
+    public function dynamicRulesProvider(): array
+    {
+        return [
+            ['stack[*].field', '*'],
+            ['stack[*].field', 'child_*'],
+            ['stack.property[*_elem_*].field', '*fcy*'],
+        ];
+    }
 }

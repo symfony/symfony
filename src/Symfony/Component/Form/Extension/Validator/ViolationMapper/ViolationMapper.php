@@ -153,14 +153,7 @@ class ViolationMapper implements ViolationMapperInterface
         $foundAtIndex = null;
 
         // Construct mapping rules for the given form
-        $rules = [];
-
-        foreach ($form->getConfig()->getOption('error_mapping') as $propertyPath => $targetPath) {
-            // Dot rules are considered at the very end
-            if ('.' !== $propertyPath) {
-                $rules[] = new MappingRule($form, $propertyPath, $targetPath);
-            }
-        }
+        $rules = $this->getMappingRules($form);
 
         $children = iterator_to_array(new \RecursiveIteratorIterator(new InheritDataAwareIterator($form)), false);
 
@@ -173,7 +166,7 @@ class ViolationMapper implements ViolationMapperInterface
 
             // Test mapping rules as long as we have any
             foreach ($rules as $key => $rule) {
-                /* @var MappingRule $rule */
+                /* @var AbstractMappingRule $rule */
 
                 // Mapping rule matches completely, terminate.
                 if (null !== ($form = $rule->match($chunk))) {
@@ -277,5 +270,28 @@ class ViolationMapper implements ViolationMapperInterface
         // requests.
         // https://github.com/symfony/symfony/pull/10567
         return $form->isSubmitted() && ($this->allowNonSynchronized || $form->isSynchronized());
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return AbstractMappingRule[]
+     */
+    private function getMappingRules(FormInterface $form): array
+    {
+        $rules = [];
+
+        foreach ($form->getConfig()->getOption('error_mapping') as $propertyPath => $targetPath) {
+            // Dot rules are considered at the very end
+            if ('.' === $propertyPath) {
+                continue;
+            }
+
+            $ruleClass = false === strpos($propertyPath, '*') && false === strpos($targetPath, '*') ? MappingRule::class : DynamicMappingRule::class;
+
+            $rules[] = new $ruleClass($form, $propertyPath, $targetPath);
+        }
+
+        return $rules;
     }
 }

@@ -70,7 +70,7 @@ class LdapUserProvider implements UserProviderInterface
         }
 
         $entries = $search->execute();
-        $count = \count($entries);
+        $count = $entries->count();
 
         if (!$count) {
             throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
@@ -80,7 +80,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException('More than one user found');
         }
 
-        $entry = $entries[0];
+        $entry = $entries->offsetGet(0);
 
         try {
             if (null !== $this->uidKey) {

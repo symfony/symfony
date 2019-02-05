@@ -45,6 +45,7 @@ class Parser
         $this->binaryOperators = [
             'or' => ['precedence' => 10, 'associativity' => self::OPERATOR_LEFT],
             '||' => ['precedence' => 10, 'associativity' => self::OPERATOR_LEFT],
+            'xor' => ['precedence' => 11, 'associativity' => self::OPERATOR_LEFT],
             'and' => ['precedence' => 15, 'associativity' => self::OPERATOR_LEFT],
             '&&' => ['precedence' => 15, 'associativity' => self::OPERATOR_LEFT],
             '|' => ['precedence' => 16, 'associativity' => self::OPERATOR_LEFT],

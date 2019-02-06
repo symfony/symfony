@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Form\Tests\Fixtures\CustomArrayObject;
 
 class MergeCollectionListenerCustomArrayObjectTest extends MergeCollectionListenerTest
@@ -23,6 +25,6 @@ class MergeCollectionListenerCustomArrayObjectTest extends MergeCollectionListen
 
     protected function getBuilder($name = 'name')
     {
-        return new FormBuilder($name, 'Symfony\Component\Form\Tests\Fixtures\CustomArrayObject', $this->dispatcher, $this->factory);
+        return new FormBuilder($name, 'Symfony\Component\Form\Tests\Fixtures\CustomArrayObject', new EventDispatcher(), (new FormFactoryBuilder())->getFormFactory());
     }
 }

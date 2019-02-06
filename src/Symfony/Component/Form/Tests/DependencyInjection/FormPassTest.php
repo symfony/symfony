@@ -19,8 +19,9 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
-use Symfony\Component\Form\FormRegistryInterface;
+use Symfony\Component\Form\FormRegistry;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -70,8 +71,12 @@ class FormPassTest extends TestCase
     {
         $container = $this->createContainerBuilder();
 
+        $container->register('form.registry', FormRegistry::class);
+        $commandDefinition = new Definition(DebugCommand::class, [new Reference('form.registry')]);
+        $commandDefinition->setPublic(true);
+
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
-        $container->setDefinition('console.command.form_debug', $this->createDebugCommandDefinition());
+        $container->setDefinition('console.command.form_debug', $commandDefinition);
         $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
         $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
 
@@ -254,19 +259,6 @@ class FormPassTest extends TestCase
             [],
             [],
             new IteratorArgument([]),
-        ]);
-
-        return $definition;
-    }
-
-    private function createDebugCommandDefinition()
-    {
-        $definition = new Definition('Symfony\Component\Form\Command\DebugCommand');
-        $definition->setPublic(true);
-        $definition->setArguments([
-            $formRegistry = $this->getMockBuilder(FormRegistryInterface::class)->getMock(),
-            [],
-            ['Symfony\Component\Form\Extension\Core\Type'],
         ]);
 
         return $definition;

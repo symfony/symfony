@@ -47,7 +47,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
         return new HttpFoundationRequestHandler($this->serverParams);
     }
 
-    protected function getMockFile($suffix = '')
+    protected function getUploadedFile($suffix = '')
     {
         return new UploadedFile(__DIR__.'/../../Fixtures/foo'.$suffix, 'foo'.$suffix);
     }

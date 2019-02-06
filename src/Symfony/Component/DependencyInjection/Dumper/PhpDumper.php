@@ -687,8 +687,8 @@ EOF;
         $code .= $this->addServiceInclude($id, $definition);
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-            $factoryCode = $asFile ? "\$this->load('%s.php', false)" : '$this->%s(false)';
-            $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
+            $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : "\$this->factories['%2$s'](false)") : '$this->%s(false)';
+            $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->export($id)));
         }
 
         if ($definition->isDeprecated()) {
@@ -862,7 +862,9 @@ EOTXT
                     }
                     $code[1] = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code[1])));
                     $factory = sprintf('$this->factories%s[\'%s\']', $definition->isPublic() ? '' : "['service_container']", $id);
-                    $code[1] = sprintf("%s = function () {\n%s};\n\nreturn %1\$s();\n", $factory, $code[1]);
+                    $lazyloadInitialization = $definition->isLazy() ? '$lazyLoad = true' : '';
+
+                    $code[1] = sprintf("%s = function (%s) {\n%s};\n\nreturn %1\$s();\n", $factory, $lazyloadInitialization, $code[1]);
                     $code = $code[0].$code[1];
                 }
 

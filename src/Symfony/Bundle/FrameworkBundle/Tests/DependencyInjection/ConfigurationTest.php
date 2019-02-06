@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ConfigurationTest extends TestCase
@@ -335,6 +336,10 @@ class ConfigurationTest extends TestCase
             'http_client' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
                 'clients' => [],
+            ],
+            'mailer' => [
+                'dsn' => 'smtp://null',
+                'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
             ],
         ];
     }

@@ -1,0 +1,32 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Mailer;
+
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\RawMessage;
+
+/**
+ * Interface for mailers able to send emails synchronous and/or asynchronous.
+ *
+ * Implementations must support synchronous and asynchronous sending.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 4.3
+ */
+interface MailerInterface
+{
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function send(RawMessage $message, SmtpEnvelope $envelope = null): void;
+}

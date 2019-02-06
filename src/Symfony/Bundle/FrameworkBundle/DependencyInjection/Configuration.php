@@ -26,6 +26,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -112,6 +113,7 @@ class Configuration implements ConfigurationInterface
         $this->addMessengerSection($rootNode);
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode);
+        $this->addMailerSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1339,6 +1341,21 @@ class Configuration implements ConfigurationInterface
                             ->variableNode('pin-sha256')->end()
                             ->variableNode('md5')->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addMailerSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('mailer')
+                    ->info('Mailer configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(Mailer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->scalarNode('dsn')->defaultValue('smtp://null')->end()
                     ->end()
                 ->end()
             ->end()

@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\Translator;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
@@ -47,6 +48,10 @@ class TwigExtension extends Extension
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
+        }
+
+        if (class_exists(Mailer::class)) {
+            $loader->load('mailer.xml');
         }
 
         if (!class_exists(Translator::class)) {

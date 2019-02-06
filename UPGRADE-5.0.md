@@ -291,3 +291,9 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
+
+Yaml
+----
+
+ * The parser is now stricter and will throw a `ParseException` when a 
+   mapping is found inside a multi-line string.

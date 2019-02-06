@@ -7,7 +7,7 @@ class Test
 {
     public static function getGroups()
     {
-        return [];
+        return array();
     }
 }
 EOPHP

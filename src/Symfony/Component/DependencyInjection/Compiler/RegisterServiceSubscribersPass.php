@@ -65,6 +65,8 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         $class = $r->name;
 
         $subscriberMap = [];
+        $aliasAdds = [];
+        $aliasSearch = [];
 
         foreach ($class::getSubscribedServices() as $key => $type) {
             if (!\is_string($type) || !preg_match('/^\??[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $type)) {
@@ -74,7 +76,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             }
-            if (\is_int($name = $key)) {
+            if ($isIntKey = \is_int($name = $key)) {
                 $key = $type;
                 $name = null;
             }
@@ -97,7 +99,31 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             }
 
             $subscriberMap[$key] = new TypedReference((string) $serviceMap[$key], $type, $optionalBehavior ?: ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $name);
+
+            if ($isIntKey) {
+                if ($this->container->hasDefinition($key)) {
+                    // This is a real definittion, search alias later
+                    $aliasSearch[$key] = true;
+                } elseif ($this->container->hasAlias($key)) {
+                    // This is an alias, only add the real definition
+                    $alias = $this->container->getAlias($key);
+                    $aliasAdds[(string) $alias] = $subscriberMap[$key];
+                }
+            }
+
             unset($serviceMap[$key]);
+        }
+
+        if (\count($aliasSearch)) {
+            foreach ($this->container->getAliases() as $id => $alias) {
+                if (isset($aliasSearch[(string) $alias])) {
+                    $aliasAdds[$id] = $subscriberMap[(string) $alias];
+                }
+            }
+        }
+
+        if (\count($aliasAdds)) {
+            $subscriberMap = array_merge($aliasAdds, $subscriberMap);
         }
 
         if ($serviceMap = array_keys($serviceMap)) {

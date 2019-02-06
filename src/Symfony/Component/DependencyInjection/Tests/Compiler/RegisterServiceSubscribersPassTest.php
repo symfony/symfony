@@ -241,4 +241,42 @@ class RegisterServiceSubscribersPassTest extends TestCase
         ];
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
+
+    public function testAutoAliasing()
+    {
+        $container = new ContainerBuilder();
+
+        $subscriber = new class() implements ServiceSubscriberInterface {
+            public static function getSubscribedServices()
+            {
+                return [
+                    'foo_service',
+                    'bar_alias',
+                ];
+            }
+        };
+        $container->register('foo_service', 'stdClass');
+        $container->setAlias('foo_alias', 'foo_service');
+
+        $container->register('bar_service', 'stdClass');
+        $container->setAlias('bar_alias', 'bar_service');
+
+        $container->register('foo', \get_class($subscriber))
+            ->addMethodCall('setContainer', [new Reference(PsrContainerInterface::class)])
+            ->addTag('container.service_subscriber');
+
+        (new RegisterServiceSubscribersPass())->process($container);
+        (new ResolveServiceSubscribersPass())->process($container);
+
+        $foo = $container->getDefinition('foo');
+        $locator = $container->getDefinition((string) $foo->getMethodCalls()[0][1][0]);
+
+        $expected = [
+            'foo_service' => new ServiceClosureArgument(new TypedReference('foo_service', 'foo_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, '')),
+            'foo_alias' => new ServiceClosureArgument(new TypedReference('foo_service', 'foo_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, '')),
+            'bar_alias' => new ServiceClosureArgument(new TypedReference('bar_alias', 'bar_alias', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, '')),
+            'bar_service' => new ServiceClosureArgument(new TypedReference('bar_alias', 'bar_alias', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, '')),
+        ];
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
+    }
 }

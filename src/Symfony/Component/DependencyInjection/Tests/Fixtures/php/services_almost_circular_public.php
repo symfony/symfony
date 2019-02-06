@@ -404,7 +404,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getListener4Service()
     {
-        $a = $this->getManager4Service();
+        $a = ($this->privates['manager4'] ?? $this->getManager4Service());
 
         if (isset($this->services['listener4'])) {
             return $this->services['listener4'];
@@ -472,7 +472,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getManager3Service($lazyLoad = true)
     {
-        return $this->services['manager3'] = new \stdClass(($this->services['connection3'] ?? $this->getConnection3Service()));
+        $a = ($this->services['connection3'] ?? $this->getConnection3Service());
+
+        if (isset($this->services['manager3'])) {
+            return $this->services['manager3'];
+        }
+
+        return $this->services['manager3'] = new \stdClass($a);
     }
 
     /**
@@ -546,6 +552,12 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getManager4Service($lazyLoad = true)
     {
-        return new \stdClass(($this->services['connection4'] ?? $this->getConnection4Service()));
+        $a = ($this->services['connection4'] ?? $this->getConnection4Service());
+
+        if (isset($this->privates['manager4'])) {
+            return $this->privates['manager4'];
+        }
+
+        return $this->privates['manager4'] = new \stdClass($a);
     }
 }

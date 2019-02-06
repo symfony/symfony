@@ -497,7 +497,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getManager3Service($lazyLoad = true)
     {
-        return $this->services['manager3'] = new \stdClass(${($_ = isset($this->services['connection3']) ? $this->services['connection3'] : $this->getConnection3Service()) && false ?: '_'});
+        $a = ${($_ = isset($this->services['connection3']) ? $this->services['connection3'] : $this->getConnection3Service()) && false ?: '_'};
+
+        if (isset($this->services['manager3'])) {
+            return $this->services['manager3'];
+        }
+
+        return $this->services['manager3'] = new \stdClass($a);
     }
 
     /**
@@ -613,7 +619,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getManager4Service($lazyLoad = true)
     {
-        return $this->services['manager4'] = new \stdClass(${($_ = isset($this->services['connection4']) ? $this->services['connection4'] : $this->getConnection4Service()) && false ?: '_'});
+        $a = ${($_ = isset($this->services['connection4']) ? $this->services['connection4'] : $this->getConnection4Service()) && false ?: '_'};
+
+        if (isset($this->services['manager4'])) {
+            return $this->services['manager4'];
+        }
+
+        return $this->services['manager4'] = new \stdClass($a);
     }
 
     /**

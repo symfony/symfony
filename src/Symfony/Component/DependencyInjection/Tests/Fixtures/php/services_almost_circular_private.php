@@ -369,10 +369,15 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      */
     protected function getManager3Service($lazyLoad = true)
     {
-        $a = new \stdClass();
-        $a->listener = [0 => ${($_ = isset($this->services['listener3']) ? $this->services['listener3'] : $this->getListener3Service()) && false ?: '_'}];
+        $a = ${($_ = isset($this->services['listener3']) ? $this->services['listener3'] : $this->getListener3Service()) && false ?: '_'};
 
-        return $this->services['manager3'] = new \stdClass($a);
+        if (isset($this->services['manager3'])) {
+            return $this->services['manager3'];
+        }
+        $b = new \stdClass();
+        $b->listener = [0 => $a];
+
+        return $this->services['manager3'] = new \stdClass($b);
     }
 
     /**
@@ -489,9 +494,12 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     protected function getManager4Service($lazyLoad = true)
     {
         $a = new \stdClass();
+
+        $this->services['manager4'] = $instance = new \stdClass($a);
+
         $a->listener = [0 => ${($_ = isset($this->services['listener4']) ? $this->services['listener4'] : $this->getListener4Service()) && false ?: '_'}];
 
-        return $this->services['manager4'] = new \stdClass($a);
+        return $instance;
     }
 
     /**

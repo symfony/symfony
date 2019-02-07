@@ -12,7 +12,7 @@
 namespace Symfony\Contracts\HttpClient;
 
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use Symfony\Contracts\Tests\HttpClient\ApiClientTest;
+use Symfony\Contracts\HttpClient\Test\ApiClientTestCase;
 
 /**
  * Provides flexible methods for interacting with HTTP APIs.

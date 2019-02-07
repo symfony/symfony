@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-02-04T12:10:08Z
+
+@OskarStark , it's okay. If you have `null` as a default value that means that the argument is nullable. Otherwise how it might have `null` as a default? See the accepted RFC https://wiki.php.net/rfc/nullable_types#default_values
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-04T12:59:28Z
+
+I know but how to use null and a custom flag parameter?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-02-04T14:35:18Z
+
+@OskarStark , `new SomeDumper('output', null, 1)`
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-04T17:55:12Z
+
+Ah sorry, TIL
+
+(?string $foo) allows the same values as (string $foo = null), except only the latter has a default. Thank you!

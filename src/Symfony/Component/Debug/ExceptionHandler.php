@@ -207,7 +207,7 @@ class ExceptionHandler
                 $title = 'Sorry, the page you are looking for could not be found.';
                 break;
             default:
-                $title = 'Whoops, looks like something went wrong.';
+                $title = $this->debug ? $this->escapeHtml($exception->getMessage()) : 'Whoops, looks like something went wrong.';
         }
 
         if (!$this->debug) {

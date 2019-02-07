@@ -13,16 +13,20 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButtonBuilder;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -647,6 +651,27 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function getValidationGroups(FormInterface $form)
     {
         return ['group1', 'group2'];
+    }
+
+    public function testCauseForNotAllowedExtraFieldsIsTheFormConstraint()
+    {
+        $form = $this
+            ->getBuilder('form', null, ['constraints' => [new NotBlank(['groups' => ['foo']])]])
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+        $form->submit([
+            'extra_data' => 'foo',
+        ]);
+
+        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $constraint = new Form();
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, $constraint);
+
+        $this->assertCount(1, $context->getViolations());
+        $this->assertSame($constraint, $context->getViolations()->get(0)->getConstraint());
     }
 
     private function getMockExecutionContext()

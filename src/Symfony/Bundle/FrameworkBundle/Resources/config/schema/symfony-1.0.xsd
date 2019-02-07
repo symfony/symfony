@@ -35,7 +35,6 @@
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
-        <xsd:attribute name="trusted-proxies" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />
@@ -76,10 +75,6 @@
     </xsd:complexType>
 
     <xsd:complexType name="profiler">
-        <xsd:all>
-            <xsd:element name="matcher" type="profiler_matcher" minOccurs="0" maxOccurs="1" />
-        </xsd:all>
-
         <xsd:attribute name="collect" type="xsd:string" />
         <xsd:attribute name="only-exceptions" type="xsd:string" />
         <xsd:attribute name="only-master-requests" type="xsd:string" />
@@ -90,18 +85,13 @@
         <xsd:attribute name="lifetime" type="xsd:string" />
     </xsd:complexType>
 
-    <xsd:complexType name="profiler_matcher">
-        <xsd:attribute name="ip" type="xsd:string" />
-        <xsd:attribute name="path" type="xsd:string" />
-        <xsd:attribute name="service" type="xsd:string" />
-    </xsd:complexType>
-
     <xsd:complexType name="router">
         <xsd:attribute name="resource" type="xsd:string" />
         <xsd:attribute name="type" type="xsd:string" />
         <xsd:attribute name="http-port" type="xsd:string" />
         <xsd:attribute name="https-port" type="xsd:string" />
         <xsd:attribute name="strict-requirements" type="xsd:string" />
+        <xsd:attribute name="utf8" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="session">
@@ -114,12 +104,12 @@
         <xsd:attribute name="cookie-domain" type="xsd:string" />
         <xsd:attribute name="cookie-secure" type="cookie_secure" />
         <xsd:attribute name="cookie-httponly" type="xsd:boolean" />
+        <xsd:attribute name="cookie-samesite" type="cookie_samesite" />
         <xsd:attribute name="use-cookies" type="xsd:boolean" />
         <xsd:attribute name="cache-limiter" type="xsd:string" />
         <xsd:attribute name="gc-maxlifetime" type="xsd:string" />
         <xsd:attribute name="gc-divisor" type="xsd:string" />
         <xsd:attribute name="gc-probability" type="xsd:string" />
-        <xsd:attribute name="use-strict-mode" type="xsd:boolean" />
         <xsd:attribute name="save-path" type="xsd:string" />
         <xsd:attribute name="metadata-update-threshold" type="xsd:nonNegativeInteger" />
     </xsd:complexType>
@@ -239,7 +229,6 @@
             <xsd:element name="mapping" type="file_mapping" />
         </xsd:choice>
         <xsd:attribute name="enabled" type="xsd:boolean" />
-        <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="name-converter" type="xsd:string" />
         <xsd:attribute name="circular-reference-handler" type="xsd:string" />
@@ -259,6 +248,7 @@
             <xsd:element name="default-psr6-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="default-redis-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="default-memcached-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="default-pdo-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="pool" type="cache_pool" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
@@ -316,6 +306,7 @@
             <xsd:element name="to" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="metadata" type="metadata" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="guard" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="metadata" type="metadata" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
@@ -350,6 +341,14 @@
             <xsd:enumeration value="1" />
             <xsd:enumeration value="0" />
             <xsd:enumeration value="auto" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+     <xsd:simpleType name="cookie_samesite">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="" />
+            <xsd:enumeration value="lax" />
+            <xsd:enumeration value="strict" />
         </xsd:restriction>
     </xsd:simpleType>
 

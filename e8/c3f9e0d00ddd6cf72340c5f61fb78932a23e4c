@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-01T08:31:36Z
+
+Don't forget to update UPGRADE-4.3 and the CHANGELOG of the component also!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-01T08:32:51Z
+
+> BC breaks? | yes, it removes \Serializable interface from AbstractToken and AuthenticationException
+
+it does not actually so there is no BC break (and serialized payloads are kept compatible) - the PR description should be updated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-07T08:38:05Z
+
+@renanbr Looks like this PR needs a rebase as it contains unrelated changes now.

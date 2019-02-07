@@ -30,15 +30,15 @@
 {% endblock %}
 
 {% block menu %}
-<span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
-    <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
-    <strong>Messages</strong>
-    {% if collector.exceptionsCount > 0 %}
-        <span class="count">
-            <span>{{ collector.exceptionsCount }}</span>
-        </span>
-    {% endif %}
-</span>
+    <span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
+        <strong>Messages</strong>
+        {% if collector.exceptionsCount > 0 %}
+            <span class="count">
+                <span>{{ collector.exceptionsCount }}</span>
+            </span>
+        {% endif %}
+    </span>
 {% endblock %}
 
 {% block head %}
@@ -71,31 +71,31 @@
             <p>No messages have been collected.</p>
         </div>
     {% else %}
+        <div class="sf-tabs message-bus">
+            <div class="tab">
+                {% set messages = collector.messages %}
+                {% set exceptionsCount = collector.exceptionsCount %}
+                <h3 class="tab-title">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
 
-    <div class="sf-tabs message-bus">
-        <div class="tab">
-            {% set messages = collector.messages %}
-            {% set exceptionsCount = collector.exceptionsCount %}
-            <h3 class="tab-title">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
-
-            <div class="tab-content">
-                <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
-                {{ helper.render_bus_messages(messages, true) }}
+                <div class="tab-content">
+                    <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+                    {{ helper.render_bus_messages(messages, true) }}
+                </div>
             </div>
-        </div>
 
-        {% for bus in collector.buses %}
-        <div class="tab message-bus">
-            {% set messages = collector.messages(bus) %}
-            {% set exceptionsCount = collector.exceptionsCount(bus) %}
-            <h3 class="tab-title">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+            {% for bus in collector.buses %}
+                <div class="tab message-bus">
+                    {% set messages = collector.messages(bus) %}
+                    {% set exceptionsCount = collector.exceptionsCount(bus) %}
+                    <h3 class="tab-title">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
 
-            <div class="tab-content">
-                <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
-                {{ helper.render_bus_messages(messages) }}
-            </div>
+                    <div class="tab-content">
+                        <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
+                        {{ helper.render_bus_messages(messages) }}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     {% endif %}
 
 {% endblock %}
@@ -105,24 +105,24 @@
     {% for dispatchCall in messages %}
     <table class="message-item">
         <thead>
-        <tr>
-            <th colspan="2" class="sf-toggle"
-                data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
-                data-toggle-initial="{{ loop.first ? 'display' }}"
-            >
-                <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
-                {% if showBus %}
-                    <span class="label">{{ dispatchCall.bus }}</span>
-                {% endif %}
-                {% if dispatchCall.exception is defined %}
-                    <span class="label status-error">exception</span>
-                {% endif %}
-                <a class="toggle-button">
-                    <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
-                    <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
-                </a>
-            </th>
-        </tr>
+            <tr>
+                <th colspan="2" class="sf-toggle"
+                    data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
+                    data-toggle-initial="{{ loop.first ? 'display' }}"
+                >
+                    <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
+                    {% if showBus %}
+                        <span class="label">{{ dispatchCall.bus }}</span>
+                    {% endif %}
+                    {% if dispatchCall.exception is defined %}
+                        <span class="label status-error">exception</span>
+                    {% endif %}
+                    <a class="toggle-button">
+                        <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
+                        <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>
+                    </a>
+                </th>
+            </tr>
         </thead>
         <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" class="sf-toggle-content">
             <tr>
@@ -133,7 +133,7 @@
                             {% set link = caller.file|file_link(caller.line) %}
                             {% if link %}
                                 <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
-                                {% else %}
+                            {% else %}
                                 <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
                             {% endif %}
                         {% else %}
@@ -150,10 +150,10 @@
                 </td>
             </tr>
             {% if showBus %}
-            <tr>
-                <td class="text-bold">Bus</td>
-                <td>{{ dispatchCall.bus }}</td>
-            </tr>
+                <tr>
+                    <td class="text-bold">Bus</td>
+                    <td>{{ dispatchCall.bus }}</td>
+                </tr>
             {% endif %}
             <tr>
                 <td class="text-bold">Message</td>
@@ -170,12 +170,12 @@
                 </td>
             </tr>
             {% if dispatchCall.exception is defined %}
-            <tr>
-                <td class="text-bold">Exception</td>
-                <td>
-                    {{ profiler_dump(dispatchCall.exception.value, maxDepth=1) }}
-                </td>
-            </tr>
+                <tr>
+                    <td class="text-bold">Exception</td>
+                    <td>
+                        {{ profiler_dump(dispatchCall.exception.value, maxDepth=1) }}
+                    </td>
+                </tr>
             {% endif %}
         </tbody>
     </table>

@@ -140,6 +140,7 @@ class OutputFormatter implements OutputFormatterInterface
             $text = $match[0];
 
             if (0 != $pos && '\\' == $message[$pos - 1]) {
+                // @fixme ignore if slash itself is escaped
                 continue;
             }
 
@@ -172,7 +173,7 @@ class OutputFormatter implements OutputFormatterInterface
             return strtr($output, ["\0" => '\\', '\\<' => '<']);
         }
 
-        return str_replace('\\<', '<', $output);
+        return preg_replace('~(?<!\\\\)(?:\\\\\\\\)*(\\\\<)~', '<', $output);
     }
 
     /**

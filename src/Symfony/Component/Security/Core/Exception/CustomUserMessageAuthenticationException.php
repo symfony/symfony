@@ -58,20 +58,17 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        $serialized = [parent::serialize(true), $this->messageKey, $this->messageData];
-
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return [parent::getState(), $this->messageKey, $this->messageData];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    protected function setState(array $data)
     {
-        list($parentData, $this->messageKey, $this->messageData) = \is_array($str) ? $str : unserialize($str);
-
-        parent::unserialize($parentData);
+        [$parentData, $this->messageKey, $this->messageData] = $data;
+        parent::setState($parentData);
     }
 }

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+* Made the `serialize()` and `unserialize()` methods of `AbstractToken` and
+  `AuthenticationException` final, use `getState()`/`setState()` instead
+
 4.2.0
 -----
 

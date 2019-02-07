@@ -52,28 +52,25 @@ class UsernameNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function serialize()
-    {
-        $serialized = [$this->username, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($str)
-    {
-        list($this->username, $parentData) = \is_array($str) ? $str : unserialize($str);
-
-        parent::unserialize($parentData);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getMessageData()
     {
         return ['{{ username }}' => $this->username];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getState(): array
+    {
+        return [$this->username, parent::getState()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setState(array $data)
+    {
+        [$this->username, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

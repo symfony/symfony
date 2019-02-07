@@ -42,20 +42,17 @@ abstract class AccountStatusException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        $serialized = [$this->user, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return [$this->user, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    protected function setState(array $data)
     {
-        list($this->user, $parentData) = \is_array($str) ? $str : unserialize($str);
-
-        parent::unserialize($parentData);
+        [$this->user, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

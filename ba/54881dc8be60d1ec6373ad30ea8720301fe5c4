@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by tvlooy at 2019-02-01T23:05:21Z
+
+@nicolas-grekas amqp is fixed!
+
+zookeeper still segfaults. I do see a fixed 7.3 segfault in master (that will become 0.7.0) we will need to re-test when this release is out to see if this is the same. If not I'll track down the test, isolate and report upstream

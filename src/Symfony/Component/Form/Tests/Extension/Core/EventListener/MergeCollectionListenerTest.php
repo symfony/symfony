@@ -17,21 +17,15 @@ use Symfony\Component\Form\FormEvent;
 
 abstract class MergeCollectionListenerTest extends TestCase
 {
-    protected $dispatcher;
-    protected $factory;
     protected $form;
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->getForm('axes');
     }
 
     protected function tearDown()
     {
-        $this->dispatcher = null;
-        $this->factory = null;
         $this->form = null;
     }
 

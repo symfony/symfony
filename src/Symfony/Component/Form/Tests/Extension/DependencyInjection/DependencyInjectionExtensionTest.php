@@ -12,7 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
@@ -21,19 +22,16 @@ class DependencyInjectionExtensionTest extends TestCase
 {
     public function testGetTypeExtensions()
     {
-        $container = $this->createContainerMock();
-        $container->expects($this->never())->method('get');
-
-        $typeExtension1 = $this->createFormTypeExtensionMock('test');
-        $typeExtension2 = $this->createFormTypeExtensionMock('test');
-        $typeExtension3 = $this->createFormTypeExtensionMock('other');
+        $typeExtension1 = new DummyExtension('test');
+        $typeExtension2 = new DummyExtension('test');
+        $typeExtension3 = new DummyExtension('other');
 
         $extensions = [
             'test' => new \ArrayIterator([$typeExtension1, $typeExtension2]),
             'other' => new \ArrayIterator([$typeExtension3]),
         ];
 
-        $extension = new DependencyInjectionExtension($container, $extensions, []);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), $extensions, []);
 
         $this->assertTrue($extension->hasTypeExtensions('test'));
         $this->assertTrue($extension->hasTypeExtensions('other'));
@@ -47,14 +45,11 @@ class DependencyInjectionExtensionTest extends TestCase
      */
     public function testThrowExceptionForInvalidExtendedType()
     {
-        $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
-        $container->expects($this->never())->method('get');
-
         $extensions = [
-            'test' => new \ArrayIterator([$this->createFormTypeExtensionMock('unmatched')]),
+            'test' => new \ArrayIterator([new DummyExtension('unmatched')]),
         ];
 
-        $extension = new DependencyInjectionExtension($container, $extensions, []);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), $extensions, []);
 
         $extension->getTypeExtensions('test');
     }
@@ -65,23 +60,15 @@ class DependencyInjectionExtensionTest extends TestCase
      */
     public function testLegacyGetTypeExtensions()
     {
-        $container = $this->createContainerMock();
+        $container = new ContainerBuilder();
 
-        $services = [
-            'extension1' => $typeExtension1 = $this->createFormTypeExtensionMock('test'),
-            'extension2' => $typeExtension2 = $this->createFormTypeExtensionMock('test'),
-            'extension3' => $typeExtension3 = $this->createFormTypeExtensionMock('other'),
-        ];
+        $typeExtension1 = new DummyExtension('test');
+        $typeExtension2 = new DummyExtension('test');
+        $typeExtension3 = new DummyExtension('other');
 
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(function ($id) use ($services) {
-                if (isset($services[$id])) {
-                    return $services[$id];
-                }
-
-                throw new ServiceNotFoundException($id);
-            });
+        $container->set('extension1', $typeExtension1);
+        $container->set('extension2', $typeExtension2);
+        $container->set('extension3', $typeExtension3);
 
         $extension = new DependencyInjectionExtension($container, [], ['test' => ['extension1', 'extension2'], 'other' => ['extension3']], []);
 
@@ -97,14 +84,10 @@ class DependencyInjectionExtensionTest extends TestCase
      */
     public function testLegacyThrowExceptionForInvalidExtendedType()
     {
-        $formTypeExtension = $this->createFormTypeExtensionMock('unmatched');
+        $formTypeExtension = new DummyExtension('unmatched');
 
-        $container = $this->createContainerMock();
-
-        $container->expects($this->any())
-            ->method('get')
-            ->with('extension')
-            ->willReturn($formTypeExtension);
+        $container = new ContainerBuilder();
+        $container->set('extension', $formTypeExtension);
 
         $extension = new DependencyInjectionExtension($container, [], ['test' => ['extension']], []);
 
@@ -116,16 +99,14 @@ class DependencyInjectionExtensionTest extends TestCase
 
     public function testGetTypeGuesser()
     {
-        $container = $this->createContainerMock();
-        $extension = new DependencyInjectionExtension($container, [], [$this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()]);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [$this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()]);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }
 
     public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
     {
-        $container = $this->createContainerMock();
-        $extension = new DependencyInjectionExtension($container, [], []);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], []);
 
         $this->assertNull($extension->getTypeGuesser());
     }
@@ -135,12 +116,9 @@ class DependencyInjectionExtensionTest extends TestCase
      */
     public function testLegacyGetTypeGuesser()
     {
-        $container = $this->createContainerMock();
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with('foo')
-            ->willReturn($this->getMockBuilder(FormTypeGuesserInterface::class)->getMock());
+        $container = new ContainerBuilder();
+        $container->set('foo', new DummyTypeGuesser());
+
         $extension = new DependencyInjectionExtension($container, [], [], ['foo']);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
@@ -151,24 +129,42 @@ class DependencyInjectionExtensionTest extends TestCase
      */
     public function testLegacyGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
     {
-        $container = $this->createContainerMock();
-        $extension = new DependencyInjectionExtension($container, [], [], []);
+        $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [], []);
 
         $this->assertNull($extension->getTypeGuesser());
     }
+}
 
-    private function createContainerMock()
+class DummyExtension extends AbstractTypeExtension
+{
+    private $extendedType;
+
+    public function __construct($extendedType)
     {
-        return $this->getMockBuilder('Psr\Container\ContainerInterface')
-            ->setMethods(['get', 'has'])
-            ->getMock();
+        $this->extendedType = $extendedType;
     }
 
-    private function createFormTypeExtensionMock($extendedType)
+    public function getExtendedType()
     {
-        $extension = $this->getMockBuilder('Symfony\Component\Form\FormTypeExtensionInterface')->getMock();
-        $extension->expects($this->any())->method('getExtendedType')->willReturn($extendedType);
+        return $this->extendedType;
+    }
+}
 
-        return $extension;
+class DummyTypeGuesser implements FormTypeGuesserInterface
+{
+    public function guessType($class, $property)
+    {
+    }
+
+    public function guessRequired($class, $property)
+    {
+    }
+
+    public function guessMaxLength($class, $property)
+    {
+    }
+
+    public function guessPattern($class, $property)
+    {
     }
 }

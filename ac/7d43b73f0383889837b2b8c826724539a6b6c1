@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-01-29T20:27:52Z
+
+In #29830, @pravdinalex reported that the 3.4 branch lacks support for those options as well. Was this PR intentionally opened against the master branch?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-01-29T20:32:51Z
+
+As this is a new "feature" it must be against `master` per definition, right?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-01-29T21:06:30Z
+
+> As this is a new "feature"
+
+Is it? The new feature has been implemented in php itself and the HTTP Foundation component already supports it. One could argue that this PR merely solves a configuration issue of the Framework Bundle.
+
+I don't have a clear opinion on this. I've just noticed a contradiction between the linked issue and the PR and thought I should mention it. 😃
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-01-30T00:14:47Z
+
+yes indeed, my first intention was to make it a bugfix for the 3.4 branch.
+
+But as it can change the behavior of the application and can be set in the application, it sounds like a new feature. But I'm open to change it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-30T10:25:13Z
+
+That's a new feature to me. Reports that ask for bug fixes but really ask for feature are not uncommon :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-08T12:18:41Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-02-08T12:23:32Z
+
+> rebase needed
+
+done

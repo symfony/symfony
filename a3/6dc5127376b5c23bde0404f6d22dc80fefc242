@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-07T07:50:26Z
+
+Instead of doing this change, would adding the `@after` annotation on `ensureKernelShutdown` work?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-02-07T09:16:51Z
+
+@nicolas-grekas sounds like a good idea! Did change it.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-02-07T11:21:09Z
+
+@nicolas-grekas tried it but __call seems never be called when parent::tearDown() is called it seems directly calling the PhpUnit teardown. (https://wtools.io/php-sandbox/6y)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-07T11:27:32Z
+
+> it seems directly calling the PhpUnit teardown
+
+all is fine then, great!
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-02-07T12:14:15Z
+
+@nicolas-grekas and the `@after` seems to be called after the `tearDown` so there should be no problems if the kernel is still needed in the tearDown.

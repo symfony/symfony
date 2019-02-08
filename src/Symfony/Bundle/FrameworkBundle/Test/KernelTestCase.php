@@ -112,6 +112,8 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
+     * @after
+     *
      * Shuts the kernel down if it was used in the test.
      */
     protected static function ensureKernelShutdown()
@@ -124,13 +126,5 @@ abstract class KernelTestCase extends TestCase
             }
         }
         static::$container = null;
-    }
-
-    /**
-     * Clean up Kernel usage in this test.
-     */
-    protected function tearDown()
-    {
-        static::ensureKernelShutdown();
     }
 }

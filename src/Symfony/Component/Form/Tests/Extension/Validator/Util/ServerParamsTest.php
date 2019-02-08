@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Util;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ServerParamsTest extends TestCase
 {
@@ -32,8 +33,8 @@ class ServerParamsTest extends TestCase
     public function testGetContentLengthFromRequest()
     {
         $request = Request::create('http://foo', 'GET', [], [], [], ['CONTENT_LENGTH' => 1024]);
-        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(['getCurrentRequest'])->getMock();
-        $requestStack->expects($this->once())->method('getCurrentRequest')->will($this->returnValue($request));
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $serverParams = new ServerParams($requestStack);
 
         $this->assertEquals(1024, $serverParams->getContentLength());
@@ -42,11 +43,7 @@ class ServerParamsTest extends TestCase
     /** @dataProvider getGetPostMaxSizeTestData */
     public function testGetPostMaxSize($size, $bytes)
     {
-        $serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(['getNormalizedIniPostMaxSize'])->getMock();
-        $serverParams
-            ->expects($this->any())
-            ->method('getNormalizedIniPostMaxSize')
-            ->will($this->returnValue(strtoupper($size)));
+        $serverParams = new DummyServerParams($size);
 
         $this->assertEquals($bytes, $serverParams->getPostMaxSize());
     }
@@ -68,5 +65,22 @@ class ServerParamsTest extends TestCase
             ['0', 0],
             ['2mk', 2048], // the unit must be the last char, so in this case 'k', not 'm'
         ];
+    }
+}
+
+class DummyServerParams extends ServerParams
+{
+    private $size;
+
+    public function __construct($size)
+    {
+        parent::__construct();
+
+        $this->size = $size;
+    }
+
+    public function getNormalizedIniPostMaxSize()
+    {
+        return $this->size;
     }
 }

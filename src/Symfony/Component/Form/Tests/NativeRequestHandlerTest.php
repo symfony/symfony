@@ -179,6 +179,59 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->assertFalse($form->isSubmitted());
     }
 
+    public function testFormIgnoresMethodFieldIfRequestMethodIsMatched()
+    {
+        $form = $this->createForm('foo', 'PUT', true);
+        $form->add($this->createForm('bar'));
+
+        $this->setRequestData('PUT', [
+            'foo' => [
+                '_method' => 'PUT',
+                'bar' => 'baz',
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertSame([], $form->getExtraData());
+    }
+
+    public function testFormDoesNotIgnoreMethodFieldIfRequestMethodIsNotMatched()
+    {
+        $form = $this->createForm('foo', 'PUT', true);
+        $form->add($this->createForm('bar'));
+
+        $this->setRequestData('PUT', [
+            'foo' => [
+                '_method' => 'DELETE',
+                'bar' => 'baz',
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertSame(['_method' => 'DELETE'], $form->getExtraData());
+    }
+
+    public function testMethodSubFormIsSubmitted()
+    {
+        $form = $this->createForm('foo', 'PUT', true);
+        $form->add($this->createForm('_method'));
+        $form->add($this->createForm('bar'));
+
+        $this->setRequestData('PUT', [
+            'foo' => [
+                '_method' => 'PUT',
+                'bar' => 'baz',
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->get('_method')->isSubmitted());
+        $this->assertSame('PUT', $form->get('_method')->getData());
+    }
+
     protected function setRequestData($method, $data, $files = [])
     {
         if ('GET' === $method) {
@@ -201,7 +254,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         return new NativeRequestHandler($this->serverParams);
     }
 
-    protected function getMockFile($suffix = '')
+    protected function getUploadedFile($suffix = '')
     {
         return [
             'name' => 'upload'.$suffix.'.txt',

@@ -46,4 +46,12 @@ class IntegerToLocalizedStringTransformer extends NumberToLocalizedStringTransfo
 
         return null !== $result ? (int) $result : null;
     }
+
+    /**
+     * @internal
+     */
+    protected function castParsedValue($value)
+    {
+        return $value;
+    }
 }

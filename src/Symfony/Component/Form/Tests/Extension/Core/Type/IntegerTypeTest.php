@@ -50,4 +50,45 @@ class IntegerTypeTest extends BaseTypeTest
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
+
+    public function testSubmittedLargeIntegersAreNotCastToFloat()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('This test requires a 64bit PHP.');
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit('201803221011791');
+
+        $this->assertSame(201803221011791, $form->getData());
+        $this->assertSame('201803221011791', $form->getViewData());
+    }
+
+    public function testTooSmallIntegersAreNotValid()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $min = '-2147483649';
+        } else {
+            $min = '-9223372036854775808';
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit($min);
+
+        $this->assertFalse($form->isSynchronized());
+    }
+
+    public function testTooGreatIntegersAreNotValid()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $max = '2147483648';
+        } else {
+            $max = '9223372036854775808';
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit($max);
+
+        $this->assertFalse($form->isSynchronized());
+    }
 }

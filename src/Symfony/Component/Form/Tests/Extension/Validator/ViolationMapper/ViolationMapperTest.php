@@ -12,8 +12,11 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -34,7 +37,7 @@ class ViolationMapperTest extends TestCase
     const LEVEL_2 = 3;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -60,7 +63,7 @@ class ViolationMapperTest extends TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->dispatcher = new EventDispatcher();
         $this->mapper = new ViolationMapper();
         $this->message = 'Message';
         $this->messageTemplate = 'Message template';
@@ -76,7 +79,7 @@ class ViolationMapperTest extends TestCase
         $config->setInheritData($inheritData);
         $config->setPropertyPath($propertyPath);
         $config->setCompound(true);
-        $config->setDataMapper($this->getDataMapper());
+        $config->setDataMapper(new PropertyPathMapper());
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
@@ -86,14 +89,6 @@ class ViolationMapperTest extends TestCase
         }
 
         return new Form($config);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getDataMapper()
-    {
-        return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
     /**

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileTypeTest extends BaseTypeTest
@@ -24,9 +25,7 @@ class FileTypeTest extends BaseTypeTest
     public function testSetData()
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->getForm();
-        $data = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->setConstructorArgs([__DIR__.'/../../../Fixtures/foo', 'foo'])
-            ->getMock();
+        $data = new File(__DIR__.'/../../../Fixtures/foo', false);
 
         $form->setData($data);
 
@@ -40,7 +39,7 @@ class FileTypeTest extends BaseTypeTest
     public function testSubmit(RequestHandlerInterface $requestHandler)
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
-        $data = $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg');
+        $data = $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg');
 
         $form->submit($data);
 
@@ -57,8 +56,8 @@ class FileTypeTest extends BaseTypeTest
         ])->setRequestHandler($requestHandler)->getForm();
 
         $data = [
-            $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
-            $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
         ];
 
         $form->setData($data);
@@ -75,8 +74,8 @@ class FileTypeTest extends BaseTypeTest
         ])->setRequestHandler($requestHandler)->getForm();
 
         $data = [
-            $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
-            $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
         ];
 
         $form->submit($data);
@@ -94,7 +93,7 @@ class FileTypeTest extends BaseTypeTest
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
         $form->submit([
-            'file' => $this->createUploadedFileMock($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
+            'file' => $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
         ]);
 
         $this->assertEquals('', $form->createView()->vars['value']);
@@ -152,8 +151,8 @@ class FileTypeTest extends BaseTypeTest
             ->getForm();
         $form->submit([
             'file:///etc/passwd',
-            $this->createUploadedFileMock(new HttpFoundationRequestHandler(), __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
-            $this->createUploadedFileMock(new NativeRequestHandler(), __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
+            $this->createUploadedFile(new HttpFoundationRequestHandler(), __DIR__.'/../../../Fixtures/foo', 'foo.jpg'),
+            $this->createUploadedFile(new NativeRequestHandler(), __DIR__.'/../../../Fixtures/foo2', 'foo2.jpg'),
         ]);
 
         $this->assertCount(1, $form->getData());
@@ -185,7 +184,7 @@ class FileTypeTest extends BaseTypeTest
         ];
     }
 
-    private function createUploadedFileMock(RequestHandlerInterface $requestHandler, $path, $originalName)
+    private function createUploadedFile(RequestHandlerInterface $requestHandler, $path, $originalName)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {
             return new UploadedFile($path, $originalName, null, null, true);

@@ -1900,6 +1900,22 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testIntegerTypeWithGroupingRendersAsTextInput()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', 123, [
+            'grouping' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="123"]
+'
+        );
+    }
+
     public function testLanguage()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\LanguageType', 'de');

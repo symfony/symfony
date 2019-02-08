@@ -1796,6 +1796,21 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
+    public function testIntegerTypeWithGroupingRendersAsTextInput()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', 123, [
+            'grouping' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+'/input
+    [@type="text"]
+    [@name="name"]
+    [@value="123"]
+'
+        );
+    }
+
     public function testLanguage()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\LanguageType', 'de');

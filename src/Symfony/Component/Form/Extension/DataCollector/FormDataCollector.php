@@ -229,9 +229,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return $this->data;
     }
 
-    /**
-     * @internal
-     */
     public function serialize()
     {
         foreach ($this->data['forms_by_hash'] as &$form) {

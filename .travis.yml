@@ -160,7 +160,6 @@ before_install:
           tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
           tfold ext.igbinary tpecl igbinary-2.0.8 igbinary.so $INI
           tfold ext.zookeeper tpecl zookeeper-0.6.0 zookeeper.so $INI
-
           tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
       done
 

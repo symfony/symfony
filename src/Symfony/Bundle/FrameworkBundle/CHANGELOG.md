@@ -13,6 +13,8 @@ CHANGELOG
    original serialization method, set the `framework.messenger.serializer.id`
    config option to `messenger.transport.symfony_serializer`.
  * Added information about deprecated aliases in `debug:autowiring` 
+ * Added php ini session options `sid_length` and `sid_bits_per_character` 
+   to the `session` section of the configuration
 
 4.2.0
 -----

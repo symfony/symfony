@@ -112,6 +112,8 @@
         <xsd:attribute name="gc-probability" type="xsd:string" />
         <xsd:attribute name="save-path" type="xsd:string" />
         <xsd:attribute name="metadata-update-threshold" type="xsd:nonNegativeInteger" />
+        <xsd:attribute name="sid-length" type="sid_length" />
+        <xsd:attribute name="sid-bits-per-character" type="sid_bits_per_character" />
     </xsd:complexType>
 
     <xsd:complexType name="request">
@@ -343,11 +345,26 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-     <xsd:simpleType name="cookie_samesite">
+    <xsd:simpleType name="cookie_samesite">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="" />
             <xsd:enumeration value="lax" />
             <xsd:enumeration value="strict" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="sid_bits_per_character">
+        <xsd:restriction base="xsd:positiveInteger">
+            <xsd:enumeration value="4" />
+            <xsd:enumeration value="5" />
+            <xsd:enumeration value="6" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="sid_length">
+        <xsd:restriction base="xsd:positiveInteger">
+            <xsd:minInclusive value="22" />
+            <xsd:maxInclusive value="256" />
         </xsd:restriction>
     </xsd:simpleType>
 

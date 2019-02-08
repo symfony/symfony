@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-06T15:49:13Z
+
+Nice. Could you please add a test case with a fixture in `PhpDumperTest.php` please (see calls to `assertStringEqualsFile` for inspiration)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-06T15:49:41Z
+
+Please rebase for 4.2 also as 4.1 is EOLed.
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-02-06T15:56:48Z
+
+> Nice. Could you please add a test case with a fixture in `PhpDumperTest.php` please (see calls to `assertStringEqualsFile` for inspiration)
+
+I'll add it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-07T17:42:48Z
+
+Another tweak: in PhpDumper on L690:
+`$factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : "\$this->factories['%s'](false)") : '$this->%s(false)';`

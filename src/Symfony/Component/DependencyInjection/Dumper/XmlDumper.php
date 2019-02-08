@@ -227,6 +227,14 @@ class XmlDumper extends Dumper
         if (!$id->isPrivate()) {
             $service->setAttribute('public', $id->isPublic() ? 'true' : 'false');
         }
+
+        if ($id->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($id->getDeprecationMessage('%alias_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
         $parent->appendChild($service);
     }
 

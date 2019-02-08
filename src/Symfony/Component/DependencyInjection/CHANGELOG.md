@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `%env(trim:...)%` processor to trim a string value
  * added `%env(default:...)%` processor to fallback to a default value
+ * added support for deprecating aliases
 
 4.2.0
 -----

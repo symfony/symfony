@@ -164,7 +164,9 @@ class DefinitionTest extends TestCase
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
         $this->assertSame($def, $def->setDeprecated(true), '->setDeprecated() implements a fluent interface');
         $this->assertTrue($def->isDeprecated(), '->isDeprecated() returns true if the instance should not be used anymore.');
-        $this->assertSame('The "deprecated_service" service is deprecated. You should stop using it, as it will be removed in the future.', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return a formatted message template');
+
+        $def->setDeprecated(true, '%service_id%');
+        $this->assertSame('deprecated_service', $def->getDeprecationMessage('deprecated_service'), '->getDeprecationMessage() should return given formatted message template');
     }
 
     /**
@@ -184,6 +186,7 @@ class DefinitionTest extends TestCase
             "With \ns" => ["invalid \n message %service_id%"],
             'With */s' => ['invalid */ message %service_id%'],
             'message not containing require %service_id% variable' => ['this is deprecated'],
+            'template not containing require %service_id% variable' => [true],
         ];
     }
 

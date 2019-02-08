@@ -541,6 +541,10 @@ class Filesystem
         $originDir = rtrim($originDir, '/\\');
         $originDirLen = \strlen($originDir);
 
+        if (!$this->exists($originDir)) {
+            throw new IOException(sprintf('The origin directory specified "%s" was not found.', $originDir), 0, null, $originDir);
+        }
+
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
             $deleteIterator = $iterator;
@@ -564,39 +568,24 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
-        if ($this->exists($originDir)) {
-            $this->mkdir($targetDir);
-        }
+        $this->mkdir($targetDir);
+        $targetDirInfo = new \SplFileInfo($targetDir);
 
         foreach ($iterator as $file) {
-            if ($file->getPathName() === $targetDir) {
+            if ($file->getPathName() === $targetDir || $file->getRealPath() === $targetDir || 0 === strpos($file->getRealPath(), $targetDirInfo->getRealPath())) {
                 continue;
-            }
-
-            if (false === strpos($file->getPath(), $originDir)) {
-                throw new IOException(sprintf('Unable to mirror "%s" directory. If the origin directory is relative, try using "realpath" before calling the mirror method.', $originDir), 0, null, $originDir);
             }
 
             $target = $targetDir.substr($file->getPathname(), $originDirLen);
 
-            if ($copyOnWindows) {
-                if (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
-                } elseif (is_dir($file)) {
-                    $this->mkdir($target);
-                } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
-                }
+            if (!$copyOnWindows && is_link($file)) {
+                $this->symlink($file->getLinkTarget(), $target);
+            } elseif (is_dir($file)) {
+                $this->mkdir($target);
+            } elseif (is_file($file)) {
+                $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
             } else {
-                if (is_link($file)) {
-                    $this->symlink($file->getLinkTarget(), $target);
-                } elseif (is_dir($file)) {
-                    $this->mkdir($target);
-                } elseif (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
-                } else {
-                    throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
-                }
+                throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
             }
         }
     }

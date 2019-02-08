@@ -1332,46 +1332,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileNotExists($targetPath.'target');
     }
 
-    public function testMirrorWithCustomIterator()
-    {
-        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        mkdir($sourcePath);
-
-        $file = $sourcePath.\DIRECTORY_SEPARATOR.'file';
-        file_put_contents($file, 'FILE');
-
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
-
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
-
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
-
-        $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($file, $targetPath.\DIRECTORY_SEPARATOR.'file');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessageRegExp /Unable to mirror "(.*)" directory/
-     */
-    public function testMirrorWithCustomIteratorWithRelativePath()
-    {
-        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        $realSourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        mkdir($realSourcePath);
-
-        $file = $realSourcePath.'file';
-        file_put_contents($file, 'FILE');
-
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
-
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
-
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
-    }
-
     public function testMirrorAvoidCopyingTargetDirectoryIfInSourceDirectory()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
@@ -1386,15 +1346,20 @@ class FilesystemTest extends FilesystemTestCase
 
         $targetPath = $sourcePath.'target'.\DIRECTORY_SEPARATOR;
 
-        $this->filesystem->mirror($sourcePath, $targetPath);
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->filesystem->symlink($targetPath, $sourcePath.'target_simlink');
+        }
 
-        $this->assertTrue(is_dir($targetPath));
-        $this->assertTrue(is_dir($targetPath.'directory'));
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['delete' => true]);
+
+        $this->assertTrue($this->filesystem->exists($targetPath));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'));
 
         $this->assertFileEquals($file1, $targetPath.'directory'.\DIRECTORY_SEPARATOR.'file1');
         $this->assertFileEquals($file2, $targetPath.'file2');
 
-        $this->assertFileNotExists($targetPath.'target');
+        $this->assertFalse($this->filesystem->exists($targetPath.'target_simlink'));
+        $this->assertFalse($this->filesystem->exists($targetPath.'target'));
     }
 
     /**

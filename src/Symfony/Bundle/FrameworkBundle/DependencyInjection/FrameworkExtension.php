@@ -1413,6 +1413,7 @@ class FrameworkExtension extends Extension
             $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
+            $definition->addTag('property_info.constructor_extractor', ['priority' => -1001]);
         }
     }
 

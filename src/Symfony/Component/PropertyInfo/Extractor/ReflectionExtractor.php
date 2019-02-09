@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     /**
      * @internal
@@ -118,6 +118,52 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return $fromConstructor;
         }
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor($class, $property)
+    {
+        try {
+            $reflection = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+        if (!$reflectionConstructor = $reflection->getConstructor()) {
+            return null;
+        }
+        if (!$reflectionParameter = $this->getReflectionParameterFromConstructor($property, $reflectionConstructor)) {
+            return null;
+        }
+        if (!$reflectionType = $reflectionParameter->getType()) {
+            return null;
+        }
+        if (!$type = $this->extractFromReflectionType($reflectionType, $reflectionConstructor)) {
+            return null;
+        }
+
+        return [$type];
+    }
+
+    /**
+     * @param string            $property
+     * @param \ReflectionMethod $reflectionConstructor
+     *
+     * @return \ReflectionParameter|null
+     */
+    private function getReflectionParameterFromConstructor($property, \ReflectionMethod $reflectionConstructor)
+    {
+        $reflectionParameter = null;
+        foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {
+            if ($reflectionParameter->getName() === $property) {
+                return $reflectionParameter;
+            }
+        }
+
+        return null;
+    }
+
 
     /**
      * {@inheritdoc}

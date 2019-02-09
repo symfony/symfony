@@ -25,8 +25,14 @@
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor">
             <tag name="property_info.list_extractor" priority="-1000" />
             <tag name="property_info.type_extractor" priority="-1002" />
+            <tag name="property_info.constructor_extractor" priority="-1002" />
             <tag name="property_info.access_extractor" priority="-1000" />
             <tag name="property_info.initializable_extractor" priority="-1000" />
+        </service>
+
+        <service id="property_info.constructor_extractor" class="Symfony\Component\PropertyInfo\Extractor\ConstructorExtractor">
+            <argument type="collection" />
+            <tag name="property_info.type_extractor" priority="-999" />
         </service>
     </services>
 </container>

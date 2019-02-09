@@ -23,6 +23,12 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 {
     private $divisor;
 
+    /**
+     * @param int|null  $scale
+     * @param bool|null $grouping
+     * @param int|null  $roundingMode
+     * @param int|null  $divisor
+     */
     public function __construct($scale = 2, $grouping = true, $roundingMode = self::ROUND_HALF_UP, $divisor = 1)
     {
         if (null === $grouping) {
@@ -58,7 +64,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
             if (!is_numeric($value)) {
                 throw new TransformationFailedException('Expected a numeric.');
             }
-            $value = (string) ($value / $this->divisor);
+            $value /= $this->divisor;
         }
 
         return parent::transform($value);

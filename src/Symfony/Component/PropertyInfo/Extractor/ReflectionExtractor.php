@@ -119,7 +119,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -163,7 +162,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         return null;
     }
-
 
     /**
      * {@inheritdoc}

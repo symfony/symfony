@@ -40,7 +40,7 @@ interface EventSubscriberInterface
      *  * ['eventName' => ['methodName', $priority]]
      *  * ['eventName' => [['methodName1', $priority], ['methodName2']]]
      *
-     * @return array The event names to listen to
+     * @return string[]|string[][]|int[][] The event names to listen to
      */
     public static function getSubscribedEvents();
 }

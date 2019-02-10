@@ -136,6 +136,10 @@
             var row = document.createElement('tr');
             request.DOMNode = row;
 
+            var requestNumberCell = document.createElement('td');
+            requestNumberCell.textContent = index + 1;
+            row.appendChild(requestNumberCell);
+
             var profilerCell = document.createElement('td');
             profilerCell.textContent = 'n/a';
             row.appendChild(profilerCell);

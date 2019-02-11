@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -1527,6 +1528,30 @@ class Request
         }
 
         return $this->content;
+    }
+
+    /**
+     * Return request body content as json decoded.
+     *
+     * @return mixed
+     *
+     * @throws JsonException
+     */
+    public function getJsonDecoded(int $depth = 512, int $options = 0)
+    {
+        $body = $this->getContent();
+
+        if ('' === $body) {
+            throw new JsonException('Unable to parse empty request body.');
+        }
+
+        $json = json_decode($body, true, $depth, $options);
+
+        if (JSON_ERROR_NONE !== $errorCode = json_last_error()) {
+            throw new JsonException(sprintf('Unable to parse JSON: %s.', json_last_error_msg()), $errorCode);
+        }
+
+        return $json;
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -2302,6 +2303,51 @@ class RequestTest extends TestCase
         $request->headers->set('X-Forwarded-Port', 443);
 
         $this->assertSame(443, $request->getPort());
+    }
+
+    public function testGetJsonDecodedWithEmptyContent()
+    {
+        $request = Request::create('http://example.com/jsonrpc', 'POST');
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(JsonException::class);
+            $this->expectExceptionMessage('Unable to parse empty request body.');
+        } else {
+            $this->setExpectedException(JsonException::class, 'Unable to parse empty request body.');
+        }
+
+        $request->getJsonDecoded();
+    }
+
+    public function testGetJsonDecoded()
+    {
+        $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
+        $request = Request::create('http://example.com/jsonrpc', 'POST', [], [], [], [], $json);
+
+        $this->assertSame(['jsonrpc' => '2.0', 'method' => 'echo', 'id' => 7, 'params' => ['Hello World']], $request->getJsonDecoded());
+    }
+
+    public function testGetJsonDecodedWithBigNumbers()
+    {
+        $json = '{"id":123456789123456789123456789}';
+        $request = Request::create('http://example.com/jsonrpc', 'POST', [], [], [], [], $json);
+
+        $this->assertSame(['id' => '123456789123456789123456789'], $request->getJsonDecoded(512, JSON_BIGINT_AS_STRING));
+    }
+
+    public function testGetJsonDecodedWithInvalidJson()
+    {
+        $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"}';
+        $request = Request::create('http://example.com/jsonrpc', 'POST', [], [], [], [], $json);
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(JsonException::class);
+            $this->expectExceptionMessage('Unable to parse JSON: State mismatch (invalid or malformed JSON).');
+        } else {
+            $this->setExpectedException(JsonException::class, 'Unable to parse JSON: State mismatch (invalid or malformed JSON).');
+        }
+
+        $request->getJsonDecoded();
     }
 }
 

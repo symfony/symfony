@@ -41,7 +41,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     [
         ./label[@for="name"]
         /following-sibling::input[@id="name"]
-        /following-sibling::div[@class="alert alert-danger d-block"]
+        /following-sibling::div[@class="alert alert-danger"]
             [
                 ./span[@class="d-block"]
                     [
@@ -288,7 +288,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $html = $this->renderErrors($view);
 
         $this->assertMatchesXpath($html,
-'/div[@class="alert alert-danger d-block"]
+'/div[@class="alert alert-danger"]
     [
         ./span[@class="d-block"]
             [./span[.="[trans]Error 1[/trans]"]]

@@ -34,7 +34,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         /following-sibling::div[@class="col-sm-10"]
             [
                 ./input[@id="name"]
-                /following-sibling::div[@class="alert alert-danger d-block"]
+                /following-sibling::div[@class="alert alert-danger"]
                     [
                         ./span[@class="d-block"]
                             [

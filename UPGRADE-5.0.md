@@ -192,7 +192,7 @@ HttpKernel
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
  * Removed the first and second constructor argument of `ConfigDataCollector`
- * Removed `ConfigDataCollector::getApplicationName()` 
+ * Removed `ConfigDataCollector::getApplicationName()`
  * Removed `ConfigDataCollector::getApplicationVersion()`
 
 Monolog
@@ -278,6 +278,11 @@ SecurityBundle
    use Guard instead.
  * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
    use Guard instead.
+ * The names of the cookies configured in the `logout.delete_cookies` option are
+   no longer normalized. If any of your cookie names has dashes they won't be
+   changed to underscores.
+   Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
+   After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
 
 Serializer
 ----------
@@ -326,5 +331,5 @@ Workflow
 Yaml
 ----
 
- * The parser is now stricter and will throw a `ParseException` when a 
+ * The parser is now stricter and will throw a `ParseException` when a
    mapping is found inside a multi-line string.

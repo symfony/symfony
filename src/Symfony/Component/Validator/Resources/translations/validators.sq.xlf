@@ -208,7 +208,7 @@
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>Ky kolekcion duhet të përmbajë {{ limit }} ose më shumë elemente.|Ky kolekcion duhet të përmbajë {{ limit }} ose më shumë elemente.</target>
+                <target>Ky kolekcion duhet të përmbajë {{ limit }} ose më pak elemente.|Ky kolekcion duhet të përmbajë {{ limit }} ose më pak elemente.</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
@@ -221,6 +221,114 @@
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
                 <target>Lloj kartele i pambështetur ose numër kartele i pavlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="59">
+                 <source>This is not a valid International Bank Account Number (IBAN).</source>
+                 <target>Ky nuk është një numër i vlefshëm ndërkombëtar i llogarisë bankare (IBAN).</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Kjo vlerë nuk është një ISBN-10 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Kjo vlerë nuk është një ISBN-13 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Kjo vlerë nuk është as ISBN-10 e vlefshme as ISBN-13 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Kjo vlerë nuk është një ISSN e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Kjo vlerë nuk është një monedhë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e madhe se {{ compared_value }}. </target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e madhe ose e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë identike me {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më vogël se {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e vogël ose e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë nuk duhet të jetë e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Kjo vlerë nuk duhet të jetë identike me {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Raporti i imazhit është shumë i madh ({{ ratio }}). Raporti maksimal i lejuar është {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Raporti i imazhit është shumë i vogël ({{ ratio }}). Raporti minimal pritet të jetë {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>Imazhi është katror ({{ width }}x{{ height }}px). Imazhet katrore nuk janë të lejuara.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>Imazhi është i orientuar nga landscape ({{ width }}x{{ height }}px). Imazhet e orientuara nga landscape nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>Imazhi është portret i orientuar ({{ width }}x{{ height }}px). Imazhet orientuese të portretit nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Një file i zbrazët nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Probleme me Host</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Kjo vlerë nuk përputhet me karakteret {{ charset }} e pritura.</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Ky nuk është një Kod i Identifikueshëm i Biznesit (BIC).</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Gabim</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>This is not a valid UUID.</source>
+                <target>Kjo nuk është një UUID e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë një shumëfish i {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Ky Kod Identifikues i Biznesit (BIC) nuk është i lidhur me IBAN {{ iban }}.</target>
             </trans-unit>
         </body>
     </file>

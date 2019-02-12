@@ -286,6 +286,26 @@ abstract class AbstractRequestHandlerTest extends TestCase
     }
 
     /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitFileWithNamelessForm($method)
+    {
+        $form = $this->createForm('', $method, true);
+        $fileForm = $this->createBuilder('document', false, ['allow_file_upload' => true])->getForm();
+        $form->add($fileForm);
+        $file = $this->getUploadedFile();
+        $this->setRequestData($method, [
+            'document' => null,
+        ], [
+            'document' => $file,
+        ]);
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame($file, $fileForm->getData());
+    }
+
+    /**
      * @dataProvider getPostMaxSizeFixtures
      */
     public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = [])

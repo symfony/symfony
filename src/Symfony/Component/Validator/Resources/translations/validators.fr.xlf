@@ -328,7 +328,7 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Ce BIC n'est pas associé à l'IBAN {{ iban }}.</target>
+                <target>Ce code d'identification d'entreprise (BIC) n'est pas associé à l'IBAN {{ iban }}.</target>
             </trans-unit>
         </body>
     </file>

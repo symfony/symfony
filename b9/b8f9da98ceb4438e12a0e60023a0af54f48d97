@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T13:49:27Z
+
+~:-1: bad idea, this shouldn't be that contextual IMHO.~
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-05T19:21:31Z
+
+Okay, makes sense somehow. But I think we should then move the `setDefault()` call to the service definition itself to make it more discoverable how it is actually wired at runtime.

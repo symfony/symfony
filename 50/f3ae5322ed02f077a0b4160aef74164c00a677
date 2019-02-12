@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by dominikhajduk at 2019-02-12T19:37:55Z
+
+Suggestion proposed by fabbot.io is incorrect as it suggests change in Polish translation target phrase. Polish `adres` is similar to English `address` but don't contain double letters.
+
+Shouldn't translation `<target>` be excluded from this check?

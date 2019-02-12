@@ -84,6 +84,9 @@ class XmlDumper extends Dumper
             if (\count($methodcall[1])) {
                 $this->convertParameters($methodcall[1], 'argument', $call);
             }
+            if ($methodcall[2] ?? false) {
+                $call->setAttribute('returns-clone', 'true');
+            }
             $parent->appendChild($call);
         }
     }

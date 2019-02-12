@@ -463,15 +463,17 @@ class YamlFileLoader extends FileLoader
                 if (isset($call['method'])) {
                     $method = $call['method'];
                     $args = isset($call['arguments']) ? $this->resolveServices($call['arguments'], $file) : [];
+                    $returnsClone = $call['returns_clone'] ?? false;
                 } else {
                     $method = $call[0];
                     $args = isset($call[1]) ? $this->resolveServices($call[1], $file) : [];
+                    $returnsClone = $call[2] ?? false;
                 }
 
                 if (!\is_array($args)) {
                     throw new InvalidArgumentException(sprintf('The second parameter for function call "%s" must be an array of its arguments for service "%s" in %s. Check your YAML syntax.', $method, $id, $file));
                 }
-                $definition->addMethodCall($method, $args);
+                $definition->addMethodCall($method, $args, $returnsClone);
             }
         }
 

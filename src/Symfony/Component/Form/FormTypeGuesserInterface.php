@@ -32,7 +32,7 @@ interface FormTypeGuesserInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      *
-     * @return Guess\ValueGuess A guess for the field's required setting
+     * @return Guess\ValueGuess|null A guess for the field's required setting
      */
     public function guessRequired($class, $property);
 

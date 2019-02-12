@@ -7,6 +7,10 @@
     <services>
         <defaults public="false" />
 
-        <service id="mime_types" class="Symfony\Component\Mime\MimeTypes" public="true" />
+        <service id="mime_types" class="Symfony\Component\Mime\MimeTypes">
+            <call method="setDefault">
+                <argument type="service" id="mime_types" />
+            </call>
+        </service>
     </services>
 </container>

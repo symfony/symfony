@@ -73,11 +73,6 @@ class FrameworkBundle extends Bundle
         if ($trustedHosts = $this->container->getParameter('kernel.trusted_hosts')) {
             Request::setTrustedHosts($trustedHosts);
         }
-
-        if ($this->container->has('mime_types')) {
-            $mt = $this->container->get('mime_types');
-            $mt->setDefault($mt);
-        }
     }
 
     public function build(ContainerBuilder $container)

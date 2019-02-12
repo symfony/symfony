@@ -267,6 +267,17 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($replacedToken, $this->tokenStorage->getToken());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     */
+    public function testSwitchtUserThrowsAuthenticationExceptionIfNoCurrentToken()
+    {
+        $this->tokenStorage->setToken(null);
+        $this->request->query->set('_switch_user', 'username');
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener->handle($this->event);
+    }
+
     public function testSwitchUserStateless()
     {
         $token = new UsernamePasswordToken('username', '', 'key', ['ROLE_FOO']);

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by JellyBellyDev at 2019-02-12T18:09:32Z
+
+Why the fabpot.io checker is not passed?
+Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-02-12T19:38:29Z
+
+@JellyBellyDev it's a fabbot.io error. It tries to solve common typos ... and it thinks that `possibile` is an English word wrongly spelled ... and suggests to change it to `possible`. The real problem is that fabbot.io doesn't realize that this isn't English, so there's no error. You can ignore it. Thanks!

@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by zairigimad at 2018-09-16T15:36:21Z
+
+Hi @onEXHovia ,  @apfelbox ,
+I've just resolved @onEXHovia discussion and i can't see your discussion @apfelbox ,
+Sorry i did an --amed.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-09-16T15:51:25Z
+
+Look here: https://github.com/symfony/symfony/pull/28477#discussion_r217917380
+
+Can you see it with this link?
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2018-09-16T22:13:12Z
+
+For the early exit, see:
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraints/BicValidator.php#L29-L31
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraints/CountryValidator.php#L35-L37
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraints/CurrencyValidator.php#L36-L38
+
+(and the other validators)
+You need this check, as your validator should only check something, if the value is not empty. Because currently you can't implement an optional field, that has to be valid JSON *if it is filled*. Currently it has to be filled and be valid JSON.
+
+But for the "it has to be filled part" you should use `NotBlank` or `NotNull`. That's why your validator should bail if the field is just empty.
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2018-09-21T13:08:43Z
+
+Thank you guys for your valuable reviews for my first PR! This is very exciting 🎉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-03T18:05:40Z
+
+Sorry to come late here, but what's the purpose of a JSON validator?
+This forces a double decoding of the JSON payload, since I suppose there will be another place that will have to get its decoded value. This other place will also expect some format for the decoded JSON, so that this should be the place where the validation should happen really. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-04T06:39:37Z
+
+I've at least added this once in a project, to validate (for the backend) arbitrary JSON sent by DraftJS. No decoding, just accepting json strings.
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2018-10-04T07:48:05Z
+
+Hi, we used to validate a lot of normal string inputs filled by contributors to see if valid JSON or not before saving them to the database. ( Application that provides configs as JSON used by other applications ). I'm not sure if it was the best way to provide configs but it was something like Cloudformation.
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/images/designer-jsoneditor.png
+
+---------------------------------------------------------------------------
+
+by zairigimad at 2019-02-02T17:32:35Z
+
+@chalasr rebase done :)

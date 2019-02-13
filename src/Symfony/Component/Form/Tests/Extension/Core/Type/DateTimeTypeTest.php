@@ -491,6 +491,18 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
+    public function testSingleTextWidgetWithCustomNonHtml5Format()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateTime('2019-02-13 19:12:13'), [
+            'widget' => 'single_text',
+            'date_format' => \IntlDateFormatter::SHORT,
+            'format' => null,
+        ]);
+        $view = $form->createView();
+
+        $this->assertSame('2/13/19, 7:12:13 PM', $view->vars['value']);
+    }
+
     public function testDateTypeChoiceErrorsBubbleUp()
     {
         $error = new FormError('Invalid!');

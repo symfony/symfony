@@ -324,11 +324,11 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>این مقدار باید چند برابر {{ compared_value }} باشد</target>
+                <target>این مقدار باید چند برابر {{ compared_value }} باشد.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>این BIC با IBAN ارتباط ندارد</target>
+                <target>این BIC با IBAN ارتباط ندارد.</target>
             </trans-unit>
         </body>
     </file>

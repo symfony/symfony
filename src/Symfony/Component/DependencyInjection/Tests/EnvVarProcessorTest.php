@@ -433,4 +433,29 @@ class EnvVarProcessorTest extends TestCase
             ];
         }));
     }
+
+    /**
+     * @dataProvider validNullables
+     */
+    public function testGetEnvNullable($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+        $result = $processor->getEnv('nullable', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+        $this->assertSame($processed, $result);
+    }
+
+    public function validNullables()
+    {
+        return [
+            ['hello', 'hello'],
+            ['', null],
+            ['null', 'null'],
+            ['Null', 'Null'],
+            ['NULL', 'NULL'],
+         ];
+    }
 }

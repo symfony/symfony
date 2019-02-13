@@ -1059,8 +1059,14 @@ class FrameworkExtension extends Extension
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
             }
         }
-        $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
-        $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
+
+        if ($container->hasDefinition('console.command.translation_debug')) {
+            $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
+        }
+
+        if ($container->hasDefinition('console.command.translation_update')) {
+            $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
+        }
 
         if ($container->fileExists($defaultDir)) {
             $dirs[] = $defaultDir;

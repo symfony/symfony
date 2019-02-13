@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -313,6 +314,17 @@ class XmlFileLoaderTest extends TestCase
                 $this->assertArrayNotHasKey('an_other_option', $attributes, 'normalization should not be done when an underscore is already found');
             }
         }
+    }
+
+    public function testParseTaggedArgumentsWithIndexBy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_tagged_arguments.xml');
+
+        $this->assertCount(1, $container->getDefinition('foo')->getTag('foo_tag'));
+        $this->assertCount(1, $container->getDefinition('foo_tagged_iterator')->getArguments());
+        $this->assertEquals(new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar'), $container->getDefinition('foo_tagged_iterator')->getArgument(0));
     }
 
     /**

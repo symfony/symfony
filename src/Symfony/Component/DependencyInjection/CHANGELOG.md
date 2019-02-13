@@ -9,6 +9,7 @@ CHANGELOG
  * added `%env(nullable:...)%` processor to allow empty variables to be processed as null values
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore
+ * added ability to define an index for a tagged collection
 
 4.2.0
 -----

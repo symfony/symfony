@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -277,6 +278,17 @@ class YamlFileLoaderTest extends TestCase
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
             $this->assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
+    }
+
+    public function testTaggedArgumentsWithIndex()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_tagged_argument.yml');
+
+        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged')->getArguments());
+        $this->assertEquals(new TaggedIteratorArgument('foo', 'barfoo', 'foobar'), $container->getDefinition('foo_service_tagged')->getArgument(0));
     }
 
     public function testNameOnlyTagsAreAllowedAsString()

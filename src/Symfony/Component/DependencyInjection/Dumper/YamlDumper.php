@@ -233,6 +233,19 @@ class YamlDumper extends Dumper
         }
         if ($value instanceof ArgumentInterface) {
             if ($value instanceof TaggedIteratorArgument) {
+                if (null !== $value->getIndexAttribute()) {
+                    $taggedValueContent = [
+                        'tag' => $value->getTag(),
+                        'index_by' => $value->getIndexAttribute(),
+                    ];
+
+                    if (null !== $value->getDefaultIndexMethod()) {
+                        $taggedValueContent['default_index_method'] = $value->getDefaultIndexMethod();
+                    }
+
+                    return new TaggedValue('tagged', $taggedValueContent);
+                }
+
                 return new TaggedValue('tagged', $value->getTag());
             }
             if ($value instanceof IteratorArgument) {

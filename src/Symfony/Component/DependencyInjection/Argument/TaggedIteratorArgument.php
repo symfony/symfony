@@ -22,14 +22,21 @@ class TaggedIteratorArgument extends IteratorArgument
     private $indexAttribute;
     private $defaultIndexMethod;
 
+    /**
+     * TaggedIteratorArgument constructor.
+     *
+     * @param string      $tag                The name of the tag identifying the target services
+     * @param string|null $indexAttribute     The name of the attribute that defines the key referencing each service in the tagged collection
+     * @param string|null $defaultIndexMethod The static method that should be called to get each service's key when their tag doesn't define the previous attribute
+     */
     public function __construct(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null)
     {
         parent::__construct([]);
 
         $this->tag = $tag;
-        $this->indexAttribute = $indexAttribute ?: null;
 
         if ($indexAttribute) {
+            $this->indexAttribute = $indexAttribute;
             $this->defaultIndexMethod = $defaultIndexMethod ?: ('getDefault'.str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $indexAttribute))).'Name');
         }
     }

@@ -286,6 +286,14 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof TaggedIteratorArgument) {
                 $element->setAttribute('type', 'tagged');
                 $element->setAttribute('tag', $value->getTag());
+
+                if (null !== $value->getIndexAttribute()) {
+                    $element->setAttribute('index-by', $value->getIndexAttribute());
+                }
+
+                if (null !== $value->getDefaultIndexMethod()) {
+                    $element->setAttribute('default-index-method', $value->getDefaultIndexMethod());
+                }
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
@@ -198,6 +199,19 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_dump_load.xml', $dumper->dump());
+    }
+
+    public function testTaggedArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')->addTag('foo_tag');
+        $container->register('foo_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar'))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_arguments.xml', $dumper->dump());
     }
 
     public function testDumpAbstractServices()

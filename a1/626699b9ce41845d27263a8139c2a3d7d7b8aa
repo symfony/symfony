@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2019-02-12T21:38:59Z
+
+The fabbot.io error should be ignored .. can we make the common typos checker smarter to not check for english spelling errors within non english translation files?

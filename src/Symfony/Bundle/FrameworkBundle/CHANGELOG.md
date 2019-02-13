@@ -15,6 +15,7 @@ CHANGELOG
  * Added information about deprecated aliases in `debug:autowiring` 
  * Added php ini session options `sid_length` and `sid_bits_per_character` 
    to the `session` section of the configuration
+ * Added support for Translator paths, Twig paths in translation commands.
 
 4.2.0
 -----

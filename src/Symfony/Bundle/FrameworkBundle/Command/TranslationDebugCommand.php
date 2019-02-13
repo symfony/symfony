@@ -50,11 +50,13 @@ class TranslationDebugCommand extends Command
     private $extractor;
     private $defaultTransPath;
     private $defaultViewsPath;
+    private $transPaths;
+    private $viewsPaths;
 
     /**
      * @param TranslatorInterface $translator
      */
-    public function __construct($translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null)
+    public function __construct($translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $viewsPaths = [])
     {
         if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
             throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
@@ -66,6 +68,8 @@ class TranslationDebugCommand extends Command
         $this->extractor = $extractor;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+        $this->transPaths = $transPaths;
+        $this->viewsPaths = $viewsPaths;
     }
 
     /**
@@ -131,7 +135,7 @@ EOF
         $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = [];
+        $transPaths = $this->transPaths;
         if (is_dir($dir = $rootDir.'/Resources/translations')) {
             if ($dir !== $this->defaultTransPath) {
                 $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
@@ -142,7 +146,7 @@ EOF
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = [];
+        $viewsPaths = $this->viewsPaths;
         if (is_dir($dir = $rootDir.'/Resources/views')) {
             if ($dir !== $this->defaultViewsPath) {
                 $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);

@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-29T08:31:33Z
+
+> Travis-ci isn't green because it tests the components separately
+
+that's the point of the PR, ensuring components are still compatible with each others versions listed in composer.json files. This should be fixed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-29T10:25:05Z
+
+At some point i'd really like to see a `Translation` VO :) this applies to at least `choice` labels as well.
+
+A single value could simplify things a lot:
+
+```php
+'label' => 'text',
+'other_label' => new Translation('text', 'domain', ['param' => 'value'], 'nl_NL'),
+'other_other_label' => new IdentityTranslation('text'),
+```
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2018-10-01T08:44:47Z
+
+@nicolas-grekas, travis CI is actually green when `deps` option is not specified. In this case I assume the components changed by this PR are tested together and this test is passed successfully.
+
+On the other hand with `deps=high` composer installs `symfony/form (4.2.x-dev)` while with `deps=low` it uses `symfony/form (v4.1.0)`. Correct me if I am wrong but integrity tests of different versions of components (`Form`, `FrameworkBudle`, `DoctineBridge`, `TwigBridge`) cannot pass and it is normal.
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2018-10-01T08:51:09Z
+
+Hi @ro0NL. There is always a way to acheive desired result in Symfony, that's why we love it :)
+In your example we need to get current locale which is not convenient IMO:
+
+```php
+'other_label' => new Translation('text', 'domain', ['param' => 'value'], $request->getLocale()),
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-01T09:01:38Z
+
+Those would be all nullable (except $text), as its purpose would be to override defaults
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-01T09:34:22Z
+
+@webnet-fr Those tests ensure that Symfony 4.1 components will work with dependencies in version 4.2. This is a bit hard for the form theme tests though as they almost do 1:1 comparisons of the generated HTML. We also struggle with that in #27043 for example. So we need to look how we can relax assertions in 4.1 a bit to reduce the pain here.
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2018-10-04T11:36:33Z
+
+@xabbuh I moved `help_translation_parameters` to `FormType`. Anyway personally I'd prefer #27775.
+
+Yes, I completely agree that form tests are tricky especially when tesing transverse changes.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-12-10T15:18:39Z
+
+Well even if I'm sure of my review, I'm less sure @carsonbot should listen to me. :wink:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-08T10:21:55Z
+
+The `deps=high` job will pass once the PR is merged.
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2019-02-10T21:43:26Z
+
+@xabbuh I've updated changelog.
+
+I will correct documentation PR shortly.
+
+---------------------------------------------------------------------------
+
+by webnet-fr at 2019-02-12T16:10:02Z
+
+Documentation is updted. https://github.com/symfony/symfony-docs/pull/10065

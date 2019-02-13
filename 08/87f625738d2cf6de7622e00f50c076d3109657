@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-07T07:44:09Z
+
+I'm not sure, but can that break anything? Like compiler passes that add the tag? Aren't all compiler passes that use `hasDefinition` "affected" btw - ie decorating their target service breaks them? In which case, shouldn't the solution be inside the pass itself/themselves - eg using has/findDefinition?
+
+Sorry that's a lot of questions, but I'm always suspicious with these kind of changes :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-07T08:43:52Z
+
+> Like compiler passes that add the tag?
+
+That's for sure possible. That would have to be solved by running custom compiler passes with a higher priority. I am afraid there is not much we can do otherwise if we want to solve the linked issue.
+
+> Aren't all compiler passes that use `hasDefinition` "affected" btw - ie decorating their target service breaks them? In which case, shouldn't the solution be inside the pass itself/themselves - eg using has/findDefinition?
+
+That was my initial solution for this (see #24223), but in fact that's not the issue we need to solve here (while I still think we could possibly improve existing compiler passes in such a way).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-07T08:46:33Z
+
+So, this issue can happen with any pass, isn't it?
+I'm not sure that potentially breaking fine working apps to support a new use case is legit.
+What alternatives do we have? Marking this as unsupported would be fine to me also if there is none.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-07T08:54:23Z
+
+Not really, because all (if I didn't miss any) our other compiler passes dealing with tags are already registered at the before optimization stage so decorating them works just fine.
+
+IMO this is not a new use case. Decorating used to work fine in the past until we accidentally broke that by moving the compiler pass.

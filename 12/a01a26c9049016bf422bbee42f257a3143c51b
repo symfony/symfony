@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-01-03T21:00:16Z
+
+Related tickets: #22151 #28618 #25129 #20434
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-01-03T21:08:55Z
+
+Appveyor randomly fails on `Symfony\Component\Process\Tests\ProcessTest::testWaitUntilSpecificOutput` though this PR isn't related to this :confused:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-01-03T21:13:18Z
+
+You can have a look here: https://github.com/symfony/symfony/issues/29760
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-01-03T21:27:10Z
+
+Reworded commit message and force pushed, everything's fine now :tada:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T14:52:48Z
+
+please rebase
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-01-28T13:58:41Z
+
+@nicolas-grekas Done.
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-01-30T13:43:41Z
+
+Sure.

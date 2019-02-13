@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2018-11-07T20:36:55Z
+
+**Update:** Extracting translation messages from services (e.g. controllers and other PHP files) that have the translator injected into them by using the following service injection methods: (properties, bindings, construct arguments and method calls).
+
+BUT they're other methods that I can't to reach (e.g. the service locator related to: services subscriber and controller service arguments) I need help to accomplish it, maybe @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-11-16T18:40:10Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-11-19T18:47:09Z
+
+Ready for next round :)
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-01-04T00:26:58Z
+
+The next move will be create some functional test (if possible) and a demo project.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-01-14T01:43:29Z
+
+Should I solve here all fabbot issues related to use short array?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-14T07:43:52Z
+
+yes, please fix fabbot issues or your PR will conflict soon.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-01-17T16:35:43Z
+
+Hellou! demo project ready! https://github.com/yceruto/new_trans_paths (read README for instructions) and see diff here https://github.com/yceruto/new_trans_paths/commit/60d7f8cfb59e207e077052a9cdade7d9e1741973,
+
+The new feature is increasing the reliability of the `debug:translation` and `translation:update` commands, check it out!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-01-24T23:00:44Z
+
+Yay! funcional tests passed!
+
+@nicolas-grekas this is ready on my side, how does it look for you?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-01-31T14:39:14Z
+
+Friendly ping.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-06T14:53:10Z
+
+Maybe I should split this PR into two for an easier review? I mean, move the last point that contains a little more complexity:
+> * All PHP files from services "`translator` aware" via constructor argument, public property, method calls, service subscriber, controller argument)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-08T14:45:45Z
+
+@yceruto I think that could be helpful
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-08T16:15:49Z
+
+@xabbuh working on it, thanks for your reply.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-08T17:48:36Z
+
+**Update:** I've divided the complexity of this PR as I mentioned earlier, see the updated description.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-08T19:06:45Z
+
+Done https://github.com/symfony/symfony/pull/30120.

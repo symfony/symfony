@@ -182,15 +182,15 @@ class AppVariable
     }
 
     /**
-     * Return a environment variable (defined in .env for example)
+     * Return a environment variable (defined in .env for example).
      *
      * If the $name is null or empty, null is returned.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getEnv($name = null)
     {
-        if (\is_null($name) || '' === $name) {
+        if (null === $name || '' === $name) {
             return null;
         }
 
@@ -200,6 +200,6 @@ class AppVariable
             return null;
         }
 
-        return ! \is_null($request) ? $request->server->get($name) : null;
+        return null !== $request ? $request->server->get($name) : null;
     }
 }

@@ -233,6 +233,11 @@ class AppVariableTest extends TestCase
         );
     }
 
+    public function testGetEnv(): void
+    {
+        // To define
+    }
+
     protected function setRequestStack($request)
     {
         $requestStackMock = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();

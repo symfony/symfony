@@ -180,4 +180,20 @@ class AppVariable
 
         return $result;
     }
+
+    /**
+     * Return a environment variable (defined in .env for example)
+     *
+     * If the $name is null or empty, null is returned.
+     *
+     * @return null|string
+     */
+    public function getEnv($name = null)
+    {
+        if (\is_null($name) || '' === $name) {
+            return null;
+        }
+
+        return $this->getRequest()->server->get($name);
+    }
 }

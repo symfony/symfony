@@ -119,6 +119,102 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
+    public function testPassLabelTranslationParametersToView()
+    {
+        $view = $this->factory->create($this->getTestedType(), null, [
+            'label_translation_parameters' => ['%param%' => 'value'],
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['label_translation_parameters']);
+    }
+
+    public function testPassAttrTranslationParametersToView()
+    {
+        $view = $this->factory->create($this->getTestedType(), null, [
+            'attr_translation_parameters' => ['%param%' => 'value'],
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['attr_translation_parameters']);
+    }
+
+    public function testInheritLabelTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'label_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testInheritAttrTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'attr_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['attr_translation_parameters']);
+    }
+
+    public function testPreferOwnLabelTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'label_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', $this->getTestedType(), [
+                'label_translation_parameters' => ['%override_param%' => 'child_value'],
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testPreferOwnAttrTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'attr_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', $this->getTestedType(), [
+                'attr_translation_parameters' => ['%override_param%' => 'child_value'],
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['attr_translation_parameters']);
+    }
+
+    public function testDefaultLabelTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testDefaultAttrTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['attr_translation_parameters']);
+    }
+
     public function testPassLabelToView()
     {
         $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, ['label' => 'My label'])

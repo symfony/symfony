@@ -1366,6 +1366,180 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
+    public function testPassLabelTranslationParametersToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'label_translation_parameters' => ['%param%' => 'value'],
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['label_translation_parameters']);
+    }
+
+    public function testPassHelpTranslationParametersToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'help_translation_parameters' => ['%param%' => 'value'],
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['help_translation_parameters']);
+    }
+
+    public function testPassAttrTranslationParametersToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'attr_translation_parameters' => ['%param%' => 'value'],
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['attr_translation_parameters']);
+    }
+
+    public function testInheritLabelTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'label_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testInheritHelpTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'help_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testInheritAttrTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'attr_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['attr_translation_parameters']);
+    }
+
+    public function testPreferOwnLabelTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'label_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'label_translation_parameters' => ['%override_param%' => 'child_value'],
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testPreferOwnHelpTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'help_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'help_translation_parameters' => ['%override_param%' => 'child_value'],
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testPreferOwnAttrTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
+                'attr_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', static::TESTED_TYPE, [
+                'attr_translation_parameters' => ['%override_param%' => 'child_value'],
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['attr_translation_parameters']);
+    }
+
+    public function testDefaultLabelTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testDefaultHelpTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testDefaultAttrTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
+            ->add('child', static::TESTED_TYPE, [
+                'em' => 'default',
+                'class' => self::SINGLE_IDENT_CLASS,
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['attr_translation_parameters']);
+    }
+
     public function testPassLabelToView()
     {
         $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, [

@@ -44,6 +44,8 @@ abstract class BaseType extends AbstractType
         $name = $form->getName();
         $blockName = $options['block_name'] ?: $form->getName();
         $translationDomain = $options['translation_domain'];
+        $labelTranslationParameters = $options['label_translation_parameters'];
+        $attrTranslationParameters = $options['attr_translation_parameters'];
         $labelFormat = $options['label_format'];
 
         if ($view->parent) {
@@ -60,6 +62,9 @@ abstract class BaseType extends AbstractType
             if (null === $translationDomain) {
                 $translationDomain = $view->parent->vars['translation_domain'];
             }
+
+            $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
+            $attrTranslationParameters = array_merge($view->parent->vars['attr_translation_parameters'], $attrTranslationParameters);
 
             if (!$labelFormat) {
                 $labelFormat = $view->parent->vars['label_format'];
@@ -97,6 +102,8 @@ abstract class BaseType extends AbstractType
             'block_prefixes' => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
             'translation_domain' => $translationDomain,
+            'label_translation_parameters' => $labelTranslationParameters,
+            'attr_translation_parameters' => $attrTranslationParameters,
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
@@ -118,6 +125,8 @@ abstract class BaseType extends AbstractType
             'disabled' => false,
             'label' => null,
             'label_format' => null,
+            'label_translation_parameters' => [],
+            'attr_translation_parameters' => [],
             'attr' => [],
             'translation_domain' => null,
             'auto_initialize' => true,

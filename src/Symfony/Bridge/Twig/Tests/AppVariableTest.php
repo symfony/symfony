@@ -233,9 +233,25 @@ class AppVariableTest extends TestCase
         );
     }
 
-    public function testGetEnv(): void
+    public function testGetEnvWithoutValidKey(): void
     {
-        // To define
+        $request = new Request();
+        $requestStack = $this->setRequestStack($request);
+
+        $this->appVariable->setRequestStack($requestStack);
+
+        $this->assertNull($this->appVariable->getEnv(''));
+    }
+
+    public function testGetEnvWithValidKey(): void
+    {
+        $request = new Request();
+        $request->server->set('this-key-exist', 'this-value-exist');
+        $requestStack = $this->setRequestStack($request);
+
+        $this->appVariable->setRequestStack($requestStack);
+
+        $this->assertNotNull($this->appVariable->getEnv('this-key-exist'));
     }
 
     protected function setRequestStack($request)

@@ -194,6 +194,12 @@ class AppVariable
             return null;
         }
 
-        return $this->getRequest()->server->get($name);
+        try {
+            $request = $this->getRequest();
+        } catch (\RuntimeException $exception) {
+            return null;
+        }
+
+        return ! \is_null($request) ? $request->server->get($name) : null;
     }
 }

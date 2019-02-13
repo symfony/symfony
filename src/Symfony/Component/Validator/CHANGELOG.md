@@ -7,7 +7,8 @@ CHANGELOG
  * added options `iban` and `ibanPropertyPath` to Bic constraint
  * added UATP cards support to `CardSchemeValidator`
  * added option `allowNull` to NotBlank constraint
-
+ * added `Json` constraint
+ 
 4.2.0
 -----
 

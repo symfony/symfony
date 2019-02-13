@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-11T08:09:45Z
+
+it's a BC break no? also ref https://github.com/symfony/symfony/pull/19492#issuecomment-236418002
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-11T08:14:39Z
+
+Why would that be a BC break?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-11T08:16:27Z
+
+Taking into account https://github.com/symfony/symfony/pull/19492#issuecomment-236418002 we could of course think about adding a Twig function instead if we do not want to add this method to the `FormView` class.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-11T08:18:21Z
+
+the order changes right? before a child named parent might be returned first, whereas now it's always the parent form
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-11T08:28:15Z
+
+alternatively, getting rid of arrayaccess in formview would also do it towards consistent accessors in php as well as twig, but that's a bigger step :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-11T08:31:01Z
+
+If you refer to `form.parent`, this still returns the child form as Twig considers `ArrayAccess` methods before looking at actually implemented methods. And `form.getParent()` just is not usable without this change.
+
+> alternatively, getting rid of arrayaccess in formview would also do it towards consistent accessors in php as well as twig, but that's a bigger step :)
+
+I don't think that's a good idea DX wise. Being able to use `form.child_name` is quite convenient.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-10-11T15:52:56Z
+
+@xabbuh could we deprecating `twig_is_root_form()` test func then? I guess it wouldn't useful anymore, replacing it by `{% form.getParent() is null %}`.
+
+---
+
+In the other hand, I think the solution should be done in Twig context, because having a getter for a public property seems odd.
+
+What about adding a new Twig function for access to the `FormView` public properties? Something like this:
+```php
+public function getPropertyValue($object, string $propertyName)
+{
+        return $object->$propertyName;
+}
+```
+for cases where the public property matches the name of the child form (`ArrayAccess` ambiguity in Twig context):
+```twig
+{# $formView->parent #}
+{% if property_value(form, 'parent') is null %}
+
+{# $formView->vars #}
+{% if property_value(form, 'vars').attr.class is defined %}
+```
+even, other `ArrayAccess` objects (in userland) with a composition similar to `FormView` can benefit from it, too.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-31T07:12:26Z
+
+I have rewritten this solution to add a new `parent_form()` Twig function instead. I would not deprecate the filter for now. Both the filter and the new function serve their own use cases.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:39:01Z
+
+@xabbuh please, create an issue in Symfony Docs to not forget about this. Also, please add some usage examples and if this improves an existing feature add a before/after example. Finally, please check if this fixes something that the current docs say it's not possible to do or buggy. Thanks!

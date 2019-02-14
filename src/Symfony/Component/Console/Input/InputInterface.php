@@ -54,10 +54,11 @@ interface InputInterface
      * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
      * @param mixed        $default    The default value to return if no result is found
      * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
+     * @param bool         $consume    If true, the corresponding parameter will be removed from the instance
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false);
+    public function getParameterOption($values, $default = false, $onlyParams = false, $consume = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.

@@ -7,6 +7,7 @@ CHANGELOG
  * added `CompiledUrlMatcher` and `CompiledUrlMatcherDumper`
  * added `CompiledUrlGenerator` and `CompiledUrlGeneratorDumper`
  * deprecated `PhpGeneratorDumper` and `PhpMatcherDumper`
+ * deprecated `generator_base_class`, `generator_cache_class`, `matcher_base_class` and `matcher_cache_class` router options
 
 4.2.0
 -----

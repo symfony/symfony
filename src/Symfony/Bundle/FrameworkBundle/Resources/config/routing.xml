@@ -60,13 +60,9 @@
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
                 <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
-                <argument key="generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</argument>
                 <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
-                <argument key="generator_cache_class">%router.cache_class_prefix%UrlGenerator</argument>
                 <argument key="matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableCompiledUrlMatcher</argument>
-                <argument key="matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</argument>
                 <argument key="matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper</argument>
-                <argument key="matcher_cache_class">%router.cache_class_prefix%UrlMatcher</argument>
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="parameter_bag" on-invalid="ignore" />

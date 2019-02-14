@@ -75,7 +75,7 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false, $consume = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false)
     {
         $values = (array) $values;
 

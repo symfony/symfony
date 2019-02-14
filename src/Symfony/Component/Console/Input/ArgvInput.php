@@ -294,7 +294,7 @@ class ArgvInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false, $consume = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false /*, $consume = false */)
     {
         $values = (array) $values;
         $tokens = $this->tokens;
@@ -306,7 +306,9 @@ class ArgvInput extends Input
             }
 
             foreach ($values as $k => $value) {
-                if ($consume) {
+                $consumed = count(func_get_args()) === 4 ? func_get_arg(3) : false;
+
+                if ($consumed) {
                     array_splice($values, $k);
                 }
 

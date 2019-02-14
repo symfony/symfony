@@ -6,7 +6,7 @@ CHANGELOG
 
  * added `CompiledUrlMatcher` and `CompiledUrlMatcherDumper`
  * added `CompiledUrlGenerator` and `CompiledUrlGeneratorDumper`
- * deprecated `PhpUrlGeneratorDumped` and `PhpMatcherDumper`
+ * deprecated `PhpGeneratorDumper` and `PhpMatcherDumper`
 
 4.2.0
 -----

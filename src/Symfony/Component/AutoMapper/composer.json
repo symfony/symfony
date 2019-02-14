@@ -1,0 +1,44 @@
+{
+    "name": "symfony/auto-mapper",
+    "type": "library",
+    "description": "Symfony AutoMapper Component",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joel Wurtz",
+            "email": "jwurtz@jolicode.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "nikic/php-parser": "^4.0",
+        "symfony/property-info": "~3.4|~4.0"
+    },
+    "require-dev": {
+        "symfony/serializer": "^4.2"
+    },
+    "suggest": {
+        "symfony/serializer": "Allow to bridge mappers to normalizer and denormalizer"
+    },
+    "conflict": {
+        "symfony/serializer": "<4.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\AutoMapper\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.3-dev"
+        }
+    }
+}

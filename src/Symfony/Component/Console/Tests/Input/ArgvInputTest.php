@@ -467,11 +467,11 @@ class ArgvInputTest extends TestCase
 
     public function provideParameterToConsume()
     {
-        return array(
-            array(array('app/console', '', '-e', 'dev'), '-e', false, true, ''),
-            array(array('app/console', '', '-e', 'dev'), '-e', false, false, 'dev'),
-            array(array('app/console', '', '-e', 'test'), '-e', false, true, ''),
-            array(array('app/console', '', '-e', 'test'), '-e', false, false, 'test'),
-        );
+        return [
+            [['app/console', '', '-e', 'dev'], '-e', false, true, ''],
+            [['app/console', '', '-e', 'dev'], '-e', false, false, 'dev'],
+            [['app/console', '', '-e', 'test'], '-e', false, true, ''],
+            [['app/console', '', '-e', 'test'], '-e', false, false, 'test'],
+        ];
     }
 }

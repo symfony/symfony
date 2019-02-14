@@ -458,8 +458,6 @@ class ArgvInputTest extends TestCase
 
     /**
      * @dataProvider provideParameterToConsume
-     *
-     * @group argv
      */
     public function testParameterIsConsumed($argv, $key, $onlyParams, $consumed, $expected)
     {
@@ -470,16 +468,10 @@ class ArgvInputTest extends TestCase
     public function provideParameterToConsume()
     {
         return array(
-            array(array('app/console', '', '-e', 'dev'), '-e', false, false, ''),
-            array(array('app/console', '', '--env=dev'), '--env', false, false, ''),
-            array(array('app/console', '', '-e', 'dev'), array('-e', '--env'), false, false, ''),
-            array(array('app/console', '', '--env=dev'), array('-e', '--env'), false, false, ''),
-            array(array('app/console', '', '--env=dev', '--en=1'), array('--en'), false, false, ''),
-            array(array('app/console', '', '--env=dev', '', '--en=1'), array('--en'), false, true, ''),
-            array(array('app/console', '', '--env', 'val'), '--env', false, false, ''),
-            array(array('app/console', '', '--env', 'val', '--dummy'), '--env', false, true, ''),
-            array(array('app/console', '', '--', '--env=dev'), '--env', false, false, ''),
-            array(array('app/console', '', '--', '--env=dev'), '--env', true, true, false, ''),
+            array(array('app/console', '', '-e', 'dev'), '-e', false, true, ''),
+            array(array('app/console', '', '-e', 'dev'), '-e', false, false, 'dev'),
+            array(array('app/console', '', '-e', 'test'), '-e', false, true, ''),
+            array(array('app/console', '', '-e', 'test'), '-e', false, false, 'test'),
         );
     }
 }

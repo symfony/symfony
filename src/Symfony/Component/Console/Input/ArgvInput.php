@@ -306,7 +306,7 @@ class ArgvInput extends Input
             }
 
             foreach ($values as $k => $value) {
-                $consumed = 4 === count(func_get_args()) ? func_get_arg(3) : false;
+                $consumed = 4 === \count(func_get_args()) ? func_get_arg(3) : false;
 
                 if ($consumed) {
                     array_splice($values, $k);

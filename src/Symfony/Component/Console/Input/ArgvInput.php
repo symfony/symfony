@@ -305,9 +305,9 @@ class ArgvInput extends Input
                 return $default;
             }
 
-            foreach ($values as $value) {
+            foreach ($values as $k => $value) {
                 if ($consume) {
-                    array_splice($values, array_search($value, $values, true));
+                    array_splice($values, $k);
                 }
 
                 if ($token === $value) {

@@ -458,8 +458,6 @@ class ArgvInputTest extends TestCase
 
     /**
      * @dataProvider provideParameterToConsume
-     *
-     * @group arg
      */
     public function testParameterIsConsumed($argv, $key, $onlyParams, $consumed, $expected)
     {

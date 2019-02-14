@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\AutoMapper;
 
+use Symfony\Component\AutoMapper\Exception\CircularReferenceException;
+
 /**
  * Context for mapping.
  *
@@ -47,6 +49,8 @@ class Context extends \ArrayObject
      */
     public function __construct(array $groups = null, array $attributes = null, array $ignoredAttributes = null)
     {
+        parent::__construct();
+
         $this->groups = $groups;
         $this->depth = 0;
         $this->attributes = $attributes;

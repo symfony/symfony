@@ -306,7 +306,6 @@ class ArgvInput extends Input
             }
 
             foreach ($values as $value) {
-
                 if ($consume) {
                     array_splice($values, array_search($value, $values, true));
                 }

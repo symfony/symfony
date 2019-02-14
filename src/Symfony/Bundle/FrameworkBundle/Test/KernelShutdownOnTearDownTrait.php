@@ -16,7 +16,9 @@ use PHPUnit\Framework\TestCase;
 // Auto-adapt to PHPUnit 8 that added a `void` return-type to the tearDown method
 
 if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
-eval('
+    eval('
+    namespace Symfony\Bundle\FrameworkBundle\Test;
+
     /**
      * @internal
      */

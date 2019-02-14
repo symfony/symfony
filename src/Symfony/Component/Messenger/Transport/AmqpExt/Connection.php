@@ -24,6 +24,15 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class Connection
 {
+    private const ARGUMENTS_AS_INTEGER = [
+        'x-delay',
+        'x-expires',
+        'x-max-length',
+        'x-max-length-bytes',
+        'x-max-priority',
+        'x-message-ttl',
+    ];
+
     private $connectionCredentials;
     private $exchangeConfiguration;
     private $queueConfiguration;
@@ -89,10 +98,30 @@ class Connection
 
         $exchangeOptions = $amqpOptions['exchange'];
         $queueOptions = $amqpOptions['queue'];
-
         unset($amqpOptions['queue'], $amqpOptions['exchange']);
 
+        if (\is_array($queueOptions['arguments'] ?? false)) {
+            $queueOptions['arguments'] = self::normalizeQueueArguments($queueOptions['arguments']);
+        }
+
         return new self($amqpOptions, $exchangeOptions, $queueOptions, $debug, $amqpFactory);
+    }
+
+    private static function normalizeQueueArguments(array $arguments): array
+    {
+        foreach (self::ARGUMENTS_AS_INTEGER as $key) {
+            if (!array_key_exists($key, $arguments)) {
+                continue;
+            }
+
+            if (!\is_numeric($arguments[$key])) {
+                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", %s given.', $key, \gettype($arguments[$key])));
+            }
+
+            $arguments[$key] = (int) $arguments[$key];
+        }
+
+        return $arguments;
     }
 
     /**

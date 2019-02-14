@@ -12,9 +12,13 @@
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 class CsrfValidationListenerTest extends TestCase
 {
@@ -25,11 +29,11 @@ class CsrfValidationListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
-        $this->tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
+        $this->dispatcher = new EventDispatcher();
+        $this->factory = (new FormFactoryBuilder())->getFormFactory();
+        $this->tokenManager = new CsrfTokenManager();
         $this->form = $this->getBuilder()
-            ->setDataMapper($this->getDataMapper())
+            ->setDataMapper(new PropertyPathMapper())
             ->getForm();
     }
 
@@ -46,11 +50,6 @@ class CsrfValidationListenerTest extends TestCase
         return new FormBuilder('post', null, $this->dispatcher, $this->factory, ['compound' => true]);
     }
 
-    protected function getDataMapper()
-    {
-        return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
-    }
-
     // https://github.com/symfony/symfony/pull/5838
     public function testStringFormData()
     {
@@ -62,6 +61,16 @@ class CsrfValidationListenerTest extends TestCase
 
         // Validate accordingly
         $this->assertSame($data, $event->getData());
+    }
+
+    public function testArrayCsrfToken()
+    {
+        $event = new FormEvent($this->form, ['csrf' => []]);
+
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');
+        $validation->preSubmit($event);
+
+        $this->assertNotEmpty($this->form->getErrors());
     }
 
     public function testMaxPostSizeExceeded()

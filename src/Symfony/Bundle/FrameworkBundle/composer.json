@@ -18,10 +18,10 @@
     "require": {
         "php": "^7.1.3",
         "ext-xml": "*",
-        "symfony/cache": "~4.2",
+        "symfony/cache": "~4.3",
         "symfony/config": "~4.2",
         "symfony/contracts": "^1.0.2",
-        "symfony/dependency-injection": "^4.2",
+        "symfony/dependency-injection": "^4.3",
         "symfony/event-dispatcher": "^4.1",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.2",
@@ -74,7 +74,7 @@
         "symfony/property-info": "<3.4",
         "symfony/serializer": "<4.2",
         "symfony/stopwatch": "<3.4",
-        "symfony/translation": "<4.2",
+        "symfony/translation": "<4.3",
         "symfony/twig-bridge": "<4.1.1",
         "symfony/validator": "<4.1",
         "symfony/workflow": "<4.1"

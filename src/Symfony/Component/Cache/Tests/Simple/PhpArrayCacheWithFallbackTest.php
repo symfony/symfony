@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Tests\Adapter\FilesystemAdapterTest;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class PhpArrayCacheWithFallbackTest extends CacheTestCase
 {

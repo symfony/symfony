@@ -58,6 +58,9 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         return 'reflection.'.$this->className;
     }
 
+    /**
+     * @internal
+     */
     public function serialize()
     {
         if (null === $this->hash) {
@@ -68,6 +71,9 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         return serialize([$this->files, $this->className, $this->hash]);
     }
 
+    /**
+     * @internal
+     */
     public function unserialize($serialized)
     {
         list($this->files, $this->className, $this->hash) = unserialize($serialized);

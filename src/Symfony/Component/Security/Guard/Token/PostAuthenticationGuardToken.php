@@ -74,17 +74,17 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        return serialize([$this->providerKey, parent::serialize()]);
+        return [$this->providerKey, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->providerKey, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

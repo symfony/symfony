@@ -17,6 +17,9 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * @group legacy
+ */
 class DumpedRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 {
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

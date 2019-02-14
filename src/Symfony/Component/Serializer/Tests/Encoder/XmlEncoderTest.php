@@ -193,11 +193,11 @@ XML;
     {
         $array = [
             '#' => 'Paul',
-            '@gender' => 'm',
+            '@eye-color' => 'brown',
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response gender="m">Paul</response>'."\n";
+            '<response eye-color="brown">Paul</response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -206,11 +206,11 @@ XML;
     {
         $array = [
             'firstname' => 'Paul',
-            '@gender' => 'm',
+            '@eye-color' => 'brown',
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response gender="m"><firstname>Paul</firstname></response>'."\n";
+            '<response eye-color="brown"><firstname>Paul</firstname></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -230,11 +230,11 @@ XML;
     public function testEncodeScalarWithAttribute()
     {
         $array = [
-            'person' => ['@gender' => 'M', '#' => 'Peter'],
+            'person' => ['@eye-color' => 'brown', '#' => 'Peter'],
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<response><person gender="M">Peter</person></response>'."\n";
+            '<response><person eye-color="brown">Peter</person></response>'."\n";
 
         $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
     }
@@ -333,11 +333,11 @@ XML;
         $this->encoder->setSerializer($serializer);
 
         $array = [
-            'person' => ['@gender' => 'M', '#' => 'Peter'],
+            'person' => ['@eye-color' => 'brown', '#' => 'Peter'],
         ];
 
         $expected = '<?xml version="1.0"?>'."\n".
-            '<test><person gender="M">Peter</person></test>'."\n";
+            '<test><person eye-color="brown">Peter</person></test>'."\n";
 
         $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
     }
@@ -401,10 +401,10 @@ XML;
     public function testDecodeScalarWithAttribute()
     {
         $source = '<?xml version="1.0"?>'."\n".
-            '<response><person gender="M">Peter</person></response>'."\n";
+            '<response><person eye-color="brown">Peter</person></response>'."\n";
 
         $expected = [
-            'person' => ['@gender' => 'M', '#' => 'Peter'],
+            'person' => ['@eye-color' => 'brown', '#' => 'Peter'],
         ];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -413,11 +413,11 @@ XML;
     public function testDecodeScalarRootAttributes()
     {
         $source = '<?xml version="1.0"?>'."\n".
-            '<person gender="M">Peter</person>'."\n";
+            '<person eye-color="brown">Peter</person>'."\n";
 
         $expected = [
             '#' => 'Peter',
-            '@gender' => 'M',
+            '@eye-color' => 'brown',
         ];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
@@ -426,12 +426,12 @@ XML;
     public function testDecodeRootAttributes()
     {
         $source = '<?xml version="1.0"?>'."\n".
-            '<person gender="M"><firstname>Peter</firstname><lastname>Mac Calloway</lastname></person>'."\n";
+            '<person eye-color="brown"><firstname>Peter</firstname><lastname>Mac Calloway</lastname></person>'."\n";
 
         $expected = [
             'firstname' => 'Peter',
             'lastname' => 'Mac Calloway',
-            '@gender' => 'M',
+            '@eye-color' => 'brown',
         ];
 
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));

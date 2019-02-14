@@ -92,21 +92,17 @@ class RememberMeToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        return serialize([
-            $this->secret,
-            $this->providerKey,
-            parent::serialize(),
-        ]);
+        return [$this->secret, $this->providerKey, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->secret, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->secret, $this->providerKey, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

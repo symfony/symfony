@@ -154,7 +154,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function unserialize($data)
     {
-        parent::unserialize($data);
+        $this->data = unserialize($data);
         $charset = array_pop($this->data);
         $fileLinkFormat = array_pop($this->data);
         $this->dataCount = \count($this->data);

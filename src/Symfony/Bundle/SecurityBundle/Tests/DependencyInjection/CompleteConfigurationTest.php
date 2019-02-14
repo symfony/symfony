@@ -506,6 +506,20 @@ abstract class CompleteConfigurationTest extends TestCase
         ]], $listeners);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie1-name" cookie configured in "logout.delete_cookies" will delete the "cookie1-name" cookie instead of the "cookie1_name" cookie.
+     * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie3-long_name" cookie configured in "logout.delete_cookies" will delete the "cookie3-long_name" cookie instead of the "cookie3_long_name" cookie.
+     */
+    public function testLogoutDeleteCookieNamesNormalization()
+    {
+        $container = $this->getContainer('logout_delete_cookies');
+        $cookiesToDelete = $container->getDefinition('security.logout.handler.cookie_clearing.main')->getArgument(0);
+        $expectedCookieNames = ['cookie2_name', 'cookie1_name', 'cookie3_long_name'];
+
+        $this->assertSame($expectedCookieNames, array_keys($cookiesToDelete));
+    }
+
     protected function getContainer($file)
     {
         $file .= '.'.$this->getFileExtension();

@@ -18,6 +18,9 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * @group legacy
+ */
 class PhpGeneratorDumperTest extends TestCase
 {
     /**

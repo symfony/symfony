@@ -13,6 +13,8 @@ Cache
 -----
 
  * Removed `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
+ * Removed all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
+ * Removed `SimpleCacheAdapter`, use `Psr16Adapter instead.
 
 Config
 ------
@@ -76,6 +78,8 @@ Finder
 Form
 ----
 
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
  * The `getExtendedType()` method was removed from the `FormTypeExtensionInterface`. It is replaced by the the static
    `getExtendedTypes()` method which must return an iterable of extended types.
 
@@ -163,6 +167,7 @@ FrameworkBundle
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
+ * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
 
 HttpFoundation
 --------------
@@ -187,7 +192,7 @@ HttpKernel
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
  * Removed the first and second constructor argument of `ConfigDataCollector`
- * Removed `ConfigDataCollector::getApplicationName()` 
+ * Removed `ConfigDataCollector::getApplicationName()`
  * Removed `ConfigDataCollector::getApplicationVersion()`
 
 Monolog
@@ -227,6 +232,37 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
+   thus `serialize()` and `unserialize()` aren't available.
+   Use `getState()` and `setState()` instead.
+
+   Before:
+   ```php
+   public function serialize()
+   {
+       return [$this->myLocalVar, parent::serialize()];
+   }
+
+   public function unserialize($serialized)
+   {
+       [$this->myLocalVar, $parentSerialized] = unserialize($serialized);
+       parent::unserialize($parentSerialized);
+   }
+   ```
+
+   After:
+   ```php
+   protected function getState(): array
+   {
+       return [$this->myLocalVar, parent::getState()];
+   }
+
+   protected function setState(array $data)
+   {
+       [$this->myLocalVar, $parentData] = $data;
+       parent::setState($parentData);
+   }
+   ```
 
 SecurityBundle
 --------------
@@ -242,6 +278,11 @@ SecurityBundle
    use Guard instead.
  * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
    use Guard instead.
+ * The names of the cookies configured in the `logout.delete_cookies` option are
+   no longer normalized. If any of your cookie names has dashes they won't be
+   changed to underscores.
+   Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
+   After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
 
 Serializer
 ----------
@@ -286,3 +327,9 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
+
+Yaml
+----
+
+ * The parser is now stricter and will throw a `ParseException` when a
+   mapping is found inside a multi-line string.

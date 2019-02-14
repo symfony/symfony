@@ -187,9 +187,9 @@
                 {%- endif -%}
             {%- else -%}
                 {%- if help_html is same as(false) -%}
-                    {{- help|trans({}, translation_domain) -}}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
                 {%- else -%}
-                    {{- help|trans({}, translation_domain)|raw -}}
+                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
                 {%- endif -%}
             {%- endif -%}
         </span>

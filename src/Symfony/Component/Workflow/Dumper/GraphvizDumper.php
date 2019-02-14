@@ -204,9 +204,9 @@ class GraphvizDumper implements DumperInterface
     /**
      * @internal
      */
-    protected function escape(string $string): string
+    protected function escape($value): string
     {
-        return addslashes($string);
+        return \is_bool($value) ? ($value ? '1' : '0') : \addslashes($value);
     }
 
     private function addAttributes(array $attributes): string

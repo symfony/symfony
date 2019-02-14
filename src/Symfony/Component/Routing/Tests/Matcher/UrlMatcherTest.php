@@ -731,12 +731,12 @@ class UrlMatcherTest extends TestCase
         $this->assertSame(['_route' => 'b'], $matcher->match('/bar/'));
 
         $coll = new RouteCollection();
-        $coll->add('a', new Route('/dav/{foo<.*>?}', [], [], [], '', [], ['GET', 'OPTIONS']));
+        $coll->add('a', new Route('/dav/{foo}', [], ['foo' => '.*'], [], '', [], ['GET', 'OPTIONS']));
 
         $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'OPTIONS'));
         $expected = [
             '_route' => 'a',
-            'foo' => 'files/bar',
+            'foo' => 'files/bar/',
         ];
         $this->assertEquals($expected, $matcher->match('/dav/files/bar/'));
     }
@@ -764,6 +764,17 @@ class UrlMatcherTest extends TestCase
             'customerId' => '123',
         ];
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
+    }
+
+    public function testGreedyTrailingRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}', [], ['a' => '.+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo'], $matcher->match('/foo'));
+        $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

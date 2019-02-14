@@ -156,21 +156,18 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar = preg_match('#\{\w+\}/?$#', $route->getPath())) {
-                // no-op
-            } elseif (preg_match($regex, $trimmedPathinfo, $m)) {
-                $matches = $m;
-            } else {
-                $hasTrailingSlash = true;
-            }
+            $hasTrailingVar = $trimmedPathinfo !== $pathinfo && preg_match('#\{\w+\}/?$#', $route->getPath());
 
-            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                 if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
                     return $this->allow = $this->allowSchemes = [];
                 }
-                if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                    continue;
-                }
+
+                continue;
+            }
+
+            if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, $trimmedPathinfo, $m)) {
+                $matches = $m;
             }
 
             $hostMatches = [];

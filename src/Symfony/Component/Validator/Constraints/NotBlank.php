@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class NotBlank extends Constraint
 {
@@ -28,4 +29,5 @@ class NotBlank extends Constraint
     ];
 
     public $message = 'This value should not be blank.';
+    public $allowNull = false;
 }

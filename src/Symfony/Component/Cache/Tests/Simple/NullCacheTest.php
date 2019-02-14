@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Simple\NullCache;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class NullCacheTest extends TestCase
 {

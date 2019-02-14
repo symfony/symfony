@@ -1,4 +1,4 @@
 services:
     alias_for_foobar:
         alias: foobar
-        deprecated: The "%service_id%" service alias is deprecated.
+        deprecated: The "%alias_id%" service alias is deprecated.

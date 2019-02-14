@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
  *
  * @internal
  */
-trait PhpMatcherTrait
+trait CompiledUrlMatcherTrait
 {
     private $matchHost = false;
     private $staticRoutes = [];
@@ -126,25 +126,25 @@ trait PhpMatcherTrait
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as list($ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition)) {
-                    if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
-                        continue;
+                    if (null !== $condition) {
+                        if (0 === $condition) { // marks the last route in the regexp
+                            continue 3;
+                        }
+                        if (!($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
+                            continue;
+                        }
                     }
 
-                    if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                        // no-op
-                    } elseif (preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
-                        $matches = $n;
-                    } else {
-                        $hasTrailingSlash = true;
-                    }
-
-                    if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                    $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
+                    if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                         if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
                             return $allow = $allowSchemes = [];
                         }
-                        if ($trimmedPathinfo === $pathinfo || !$hasTrailingVar) {
-                            continue;
-                        }
+                        continue;
+                    }
+
+                    if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        $matches = $n;
                     }
 
                     foreach ($vars as $i => $v) {

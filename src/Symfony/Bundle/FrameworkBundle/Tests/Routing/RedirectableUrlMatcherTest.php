@@ -17,6 +17,9 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * @group legacy
+ */
 class RedirectableUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()

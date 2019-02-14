@@ -6,14 +6,16 @@ CHANGELOG
 
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
- * Added `ControllerTrait::isFormValid()`
- * Added an `help_html` form option to display the `help` text as HTML
-
+ * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead
  * [BC Break] When using Messenger, the default transport changed from
    using Symfony's serializer service to use `PhpSerializer`, which uses
    PHP's native `serialize()` and `unserialize()` functions. To use the
    original serialization method, set the `framework.messenger.serializer.id`
    config option to `messenger.transport.symfony_serializer`.
+ * Added information about deprecated aliases in `debug:autowiring` 
+ * Added php ini session options `sid_length` and `sid_bits_per_character` 
+   to the `session` section of the configuration
+ * Added support for Translator paths, Twig paths in translation commands.
 
 4.2.0
 -----

@@ -200,7 +200,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->createForm('param1', $method, true);
         $form->add($this->createForm('field1'));
         $form->add($this->createBuilder('field2', false, ['allow_file_upload' => true])->getForm());
-        $file = $this->getMockFile();
+        $file = $this->getUploadedFile();
 
         $this->setRequestData($method, [
             'param1' => [
@@ -225,7 +225,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     public function testParamTakesPrecedenceOverFile($method)
     {
         $form = $this->createForm('param1', $method);
-        $file = $this->getMockFile();
+        $file = $this->getUploadedFile();
 
         $this->setRequestData($method, [
             'param1' => 'DATA',
@@ -247,7 +247,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
             ->getForm();
-        $file = $this->getMockFile();
+        $file = $this->getUploadedFile();
 
         $this->setRequestData($method, [
             'param1' => null,
@@ -269,20 +269,40 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
             ->getForm();
-        $file = $this->getMockFile();
+        $file = $this->getUploadedFile();
 
         $this->setRequestData($method, [
             'param1' => null,
         ], [
-            'param2' => $this->getMockFile('2'),
+            'param2' => $this->getUploadedFile('2'),
             'param1' => $file,
-            'param3' => $this->getMockFile('3'),
+            'param3' => $this->getUploadedFile('3'),
         ]);
 
         $this->requestHandler->handleRequest($form, $this->request);
 
         $this->assertTrue($form->isSubmitted());
         $this->assertSame($file, $form->getData());
+    }
+
+    /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitFileWithNamelessForm($method)
+    {
+        $form = $this->createForm('', $method, true);
+        $fileForm = $this->createBuilder('document', false, ['allow_file_upload' => true])->getForm();
+        $form->add($fileForm);
+        $file = $this->getUploadedFile();
+        $this->setRequestData($method, [
+            'document' => null,
+        ], [
+            'document' => $file,
+        ]);
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertSame($file, $fileForm->getData());
     }
 
     /**
@@ -332,7 +352,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     public function testUploadedFilesAreAccepted()
     {
-        $this->assertTrue($this->requestHandler->isFileUpload($this->getMockFile()));
+        $this->assertTrue($this->requestHandler->isFileUpload($this->getUploadedFile()));
     }
 
     public function testInvalidFilesAreRejected()
@@ -344,7 +364,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     abstract protected function getRequestHandler();
 
-    abstract protected function getMockFile($suffix = '');
+    abstract protected function getUploadedFile($suffix = '');
 
     abstract protected function getInvalidFile();
 

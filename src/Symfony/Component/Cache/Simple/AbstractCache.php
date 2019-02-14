@@ -12,16 +12,20 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', AbstractCache::class, AbstractAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+ * @deprecated since Symfony 4.3, use AbstractAdapter and type-hint for CacheInterface instead.
  */
-abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
+abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractTrait {
         deleteItems as private;

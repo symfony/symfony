@@ -4,8 +4,34 @@ CHANGELOG
 4.3.0
 -----
 
+ * deprecated using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget`
+   option is set to `single_text`
  * added `block_prefix` option to `BaseType`.
  * added `help_html` option to display the `help` text as HTML.
+ * added `label_translation_parameters`, `attr_translation_parameters`, `help_translation_parameters` options 
+   to `FormType` to pass translation parameters to form labels, attributes (`placeholder` and `title`) and help text respectively.
+   The passed parameters will replace placeholders in translation messages.
+   
+   ```php
+   class OrderType extends AbstractType
+   {
+       public function buildForm(FormBuilderInterface $builder, array $options)
+       {
+           $builder->add('comment', TextType::class, [
+               'label' => 'Comment to the order to %company%',
+               'label_translation_parameters' => [
+                   '%company%' => 'Acme',
+               ],
+               'help' => 'The address of the %company% is %address%',
+               'help_translation_parameters' => [
+                   '%company%' => 'Acme Ltd.',
+                   '%address%' => '4 Form street, Symfonyville',
+               ],
+           ])
+       }
+   }
+   ```
+
 
 4.2.0
 -----

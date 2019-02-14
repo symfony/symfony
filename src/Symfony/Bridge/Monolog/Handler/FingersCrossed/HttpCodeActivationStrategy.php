@@ -60,7 +60,6 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
                     continue;
                 }
 
-                $urlBlacklist = null;
                 if (\count($exclusion['urls'])) {
                     return !preg_match('{('.implode('|', $exclusion['urls']).')}i', $request->getPathInfo());
                 }

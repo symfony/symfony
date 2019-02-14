@@ -83,6 +83,10 @@ class SwitchUserListener implements ListenerInterface
             return;
         }
 
+        if (null === $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
+        }
+
         if (self::EXIT_VALUE === $username) {
             $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
@@ -165,7 +169,7 @@ class SwitchUserListener implements ListenerInterface
      */
     private function attemptExitUser(Request $request)
     {
-        if (null === ($currentToken = $this->tokenStorage->getToken()) || false === $original = $this->getOriginalToken($currentToken)) {
+        if (false === $original = $this->getOriginalToken($this->tokenStorage->getToken())) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 

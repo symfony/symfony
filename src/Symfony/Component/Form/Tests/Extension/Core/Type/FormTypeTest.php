@@ -651,4 +651,52 @@ class FormTypeTest extends BaseTypeTest
 
         $this->assertSame(['form', 'child', '_parent_child'], $view['child']->vars['block_prefixes']);
     }
+
+    public function testDefaultHelpTranslationParameters()
+    {
+        $view = $this->factory->createNamedBuilder('parent', self::TESTED_TYPE)
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals([], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testPassHelpTranslationParametersToView()
+    {
+        $view = $this->factory->create($this->getTestedType(), null, [
+            'help_translation_parameters' => ['%param%' => 'value'],
+        ])
+            ->createView();
+
+        $this->assertSame(['%param%' => 'value'], $view->vars['help_translation_parameters']);
+    }
+
+    public function testInheritHelpTranslationParametersFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'help_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%param%' => 'value'], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testPreferOwnHelpTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'help_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
+            ])
+            ->add('child', $this->getTestedType(), [
+                'help_translation_parameters' => ['%override_param%' => 'child_value'],
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['help_translation_parameters']);
+    }
 }

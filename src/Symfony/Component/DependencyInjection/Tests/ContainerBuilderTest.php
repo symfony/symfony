@@ -88,7 +88,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.
+     * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testCreateDeprecatedService()
     {
@@ -261,7 +261,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will soon be removed.
+     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.
      */
     public function testDeprecatedAlias()
     {

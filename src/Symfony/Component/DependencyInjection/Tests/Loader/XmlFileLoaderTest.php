@@ -343,7 +343,7 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('services_deprecated.xml');
 
         $this->assertTrue($container->getDefinition('foo')->isDeprecated());
-        $message = 'The "foo" service is deprecated. You should stop using it, as it will soon be removed.';
+        $message = 'The "foo" service is deprecated. You should stop using it, as it will be removed in the future.';
         $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
 
         $this->assertTrue($container->getDefinition('bar')->isDeprecated());
@@ -358,7 +358,7 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('deprecated_alias_definitions.xml');
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
-        $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will soon be removed.';
+        $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will be removed in the future.';
         $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());

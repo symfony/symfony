@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -9,7 +9,7 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 {
-    use PhpMatcherTrait;
+    use CompiledUrlMatcherTrait;
 
     public function __construct(RequestContext $context)
     {
@@ -28,6 +28,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             56 => [
                 [['_route' => 'r1'], ['foo', 'foo'], null, null, false, true, null],
                 [['_route' => 'r2'], ['foo', 'foo'], null, null, false, true, null],
+                [null, null, null, null, false, false, 0],
             ],
         ];
     }

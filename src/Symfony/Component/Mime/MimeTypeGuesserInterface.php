@@ -28,7 +28,7 @@ interface MimeTypeGuesserInterface
      *
      * @param string $path The path to the file
      *
-     * @return string The MIME type or null, if none could be guessed
+     * @return string|null The MIME type or null, if none could be guessed
      *
      * @throws \LogicException           If the guesser is not supported
      * @throws \InvalidArgumentException If the file does not exist or is not readable

@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Simple\PhpFilesCache;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class PhpFilesCacheTest extends CacheTestCase
 {

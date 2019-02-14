@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `CompiledUrlMatcher` and `CompiledUrlMatcherDumper`
+ * added `CompiledUrlGenerator` and `CompiledUrlGeneratorDumper`
+ * deprecated `PhpGeneratorDumper` and `PhpMatcherDumper`
+
 4.2.0
 -----
 

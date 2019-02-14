@@ -672,7 +672,7 @@ EOF
         }
 
         foreach ($alias->childNodes as $child) {
-            if (!$child instanceof \DOMElement && self::NS !== $child->namespaceURI) {
+            if (!$child instanceof \DOMElement || self::NS !== $child->namespaceURI) {
                 continue;
             }
             if (!\in_array($child->localName, ['deprecated'], true)) {

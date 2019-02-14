@@ -82,8 +82,11 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -754,6 +757,12 @@ class FrameworkExtension extends Extension
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
         }
+        if (!class_exists(CompiledUrlMatcher::class)) {
+            $argument['matcher_class'] = $argument['matcher_base_class'];
+            $argument['matcher_dumper_class'] = PhpMatcherDumper::class;
+            $argument['generator_class'] = $argument['generator_base_class'];
+            $argument['generator_dumper_class'] = PhpGeneratorDumper::class;
+        }
         $router->replaceArgument(2, $argument);
 
         $container->setParameter('request_listener.http_port', $config['http_port']);
@@ -1014,20 +1023,21 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = [];
+        $transPaths = [];
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
-            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Form\Form')) {
             $r = new \ReflectionClass('Symfony\Component\Form\Form');
 
-            $dirs[] = \dirname($r->getFileName()).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname($r->getFileName()).'/Resources/translations';
         }
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
+            $dirs[] = $transPaths[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
@@ -1044,10 +1054,18 @@ class FrameworkExtension extends Extension
 
         foreach ($config['paths'] as $dir) {
             if ($container->fileExists($dir)) {
-                $dirs[] = $dir;
+                $dirs[] = $transPaths[] = $dir;
             } else {
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
             }
+        }
+
+        if ($container->hasDefinition('console.command.translation_debug')) {
+            $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
+        }
+
+        if ($container->hasDefinition('console.command.translation_update')) {
+            $container->getDefinition('console.command.translation_update')->replaceArgument(6, $transPaths);
         }
 
         if ($container->fileExists($defaultDir)) {

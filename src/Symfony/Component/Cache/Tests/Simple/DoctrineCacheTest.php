@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class DoctrineCacheTest extends CacheTestCase
 {

@@ -70,7 +70,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
             foreach ($container->getDefinitions() as $id => $definition) {
                 if (!isset($connectedIds[$id])) {
                     $container->removeDefinition($id);
-                    $container->resolveEnvPlaceholders(serialize($definition));
+                    $container->resolveEnvPlaceholders(!$definition->hasErrors() ? serialize($definition) : $definition);
                     $container->log($this, sprintf('Removed service "%s"; reason: unused.', $id));
                 }
             }
@@ -86,7 +86,7 @@ class RemoveUnusedDefinitionsPass extends AbstractRecursivePass implements Repea
     protected function processValue($value, $isRoot = false)
     {
         if (!$value instanceof Reference) {
-            return parent::processValue($value);
+            return parent::processValue($value, $isRoot);
         }
 
         if (ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior()) {

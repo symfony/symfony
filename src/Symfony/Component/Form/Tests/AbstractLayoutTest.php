@@ -18,6 +18,8 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
+    use VersionAwareTest;
+
     protected $csrfTokenManager;
     protected $testableFeatures = [];
 

@@ -146,7 +146,7 @@ class NonStringInput extends Input
     {
     }
 
-    public function getParameterOption($values, $default = false, $onlyParams = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false, $consume = false)
     {
     }
 

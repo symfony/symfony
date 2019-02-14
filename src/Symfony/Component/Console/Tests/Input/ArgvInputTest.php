@@ -455,4 +455,31 @@ class ArgvInputTest extends TestCase
         $this->assertEquals(['foo' => '0'], $input->getOptions(), '->parse() parses optional options with empty value as null');
         $this->assertEquals(['name' => 'bar'], $input->getArguments(), '->parse() parses optional arguments');
     }
+
+    /**
+     * @dataProvider provideParameterToConsume
+     *
+     * @group argv
+     */
+    public function testParameterIsConsumed($argv, $key, $onlyParams, $consumed, $expected)
+    {
+        $input = new ArgvInput($argv);
+        $this->assertEquals($expected, $input->getParameterOption($key, false, $onlyParams, $consumed), 'The parameter has been removed');
+    }
+
+    public function provideParameterToConsume()
+    {
+        return array(
+            array(array('app/console', '', '-e', 'dev'), '-e', false, false, ''),
+            array(array('app/console', '', '--env=dev'), '--env', false, false, ''),
+            array(array('app/console', '', '-e', 'dev'), array('-e', '--env'), false, false, ''),
+            array(array('app/console', '', '--env=dev'), array('-e', '--env'), false, false, ''),
+            array(array('app/console', '', '--env=dev', '--en=1'), array('--en'), false, false, ''),
+            array(array('app/console', '', '--env=dev', '', '--en=1'), array('--en'), false, true, ''),
+            array(array('app/console', '', '--env', 'val'), '--env', false, false, ''),
+            array(array('app/console', '', '--env', 'val', '--dummy'), '--env', false, true, ''),
+            array(array('app/console', '', '--', '--env=dev'), '--env', false, false, ''),
+            array(array('app/console', '', '--', '--env=dev'), '--env', true, true, false, ''),
+        );
+    }
 }

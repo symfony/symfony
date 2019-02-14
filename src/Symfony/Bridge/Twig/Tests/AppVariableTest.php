@@ -236,9 +236,8 @@ class AppVariableTest extends TestCase
     public function testGetEnvWithoutValidKey(): void
     {
         $request = new Request();
-        $requestStack = $this->setRequestStack($request);
 
-        $this->appVariable->setRequestStack($requestStack);
+        $this->setRequestStack($request);
 
         $this->assertNull($this->appVariable->getEnv(''));
     }
@@ -247,9 +246,8 @@ class AppVariableTest extends TestCase
     {
         $request = new Request();
         $request->server->set('this-key-exist', 'this-value-exist');
-        $requestStack = $this->setRequestStack($request);
 
-        $this->appVariable->setRequestStack($requestStack);
+        $this->setRequestStack($request);
 
         $this->assertNotNull($this->appVariable->getEnv('this-key-exist'));
     }

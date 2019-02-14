@@ -193,11 +193,11 @@ class AppVariable
         if (null === $name || '' === $name) {
             return null;
         }
-        
+
         if (null === $this->requestStack) {
             throw new \RuntimeException(sprintf('The app.request variable is not available'));
-        }    
-        
+        }
+
         $request = $this->getRequest();
 
         return null !== $request ? $request->server->get($name) : null;

@@ -124,6 +124,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassLabelTranslationParametersToView()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory->create($this->getTestedType(), null, [
             'label_translation_parameters' => ['%param%' => 'value'],
         ])
@@ -134,6 +136,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPassAttrTranslationParametersToView()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory->create($this->getTestedType(), null, [
             'attr_translation_parameters' => ['%param%' => 'value'],
         ])
@@ -144,6 +148,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testInheritLabelTranslationParametersFromParent()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'label_translation_parameters' => ['%param%' => 'value'],
@@ -157,6 +163,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testInheritAttrTranslationParametersFromParent()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'attr_translation_parameters' => ['%param%' => 'value'],
@@ -170,6 +178,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPreferOwnLabelTranslationParameters()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'label_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
@@ -185,6 +195,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testPreferOwnAttrTranslationParameters()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, [
                 'attr_translation_parameters' => ['%parent_param%' => 'parent_value', '%override_param%' => 'parent_override_value'],
@@ -200,6 +212,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testDefaultLabelTranslationParameters()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
             ->getForm()
@@ -210,6 +224,8 @@ abstract class BaseTypeTest extends TypeTestCase
 
     public function testDefaultAttrTranslationParameters()
     {
+        $this->requiresFeatureSet(403);
+
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
             ->getForm()

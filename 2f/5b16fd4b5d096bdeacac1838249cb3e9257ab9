@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-02-13T14:41:52Z
+
+@LubenZA I'm sorry to bother you, but this morning we added a new phrase to the translated files. Could you please add this new translation so we complete the Bulgarian translation? Thanks!
+
+```xml
+<trans-unit id="86">
+    <source>This value should be valid JSON.</source>
+    <target>...</target>
+</trans-unit>
+```
+
+---------------------------------------------------------------------------
+
+by LubenZA at 2019-02-13T15:54:51Z
+
+No bother at all - I will translate shortly.
+
+---------------------------------------------------------------------------
+
+by LubenZA at 2019-02-13T16:01:51Z
+
+If you need more translations   just shout.
+Feel free to close when you are happy.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-02-13T16:06:39Z
+
+@LubenZA thank you! This is now perfectly completed. We'll merge your pull request soon. Thanks.

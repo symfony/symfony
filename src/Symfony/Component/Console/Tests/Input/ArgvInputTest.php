@@ -462,16 +462,17 @@ class ArgvInputTest extends TestCase
     public function testParameterIsConsumed($argv, $key, $onlyParams, $consumed, $expected)
     {
         $input = new ArgvInput($argv);
-        $this->assertEquals($expected, $input->getParameterOption($key, false, $onlyParams, $consumed), 'The parameter has been removed');
+        $this->assertEquals($expected, $input->getParameterOption($key, false, $onlyParams, $consumed), 'The parameter has been consumed');
     }
 
     public function provideParameterToConsume()
     {
         return [
+            [['app/console', 'foo:bar'], '-e', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], '-f', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '--foo', 'bar'], '-f', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '--foo=', 'bar'], '-f', false, true, ''],
             [['app/console', '', '-e', 'dev'], '-e', false, true, ''],
-            [['app/console', '', '-e', 'dev'], '-e', false, false, 'dev'],
-            [['app/console', '', '-e', 'test'], '-e', false, true, ''],
-            [['app/console', '', '-e', 'test'], '-e', false, false, 'test'],
         ];
     }
 }

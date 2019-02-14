@@ -293,8 +293,10 @@ class ArgvInput extends Input
 
     /**
      * {@inheritdoc}
+     *
+     * @param bool $consume If true, the corresponding parameter will be removed from the instance
      */
-    public function getParameterOption($values, $default = false, $onlyParams = false /*, $consume = false */)
+    public function getParameterOption($values, $default = false, $onlyParams = false/*, bool $consume = false*/)
     {
         $values = (array) $values;
         $tokens = $this->tokens;
@@ -305,13 +307,7 @@ class ArgvInput extends Input
                 return $default;
             }
 
-            foreach ($values as $k => $value) {
-                $consumed = 4 === \count(\func_get_args()) ? func_get_arg(3) : false;
-
-                if ($consumed) {
-                    array_splice($values, $k);
-                }
-
+            foreach ($values as $value) {
                 if ($token === $value) {
                     return array_shift($tokens);
                 }

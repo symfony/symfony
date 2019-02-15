@@ -27,4 +27,14 @@ class BirthdayTypeTest extends DateTypeTest
             'years' => 'bad value',
         ]);
     }
+
+    public function testChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $view = $form->createView();
+
+        $yearChoices = $view->children['year']->vars['choices'];
+        dump($yearChoices);
+        dump(reset($yearChoices));
+    }
 }

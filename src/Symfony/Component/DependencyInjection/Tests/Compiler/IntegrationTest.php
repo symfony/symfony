@@ -14,10 +14,12 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
@@ -242,15 +244,15 @@ class IntegrationTest extends TestCase
     public function testTaggedServiceWithIndexAttribute()
     {
         $container = new ContainerBuilder();
-        $container->register(BarTagClass::class, BarTagClass::class)
+        $container->register(BarTagClass::class)
             ->setPublic(true)
             ->addTag('foo_bar', ['foo' => 'bar'])
         ;
-        $container->register(FooTagClass::class, FooTagClass::class)
+        $container->register(FooTagClass::class)
             ->setPublic(true)
             ->addTag('foo_bar')
         ;
-        $container->register(FooBarTaggedClass::class, FooBarTaggedClass::class)
+        $container->register(FooBarTaggedClass::class)
             ->addArgument(new TaggedIteratorArgument('foo_bar', 'foo'))
             ->setPublic(true)
         ;
@@ -266,15 +268,15 @@ class IntegrationTest extends TestCase
     public function testTaggedServiceWithIndexAttributeAndDefaultMethod()
     {
         $container = new ContainerBuilder();
-        $container->register(BarTagClass::class, BarTagClass::class)
+        $container->register(BarTagClass::class)
             ->setPublic(true)
             ->addTag('foo_bar')
         ;
-        $container->register(FooTagClass::class, FooTagClass::class)
+        $container->register(FooTagClass::class)
             ->setPublic(true)
             ->addTag('foo_bar', ['foo' => 'foo'])
         ;
-        $container->register(FooBarTaggedClass::class, FooBarTaggedClass::class)
+        $container->register(FooBarTaggedClass::class)
             ->addArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar'))
             ->setPublic(true)
         ;
@@ -285,6 +287,68 @@ class IntegrationTest extends TestCase
 
         $param = iterator_to_array($s->getParam()->getIterator());
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+    }
+
+    public function testTaggedServiceLocatorWithIndexAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'bar'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo')))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        /** @var ServiceLocator $serviceLocator */
+        $serviceLocator = $s->getParam();
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+
+        $same = [
+            'bar' => $serviceLocator->get('bar'),
+            'foo_tag_class' => $serviceLocator->get('foo_tag_class'),
+        ];
+        $this->assertSame(['bar' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $same);
+    }
+
+    public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', 'foo', 'getFooBar')))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        /** @var ServiceLocator $serviceLocator */
+        $serviceLocator = $s->getParam();
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+
+        $same = [
+            'bar_tab_class_with_defaultmethod' => $serviceLocator->get('bar_tab_class_with_defaultmethod'),
+            'foo' => $serviceLocator->get('foo'),
+        ];
+        $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $same);
     }
 }
 

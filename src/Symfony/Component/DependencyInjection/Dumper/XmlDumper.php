@@ -298,8 +298,18 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');
             } elseif ($value instanceof ServiceLocatorArgument) {
-                $element->setAttribute('type', 'service_locator');
-                $this->convertParameters($value->getValues(), $type, $element, 'key');
+                if ($value->getTaggedIteratorArgument()) {
+                    $element->setAttribute('type', 'tagged_locator');
+                    $element->setAttribute('tag', $value->getTaggedIteratorArgument()->getTag());
+                    $element->setAttribute('index-by', $value->getTaggedIteratorArgument()->getIndexAttribute());
+
+                    if (null !== $value->getTaggedIteratorArgument()->getDefaultIndexMethod()) {
+                        $element->setAttribute('default-index-method', $value->getTaggedIteratorArgument()->getDefaultIndexMethod());
+                    }
+                } else {
+                    $element->setAttribute('type', 'service_locator');
+                    $this->convertParameters($value->getValues(), $type, $element, 'key');
+                }
             } elseif ($value instanceof Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);

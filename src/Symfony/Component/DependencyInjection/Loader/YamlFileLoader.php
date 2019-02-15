@@ -702,7 +702,9 @@ class YamlFileLoader extends FileLoader
                 if (!\is_array($argument)) {
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps in "%s".', $file));
                 }
+
                 $argument = $this->resolveServices($argument, $file, $isParameter);
+
                 try {
                     return new ServiceLocatorArgument($argument);
                 } catch (InvalidArgumentException $e) {
@@ -723,6 +725,17 @@ class YamlFileLoader extends FileLoader
                 }
 
                 throw new InvalidArgumentException(sprintf('"!tagged" tags only accept a non empty string or an array with a key "tag" in "%s".', $file));
+            }
+            if ('tagged_locator' === $value->getTag()) {
+                if (\is_array($argument) && isset($argument['tag'], $argument['index_by']) && $argument['tag'] && $argument['index_by']) {
+                    if ($diff = array_diff(array_keys($argument), ['tag', 'index_by', 'default_index_method'])) {
+                        throw new InvalidArgumentException(sprintf('"!tagged_locator" tag contains unsupported key "%s"; supported ones are "tag", "index_by" and "default_index_method".', implode('"", "', $diff)));
+                    }
+
+                    return new ServiceLocatorArgument(new TaggedIteratorArgument($argument['tag'], $argument['index_by'], $argument['default_index_method'] ?? null));
+                }
+
+                throw new InvalidArgumentException(sprintf('"!tagged_locator" tags only accept an array with at least keys "tag" and "index_by" in "%s".', $file));
             }
             if ('service' === $value->getTag()) {
                 if ($isParameter) {

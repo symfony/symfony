@@ -533,6 +533,13 @@ class XmlFileLoader extends FileLoader
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="service_locator" only accepts maps of type="service" references in "%s".', $name, $file));
                     }
                     break;
+                case 'tagged_locator':
+                    if (!$arg->getAttribute('tag') || !$arg->getAttribute('index-by')) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="tagged_locator" has no or empty "tag" or "index-by" attributes in "%s".', $name, $file));
+                    }
+
+                    $arguments[$key] = new ServiceLocatorArgument(new TaggedIteratorArgument($arg->getAttribute('tag'), $arg->getAttribute('index-by'), $arg->getAttribute('default-index-method') ?: null));
+                    break;
                 case 'tagged':
                     if (!$arg->getAttribute('tag')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="tagged" has no or empty "tag" attribute in "%s".', $name, $file));

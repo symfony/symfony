@@ -8,9 +8,12 @@ services:
         class: Foo
         tags:
             - { name: foo }
-    foo_service_tagged:
+    foo_service_tagged_iterator:
         class: Bar
         arguments: [!tagged { tag: foo, index_by: barfoo, default_index_method: foobar }]
+    foo_service_tagged_locator:
+        class: Bar
+        arguments: [!tagged_locator { tag: foo, index_by: barfoo, default_index_method: foobar }]
     Psr\Container\ContainerInterface:
         alias: service_container
         public: false

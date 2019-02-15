@@ -18,6 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
@@ -287,8 +288,12 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_with_tagged_argument.yml');
 
         $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
-        $this->assertCount(1, $container->getDefinition('foo_service_tagged')->getArguments());
-        $this->assertEquals(new TaggedIteratorArgument('foo', 'barfoo', 'foobar'), $container->getDefinition('foo_service_tagged')->getArgument(0));
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged_iterator')->getArguments());
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged_locator')->getArguments());
+
+        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar');
+        $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
     }
 
     public function testNameOnlyTagsAreAllowedAsString()

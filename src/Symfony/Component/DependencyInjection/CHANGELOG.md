@@ -9,6 +9,7 @@ CHANGELOG
  * added support for deprecating aliases
  * made `ContainerParametersResource` final and not implement `Serializable` anymore
  * added ability to define an index for a tagged collection
+ * added ability to define an index for services in an injected service locator argument
 
 4.2.0
 -----

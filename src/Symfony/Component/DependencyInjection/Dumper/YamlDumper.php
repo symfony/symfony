@@ -252,6 +252,18 @@ class YamlDumper extends Dumper
                 $tag = 'iterator';
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $tag = 'service_locator';
+                if ($value->getTaggedIteratorArgument()) {
+                    $taggedValueContent = [
+                        'tag' => $value->getTaggedIteratorArgument()->getTag(),
+                        'index_by' => $value->getTaggedIteratorArgument()->getIndexAttribute(),
+                    ];
+
+                    if (null !== $value->getTaggedIteratorArgument()->getDefaultIndexMethod()) {
+                        $taggedValueContent['default_index_method'] = $value->getTaggedIteratorArgument()->getDefaultIndexMethod();
+                    }
+
+                    return new TaggedValue('tagged_locator', $taggedValueContent);
+                }
             } else {
                 throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', \get_class($value)));
             }

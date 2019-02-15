@@ -93,6 +93,6 @@ class PriorityTaggedServiceTraitImplementation
 
     public function test($tagName, ContainerBuilder $container)
     {
-        return $this->findAndSortTaggedServices($tagName, $container);
+        return self::findAndSortTaggedServices($tagName, $container);
     }
 }

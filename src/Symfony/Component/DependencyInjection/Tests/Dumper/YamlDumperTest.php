@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -96,11 +97,13 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_inline.yml', $dumper->dump());
     }
 
-    public function testTaggedArgument()
+    public function testTaggedArguments()
     {
+        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar');
         $container = new ContainerBuilder();
         $container->register('foo_service', 'Foo')->addTag('foo');
-        $container->register('foo_service_tagged', 'Bar')->addArgument(new TaggedIteratorArgument('foo', 'barfoo', 'foobar'));
+        $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
+        $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_argument.yml', $dumper->dump());

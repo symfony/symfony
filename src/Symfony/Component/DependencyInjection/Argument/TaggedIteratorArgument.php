@@ -23,8 +23,6 @@ class TaggedIteratorArgument extends IteratorArgument
     private $defaultIndexMethod;
 
     /**
-     * TaggedIteratorArgument constructor.
-     *
      * @param string      $tag                The name of the tag identifying the target services
      * @param string|null $indexAttribute     The name of the attribute that defines the key referencing each service in the tagged collection
      * @param string|null $defaultIndexMethod The static method that should be called to get each service's key when their tag doesn't define the previous attribute

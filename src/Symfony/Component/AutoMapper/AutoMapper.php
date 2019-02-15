@@ -180,7 +180,7 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
      *
      * @internal
      */
-    public static function create(bool $private = true, ClassLoaderInterface $loader = null, AdvancedNameConverterInterface $nameConverter = null, string $classPrefix = 'Mapper_'): self
+    public static function create(bool $private = true, ClassLoaderInterface $loader = null, AdvancedNameConverterInterface $nameConverter = null, string $classPrefix = 'Mapper_', bool $attributeChecking = true): self
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
@@ -229,6 +229,14 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
             $classMetadataFactory,
             $nameConverter
         );
+
+        $factory = new MapperGeneratorMetadataFactory(
+            $sourceTargetMappingExtractor,
+            $fromSourceMappingExtractor,
+            $fromTargetMappingExtractor,
+            $classPrefix
+        );
+        $factory->setAttributeChecking($attributeChecking);
 
         $autoMapper = new self($loader, new MapperGeneratorMetadataFactory(
             $sourceTargetMappingExtractor,

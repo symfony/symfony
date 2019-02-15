@@ -26,6 +26,7 @@ final class MapperGeneratorMetadataFactory
     private $fromSourcePropertiesMappingExtractor;
     private $fromTargetPropertiesMappingExtractor;
     private $classPrefix;
+    private $attributeChecking = true;
 
     public function __construct(
         SourceTargetMappingExtractor $sourceTargetPropertiesMappingExtractor,
@@ -40,9 +41,17 @@ final class MapperGeneratorMetadataFactory
     }
 
     /**
+     * Whether or not attribute checking code should be generated.
+     */
+    public function setAttributeChecking(bool $attributeChecking): void
+    {
+        $this->attributeChecking = $attributeChecking;
+    }
+
+    /**
      * Create metadata for a source and target.
      */
-    public function create(MapperGeneratorMetadataRegistryInterface $autoMapperRegister, string $source, string $target): MapperGeneratorMetadataInterface
+    public function create(MapperGeneratorMetadataRegistryInterface $autoMapperRegister, string $source, string $target): MapperMetadata
     {
         $extractor = $this->sourceTargetPropertiesMappingExtractor;
 
@@ -54,6 +63,9 @@ final class MapperGeneratorMetadataFactory
             $extractor = $this->fromSourcePropertiesMappingExtractor;
         }
 
-        return new MapperMetadata($autoMapperRegister, $extractor, $source, $target, $this->classPrefix);
+        $mapperMetadata = new MapperMetadata($autoMapperRegister, $extractor, $source, $target, $this->classPrefix);
+        $mapperMetadata->setAttributeChecking($this->attributeChecking);
+
+        return $mapperMetadata;
     }
 }

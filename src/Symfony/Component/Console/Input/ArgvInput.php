@@ -298,10 +298,15 @@ class ArgvInput extends Input
      */
     public function getParameterOption($values, $default = false, $onlyParams = false/*, bool $consume = false*/)
     {
+        $consume = 3 < \func_num_args() ? \func_get_arg(3) : false;
+
+        if ($consume) {
+            $toConsume = array_search($values, $this->tokens, true);
+            unset($this->tokens[$toConsume]);
+        }
+
         $values = (array) $values;
         $tokens = $this->tokens;
-
-        $consume = 3 < \func_num_args() ? \func_get_arg(3) : false;
 
         while (0 < \count($tokens)) {
             $token = array_shift($tokens);

@@ -458,6 +458,8 @@ class ArgvInputTest extends TestCase
 
     /**
      * @dataProvider provideParameterToConsume
+     *
+     * @group argv
      */
     public function testParameterIsConsumed($argv, $key, $onlyParams, $consumed, $expected)
     {
@@ -468,11 +470,18 @@ class ArgvInputTest extends TestCase
     public function provideParameterToConsume()
     {
         return [
+            [['app/console', 'foo:bar'], '-e', false, false, ''],
             [['app/console', 'foo:bar'], '-e', false, true, ''],
-            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], '-f', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev'], '-e', false, false, 'dev'],
+            [['app/console', 'foo:bar', '-e', 'dev'], '-e', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], ['-e', '-f'], false, false, 'dev'],
+            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], ['-e', '-f'], false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], '-e', false, false, 'dev'],
+            [['app/console', 'foo:bar', '-e', 'dev', '-f', 'bar'], '-e', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '--foo', 'bar'], '-f', false, false, ''],
             [['app/console', 'foo:bar', '-e', 'dev', '--foo', 'bar'], '-f', false, true, ''],
-            [['app/console', 'foo:bar', '-e', 'dev', '--foo=', 'bar'], '-f', false, true, ''],
-            [['app/console', '', '-e', 'dev'], '-e', false, true, ''],
+            [['app/console', 'foo:bar', '-e', 'dev', '--foo', 'bar'], '--foo', false, false, 'bar'],
+            [['app/console', 'foo:bar', '-e', 'dev', '--foo', 'bar'], '-f', false, true, ''],
         ];
     }
 }

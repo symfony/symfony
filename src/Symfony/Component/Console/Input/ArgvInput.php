@@ -301,6 +301,8 @@ class ArgvInput extends Input
         $values = (array) $values;
         $tokens = $this->tokens;
 
+        $consume = 3 < \func_num_args() ? \func_get_arg(3) : false;
+
         while (0 < \count($tokens)) {
             $token = array_shift($tokens);
             if ($onlyParams && '--' === $token) {

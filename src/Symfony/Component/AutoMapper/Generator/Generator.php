@@ -185,9 +185,11 @@ class Generator
                 }
             }
 
-            $conditions[] = new Expr\MethodCall($contextVariable, 'isAllowedAttribute', [
-                new Arg(new Scalar\String_($propertyMapping->getProperty())),
-            ]);
+            if ($mapperGeneratorMetadata->shouldCheckAttributes()) {
+                $conditions[] = new Expr\MethodCall($contextVariable, 'isAllowedAttribute', [
+                    new Arg(new Scalar\String_($propertyMapping->getProperty())),
+                ]);
+            }
 
             if (null !== $propertyMapping->getSourceGroups()) {
                 $conditions[] = new Expr\BinaryOp\BooleanAnd(

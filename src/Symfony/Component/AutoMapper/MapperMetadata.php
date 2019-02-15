@@ -44,6 +44,8 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
 
     private $classPrefix;
 
+    private $attributeChecking;
+
     public function __construct(MapperGeneratorMetadataRegistryInterface $metadataRegistry, MappingExtractorInterface $mappingExtractor, string $source, string $target, string $classPrefix = 'Mapper_')
     {
         $this->mappingExtractor = $mappingExtractor;
@@ -53,6 +55,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
         $this->isConstructorAllowed = true;
         $this->dateTimeFormat = \DateTime::RFC3339;
         $this->classPrefix = $classPrefix;
+        $this->attributeChecking = true;
     }
 
     /**
@@ -216,6 +219,14 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function shouldCheckAttributes(): bool
+    {
+        return $this->attributeChecking;
+    }
+
+    /**
      * Set DateTime format to use when generating a mapper.
      */
     public function setDateTimeFormat(string $dateTimeFormat): void
@@ -237,6 +248,14 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
     public function forMember(string $property, callable $callback): void
     {
         $this->customMapping[$property] = $callback;
+    }
+
+    /**
+     * Whether or not attribute checking code should be generated.
+     */
+    public function setAttributeChecking(bool $attributeChecking): void
+    {
+        $this->attributeChecking = $attributeChecking;
     }
 
     private function buildPropertyMapping()

@@ -48,6 +48,11 @@ interface MapperGeneratorMetadataInterface extends MapperMetadataInterface
     public function isConstructorAllowed(): bool;
 
     /**
+     * Whether we should generate attributes checking.
+     */
+    public function shouldCheckAttributes(): bool;
+
+    /**
      * If not using target constructor, allow to know if we can clone a empty target.
      */
     public function isTargetCloneable(): bool;

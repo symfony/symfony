@@ -54,7 +54,7 @@ class TransNodeTest extends TestCase
     protected function getVariableGetterWithStrictCheck($name)
     {
         if (Environment::MAJOR_VERSION >= 2) {
-            return sprintf('(isset($context["%s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name);
+            return sprintf('(isset($context["%1$s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new %2$s(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name, Environment::VERSION_ID >= 20700 ? '\Twig\Error\RuntimeError' : 'Twig_Error_Runtime');
         }
 
         if (\PHP_VERSION_ID >= 70000) {

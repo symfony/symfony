@@ -15,13 +15,12 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class AbstractObjectNormalizerTest extends TestCase
@@ -76,6 +75,31 @@ class AbstractObjectNormalizerTest extends TestCase
             'any',
             ['allow_extra_attributes' => false]
         );
+    }
+
+    public function testDenormalizeDeepCollection()
+    {
+        $denormalizer = $this->getDenormalizerForDummyDeepCollection();
+
+        $dummyCollection = $denormalizer->denormalize(
+            [
+                'children' => [
+                    [
+                        [
+                            'bar' => 'first',
+                        ],
+                    ],
+                ],
+            ],
+            DummyDeepCollection::class
+        );
+
+        $this->assertInstanceOf(DummyDeepCollection::class, $dummyCollection);
+        $this->assertInternalType('array', $dummyCollection->children);
+        $this->assertCount(1, $dummyCollection->children);
+        $this->assertInternalType('array', $dummyCollection->children[0]);
+        $this->assertCount(1, $dummyCollection->children[0]);
+        $this->assertInstanceOf(DummyChild::class, $dummyCollection->children[0][0]);
     }
 
     public function testDenormalizeCollectionDecodedFromXmlWithOneChild()
@@ -139,7 +163,41 @@ class AbstractObjectNormalizerTest extends TestCase
             ));
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
-        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $arrayDenormalizer = new ArrayDenormalizer();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
+    private function getDenormalizerForDummyDeepCollection()
+    {
+        $extractor = $this->getMockBuilder(PhpDocExtractor::class)->getMock();
+        $extractor->method('getTypes')
+            ->will($this->onConsecutiveCalls(
+                [
+                    new Type(
+                        'array',
+                        false,
+                        null,
+                        true,
+                        new Type('int'),
+                        new Type(
+                            'array',
+                            false,
+                            null,
+                            true,
+                            new Type('int'),
+                            new Type('object', false, DummyChild::class)
+                        )
+                    ),
+                ],
+                null
+            ));
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizer();
         $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
         $arrayDenormalizer->setSerializer($serializer);
         $denormalizer->setSerializer($serializer);
@@ -233,6 +291,12 @@ class DummyCollection
     public $children;
 }
 
+class DummyDeepCollection
+{
+    /** @var DummyChild[][] */
+    public $children;
+}
+
 class DummyChild
 {
     public $bar;
@@ -304,47 +368,5 @@ class AbstractObjectNormalizerCollectionDummy extends AbstractObjectNormalizer
 
     public function deserialize($data, $type, $format, array $context = [])
     {
-    }
-}
-
-class ArrayDenormalizerDummy implements DenormalizerInterface, SerializerAwareInterface
-{
-    /**
-     * @var SerializerInterface|DenormalizerInterface
-     */
-    private $serializer;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NotNormalizableValueException
-     */
-    public function denormalize($data, $class, $format = null, array $context = [])
-    {
-        $serializer = $this->serializer;
-        $class = substr($class, 0, -2);
-
-        foreach ($data as $key => $value) {
-            $data[$key] = $serializer->denormalize($value, $class, $format, $context);
-        }
-
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
-    {
-        return '[]' === substr($type, -2)
-            && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        $this->serializer = $serializer;
     }
 }

@@ -322,23 +322,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return;
             }
 
-            if ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueType()) && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
-                $builtinType = Type::BUILTIN_TYPE_OBJECT;
-                $class = $collectionValueType->getClassName().'[]';
-
-                // Fix a collection that contains the only one element
-                // This is special to xml format only
-                if ('xml' === $format && !\is_int(key($data))) {
-                    $data = [$data];
-                }
-
-                if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
-                    $context['key_type'] = $collectionKeyType;
-                }
-            } else {
-                $builtinType = $type->getBuiltinType();
-                $class = $type->getClassName();
-            }
+            [$builtinType, $class] = $this->flatternDenormalizationType($type, $context);
 
             $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
 
@@ -373,6 +357,29 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), \gettype($data)));
+    }
+
+    private function flatternDenormalizationType(Type $type, array &$context): array
+    {
+        if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && (Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType() || Type::BUILTIN_TYPE_ARRAY === $collectionValueType->getBuiltinType())) {
+            if ($collectionValueType->isCollection()) {
+                [$builtinType, $class] = $this->flatternDenormalizationType($collectionValueType, $context);
+            } else {
+                [$builtinType, $class] = [$collectionValueType->getBuiltinType(), $collectionValueType->getClassName()];
+            }
+
+            if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
+                $class = $class.'[]';
+
+                if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
+                    $context['key_types'][] = $collectionKeyType;
+                }
+            }
+        } else {
+            return [$type->getBuiltinType(), $type->getClassName()];
+        }
+
+        return [$builtinType, $class];
     }
 
     /**

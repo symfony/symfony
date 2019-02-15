@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -51,7 +52,18 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
         $serializer = $this->serializer;
         $class = substr($class, 0, -2);
 
-        $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
+        if (isset($context['key_types']) && \count($context['key_types'])) {
+            $builtinType = array_pop($context['key_types'])->getBuiltinType();
+        } else {
+            $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
+        }
+
+        // Fix a collection that contains the only one element
+        // This is special to xml format only
+        if (XmlEncoder::FORMAT === $format && (null === $builtinType ? !\is_int(key($data)) : !('\is_'.$builtinType)(key($data)))) {
+            $data = [$data];
+        }
+
         foreach ($data as $key => $value) {
             if (null !== $builtinType && !('is_'.$builtinType)($key)) {
                 throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, \gettype($key)));

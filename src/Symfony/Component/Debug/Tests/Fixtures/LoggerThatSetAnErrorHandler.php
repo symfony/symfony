@@ -2,13 +2,14 @@
 
 namespace Symfony\Component\Debug\Tests\Fixtures;
 
-use Psr\Log\AbstractLogger;
+use Symfony\Component\Debug\BufferingLogger;
 
-class LoggerThatSetAnErrorHandler extends AbstractLogger
+class LoggerThatSetAnErrorHandler extends BufferingLogger
 {
     public function log($level, $message, array $context = [])
     {
         set_error_handler('is_string');
+        parent::log($level, $message, $context);
         restore_error_handler();
     }
 }

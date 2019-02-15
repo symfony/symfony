@@ -12,12 +12,12 @@
 namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
+use Symfony\Component\Debug\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
 use Symfony\Component\Debug\Tests\Fixtures\LoggerThatSetAnErrorHandler;
 
 /**
@@ -590,26 +590,40 @@ class ErrorHandlerTest extends TestCase
     }
 
     /**
-     * @dataProvider errorHandlerIsNotLostWhenLoggingProvider
+     * @dataProvider errorHandlerWhenLoggingProvider
      */
-    public function testErrorHandlerIsNotLostWhenLogging($customErrorHandlerHasBeenPreviouslyDefined, LoggerInterface $logger)
+    public function testErrorHandlerWhenLogging($previousHandlerWasDefined, $loggerSetsAnotherHandler, $nextHandlerIsDefined)
     {
         try {
-            if ($customErrorHandlerHasBeenPreviouslyDefined) {
+            if ($previousHandlerWasDefined) {
                 set_error_handler('count');
             }
 
+            $logger = $loggerSetsAnotherHandler ? new LoggerThatSetAnErrorHandler() : new NullLogger();
+
             $handler = ErrorHandler::register();
             $handler->setDefaultLogger($logger);
+
+            if ($nextHandlerIsDefined) {
+                $handler = ErrorHandlerThatUsesThePreviousOne::register();
+            }
 
             @trigger_error('foo', E_USER_DEPRECATED);
             @trigger_error('bar', E_USER_DEPRECATED);
 
             $this->assertSame([$handler, 'handleError'], set_error_handler('var_dump'));
 
+            if ($logger instanceof LoggerThatSetAnErrorHandler) {
+                $this->assertCount(2, $logger->cleanLogs());
+            }
+
             restore_error_handler();
 
-            if ($customErrorHandlerHasBeenPreviouslyDefined) {
+            if ($previousHandlerWasDefined) {
+                restore_error_handler();
+            }
+
+            if ($nextHandlerIsDefined) {
                 restore_error_handler();
             }
         } finally {
@@ -618,13 +632,14 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    public function errorHandlerIsNotLostWhenLoggingProvider()
+    public function errorHandlerWhenLoggingProvider()
     {
-        return [
-            [false, new NullLogger()],
-            [true, new NullLogger()],
-            [false, new LoggerThatSetAnErrorHandler()],
-            [true, new LoggerThatSetAnErrorHandler()],
-        ];
+        foreach ([false, true] as $previousHandlerWasDefined) {
+            foreach ([false, true] as $loggerSetsAnotherHandler) {
+                foreach ([false, true] as $nextHandlerIsDefined) {
+                    yield [$previousHandlerWasDefined, $loggerSetsAnotherHandler, $nextHandlerIsDefined];
+                }
+            }
+        }
     }
 }

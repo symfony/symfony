@@ -328,7 +328,7 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Šis bendrovės identifikavimo kodas (BIC) nesusijęs su IBAN {{ iban }}</target>
+                <target>Šis bendrovės identifikavimo kodas (BIC) nesusijęs su IBAN {{ iban }}.</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>

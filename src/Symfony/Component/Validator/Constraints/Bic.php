@@ -31,6 +31,7 @@ class Bic extends Constraint
     const INVALID_COUNTRY_CODE_ERROR = '1ce76f8d-3c1f-451c-9e62-fe9c3ed486ae';
     const INVALID_CASE_ERROR = '11884038-3312-4ae5-9d04-699f782130c7';
     const INVALID_IBAN_COUNTRY_CODE_ERROR = '29a2c3bb-587b-4996-b6f5-53081364cea5';
+    const INVALID_SPACES_ERROR = 'cf0325f4-5c35-47a8-a360-51dac05b6540';
 
     protected static $errorNames = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',
@@ -38,12 +39,15 @@ class Bic extends Constraint
         self::INVALID_BANK_CODE_ERROR => 'INVALID_BANK_CODE_ERROR',
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
+        self::INVALID_SPACES_ERROR => 'INVALID_SPACES_ERROR',
     ];
 
     public $message = 'This is not a valid Business Identifier Code (BIC).';
     public $ibanMessage = 'This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.';
     public $iban;
     public $ibanPropertyPath;
+    public $allowLowerCase = false;
+    public $allowSpaces = true;
 
     public function __construct($options = null)
     {

@@ -72,6 +72,15 @@ class BicValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
+        if (!$constraint->allowSpaces && false !== strpos($value, ' ')) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Bic::INVALID_SPACES_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         $canonicalize = str_replace(' ', '', $value);
 
         // the bic must be either 8 or 11 characters long
@@ -122,7 +131,7 @@ class BicValidator extends ConstraintValidator
         }
 
         // should contain uppercase characters only
-        if (strtoupper($canonicalize) !== $canonicalize) {
+        if (!$constraint->allowLowerCase && strtoupper($canonicalize) !== $canonicalize) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Bic::INVALID_CASE_ERROR)

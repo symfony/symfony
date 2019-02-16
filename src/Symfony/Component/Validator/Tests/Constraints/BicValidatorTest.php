@@ -256,6 +256,34 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         yield ['BARCGGSA', 'GB12 CPBK 0892 9965 0449 911'];
         yield ['BARCVGSA', 'GB12 CPBK 0892 9965 0449 911'];
     }
+
+    public function testValidBicAllowLowerCase()
+    {
+        $constraint = new Bic([
+            'allowLowerCase' => true,
+        ]);
+
+        $this->validator->validate('DeutAT2LXXX', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidBicDisallowSpaces()
+    {
+        $bic = 'DEUTA T2LX XX';
+
+        $constraint = new Bic([
+            'allowSpaces' => false,
+            'message' => 'myMessage',
+        ]);
+
+        $this->validator->validate($bic, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$bic.'"')
+            ->setCode(Bic::INVALID_SPACES_ERROR)
+            ->assertRaised();
+    }
 }
 
 class BicComparisonTestClass

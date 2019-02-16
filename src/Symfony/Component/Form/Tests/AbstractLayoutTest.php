@@ -1871,6 +1871,23 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         );
     }
 
+    public function testRenderNumberWithHtml5NumberType()
+    {
+        $this->requiresFeatureSet(403);
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
+            'html5' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+'/input
+    [@type="number"]
+    [@name="name"]
+    [@value="1234.56"]
+'
+        );
+    }
+
     public function testPassword()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');

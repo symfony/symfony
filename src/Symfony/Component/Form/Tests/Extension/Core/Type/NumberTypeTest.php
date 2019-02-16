@@ -75,4 +75,28 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame($expectedData, $form->getNormData());
         $this->assertSame($expectedData, $form->getData());
     }
+
+    public function testIgnoresDefaultLocaleToRenderHtml5NumberWidgets()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'scale' => 2,
+            'rounding_mode' => \NumberFormatter::ROUND_UP,
+            'html5' => true,
+        ]);
+        $form->setData(12345.54321);
+
+        $this->assertSame('12345.55', $form->createView()->vars['value']);
+        $this->assertSame('12345.55', $form->getViewData());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     */
+    public function testGroupingNotAllowedWithHtml5Widget()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'grouping' => true,
+            'html5' => true,
+        ]);
+    }
 }

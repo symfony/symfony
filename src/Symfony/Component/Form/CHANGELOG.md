@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * added `html5` option to `NumberType` that allows to render `type="number"` input fields
  * deprecated using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget`
    option is set to `single_text`
  * added `block_prefix` option to `BaseType`.

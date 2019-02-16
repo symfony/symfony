@@ -28,6 +28,8 @@ class Iban extends Constraint
     const CHECKSUM_FAILED_ERROR = 'b9401321-f9bf-4dcb-83c1-f31094440795';
     const INVALID_FORMAT_ERROR = 'c8d318f1-2ecc-41ba-b983-df70d225cf5a';
     const NOT_SUPPORTED_COUNTRY_CODE_ERROR = 'e2c259f3-4b46-48e6-b72e-891658158ec8';
+    const INVALID_CASE_ERROR = 'd58f8108-22b8-4a4b-a151-09b40fa416a6';
+    const INVALID_SPACES_ERROR = 'cf0325f4-5c35-47a8-a360-51dac05b6540';
 
     protected static $errorNames = [
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
@@ -35,7 +37,11 @@ class Iban extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
         self::NOT_SUPPORTED_COUNTRY_CODE_ERROR => 'NOT_SUPPORTED_COUNTRY_CODE_ERROR',
+        self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
+        self::INVALID_SPACES_ERROR => 'INVALID_SPACES_ERROR',
     ];
 
     public $message = 'This is not a valid International Bank Account Number (IBAN).';
+    public $allowLowerCase = true;
+    public $allowSpaces = true;
 }

@@ -432,6 +432,67 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    public function testValidIbanAllowLowerCase()
+    {
+        $iban = 'fr14 2004 1010 0505 0001 3M02 606';
+
+        $constraint = new Iban([
+            'message' => 'myMessage',
+            'allowLowerCase' => true,
+        ]);
+
+        $this->validator->validate($iban, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidIbanDisallowLowerCase()
+    {
+        $iban = 'fr14 2004 1010 0505 0001 3M02 606';
+
+        $constraint = new Iban([
+            'message' => 'myMessage',
+            'allowLowerCase' => false,
+        ]);
+
+        $this->validator->validate($iban, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$iban.'"')
+            ->setCode(Iban::INVALID_CASE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidIbanAllowSpaces()
+    {
+        $iban = 'FR14 2004 1010 0505 0001 3M02 606';
+
+        $constraint = new Iban([
+            'allowSpaces' => true,
+        ]);
+
+        $this->validator->validate($iban, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidIbanDisallowSpaces()
+    {
+        $iban = 'FR14 2004 1010 0505 0001 3M02 606';
+
+        $constraint = new Iban([
+            'message' => 'myMessage',
+            'allowSpaces' => false,
+        ]);
+
+        $this->validator->validate($iban, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$iban.'"')
+            ->setCode(Iban::INVALID_SPACES_ERROR)
+            ->assertRaised();
+    }
+
     private function assertViolationRaised($iban, $code)
     {
         $constraint = new Iban([

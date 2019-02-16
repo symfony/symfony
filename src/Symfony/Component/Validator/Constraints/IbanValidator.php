@@ -156,6 +156,24 @@ class IbanValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        if (!$constraint->allowSpaces && false !== strpos($value, ' ')) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::INVALID_SPACES_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        if (!$constraint->allowLowerCase && strtoupper($value) !== $value) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::INVALID_CASE_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         // Remove spaces and convert to uppercase
         $canonicalized = str_replace(' ', '', strtoupper($value));
 
@@ -182,7 +200,7 @@ class IbanValidator extends ConstraintValidator
         }
 
         // ...have a format available
-        if (!array_key_exists($countryCode, self::$formats)) {
+        if (!\array_key_exists($countryCode, self::$formats)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)

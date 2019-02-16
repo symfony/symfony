@@ -16,6 +16,7 @@ CHANGELOG
  * Added php ini session options `sid_length` and `sid_bits_per_character` 
    to the `session` section of the configuration
  * Added support for Translator paths, Twig paths in translation commands.
+ * Added support for PHP files with translations in translation commands.
 
 4.2.0
 -----

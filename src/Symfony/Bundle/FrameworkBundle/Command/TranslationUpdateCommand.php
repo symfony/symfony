@@ -207,7 +207,7 @@ EOF
         $errorIo->comment('Parsing templates...');
         $this->extractor->setPrefix($input->getOption('prefix'));
         foreach ($viewsPaths as $path) {
-            if (is_dir($path)) {
+            if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
         }

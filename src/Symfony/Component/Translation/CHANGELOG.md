@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Improved Xliff 1.2 loader to load the original file's metadata
+ * Added `TranslatorPathsPass`
 
 4.2.0
 -----

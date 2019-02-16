@@ -1,5 +1,6 @@
 imports:
     - { resource: ../config/default.yml }
+    - { resource: services.yml }
 
 framework:
     secret: '%secret%'

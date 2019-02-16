@@ -51,6 +51,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
+use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
 use Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass;
@@ -103,6 +104,7 @@ class FrameworkBundle extends Bundle
         // must be registered as late as possible to get access to all Twig paths registered in
         // twig.template_iterator definition
         $this->addCompilerPassIfExists($container, TranslatorPass::class, PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
+        $this->addCompilerPassIfExists($container, TranslatorPathsPass::class, PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass(false));
         $this->addCompilerPassIfExists($container, TranslationExtractorPass::class);

@@ -346,7 +346,7 @@ EOF
     {
         $extractedCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            if (is_dir($path)) {
+            if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
         }

@@ -24,7 +24,7 @@
         "symfony/dependency-injection": "^4.3",
         "symfony/event-dispatcher": "^4.1",
         "symfony/http-foundation": "^4.3",
-        "symfony/http-kernel": "^4.2",
+        "symfony/http-kernel": "^4.3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",

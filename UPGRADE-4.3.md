@@ -55,6 +55,8 @@ Routing
 
  * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
    options have been deprecated.
+ * Implementing `Serializable` for `Route` and `CompiledRoute` is deprecated; if you serialize them, please
+   ensure your unserialization logic can recover from a failure related to an updated serialization format
 
 Security
 --------

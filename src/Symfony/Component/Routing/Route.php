@@ -63,7 +63,7 @@ class Route implements \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @internal since Symfony 4.3, will be removed in Symfony 5 as the class won't implement Serializable anymore
      */
     public function serialize()
     {
@@ -81,7 +81,7 @@ class Route implements \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @internal since Symfony 4.3, will be removed in Symfony 5 as the class won't implement Serializable anymore
      */
     public function unserialize($serialized)
     {

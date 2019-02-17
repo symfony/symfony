@@ -6,6 +6,7 @@ CHANGELOG
 
  * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
  * made `Symfony\Component\HttpKernel\EventListenerLocaleListener` set the default locale early
+ * made `FileLinkFormatter` final and not implement `Serializable` anymore
 
 4.2.0
 -----

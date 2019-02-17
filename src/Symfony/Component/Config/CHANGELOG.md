@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
+ * made `Resource\*` classes final and not implement `Serializable` anymore
 
 4.2.0
 -----

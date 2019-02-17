@@ -246,9 +246,9 @@ class ConnectionTest extends TestCase
             'type' => '*',
         ];
         $amqpExchange->expects($this->once())->method('publish')
-            ->with('body', null, 1, ['delivery_mode' => 2, 'headers' => $headers]);
+            ->with('body', null, 1, ['delivery_mode' => 2, 'headers' => ['token' => 'uuid', 'type' => '*']]);
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[flags]=1', [], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[attributes][headers][token]=uuid&queue[flags]=1', [], true, $factory);
         $connection->publish('body', $headers);
     }
 }

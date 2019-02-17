@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by renanbr at 2019-01-31T16:25:33Z
+
+This is a work in progress.
+
+There are some issues to be solved.
+
+### KernelInterface API
+
+I'm not able to mesure the impact of droping `\Serializable` from `KernelInterface`, not sure if we should do that in a minor release.
+
+### Tests
+
+#### Traces into objects
+
+This new serialization strategy injects a trace into the serialized objects.
+To make some tests pass I had to clone these objects to keep their original instances clean.
+Here the list of tests changed:
+
+- `Symfony\Component\Config\Tests\Resource\ComposerResourceTest:testSerializeUnserialize()`
+- `Symfony\Component\DependencyInjection\Tests\Config\ContainerParametersResourceTest:testSerializeUnserialize()`
+- `Symfony\Component\Routing\Tests\RouteTest:testSerialize()`
+- `Symfony\Component\Routing\Tests\RouteTest:testSerializeWhenCompiled()`
+    - This one is interesting because there is a internal object with the same behavior as its parent
+
+#### Tests realying on serialized strings
+
+`Symfony\Component\HttpKernel\Tests\DataCollector\DumpDataCollectorTest` relied on internal serialization engine. I've updated it, but it still depends on the internal implementation. I created a `ExposedDumpDataCollector` class that expose some internal variables for test purposes.
+
+#### Tests failing
+
+- `Symfony\Component\Routing\Tests\RouteTest:testSerializedRepresentationKeepsWorking()`
+- `Symfony\Component\Config\Tests\ResourceCheckerConfigCacheTest:testCacheIsNotFreshWhenUnserializeFails()`
+    - I guess it's related to `Symfony\Component\Config\ResourceCheckerConfigCache:safelyUnserialize()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-01T08:35:10Z
+
+I would consider implementing `Serializable` an internal implementation detail, which means I'm fine removing it on these classes on master. No BC break here :)
+
+---------------------------------------------------------------------------
+
+by renanbr at 2019-02-01T13:35:37Z
+
+@stof, using __sleep without transient attribute will break serialization for child classes (if parent class has private attributes in the bulk).
+
+In other words: Serializing extended classes won't work anymore.
+
+Real example: I ketp the trasient attribute in the `Symfony\Component\Routing\CompiledRoute` in order to keep `Symfony\Component\Routing\Tests\RouteTest:testSerializeWhenCompiledWithClass()` green.
+
+Here is a list of classes that mention private attributes in `__sleep()`:
+
+- `Symfony\Component\Config\Resource\ClassExistenceResource`
+- `Symfony\Component\Config\Resource\ComposerResource`
+- `Symfony\Component\Config\Resource\DirectoryResource`
+- `Symfony\Component\Config\Resource\FileExistenceResource`
+- `Symfony\Component\Config\Resource\FileResource`
+- `Symfony\Component\Config\Resource\GlobResource`
+- `Symfony\Component\Config\Resource\ReflectionClassResource`
+- `Symfony\Component\DependencyInjection\Config\ContainerParametersResource`
+- `Symfony\Component\Form\FormError`
+- `Symfony\Component\HttpKernel\Debug\FileLinkFormatter`
+- `Symfony\Component\Routing\Route`
+
+Please, check if I should revert it for some of them.
+
+Here is the list of classes mentioning only protected attributes in `__sleep()`:
+
+- `Symfony\Component\HttpKernel\DataCollector\DataCollector`
+- `Symfony\Component\HttpKernel\Kernel`
+
+Here is the list of classes I did changed the transient attribute approach:
+
+- `Symfony\Component\Form\Extension\DataCollector\FormDataCollector`
+- `Symfony\Component\HttpKernel\DataCollector\DumpDataCollector`
+
+---
+
+@nicolas-grekas `s/list(...)/[...]` done
+
+---
+
+Tests still failing:
+
+- `Symfony\Component\Config\Test\ResourceCheckerConfigCacheTest::testCacheIsNotFreshWhenUnserializeFails`
+- `Symfony\Component\Routing\Tests\RouteTest::testSerializedRepresentationKeepsWorking`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-05T11:05:11Z
+
+Actually, we cannot do that for `DataCollector` as that breaks classes like e.g.
+https://github.com/intbizth/toro-admin-bundle/blob/fc85a454fa8c22daffdd6e4ac713b8ea95d23990/DataCollector/ToroDataCollector.php
+
+Maybe split the data-collector related changes to a separate PR to move the rest forward?
+
+---------------------------------------------------------------------------
+
+by renanbr at 2019-02-05T11:42:20Z
+
+I think we can drop `\Serialize` nowhere, because related methods become `@internal` one week ago. We cannot be sure no one is overwriting these methods in other classes :unamused:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-05T11:46:10Z
+
+And we still need to move forward, so we need plans :)
+Mine would be to drop Serializable from resources and mark them `@final` because that looks safe enough,
+and remove `@internal` from the base data collector btw, then consider data collectors in a separate PR.
+
+---------------------------------------------------------------------------
+
+by renanbr at 2019-02-08T18:14:28Z
+
+Updates:
+
+ - Reverted changes in `DataCollector`
+ - Some classes become `@final`
+
+---
+
+:exclamation: Test failing `ResourceCheckerConfigCacheTest::testCacheIsNotFreshWhenUnserializeFails`
+
+It seems the strategy applyed in `ResourceCheckerConfigCache:safelyUnserialize()` does not work with `__sleep()` payload.
+
+Here is an example where native `unserialize()` works, and `safelyUnserialize()` doesn't: https://3v4l.org/0Chn9
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-02-11T23:02:32Z
+
+OK for dropping `\Serializable` on my side but still, it is a BC break that should be mentioned in CHANGELOG/UPGRADE files IMHO. Classes made `@final` may also be documented as anything that triggers notices.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-17T09:56:57Z
+
+Changelogs updated. Not sure about upgrade files, so I didn't update them.

@@ -52,18 +52,7 @@ class ReflectionCaster
             return [];
         }
 
-        if (isset($a[$prefix.'parameters'])) {
-            foreach ($a[$prefix.'parameters']->value as &$v) {
-                $param = $v;
-                $v = new EnumStub([]);
-                foreach (static::castParameter($param, [], $stub, true) as $k => $param) {
-                    if ("\0" === $k[0]) {
-                        $v->value[substr($k, 3)] = $param;
-                    }
-                }
-                unset($v->value['position'], $v->value['isVariadic'], $v->value['byReference'], $v);
-            }
-        }
+        unset($a[$prefix.'parameters']);
 
         if ($f = $c->getFileName()) {
             $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());

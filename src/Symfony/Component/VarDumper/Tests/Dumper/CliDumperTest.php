@@ -81,13 +81,6 @@ array:24 [
   "closure" => Closure(\$a, PDO &\$b = null) {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
     this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
-    parameters: {
-      \$a: {}
-      &\$b: {
-        typeHint: "PDO"
-        default: null
-      }
-    }
     file: "%s%eTests%eFixtures%edumb-var.php"
     line: "{$var['line']} to {$var['line']}"
   }

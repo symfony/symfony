@@ -59,6 +59,9 @@
     <service id="new_factory4" class="BazClass">
       <factory method="getInstance" />
     </service>
+    <service id="new_factory5" class="FooBarClass">
+      <factory service="baz" />
+    </service>
     <service id="alias_for_foo" alias="foo" />
     <service id="another_alias_for_foo" alias="foo" public="false" />
     <service id="0" class="FooClass" />

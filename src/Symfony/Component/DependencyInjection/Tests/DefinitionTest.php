@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
@@ -35,6 +36,9 @@ class DefinitionTest extends TestCase
 
         $def->setFactory('Foo::bar');
         $this->assertEquals(['Foo', 'bar'], $def->getFactory(), '->setFactory() converts string static method call to the array');
+
+        $def->setFactory($ref = new Reference('baz'));
+        $this->assertSame([$ref, '__invoke'], $def->getFactory(), '->setFactory() converts service reference to class invoke call');
         $this->assertSame(['factory' => true], $def->getChanges());
     }
 

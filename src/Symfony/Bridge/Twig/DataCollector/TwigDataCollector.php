@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Twig\Environment;
+use Twig\Error\LoaderError;
 use Twig\Markup;
 use Twig\Profiler\Dumper\HtmlDumper;
 use Twig\Profiler\Profile;
@@ -70,7 +71,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             if ($profile->isTemplate()) {
                 try {
                     $template = $this->twig->load($name = $profile->getName());
-                } catch (\Twig_Error_Loader $e) {
+                } catch (LoaderError $e) {
                     $template = null;
                 }
 

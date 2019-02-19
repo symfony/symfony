@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\BuiltInDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -62,6 +63,7 @@ class SerializerEndToEndTest extends TestCase
             new ConstraintViolationListNormalizer(),
             new DateIntervalNormalizer(),
             new DataUriNormalizer(),
+            new BuiltInDenormalizer(),
             new ArrayDenormalizer(),
             new ObjectNormalizer(
                 $classMetadata,

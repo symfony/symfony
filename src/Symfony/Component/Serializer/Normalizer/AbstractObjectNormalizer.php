@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -326,25 +325,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
 
-            if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
-                if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
-                }
-
-                $childContext = $this->createChildContext($context, $attribute);
-                if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                    return $this->serializer->denormalize($data, $class, $format, $childContext);
-                }
+            if (!$this->serializer instanceof DenormalizerInterface) {
+                throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
             }
 
-            // JSON only has a Number type corresponding to both int and float PHP types.
-            // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
-            // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
-            // PHP's json_decode automatically converts Numbers without a decimal part to integers.
-            // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
-            // a float is expected.
-            if (Type::BUILTIN_TYPE_FLOAT === $builtinType && \is_int($data) && false !== strpos($format, JsonEncoder::FORMAT)) {
-                return (float) $data;
+            $childContext = $this->createChildContext($context, $attribute);
+            if ($this->serializer->supportsDenormalization($data, $class ?? $builtinType, $format, $childContext)) {
+                return $this->serializer->denormalize($data, $class ?? $builtinType, $format, $childContext);
             }
 
             if (('is_'.$builtinType)($data)) {
@@ -361,19 +348,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     private function flatternDenormalizationType(Type $type, array &$context): array
     {
-        if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && (Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType() || Type::BUILTIN_TYPE_ARRAY === $collectionValueType->getBuiltinType())) {
+        if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType())) {
             if ($collectionValueType->isCollection()) {
                 [$builtinType, $class] = $this->flatternDenormalizationType($collectionValueType, $context);
             } else {
                 [$builtinType, $class] = [$collectionValueType->getBuiltinType(), $collectionValueType->getClassName()];
             }
 
-            if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {
-                $class = $class.'[]';
+            $class = $class ? $class.'[]' : $class;
+            $builtinType = $builtinType.'[]';
 
-                if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
-                    $context['key_types'][] = $collectionKeyType;
-                }
+            if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
+                $context['key_types'][] = $collectionKeyType;
             }
         } else {
             return [$type->getBuiltinType(), $type->getClassName()];

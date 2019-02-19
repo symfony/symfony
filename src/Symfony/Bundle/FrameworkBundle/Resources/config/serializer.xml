@@ -73,6 +73,11 @@
             <tag name="serializer.normalizer" priority="-990" />
         </service>
 
+        <service id="serializer.denormalizer.builtin" class="Symfony\Component\Serializer\Normalizer\BuiltInDenormalizer">
+            <!-- Run before the object normalizer -->
+            <tag name="serializer.normalizer" priority="-980" />
+        </service>
+
         <!-- Loader -->
         <service id="serializer.mapping.chain_loader" class="Symfony\Component\Serializer\Mapping\Loader\LoaderChain">
             <argument type="collection" />

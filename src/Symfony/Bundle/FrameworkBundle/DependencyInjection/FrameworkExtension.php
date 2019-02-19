@@ -87,6 +87,7 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Normalizer\BuiltInDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1321,6 +1322,10 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Yaml::class)) {
             $container->removeDefinition('serializer.encoder.yaml');
+        }
+
+        if (!class_exists(BuiltInDenormalizer::class)) {
+            $container->removeDefinition('serializer.denormalizer.builtin');
         }
 
         $serializerLoaders = [];

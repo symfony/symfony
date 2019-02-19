@@ -39,6 +39,10 @@
             <argument type="service" id="debug.stopwatch" />
         </service>
 
+        <service id="messenger.middleware.security" class="Symfony\Component\Messenger\Middleware\SecurityMiddleware">
+            <argument type="service" id="security.authorization_checker" />
+        </service>
+
         <!-- Logging -->
         <service id="messenger.middleware.logging" class="Symfony\Component\Messenger\Middleware\LoggingMiddleware">
             <tag name="monolog.logger" channel="messenger" />

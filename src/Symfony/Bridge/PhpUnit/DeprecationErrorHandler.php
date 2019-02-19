@@ -108,9 +108,7 @@ class DeprecationErrorHandler
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        $mode = $this->getMode();
-
-        if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || self::MODE_DISABLED === $mode) {
+        if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || self::MODE_DISABLED === $mode = $this->getMode()) {
             $ErrorHandler = self::$utilPrefix.'ErrorHandler';
 
             return $ErrorHandler::handleError($type, $msg, $file, $line, $context);

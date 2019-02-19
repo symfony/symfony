@@ -549,7 +549,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     /**
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted
+     * @expectedExceptionMessage Aborted.
      */
     public function testAskThrowsExceptionOnMissingInput()
     {
@@ -559,7 +559,17 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
     /**
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted
+     * @expectedExceptionMessage Aborted.
+     */
+    public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted.
      */
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {

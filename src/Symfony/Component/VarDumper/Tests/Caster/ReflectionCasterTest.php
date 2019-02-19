@@ -70,10 +70,7 @@ EOTXT
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
 Closure($x) {
-%Aparameters: {
-    $x: {}
-  }
-  use: {
+%Ause: {
     $a: 123
     $b: & 123
   }

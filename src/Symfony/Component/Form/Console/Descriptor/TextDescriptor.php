@@ -188,7 +188,6 @@ class TextDescriptor extends Descriptor
             $prefix = Caster::PREFIX_VIRTUAL;
 
             return [
-                $prefix.'parameters' => isset($a[$prefix.'parameters']) ? \count($a[$prefix.'parameters']->value) : 0,
                 $prefix.'file' => $a[$prefix.'file'],
                 $prefix.'line' => $a[$prefix.'line'],
             ];

@@ -837,17 +837,18 @@ class ObjectNormalizerTest extends TestCase
         $serializer->denormalize(['date' => 'foo'], ObjectOuter::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage The type of the key "a" must be "int" ("string" given).
-     */
-    public function testRejectInvalidKey()
+    public function testAcceptValidKey()
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
 
-        $serializer->denormalize(['inners' => ['a' => ['foo' => 1]]], ObjectOuter::class);
+        $result = new ObjectOuter();
+        $inner = new ObjectInner();
+        $inner->foo = 1;
+        $result->setInners(['a' => $inner]);
+
+        $this->assertEquals($result, $serializer->denormalize(['inners' => ['a' => ['foo' => 1]]], ObjectOuter::class));
     }
 
     public function testDoNotRejectInvalidTypeOnDisableTypeEnforcementContextOption()

@@ -270,6 +270,79 @@ baz
 
 CSV
             ],
+            'string keys' => [
+                ['first' => new Baz('baz'), 'second' => new Baz('baz2')],
+                Baz::class.'[]',
+                ['key_types' => [new Type(Type::BUILTIN_TYPE_STRING)]],
+                <<<XML
+<?xml version="1.0"?>
+<response>
+  <first>
+    <name>baz</name>
+  </first>
+  <second>
+    <name>baz2</name>
+  </second>
+</response>
+
+XML
+                , <<<JSON
+{
+  "first": {
+    "name": "baz"
+  },
+  "second": {
+    "name": "baz2"
+  }
+}
+JSON
+                , <<<YAML
+first:
+  name: baz
+second:
+  name: baz2
+
+YAML
+                , <<<CSV
+first.name,second.name
+baz,baz2
+
+CSV
+            ],
+            'string keys in object' => [
+                new Quz(['a' => 'a', 'b' => 'b']),
+                Quz::class,
+                [CsvEncoder::AS_COLLECTION_KEY => false],
+                <<<XML
+<?xml version="1.0"?>
+<response>
+  <data>
+    <a>a</a>
+    <b>b</b>
+  </data>
+</response>
+
+XML
+                , <<<JSON
+{
+  "data": {
+    "a": "a",
+    "b": "b"
+  }
+}
+JSON
+                , <<<YAML
+data:
+  a: a
+  b: b
+
+YAML
+                , <<<CSV
+data.a,data.b
+a,b
+
+CSV
+            ],
             'qaz' => $this->qazData()
         ];
     }

@@ -108,7 +108,7 @@ final class PhpDocTypeHelper
                 $collectionKeyType = null;
                 $collectionValueType = null;
             } else {
-                $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
+                $collectionKeyType = null;
                 $collectionValueType = $this->createType($type, $nullable, substr($docType, 0, -2));
             }
 

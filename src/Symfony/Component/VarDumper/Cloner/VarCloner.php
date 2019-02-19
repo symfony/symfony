@@ -47,7 +47,7 @@ class VarCloner extends AbstractCloner
                                         // or null if the original value is used directly
 
         if (!self::$hashMask) {
-            self::$gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
+            self::$gid = uniqid((string) mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
             self::initHashMask();
         }
         $gid = self::$gid;

@@ -47,7 +47,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
 
-            $uniqueName = md5($name.uniqid(mt_rand(), true));
+            $uniqueName = md5($name.uniqid((string) mt_rand(), true));
             $placeholder = sprintf('env_%s_%s', str_replace(':', '_', $env), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 

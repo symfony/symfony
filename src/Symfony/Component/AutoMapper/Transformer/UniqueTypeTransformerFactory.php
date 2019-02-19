@@ -44,6 +44,10 @@ class UniqueTypeTransformerFactory implements TransformerFactoryInterface
         }
 
         foreach ($targetTypes as $targetType) {
+            if (null === $targetType) {
+                continue;
+            }
+
             $transformer = $this->chainTransformerFactory->getTransformer($sourcesTypes, [$targetType], $mapperMetadata);
 
             if (null !== $transformer) {

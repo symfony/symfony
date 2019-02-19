@@ -27,6 +27,8 @@ final class UniqueVariableScope
      */
     public function getUniqueName(string $name): string
     {
+        $name = strtolower($name);
+
         if (!isset($this->registry[$name])) {
             $this->registry[$name] = 0;
 

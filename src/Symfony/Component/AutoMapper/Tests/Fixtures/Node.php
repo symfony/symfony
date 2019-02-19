@@ -9,10 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AutoMapper\Tests\Extractor;
+namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
-
-class WriteMutatorTest extends TestCase
+class Node
 {
+    /** @var Node */
+    public $parent;
+
+    /** @var Node[] */
+    public $childs = [];
 }

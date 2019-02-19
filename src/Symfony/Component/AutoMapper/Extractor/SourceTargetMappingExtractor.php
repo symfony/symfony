@@ -40,7 +40,9 @@ class SourceTargetMappingExtractor extends MappingExtractor
             }
 
             if (\in_array($property, $targetProperties, true)) {
-                if (!$this->propertyInfoExtractor->isWritable($mapperMetadata->getTarget(), $property)) {
+                $targetMutatorConstruct = $this->accessorExtractor->getWriteMutator($mapperMetadata->getTarget(), $property, true);
+
+                if (($targetMutatorConstruct === null || $targetMutatorConstruct->getParameter() === null) && !$this->propertyInfoExtractor->isWritable($mapperMetadata->getTarget(), $property)) {
                     continue;
                 }
 
@@ -69,7 +71,7 @@ class SourceTargetMappingExtractor extends MappingExtractor
 
                 $mapping[] = new PropertyMapping(
                     $sourceAccessor,
-                    $targetMutator,
+                    $targetMutator ?? $targetMutatorConstruct,
                     $transformer,
                     $property,
                     false,

@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AutoMapper\Tests\Extractor;
+namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
-
-class PrivateReflectionExtractorTest extends TestCase
+class Cat extends Pet
 {
 }

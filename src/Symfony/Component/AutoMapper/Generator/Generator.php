@@ -303,7 +303,7 @@ class Generator
         $classDiscriminatorMapping = 'array' !== $mapperMetadata->getTarget() && null !== $this->classDiscriminator ? $this->classDiscriminator->getMappingForClass($mapperMetadata->getTarget()) : null;
 
         if (null !== $classDiscriminatorMapping && null !== ($propertyMapping = $mapperMetadata->getPropertyMapping($classDiscriminatorMapping->getTypeProperty()))) {
-            [$output, $createObjectStatements] = $propertyMapping->getTransformer()->transform($propertyMapping->getReadAccessor()->getExpression($sourceInput), $uniqueVariableScope, $propertyMapping);
+            [$output, $createObjectStatements] = $propertyMapping->getTransformer()->transform($propertyMapping->getReadAccessor()->getExpression($sourceInput), $propertyMapping, $uniqueVariableScope);
 
             foreach ($classDiscriminatorMapping->getTypesMapping() as $typeValue => $typeTarget) {
                 $mapperName = 'Discriminator_Mapper_'.$mapperMetadata->getSource().'_'.$typeTarget;
@@ -339,14 +339,14 @@ class Generator
 
             /** @var PropertyMapping $propertyMapping */
             foreach ($propertiesMapping as $propertyMapping) {
-                if (null === $propertyMapping->getWriteMutator()->getParameter()) {
+                if (null === ($parameter = $propertyMapping->getWriteMutator()->getParameter())) {
                     continue;
                 }
 
                 $constructVar = new Expr\Variable($uniqueVariableScope->getUniqueName('constructArg'));
 
                 [$output, $propStatements] = $propertyMapping->getTransformer()->transform($propertyMapping->getReadAccessor()->getExpression($sourceInput), $propertyMapping, $uniqueVariableScope);
-                $constructArguments[$propertyMapping->getWriteMutator()->getParameter()->getPosition()] = new Arg($constructVar);
+                $constructArguments[$parameter->getPosition()] = new Arg($constructVar);
 
                 $propStatements[] = new Stmt\Expression(new Expr\Assign($constructVar, $output));
                 $createObjectStatements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, 'hasConstructorArgument', [
@@ -387,6 +387,8 @@ class Generator
                     $constructArguments[$constructorParameter->getPosition()] = new Arg($constructVar);
                 }
             }
+
+            ksort($constructArguments);
 
             $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name\FullyQualified($mapperMetadata->getTarget()), $constructArguments)));
         } elseif (null !== $targetConstructor && $mapperMetadata->isTargetCloneable()) {

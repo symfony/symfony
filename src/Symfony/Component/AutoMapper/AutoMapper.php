@@ -131,7 +131,7 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
         }
 
         if (null === $source) {
-            throw new NoMappingFoundException('Cannot map this value, its neither an object or an array');
+            throw new NoMappingFoundException('Cannot map this value, source is neither an object or an array.');
         }
 
         if (null === $context) {
@@ -153,7 +153,11 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
         }
 
         if (null === $target) {
-            throw new NoMappingFoundException('Cannot map this value, its neither an object or an array');
+            throw new NoMappingFoundException('Cannot map this value, target is neither an object or an array.');
+        }
+
+        if ('array' === $source && 'array' === $target) {
+            throw new NoMappingFoundException('Cannot map this value, both source and target are array.');
         }
 
         return $this->getMapper($source, $target)->map($sourceData, $context);
@@ -180,7 +184,14 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
      *
      * @internal
      */
-    public static function create(bool $private = true, ClassLoaderInterface $loader = null, AdvancedNameConverterInterface $nameConverter = null, string $classPrefix = 'Mapper_', bool $attributeChecking = true): self
+    public static function create(
+        bool $private = true,
+        ClassLoaderInterface $loader = null,
+        AdvancedNameConverterInterface $nameConverter = null,
+        string $classPrefix = 'Mapper_',
+        bool $attributeChecking = true,
+        bool $autoRegister = true
+    ): self
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
@@ -238,12 +249,16 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
         );
         $factory->setAttributeChecking($attributeChecking);
 
-        $autoMapper = new self($loader, new MapperGeneratorMetadataFactory(
-            $sourceTargetMappingExtractor,
-            $fromSourceMappingExtractor,
-            $fromTargetMappingExtractor,
-            $classPrefix
-        ));
+        if ($autoRegister) {
+            $autoMapper = new self($loader, new MapperGeneratorMetadataFactory(
+                $sourceTargetMappingExtractor,
+                $fromSourceMappingExtractor,
+                $fromTargetMappingExtractor,
+                $classPrefix
+            ));
+        } else {
+            $autoMapper = new self($loader);
+        }
 
         $transformerFactory->addTransformerFactory(new MultipleTransformerFactory($transformerFactory));
         $transformerFactory->addTransformerFactory(new NullableTransformerFactory($transformerFactory));

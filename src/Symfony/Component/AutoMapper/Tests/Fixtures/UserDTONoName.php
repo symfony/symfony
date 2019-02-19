@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AutoMapper\Tests\Extractor;
+namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
-
-class SourceTargetMappingExtractorTest extends TestCase
+class UserDTONoName
 {
+    /**
+     * @var int
+     */
+    public $id;
 }

@@ -9,10 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AutoMapper\Tests\Loader;
+namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
-
-class EvalLoaderTest extends TestCase
+class UserDTONoAge
 {
+    /**
+     * @var int
+     */
+    public $id;
+
+    /**
+     * @var string
+     */
+    public $name;
 }

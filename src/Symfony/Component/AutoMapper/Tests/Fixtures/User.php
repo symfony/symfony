@@ -17,30 +17,46 @@ class User
      * @var int
      */
     private $id;
+
     /**
      * @var string
      */
     public $name;
+
     /**
      * @var string|int
      */
     public $age;
+
     /**
      * @var string
      */
     private $email;
+
     /**
      * @var Address
      */
     public $address;
+
     /**
      * @var Address[]
      */
     public $addresses = [];
+
     /**
      * @var \DateTimeInterface
      */
     public $createdAt;
+
+    /**
+     * @var float
+     */
+    public $money;
+
+    /**
+     * @var iterable
+     */
+    public $languages;
 
     public function __construct($id, $name, $age)
     {
@@ -49,6 +65,8 @@ class User
         $this->age = $age;
         $this->email = 'test';
         $this->createdAt = new \DateTime();
+        $this->money = 20.10;
+        $this->languages = new \ArrayObject();
     }
 
     /**

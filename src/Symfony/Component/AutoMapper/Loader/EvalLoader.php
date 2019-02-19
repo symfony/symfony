@@ -30,9 +30,9 @@ class EvalLoader implements ClassLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClass(MapperGeneratorMetadataInterface $mapperConfiguration): void
+    public function loadClass(MapperGeneratorMetadataInterface $mapperGeneratorMetadata): void
     {
-        $class = $this->generator->compile($mapperConfiguration);
+        $class = $this->generator->generate($mapperGeneratorMetadata);
 
         eval($this->printer->prettyPrint([$class]));
     }

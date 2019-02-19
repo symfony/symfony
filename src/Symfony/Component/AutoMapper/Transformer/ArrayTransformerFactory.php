@@ -41,7 +41,11 @@ class ArrayTransformerFactory extends AbstractUniqueTypeTransformerFactory
             return null;
         }
 
-        $subItemTransformer = $this->chainTransformerFactory->getTransformer([$sourceType->getCollectionValueType()], [$targetType->getCollectionValueType()], $mapperMetadata);
+        if (null === $sourceType->getCollectionValueType() || null === $targetType->getCollectionValueType()) {
+            $subItemTransformer = new CopyTransformer();
+        } else {
+            $subItemTransformer = $this->chainTransformerFactory->getTransformer([$sourceType->getCollectionValueType()], [$targetType->getCollectionValueType()], $mapperMetadata);
+        }
 
         if (null !== $subItemTransformer) {
             return new ArrayTransformer($subItemTransformer);

@@ -44,6 +44,21 @@ final class ReadAccessor
         $this->private = $private;
     }
 
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->private;
+    }
+
     /**
      * Get AST expression for reading property from an input.
      *

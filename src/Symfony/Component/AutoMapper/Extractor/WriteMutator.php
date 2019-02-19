@@ -44,6 +44,21 @@ final class WriteMutator
         $this->parameter = $parameter;
     }
 
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->private;
+    }
+
     /**
      * Get AST expression for writing from a value to an output.
      *

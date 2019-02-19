@@ -237,7 +237,7 @@ class Context extends \ArrayObject
      */
     public function withNewContext(string $attribute): self
     {
-        if (null === $this->attributes) {
+        if (null === $this->attributes && null === $this->ignoredAttributes) {
             return $this;
         }
 

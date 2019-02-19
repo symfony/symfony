@@ -9,10 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AutoMapper\Tests\Extractor;
+namespace Symfony\Component\AutoMapper\Tests\Fixtures;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-class ReadAccessorTest extends TestCase
+class Bar
 {
+    /**
+     * @var int
+     *
+     * @Groups({"group2", "group3"})
+     */
+    public $id;
 }

@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ReflectionCaster
 {
+    const UNSET_CLOSURE_FILE_INFO = ['Closure' => __CLASS__.'::unsetClosureFileInfo'];
+
     private static $extraMap = [
         'docComment' => 'getDocComment',
         'extension' => 'getExtensionName',
@@ -46,18 +48,30 @@ class ReflectionCaster
 
         $stub->class .= self::getSignature($a);
 
+        if ($f = $c->getFileName()) {
+            $stub->attr['file'] = $f;
+            $stub->attr['line'] = $c->getStartLine();
+        }
+
+        unset($a[$prefix.'parameters']);
+
         if ($filter & Caster::EXCLUDE_VERBOSE) {
             $stub->cut += ($c->getFileName() ? 2 : 0) + \count($a);
 
             return [];
         }
 
-        unset($a[$prefix.'parameters']);
-
-        if ($f = $c->getFileName()) {
+        if ($f) {
             $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());
             $a[$prefix.'line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
+
+        return $a;
+    }
+
+    public static function unsetClosureFileInfo(\Closure $c, array $a)
+    {
+        unset($a[Caster::PREFIX_VIRTUAL.'file'], $a[Caster::PREFIX_VIRTUAL.'line']);
 
         return $a;
     }

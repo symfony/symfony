@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\DataCollector;
 
 use Symfony\Component\VarDumper\Caster\CutStub;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
@@ -79,7 +80,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function getCasters()
     {
-        return [
+        $casters = [
             '*' => function ($v, array $a, Stub $s, $isNested) {
                 if (!$v instanceof Stub) {
                     foreach ($a as $k => $v) {
@@ -92,5 +93,11 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
                 return $a;
             },
         ];
+
+        if (method_exists(ReflectionCaster::class, 'unsetClosureFileInfo')) {
+            $casters += ReflectionCaster::UNSET_CLOSURE_FILE_INFO;
+        }
+
+        return $casters;
     }
 }

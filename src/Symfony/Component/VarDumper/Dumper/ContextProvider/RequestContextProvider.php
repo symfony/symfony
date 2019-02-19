@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper\ContextProvider;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
@@ -29,6 +30,7 @@ final class RequestContextProvider implements ContextProviderInterface
         $this->requestStack = $requestStack;
         $this->cloner = new VarCloner();
         $this->cloner->setMaxItems(0);
+        $this->cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
     }
 
     public function getContext(): ?array

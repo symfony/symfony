@@ -279,7 +279,7 @@ abstract class AbstractCloner implements ClonerInterface
             $stub->class = get_parent_class($class).'@anonymous';
         }
         if (isset($this->classInfo[$class])) {
-            list($i, $parents, $hasDebugInfo) = $this->classInfo[$class];
+            list($i, $parents, $hasDebugInfo, $fileInfo) = $this->classInfo[$class];
         } else {
             $i = 2;
             $parents = [$class];
@@ -295,9 +295,16 @@ abstract class AbstractCloner implements ClonerInterface
             }
             $parents[] = '*';
 
-            $this->classInfo[$class] = [$i, $parents, $hasDebugInfo];
+            $r = new \ReflectionClass($class);
+            $fileInfo = $r->isInternal() || $r->isSubclassOf(Stub::class) ? [] : [
+                'file' => $r->getFileName(),
+                'line' => $r->getStartLine(),
+            ];
+
+            $this->classInfo[$class] = [$i, $parents, $hasDebugInfo, $fileInfo];
         }
 
+        $stub->attr += $fileInfo;
         $a = Caster::castObject($obj, $class, $hasDebugInfo);
 
         try {

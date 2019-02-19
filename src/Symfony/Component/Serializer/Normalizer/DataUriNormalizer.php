@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
@@ -140,9 +141,11 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
             return $object->getMimeType();
         }
 
-        if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
-            return $mimeType;
-        }
+        try {
+            if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
+                return $mimeType;
+            }
+        } catch (FileNotFoundException $e) {}
 
         return 'application/octet-stream';
     }

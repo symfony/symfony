@@ -22,6 +22,7 @@ class DataUriNormalizerTest extends TestCase
 {
     const TEST_GIF_DATA = 'data:image/gif;base64,R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=';
     const TEST_TXT_DATA = 'data:text/plain,K%C3%A9vin%20Dunglas%0A';
+    const TEST_TXT_DATA_NO_MIME = 'data:application/octet-stream;base64,S8OpdmluIER1bmdsYXMK';
     const TEST_TXT_CONTENT = "Kévin Dunglas\n";
 
     /**
@@ -76,6 +77,19 @@ class DataUriNormalizerTest extends TestCase
         $data = $this->normalizer->normalize($file);
 
         $this->assertSame(self::TEST_TXT_DATA, $data);
+        $this->assertSame(self::TEST_TXT_CONTENT, file_get_contents($data));
+    }
+
+    /**
+     * @requires extension fileinfo
+     */
+    public function testNormalizeDataUrl()
+    {
+        $file = new \SplFileObject(self::TEST_TXT_DATA);
+
+        $data = $this->normalizer->normalize($file);
+
+        $this->assertSame(self::TEST_TXT_DATA_NO_MIME, $data);
         $this->assertSame(self::TEST_TXT_CONTENT, file_get_contents($data));
     }
 

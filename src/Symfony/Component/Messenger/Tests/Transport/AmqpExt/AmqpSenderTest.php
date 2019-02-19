@@ -39,7 +39,7 @@ class AmqpSenderTest extends TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Messenger\Exception\TransportException
+     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
      */
     public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
     {

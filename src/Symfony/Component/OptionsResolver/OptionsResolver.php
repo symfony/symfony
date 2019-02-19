@@ -57,7 +57,7 @@ class OptionsResolver implements Options
     /**
      * A list of normalizer closures.
      *
-     * @var \Closure[]
+     * @var \Closure[][]
      */
     private $normalizers = [];
 
@@ -484,7 +484,56 @@ class OptionsResolver implements Options
             throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
         }
 
-        $this->normalizers[$option] = $normalizer;
+        $this->normalizers[$option] = [$normalizer];
+
+        // Make sure the option is processed
+        unset($this->resolved[$option]);
+
+        return $this;
+    }
+
+    /**
+     * Adds a normalizer for an option.
+     *
+     * The normalizer should be a closure with the following signature:
+     *
+     *     function (Options $options, $value): mixed {
+     *         // ...
+     *     }
+     *
+     * The closure is invoked when {@link resolve()} is called. The closure
+     * has access to the resolved values of other options through the passed
+     * {@link Options} instance.
+     *
+     * The second parameter passed to the closure is the value of
+     * the option.
+     *
+     * The resolved option value is set to the return value of the closure.
+     *
+     * @param string   $option       The option name
+     * @param \Closure $normalizer   The normalizer
+     * @param bool     $forcePrepend If set to true, prepend instead of appending
+     *
+     * @return $this
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function addNormalizer(string $option, \Closure $normalizer, bool $forcePrepend = false): self
+    {
+        if ($this->locked) {
+            throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
+        }
+
+        if (!isset($this->defined[$option])) {
+            throw new UndefinedOptionsException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
+        }
+
+        if ($forcePrepend) {
+            array_unshift($this->normalizers[$option], $normalizer);
+        } else {
+            $this->normalizers[$option][] = $normalizer;
+        }
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -966,15 +1015,15 @@ class OptionsResolver implements Options
                 throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', array_keys($this->calling))));
             }
 
-            $normalizer = $this->normalizers[$option];
-
             // The following section must be protected from cyclic
             // calls. Set $calling for the current $option to detect a cyclic
             // dependency
             // BEGIN
             $this->calling[$option] = true;
             try {
-                $value = $normalizer($this, $value);
+                foreach ($this->normalizers[$option] as $normalizer) {
+                    $value = $normalizer($this, $value);
+                }
             } finally {
                 unset($this->calling[$option]);
             }

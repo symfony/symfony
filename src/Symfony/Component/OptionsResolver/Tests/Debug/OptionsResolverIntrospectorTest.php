@@ -201,6 +201,42 @@ class OptionsResolverIntrospectorTest extends TestCase
         $this->assertSame('bar', $debug->getNormalizer('foo'));
     }
 
+    public function testGetNormalizers()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('foo');
+        $resolver->addNormalizer('foo', $normalizer1 = function () {});
+        $resolver->addNormalizer('foo', $normalizer2 = function () {});
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $this->assertSame([$normalizer1, $normalizer2], $debug->getNormalizers('foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoConfigurationException
+     * @expectedExceptionMessage No normalizer was set for the "foo" option.
+     */
+    public function testGetNormalizersThrowsOnNoConfiguredValue()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('foo');
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $debug->getNormalizers('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The option "foo" does not exist.
+     */
+    public function testGetNormalizersThrowsOnNotDefinedOption()
+    {
+        $resolver = new OptionsResolver();
+
+        $debug = new OptionsResolverIntrospector($resolver);
+        $debug->getNormalizers('foo');
+    }
+
     public function testGetDeprecationMessage()
     {
         $resolver = new OptionsResolver();

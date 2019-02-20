@@ -97,6 +97,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testXml($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$xml) {
+            $this->markTestSkipped(sprintf('Xml doesnt support this (%s) data type', $type));
+        }
         $data = $this->serializer->serialize($object, 'xml', $context);
         $this->assertXmlStringEqualsXmlString($xml, $data);
     }
@@ -106,6 +109,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testDeserializeXml($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$xml) {
+            $this->markTestSkipped(sprintf('Xml doesnt support this (%s) data type', $type));
+        }
         $deserialized = $this->serializer->deserialize($xml, $type, 'xml', $context);
         $this->assertEquals($object, $deserialized);
     }
@@ -115,6 +121,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testJson($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$json) {
+            $this->markTestSkipped(sprintf('Json doesnt support this (%s) data type', $type));
+        }
         $data = $this->serializer->serialize($object, 'json', $context);
         $this->assertJsonStringEqualsJsonString($json, $data);
     }
@@ -124,6 +133,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testDeserializeJson($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$json) {
+            $this->markTestSkipped(sprintf('Json doesnt support this (%s) data type', $type));
+        }
         $deserialized = $this->serializer->deserialize($json, $type, 'json', $context);
         $this->assertEquals($object, $deserialized);
     }
@@ -133,6 +145,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testYaml($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$yaml) {
+            $this->markTestSkipped(sprintf('Yaml doesnt support this (%s) data type', $type));
+        }
         $data = $this->serializer->serialize($object, 'yaml', $context);
         $this->assertYamlStringEqualsYamlString($yaml, $data);
     }
@@ -142,6 +157,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testDeserializeYaml($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$yaml) {
+            $this->markTestSkipped(sprintf('Yaml doesnt support this (%s) data type', $type));
+        }
         $deserialized = $this->serializer->deserialize($yaml, $type, 'yaml', $context);
         $this->assertEquals($object, $deserialized);
     }
@@ -151,6 +169,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testCsv($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$csv) {
+            $this->markTestSkipped(sprintf('Csv doesnt support this (%s) data type', $type));
+        }
         $data = $this->serializer->serialize($object, 'csv', array_merge([
             'as_collection' => true,
         ], $context));
@@ -162,6 +183,9 @@ class SerializerEndToEndTest extends TestCase
      */
     public function testDeserializeCsv($object, $type, $context, $xml, $json, $yaml, $csv)
     {
+        if (!$csv) {
+            $this->markTestSkipped(sprintf('Csv doesnt support this (%s) data type', $type));
+        }
         $deserialized = $this->serializer->deserialize($csv, $type, 'csv', array_merge([
             'as_collection' => true,
         ], $context));
@@ -185,11 +209,7 @@ JSON
                 , <<<YAML
 hello
 YAML
-                , <<<CSV
-0
-hello
-
-CSV
+                , null
             ],
             'string array' => [
                 ['hello', 'world'],
@@ -210,11 +230,7 @@ JSON
 - hello
 - world
 YAML
-                , <<<CSV
-0,1
-hello,world
-
-CSV
+                , null
             ],
             'baz' => [
                 new Baz('baz'),
@@ -274,19 +290,7 @@ CSV
                 ['first' => new Baz('baz'), 'second' => new Baz('baz2')],
                 Baz::class.'[]',
                 ['key_types' => [new Type(Type::BUILTIN_TYPE_STRING)]],
-                <<<XML
-<?xml version="1.0"?>
-<response>
-  <first>
-    <name>baz</name>
-  </first>
-  <second>
-    <name>baz2</name>
-  </second>
-</response>
-
-XML
-                , <<<JSON
+                null, <<<JSON
 {
   "first": {
     "name": "baz"
@@ -303,26 +307,13 @@ second:
   name: baz2
 
 YAML
-                , <<<CSV
-first.name,second.name
-baz,baz2
-
-CSV
+                , null
             ],
             'string keys in object' => [
                 new Quz(['a' => 'a', 'b' => 'b']),
                 Quz::class,
                 [CsvEncoder::AS_COLLECTION_KEY => false],
-                <<<XML
-<?xml version="1.0"?>
-<response>
-  <data>
-    <a>a</a>
-    <b>b</b>
-  </data>
-</response>
-
-XML
+                null
                 , <<<JSON
 {
   "data": {
@@ -351,6 +342,7 @@ CSV
     {
         $qaz = new Qaz();
         $qaz->setQazString('foo');
+        $qaz->setQazStringEmpty('');
         $qaz->setQazInt(123);
         $qaz->setQazFloat(3.14);
         $qaz->setQazBool(true);
@@ -376,7 +368,6 @@ CSV
         $qaz->setQazDateArrayArray([[\DateTime::createFromFormat(DATE_ISO8601, '2019-05-17T12:05:06+02:00')], [\DateTime::createFromFormat(DATE_ISO8601, '2020-06-17T12:05:06+02:00')]]);
         $qaz->setQazBazArrayArray([[new Baz('baz5'), new Baz('baz6')], [new Baz('baz7'), new Baz('baz8')]]);
         $qaz->setQazBazArrayArrayOneItem([[new Baz('baz9')]]);
-        $qaz->setQazIntOption(1);
 
         return [
             $qaz,
@@ -386,6 +377,7 @@ CSV
 <?xml version="1.0"?>
 <response>
   <qazstring>foo</qazstring>
+  <qazstringempty></qazstringempty>
   <qazint>123</qazint>
   <qazfloat>3.14</qazfloat>
   <qazbool>1</qazbool>
@@ -498,14 +490,16 @@ CSV
     </item>
   </qazbazarrayarrayoneitem>
   <qazstringoption/>
-  <qazintoption>1</qazintoption>
+  <qazintoption/>
   <qazdateoption/>
+  <qazbazoption/>
 </response>
 
 XML
             , <<<JSON
 {
   "qazString": "foo",
+  "qazStringEmpty": "",
   "qazInt": 123,
   "qazFloat": 3.14,
   "qazBool": true,
@@ -650,13 +644,15 @@ XML
     ]
   ],
   "qazStringOption": null,
-  "qazIntOption": 1,
-  "qazDateOption": null
+  "qazIntOption": null,
+  "qazDateOption": null,
+  "qazBazOption": null
 }
 
 JSON
             , <<<YAML
 qazString: foo
+qazStringEmpty: ''
 qazInt: 123
 qazFloat: 3.14
 qazBool: true
@@ -761,15 +757,15 @@ qazBazArrayArrayOneItem:
     -
       name: baz9
 qazStringOption: null
-qazIntOption: 1
+qazIntOption: null
 qazDateOption: null
-
+qazBazOption: null
 
 YAML
 
             , <<<CSV
-qazString,qazInt,qazFloat,qazBool,qazBoolFalse,qazDate,qazDateImmut,qazInterval,qazData,qazBaz.name,qazArray.0,qazArray.1,qazArray.2,qazStringArray.0,qazStringArray.1,qazIntArray.0,qazIntArray.1,qazIntArray.2,qazFloatArray.0,qazFloatArray.1,qazFloatArray.2,qazBoolArray.0,qazBoolArray.1,qazBoolArray.2,qazDateArray.0,qazDateArray.1,qazBazArray.0.name,qazBazArray.1.name,qazBazArrayOneItem.0.name,qazArrayArray.0.0,qazArrayArray.0.1,qazArrayArray.0.2,qazArrayArray.1.0,qazArrayArray.1.1,qazArrayArray.1.2,qazStringArrayArray.0.0,qazStringArrayArray.0.1,qazStringArrayArray.1.0,qazStringArrayArray.1.1,qazIntArrayArray.0.0,qazIntArrayArray.0.1,qazIntArrayArray.0.2,qazIntArrayArray.1.0,qazIntArrayArray.1.1,qazIntArrayArray.1.2,qazFloatArrayArray.0.0,qazFloatArrayArray.0.1,qazFloatArrayArray.0.2,qazFloatArrayArray.1.0,qazFloatArrayArray.1.1,qazFloatArrayArray.1.2,qazBoolArrayArray.0.0,qazBoolArrayArray.0.1,qazBoolArrayArray.0.2,qazBoolArrayArray.1.0,qazBoolArrayArray.1.1,qazBoolArrayArray.1.2,qazDateArrayArray.0.0,qazDateArrayArray.1.0,qazBazArrayArray.0.0.name,qazBazArrayArray.0.1.name,qazBazArrayArray.1.0.name,qazBazArrayArray.1.1.name,qazBazArrayArrayOneItem.0.0.name,qazStringOption,qazIntOption,qazDateOption
-foo,123,3.14,1,,2019-01-17T12:05:06+02:00,2019-02-17T12:05:06+02:00,P0Y0M1DT0H0M0S,"data:application/octet-stream;base64,SGVsbG8sIFdvcmxkIQ==",baz1,1,2.1,1,foo,bar,1,2,3,1.1,2.2,3.3,1,,1,2019-03-17T12:05:06+02:00,2020-04-17T12:05:06+02:00,baz2,baz3,baz4,15,16,1.7,19,2,2.1,foo2,bar2,baz2,qaz2,4,5,6,7,8,9,4.4,5.5,6.6,7.7,8.8,9.9,1,1,,,,1,2019-05-17T12:05:06+02:00,2020-06-17T12:05:06+02:00,baz5,baz6,baz7,baz8,baz9,,1,
+qazString,qazStringEmpty,qazInt,qazFloat,qazBool,qazBoolFalse,qazDate,qazDateImmut,qazInterval,qazData,qazBaz.name,qazArray.0,qazArray.1,qazArray.2,qazStringArray.0,qazStringArray.1,qazIntArray.0,qazIntArray.1,qazIntArray.2,qazFloatArray.0,qazFloatArray.1,qazFloatArray.2,qazBoolArray.0,qazBoolArray.1,qazBoolArray.2,qazDateArray.0,qazDateArray.1,qazBazArray.0.name,qazBazArray.1.name,qazBazArrayOneItem.0.name,qazArrayArray.0.0,qazArrayArray.0.1,qazArrayArray.0.2,qazArrayArray.1.0,qazArrayArray.1.1,qazArrayArray.1.2,qazStringArrayArray.0.0,qazStringArrayArray.0.1,qazStringArrayArray.1.0,qazStringArrayArray.1.1,qazIntArrayArray.0.0,qazIntArrayArray.0.1,qazIntArrayArray.0.2,qazIntArrayArray.1.0,qazIntArrayArray.1.1,qazIntArrayArray.1.2,qazFloatArrayArray.0.0,qazFloatArrayArray.0.1,qazFloatArrayArray.0.2,qazFloatArrayArray.1.0,qazFloatArrayArray.1.1,qazFloatArrayArray.1.2,qazBoolArrayArray.0.0,qazBoolArrayArray.0.1,qazBoolArrayArray.0.2,qazBoolArrayArray.1.0,qazBoolArrayArray.1.1,qazBoolArrayArray.1.2,qazDateArrayArray.0.0,qazDateArrayArray.1.0,qazBazArrayArray.0.0.name,qazBazArrayArray.0.1.name,qazBazArrayArray.1.0.name,qazBazArrayArray.1.1.name,qazBazArrayArrayOneItem.0.0.name,qazStringOption,qazIntOption,qazDateOption,qazBazOption
+foo,,123,3.14,1,0,2019-01-17T12:05:06+02:00,2019-02-17T12:05:06+02:00,P0Y0M1DT0H0M0S,"data:application/octet-stream;base64,SGVsbG8sIFdvcmxkIQ==",baz1,1,2.1,1,foo,bar,1,2,3,1.1,2.2,3.3,1,0,1,2019-03-17T12:05:06+02:00,2020-04-17T12:05:06+02:00,baz2,baz3,baz4,15,16,1.7,19,2,2.1,foo2,bar2,baz2,qaz2,4,5,6,7,8,9,4.4,5.5,6.6,7.7,8.8,9.9,1,1,0,0,0,1,2019-05-17T12:05:06+02:00,2020-06-17T12:05:06+02:00,baz5,baz6,baz7,baz8,baz9,,,,
 
 CSV
         ];
@@ -803,6 +799,11 @@ class Qaz
      * @var string
      */
     private $qazString;
+
+    /**
+     * @var string
+     */
+    private $qazStringEmpty;
 
     /**
      * @var int
@@ -944,6 +945,11 @@ class Qaz
      */
     private $qazDateOption;
 
+    /**
+     * @var ?Baz
+     */
+    private $qazBazOption;
+
     public function getQazString(): string
     {
         return $this->qazString;
@@ -952,6 +958,16 @@ class Qaz
     public function setQazString(string $qazString): void
     {
         $this->qazString = $qazString;
+    }
+
+    public function getQazStringEmpty(): string
+    {
+        return $this->qazStringEmpty;
+    }
+
+    public function setQazStringEmpty(string $qazStringEmpty): void
+    {
+        $this->qazStringEmpty = $qazStringEmpty;
     }
 
     public function getQazInt(): int
@@ -1322,6 +1338,16 @@ class Qaz
     public function setQazDateOption(?\DateTime $qazDateOption): void
     {
         $this->qazDateOption = $qazDateOption;
+    }
+
+    public function getQazBazOption(): ?Baz
+    {
+        return $this->qazBazOption;
+    }
+
+    public function setQazBazOption(?Baz $qazBazOption): void
+    {
+        $this->qazBazOption = $qazBazOption;
     }
 }
 

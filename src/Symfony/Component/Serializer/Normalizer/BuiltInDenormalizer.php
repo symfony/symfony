@@ -28,6 +28,16 @@ class BuiltInDenormalizer implements DenormalizerInterface
 
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        $nullable = $context['value_nullable'] ?? false;
+        if ($nullable && null === $data) {
+            return null;
+        }
+
+        // This is a fast path to avoid checks when the data is already correct
+        if (('\is_'.$class)($data)) {
+            return $data;
+        }
+
         // JSON only has a Number type corresponding to both int and float PHP types.
         // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
         // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
@@ -39,6 +49,7 @@ class BuiltInDenormalizer implements DenormalizerInterface
         }
 
         // XML and CSV formats dont represent ints, floats or bools, so we convert strings into these formats
+        // Also null and empty string are not different, so we convert null to ''
         if ($format === XmlEncoder::FORMAT || $format === CsvEncoder::FORMAT) {
             if (Type::BUILTIN_TYPE_INT === $class && \is_string($data) && (string)(int) $data === $data) {
                 return (int) $data;
@@ -48,6 +59,9 @@ class BuiltInDenormalizer implements DenormalizerInterface
             }
             if (Type::BUILTIN_TYPE_BOOL === $class && ($data === '1' || $data === '0')) {
                 return $data === '1' ? true : false;
+            }
+            if (Type::BUILTIN_TYPE_STRING === $class && null === $data) {
+                return $nullable ? null : '';
             }
         }
 

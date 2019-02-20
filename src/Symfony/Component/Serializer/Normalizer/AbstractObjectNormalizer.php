@@ -321,7 +321,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return;
             }
 
-            [$builtinType, $class] = $this->flatternDenormalizationType($type, $context);
+            $childContext = $this->createChildContext($context, $attribute);
+            [$builtinType, $class] = $this->flatternDenormalizationType($type, $childContext);
 
             $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
 
@@ -329,7 +330,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
             }
 
-            $childContext = $this->createChildContext($context, $attribute);
             if ($this->serializer->supportsDenormalization($data, $class ?? $builtinType, $format, $childContext)) {
                 return $this->serializer->denormalize($data, $class ?? $builtinType, $format, $childContext);
             }
@@ -361,11 +361,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
                 $context['key_types'][] = $collectionKeyType;
             }
-        } else {
-            return [$type->getBuiltinType(), $type->getClassName()];
+
+            return [$builtinType, $class];
         }
 
-        return [$builtinType, $class];
+        $context['value_nullable'] = $type->isNullable();
+        return [$type->getBuiltinType(), $type->getClassName()];
     }
 
     /**

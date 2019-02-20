@@ -480,4 +480,17 @@ CSV
     {
         $this->assertEquals([], $this->encoder->decode('', 'csv'));
     }
+
+    public function testEncodeWithBoolValue()
+    {
+        $expectedCsv = <<<'CSV'
+foo,bar
+1,0
+
+CSV;
+
+        $actualXml = $this->encoder->encode(['foo' => true, 'bar' => false], 'csv');
+
+        $this->assertEquals($expectedCsv, $actualXml);
+    }
 }

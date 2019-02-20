@@ -46,7 +46,7 @@ class BuiltInDenormalizer implements DenormalizerInterface
             if (Type::BUILTIN_TYPE_FLOAT === $class && \is_string($data) && (string)(float) $data === $data) {
                 return (float) $data;
             }
-            if (Type::BUILTIN_TYPE_BOOL === $class && ($data === '1' || $data === '0' || $data === '')) {
+            if (Type::BUILTIN_TYPE_BOOL === $class && ($data === '1' || $data === '0')) {
                 return $data === '1' ? true : false;
             }
         }

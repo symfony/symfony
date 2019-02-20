@@ -204,6 +204,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         foreach ($array as $key => $value) {
             if (\is_array($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
+            } elseif (\is_bool($value)) {
+                $result[$parentKey.$key] = $value ? '1' : '0';
             } else {
                 if ($escapeFormulas && \in_array(substr($value, 0, 1), $this->formulasStartCharacters, true)) {
                     $result[$parentKey.$key] = "\t".$value;

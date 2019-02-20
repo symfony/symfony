@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'fopen_flags' => false,
         'ordered_imports' => true,
+        'orderer_class_elements' => true,
         'protected_to_private' => false,
         // Part of @Symfony:risky in PHP-CS-Fixer 2.13.0. To be removed from the config file once upgrading
         'native_function_invocation' => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced'],

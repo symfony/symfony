@@ -83,15 +83,26 @@ class CheckboxTypeTest extends BaseTypeTest
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testSubmitWithValueUnchecked()
+    /**
+     * @dataProvider provideSubmitWithValueUnchecked
+     */
+    public function testSubmitWithValueUnchecked($value)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => 'foobar',
         ]);
-        $form->submit(null);
+        $form->submit($value);
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
+    }
+
+    public function provideSubmitWithValueUnchecked()
+    {
+        yield [null];
+        yield [false];
+        yield ['false'];
+        yield ['off'];
     }
 
     public function testSubmitWithEmptyValueChecked()
@@ -189,7 +200,6 @@ class CheckboxTypeTest extends BaseTypeTest
     {
         return [
             [''],
-            ['false'],
             ['0'],
         ];
     }

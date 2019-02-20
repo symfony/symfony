@@ -176,7 +176,7 @@ class DateTimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -251,6 +251,7 @@ class DateTimeType extends AbstractType
             'empty_data' => function (Options $options) {
                 return $options['compound'] ? [] : '';
             },
+            'input_format' => 'Y-m-d H:i:s',
         ]);
 
         // Don't add some defaults in order to preserve the defaults
@@ -317,6 +318,8 @@ class DateTimeType extends AbstractType
 
             return '';
         });
+
+        $resolver->setAllowedTypes('input_format', 'string');
     }
 
     /**

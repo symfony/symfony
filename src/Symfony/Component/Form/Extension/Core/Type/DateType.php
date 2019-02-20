@@ -154,7 +154,7 @@ class DateType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -283,6 +283,7 @@ class DateType extends AbstractType
                 return $options['compound'] ? [] : '';
             },
             'choice_translation_domain' => false,
+            'input_format' => 'Y-m-d',
         ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
@@ -305,6 +306,8 @@ class DateType extends AbstractType
         $resolver->setAllowedTypes('years', 'array');
         $resolver->setAllowedTypes('months', 'array');
         $resolver->setAllowedTypes('days', 'array');
+
+        $resolver->setAllowedTypes('input_format', 'string');
     }
 
     /**

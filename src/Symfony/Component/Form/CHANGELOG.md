@@ -10,6 +10,7 @@ CHANGELOG
  * deprecated the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
  * added `input=datetime_immutable` to DateType, TimeType, DateTimeType
  * added `rounding_mode` option to MoneyType
+ * added additional values (`false`, `'false'` and `'off'`) to the default value of `false_values` from `CheckboxType`
 
 4.0.0
 -----

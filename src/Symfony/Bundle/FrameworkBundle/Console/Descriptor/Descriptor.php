@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -292,6 +293,11 @@ abstract class Descriptor implements DescriptorInterface
     {
         $resolvedClass = $class;
         try {
+            $resource = new ClassExistenceResource($class, false);
+
+            // isFresh() will explode ONLY if a parent class/trait does not exist
+            $resource->isFresh(0);
+
             $r = new \ReflectionClass($class);
             $resolvedClass = $r->name;
 

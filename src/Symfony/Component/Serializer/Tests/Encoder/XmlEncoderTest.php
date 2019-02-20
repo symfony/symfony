@@ -247,6 +247,26 @@ XML;
         $this->assertEquals('foo', $this->encoder->decode($source, 'xml'));
     }
 
+    public function testEncodeNull()
+    {
+        $array = [
+            'person' => null,
+        ];
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person/></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($array, 'xml'));
+    }
+
+    public function testDecodeNull()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response><person/></response>'."\n";
+
+        $this->assertSame(['person' => null], $this->encoder->decode($source, 'xml'));
+    }
+
     public function testDecodeBigDigitAttributes()
     {
         $source = <<<XML
@@ -303,7 +323,7 @@ XML;
             'node' => [
                 '@a' => '018',
                 '@b' => '-12.11',
-                '#' => '',
+                '#' => null,
             ],
         ];
         $this->assertSame($expected, $data);

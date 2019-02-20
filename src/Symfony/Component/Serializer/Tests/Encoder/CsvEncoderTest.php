@@ -481,6 +481,22 @@ CSV
         $this->assertEquals([], $this->encoder->decode('', 'csv'));
     }
 
+    public function testDecodeEmtpyValue()
+    {
+        $expected = [
+            ['foo' => ['a' => '1', 'b' => null]],
+        ];
+
+        $this->assertSame($expected, $this->encoder->decode(<<<'CSV'
+foo.a,foo.b
+1,
+
+CSV
+            , 'csv', [
+                CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
+            ]));
+    }
+
     public function testEncodeWithBoolValue()
     {
         $expectedCsv = <<<'CSV'

@@ -365,7 +365,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     private function parseXmlValue(\DOMNode $node, array $context = [])
     {
         if (!$node->hasChildNodes()) {
-            return $node->nodeValue;
+            return $node->nodeValue === '' ? null : $node->nodeValue;
         }
 
         if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, [XML_TEXT_NODE, XML_CDATA_SECTION_NODE])) {

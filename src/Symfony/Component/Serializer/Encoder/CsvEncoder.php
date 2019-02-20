@@ -155,7 +155,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 for ($j = 0; $j < $depth; ++$j) {
                     // Handle nested arrays
                     if ($j === ($depth - 1)) {
-                        $arr[$headers[$i][$j]] = $cols[$i];
+                        $arr[$headers[$i][$j]] = $cols[$i] === '' ? null : $cols[$i];
 
                         continue;
                     }

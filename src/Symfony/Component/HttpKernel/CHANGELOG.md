@@ -12,6 +12,7 @@ CHANGELOG
  * the base `DataCollector` doesn't implement `Serializable` anymore, you should
    store all the serialized state in the data property instead
  * `DumpDataCollector` has been marked as `final`
+ * added an event listener to prevent search engines from indexing applications in debug mode.
 
 4.2.0
 -----

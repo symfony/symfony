@@ -85,5 +85,8 @@
             <argument type="service" id="controller_name_converter" />
             <tag name="kernel.event_subscriber" />
         </service>
+        <service id="disallow_search_engine_index_response_listener" class="Symfony\Component\HttpKernel\EventListener\DisallowRobotsIndexingListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

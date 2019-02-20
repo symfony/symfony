@@ -294,9 +294,9 @@ class DateTimeType extends AbstractType
         ]);
 
         $resolver->setDeprecated('date_format', function (Options $options, $dateFormat) {
-            if (null !== $dateFormat && 'single_text' === $options['widget']) {
-                return sprintf('Using the "date_format" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
-                //throw new LogicException(sprintf('Cannot use the "date_format" option of the %s when the "widget" option is set to "single_text".', self::class));
+            if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+                return sprintf('Using the "date_format" option of %s with an HTML5 date widget is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "date_format" option of the %s with an HTML5 date.', self::class));
             }
 
             return '';

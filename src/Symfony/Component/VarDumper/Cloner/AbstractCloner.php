@@ -125,6 +125,14 @@ abstract class AbstractCloner implements ClonerInterface
 
         'Memcached' => ['Symfony\Component\VarDumper\Caster\MemcachedCaster', 'castMemcached'],
 
+        'Ds\Set' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Vector' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Deque' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Stack' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Queue' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\PriorityQueue' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Map' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castMap'],
+
         ':curl' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'],
         ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
         ':dba persistent' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],

@@ -27,6 +27,43 @@ use PHPUnit\Framework\MockObject\Matcher\StatelessInvocation;
  */
 class DebugClassLoader
 {
+    private const SPECIAL_RETURN_TYPES = [
+        'mixed' => 'mixed',
+        'void' => 'void',
+        'null' => 'null',
+        'resource' => 'resource',
+        'static' => 'object',
+        '$this' => 'object',
+        'boolean' => 'bool',
+        'true' => 'bool',
+        'false' => 'bool',
+        'integer' => 'int',
+        'array' => 'array',
+        'bool' => 'bool',
+        'callable' => 'callable',
+        'float' => 'float',
+        'int' => 'integer',
+        'iterable' => 'iterable',
+        'object' => 'object',
+        'string' => 'string',
+        'self' => 'self',
+        'parent' => 'parent',
+    ];
+
+    private const BUILTIN_RETURN_TYPES = [
+        'void' => true,
+        'array' => true,
+        'bool' => true,
+        'callable' => true,
+        'float' => true,
+        'int' => true,
+        'iterable' => true,
+        'object' => true,
+        'string' => true,
+        'self' => true,
+        'parent' => true,
+    ];
+
     private $classLoader;
     private $isFinder;
     private $loaded = [];
@@ -40,6 +77,8 @@ class DebugClassLoader
     private static $annotatedParameters = [];
     private static $darwinCache = ['/' => ['/', []]];
     private static $method = [];
+    private static $returnTypes = [];
+    private static $methodTraits = [];
 
     public function __construct(callable $classLoader)
     {
@@ -218,11 +257,11 @@ class DebugClassLoader
         $deprecations = [];
 
         // Don't trigger deprecations for classes in the same vendor
-        if (2 > $len = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
-            $len = 0;
-            $ns = '';
+        if (2 > $vendorLen = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
+            $vendorLen = 0;
+            $vendor = '';
         } else {
-            $ns = str_replace('_', '\\', substr($class, 0, $len));
+            $vendor = str_replace('_', '\\', substr($class, 0, $vendorLen));
         }
 
         // Detect annotations on the class
@@ -252,7 +291,7 @@ class DebugClassLoader
             }
         }
 
-        $parent = get_parent_class($class);
+        $parent = get_parent_class($class) ?: null;
         $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent);
         if ($parent) {
             $parentAndOwnInterfaces[$parent] = $parent;
@@ -271,13 +310,13 @@ class DebugClassLoader
             if (!isset(self::$checkedClasses[$use])) {
                 $this->checkClass($use);
             }
-            if (isset(self::$deprecated[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len) && !isset(self::$deprecated[$class])) {
+            if (isset(self::$deprecated[$use]) && strncmp($vendor, str_replace('_', '\\', $use), $vendorLen) && !isset(self::$deprecated[$class])) {
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
                 $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $class, $type, $verb, $use, self::$deprecated[$use]);
             }
-            if (isset(self::$internal[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len)) {
+            if (isset(self::$internal[$use]) && strncmp($vendor, str_replace('_', '\\', $use), $vendorLen)) {
                 $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $class);
             }
             if (isset(self::$method[$use])) {
@@ -305,15 +344,24 @@ class DebugClassLoader
         }
 
         if (trait_exists($class)) {
+            $file = $refl->getFileName();
+
+            foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+                if ($method->getFileName() === $file) {
+                    self::$methodTraits[$file][$method->getStartLine()] = $class;
+                }
+            }
+
             return $deprecations;
         }
 
-        // Inherit @final, @internal and @param annotations for methods
+        // Inherit @final, @internal, @param and @return annotations for methods
         self::$finalMethods[$class] = [];
         self::$internalMethods[$class] = [];
         self::$annotatedParameters[$class] = [];
+        self::$returnTypes[$class] = [];
         foreach ($parentAndOwnInterfaces as $use) {
-            foreach (['finalMethods', 'internalMethods', 'annotatedParameters'] as $property) {
+            foreach (['finalMethods', 'internalMethods', 'annotatedParameters', 'returnTypes'] as $property) {
                 if (isset(self::${$property}[$use])) {
                     self::${$property}[$class] = self::${$property}[$class] ? self::${$property}[$use] + self::${$property}[$class] : self::${$property}[$use];
                 }
@@ -323,6 +371,16 @@ class DebugClassLoader
         foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
             if ($method->class !== $class) {
                 continue;
+            }
+
+            if (null === $ns = self::$methodTraits[$method->getFileName()][$method->getStartLine()] ?? null) {
+                $ns = $vendor;
+                $len = $vendorLen;
+            } elseif (2 > $len = 1 + (strpos($ns, '\\') ?: strpos($ns, '_'))) {
+                $len = 0;
+                $ns = '';
+            } else {
+                $ns = str_replace('_', '\\', substr($ns, 0, $len));
             }
 
             if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
@@ -353,8 +411,24 @@ class DebugClassLoader
                 }
             }
 
+            if (isset(self::$returnTypes[$class][$method->name]) && !$method->hasReturnType() && !($doc && preg_match('/\n\s+\* @return +(\S+)/', $doc))) {
+                list($returnType, $declaringClass, $declaringFile) = self::$returnTypes[$class][$method->name];
+
+                if (strncmp($ns, $declaringClass, $len)) {
+                    //if (0 === strpos($class, 'Symfony\\')) {
+                    //    self::patchMethod($method, $returnType, $declaringFile);
+                    //}
+
+                    $deprecations[] = sprintf('Method "%s::%s()" will return "%s" as of its next major version. Doing the same in child class "%s" will be required when upgrading.', $declaringClass, $method->name, $returnType, $class);
+                }
+            }
+
             if (!$doc) {
                 continue;
+            }
+
+            if (!$method->hasReturnType() && false !== strpos($doc, '@return') && preg_match('/\n\s+\* @return +(\S+)/', $doc, $matches)) {
+                $this->setReturnType($matches[1], $method, $parent);
             }
 
             $finalOrInternal = false;
@@ -496,11 +570,9 @@ class DebugClassLoader
     /**
      * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
-     * @param string|false $parent
-     *
      * @return string[]
      */
-    private function getOwnInterfaces(string $class, $parent): array
+    private function getOwnInterfaces(string $class, ?string $parent): array
     {
         $ownInterfaces = class_implements($class, false);
 
@@ -517,5 +589,192 @@ class DebugClassLoader
         }
 
         return $ownInterfaces;
+    }
+
+    private function setReturnType(string $types, \ReflectionMethod $method, ?string $parent): void
+    {
+        $nullable = false;
+        $typesMap = [];
+        foreach (explode('|', $types) as $t) {
+            $t = $this->normalizeType($t, $method->class, $parent);
+            $typesMap[strtolower($t)] = $t;
+        }
+
+        if (isset($typesMap['array']) && isset($typesMap['iterable'])) {
+            if ('[]' === substr($typesMap['array'], -2)) {
+                $typesMap['iterable'] = $typesMap['array'];
+            }
+            unset($typesMap['array']);
+        }
+
+        $normalizedType = key($typesMap);
+        $returnType = current($typesMap);
+
+        foreach ($typesMap as $n => $t) {
+            if ('null' === $n) {
+                $nullable = true;
+            } elseif ('null' === $normalizedType) {
+                $normalizedType = $t;
+                $returnType = $t;
+            } elseif ($n !== $normalizedType) {
+                // ignore multi-types return declarations
+                return;
+            }
+        }
+
+        if ('void' === $normalizedType) {
+            $nullable = false;
+        } elseif (!isset(self::BUILTIN_RETURN_TYPES[$normalizedType]) && isset(self::SPECIAL_RETURN_TYPES[$normalizedType])) {
+            // ignore other special return types
+            return;
+        }
+
+        if ($nullable) {
+            $returnType = '?'.$returnType;
+        }
+
+        self::$returnTypes[$method->class][$method->name] = [$returnType, $method->class, $method->getFileName()];
+    }
+
+    private function normalizeType(string $type, string $class, ?string $parent): string
+    {
+        if (isset(self::SPECIAL_RETURN_TYPES[$lcType = strtolower($type)])) {
+            if ('parent' === $lcType = self::SPECIAL_RETURN_TYPES[$lcType]) {
+                $lcType = null !== $parent ? '\\'.$parent : 'parent';
+            } elseif ('self' === $lcType) {
+                $lcType = '\\'.$class;
+            }
+
+            return $lcType;
+        }
+
+        if ('[]' === substr($type, -2)) {
+            return 'array';
+        }
+
+        if (preg_match('/^(array|iterable|callable) *[<(]/', $lcType, $m)) {
+            return $m[1];
+        }
+
+        // We could resolve "use" statements to return the FQDN
+        // but this would be too expensive for a runtime checker
+
+        return $type;
+    }
+
+    /**
+     * Utility method to add @return annotations to the Symfony code-base where it triggers a self-deprecations.
+     */
+    private static function patchMethod(\ReflectionMethod $method, string $returnType, string $declaringFile)
+    {
+        static $patchedMethods = [];
+        static $useStatements = [];
+
+        if (!file_exists($file = $method->getFileName()) || isset($patchedMethods[$file][$startLine = $method->getStartLine()])) {
+            return;
+        }
+
+        $patchedMethods[$file][$startLine] = true;
+        $patchedMethods[$file][0] = $patchedMethods[$file][0] ?? 0;
+        $startLine += $patchedMethods[$file][0] - 2;
+        $nullable = '?' === $returnType[0] ? '?' : '';
+        $returnType = ltrim($returnType, '?');
+        $code = file($file);
+
+        if (!isset(self::BUILTIN_RETURN_TYPES[$returnType]) && ('\\' !== $returnType[0] || $p = strrpos($returnType, '\\', 1))) {
+            list($namespace, $useOffset, $useMap) = $useStatements[$file] ?? $useStatements[$file] = self::getUseStatements($file);
+
+            if ('\\' !== $returnType[0]) {
+                list($declaringNamespace, , $declaringUseMap) = $useStatements[$declaringFile] ?? $useStatements[$declaringFile] = self::getUseStatements($declaringFile);
+
+                $p = strpos($returnType, '\\', 1);
+                $alias = $p ? substr($returnType, 0, $p) : $returnType;
+
+                if (isset($declaringUseMap[$alias])) {
+                    $returnType = '\\'.$declaringUseMap[$alias].($p ? substr($returnType, $p) : '');
+                } else {
+                    $returnType = '\\'.$declaringNamespace.$returnType;
+                }
+
+                $p = strrpos($returnType, '\\', 1);
+            }
+
+            $alias = substr($returnType, 1 + $p);
+            $returnType = substr($returnType, 1);
+
+            if (!isset($useMap[$alias]) && (class_exists($c = $namespace.$alias) || interface_exists($c) || trait_exists($c))) {
+                $useMap[$alias] = $c;
+            }
+
+            if (!isset($useMap[$alias])) {
+                $useStatements[$file][2][$alias] = $returnType;
+                $code[$useOffset] = "use $returnType;\n".$code[$useOffset];
+                ++$patchedMethods[$file][0];
+            } elseif ($useMap[$alias] !== $returnType) {
+                $alias .= 'FIXME';
+                $useStatements[$file][2][$alias] = $returnType;
+                $code[$useOffset] = "use $returnType as $alias;\n".$code[$useOffset];
+                ++$patchedMethods[$file][0];
+            }
+
+            $returnType = $alias;
+        }
+
+        if ($method->getDocComment()) {
+            $code[$startLine] = "     * @return $nullable$returnType\n".$code[$startLine];
+        } else {
+            $code[$startLine] .= <<<EOTXT
+    /**
+     * @return $nullable$returnType
+     */
+
+EOTXT;
+        }
+
+        $patchedMethods[$file][0] += substr_count($code[$startLine], "\n") - 1;
+        file_put_contents($file, $code);
+    }
+
+    private static function getUseStatements(string $file): array
+    {
+        $namespace = '';
+        $useMap = [];
+        $useOffset = 0;
+
+        if (!file_exists($file)) {
+            return [$namespace, $useOffset, $useMap];
+        }
+
+        $file = file($file);
+
+        for ($i = 0; $i < \count($file); ++$i) {
+            if (preg_match('/^(class|interface|trait|abstract) /', $file[$i])) {
+                break;
+            }
+
+            if (0 === strpos($file[$i], 'namespace ')) {
+                $namespace = substr($file[$i], \strlen('namespace '), -2).'\\';
+                $useOffset = $i + 2;
+            }
+
+            if (0 === strpos($file[$i], 'use ')) {
+                $useOffset = $i;
+
+                for (; 0 === strpos($file[$i], 'use '); ++$i) {
+                    $u = explode(' as ', substr($file[$i], 4, -2), 2);
+
+                    if (1 === \count($u)) {
+                        $p = strrpos($u[0], '\\');
+                        $useMap[substr($u[0], false !== $p ? 1 + $p : 0)] = $u[0];
+                    } else {
+                        $useMap[$u[1]] = $u[0];
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return [$namespace, $useOffset, $useMap];
     }
 }

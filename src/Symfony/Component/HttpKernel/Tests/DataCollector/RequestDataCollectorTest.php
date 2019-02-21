@@ -333,4 +333,58 @@ class RequestDataCollectorTest extends TestCase
 
         throw new \InvalidArgumentException(sprintf('Cookie named "%s" is not in response', $name));
     }
+
+    /**
+     * @dataProvider provideJsonContentTypes
+     */
+    public function testIsJson($contentType, $expected)
+    {
+        $response = $this->createResponse();
+        $request = $this->createRequest();
+        $request->headers->set('Content-Type', $contentType);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $response);
+
+        $this->assertSame($expected, $c->isJsonRequest());
+    }
+
+    public function provideJsonContentTypes()
+    {
+        return array(
+            array('text/csv', false),
+            array('application/json', true),
+            array('application/JSON', true),
+            array('application/hal+json', true),
+            array('application/xml+json', true),
+            array('application/xml', false),
+            array('', false),
+        );
+    }
+
+    /**
+     * @dataProvider providePrettyJson
+     */
+    public function testGetPrettyJsonValidity($content, $expected)
+    {
+        $response = $this->createResponse();
+        $request = Request::create('/', 'POST', array(), array(), array(), array(), $content);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $response);
+
+        $this->assertSame($expected, $c->getPrettyJson());
+    }
+
+    public function providePrettyJson()
+    {
+        return array(
+            array('null', 'null'),
+            array('{ "foo": "bar" }', '{
+    "foo": "bar"
+}'),
+            array('{ "abc" }', null),
+            array('', null),
+        );
+    }
 }

@@ -161,8 +161,27 @@
                         <p>Request content not available (it was retrieved as a resource).</p>
                     </div>
                 {% elseif collector.content %}
-                    <div class="card">
-                        <pre class="break-long-words">{{ collector.content }}</pre>
+                    <div class="sf-tabs">
+                        {% set prettyJson = collector.isJsonRequest ? collector.prettyJson : null %}
+                        {% if prettyJson is not null %}
+                        <div class="tab">
+                            <h3 class="tab-title">Pretty</h3>
+                            <div class="tab-content">
+                                <div class="card" style="max-height: 500px; overflow-y: auto;">
+                                    <pre class="break-long-words">{{ prettyJson }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="tab">
+                            <h3 class="tab-title">Raw</h3>
+                            <div class="tab-content">
+                                <div class="card">
+                                    <pre class="break-long-words">{{ collector.content }}</pre>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% else %}
                     <div class="empty">

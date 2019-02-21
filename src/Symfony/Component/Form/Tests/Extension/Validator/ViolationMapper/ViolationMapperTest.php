@@ -205,7 +205,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testAbortMappingIfNotSubmitted()
+    public function testMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
@@ -225,10 +225,10 @@ class ViolationMapperTest extends TestCase
 
         $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
         $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
-        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
+        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
     }
 
-    public function testAbortDotRuleMappingIfNotSubmitted()
+    public function testDotRuleMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('data.address');
         $parent = $this->getForm('parent');
@@ -250,7 +250,7 @@ class ViolationMapperTest extends TestCase
 
         $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
         $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
-        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
+        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
     }
 
     public function provideDefaultTests()

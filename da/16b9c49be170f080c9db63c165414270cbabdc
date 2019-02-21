@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-08T18:45:55Z
+
+The PR conflicts a bit with upstream, during added constructor hints. Let me know what to do, i wasnt necessarily aiming to deprecate not passing this new argument, nor do i want to add a new setter.
+
+Also im not sure about applying all short array changes here&now, on 3.4
+
+edit: dropped the constructor arg, but still conflicts :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T10:44:40Z
+
+could you please rebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-20T10:33:19Z
+
+rebase needed to retrigger the CI bots
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-02-20T10:38:49Z
+
+@nicolas-grekas done.

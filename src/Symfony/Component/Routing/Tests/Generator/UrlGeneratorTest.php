@@ -708,16 +708,16 @@ class UrlGeneratorTest extends TestCase
      */
     public function testLookRoundRequirementsInPath($expected, $path, $requirement)
     {
-        $routes = $this->getRoutes('test', new Route($path, array(), array('foo' => $requirement, 'baz' => '.+?')));
-        $this->assertSame($expected, $this->getGenerator($routes)->generate('test', array('foo' => 'a/b', 'baz' => 'c/d/e')));
+        $routes = $this->getRoutes('test', new Route($path, [], ['foo' => $requirement, 'baz' => '.+?']));
+        $this->assertSame($expected, $this->getGenerator($routes)->generate('test', ['foo' => 'a/b', 'baz' => 'c/d/e']));
     }
 
     public function provideLookAroundRequirementsInPath()
     {
-        yield array('/app.php/a/b/b%28ar/c/d/e', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)');
-        yield array('/app.php/a/b/bar/c/d/e', '/{foo}/bar/{baz}', '.+(?!$)');
-        yield array('/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<=/bar/).+');
-        yield array('/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+');
+        yield ['/app.php/a/b/b%28ar/c/d/e', '/{foo}/b(ar/{baz}', '.+(?=/b\\(ar/)'];
+        yield ['/app.php/a/b/bar/c/d/e', '/{foo}/bar/{baz}', '.+(?!$)'];
+        yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<=/bar/).+'];
+        yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+'];
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null)

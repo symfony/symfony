@@ -1,0 +1,200 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-19T06:51:06Z
+
+I like this proposal a lot. I would apply this behaviour by default, without any button or toggle. To prevent issues with complex queries, I'd apply a `max-height` of around 500px to the container element.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-19T07:13:26Z
+
+I think it should be pretty by default, but a `Raw` option could still be useful?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-19T08:31:53Z
+
+and if we want to do it all the time (with a tab switcher to view the raw one), it would make sense to do the pretty-printing server-side.
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-10-19T09:15:47Z
+
+👍 Sounds good. I'll look at getting that implemented.
+
+If we're doing the pretty-printing on the server, that would mean we're putting the entire payload into the DOM twice, once "pretty-printed", the other raw – I'm assuming most payloads aren't too big so this won't be an issue - are we okay with this?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-19T17:21:26Z
+
+also instead of pretty JSON, wouldnt VarDumper (thus collapsible) be far more useful?
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-10-19T21:44:15Z
+
+Okay, so, I've taken the above feedback, rebased and updated the UI. There are now "Pretty" and "Raw" tabs. I've left the formatting down to JS for reasons discussed later.
+
+![screenshot 2018-10-19 at 22 04 05](https://user-images.githubusercontent.com/573318/47243808-2a954100-d3eb-11e8-94b2-3211fcaad64c.png)
+![screenshot 2018-10-19 at 22 04 33](https://user-images.githubusercontent.com/573318/47243811-2a954100-d3eb-11e8-8f0d-c53bca427f9d.png)
+
+I definitely prefer this. Thank you for the suggestions 👍
+
+> and if we want to do it all the time (with a tab switcher to view the raw one), it would make sense to do the pretty-printing server-side.
+
+I don't have much experience with the internals of the profiler. However, from what I can workout there are a few options we have to pretty print on the server.
+
+I'm assuming the method of pretty-printing we'd use is `json_encode(json_decode($requestContent), JSON_PRETTY_PRINT))` (remember, at the moment our `$requestContent` is a string). Alternatively, we can look for additional libraries, but I'm not sure what the stance on that is?
+
+1. `collector` is basically `$this->data` from [`RequestDataCollector.php`](https://github.com/symfony/symfony/blob/v4.1.6/src/Symfony/Component/HttpKernel/DataCollector/RequestDataCollector.php#L89-L112). We could store an additional key (e.g. `"content_formatted"`) and perform our pretty-printing during collection.
+**Pros:** Don't have to pretty print in the profiler (is that a pro?)
+**Cons:** Performance affect during collection; storing the entire request payload twice in the profiler.
+2. We perform the print-printing in [`ProfilerController::panelAction`](https://github.com/SamFleming/symfony/blob/d56ed851b4f2d012c8633f0632feb96d17b96c17/src/Symfony/Bundle/WebProfilerBundle/Controller/ProfilerController.php#L76) and add a key to the available twig variables https://github.com/SamFleming/symfony/blob/d56ed851b4f2d012c8633f0632feb96d17b96c17/src/Symfony/Bundle/WebProfilerBundle/Controller/ProfilerController.php#L104-L112.
+**Pros:** Not storing duplicate content.
+**Cons:** Placing Collector specific logic in the generic `panelAction` — should it really be the responsibility of `panelAction` to look into the Collector and its attributes to perform the printing?
+3. Something obvious I'm missing? 😝 🤞
+
+It would be great to hear some feedback on the above options as I'm not really sure which route to take.
+
+> also instead of pretty JSON, wouldnt VarDumper (thus collapsible) be far more useful?
+
+I had been thinking about this. My main motivation for not using VarDumper was maintaining the ability to copy the pretty-printed output and edit it (e.g. for use in [Postman](https://www.getpostman.com/)). If we output using the `VarDumper` copy + paste wouldn't be possible. Perhaps we could have an additional "Dump" tab which contains the output — then we have three variations of request content though 🤔
+
+---
+
+**Sidenote:**
+
+I've had to create commit 9cdcf0b6592bf7e76f30bd112843e73931c3a477 as there appears to be a bug when nesting tabs in the profiler panels. Looks like until this PR it's never been required. Shall I split this out into a separate PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-22T09:51:51Z
+
+You could add a getter on the Collector object returning the pretty-printed JSON, without the need to do it at collect time (it can be computed from the raw content at render time)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-24T09:38:20Z
+
+We could also add a 3rd tab: "Debug" that uses `profiler_dump()` whereas "Pretty" uses `json_encode` (both available in twig)
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T10:03:24Z
+
+Thanks for the approval @ro0NL – I've updated the regex as suggested 👌 — It will match `application/hal+ld+json`, are you okay with that – alternatively we could change the quantifier to `?` to only match one or zero (instead of zero or more) – your thoughts here would be appreciated.
+
+I'm currently trying to setup the "Debug" tab as suggested but am struggling with some unexpected errors. I'll keep trying.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T10:13:25Z
+
+@SamFleming perhaps better to introduce the debug tab in a new PR so we dont block/postpone this one (i was just brainfarting :)) But i definitively think it's a nice addition.
+
+> It will match application/hal+ld+json, are you okay with that
+
+yes, i tweaked it to more generic. Now matches `foo+bar+json, foo+++json`. I think we want to be tolerant yes.
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T16:42:27Z
+
+> @SamFleming perhaps better to introduce the debug tab in a new PR so we dont block/postpone this one (i was just brainfarting :)) But i definitively think it's a nice addition.
+
+Awesome, 👌
+
+Anything left for me to do to get this ready for merging?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T16:53:05Z
+
+let's wait :) i do have one last question though; what happens if the request content is not valid JSON? Even if the content-type says so.. does it crash the panel? Will developer see the error?
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:07:11Z
+
+![image](https://user-images.githubusercontent.com/573318/49035754-9ec2c180-f1ad-11e8-85c3-cca2006adb1b.png)
+
+Is what shows when the JSON is invalid. `json_decode` will return `NULL` when invalid JSON is encountered, then `json_encode(NULL)` returns `null`.
+
+We could check `json_last_error` then display `json_last_error_msg` in the "Pretty" tab if there's an issue?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T19:10:07Z
+
+Perhaps fallback to raw content only without tabs then. I.e. the current behavior
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:13:48Z
+
+Done https://github.com/symfony/symfony/pull/28919/commits/63c02194e7b63052bf990e484bb504d13c992db4
+
+Is this too... horrible?
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:37:50Z
+
+Oh... I thought I saw a comment about checking `json_last_error` 😅. I've implemented here https://github.com/symfony/symfony/pull/28919/commits/9446deb10e8ae704b9e93034d67633834aa6aac8
+
+I definitely prefer, as it removes any abiquity. However, if we're going this route, is there any point checking the Content-Type for being JSON? Is it worth attempting the `json_encode(json_decode())` no matter what is in the body, then using `json_last_error` to determine whether the tab shows?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T19:43:59Z
+
+the extra overhead might bite us as we try to parse each request content, every time. Tend to prefer the explicit check here.
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:45:21Z
+
+I also wonder if it's worth caching the result of  [`getPrettyJson`](https://github.com/symfony/symfony/pull/28919/files#diff-e8f5b14fbfbbeac60fc9f3abe310c3b0R266) seeing as it is being called twice in twig and I'm assume `json_decode(json_encode())` could be quite resource intensive... or assigning it to a variable in twig.
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:45:36Z
+
+> the extra overhead might bite us as we try to parse each request content, every time. Tend to prefer the explicit check here.
+
+👌 Fair
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T19:47:21Z
+
+actually we dont parse during the request :D (im tired), only during display in the profiler. But yeah, i think we should be conservative, and expand as needed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T19:48:53Z
+
+> I also wonder if it's worth caching the result of [`getPrettyJson`](https://github.com/symfony/symfony/pull/28919/files#diff-e8f5b14fbfbbeac60fc9f3abe310c3b0R266) seeing as it is being called twice in twig and I'm assume `json_decode(json_encode())` could be quite resource intensive... or assigning it to a variable in twig.
+
+correct. We should return string|null (checking for last_error intermediary) and call it once in twig.
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2018-11-26T19:53:28Z
+
+> We should return string|null (checking for last_error intermediary)
+
+Apologies, not quite sure what you mean here. I was thinking this https://github.com/symfony/symfony/pull/28919/commits/91a2b392e99879c19faec020f93aeeb3341fdbb7
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-26T20:01:06Z
+
+return `"string"` for valid JSON, or `null` otherwise. Then in twig `prettyJson is not null` :)
+
+---------------------------------------------------------------------------
+
+by SamFleming at 2019-02-13T16:34:13Z
+
+@dunglas was there anything else you wanted me to do on this?

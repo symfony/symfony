@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-20T07:49:24Z
+
+Do we really need that logic? To me, an approach like #30244 will achieve the same with greater flexibility.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-02-20T08:57:25Z
+
+I think yes, it fixes a real bug. ArrayInput does not suffer from this issue.
+#30244 looks like a feature to me as it requires code change for being used, we would need to document it. And the fact it involves to remove an option from the input makes it less flexible to me, IMHO it is not the desired behavior for the 80% use case, keeping in mind that this is not only about `--env` but any option defined at the application level which are generally meant to be accessed from the final input object at command runtime.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-02-20T18:28:33Z
+
+how does this handle cases where multiple shortcut gets grouped together ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-02-20T20:53:39Z
+
+@stof in case the token is a short option (group), this checks that the last char of the token has a value and, if it has one, the next token is skipped. Just added a test + inline comment.

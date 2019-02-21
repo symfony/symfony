@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-01-13T01:21:20Z
+
+I like the idea.
+I think this belongs to the framework, not the Console component.
+Components should not be aware of bundles, it's the other way around.
+FrameworkBundle looks like a perfect fit for this, as it represents the glue for all Symfony components and bundles, and it has its own [console Application](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Console/Application.php).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-13T07:19:57Z
+
+i'd prefer something like we did for twig: https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/UndefinedCallableHandler.php
+
+i think its more straightforward to handle it in e.g. a catch-all event listener for unknown commands, opposed to tracking a list on high level (console application).
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-13T08:07:22Z
+
+I had some doubts adding it to the main application, since it is widely used as a standalone component, but I wanted the suggestions to be available for some, who started his project with a symfony/skeleton (so without the FrameworkBundle) and tries to use features, that are not installed.
+
+By the way, can you tell me, why my CI checks failed? Did I forget about something in my PR?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-13T09:11:12Z
+
+My mistake. I confused FrameworkBundle with SensioFrameworkExtraBundle. I will rework the PR.
+
+But my other question about the CI checks is still valid :)
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-14T00:10:45Z
+
+I went with the suggestion from @ro0NL and created an event subscriber. I can always switch to a try/catch in [FrameworkBundle Console Application](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Console/Application.php).
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-17T09:27:57Z
+
+I improved the logic. For example, when someone has **WebServerBundle** and runs `server:dump`, the message will suggest installing **VarDumper** (along with alternatives from the original **CommandNotFoundException).** But on `server:foo` will add nothing - just show the alternatives.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-02-11T19:31:55Z
+
+@przemyslaw-bogusz Could you please take @nicolas-grekas's comment into account? This looks good to me.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-02-12T08:10:55Z
+
+@chalasr @nicolas-grekas All done. I've also updated changelog
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-13T07:25:57Z
+
+@przemyslaw-bogusz Can you rebase this pull request? I see that you merged instead of rebase and that prevents us from merging. Thank you.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-02-13T09:13:40Z
+
+@fabpot Done.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-02-14T14:18:40Z
+
+Too many reviews in a short period of time and things got a little messy for a moment. I've implemented all suggestions the code, fixed the tests. The one Travis CI test that fails, failed before and I guess it has nothing to do with my code directly.
+
+The only thing left to decide is whether to put `the` back in the exception message by default, or add it to selected messages. I'm in favor of `the` by default.

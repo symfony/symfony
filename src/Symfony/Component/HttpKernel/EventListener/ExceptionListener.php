@@ -56,13 +56,12 @@ class ExceptionListener implements EventSubscriberInterface
         } catch (\Exception $e) {
             $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', \get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()));
 
-            $wrapper = $e;
-
-            while ($prev = $wrapper->getPrevious()) {
+            $prev = $e;
+            do {
                 if ($exception === $wrapper = $prev) {
                     throw $e;
                 }
-            }
+            } while ($prev = $wrapper->getPrevious());
 
             $prev = new \ReflectionProperty($wrapper instanceof \Exception ? \Exception::class : \Error::class, 'previous');
             $prev->setAccessible(true);

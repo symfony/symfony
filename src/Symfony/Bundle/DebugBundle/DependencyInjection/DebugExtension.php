@@ -43,6 +43,11 @@ class DebugExtension extends Extension
             ->addMethodCall('setMinDepth', [$config['min_depth']])
             ->addMethodCall('setMaxString', [$config['max_string_length']]);
 
+        if (method_exists(ReflectionClass::class, 'unsetClosureFileInfo')) {
+            $container->getDefinition('var_dumper.cloner')
+                ->addMethodCall('addCasters', ReflectionClass::UNSET_CLOSURE_FILE_INFO);
+        }
+
         if (method_exists(HtmlDumper::class, 'setTheme') && 'dark' !== $config['theme']) {
             $container->getDefinition('var_dumper.html_dumper')
                 ->addMethodCall('setTheme', [$config['theme']]);

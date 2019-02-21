@@ -87,21 +87,17 @@ class FileLinkFormatter
 
     private function getFileLinkFormat()
     {
-        if ($this->fileLinkFormat) {
-            return $this->fileLinkFormat;
-        }
         if ($this->requestStack && $this->baseDir && $this->urlFormat) {
             $request = $this->requestStack->getMasterRequest();
-            if ($request instanceof Request) {
-                if ($this->urlFormat instanceof \Closure && !$this->urlFormat = ($this->urlFormat)()) {
-                    return;
-                }
 
-                return [
+            if ($request instanceof Request && (!$this->urlFormat instanceof \Closure || $this->urlFormat = ($this->urlFormat)())) {
+                $this->fileLinkFormat = [
                     $request->getSchemeAndHttpHost().$request->getBasePath().$this->urlFormat,
                     $this->baseDir.\DIRECTORY_SEPARATOR, '',
                 ];
             }
         }
+
+        return $this->fileLinkFormat;
     }
 }

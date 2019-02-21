@@ -133,7 +133,10 @@ class Connection
             $this->setup();
         }
 
-        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, ['headers' => $headers]);
+        $flags = $this->queueConfiguration['flags'] ?? AMQP_NOPARAM;
+        $attributes = array_merge_recursive($this->queueConfiguration['attributes'] ?? [], ['headers' => $headers]);
+
+        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, $flags, $attributes);
     }
 
     /**

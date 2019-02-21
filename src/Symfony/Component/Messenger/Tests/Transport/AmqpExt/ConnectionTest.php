@@ -233,6 +233,24 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', [], true, $factory);
         $connection->publish('body');
     }
+
+    public function testPublishWithQueueOptions()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+        $headers = [
+            'type' => '*',
+        ];
+        $amqpExchange->expects($this->once())->method('publish')
+            ->with('body', null, 1, ['delivery_mode' => 2, 'headers' => ['token' => 'uuid', 'type' => '*']]);
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[attributes][headers][token]=uuid&queue[flags]=1', [], true, $factory);
+        $connection->publish('body', $headers);
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

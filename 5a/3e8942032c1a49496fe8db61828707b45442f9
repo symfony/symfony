@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-07-03T11:12:54Z
+
+@dunglas, anymore work should be done here?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-07-10T12:23:00Z
+
+Hi @dunglas, Anymore work to do here?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-09-18T14:02:50Z
+
+Could someone point me how to fix the broken tests on PHP 7.1? I didn't find out how these last changes has impacted on other SF components.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-18T14:23:20Z
+
+Failures look unrelated with your changes.
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-09-18T14:24:15Z
+
+Nice. Thank you.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T09:44:46Z
+
+@tsantos84 Can you rebase this PR to get rid of the merge commits (this is a requirement before I can merge)? Thank you.
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-10-21T22:56:19Z
+
+@fabpot, I've got all this commits after rebasing the branch. Is this the expected result? Sounds weird for me. I've never use rebase before to be honest.
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-11-03T01:51:26Z
+
+Github had bad moments exactly when I've tried to call you to help me with rebase. I think its better to create a new branch and cherry pick only the necessary commits.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-03T12:44:04Z
+
+@tsantos84 I have rebased your PR. Can you double-check that I didn't mess up anything?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-11-03T15:04:45Z
+
+All commits are there. Many thanks for help me in this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-05T10:21:33Z
+
+It could be worth to add an entry to the component's changelog file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T09:13:10Z
+
+@tsantos84 could you please add a note in the changelog file of the component as suggested by @xabbuh?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-12-02T15:40:59Z
+
+Sure. Which version should I reference?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2018-12-03T18:07:40Z
+
+@nicolas-grekas?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-12-12T18:03:16Z
+
+@tsantos84 4.3.0 is the target here.
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2019-01-18T10:30:12Z
+
+Done, @dunglas. Sorry for the very long time since your request for these changes.

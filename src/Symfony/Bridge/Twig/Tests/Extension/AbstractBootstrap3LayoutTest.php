@@ -2089,6 +2089,22 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testRenderNumberWithHtml5NumberType()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
+            'html5' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="number"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="1234.56"]
+'
+        );
+    }
+
     public function testPassword()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');

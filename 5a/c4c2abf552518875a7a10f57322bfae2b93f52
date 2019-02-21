@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-14T09:09:26Z
+
+ping @schmittjoh since you had some interest into these also.
+
+---------------------------------------------------------------------------
+
+by schmittjoh at 2018-06-14T13:09:50Z
+
+@nicolas-grekas , yeah, this is actually a pull-request from us.
+
+I've talked with Nasim, and she has suggested a slightly different fix now. Instead of turning off the validation entirely for the variable, we just remove validation of the look-around parts. This has the advantage that the value itself is still validated.
+
+---------------------------------------------------------------------------
+
+by nasimnabavi at 2018-06-15T09:12:33Z
+
+Comments are applied:
+- regEx is changed.
+- new test added
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:51:16Z
+
+@nicolas-grekas @stof Ready for another review of this PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-10T11:09:07Z
+
+From a performance PoV, I think it would be better to perform this regex transformation at compile time, by adding a new (optional) index in the token (if it is not there, we would use the unmodified pattern). But this would probably require doing that change in master only, considering it as a new feature (which could be fine. the original issue https://github.com/symfony/symfony/issues/10548 was tagged as an enhancement, not as a bug).

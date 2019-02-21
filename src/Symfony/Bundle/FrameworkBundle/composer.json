@@ -28,7 +28,7 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "^4.1"
+        "symfony/routing": "^4.3"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",

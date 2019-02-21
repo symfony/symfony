@@ -30,7 +30,7 @@ use Symfony\Component\String\Inflector\InflectorInterface;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     /**
      * @internal
@@ -170,6 +170,44 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($fromDefaultValue = $this->extractFromDefaultValue($class, $property)) {
             return $fromDefaultValue;
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        try {
+            $reflection = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+        if (!$reflectionConstructor = $reflection->getConstructor()) {
+            return null;
+        }
+        if (!$reflectionParameter = $this->getReflectionParameterFromConstructor($property, $reflectionConstructor)) {
+            return null;
+        }
+        if (!$reflectionType = $reflectionParameter->getType()) {
+            return null;
+        }
+        if (!$type = $this->extractFromReflectionType($reflectionType, $reflectionConstructor)) {
+            return null;
+        }
+
+        return [$type];
+    }
+
+    private function getReflectionParameterFromConstructor(string $property, \ReflectionMethod $reflectionConstructor): ?\ReflectionParameter
+    {
+        $reflectionParameter = null;
+        foreach ($reflectionConstructor->getParameters() as $reflectionParameter) {
+            if ($reflectionParameter->getName() === $property) {
+                return $reflectionParameter;
+            }
         }
 
         return null;

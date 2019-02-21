@@ -29,7 +29,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @final
  */
-class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
+class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     const PROPERTY = 0;
     const ACCESSOR = 1;
@@ -159,6 +159,63 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         return [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0])];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypesFromConstructor(string $class, string $property): ?array
+    {
+        $docBlock = $this->getDocBlockFromConstructor($class, $property);
+
+        if (!$docBlock) {
+            return null;
+        }
+
+        $types = [];
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        foreach ($docBlock->getTagsByName('param') as $tag) {
+            if ($tag && null !== $tag->getType()) {
+                $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
+            }
+        }
+
+        if (!isset($types[0])) {
+            return null;
+        }
+
+        return $types;
+    }
+
+    private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
+    {
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+        $reflectionConstructor = $reflectionClass->getConstructor();
+        if (!$reflectionConstructor) {
+            return null;
+        }
+
+        try {
+            $docBlock = $this->docBlockFactory->create($reflectionConstructor, $this->contextFactory->createFromReflector($reflectionConstructor));
+
+            return $this->filterDocBlockParams($docBlock, $property);
+        } catch (\InvalidArgumentException $e) {
+            return null;
+        }
+    }
+
+    private function filterDocBlockParams(DocBlock $docBlock, string $allowedParam): DocBlock
+    {
+        $tags = array_values(array_filter($docBlock->getTagsByName('param'), function ($tag) use ($allowedParam) {
+            return $tag instanceof DocBlock\Tags\Param && $allowedParam === $tag->getVariableName();
+        }));
+
+        return new DocBlock($docBlock->getSummary(), $docBlock->getDescription(), $tags, $docBlock->getContext(),
+            $docBlock->getLocation(), $docBlock->isTemplateStart(), $docBlock->isTemplateEnd());
     }
 
     private function getDocBlock(string $class, string $property): array

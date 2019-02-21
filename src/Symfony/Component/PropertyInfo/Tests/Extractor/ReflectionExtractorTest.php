@@ -547,4 +547,23 @@ class ReflectionExtractorTest extends TestCase
             'enable_magic_call_extraction' => true,
         ]);
     }
+
+    /**
+     * @dataProvider extractConstructorTypesProvider
+     */
+    public function testExtractConstructorTypes(string $property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function extractConstructorTypesProvider(): array
+    {
+        return [
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['date', null],
+            ['dateObject', null],
+            ['dateTime', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['ddd', null],
+        ];
+    }
 }

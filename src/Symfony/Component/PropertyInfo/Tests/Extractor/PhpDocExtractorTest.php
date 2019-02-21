@@ -282,6 +282,25 @@ class PhpDocExtractorTest extends TestCase
         return (new \ReflectionMethod(StandardTagFactory::class, 'create'))
             ->hasReturnType();
     }
+
+    /**
+     * @dataProvider constructorTypesProvider
+     */
+    public function testExtractConstructorTypes($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypesFromConstructor('Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy', $property));
+    }
+
+    public function constructorTypesProvider()
+    {
+        return [
+            ['date', [new Type(Type::BUILTIN_TYPE_INT)]],
+            ['timezone', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeZone')]],
+            ['dateObject', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeInterface')]],
+            ['dateTime', null],
+            ['ddd', null],
+        ];
+    }
 }
 
 class EmptyDocBlock

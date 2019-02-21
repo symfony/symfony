@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
@@ -113,13 +114,9 @@ class Router implements RouterInterface, RequestMatcherInterface
      *   * cache_dir:              The cache directory (or null to disable caching)
      *   * debug:                  Whether to enable debugging or not (false by default)
      *   * generator_class:        The name of a UrlGeneratorInterface implementation
-     *   * generator_base_class:   The base class for the dumped generator class
-     *   * generator_cache_class:  The class name for the dumped generator class
      *   * generator_dumper_class: The name of a GeneratorDumperInterface implementation
      *   * matcher_class:          The name of a UrlMatcherInterface implementation
-     *   * matcher_base_class:     The base class for the dumped matcher class
-     *   * matcher_dumper_class:   The class name for the dumped matcher class
-     *   * matcher_cache_class:    The name of a MatcherDumperInterface implementation
+     *   * matcher_dumper_class:   The name of a MatcherDumperInterface implementation
      *   * resource_type:          Type hint for the main resource (optional)
      *   * strict_requirements:    Configure strict requirement checking for generators
      *                             implementing ConfigurableRequirementsInterface (default is true)
@@ -134,13 +131,13 @@ class Router implements RouterInterface, RequestMatcherInterface
             'cache_dir' => null,
             'debug' => false,
             'generator_class' => CompiledUrlGenerator::class,
-            'generator_base_class' => UrlGenerator::class,
+            'generator_base_class' => UrlGenerator::class, // deprecated
             'generator_dumper_class' => CompiledUrlGeneratorDumper::class,
-            'generator_cache_class' => 'UrlGenerator',
+            'generator_cache_class' => 'UrlGenerator', // deprecated
             'matcher_class' => CompiledUrlMatcher::class,
-            'matcher_base_class' => UrlMatcher::class,
+            'matcher_base_class' => UrlMatcher::class, // deprecated
             'matcher_dumper_class' => CompiledUrlMatcherDumper::class,
-            'matcher_cache_class' => 'UrlMatcher',
+            'matcher_cache_class' => 'UrlMatcher', // deprecated
             'resource_type' => null,
             'strict_requirements' => true,
         ];
@@ -148,6 +145,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = [];
         foreach ($options as $key => $value) {
+            $this->checkDeprecatedOption($key);
             if (array_key_exists($key, $this->options)) {
                 $this->options[$key] = $value;
             } else {
@@ -174,6 +172,8 @@ class Router implements RouterInterface, RequestMatcherInterface
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
         }
 
+        $this->checkDeprecatedOption($key);
+
         $this->options[$key] = $value;
     }
 
@@ -191,6 +191,8 @@ class Router implements RouterInterface, RequestMatcherInterface
         if (!array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
         }
+
+        $this->checkDeprecatedOption($key);
 
         return $this->options[$key];
     }
@@ -279,7 +281,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->matcher;
         }
 
-        $compiled = is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true);
+        $compiled = is_a($this->options['matcher_class'], CompiledUrlMatcher::class, true) && (UrlMatcher::class === $this->options['matcher_base_class'] || RedirectableUrlMatcher::class === $this->options['matcher_base_class']);
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
             $routes = $this->getRouteCollection();
@@ -336,7 +338,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
-        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true);
+        $compiled = is_a($this->options['generator_class'], CompiledUrlGenerator::class, true) && UrlGenerator::class === $this->options['generator_base_class'];
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
             $routes = $this->getRouteCollection();
@@ -410,5 +412,16 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         return $this->configCacheFactory;
+    }
+
+    private function checkDeprecatedOption($key)
+    {
+        switch ($key) {
+            case 'generator_base_class':
+            case 'generator_cache_class':
+            case 'matcher_base_class':
+            case 'matcher_cache_class':
+                @trigger_error(sprintf('Option "%s" given to router %s is deprecated since Symfony 4.3.', $key, static::class), E_USER_DEPRECATED);
+        }
     }
 }

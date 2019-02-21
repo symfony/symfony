@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-02-15T00:30:10Z
+
+For some reason the non-insulted functional tests are failing.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-18T10:09:40Z
+
+we should document this in `UPGRADE-4.3.md` and `UPGRADE-5.0.md` too though

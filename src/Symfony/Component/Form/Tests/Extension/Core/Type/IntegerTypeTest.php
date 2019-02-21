@@ -24,14 +24,15 @@ class IntegerTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    public function testSubmitCastsToInteger()
+    public function testSubmitRejectsFloats()
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 
         $form->submit('1.678');
 
-        $this->assertSame(1, $form->getData());
-        $this->assertSame('1', $form->getViewData());
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->isSynchronized());
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

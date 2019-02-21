@@ -31,6 +31,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
@@ -123,6 +124,8 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);
         $this->addCompilerPassIfExists($container, MessengerPass::class);
+        $container->addCompilerPass(new RegisterReverseContainerPass(true));
+        $container->addCompilerPass(new RegisterReverseContainerPass(false), PassConfig::TYPE_AFTER_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);

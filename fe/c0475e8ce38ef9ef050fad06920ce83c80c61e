@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-20T08:50:39Z
+
+Not dumping the contents of the data structures might be considered a bug by some people. Personally I'd like to see it in 3.x because our project is using LTS Symfony and not seeing the data is often a problem for my colleagues when debugging. On the other hand it should be possible to only upgrade symfony/var-dumper to 4.x and keep the rest as LTS. Let me know if you want me to target an older branch and I'll rebase it.
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-20T08:59:15Z
+
+Btw. should I add `: array` return types?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-02-20T09:59:25Z
+
+this is a new feature, so it goes in master to me.
+
+Please add a line about it in the changelog of the component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-20T10:06:49Z
+
+> Btw. should I add `: array` return types?
+
+yes please
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-20T10:29:51Z
+
+> > Btw. should I add `: array` return types?
+>
+> yes please
+
+Note that the array return type is not present in other casters.
+
+Another thing is the `$isNested` parameter which sounds like a boolean but doesn't have the typehint in other cases.
+
+Also I'm not actually using `$stub` and `$isNested` so I could just remove them and it should still work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-20T10:32:22Z
+
+Most of the existing code date from pre-PHP7, that's the reason. New code can use new language features. Let's keep the extra arguments as adding them later would be a BC break, and also because that's the signature of casters.
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-20T10:33:05Z
+
+Ok, all done.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-02-20T11:08:40Z
+
+I suggesting adding the `bool` typehint on `$isNested` too.
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-21T18:18:39Z
+
+@stof According to docs Casters can also take a fifth parameter `$filter`. Should I add it too?
+
+the docs says this about it:
+
+> A bit field of Caster ::EXCLUDE_* constants.
+
+https://symfony.com/doc/current/components/var_dumper/advanced.html#casters
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-21T18:42:34Z
+
+Almost no casters use it so no need.

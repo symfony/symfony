@@ -125,13 +125,10 @@ abstract class AbstractCloner implements ClonerInterface
 
         'Memcached' => ['Symfony\Component\VarDumper\Caster\MemcachedCaster', 'castMemcached'],
 
-        'Ds\Set' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
-        'Ds\Vector' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
-        'Ds\Deque' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
-        'Ds\Stack' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
-        'Ds\Queue' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
-        'Ds\PriorityQueue' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castDs'],
+        'Ds\Collection' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castCollection'],
         'Ds\Map' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castMap'],
+        'Ds\Pair' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castPair'],
+        'Symfony\Component\VarDumper\Caster\DsPairStub' => ['Symfony\Component\VarDumper\Caster\DsCaster', 'castPairStub'],
 
         ':curl' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castCurl'],
         ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],

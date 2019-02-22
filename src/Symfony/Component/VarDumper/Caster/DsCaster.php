@@ -11,13 +11,9 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use Ds\Deque;
+use Ds\Collection;
 use Ds\Map;
-use Ds\PriorityQueue;
-use Ds\Queue;
-use Ds\Set;
-use Ds\Stack;
-use Ds\Vector;
+use Ds\Pair;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
@@ -27,23 +23,45 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DsCaster
 {
-    /**
-     * @param Set|Deque|Vector|Stack|Queue|PriorityQueue $c
-     */
-    public static function castDs($c, array $a, Stub $stub, bool $isNested): array
+    public static function castCollection(Collection $c, array $a, Stub $stub, bool $isNested): array
     {
-        $prefix = Caster::PREFIX_VIRTUAL;
-        $a = $c->toArray();
-        $a[$prefix.'capacity'] = $c->capacity();
+        $a[Caster::PREFIX_VIRTUAL.'count'] = $c->count();
+        $a[Caster::PREFIX_VIRTUAL.'capacity'] = $c->capacity();
+
+        if (!$c instanceof Map) {
+            $a += $c->toArray();
+        }
 
         return $a;
     }
 
     public static function castMap(Map $c, array $a, Stub $stub, bool $isNested): array
     {
-        $prefix = Caster::PREFIX_VIRTUAL;
-        $a = $c->pairs()->toArray();
-        $a[$prefix.'capacity'] = $c->capacity();
+        foreach ($c as $k => $v) {
+            $a[] = new DsPairStub($k, $v);
+        }
+
+        return $a;
+    }
+
+    public static function castPair(Pair $c, array $a, Stub $stub, bool $isNested): array
+    {
+        foreach ($c->toArray() as $k => $v) {
+            $a[Caster::PREFIX_VIRTUAL.$k] = $v;
+        }
+
+        return $a;
+    }
+
+    public static function castPairStub(DsPairStub $c, array $a, Stub $stub, bool $isNested): array
+    {
+        if ($isNested) {
+            $stub->class = Pair::class;
+            $stub->value = null;
+            $stub->handle = 0;
+
+            $a = $c->value;
+        }
 
         return $a;
     }

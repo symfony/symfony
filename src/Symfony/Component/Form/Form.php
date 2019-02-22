@@ -42,9 +42,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value for both internal processing and
- * storage in the object. In these cases you simply need to set a view
- * transformer to convert between formats (2) and (3). You can do this by
- * calling addViewTransformer().
+ * storage in the object. In these cases you need to set a view transformer
+ * to convert between formats (2) and (3). You can do this by calling
+ * addViewTransformer().
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value

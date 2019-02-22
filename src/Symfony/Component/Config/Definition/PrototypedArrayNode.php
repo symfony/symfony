@@ -301,7 +301,7 @@ class PrototypedArrayNode extends ArrayNode
         }
 
         foreach ($rightSide as $k => $v) {
-            // prototype, and key is irrelevant, so simply append the element
+            // prototype, and key is irrelevant, append the element
             if (null === $this->keyAttribute) {
                 $leftSide[] = $v;
                 continue;

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:framework="http://symfony.com/schema/dic/symfony"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:http_client>
+            <framework:default_options>
+                <framework:auth>foo:bar</framework:auth>
+                <framework:query>
+                    <framework:foo>bar</framework:foo>
+                    <framework:bar>baz</framework:bar>
+                </framework:query>
+                <framework:headers>
+                    <framework:X-powered>PHP</framework:X-powered>
+                </framework:headers>
+                <framework:max_redirects>2</framework:max_redirects>
+                <framework:http_version>2.0</framework:http_version>
+                <framework:base_uri>http://example.com</framework:base_uri>
+                <framework:buffer>true</framework:buffer>
+                <framework:resolve>
+                    <framework:localhost>127.0.0.1</framework:localhost>
+                </framework:resolve>
+                <framework:proxy>proxy.org</framework:proxy>
+                <framework:timeout>3.5</framework:timeout>
+                <framework:bindto>127.0.0.1</framework:bindto>
+                <framework:verify_peer>true</framework:verify_peer>
+                <framework:verify_host>true</framework:verify_host>
+                <framework:cafile>/etc/ssl/cafile</framework:cafile>
+                <framework:capath>/etc/ssl</framework:capath>
+                <framework:local_cert>/etc/ssl/cert.pem</framework:local_cert>
+                <framework:local_pk>/etc/ssl/private_key.pem</framework:local_pk>
+                <framework:passphrase>password123456</framework:passphrase>
+                <framework:ciphers>RC4-SHA:TLS13-AES-128-GCM-SHA256</framework:ciphers>
+                <framework:peer_fingerprint>
+                    <framework:pin-sha256>14s5erg62v1v8471g2revg48r7==</framework:pin-sha256>
+                    <framework:pin-sha256>jsda84hjtyd4821bgfesd215bsfg5412=</framework:pin-sha256>
+                    <framework:md5>sdhtb481248721thbr=</framework:md5>
+                </framework:peer_fingerprint>
+            </framework:default_options>
+        </framework:http_client>
+    </framework:config>
+</container>

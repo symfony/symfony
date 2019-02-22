@@ -331,6 +331,11 @@ class ConfigurationTest extends TestCase
                 'buses' => ['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]],
             ],
             'disallow_search_engine_index' => true,
+            'http_client' => [
+                'enabled' => false,
+                'max_host_connections' => 6,
+                'clients' => [],
+            ],
         ];
     }
 }

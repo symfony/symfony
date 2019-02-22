@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
@@ -57,6 +58,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\HttpClientTrait;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -110,6 +114,8 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -299,6 +305,10 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['http_client'])) {
+            $this->registerHttpClientConfiguration($config['http_client'], $container, $loader);
         }
 
         if ($this->isConfigEnabled($container, $config['web_link'])) {
@@ -1744,6 +1754,48 @@ class FrameworkExtension extends Extension
                 $propertyAccessDefinition->setClass(ArrayAdapter::class);
                 $propertyAccessDefinition->setArguments([0, false]);
             }
+        }
+    }
+
+    private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!class_exists(HttpClient::class)) {
+            throw new LogicException('HttpClient support cannot be enabled as the component is not installed. Try running "composer require symfony/http-client".');
+        }
+
+        $loader->load('http_client.xml');
+
+        $merger = new class() {
+            use HttpClientTrait;
+
+            public function merge(array $options, array $defaultOptions)
+            {
+                try {
+                    [, $options] = $this->prepareRequest(null, null, $options, $defaultOptions);
+
+                    return $options;
+                } catch (TransportExceptionInterface $e) {
+                    throw new InvalidArgumentException($e->getMessage(), 0, $e);
+                }
+            }
+        };
+
+        $defaultOptions = $merger->merge($config['default_options'] ?? [], []);
+        $container->getDefinition('http_client')->setArguments([$defaultOptions, $config['max_host_connections'] ?? 6]);
+
+        foreach ($config['clients'] as $name => $clientConfig) {
+            $options = $merger->merge($clientConfig['default_options'] ?? [], $defaultOptions);
+
+            $container->register($name, HttpClientInterface::class)
+                ->setFactory([HttpClient::class, 'create'])
+                ->setArguments([$options, $clientConfig['max_host_connections'] ?? $config['max_host_connections'] ?? 6]);
+
+            $container->register('psr18.'.$name, Psr18Client::class)
+                ->setAutowired(true)
+                ->setArguments([new Reference($name)]);
+
+            $container->registerAliasForArgument($name, HttpClientInterface::class);
+            $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
         }
     }
 

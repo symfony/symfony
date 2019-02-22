@@ -42,6 +42,7 @@
         "symfony/security": "~3.4|~4.0",
         "symfony/form": "^4.3",
         "symfony/expression-language": "~3.4|~4.0",
+        "symfony/http-client": "^4.3",
         "symfony/messenger": "^4.2",
         "symfony/mime": "^4.3",
         "symfony/process": "~3.4|~4.0",

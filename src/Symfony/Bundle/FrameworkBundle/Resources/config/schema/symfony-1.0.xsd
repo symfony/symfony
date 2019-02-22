@@ -32,6 +32,7 @@
             <xsd:element name="php-errors" type="php-errors" minOccurs="0" maxOccurs="1" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
             <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="http_client" type="http_client" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -443,5 +444,65 @@
             <xsd:element name="argument" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="http_client">
+        <xsd:sequence>
+            <xsd:element name="max_host_connections" type="xsd:integer" minOccurs="0" />
+            <xsd:element name="default_options" type="http_client_options" minOccurs="0" />
+            <xsd:element name="client" type="http_client_client" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="http_client_options">
+        <xsd:sequence>
+            <xsd:element name="auth" type="xsd:string" minOccurs="0" />
+            <xsd:element name="query" type="http_query" minOccurs="0" />
+            <xsd:element name="headers" type="http_headers" minOccurs="0" />
+            <xsd:element name="max_redirects" type="xsd:integer" minOccurs="0" />
+            <xsd:element name="http_version" type="xsd:string" minOccurs="0" />
+            <xsd:element name="base_uri" type="xsd:string" minOccurs="0" />
+            <xsd:element name="buffer" type="xsd:boolean" minOccurs="0" />
+            <xsd:element name="resolve" type="metadata" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="proxy" type="xsd:string" minOccurs="0" />
+            <xsd:element name="no_proxy" type="xsd:string" minOccurs="0" />
+            <xsd:element name="timeout" type="xsd:float" minOccurs="0" />
+            <xsd:element name="bindto" type="xsd:string" minOccurs="0" />
+            <xsd:element name="verify_peer" type="xsd:boolean" minOccurs="0" />
+            <xsd:element name="verify_host" type="xsd:boolean" minOccurs="0" />
+            <xsd:element name="cafile" type="xsd:string" minOccurs="0" />
+            <xsd:element name="capath" type="xsd:string" minOccurs="0" />
+            <xsd:element name="local_cert" type="xsd:string" minOccurs="0" />
+            <xsd:element name="local_pk" type="xsd:string" minOccurs="0" />
+            <xsd:element name="passphrase" type="xsd:string" minOccurs="0" />
+            <xsd:element name="ciphers" type="xsd:string" minOccurs="0" />
+            <xsd:element name="peer_fingerprint" type="fingerprint" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="http_client_client">
+        <xsd:sequence>
+            <xsd:element name="default_options" type="http_client_options" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="fingerprint">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" processContents="lax" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="http_query">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" processContents="lax" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="http_headers">
+        <xsd:sequence>
+            <xsd:any minOccurs="0" processContents="lax" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

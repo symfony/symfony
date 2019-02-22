@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-21T09:20:03Z
+
+Maybe do-while would be better?
+
+```php
+$prev = $e;
+do {
+	if ($exception === $wrapper = $prev) {
+		throw $e;
+	}
+} while ($prev = $wrapper->getPrevious());
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-21T11:44:19Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-21T11:48:21Z
+
+@nicolas-grekas What do you think about the do-while?
+
+---------------------------------------------------------------------------
+
+by enumag at 2019-02-21T12:03:30Z
+
+Squashed to one commit. Should be ready to merge in my opinion.

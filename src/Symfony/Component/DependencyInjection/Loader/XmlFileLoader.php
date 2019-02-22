@@ -353,7 +353,7 @@ class XmlFileLoader extends FileLoader
                     continue;
                 }
 
-                if (false !== strpos($name, '-') && false === strpos($name, '_') && !array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
+                if (false !== strpos($name, '-') && false === strpos($name, '_') && !\array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
                     $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
                 }
                 // keep not normalized key
@@ -537,7 +537,8 @@ class XmlFileLoader extends FileLoader
                     if (!$arg->getAttribute('tag')) {
                         throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="tagged" has no or empty "tag" attribute in "%s".', $name, $file));
                     }
-                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'));
+
+                    $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'), $arg->getAttribute('index-by') ?: null, $arg->getAttribute('default-index-method') ?: null);
                     break;
                 case 'binary':
                     if (false === $value = base64_decode($arg->nodeValue)) {

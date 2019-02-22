@@ -169,18 +169,29 @@ trait RedisTrait
      */
     protected function doFetch(array $ids)
     {
-        if ($ids) {
+        if (!$ids) {
+            return [];
+        }
+
+        $result = [];
+
+        if ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof ClusterInterface) {
             $values = $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
                     yield 'get' => [$id];
                 }
             });
-            foreach ($values as $id => $v) {
-                if ($v) {
-                    yield $id => parent::unserialize($v);
-                }
+        } else {
+            $values = array_combine($ids, $this->redis->mget($ids));
+        }
+
+        foreach ($values as $id => $v) {
+            if ($v) {
+                $result[$id] = parent::unserialize($v);
             }
         }
+
+        return $result;
     }
 
     /**

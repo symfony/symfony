@@ -75,6 +75,21 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
         $this->clear();
     }
 
+    public function removeDebugLogger()
+    {
+        foreach ($this->processors as $k => $processor) {
+            if ($processor instanceof DebugLoggerInterface) {
+                unset($this->processors[$k]);
+            }
+        }
+
+        foreach ($this->handlers as $k => $handler) {
+            if ($handler instanceof DebugLoggerInterface) {
+                unset($this->handlers[$k]);
+            }
+        }
+    }
+
     /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      *

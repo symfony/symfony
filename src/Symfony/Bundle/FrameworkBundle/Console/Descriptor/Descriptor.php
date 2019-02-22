@@ -225,7 +225,7 @@ abstract class Descriptor implements DescriptorInterface
             return $builder->getDefinition($serviceId);
         }
 
-        // Some service IDs don't have a Definition, they're simply an Alias
+        // Some service IDs don't have a Definition, they're aliases
         if ($builder->hasAlias($serviceId)) {
             return $builder->getAlias($serviceId);
         }

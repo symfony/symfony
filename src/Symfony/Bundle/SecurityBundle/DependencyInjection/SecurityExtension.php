@@ -479,7 +479,7 @@ class SecurityExtension extends Extension
         foreach ($this->factories as $position) {
             foreach ($position as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
-                if (array_key_exists($key, $firewall)) {
+                if (\array_key_exists($key, $firewall)) {
                     $listenerKeys[] = $key;
                 }
             }

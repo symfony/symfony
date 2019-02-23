@@ -213,7 +213,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
-        if (array_key_exists('_instanceof', $content['services'])) {
+        if (\array_key_exists('_instanceof', $content['services'])) {
             $instanceof = $content['services']['_instanceof'];
             unset($content['services']['_instanceof']);
 
@@ -250,7 +250,7 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefaults(array &$content, $file)
     {
-        if (!array_key_exists('_defaults', $content['services'])) {
+        if (!\array_key_exists('_defaults', $content['services'])) {
             return [];
         }
         $defaults = $content['services']['_defaults'];
@@ -361,7 +361,7 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['alias'])) {
             $this->container->setAlias($id, $alias = new Alias($service['alias']));
-            if (array_key_exists('public', $service)) {
+            if (\array_key_exists('public', $service)) {
                 $alias->setPublic($service['public']);
             } elseif (isset($defaults['public'])) {
                 $alias->setPublic($defaults['public']);
@@ -438,7 +438,7 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
-        if (array_key_exists('deprecated', $service)) {
+        if (\array_key_exists('deprecated', $service)) {
             $definition->setDeprecated(true, $service['deprecated']);
         }
 
@@ -571,11 +571,11 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        if (array_key_exists('namespace', $service) && !array_key_exists('resource', $service)) {
+        if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {
             throw new InvalidArgumentException(sprintf('A "resource" attribute must be set when the "namespace" attribute is set for service "%s" in %s. Check your YAML syntax.', $id, $file));
         }
 
-        if (array_key_exists('resource', $service)) {
+        if (\array_key_exists('resource', $service)) {
             if (!\is_string($service['resource'])) {
                 throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
             }

@@ -135,7 +135,7 @@ trait MemcachedTrait
             $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
             $client->setOption(\Memcached::OPT_NO_BLOCK, true);
             $client->setOption(\Memcached::OPT_TCP_NODELAY, true);
-            if (!array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
+            if (!\array_key_exists('LIBKETAMA_COMPATIBLE', $options) && !\array_key_exists(\Memcached::OPT_LIBKETAMA_COMPATIBLE, $options)) {
                 $client->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
             }
             foreach ($options as $name => $value) {

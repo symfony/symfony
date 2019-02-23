@@ -316,7 +316,7 @@ class RequestContext
      */
     public function hasParameter($name)
     {
-        return array_key_exists($name, $this->parameters);
+        return \array_key_exists($name, $this->parameters);
     }
 
     /**

@@ -120,7 +120,7 @@ class DumperCollection implements \IteratorAggregate
      */
     public function hasAttribute($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**

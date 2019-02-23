@@ -144,7 +144,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     private function getTimezone(array $context)
     {
-        $dateTimeZone = array_key_exists(self::TIMEZONE_KEY, $context) ? $context[self::TIMEZONE_KEY] : $this->timezone;
+        $dateTimeZone = \array_key_exists(self::TIMEZONE_KEY, $context) ? $context[self::TIMEZONE_KEY] : $this->timezone;
 
         if (null === $dateTimeZone) {
             return null;

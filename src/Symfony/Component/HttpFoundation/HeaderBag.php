@@ -112,7 +112,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         $key = str_replace('_', '-', strtolower($key));
         $headers = $this->all();
 
-        if (!array_key_exists($key, $headers)) {
+        if (!\array_key_exists($key, $headers)) {
             if (null === $default) {
                 return $first ? null : [];
             }
@@ -168,7 +168,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function has($key)
     {
-        return array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
+        return \array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
     }
 
     /**
@@ -245,7 +245,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function hasCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl);
+        return \array_key_exists($key, $this->cacheControl);
     }
 
     /**
@@ -257,7 +257,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      */
     public function getCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
+        return \array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
     }
 
     /**

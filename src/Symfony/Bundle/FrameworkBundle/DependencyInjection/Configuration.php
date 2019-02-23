@@ -371,7 +371,7 @@ class Configuration implements ConfigurationInterface
                                                 }
 
                                                 foreach ($transitions as $name => $transition) {
-                                                    if (array_key_exists('name', $transition)) {
+                                                    if (\array_key_exists('name', $transition)) {
                                                         continue;
                                                     }
                                                     $transition['name'] = $name;

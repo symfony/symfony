@@ -60,7 +60,7 @@ class FileFormField extends FormField
 
             // copy to a tmp location
             $tmp = sys_get_temp_dir().'/'.strtr(substr(base64_encode(hash('sha256', uniqid(mt_rand(), true), true)), 0, 7), '/', '_');
-            if (array_key_exists('extension', $info)) {
+            if (\array_key_exists('extension', $info)) {
                 $tmp .= '.'.$info['extension'];
             }
             if (is_file($tmp)) {

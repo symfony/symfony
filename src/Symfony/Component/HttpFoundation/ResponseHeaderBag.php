@@ -160,7 +160,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function hasCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl);
+        return \array_key_exists($key, $this->computedCacheControl);
     }
 
     /**
@@ -168,7 +168,7 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function getCacheControlDirective($key)
     {
-        return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
+        return \array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
     }
 
     public function setCookie(Cookie $cookie)

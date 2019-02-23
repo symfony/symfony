@@ -27,11 +27,11 @@ class XliffFileDumper extends FileDumper
     public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = [])
     {
         $xliffVersion = '1.2';
-        if (array_key_exists('xliff_version', $options)) {
+        if (\array_key_exists('xliff_version', $options)) {
             $xliffVersion = $options['xliff_version'];
         }
 
-        if (array_key_exists('default_locale', $options)) {
+        if (\array_key_exists('default_locale', $options)) {
             $defaultLocale = $options['default_locale'];
         } else {
             $defaultLocale = \Locale::getDefault();
@@ -58,7 +58,7 @@ class XliffFileDumper extends FileDumper
     private function dumpXliff1($defaultLocale, MessageCatalogue $messages, $domain, array $options = [])
     {
         $toolInfo = ['tool-id' => 'symfony', 'tool-name' => 'Symfony'];
-        if (array_key_exists('tool_info', $options)) {
+        if (\array_key_exists('tool_info', $options)) {
             $toolInfo = array_merge($toolInfo, $options['tool_info']);
         }
 
@@ -195,6 +195,6 @@ class XliffFileDumper extends FileDumper
      */
     private function hasMetadataArrayInfo($key, $metadata = null)
     {
-        return null !== $metadata && array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || \is_array($metadata[$key]));
+        return null !== $metadata && \array_key_exists($key, $metadata) && ($metadata[$key] instanceof \Traversable || \is_array($metadata[$key]));
     }
 }

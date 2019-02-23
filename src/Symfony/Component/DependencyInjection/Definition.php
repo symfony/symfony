@@ -263,7 +263,7 @@ class Definition
             throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, \count($this->arguments) - 1));
         }
 
-        if (!array_key_exists($index, $this->arguments)) {
+        if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
         }
 
@@ -308,7 +308,7 @@ class Definition
      */
     public function getArgument($index)
     {
-        if (!array_key_exists($index, $this->arguments)) {
+        if (!\array_key_exists($index, $this->arguments)) {
             throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
         }
 

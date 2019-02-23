@@ -259,7 +259,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         $children = $this->data[$item->position];
 
         foreach ($keys as $key) {
-            if (isset($children[$key]) || array_key_exists($key, $children)) {
+            if (isset($children[$key]) || \array_key_exists($key, $children)) {
                 $data = clone $this;
                 $data->key = $key;
                 $data->position = $item->position;

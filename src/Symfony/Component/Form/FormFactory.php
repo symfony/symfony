@@ -63,7 +63,7 @@ class FormFactory implements FormFactoryInterface
      */
     public function createNamedBuilder($name, $type = 'Symfony\Component\Form\Extension\Core\Type\FormType', $data = null, array $options = [])
     {
-        if (null !== $data && !array_key_exists('data', $options)) {
+        if (null !== $data && !\array_key_exists('data', $options)) {
             $options['data'] = $data;
         }
 

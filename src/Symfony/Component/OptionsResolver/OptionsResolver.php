@@ -175,7 +175,7 @@ class OptionsResolver implements Options
         // to resolve options with lazy closures, normalizers or validation
         // rules, none of which can exist for undefined options
         // If the option was resolved before, update the resolved value
-        if (!isset($this->defined[$option]) || array_key_exists($option, $this->resolved)) {
+        if (!isset($this->defined[$option]) || \array_key_exists($option, $this->resolved)) {
             $this->resolved[$option] = $value;
         }
 
@@ -215,7 +215,7 @@ class OptionsResolver implements Options
      */
     public function hasDefault($option)
     {
-        return array_key_exists($option, $this->defaults);
+        return \array_key_exists($option, $this->defaults);
     }
 
     /**
@@ -280,7 +280,7 @@ class OptionsResolver implements Options
      */
     public function isMissing($option)
     {
-        return isset($this->required[$option]) && !array_key_exists($option, $this->defaults);
+        return isset($this->required[$option]) && !\array_key_exists($option, $this->defaults);
     }
 
     /**
@@ -694,12 +694,12 @@ class OptionsResolver implements Options
         }
 
         // Shortcut for resolved options
-        if (array_key_exists($option, $this->resolved)) {
+        if (\array_key_exists($option, $this->resolved)) {
             return $this->resolved[$option];
         }
 
         // Check whether the option is set at all
-        if (!array_key_exists($option, $this->defaults)) {
+        if (!\array_key_exists($option, $this->defaults)) {
             if (!isset($this->defined[$option])) {
                 throw new NoSuchOptionException(sprintf('The option "%s" does not exist. Defined options are: "%s".', $option, implode('", "', array_keys($this->defined))));
             }
@@ -908,7 +908,7 @@ class OptionsResolver implements Options
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
 
-        return array_key_exists($option, $this->defaults);
+        return \array_key_exists($option, $this->defaults);
     }
 
     /**

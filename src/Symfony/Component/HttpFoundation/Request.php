@@ -303,10 +303,10 @@ class Request
         // HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH fields.
         $server = $_SERVER;
         if ('cli-server' === \PHP_SAPI) {
-            if (array_key_exists('HTTP_CONTENT_LENGTH', $_SERVER)) {
+            if (\array_key_exists('HTTP_CONTENT_LENGTH', $_SERVER)) {
                 $server['CONTENT_LENGTH'] = $_SERVER['HTTP_CONTENT_LENGTH'];
             }
-            if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)) {
+            if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)) {
                 $server['CONTENT_TYPE'] = $_SERVER['HTTP_CONTENT_TYPE'];
             }
         }
@@ -691,7 +691,7 @@ class Request
             $key = self::HEADER_CLIENT_PROTO;
         } elseif ('client_port' === $key) {
             $key = self::HEADER_CLIENT_PORT;
-        } elseif (!array_key_exists($key, self::$trustedHeaders)) {
+        } elseif (!\array_key_exists($key, self::$trustedHeaders)) {
             throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
         }
 
@@ -722,7 +722,7 @@ class Request
             @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.', __METHOD__), E_USER_DEPRECATED);
         }
 
-        if (!array_key_exists($key, self::$trustedHeaders)) {
+        if (!\array_key_exists($key, self::$trustedHeaders)) {
             throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
         }
 

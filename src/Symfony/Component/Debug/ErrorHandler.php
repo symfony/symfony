@@ -222,7 +222,7 @@ class ErrorHandler
             }
             if (!\is_array($log)) {
                 $log = [$log];
-            } elseif (!array_key_exists(0, $log)) {
+            } elseif (!\array_key_exists(0, $log)) {
                 throw new \InvalidArgumentException('No logger provided');
             }
             if (null === $log[0]) {

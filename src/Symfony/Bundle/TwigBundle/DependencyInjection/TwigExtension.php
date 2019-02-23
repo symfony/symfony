@@ -193,7 +193,7 @@ class TwigExtension extends Extension
         $bundleHierarchy = [];
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if (!array_key_exists($name, $bundleHierarchy)) {
+            if (!\array_key_exists($name, $bundleHierarchy)) {
                 $bundleHierarchy[$name] = [
                     'paths' => [],
                     'parents' => [],
@@ -222,7 +222,7 @@ class TwigExtension extends Extension
 
             $bundleHierarchy[$name]['parents'][] = $bundle['parent'];
 
-            if (!array_key_exists($bundle['parent'], $bundleHierarchy)) {
+            if (!\array_key_exists($bundle['parent'], $bundleHierarchy)) {
                 $bundleHierarchy[$bundle['parent']] = [
                     'paths' => [],
                     'parents' => [],

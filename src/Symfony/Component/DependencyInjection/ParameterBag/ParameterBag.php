@@ -70,7 +70,7 @@ class ParameterBag implements ParameterBagInterface
     {
         $name = $this->normalizeName($name);
 
-        if (!array_key_exists($name, $this->parameters)) {
+        if (!\array_key_exists($name, $this->parameters)) {
             if (!$name) {
                 throw new ParameterNotFoundException($name);
             }
@@ -121,7 +121,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function has($name)
     {
-        return array_key_exists($this->normalizeName($name), $this->parameters);
+        return \array_key_exists($this->normalizeName($name), $this->parameters);
     }
 
     /**

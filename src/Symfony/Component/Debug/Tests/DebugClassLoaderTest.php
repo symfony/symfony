@@ -297,7 +297,7 @@ class DebugClassLoaderTest extends TestCase
         require __DIR__.'/Fixtures/FinalClasses.php';
 
         $i = 1;
-        while(class_exists($finalClass = __NAMESPACE__.'\\Fixtures\\FinalClass'.$i++, false)) {
+        while (class_exists($finalClass = __NAMESPACE__.'\\Fixtures\\FinalClass'.$i++, false)) {
             spl_autoload_call($finalClass);
             class_exists('Test\\'.__NAMESPACE__.'\\Extends'.substr($finalClass, strrpos($finalClass, '\\') + 1), true);
         }

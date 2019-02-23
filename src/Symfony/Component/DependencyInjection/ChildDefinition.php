@@ -71,7 +71,7 @@ class ChildDefinition extends Definition
      */
     public function getArgument($index)
     {
-        if (array_key_exists('index_'.$index, $this->arguments)) {
+        if (\array_key_exists('index_'.$index, $this->arguments)) {
             return $this->arguments['index_'.$index];
         }
 

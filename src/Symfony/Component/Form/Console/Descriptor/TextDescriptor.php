@@ -110,7 +110,7 @@ class TextDescriptor extends Descriptor
         ];
         $rows = [];
         foreach ($map as $label => $name) {
-            $value = array_key_exists($name, $definition) ? $dump($definition[$name]) : '-';
+            $value = \array_key_exists($name, $definition) ? $dump($definition[$name]) : '-';
             if ('default' === $name && isset($definition['lazy'])) {
                 $value = "Value: $value\n\nClosure(s): ".$dump($definition['lazy']);
             }

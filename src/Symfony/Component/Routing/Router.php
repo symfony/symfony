@@ -142,7 +142,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         // check option names and live merge, if errors are encountered Exception will be thrown
         $invalid = [];
         foreach ($options as $key => $value) {
-            if (array_key_exists($key, $this->options)) {
+            if (\array_key_exists($key, $this->options)) {
                 $this->options[$key] = $value;
             } else {
                 $invalid[] = $key;
@@ -164,7 +164,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     public function setOption($key, $value)
     {
-        if (!array_key_exists($key, $this->options)) {
+        if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
         }
 
@@ -182,7 +182,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      */
     public function getOption($key)
     {
-        if (!array_key_exists($key, $this->options)) {
+        if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
         }
 

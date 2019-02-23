@@ -131,7 +131,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
         $attributes = $request->attributes->all();
         $arguments = [];
         foreach ($parameters as $param) {
-            if (array_key_exists($param->name, $attributes)) {
+            if (\array_key_exists($param->name, $attributes)) {
                 if ($this->supportsVariadic && $param->isVariadic() && \is_array($attributes[$param->name])) {
                     $arguments = array_merge($arguments, array_values($attributes[$param->name]));
                 } else {

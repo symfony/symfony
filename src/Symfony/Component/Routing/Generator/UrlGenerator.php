@@ -139,7 +139,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $message = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
         foreach ($tokens as $token) {
             if ('variable' === $token[0]) {
-                if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
+                if (!$optional || !\array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement (while ignoring look-around patterns)
                     if (null !== $this->strictRequirements && !preg_match('#^'.preg_replace('/\(\?(?:=|<=|!|<!)((?:[^()\\\\]+|\\\\.|\((?1)\))*)\)/', '', $token[2]).'$#'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
                         if ($this->strictRequirements) {

@@ -460,7 +460,7 @@ class NumberFormatter
      */
     public function getSymbol($attr)
     {
-        return array_key_exists($this->style, self::$enSymbols) && array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::$enSymbols) && \array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
     }
 
     /**
@@ -474,7 +474,7 @@ class NumberFormatter
      */
     public function getTextAttribute($attr)
     {
-        return array_key_exists($this->style, self::$enTextAttributes) && array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::$enTextAttributes) && \array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
     }
 
     /**

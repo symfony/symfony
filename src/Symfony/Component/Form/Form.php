@@ -574,7 +574,7 @@ class Form implements \IteratorAggregate, FormInterface
                 }
 
                 foreach ($this->children as $name => $child) {
-                    $isSubmitted = array_key_exists($name, $submittedData);
+                    $isSubmitted = \array_key_exists($name, $submittedData);
 
                     if ($isSubmitted || $clearMissing) {
                         $child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);

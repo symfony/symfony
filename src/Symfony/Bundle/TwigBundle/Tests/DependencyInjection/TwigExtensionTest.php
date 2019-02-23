@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\DefaultOverriddenBundlePathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
@@ -177,13 +178,20 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new DefaultOverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
-        $paths = [];
+        $addedPaths = [];
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
-                $paths[] = $call[1];
+                $addedPaths[] = $call[1];
+            }
+        }
+        $prependedPaths = [];
+        foreach ($def->getMethodCalls() as $call) {
+            if ('prependPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
+                $prependedPaths[] = $call[1];
             }
         }
 
@@ -196,12 +204,17 @@ class TwigExtensionTest extends TestCase
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/Fixtures/templates'],
-        ], $paths);
+        ], $addedPaths);
+        $this->assertEquals([
+            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+        ], $prependedPaths);
     }
 
     /**
      * @group legacy
      * @dataProvider getFormats
+     * @dataProvider getFormats
+     * @expectedDeprecation Templates directory "%s/Resources/TwigBundle/views" is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
      * @expectedDeprecation Templates directory "%s/Resources/views" is deprecated since Symfony 4.2, use "%s/templates" instead.
      */
     public function testLegacyTwigLoaderPaths($format)
@@ -210,13 +223,20 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new DefaultOverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
-        $paths = [];
+        $addedPaths = [];
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
-                $paths[] = $call[1];
+                $addedPaths[] = $call[1];
+            }
+        }
+        $prependedPaths = [];
+        foreach ($def->getMethodCalls() as $call) {
+            if ('prependPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
+                $prependedPaths[] = $call[1];
             }
         }
 
@@ -230,7 +250,11 @@ class TwigExtensionTest extends TestCase
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/../Fixtures/templates/Resources/views'],
             [__DIR__.'/Fixtures/templates'],
-        ], $paths);
+        ], $addedPaths);
+        $this->assertEquals([
+            [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
+            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+        ], $prependedPaths);
     }
 
     public function getFormats()

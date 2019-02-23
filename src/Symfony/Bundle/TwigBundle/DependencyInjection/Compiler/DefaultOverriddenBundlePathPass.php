@@ -22,7 +22,7 @@ final class DefaultOverriddenBundlePathPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $twigLoaderFilesystemId = $container->getAlias('twig.loader')->__toString();
+        $twigLoaderFilesystemId = 'twig.loader.native_filesystem';
 
         if (false === $container->hasDefinition($twigLoaderFilesystemId)) {
             return;

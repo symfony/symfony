@@ -41,7 +41,7 @@ class FormValidator extends ConstraintValidator
 
         $validator = $this->context->getValidator()->inContext($this->context);
 
-        if ($form->isSynchronized()) {
+        if ($form->isSubmitted() && $form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
             $groups = self::getValidationGroups($form);
             $data = $form->getData();
@@ -90,7 +90,7 @@ class FormValidator extends ConstraintValidator
                     }
                 }
             }
-        } else {
+        } elseif (!$form->isSynchronized()) {
             $childrenSynchronized = true;
 
             /** @var FormInterface $child */

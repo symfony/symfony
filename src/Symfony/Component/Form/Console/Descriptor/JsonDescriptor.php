@@ -79,7 +79,7 @@ class JsonDescriptor extends Descriptor
             'allowed_values' => 'allowedValues',
         ];
         foreach ($map as $label => $name) {
-            if (array_key_exists($name, $definition)) {
+            if (\array_key_exists($name, $definition)) {
                 $data[$label] = $definition[$name];
 
                 if ('default' === $name) {

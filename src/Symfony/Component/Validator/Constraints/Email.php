@@ -76,19 +76,19 @@ class Email extends Constraint
 
     public function __construct($options = null)
     {
-        if (\is_array($options) && array_key_exists('strict', $options)) {
+        if (\is_array($options) && \array_key_exists('strict', $options)) {
             @trigger_error(sprintf('The "strict" property is deprecated since Symfony 4.1. Use "mode"=>"%s" instead.', self::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
         }
 
-        if (\is_array($options) && array_key_exists('checkMX', $options)) {
+        if (\is_array($options) && \array_key_exists('checkMX', $options)) {
             @trigger_error('The "checkMX" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
         }
 
-        if (\is_array($options) && array_key_exists('checkHost', $options)) {
+        if (\is_array($options) && \array_key_exists('checkHost', $options)) {
             @trigger_error('The "checkHost" option is deprecated since Symfony 4.2.', E_USER_DEPRECATED);
         }
 
-        if (\is_array($options) && array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
+        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
             throw new \InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 

@@ -65,7 +65,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (!\is_array($array)) {
                 throw new RuntimeException(sprintf('Resolved value of "%s" did not result in an array value.', $next));
             }
-            if (!array_key_exists($key, $array)) {
+            if (!\array_key_exists($key, $array)) {
                 throw new RuntimeException(sprintf('Key "%s" not found in "%s" (resolved from "%s")', $key, json_encode($array), $next));
             }
 

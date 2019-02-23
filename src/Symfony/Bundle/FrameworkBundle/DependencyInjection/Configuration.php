@@ -327,7 +327,7 @@ class Configuration implements ConfigurationInterface
                                                 }
 
                                                 foreach ($places as $name => $place) {
-                                                    if (\is_array($place) && array_key_exists('name', $place)) {
+                                                    if (\is_array($place) && \array_key_exists('name', $place)) {
                                                         continue;
                                                     }
                                                     $place['name'] = $name;
@@ -365,7 +365,7 @@ class Configuration implements ConfigurationInterface
                                                 }
 
                                                 foreach ($transitions as $name => $transition) {
-                                                    if (\is_array($transition) && array_key_exists('name', $transition)) {
+                                                    if (\is_array($transition) && \array_key_exists('name', $transition)) {
                                                         continue;
                                                     }
                                                     $transition['name'] = $name;

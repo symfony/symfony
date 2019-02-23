@@ -61,9 +61,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
         $options = ['validation_groups' => ['group1', 'group2']];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -82,9 +81,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             'validation_groups' => ['group1', 'group2'],
             'constraints' => [$constraint1, $constraint2],
         ];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         // First default constraints
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
@@ -110,10 +108,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             'validation_groups' => ['group1', 'group2'],
             'constraints' => [new Valid()],
         ];
-        $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
+        $form = $this->getCompoundForm($object, $options);
         $parent->add($form);
-
-        $form->setData($object);
+        $parent->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -146,8 +143,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testMissingConstraintIndex()
     {
         $object = new \stdClass();
-        $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);
-        $form = $form->setData($object)->getForm();
+        $form = $this->getCompoundForm($object);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['Default']);
 
@@ -170,10 +167,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             'validation_groups' => ['group1', 'group2'],
             'constraints' => [$constraint1, $constraint2],
         ];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
         $parent->add($form);
+        $parent->submit([]);
 
         $this->expectValidateValueAt(0, 'data', $object, $constraint1, 'group1');
         $this->expectValidateValueAt(1, 'data', $object, $constraint2, 'group2');
@@ -361,9 +357,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
         $options = ['validation_groups' => new GroupSequence(['group1', 'group2'])];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, new GroupSequence(['group1', 'group2']));
         $this->expectValidateAt(1, 'data', $object, new GroupSequence(['group1', 'group2']));
@@ -377,9 +372,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
         $options = ['validation_groups' => [$this, 'getValidationGroups']];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -392,9 +386,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
         $options = ['validation_groups' => 'header'];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['header']);
 
@@ -409,9 +402,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $options = ['validation_groups' => function (FormInterface $form) {
             return ['group1', 'group2'];
         }];
-        $form = $this->getBuilder('name', '\stdClass', $options)
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object, $options);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -455,7 +447,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setCompound(true)
             ->setDataMapper(new PropertyPathMapper())
             ->getForm();
-        $form = $this->getForm('name', '\stdClass', [
+        $form = $this->getCompoundForm($object, [
             'validation_groups' => 'form_group',
             'constraints' => [new Valid()],
         ]);
@@ -465,7 +457,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             'validation_groups' => 'button_group',
         ]));
 
-        $form->setData($object);
+        $parent->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['form_group']);
 
@@ -484,10 +476,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setDataMapper(new PropertyPathMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
-        $form = $this->getBuilder('name', '\stdClass', $formOptions)->getForm();
+        $form = $this->getCompoundForm($object, $formOptions);
         $parent->add($form);
-
-        $form->setData($object);
+        $parent->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group']);
 
@@ -506,10 +497,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setDataMapper(new PropertyPathMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
-        $form = $this->getBuilder('name', '\stdClass', $formOptions)->getForm();
+        $form = $this->getCompoundForm($object, $formOptions);
         $parent->add($form);
-
-        $form->setData($object);
+        $parent->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -523,7 +513,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         $parentOptions = [
-            'validation_groups' => function (FormInterface $form) {
+            'validation_groups' => function () {
                 return ['group1', 'group2'];
             },
         ];
@@ -532,10 +522,9 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setDataMapper(new PropertyPathMapper())
             ->getForm();
         $formOptions = ['constraints' => [new Valid()]];
-        $form = $this->getBuilder('name', '\stdClass', $formOptions)->getForm();
+        $form = $this->getCompoundForm($object, $formOptions);
         $parent->add($form);
-
-        $form->setData($object);
+        $parent->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
@@ -547,9 +536,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     public function testAppendPropertyPath()
     {
         $object = new \stdClass();
-        $form = $this->getBuilder('name', '\stdClass')
-            ->setData($object)
-            ->getForm();
+        $form = $this->getCompoundForm($object);
+        $form->submit([]);
 
         $this->expectValidateAt(0, 'data', $object, ['Default']);
 
@@ -681,6 +669,15 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     private function getForm($name = 'name', $dataClass = null, array $options = [])
     {
         return $this->getBuilder($name, $dataClass, $options)->getForm();
+    }
+
+    private function getCompoundForm($data, array $options = [])
+    {
+        return $this->getBuilder('name', \get_class($data), $options)
+            ->setData($data)
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
     }
 
     private function getSubmitButton($name = 'name', array $options = [])

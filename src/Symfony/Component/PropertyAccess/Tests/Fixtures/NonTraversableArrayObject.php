@@ -26,7 +26,7 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
 
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->array);
+        return \array_key_exists($offset, $this->array);
     }
 
     public function offsetGet($offset)

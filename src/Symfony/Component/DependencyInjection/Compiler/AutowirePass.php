@@ -189,7 +189,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         foreach ($parameters as $index => $parameter) {
-            if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
+            if (\array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
             }
 

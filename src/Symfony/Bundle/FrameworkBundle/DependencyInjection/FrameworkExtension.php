@@ -919,7 +919,7 @@ class FrameworkExtension extends Extension
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
-            } elseif (!array_key_exists('version', $package) && null === $package['json_manifest_path']) {
+            } elseif (!\array_key_exists('version', $package) && null === $package['json_manifest_path']) {
                 // if neither version nor json_manifest_path are specified, use the default
                 $version = $defaultVersion;
             } else {
@@ -1117,7 +1117,7 @@ class FrameworkExtension extends Extension
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
-        if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
+        if (\array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
             }
@@ -1125,7 +1125,7 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('enableAnnotationMapping', [new Reference('annotation_reader')]);
         }
 
-        if (array_key_exists('static_method', $config) && $config['static_method']) {
+        if (\array_key_exists('static_method', $config) && $config['static_method']) {
             foreach ($config['static_method'] as $methodName) {
                 $validatorBuilder->addMethodCall('addMethodMapping', [$methodName]);
             }

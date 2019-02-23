@@ -171,7 +171,7 @@ class GraphvizDumper extends Dumper
         }
 
         foreach ($container->getServiceIds() as $id) {
-            if (array_key_exists($id, $container->getAliases())) {
+            if (\array_key_exists($id, $container->getAliases())) {
                 continue;
             }
 

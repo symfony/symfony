@@ -42,7 +42,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     public function __construct(iterable $voters = [], string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
-        if (!\is_callable([$this, $strategyMethod])) {
+        if ('' === $strategy || !\is_callable([$this, $strategyMethod])) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 

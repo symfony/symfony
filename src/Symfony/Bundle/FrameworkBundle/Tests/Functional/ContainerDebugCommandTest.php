@@ -22,7 +22,7 @@ class ContainerDebugCommandTest extends WebTestCase
 {
     public function testDumpContainerIfNotExists()
     {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);

@@ -230,7 +230,7 @@ DependencyInjection
    supported.
 
  * The ``strict`` attribute in service arguments has been removed.
-   The attribute is ignored since 3.0, so you can simply remove it.
+   The attribute is ignored since 3.0, you can remove it.
 
  * Top-level anonymous services in XML are no longer supported.
 

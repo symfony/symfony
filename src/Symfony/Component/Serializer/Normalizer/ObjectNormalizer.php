@@ -113,7 +113,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         $cacheKey = \get_class($object);
-        if (!array_key_exists($cacheKey, $this->discriminatorCache)) {
+        if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {
             $this->discriminatorCache[$cacheKey] = null;
             if (null !== $this->classDiscriminatorResolver) {
                 $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object);

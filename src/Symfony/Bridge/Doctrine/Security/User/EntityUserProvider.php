@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * Wrapper around a Doctrine ObjectManager.
  *
- * Provides easy to use provisioning for Doctrine entity users.
+ * Provides provisioning for Doctrine entity users.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

@@ -38,7 +38,8 @@ CHANGELOG
        }
    }
    ```
- * added new option `input_format` to `DateType` and `DateTimeType` to specify the date format when using the `string` input.
+ * added the `input_format` option to `DateType`, `DateTimeType`, and `TimeType` to specify the input format when setting
+   the `input` option to `string`
 
 4.2.0
 -----

@@ -295,7 +295,7 @@ class ReflectionExtractorTest extends TestCase
     }
     
     /**
-     * @dataProvider ConstructorTypesProvider
+     * @dataProvider constructorTypesProvider
      */
     public function testExtractTypeConstructor(string $class, string $property, array $type = null)
     {

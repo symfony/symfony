@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-23T09:39:25Z
+
+Using `mb_ord()` requires PHP 7.2, but the lowest supported version for branch 3.4 is PHP 5.5.
+We could use the 7.2 polyfill to make this work, but I don't think the polyfill implements the case where it should return `false` on invalid characters.
+That'd be great if someone could have a look at the polyfill to fix it.
+
+For this PR, we could use that map:
+`$lengthMask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);`
+Then, for a byte `$b`, knowing the length of the utf8 character it starts is done with:
+`$length = $b < "\x80" ? 1 : $lengthMask[$b & "\xF0"];`
+
+---------------------------------------------------------------------------
+
+by jls-esokia at 2019-02-23T10:23:52Z
+
+My bad, I saw `mb_ord` was listed in the polyfill-mbstring library which is a dependency of the console component.  Ok made the necessary correction.

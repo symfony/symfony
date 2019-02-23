@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by PReimers at 2019-02-22T14:15:56Z
+
+Just discovered I need to write some additional tests.
+They'll follow later today.
+
+---------------------------------------------------------------------------
+
+by PReimers at 2019-02-22T18:09:40Z
+
+I changed the if condition and added some test cases to test additional scenarios.
+
+I hope it's no problem I added a class in the test file. This allowed me to test if the `$username` variable contains a class containing a `__toString()` method

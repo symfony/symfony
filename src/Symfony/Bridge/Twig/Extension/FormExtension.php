@@ -54,7 +54,7 @@ class FormExtension extends AbstractExtension
             new TwigFunction('form_start', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
             new TwigFunction('form_end', null, ['node_class' => 'Symfony\Bridge\Twig\Node\RenderBlockNode', 'is_safe' => ['html']]),
             new TwigFunction('csrf_token', ['Symfony\Component\Form\FormRenderer', 'renderCsrfToken']),
-            new TwigFunction('parent_form', 'Symfony\Bridge\Twig\Extension\twig_get_parent_form'),
+            new TwigFunction('form_parent', 'Symfony\Bridge\Twig\Extension\twig_get_form_parent'),
         ];
     }
 
@@ -120,7 +120,7 @@ function twig_is_root_form(FormView $formView)
 /**
  * @internal
  */
-function twig_get_parent_form(FormView $formView): ?FormView
+function twig_get_form_parent(FormView $formView): ?FormView
 {
     return $formView->parent;
 }

@@ -305,7 +305,7 @@ class ReflectionExtractorTest extends TestCase
         $this->assertNull($this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
     }
 
-    public function ConstructorTypesProvider(): array
+    public function constructorTypesProvider(): array
     {
         return [
             // php71 dummy has following constructor: __construct(string $string, int $intPrivate)

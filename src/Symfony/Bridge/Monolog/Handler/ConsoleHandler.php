@@ -50,6 +50,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
     ];
+    private $consoleFormaterOptions;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -58,7 +59,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */
-    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [])
+    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormaterOptions = [])
     {
         parent::__construct(Logger::DEBUG, $bubble);
         $this->output = $output;
@@ -66,6 +67,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         if ($verbosityLevelMap) {
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
+
+        $this->consoleFormaterOptions = $consoleFormaterOptions;
     }
 
     /**
@@ -155,13 +158,13 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
             return new LineFormatter();
         }
         if (!$this->output) {
-            return new ConsoleFormatter();
+            return new ConsoleFormatter($this->consoleFormaterOptions);
         }
 
-        return new ConsoleFormatter([
+        return new ConsoleFormatter(array_replace([
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
-        ]);
+        ], $this->consoleFormaterOptions));
     }
 
     /**

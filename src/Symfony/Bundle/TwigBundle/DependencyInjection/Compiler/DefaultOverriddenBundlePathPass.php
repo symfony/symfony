@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Registers the default overriding bundles paths.
  */
-class DefaultOverridenBundlePathPass implements CompilerPassInterface
+final class DefaultOverriddenBundlePathPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {

@@ -193,7 +193,6 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path1', 'namespace1'],
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/Fixtures/templates'],
@@ -203,7 +202,6 @@ class TwigExtensionTest extends TestCase
     /**
      * @group legacy
      * @dataProvider getFormats
-     * @expectedDeprecation Templates directory "%s/Resources/TwigBundle/views" is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
      * @expectedDeprecation Templates directory "%s/Resources/views" is deprecated since Symfony 4.2, use "%s/templates" instead.
      */
     public function testLegacyTwigLoaderPaths($format)
@@ -228,8 +226,6 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path1', 'namespace1'],
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/../Fixtures/templates/Resources/views'],

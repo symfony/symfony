@@ -1,6 +1,7 @@
 <?php
 
-return new class() {
+return new class
+{
     public $proxyClass;
     private $privates = [];
 

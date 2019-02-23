@@ -126,10 +126,10 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
 
         $transformer = new IntegerToLocalizedStringTransformer(true);
 
-        $this->assertEquals(1234, $transformer->reverseTransform('1.234,5'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12.345,912'));
-        $this->assertEquals(1234, $transformer->reverseTransform('1234,5'));
-        $this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
+        $this->assertEquals(1234, $transformer->reverseTransform('1.234'));
+        $this->assertEquals(12345, $transformer->reverseTransform('12.345'));
+        $this->assertEquals(1234, $transformer->reverseTransform('1234'));
+        $this->assertEquals(12345, $transformer->reverseTransform('12345'));
     }
 
     /**

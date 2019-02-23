@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\DefaultOverridenBundlePathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
@@ -37,6 +38,7 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new ExceptionListenerPass());
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new DefaultOverridenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     public function registerCommands(Application $application)

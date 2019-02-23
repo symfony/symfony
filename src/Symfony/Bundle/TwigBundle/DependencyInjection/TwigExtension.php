@@ -169,20 +169,6 @@ class TwigExtension extends Extension
     {
         $bundleHierarchy = [];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            $defaultOverrideBundlePath = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name;
-
-            if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
-                @trigger_error(sprintf('Templates directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultOverrideBundlePath), E_USER_DEPRECATED);
-
-                $bundleHierarchy[$name][] = $dir;
-            }
-            $container->addResource(new FileExistenceResource($dir));
-
-            if (file_exists($defaultOverrideBundlePath)) {
-                $bundleHierarchy[$name][] = $defaultOverrideBundlePath;
-            }
-            $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
-
             if (file_exists($dir = $bundle['path'].'/Resources/views')) {
                 $bundleHierarchy[$name][] = $dir;
             }

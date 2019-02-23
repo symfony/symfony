@@ -119,19 +119,19 @@ class ResolveBindingsPass extends AbstractRecursivePass
             }
 
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
-                if (array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
+                if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
                     continue;
                 }
 
                 $typeHint = ProxyHelper::getTypeHint($reflectionMethod, $parameter);
 
-                if (array_key_exists($k = ltrim($typeHint, '\\').' $'.$parameter->name, $bindings)) {
+                if (\array_key_exists($k = ltrim($typeHint, '\\').' $'.$parameter->name, $bindings)) {
                     $arguments[$key] = $this->getBindingValue($bindings[$k]);
 
                     continue;
                 }
 
-                if (array_key_exists('$'.$parameter->name, $bindings)) {
+                if (\array_key_exists('$'.$parameter->name, $bindings)) {
                     $arguments[$key] = $this->getBindingValue($bindings['$'.$parameter->name]);
 
                     continue;

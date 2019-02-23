@@ -327,7 +327,7 @@ class Route implements \Serializable
      */
     public function hasOption($name)
     {
-        return array_key_exists($name, $this->options);
+        return \array_key_exists($name, $this->options);
     }
 
     /**
@@ -396,7 +396,7 @@ class Route implements \Serializable
      */
     public function hasDefault($name)
     {
-        return array_key_exists($name, $this->defaults);
+        return \array_key_exists($name, $this->defaults);
     }
 
     /**
@@ -481,7 +481,7 @@ class Route implements \Serializable
      */
     public function hasRequirement($key)
     {
-        return array_key_exists($key, $this->requirements);
+        return \array_key_exists($key, $this->requirements);
     }
 
     /**

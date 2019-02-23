@@ -67,7 +67,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         foreach ($container->getExtensionConfig('framework') as $config) {
             if (isset($config['session']) && \is_array($config['session'])) {
                 $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
-                $rememberMeSameSiteDefault = array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
+                $rememberMeSameSiteDefault = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
             }
         }
         foreach ($this->listenerPositions as $position) {
@@ -412,7 +412,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         foreach ($this->factories as $position) {
             foreach ($position as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
-                if (array_key_exists($key, $firewall)) {
+                if (\array_key_exists($key, $firewall)) {
                     $listenerKeys[] = $key;
                 }
             }

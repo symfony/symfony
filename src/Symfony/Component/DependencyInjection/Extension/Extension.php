@@ -127,7 +127,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      */
     protected function isConfigEnabled(ContainerBuilder $container, array $config)
     {
-        if (!array_key_exists('enabled', $config)) {
+        if (!\array_key_exists('enabled', $config)) {
             throw new InvalidArgumentException("The config array has no 'enabled' key.");
         }
 

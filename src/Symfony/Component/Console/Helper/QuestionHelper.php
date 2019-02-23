@@ -269,6 +269,10 @@ class QuestionHelper extends Helper
 
                 continue;
             } else {
+                if ("\x80" <= $c) {
+                    $c .= fread($inputStream, ["\xC0" => 1, "\xD0" => 1, "\xE0" => 2, "\xF0" => 3][$c & "\xF0"]);
+                }
+
                 $output->write($c);
                 $ret .= $c;
                 ++$i;

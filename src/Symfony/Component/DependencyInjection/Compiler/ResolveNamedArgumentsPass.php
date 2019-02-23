@@ -77,7 +77,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 $typeFound = false;
                 foreach ($parameters as $j => $p) {
-                    if (!array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
+                    if (!\array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
                         $resolvedArguments[$j] = $argument;
                         $typeFound = true;
                     }

@@ -51,7 +51,7 @@ class CacheClearCommandTest extends TestCase
         // Ensure that all *.meta files are fresh
         $finder = new Finder();
         $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
-        // simply check that cache is warmed up
+        // check that cache is warmed up
         $this->assertNotEmpty($metaFiles);
         $configCacheFactory = new ConfigCacheFactory(true);
 

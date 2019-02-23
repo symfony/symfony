@@ -94,10 +94,10 @@ class NativeRequestHandler implements RequestHandlerInterface
             if ('' === $name) {
                 $params = $_POST;
                 $files = $fixedFiles;
-            } elseif (array_key_exists($name, $_POST) || array_key_exists($name, $fixedFiles)) {
+            } elseif (\array_key_exists($name, $_POST) || \array_key_exists($name, $fixedFiles)) {
                 $default = $form->getConfig()->getCompound() ? [] : null;
-                $params = array_key_exists($name, $_POST) ? $_POST[$name] : $default;
-                $files = array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
+                $params = \array_key_exists($name, $_POST) ? $_POST[$name] : $default;
+                $files = \array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
             } else {
                 // Don't submit the form if it is not present in the request
                 return;
@@ -115,7 +115,7 @@ class NativeRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        if (\is_array($data) && array_key_exists('_method', $data) && $method === $data['_method'] && !$form->has('_method')) {
+        if (\is_array($data) && \array_key_exists('_method', $data) && $method === $data['_method'] && !$form->has('_method')) {
             unset($data['_method']);
         }
 

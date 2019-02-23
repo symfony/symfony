@@ -38,7 +38,7 @@ class FormType extends BaseType
     {
         parent::buildForm($builder, $options);
 
-        $isDataOptionSet = array_key_exists('data', $options);
+        $isDataOptionSet = \array_key_exists('data', $options);
 
         $builder
             ->setRequired($options['required'])

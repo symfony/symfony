@@ -351,15 +351,15 @@ class RequestDataCollectorTest extends TestCase
 
     public function provideJsonContentTypes()
     {
-        return array(
-            array('text/csv', false),
-            array('application/json', true),
-            array('application/JSON', true),
-            array('application/hal+json', true),
-            array('application/xml+json', true),
-            array('application/xml', false),
-            array('', false),
-        );
+        return [
+            ['text/csv', false],
+            ['application/json', true],
+            ['application/JSON', true],
+            ['application/hal+json', true],
+            ['application/xml+json', true],
+            ['application/xml', false],
+            ['', false],
+        ];
     }
 
     /**
@@ -368,7 +368,7 @@ class RequestDataCollectorTest extends TestCase
     public function testGetPrettyJsonValidity($content, $expected)
     {
         $response = $this->createResponse();
-        $request = Request::create('/', 'POST', array(), array(), array(), array(), $content);
+        $request = Request::create('/', 'POST', [], [], [], [], $content);
 
         $c = new RequestDataCollector();
         $c->collect($request, $response);
@@ -378,13 +378,13 @@ class RequestDataCollectorTest extends TestCase
 
     public function providePrettyJson()
     {
-        return array(
-            array('null', 'null'),
-            array('{ "foo": "bar" }', '{
+        return [
+            ['null', 'null'],
+            ['{ "foo": "bar" }', '{
     "foo": "bar"
-}'),
-            array('{ "abc" }', null),
-            array('', null),
-        );
+}'],
+            ['{ "abc" }', null],
+            ['', null],
+        ];
     }
 }

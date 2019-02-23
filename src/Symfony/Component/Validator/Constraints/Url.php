@@ -109,10 +109,10 @@ class Url extends Constraint
     public function __construct($options = null)
     {
         if (\is_array($options)) {
-            if (array_key_exists('checkDNS', $options)) {
+            if (\array_key_exists('checkDNS', $options)) {
                 @trigger_error(sprintf('The "checkDNS" option in "%s" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.', self::class), E_USER_DEPRECATED);
             }
-            if (array_key_exists('dnsMessage', $options)) {
+            if (\array_key_exists('dnsMessage', $options)) {
                 @trigger_error(sprintf('The "dnsMessage" option in "%s" is deprecated since Symfony 4.1.', self::class), E_USER_DEPRECATED);
             }
         }

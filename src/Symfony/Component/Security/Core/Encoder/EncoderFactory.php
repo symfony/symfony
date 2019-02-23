@@ -33,7 +33,7 @@ class EncoderFactory implements EncoderFactoryInterface
         $encoderKey = null;
 
         if ($user instanceof EncoderAwareInterface && (null !== $encoderName = $user->getEncoderName())) {
-            if (!array_key_exists($encoderName, $this->encoders)) {
+            if (!\array_key_exists($encoderName, $this->encoders)) {
                 throw new \RuntimeException(sprintf('The encoder "%s" was not configured.', $encoderName));
             }
 

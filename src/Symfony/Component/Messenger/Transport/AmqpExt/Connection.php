@@ -110,7 +110,7 @@ class Connection
     private static function normalizeQueueArguments(array $arguments): array
     {
         foreach (self::ARGUMENTS_AS_INTEGER as $key) {
-            if (!array_key_exists($key, $arguments)) {
+            if (!\array_key_exists($key, $arguments)) {
                 continue;
             }
 
@@ -256,6 +256,6 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        return !array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], [false, 'false'], true);
+        return !\array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], [false, 'false'], true);
     }
 }

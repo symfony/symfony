@@ -63,7 +63,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -71,7 +71,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      */
     public function get($name, $default = null)
     {
-        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+        return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -107,7 +107,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     public function remove($name)
     {
         $retval = null;
-        if (array_key_exists($name, $this->attributes)) {
+        if (\array_key_exists($name, $this->attributes)) {
             $retval = $this->attributes[$name];
             unset($this->attributes[$name]);
         }

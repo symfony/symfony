@@ -548,7 +548,7 @@ abstract class Client
     {
         do {
             $request = $this->history->back();
-        } while (array_key_exists(serialize($request), $this->redirects));
+        } while (\array_key_exists(serialize($request), $this->redirects));
 
         return $this->requestFromRequest($request, false);
     }
@@ -562,7 +562,7 @@ abstract class Client
     {
         do {
             $request = $this->history->forward();
-        } while (array_key_exists(serialize($request), $this->redirects));
+        } while (\array_key_exists(serialize($request), $this->redirects));
 
         return $this->requestFromRequest($request, false);
     }

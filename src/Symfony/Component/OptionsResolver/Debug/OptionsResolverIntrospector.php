@@ -32,7 +32,7 @@ class OptionsResolverIntrospector
                 throw new UndefinedOptionsException(sprintf('The option "%s" does not exist.', $option));
             }
 
-            if (!array_key_exists($option, $this->{$property})) {
+            if (!\array_key_exists($option, $this->{$property})) {
                 throw new NoConfigurationException($message);
             }
 

@@ -985,7 +985,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $expressions = [];
 
         // An expression which will never match to replace expressions which cannot match in the crawler
-        // We cannot simply drop
+        // We cannot drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
         $xpathLen = \strlen($xpath);

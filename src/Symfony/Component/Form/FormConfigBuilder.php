@@ -418,7 +418,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasAttribute($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -426,7 +426,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+        return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -513,7 +513,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasOption($name)
     {
-        return array_key_exists($name, $this->options);
+        return \array_key_exists($name, $this->options);
     }
 
     /**
@@ -521,7 +521,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getOption($name, $default = null)
     {
-        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+        return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     /**

@@ -94,7 +94,7 @@ class StateMachineValidatorTest extends TestCase
 
         (new StateMachineValidator())->validate($definition, 'foo');
 
-        // the test simply ensures that the validation does not fail (i.e. it does not throw any exceptions)
+        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
         $this->addToAssertionCount(1);
 
         // The graph looks like:

@@ -41,7 +41,7 @@ class TemplateReference implements TemplateReferenceInterface
      */
     public function set($name, $value)
     {
-        if (array_key_exists($name, $this->parameters)) {
+        if (\array_key_exists($name, $this->parameters)) {
             $this->parameters[$name] = $value;
         } else {
             throw new \InvalidArgumentException(sprintf('The template does not support the "%s" parameter.', $name));
@@ -55,7 +55,7 @@ class TemplateReference implements TemplateReferenceInterface
      */
     public function get($name)
     {
-        if (array_key_exists($name, $this->parameters)) {
+        if (\array_key_exists($name, $this->parameters)) {
             return $this->parameters[$name];
         }
 

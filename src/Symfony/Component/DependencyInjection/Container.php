@@ -385,7 +385,7 @@ class Container implements ResettableContainerInterface
         if (isset($this->resolving[$envName = "env($name)"])) {
             throw new ParameterCircularReferenceException(array_keys($this->resolving));
         }
-        if (isset($this->envCache[$name]) || array_key_exists($name, $this->envCache)) {
+        if (isset($this->envCache[$name]) || \array_key_exists($name, $this->envCache)) {
             return $this->envCache[$name];
         }
         if (!$this->has($id = 'container.env_var_processors_locator')) {

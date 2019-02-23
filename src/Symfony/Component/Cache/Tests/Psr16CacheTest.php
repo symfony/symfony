@@ -25,7 +25,7 @@ class Psr16CacheTest extends SimpleCacheTest
     {
         parent::setUp();
 
-        if (array_key_exists('testPrune', $this->skippedTests)) {
+        if (\array_key_exists('testPrune', $this->skippedTests)) {
             return;
         }
 

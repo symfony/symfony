@@ -111,7 +111,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      */
     public function hasArgument($key)
     {
-        return array_key_exists($key, $this->arguments);
+        return \array_key_exists($key, $this->arguments);
     }
 
     /**

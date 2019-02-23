@@ -284,7 +284,7 @@ trait RedisTrait
 
         $result = [];
 
-        if ($this->redis instanceof \Predis\Client) {
+        if ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof ClusterInterface) {
             $values = $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
                     yield 'get' => [$id];

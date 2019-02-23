@@ -164,7 +164,7 @@ class LocaleDataGenerator
         // the name sorting
         // $name = $this->langBundle->getLanguageName($displayLocale, $lang, $region);
 
-        // Some languages are simply not translated
+        // Some languages are not translated
         // Example: "az" (Azerbaijani) has no translation in "af" (Afrikaans)
         if (null === ($name = $this->languageDataProvider->getName($lang, $displayLocale))) {
             return;

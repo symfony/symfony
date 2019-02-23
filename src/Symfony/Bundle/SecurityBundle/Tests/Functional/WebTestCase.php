@@ -62,7 +62,7 @@ class WebTestCase extends BaseWebTestCase
             $options['test_case'],
             isset($options['root_config']) ? $options['root_config'] : 'config.yml',
             isset($options['environment']) ? $options['environment'] : strtolower(static::getVarDir().$options['test_case']),
-            isset($options['debug']) ? $options['debug'] : true
+            isset($options['debug']) ? $options['debug'] : false
         );
     }
 

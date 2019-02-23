@@ -617,6 +617,81 @@ class Request
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Sets the name for trusted headers.
+     *
+     * The following header keys are supported:
+     *
+     *  * Request::HEADER_CLIENT_IP:    defaults to X-Forwarded-For   (see getClientIp())
+     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getHost())
+     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getPort())
+     *  * Request::HEADER_CLIENT_PROTO: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
+     *  * Request::HEADER_FORWARDED:    defaults to Forwarded         (see RFC 7239)
+     *
+     * Setting an empty value allows to disable the trusted header for the given key.
+     *
+     * @param string $key   The header key
+     * @param string $value The header name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.
+     */
+    public static function setTrustedHeaderName($key, $value)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.', __METHOD__), E_USER_DEPRECATED);
+
+        if ('forwarded' === $key) {
+            $key = self::HEADER_FORWARDED;
+        } elseif ('client_ip' === $key) {
+            $key = self::HEADER_CLIENT_IP;
+        } elseif ('client_host' === $key) {
+            $key = self::HEADER_CLIENT_HOST;
+        } elseif ('client_proto' === $key) {
+            $key = self::HEADER_CLIENT_PROTO;
+        } elseif ('client_port' === $key) {
+            $key = self::HEADER_CLIENT_PORT;
+        } elseif (!\array_key_exists($key, self::$trustedHeaders)) {
+            throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
+        }
+
+        self::$trustedHeaders[$key] = $value;
+
+        if (null !== $value) {
+            self::$trustedHeaderNames[$key] = $value;
+            self::$trustedHeaderSet |= $key;
+        } else {
+            self::$trustedHeaderSet &= ~$key;
+        }
+    }
+
+    /**
+     * Gets the trusted proxy header name.
+     *
+     * @param string $key The header key
+     *
+     * @return string The header name
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.
+     */
+    public static function getTrustedHeaderName($key)
+    {
+        if (2 > \func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        if (!\array_key_exists($key, self::$trustedHeaders)) {
+            throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
+        }
+
+        return self::$trustedHeaders[$key];
+    }
+
+    /**
+>>>>>>> 3.4
      * Normalizes a query string.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized,

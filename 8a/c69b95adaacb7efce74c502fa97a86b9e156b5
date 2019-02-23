@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-02-21T17:34:44Z
+
+Maybe related? https://github.com/symfony/symfony/issues/29877
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-22T14:46:24Z
+
+I don't think a test case would have prevented the change - I would have changed the tests at the time actually.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2019-02-22T17:55:14Z
+
+I meant adding a test would prevent a future regression.
+
+Also, this doesn't seem to fix #29877 since that issue is due to incorrectly detecting APCu in CLI.

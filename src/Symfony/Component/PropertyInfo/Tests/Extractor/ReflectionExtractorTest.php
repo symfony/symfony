@@ -302,7 +302,7 @@ class ReflectionExtractorTest extends TestCase
         // check that constructor extractions works by default, and if passed in via context. Check that null is returned if constructor extraction is disabled
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
         $this->assertEquals($type, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => true]));
-        $this->assertEquals( null, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
+        $this->assertNull($this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
     }
 
     public function ConstructorTypesProvider(): array

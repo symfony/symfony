@@ -309,12 +309,12 @@ class ReflectionExtractorTest extends TestCase
     {
         return [
             // php71 dummy has following constructor: __construct(string $string, int $intPrivate)
-            [Php71Dummy::class, 'string', [new Type(Type::BUILTIN_TYPE_STRING, false)] ],
-            [Php71Dummy::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
+            [Php71Dummy::class, 'string', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
+            [Php71Dummy::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)]],
             // Php71DummyExtended2 adds int $intWithAccessor
-            [Php71DummyExtended2::class, 'intWithAccessor', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
-            [Php71DummyExtended2::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
-            [DefaultValue::class, 'foo', null ],
+            [Php71DummyExtended2::class, 'intWithAccessor', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            [Php71DummyExtended2::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            [DefaultValue::class, 'foo', null],
         ];
-    }    
+    }
 }

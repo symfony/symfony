@@ -293,4 +293,28 @@ class ReflectionExtractorTest extends TestCase
             [NotInstantiable::class, 'foo', false],
         ];
     }
+    
+    /**
+     * @dataProvider ConstructorTypesProvider
+     */
+    public function testExtractTypeConstructor(string $class, string $property, array $type = null)
+    {
+		// check that constructor extractions works by default, and if passed in via context. Check that null is returned if constructor extraction is disabled
+		$this->assertEquals($type, $this->extractor->getTypes($class, $property, []));
+		$this->assertEquals($type, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => true]));
+		$this->assertEquals( null, $this->extractor->getTypes($class, $property, ['enable_constructor_extraction' => false]));
+    }
+
+    public function ConstructorTypesProvider(): array
+    {
+        return [
+			// php71 dummy has following constructor: __construct(string $string, int $intPrivate)
+            [Php71Dummy::class, 'string', [new Type(Type::BUILTIN_TYPE_STRING, false)] ],
+            [Php71Dummy::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
+			// Php71DummyExtended2 adds int $intWithAccessor
+            [Php71DummyExtended2::class, 'intWithAccessor', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
+            [Php71DummyExtended2::class, 'intPrivate', [new Type(Type::BUILTIN_TYPE_INT, false)] ],
+            [DefaultValue::class, 'foo', null ],
+        ];
+    }    
 }

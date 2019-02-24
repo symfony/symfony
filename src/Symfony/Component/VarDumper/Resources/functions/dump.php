@@ -31,6 +31,26 @@ if (!function_exists('dump')) {
     }
 }
 
+if (!function_exists('dumpif')) {
+    /**
+     * @author Tales Santos <tales.augusto.santos@gmail.com>
+     */
+    function dumpif($var, ...$moreVars)
+    {
+        $condition = array_pop($moreVars);
+
+        if (!is_callable($condition)) {
+            throw new \InvalidArgumentException('You should provide a condition in order to dump $var');
+        }
+
+        if (true !== call_user_func($condition)) {
+            return $var;
+        }
+
+        return dump($var, $moreVars);
+    }
+}
+
 if (!function_exists('dd')) {
     function dd(...$vars)
     {

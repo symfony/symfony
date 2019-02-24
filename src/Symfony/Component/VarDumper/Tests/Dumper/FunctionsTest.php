@@ -46,6 +46,50 @@ class FunctionsTest extends TestCase
         $this->assertEquals([$var1, $var2, $var3], $return);
     }
 
+    public function testDumpConditionallyShouldTriggerTheDumper()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+
+        ob_start();
+        dumpif($var1, function () {
+            return true;
+        });
+        $out = ob_get_clean();
+
+        $this->assertNotEmpty($out);
+    }
+
+    public function testDumpConditionallyShouldNotTriggerTheDumper()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+
+        ob_start();
+        dumpif($var1, function () {
+            return false;
+        });
+        $out = ob_get_clean();
+
+        $this->assertEmpty($out);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDumpConditionallyWithoutCallableShouldThrowException()
+    {
+        $this->setupVarDumper();
+
+        $var1 = 'a';
+        $var2 = 'b';
+
+        dumpif($var1, $var2);
+
+    }
+
     protected function setupVarDumper()
     {
         $cloner = new VarCloner();

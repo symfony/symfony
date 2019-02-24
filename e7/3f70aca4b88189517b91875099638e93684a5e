@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by skalpa at 2019-02-24T02:27:44Z
+
+The fabpot.io failure seems to be a false positive (the script reads the typehint from the first definition and complains about the docblock of the second definition).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-24T09:41:38Z
+
+You should report the crash to phpstan then.

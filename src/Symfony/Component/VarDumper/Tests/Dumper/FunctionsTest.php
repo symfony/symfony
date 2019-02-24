@@ -87,7 +87,6 @@ class FunctionsTest extends TestCase
         $var2 = 'b';
 
         dumpif($var1, $var2);
-
     }
 
     protected function setupVarDumper()

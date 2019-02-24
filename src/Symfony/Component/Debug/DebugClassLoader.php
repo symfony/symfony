@@ -390,6 +390,11 @@ class DebugClassLoader
 
         $dirFiles = self::$darwinCache[$kDir][1];
 
+        if (!isset($dirFiles[$file]) && ') : eval()\'d code' === substr($file, -17)) {
+            // Get the file name from "file_name.php(123) : eval()'d code"
+            $file = substr($file, 0, strrpos($file, '(', -17));
+        }
+
         if (isset($dirFiles[$file])) {
             return $real .= $dirFiles[$file];
         }

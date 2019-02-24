@@ -385,6 +385,11 @@ class DebugClassLoaderTest extends TestCase
 
         $this->assertSame([], $deprecations);
     }
+
+    public function testEvaluatedCode()
+    {
+        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\DefinitionInEvaluatedCode', true));
+    }
 }
 
 class ClassLoader

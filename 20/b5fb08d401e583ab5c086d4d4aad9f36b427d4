@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by skalpa at 2019-02-24T15:15:39Z
+
+The AppVeyor build fail is unrelated (problem with the console `ProcessHelperTest`).

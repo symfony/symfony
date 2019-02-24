@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `DsCaster` to support dumping the contents of data structures from the Ds extension
+ * added `dumpif` function to dump vars conditionally
 
 4.2.0
 -----

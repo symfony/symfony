@@ -45,7 +45,7 @@ class AmqpSender implements SenderInterface
         try {
             $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
         } catch (\AMQPException $e) {
-            throw new TransportException('Current transport was not able to send given message, please try again');
+            throw new TransportException('Current transport was not able to send given message, please try again', 0, $e);
         }
 
         return $envelope;

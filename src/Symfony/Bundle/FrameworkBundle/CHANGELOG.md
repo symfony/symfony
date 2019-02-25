@@ -17,6 +17,7 @@ CHANGELOG
    to the `session` section of the configuration
  * Added support for Translator paths, Twig paths in translation commands.
  * Added support for PHP files with translations in translation commands.
+ * Added support for boolean container parameters within routes.
 
 4.2.0
 -----

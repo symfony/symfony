@@ -103,6 +103,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2699999999999999'],
             ['MASTERCARD', '2709999999999999'],
             ['MASTERCARD', '2720995105105100'],
+            ['MIR', '2200381427330082'],
             ['UATP', '110165309696173'],
             ['VISA', '4111111111111111'],
             ['VISA', '4012888888881881'],
@@ -135,6 +136,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ['MASTERCARD', '2721001234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['MASTERCARD', '2220991234567890', CardScheme::INVALID_FORMAT_ERROR], // Not assigned yet
             ['UATP', '11016530969617', CardScheme::INVALID_FORMAT_ERROR], // invalid length
+            ['MIR', '22003814273300821', CardScheme::INVALID_FORMAT_ERROR], // invalid length
         ];
     }
 }

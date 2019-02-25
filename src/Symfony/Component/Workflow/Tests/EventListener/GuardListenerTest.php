@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -35,8 +36,7 @@ class GuardListenerTest extends TestCase
             ],
         ];
         $expressionLanguage = new ExpressionLanguage();
-        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
-        $token->expects($this->any())->method('getRoles')->willReturn([new Role('ROLE_USER')]);
+        $token = new UsernamePasswordToken('username', 'credentials', 'provider', ['ROLE_USER']);
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->expects($this->any())->method('getToken')->willReturn($token);
         $this->authenticationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();

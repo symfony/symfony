@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Security\Core\Role\Role;
 class ExpressionVoterTest extends TestCase
 {
     /**
+     * @group legacy
      * @dataProvider getVoteTests
      */
     public function testVote($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true)
@@ -27,6 +29,16 @@ class ExpressionVoterTest extends TestCase
         $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
 
         $this->assertSame($expected, $voter->vote($this->getToken($roles, $tokenExpectsGetRoles), null, $attributes));
+    }
+
+    /**
+     * @dataProvider getVoteTests
+     */
+    public function testVoteWithTokenThatReturnsRoleNames($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true)
+    {
+        $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
+
+        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles, $tokenExpectsGetRoles), null, $attributes));
     }
 
     public function getVoteTests()
@@ -52,6 +64,19 @@ class ExpressionVoterTest extends TestCase
         if ($tokenExpectsGetRoles) {
             $token->expects($this->once())
                 ->method('getRoles')
+                ->will($this->returnValue($roles));
+        }
+
+        return $token;
+    }
+
+    protected function getTokenWithRoleNames(array $roles, $tokenExpectsGetRoles = true)
+    {
+        $token = $this->getMockBuilder(AbstractToken::class)->getMock();
+
+        if ($tokenExpectsGetRoles) {
+            $token->expects($this->once())
+                ->method('getRoleNames')
                 ->will($this->returnValue($roles));
         }
 

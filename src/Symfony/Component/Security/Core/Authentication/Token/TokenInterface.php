@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Role\Role;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @method string[] getRoleNames() The associated roles - not implementing it is deprecated since Symfony 4.3
  */
 interface TokenInterface extends \Serializable
 {
@@ -34,6 +36,8 @@ interface TokenInterface extends \Serializable
      * Returns the user roles.
      *
      * @return Role[] An array of Role instances
+     *
+     * @deprecated since Symfony 4.3, use the getRoleNames() method instead
      */
     public function getRoles();
 

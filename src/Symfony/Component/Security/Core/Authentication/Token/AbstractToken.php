@@ -26,11 +26,12 @@ abstract class AbstractToken implements TokenInterface
 {
     private $user;
     private $roles = [];
+    private $roleNames = [];
     private $authenticated = false;
     private $attributes = [];
 
     /**
-     * @param (Role|string)[] $roles An array of roles
+     * @param string[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
@@ -38,13 +39,19 @@ abstract class AbstractToken implements TokenInterface
     {
         foreach ($roles as $role) {
             if (\is_string($role)) {
-                $role = new Role($role);
+                $role = new Role($role, false);
             } elseif (!$role instanceof Role) {
                 throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or Role instances, but got %s.', \gettype($role)));
             }
 
             $this->roles[] = $role;
+            $this->roleNames[] = (string) $role;
         }
+    }
+
+    public function getRoleNames(): array
+    {
+        return $this->roleNames;
     }
 
     /**
@@ -52,6 +59,10 @@ abstract class AbstractToken implements TokenInterface
      */
     public function getRoles()
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.3. Use the getRoleNames() method instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         return $this->roles;
     }
 
@@ -172,7 +183,7 @@ abstract class AbstractToken implements TokenInterface
      */
     protected function getState(): array
     {
-        return [$this->user, $this->authenticated, $this->roles, $this->attributes];
+        return [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames];
     }
 
     /**
@@ -193,7 +204,7 @@ abstract class AbstractToken implements TokenInterface
      */
     protected function setState(array $data)
     {
-        [$this->user, $this->authenticated, $this->roles, $this->attributes] = $data;
+        [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames] = $data;
     }
 
     /**

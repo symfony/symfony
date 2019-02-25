@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 class UsernamePasswordTokenTest extends TestCase
 {
@@ -23,7 +22,7 @@ class UsernamePasswordTokenTest extends TestCase
         $this->assertFalse($token->isAuthenticated());
 
         $token = new UsernamePasswordToken('foo', 'bar', 'key', ['ROLE_FOO']);
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertTrue($token->isAuthenticated());
         $this->assertEquals('key', $token->getProviderKey());
     }

@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
-use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends TestCase
 {
@@ -78,7 +77,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
-        $this->assertEquals([new Role('ROLE_FOO')], $authToken->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
         $this->assertEquals('', $authToken->getCredentials());
     }
 

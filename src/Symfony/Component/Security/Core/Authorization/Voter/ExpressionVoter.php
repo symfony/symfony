@@ -18,6 +18,8 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -90,18 +92,34 @@ class ExpressionVoter implements VoterInterface
 
     private function getVariables(TokenInterface $token, $subject)
     {
-        if (null !== $this->roleHierarchy) {
-            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());
+        if ($this->roleHierarchy instanceof RoleHierarchy) {
+            if (method_exists($token, 'getRoleNames')) {
+                $rolesFromToken = $token->getRoleNames();
+            } else {
+                @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
+
+                $rolesFromToken = $token->getRoles(false);
+            }
+
+            $roles = $this->roleHierarchy->getReachableRoleNames($rolesFromToken);
+        } elseif (null !== $this->roleHierarchy) {
+            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles(false));
+        } elseif (method_exists($token, 'getRoleNames')) {
+            $roles = $token->getRoleNames();
         } else {
-            $roles = $token->getRoles();
+            @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
+
+            $roles = $token->getRoles(false);
         }
+
+        $roles = array_map(function ($role) { return $role instanceof Role ? $role->getRole() : $role; }, $roles);
 
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'object' => $subject,
             'subject' => $subject,
-            'roles' => array_map(function ($role) { return $role->getRole(); }, $roles),
+            'roles' => $roles,
             'trust_resolver' => $this->trustResolver,
             'auth_checker' => $this->authChecker,
         ];

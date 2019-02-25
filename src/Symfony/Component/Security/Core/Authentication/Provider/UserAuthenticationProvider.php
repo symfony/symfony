@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -87,7 +88,12 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             throw $e;
         }
 
-        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
+        if ($token instanceof SwitchUserToken) {
+            $authenticatedToken = new SwitchUserToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token), $token->getOriginalToken());
+        } else {
+            $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $this->providerKey, $this->getRoles($user, $token));
+        }
+
         $authenticatedToken->setAttributes($token->getAttributes());
 
         return $authenticatedToken;
@@ -110,7 +116,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     {
         $roles = $user->getRoles();
 
-        foreach ($token->getRoles() as $role) {
+        foreach ($token->getRoles(false) as $role) {
             if ($role instanceof SwitchUserRole) {
                 $roles[] = $role;
 

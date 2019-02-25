@@ -36,7 +36,6 @@ class TokenProcessorTest extends TestCase
         $this->assertArrayHasKey('token', $record['extra']);
         $this->assertEquals($token->getUsername(), $record['extra']['token']['username']);
         $this->assertEquals($token->isAuthenticated(), $record['extra']['token']['authenticated']);
-        $roles = array_map(function ($role) { return $role->getRole(); }, $token->getRoles());
-        $this->assertEquals($roles, $record['extra']['token']['roles']);
+        $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 }

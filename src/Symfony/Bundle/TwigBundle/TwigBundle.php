@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\OverriddenBundlePathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\OverriddenBundlePathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;

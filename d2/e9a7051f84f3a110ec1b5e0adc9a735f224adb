@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-12T17:09:03Z
+
+@symfony/deciders I would like to hear your opinion on this topic? Do you think it's worth to finish this approach? Should we take another road?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T09:29:03Z
+
+@fabpot @stof you might be the best to help here?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T09:34:05Z
+
+IMO it's a good move. We still need to be able to get both impersonator/impersonated user from the token, I guess it's planed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-08-31T09:40:44Z
+
+> IMO it's a good move. We still need to be able to get both impersonator/impersonated user from the token, I guess it's planed
+
+@chalasr I guess the `SwitchUserToken` (or maybe better `SwitchedUserToken`) suggested by @HeahDude could be a good solution.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-08-31T09:45:34Z
+
+Agreed, that would remove the need for `isUserSwitched`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T12:48:24Z
+
+@xabbuh will you have tome to finish this PR for 3.4?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-26T13:47:58Z
+
+Yes, I am working on it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T15:52:19Z
+
+should we move to 4.1?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-08T16:07:13Z
+
+I think so.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-21T10:27:42Z
+
+I would love to see this in 4.3 :) /cc @xabbuh
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-22T23:57:31Z
+
+tests pass now
+
+Status: Needs Review

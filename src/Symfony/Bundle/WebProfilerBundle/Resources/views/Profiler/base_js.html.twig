@@ -212,11 +212,11 @@
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
-            var profilerCell = row.children[0];
-            var methodCell = row.children[1];
-            var statusCodeCell = row.children[3];
+            var profilerCell = row.children[1];
+            var methodCell = row.children[2];
+            var statusCodeCell = row.children[4];
             var statusCodeElem = statusCodeCell.children[0];
-            var durationCell = row.children[5];
+            var durationCell = row.children[6];
 
             if (request.error) {
                 row.className = 'sf-ajax-request sf-ajax-request-error';

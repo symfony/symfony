@@ -91,13 +91,19 @@ class TwigExtension extends Extension
         }
 
         // register user-configured paths
+        $namespacedUserConfiguredPaths = [];
         foreach ($config['paths'] as $path => $namespace) {
             if (!$namespace) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path]);
             } else {
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
+                if (isset($namespacedUserConfiguredPaths[$namespace])) {
+                    array_unshift($namespacedUserConfiguredPaths[$namespace], $path);
+                } else {
+                    $namespacedUserConfiguredPaths[$namespace] = [$path];
+                }
             }
         }
+        $container->setParameter('twig.namespaced_user_configured_paths', $namespacedUserConfiguredPaths);
 
         // paths are modified in ExtensionPass if forms are enabled
         $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);

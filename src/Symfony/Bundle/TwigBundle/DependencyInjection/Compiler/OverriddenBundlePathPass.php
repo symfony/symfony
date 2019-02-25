@@ -16,21 +16,21 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Registers the default overriding bundles paths.
+ * Registers the default and user-configured overriding bundles paths.
  */
-final class DefaultOverriddenBundlePathPass implements CompilerPassInterface
+final class OverriddenBundlePathPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
         $twigLoaderFilesystemId = 'twig.loader.native_filesystem';
-
         if (false === $container->hasDefinition($twigLoaderFilesystemId)) {
             return;
         }
-
         $twigLoaderFilesystemDefinition = $container->getDefinition($twigLoaderFilesystemId);
+
         $twigDefaultPath = $container->getParameter('twig.default_path');
 
+        // Adds Twig default_path relative overriden path on top
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             $defaultOverrideBundlePath = $container->getParameterBag()->resolveValue($twigDefaultPath).'/bundles/'.$name;
 
@@ -51,6 +51,16 @@ final class DefaultOverriddenBundlePathPass implements CompilerPassInterface
                 );
             }
             $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
+        }
+
+        // Adds user-configured namespaced paths
+        foreach ($container->getParameter('twig.namespaced_user_configured_paths') as $namespace => $paths) {
+            foreach ($paths as $path) {
+                $twigLoaderFilesystemDefinition->addMethodCall(
+                    'prependPath',
+                    [$path, $namespace]
+                );
+            }
         }
     }
 

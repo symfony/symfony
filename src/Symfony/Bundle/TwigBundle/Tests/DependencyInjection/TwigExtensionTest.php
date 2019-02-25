@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\DefaultOverriddenBundlePathPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\OverriddenBundlePathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
@@ -178,7 +178,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
-        $container->addCompilerPass(new DefaultOverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new OverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
@@ -198,15 +198,15 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals([
             ['path1'],
             ['path2'],
-            ['namespaced_path1', 'namespace1'],
-            ['namespaced_path2', 'namespace2'],
-            ['namespaced_path3', 'namespace3'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/Fixtures/templates'],
         ], $addedPaths);
         $this->assertEquals([
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            ['namespaced_path1', 'namespace1'],
+            ['namespaced_path2', 'namespace2'],
+            ['namespaced_path3', 'namespace3'],
         ], $prependedPaths);
     }
 
@@ -223,7 +223,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
-        $container->addCompilerPass(new DefaultOverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new OverriddenBundlePathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
@@ -243,9 +243,6 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals([
             ['path1'],
             ['path2'],
-            ['namespaced_path1', 'namespace1'],
-            ['namespaced_path2', 'namespace2'],
-            ['namespaced_path3', 'namespace3'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/../Fixtures/templates/Resources/views'],
@@ -254,6 +251,9 @@ class TwigExtensionTest extends TestCase
         $this->assertEquals([
             [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            ['namespaced_path1', 'namespace1'],
+            ['namespaced_path2', 'namespace2'],
+            ['namespaced_path3', 'namespace3'],
         ], $prependedPaths);
     }
 

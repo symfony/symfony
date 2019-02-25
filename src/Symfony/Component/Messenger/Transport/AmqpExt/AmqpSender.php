@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -41,7 +42,11 @@ class AmqpSender implements SenderInterface
     {
         $encodedMessage = $this->serializer->encode($envelope);
 
-        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+        try {
+            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+        } catch (\AMQPException $e) {
+            throw new TransportException('Current transport was not able to send given message, please try again');
+        }
 
         return $envelope;
     }

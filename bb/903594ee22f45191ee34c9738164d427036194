@@ -1,0 +1,236 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-21T08:20:54Z
+
+If you have time @mpdude, I would love to get your review on this one.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-03-23T21:47:58Z
+
+I'd really like to help here! It's a bit difficult, though, as the description does not directly make clear what we're after.
+
+After reading the linked issues my understanding is that we want to enable the `ResponseCacheStrategy` to deal with `private` responses and come up with a result better than `no-cache, must-revalidate` – that is, provide an expiration time.
+
+Before discussing the implementation, can we agree on what the merge policy needs to be?
+
+I have reviewed the existing tests and think that the merge rules could be as follows.
+
+0. If we have no embedded response, leave the master response alone.
+1. If one of the responses is `private`, the result must be `private`. Otherwise, all responses are `public`.
+2. Validation-type headers (`Last-Modified`, `ETag`) need to be removed. Validation cannot reasonably be used on merged responses.
+3. If the result is `public`, compute the final `s-maxage` by looking for the smallest value among all responses, considering `s-maxage`, `max-age` and `Expires` in this order. If only a single response
+does not provide any of these, the result must use `no-cache, must-revalidate`.
+4. Try to compute a final `max-age` by looking for the smallest value among all responses, considering `max-age` and `Expires` in this order. If only a single response does not provide any of these two, we cannot compute `max-age`.
+5. If the result is `private` and we don't have the `max-age`, we need to resort to `no-cache, must-revalidate`.
+6. Calculate `Age` in a way that the resulting response becomes stale as soon as the lowest TTL of any response expires. [Do we have to consider `s-maxage` or `max-age` here?]
+
+Does that make sense?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-03-25T07:53:23Z
+
+0. agreed
+
+1. If not all of the responses are marked as `public`, the final should not have `public` imho. Not having a `public` directive is not the same as not having any directive. In the same sense, having one `private` response (allow browser caching) does not mean all responses can be cached by the browser. Only if all other are either `public` or `private` a browser should be allowed to cache the result. *FYI: this might not be implemented in my PR*.
+
+2. agreed
+
+3. Why do we merge multiple header values that are not meant to be the same?
+    - `s-maxage` is for shared caches only
+    - `max-age` is for private caches as well as for shared caches if no `s-maxage` is defined
+    - `Expires` headers are similar to `max-age`, but mostly useful for HTTP/1.0 protocol. `Expires` can existing in combination with `max-age` to control or prohibit caching for HTTP/1.0 servers, especially if they do not support features like `must-revalidate`.
+
+4. same as 3.
+
+5. A `private` directive without `max-age` is perfectly fine. Each cache definition is valid without other. It's up to the cache server to decide on a cache duration if none is given. This assumes **all** responses are marked as private but all or some of them do not have a `max-age`.
+
+6. The age has nothing to do with expiration time. `Age` is determined by the difference between `Date` header (when the response has been added to cache) and *now*. After merging multiple responses, age must represent the oldest response's age imho.
+
+I still don't understand why Symfony generally adds a `no-cache, must-revalidation`. Quoting from #26245
+
+> >A `no-cache` directive essentially tells all caches (and that includes the Browser, which is a private cache) to no cache the response.
+
+> I think you're misreading the RFC you quoted? `no-cache` means "don't serve this from a cache without revalidation", `private` means "store in private caches only". `no-store` is the way of stating "don't keep this in caches".
+
+You're somewhat right with my incorrect interpretation. I wasn't very sure about revalidation, so I looked it up: https://stackoverflow.com/questions/18148884/difference-between-no-cache-and-must-revalidate#19938619
+So essentially, `no-cache, must-revalidate` allows a cache to store it but never to use it without revalidation. And we are removing both possible revalidation options (Etag and Last-Modified, see 2.), which essentially results in a useless waste of storage? Also, `no-cache` implies `must-revalidate`, so the second directive is not useful either?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2018-04-09T15:06:08Z
+
+Any progress here? The current implementation breaks client cache headers when working with ESI fragments :(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-04-14T15:10:37Z
+
+friendly ping @aschempp
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-04-15T06:38:24Z
+
+I have updated the PR to fix some mentioned coding style and implemented point 1 in [my comment](https://github.com/symfony/symfony/pull/26532#issuecomment-375952282). I know there's more, but I think we should discuss the general idea before I finish the implementation.
+
+However, most of the notes in my thoughts in the last comment still stand, so I guess we should also ping @mpdude 😁
+
+Before we discuss the fine details of this though, we should agree or even write down our thoughts on the supposed *default behavior*. Symfony [**always** adds cache control headers](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php#L310) which I consider strange. Especially the second if-condition means I can have an `Expires` header but the `ResponseHeaderBag` will add a cache-control directive that "breaks" this for any HTTP/1.1 cache.
+
+According the the RFC, not having a `Cache-Control` header is perfectly fine, but that is not possible with Symfony. Is this behavior considered correct @mpdude / @nicolas-grekas ? And if we want to be conservative (prevent caching if no caching headers are given), I think we should still correctly handle HTTP/1.0 headers?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-04-30T07:07:18Z
+
+Is there anything I can do to push this forward?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-06-19T14:15:26Z
+
+@aschempp would you mind rebasing please?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-06-20T07:18:25Z
+
+Rebase is done. The change from https://github.com/aschempp/symfony/commit/3d27b5946db147da7d96b14bb2a89b8a25d8a58b#diff-e5a339b48cec0fa0a4d0c5c4c705f568R75 has been dropped, but I preserved the unit test and they are still passing.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-06-20T07:39:47Z
+
+I just looked at the disabled unit tests and will follow up with a few changes shortly.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-06-20T13:00:48Z
+
+Sorry for taking a while. I tried to implement merging of `Last-Modified` and `Etag` but realized this won't work reliably. They now render a response uncachable without additional expiry headers.
+
+---
+
+One thing I'm not sure about is the default Response behavior. If there are not `Cache-Control` headers, Symfony always adds `private, must-revalidate`. https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpFoundation/ResponseHeaderBag.php#L309-L331
+
+First of all, `private` means a browser is allowed to cache it, which is not the same as _no Cache-Control provided_, ie. probably not cacheable. Secondly, `must-revalidate` does not make sense because there is never any validation information (`Last-Modified` and `Etag` are removed), a validation will never be possible.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-06-21T06:10:36Z
+
+I have removed two assertions in the HttpCacheTest to fix tests. I'm very well aware that removing assertions to fix a test is not really a practical solution. However, as explained in https://github.com/symfony/symfony/issues/26245#issuecomment-375630190, I think the assertions (and Symfony behavior) were wrong in the first place …
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-07-10T07:09:11Z
+
+Any follow-up questions for this PR I need to address?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-26T10:01:04Z
+
+(could you please rebase on latest 3.4?)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-07-27T17:17:35Z
+
+For me, this PR is too confusing to give meaningful feedback.
+
+Can we somehow simplify this or break it into smaller pieces we could discuss independently?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-07-30T13:50:53Z
+
+@mpdude did you look at the diff or at the new version of the file directly? What can I do to simplify the changes? I think they are all related, there are no "individual features" that could be split into smaller pieces.
+
+@nicolas-grekas I will rebase as soon as any questions are resolved. Previously all changes in the old file were irrelevant because it is basically a complete rewrite of the class.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-10-22T06:52:28Z
+
+Is there anything I can do to get this merged at some point?
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2018-10-22T07:00:34Z
+
+Due to the [already mentioned security issue](https://github.com/symfony/symfony/issues/28872#issuecomment-429772627) this should be merged as soon as possible.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-10-22T21:11:49Z
+
+In those places where you changed existing tests, could you leave a comment explaining why the change is necessary and/or correct?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2018-12-08T13:03:23Z
+
+I have added unit tests in #29522 to show the incorrect behavior of the `ResponseCacheStrategy`. Also reverted any other changes to unit tests in this PR for now, so we can see what's failing (because the tests are incorrect).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-12-08T13:48:07Z
+
+@aschempp Can you rebase this pull request? We cannot merge a pull request with a merge commit. Thank you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T14:28:03Z
+
+What's the status here?
+Please rebase to account for short arrays also.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-01-27T15:58:27Z
+
+This PR is still ready to me. Be aware that it currently points to 3.4 as a bugfix, so I'm not sure about short arrays?
+
+I have finished everything requested at the SymfonyCon, but we haven't made any more progress since. I'm not sure who's in charge of a final decision on what needs to be completed and actually merge this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T16:22:19Z
+
+Short arrays have been applied to 3.4 also, that's why a rebase is needed :)
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-01-29T17:34:42Z
+
+Rebased now and updated to short arrays using the php-cs-fixer
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-29T17:38:56Z
+
+Thanks! What about unanswered comments from David?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-01-29T18:26:00Z
+
+> Thanks! What about unanswered comments from David?
+
+You mean this one? https://github.com/symfony/symfony/pull/26532#discussion_r242842650
+I'm not sure how to handle this, or how a different comment would be an improvement…
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-01-30T07:24:49Z
+
+the open comments are all about improving the phpdoc or doc comments. basically for the places where i misunderstood the code before, because i think the explanations given in the discussion here and in person in lisbon would merit to be in the code file for future reference. some of the interactions are quite intricate (i don't see a way to improve that) and therefore need to be well documented so we still remember why things are as they are in a couple of years.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-30T07:28:34Z
+
+Any suggestions maybe? :)

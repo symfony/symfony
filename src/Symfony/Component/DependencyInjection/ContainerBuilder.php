@@ -517,8 +517,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets a service.
      *
-     * @param string $id      The service identifier
-     * @param object $service The service instance
+     * @param string          $id      The service identifier
+     * @param object|callable $service The service instance
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */

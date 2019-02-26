@@ -88,9 +88,8 @@ Security
 
  * The `Role` and `SwitchUserRole` classes are deprecated and will be removed in 5.0. Use strings for roles
    instead.
- * The `RoleHierarchyInterface` is deprecated and will be removed in 5.0.
- * The `getReachableRoles()` method of the `RoleHierarchy` class is deprecated and will be removed in 5.0.
-   Use the `getReachableRoleNames()` method instead.
+ * The `getReachableRoles()` method of the `RoleHierarchyInterface` is deprecated and will be removed in 5.0.
+   Role hierarchies must implement the `getReachableRoleNames()` method instead and return roles as strings.
  * The `getRoles()` method of the `TokenInterface` is deprecated. Tokens must implement the `getRoleNames()`
    method instead and return roles as strings.
  * The `ListenerInterface` is deprecated, turn your listeners into callables instead.

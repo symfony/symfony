@@ -14,21 +14,13 @@ namespace Symfony\Component\Security\Core\Role;
 /**
  * RoleHierarchyInterface is the interface for a role hierarchy.
  *
+ * The getReachableRoles(Role[] $roles) method that returns an array of all reachable Role objects is deprecated
+ * since Symfony 4.3.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since Symfony 4.3, to be removed in 5.0.
+ * @method string[] getReachableRoleNames(string[] $roles) The associated roles - not implementing it is deprecated since Symfony 4.3
  */
 interface RoleHierarchyInterface
 {
-    /**
-     * Returns an array of all reachable roles by the given ones.
-     *
-     * Reachable roles are the roles directly assigned but also all roles that
-     * are transitively reachable from them in the role hierarchy.
-     *
-     * @param Role[] $roles An array of directly assigned roles
-     *
-     * @return Role[] An array of all reachable roles
-     */
-    public function getReachableRoles(array $roles);
 }

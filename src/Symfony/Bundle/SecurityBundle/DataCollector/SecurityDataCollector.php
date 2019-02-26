@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
@@ -113,7 +112,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             }
 
             if (null !== $this->roleHierarchy) {
-                if ($this->roleHierarchy instanceof RoleHierarchy) {
+                if (method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
                     $allRoles = $this->roleHierarchy->getReachableRoleNames($assignedRoles);
                 } else {
                     $allRoles = array_map(function (Role $role) { return (string) $role; }, $this->roleHierarchy->getReachableRoles($token->getRoles(false)));

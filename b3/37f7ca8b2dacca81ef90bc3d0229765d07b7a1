@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-26T07:55:31Z
+
+Good catch. 👍 Can you also remove the accidentally added `setTrustedHeaderName()` and `getTrustedHeaderName()` methods and rebase on the `4.2` branch?
+
+---------------------------------------------------------------------------
+
+by shyim at 2019-02-26T08:04:25Z
+
+Done :)

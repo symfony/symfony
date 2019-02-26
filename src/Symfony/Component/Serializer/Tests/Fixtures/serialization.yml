@@ -24,3 +24,7 @@
       second: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
   attributes:
     foo: ~
+'Symfony\Component\Serializer\Tests\Fixtures\EmbeddedDummy':
+  attributes:
+    foo:
+      embedded: true

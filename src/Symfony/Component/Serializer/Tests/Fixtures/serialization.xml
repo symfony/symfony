@@ -34,4 +34,8 @@
         <attribute name="foo" />
     </class>
 
+    <class name="Symfony\Component\Serializer\Tests\Fixtures\EmbeddedDummy">
+        <attribute name="foo" embedded="true" />
+    </class>
+
 </serializer>

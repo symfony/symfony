@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the list of constraint violations' parameters in `ConstraintViolationListNormalizer`
+ * Added a `@Embedded` annotation to serialize/deserialize from/in subobject. Also work with `embedded=true` in attribute node in XML and `embedded: true` in Yaml.
 
 4.2.0
 -----

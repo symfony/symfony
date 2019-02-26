@@ -19,6 +19,7 @@ use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\EmbeddedDummy;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
 
 /**
@@ -91,5 +92,14 @@ class XmlFileLoaderTest extends TestCase
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 
         $this->assertEquals($expected, $classMetadata);
+    }
+
+    public function testEmbedded()
+    {
+        $classMetadata = new ClassMetadata(EmbeddedDummy::class);
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+        $this->assertTrue($attributesMetadata['foo']->isEmbedded());
     }
 }

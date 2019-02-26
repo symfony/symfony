@@ -50,6 +50,15 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public $serializedName;
 
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isEmbedded()} instead.
+     */
+    public $embedded = false;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -113,6 +122,16 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->serializedName;
     }
 
+    public function isEmbedded(): bool
+    {
+        return $this->embedded;
+    }
+
+    public function setEmbedded(bool $isEmbedded)
+    {
+        $this->embedded = $isEmbedded;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -131,6 +150,8 @@ class AttributeMetadata implements AttributeMetadataInterface
         if (null === $this->serializedName) {
             $this->serializedName = $attributeMetadata->getSerializedName();
         }
+
+        $this->setEmbedded($attributeMetadata->isEmbedded());
     }
 
     /**
@@ -140,6 +161,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName'];
+        return ['name', 'groups', 'maxDepth', 'serializedName', 'embedded'];
     }
 }

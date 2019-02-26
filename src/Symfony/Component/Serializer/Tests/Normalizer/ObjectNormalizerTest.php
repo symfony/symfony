@@ -29,6 +29,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EmbeddedDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\EmbeddedDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NotSerializedConstructorArgumentDummy;
@@ -1002,6 +1004,44 @@ class ObjectNormalizerTest extends TestCase
 
         $normalizer = new ObjectNormalizer(null, $nameConverter);
         $this->assertArrayHasKey('foo-Symfony\Component\Serializer\Tests\Normalizer\ObjectDummy-json-bar', $normalizer->normalize(new ObjectDummy(), 'json', ['foo' => 'bar']));
+    }
+
+    public function testEmbeddedNormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new EmbeddedDummy();
+        $obj->simple = 'hello';
+        $obj->foo->bar = 'first';
+        $obj->foo->baz = 'second';
+
+        $this->assertEquals([
+            'simple' => 'hello', 'bar' => 'first', 'baz' => 'second',
+        ], $this->normalizer->normalize($obj));
+    }
+
+    public function testEmbeddedDenormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new EmbeddedDummy();
+        $obj->simple = 'hello';
+        $obj->foo->bar = 'first';
+        $obj->foo->baz = 'second';
+
+        $toDeNormalize = ['simple' => 'hello', 'bar' => 'first', 'baz' => 'second'];
+
+        $denormalized = $this->normalizer->denormalize(
+            $toDeNormalize,
+            EmbeddedDummy::class
+        );
+        $this->assertEquals($obj, $denormalized);
+        $this->assertEquals($obj->foo, $denormalized->foo);
+        $this->assertInstanceOf(EmbeddedDummyChild::class, $denormalized->foo);
     }
 }
 

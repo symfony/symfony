@@ -68,6 +68,18 @@ interface AttributeMetadataInterface
     public function getSerializedName(): ?string;
 
     /**
+     * Gets the attribute need to be embedded.
+     *
+     * @return bool
+     */
+    public function isEmbedded(): bool;
+
+    /**
+     * @param bool $isEmbedded
+     */
+    public function setEmbedded(bool $isEmbedded);
+
+    /**
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      */
     public function merge(self $attributeMetadata);

@@ -93,6 +93,10 @@ class YamlFileLoader extends FileLoader
 
                     $attributeMetadata->setSerializedName($data['serialized_name']);
                 }
+
+                if (isset($data['embedded']) && true === $data['embedded']) {
+                    $attributeMetadata->setEmbedded(true);
+                }
             }
         }
 

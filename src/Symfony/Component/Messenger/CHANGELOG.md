@@ -13,7 +13,7 @@ CHANGELOG
 
  * Added `TransportException` to mark an exception transport-related
 
- * [BC BREAK] If listening to exceptions while using `AmqpSender`, `\AMQPException` is
+ * [BC BREAK] If listening to exceptions while using `AmqpSender` or `AmqpReceiver`, `\AMQPException` is
    no longer thrown in favor of `TransportException`.
 
 4.2.0

@@ -40,7 +40,8 @@ final class SecurityUserValueResolver implements ArgumentValueResolverInterface
     public function supports(Request $request, ArgumentMetadata $argument)
     {
         // only security user implementations are supported
-        if (UserInterface::class !== $argument->getType()) {
+        $type = $argument->getType();
+        if (UserInterface::class !== $type && !is_subclass_of($type, UserInterface::class)) {
             return false;
         }
 

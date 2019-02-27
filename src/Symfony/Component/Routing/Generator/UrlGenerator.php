@@ -171,7 +171,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             $this->logger->error($message, ['parameter' => $varName, 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$varName]]);
                         }
 
-                        return;
+                        return '';
                     }
 
                     $url = $token[1].$mergedParams[$varName].$url;
@@ -226,7 +226,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                             $this->logger->error($message, ['parameter' => $token[3], 'route' => $name, 'expected' => $token[2], 'given' => $mergedParams[$token[3]]]);
                         }
 
-                        return;
+                        return '';
                     }
 
                     $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;

@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-10T08:59:34Z
+
+Exceptions should only be thrown by the validators if the developer made some mistake in their configuration and those exceptions should not be caught. Thus I would not document them here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-10T09:15:54Z
+
+> Exceptions should only be thrown by the validators if the developer made some mistake in their configuration
+
+To comply with the API of a _constraint validator_, implementors should at least know about the `Unexpected...` exceptions.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-01-10T09:32:48Z
+
+> Exceptions should only be thrown by the validators if the developer made some mistake in their configuration and those exceptions should not be caught.
+
+Why not.. ?? I might have a controller that initializes my custom validator and I need to customize the message shown to the consumer of the controller by catching the exception...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-01-10T17:22:32Z
+
+I suggest something like
+
+```
+@throws UnexpectedTypeException If the constraint is incompatible
+@throws UnexpectedTypeException If the value is incompatible (causes an unrecoverable error)
+@throws UnexpectedValueException If the value is incompatible (causes a recoverable violation)
+@throws ConstraintDefintionException If a constraint option is incompatible during runtime
+@throws ValidatorException If any other validation related error occured
+```
+
+im :+-0: on adding ValidatorException specifically; i've no real proof it was designed like that. It seems reasonable, though in practice it could be a plain \RuntimeException as well. Which is why im skeptical about adding it now.
+
+> I might have a controller that initializes my custom validator and I need to customize the message shown to the consumer of the controller by catching the exception...
+
+In this case, i think you could throw a custom exception as well, and document it on your custom constraint validator.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-01-10T17:51:08Z
+
+@ro0NL I saw that you added above also this
+
+```
+@throws ValidatorException If any other validation related error occured
+```
+
+I can agree with that then.. I thought that in your review comment you you wanted to remove the generic one and add only the specific ones...
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-01-14T21:02:13Z
+
+I made some changes according to @ro0NL but... I haven't added the `UnexpectedValueException`. This exception exists on master and I am targeting 3.4
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-02-26T12:52:33Z
+
+Done. I left only one exception as discussed.

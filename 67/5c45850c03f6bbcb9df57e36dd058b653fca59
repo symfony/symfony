@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-02-26T08:40:20Z
+
+im still seeing the blue dots (https://github.com/symfony/symfony/issues/29858#issuecomment-453966901)
+
+both chrome/ff
+
+![image](https://user-images.githubusercontent.com/1047696/53398635-6009f680-39aa-11e9-805b-0df52d6e2226.png)
+
+---------------------------------------------------------------------------
+
+by inmarelibero at 2019-02-26T10:52:07Z
+
+@ro0NL I can't see those blue dots, do you have a better screen than https://user-images.githubusercontent.com/1047696/53398635-6009f680-39aa-11e9-805b-0df52d6e2226.png, or indicate better where they are ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-02-26T11:10:13Z
+
+normal
+![image](https://user-images.githubusercontent.com/1047696/53408239-55f1f300-39be-11e9-8ec4-c9afce318011.png)
+
+hover
+![image](https://user-images.githubusercontent.com/1047696/53408310-74f08500-39be-11e9-928c-2341afcbe0fc.png)
+
+better?
+
+i think  it happens because the text is wrapped in an `<a>` element.
+
+The following additional patch solves it for me:
+
+```diff
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+index 9c1cad2..f42e150 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+@@ -103,6 +103,7 @@
+ .sf-toolbar-block > a:hover {
+     display: block;
+     text-decoration: none;
++    color: inherit;
+ }
+
+ .sf-toolbar-block span {
+```
+
+---------------------------------------------------------------------------
+
+by inmarelibero at 2019-02-26T15:58:04Z
+
+thanks @ro0NL, I would't have noticed in a hundred years, you can check the screenshot
+<img width="605" alt="schermata 2019-02-26 alle 16 56 56" src="https://user-images.githubusercontent.com/254808/53426645-a3368a80-39e7-11e9-87fd-8a42afed3dbd.png">
+
+should be everything good now

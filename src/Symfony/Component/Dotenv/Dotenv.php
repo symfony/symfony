@@ -57,20 +57,23 @@ final class Dotenv
      * .env.local is always ignored in test env because tests should produce the same results for everyone.
      * .env.dist is loaded when it exists and .env is not found.
      *
-     * @param string $path       A file to load
-     * @param string $varName    The name of the env vars that defines the app env
-     * @param string $defaultEnv The app env to use when none is defined
-     * @param array  $testEnvs   A list of app envs for which .env.local should be ignored
+     * @param string $path                 A file to load
+     * @param string $varName              The name of the env vars that defines the app env
+     * @param string $defaultEnv           The app env to use when none is defined
+     * @param array  $testEnvs             A list of app envs for which .env.local should be ignored
+     * @param bool   $overrideExistingVars true when existing environment variables must be overridden
      *
      * @throws FormatException when a file has a syntax error
      * @throws PathException   when a file does not exist or is not readable
      */
-    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = ['test']): void
+    public function loadEnv(string $path, string $varName = 'APP_ENV', string $defaultEnv = 'dev', array $testEnvs = ['test'], bool $overrideExistingVars = false): void
     {
+        $loader = $overrideExistingVars ? 'overload' : 'load';
+
         if (file_exists($path) || !file_exists($p = "$path.dist")) {
-            $this->load($path);
+            $this->$loader($path);
         } else {
-            $this->load($p);
+            $this->$loader($p);
         }
 
         if (null === $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? null) {
@@ -78,7 +81,7 @@ final class Dotenv
         }
 
         if (!\in_array($env, $testEnvs, true) && file_exists($p = "$path.local")) {
-            $this->load($p);
+            $this->$loader($p);
             $env = $_SERVER[$varName] ?? $_ENV[$varName] ?? $env;
         }
 
@@ -87,11 +90,11 @@ final class Dotenv
         }
 
         if (file_exists($p = "$path.$env")) {
-            $this->load($p);
+            $this->$loader($p);
         }
 
         if (file_exists($p = "$path.$env.local")) {
-            $this->load($p);
+            $this->$loader($p);
         }
     }
 

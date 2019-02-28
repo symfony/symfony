@@ -162,6 +162,40 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/de', $url);
     }
 
+    public function testGenerateForRouteWithLocale()
+    {
+        $routes = $this->getRoutes('test.nl', new Route('/testing/nl'));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('_locale', 'nl');
+        $generator->setContext($context);
+        $url = $generator->generate('test');
+
+        $this->assertSame('/app.php/testing/nl', $url);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function testGenerateForRouteWithInvalidLocale()
+    {
+        $routes = $this->getRoutes('test.en', new Route('/testing/en'));
+        $generator = $this->getGenerator($routes);
+        $context = new RequestContext('/app.php');
+        $context->setParameter('_locale', 'nl');
+        $generator->setContext($context);
+        $generator->generate('test');
+    }
+
+    public function testGenerateForRouteWithoutDefaultLocale()
+    {
+        $routes = $this->getRoutes('test.en', new Route('/testing/en'));
+        $generator = $this->getGenerator($routes);
+        $url = $generator->generate('test');
+
+        $this->assertSame('/app.php/testing/en', $url);
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
      */

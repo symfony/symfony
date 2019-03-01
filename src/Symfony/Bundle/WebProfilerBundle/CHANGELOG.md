@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Replaced the canvas performance graph renderer with an SVG renderer
+
 4.1.0
 -----
 

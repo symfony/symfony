@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-02-27T18:10:04Z
+
+Good catch! This fix is needed for https://github.com/api-platform/core/pull/2566.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2019-02-28T07:42:50Z
+
+> The change must also be reintroduced here and here:
+>
+>     * https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Serializer.php#L317
+>
+>     * https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Serializer.php#L325
+
+Not sure, `context` is already present there?
+
+Also unit test failures are unrelated (form/twig)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-01T08:25:01Z
+
+Oops, sorry about that!

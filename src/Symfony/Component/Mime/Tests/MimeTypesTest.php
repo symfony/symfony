@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -35,10 +36,10 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTest
 
             public function guessMimeType(string $mimeType): ?string
             {
-                throw new \RuntimeException('Should never be called.');
+                throw new RuntimeException('Should never be called.');
             }
         });
-        $this->assertEquals('image/gif', $guesser->guessMimeType(__DIR__.'/Fixtures/test'));
+        $this->assertEquals('image/gif', $guesser->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
     }
 
     public function testGetExtensions()

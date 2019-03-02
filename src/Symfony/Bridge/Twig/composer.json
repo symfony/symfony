@@ -27,6 +27,7 @@
         "symfony/form": "^4.3",
         "symfony/http-foundation": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/mime": "~4.3",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",

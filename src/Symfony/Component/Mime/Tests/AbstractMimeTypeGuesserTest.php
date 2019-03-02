@@ -18,7 +18,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
 {
     public static function tearDownAfterClass()
     {
-        $path = __DIR__.'/Fixtures/to_delete';
+        $path = __DIR__.'/Fixtures/mimetypes/to_delete';
         if (file_exists($path)) {
             @chmod($path, 0666);
             @unlink($path);
@@ -33,7 +33,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/test'));
+        $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
     }
 
     public function testGuessImageWithDirectory()
@@ -43,7 +43,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         }
 
         $this->expectException('\InvalidArgumentException');
-        $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/directory');
+        $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/directory');
     }
 
     public function testGuessImageWithKnownExtension()
@@ -52,7 +52,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/test.gif'));
+        $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/test.gif'));
     }
 
     public function testGuessFileWithUnknownExtension()
@@ -61,7 +61,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('Guesser is not supported');
         }
 
-        $this->assertEquals('application/octet-stream', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/.unknownextension'));
+        $this->assertEquals('application/octet-stream', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/.unknownextension'));
     }
 
     public function testGuessWithIncorrectPath()
@@ -71,7 +71,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
         }
 
         $this->expectException('\InvalidArgumentException');
-        $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/not_here');
+        $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/not_here');
     }
 
     public function testGuessWithNonReadablePath()
@@ -88,7 +88,7 @@ abstract class AbstractMimeTypeGuesserTest extends TestCase
             $this->markTestSkipped('This test will fail if run under superuser');
         }
 
-        $path = __DIR__.'/Fixtures/to_delete';
+        $path = __DIR__.'/Fixtures/mimetypes/to_delete';
         touch($path);
         @chmod($path, 0333);
 

@@ -68,6 +68,9 @@ CHANGELOG
  * Added support for the new Argon2i password encoder
  * added `stateless` option to the `switch_user` listener
  * deprecated auto picking the first registered provider when no configured provider on a firewall and ambiguous
+ * `AccessListener` reuses logic of `AuthorizationCheckerInterface`.
+   `AccessListener::__construct` now accepts `TokenStorageInterface`, `AccessMapInterface` and `AuthorizationCheckerInterface`,
+   if old signature is used `E_USER_DEPRECATED` will be triggered 
 
 3.3.0
 -----

@@ -242,9 +242,8 @@
         <service id="security.access_listener" class="Symfony\Component\Security\Http\Firewall\AccessListener">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
-            <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="security.access_map" />
-            <argument type="service" id="security.authentication.manager" />
+            <argument type="service" id="security.authorization_checker"/>
         </service>
     </services>
 </container>

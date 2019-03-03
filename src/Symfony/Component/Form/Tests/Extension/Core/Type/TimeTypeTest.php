@@ -80,6 +80,22 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertEquals($input, $form->getViewData());
     }
 
+    public function testSubmitStringWithCustomFormat()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, '11:33', [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'string',
+            'input_format' => 'H:i',
+        ]);
+
+        $form->submit('03:24');
+
+        $this->assertEquals('03:24', $form->getData());
+        $this->assertEquals('03:24', $form->getViewData());
+    }
+
     public function testSubmitTimestamp()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

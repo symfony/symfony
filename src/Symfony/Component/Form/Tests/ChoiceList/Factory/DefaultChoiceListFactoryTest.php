@@ -77,6 +77,11 @@ class DefaultChoiceListFactoryTest extends TestCase
         return $this->obj1 === $object || $this->obj2 === $object ? 'Group 1' : 'Group 2';
     }
 
+    public function getGroupArray($object)
+    {
+        return $this->obj1 === $object || $this->obj2 === $object ? ['Group 1', 'Group 2'] : ['Group 3'];
+    }
+
     public function getGroupAsObject($object)
     {
         return $this->obj1 === $object || $this->obj2 === $object
@@ -462,6 +467,19 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertGroupedView($view);
     }
 
+    public function testCreateViewFlatGroupByAsCallableReturnsArray()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [],
+            null, // label
+            null, // index
+            [$this, 'getGroupArray']
+        );
+
+        $this->assertGroupedViewWithChoiceDuplication($view);
+    }
+
     public function testCreateViewFlatGroupByObjectThatCanBeCastToString()
     {
         $view = $this->factory->createView(
@@ -771,6 +789,26 @@ class DefaultChoiceListFactoryTest extends TestCase
                         [2 => new ChoiceView($this->obj3, '2', 'C')]
                     ),
                 ]
+        ), $view);
+    }
+
+    private function assertGroupedViewWithChoiceDuplication($view)
+    {
+        $this->assertEquals(new ChoiceListView(
+            [
+                'Group 1' => new ChoiceGroupView(
+                    'Group 1',
+                    [0 => new ChoiceView($this->obj1, '0', 'A'), 2 => new ChoiceView($this->obj2, '1', 'B')]
+                ),
+                'Group 2' => new ChoiceGroupView(
+                    'Group 2',
+                    [1 => new ChoiceView($this->obj1, '0', 'A'), 3 => new ChoiceView($this->obj2, '1', 'B')]
+                ),
+                'Group 3' => new ChoiceGroupView(
+                    'Group 3',
+                    [4 => new ChoiceView($this->obj3, '2', 'C'), 5 => new ChoiceView($this->obj4, '3', 'D')]
+                ),
+            ], []
         ), $view);
     }
 }

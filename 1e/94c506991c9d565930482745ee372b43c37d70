@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-12-27T21:38:52Z
+
+Would need a separate PR, but would you accept a new method that takes a resource?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-12-28T08:25:02Z
+
+What about reusing the same method?
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-12-28T09:58:08Z
+
+That would be my preference, but this PR was following #20980 and #28019.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-21T09:44:33Z
+
+I would be in favor of supporting resources and strings in the existing method.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2019-02-22T08:49:47Z
+
+@fabpot Updated to match.

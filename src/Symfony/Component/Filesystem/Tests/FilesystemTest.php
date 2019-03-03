@@ -1518,6 +1518,10 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::dumpFile()" with an array in the $content argument is deprecated since Symfony 4.3.
+     */
     public function testDumpFileWithArray()
     {
         $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'baz.txt';
@@ -1589,6 +1593,60 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->dumpFile($filename, 'foo');
 
         $this->filesystem->appendToFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'foobar');
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(664, $filename);
+            umask($oldMask);
+        }
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::appendToFile()" with an array in the $content argument is deprecated since Symfony 4.3.
+     */
+    public function testAppendToFileWithArray()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar.txt';
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        $this->filesystem->appendToFile($filename, array('bar'));
+
+        $this->assertFileExists($filename);
+        $this->assertStringEqualsFile($filename, 'foobar');
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(664, $filename);
+            umask($oldMask);
+        }
+    }
+
+    public function testAppendToFileWithResource()
+    {
+        $filename = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar.txt';
+
+        // skip mode check on Windows
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
+        $this->filesystem->dumpFile($filename, 'foo');
+
+        $resource = fopen('php://memory', 'rw');
+        fwrite($resource, 'bar');
+        fseek($resource, 0);
+
+        $this->filesystem->appendToFile($filename, $resource);
 
         $this->assertFileExists($filename);
         $this->assertStringEqualsFile($filename, 'foobar');

@@ -70,6 +70,12 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
 
+Filesystem
+----------
+
+ * The `Filesystem::dumpFile()` method no longer supports arrays in the `$content` argument.
+ * The `Filesystem::appendToFile()` method no longer supports arrays in the `$content` argument.
+
 Finder
 ------
 

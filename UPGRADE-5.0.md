@@ -223,6 +223,12 @@ Process
    $process = Process::fromShellCommandline('ls -l');
    ```
 
+Routing
+-------
+
+ * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
+   options have been removed.
+
 Security
 --------
 

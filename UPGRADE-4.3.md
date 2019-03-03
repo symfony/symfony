@@ -50,6 +50,12 @@ HttpFoundation
  * The `FileinfoMimeTypeGuesser` class has been deprecated,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
 
+Routing
+-------
+
+ * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
+   options have been deprecated.
+
 Security
 --------
 

@@ -293,7 +293,7 @@ class ReflectionExtractorTest extends TestCase
             [NotInstantiable::class, 'foo', false],
         ];
     }
-    
+
     /**
      * @dataProvider constructorTypesProvider
      */

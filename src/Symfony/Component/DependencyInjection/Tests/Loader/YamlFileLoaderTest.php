@@ -800,4 +800,17 @@ class YamlFileLoaderTest extends TestCase
         $definition = $container->getDefinition('foo');
         $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
+
+    public function testYamlFileTag()
+    {
+        $path = self::$fixturesPath.'/yaml';
+        $container = new ContainerBuilder();
+        $container->setParameter('fixture_dir', $path);
+
+        $loader = new YamlFileLoader($container, new FileLocator($path));
+        $loader->load('services_with_yaml_file_tag.yml');
+
+        $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
+        $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));
+    }
 }

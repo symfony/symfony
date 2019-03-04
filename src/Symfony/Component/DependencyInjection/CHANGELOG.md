@@ -13,6 +13,7 @@ CHANGELOG
  * added `ReverseContainer`: a container that turns services back to their ids
  * added ability to define an index for a tagged collection
  * added ability to define an index for services in an injected service locator argument
+ * added the `!yaml_file` YAML custom tag, allowing to inject the parsed content of a YAML file
 
 4.2.0
 -----

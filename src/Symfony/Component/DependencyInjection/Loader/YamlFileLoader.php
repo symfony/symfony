@@ -758,6 +758,11 @@ class YamlFileLoader extends FileLoader
 
                 return new Reference($id);
             }
+            if ('yaml_file' === $value->getTag()) {
+                $file = $this->container->resolveEnvPlaceholders($argument, true);
+
+                return $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT);
+            }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));
         }

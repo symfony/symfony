@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\SkippedTestError;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
@@ -1947,9 +1948,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPercentNoSymbol()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, array('symbol' => false));
+        $this->requiresFeatureSet(403);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
     [@name="name"]
@@ -1961,9 +1963,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     public function testPercentCustomSymbol()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, array('symbol' => '‱'));
+        $this->requiresFeatureSet(403);
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
     [@type="text"]
     [@name="name"]

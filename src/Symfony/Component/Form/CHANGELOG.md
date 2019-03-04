@@ -4,7 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
- * added a `symbol` option to the `PercentType` that allows to disable the output of the percent character
+ * added a `symbol` option to the `PercentType` that allows to disable or customize the output of the percent character
  * Using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled is deprecated.
  * Using names for buttons that do not start with a letter, a digit, or an underscore is deprecated and will lead to an
    exception in 5.0.

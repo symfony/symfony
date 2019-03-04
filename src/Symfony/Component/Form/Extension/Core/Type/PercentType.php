@@ -54,7 +54,7 @@ class PercentType extends AbstractType
         ]);
 
         $resolver->setAllowedTypes('scale', 'int');
-        $resolver->setAllowedTypes('symbol', array('bool', 'string'));
+        $resolver->setAllowedTypes('symbol', ['bool', 'string']);
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Tests\AbstractLayoutTest;
 
@@ -2175,24 +2176,22 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testPercentNoSymbol()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, array('symbol' => false));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/input
-            [@id="my&id"]
-            [@type="text"]
-            [@name="name"]
-            [@class="my&class form-control"]
-            [@value="10"]
+    [@id="my&id"]
+    [@type="text"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="10"]
 '
         );
     }
 
     public function testPercentCustomSymbol()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, array('symbol' => '‱'));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
 '/div
     [@class="input-group"]
     [

@@ -1082,7 +1082,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
-            '/div
+'/div
     [@class="input-group"]
     [
         ./div
@@ -1108,7 +1108,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $form = $this->factory->createNamed('name', PercentType::class, 0.1);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
-            '/div
+'/div
     [@class="input-group"]
     [
         ./input
@@ -1131,25 +1131,23 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
     public function testPercentNoSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, array('symbol' => false));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
-            '/input
-            [@id="my&id"]
-            [@type="text"]
-            [@name="name"]
-            [@class="my&class form-control"]
-            [@value="10"]
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
+'/input
+    [@id="my&id"]
+    [@type="text"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="10"]
 '
         );
     }
 
     public function testPercentCustomSymbol()
     {
-        $form = $this->factory->createNamed('name', PercentType::class, 0.1, array('symbol' => '‱'));
-
-        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
-            '/div
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
+'/div
     [@class="input-group"]
     [
         ./input

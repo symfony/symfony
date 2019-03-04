@@ -113,8 +113,8 @@ class SwitchUserListenerTest extends TestCase
      */
     public function testExitUserBasedOnSwitchUserRoleUpdatesToken()
     {
-        $originalToken = new UsernamePasswordToken('username', '', 'key', array());
-        $this->tokenStorage->setToken(new UsernamePasswordToken('username', '', 'key', array(new SwitchUserRole('ROLE_PREVIOUS', $originalToken, false)), $originalToken));
+        $originalToken = new UsernamePasswordToken('username', '', 'key', []);
+        $this->tokenStorage->setToken(new UsernamePasswordToken('username', '', 'key', [new SwitchUserRole('ROLE_PREVIOUS', $originalToken, false)], $originalToken));
 
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 

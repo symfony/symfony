@@ -1619,7 +1619,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->dumpFile($filename, 'foo');
 
-        $this->filesystem->appendToFile($filename, array('bar'));
+        $this->filesystem->appendToFile($filename, ['bar']);
 
         $this->assertFileExists($filename);
         $this->assertStringEqualsFile($filename, 'foobar');

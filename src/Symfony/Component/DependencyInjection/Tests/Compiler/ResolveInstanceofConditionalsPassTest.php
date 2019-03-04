@@ -307,4 +307,26 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertInstanceOf(BoundArgument::class, $bindings['$toto']);
         $this->assertSame(123, $bindings['$toto']->getValues()[0]);
     }
+
+    public function testDecoratorsAreNotAutomaticallyTagged()
+    {
+        $container = new ContainerBuilder();
+
+        $decorator = $container->register('decorator', self::class);
+        $decorator->setDecoratedService('decorated');
+        $decorator->setInstanceofConditionals([
+            parent::class => (new ChildDefinition(''))->addTag('tag'),
+        ]);
+        $decorator->setAutoconfigured(true);
+        $decorator->addTag('manual');
+
+        $container->registerForAutoconfiguration(parent::class)
+            ->addTag('tag')
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $this->assertSame(['manual' => [[]]], $container->getDefinition('decorator')->getTags());
+    }
 }

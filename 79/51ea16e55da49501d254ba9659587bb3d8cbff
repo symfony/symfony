@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-18T12:03:44Z
+
+Typo:
+This leaves us WITH....
+
+---------------------------------------------------------------------------
+
+by alexpott at 2019-02-19T09:32:55Z
+
+Drupal extends `CompilerRoute` and overrides both `::serialize` and `::unserialize`. We can rebuild our router so the change to the payload should be okay.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-19T09:56:37Z
+
+@alexpott thanks, then the plan for Drupal should be to stop  calling `parent::serialize()`/`unserialize()` asap and explicitly declare `implements \Serializable`. Then you'd preserve full forward and backward compat.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-23T16:49:13Z
+
+> I would remove the possibility to serialize a Kernel as I don't see (anymore) the use cases.
+
+Actually, that's not possible: the kernel is serialized in FrameworkBundle for insulated tests, see https://github.com/symfony/symfony/blob/3895acd17598520682468ff1aa0994b7cfc1e316/src/Symfony/Bundle/FrameworkBundle/Client.php#L164

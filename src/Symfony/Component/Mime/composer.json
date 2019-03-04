@@ -1,0 +1,39 @@
+{
+    "name": "symfony/mime",
+    "type": "library",
+    "description": "A library to manipulate MIME messages",
+    "keywords": ["mime", "mime-type"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symfony/polyfill-intl-idn": "^1.10",
+        "symfony/polyfill-mbstring": "^1.0"
+    },
+    "require-dev": {
+        "egulias/email-validator": "^2.0",
+        "symfony/dependency-injection": "~3.4|^4.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mime\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.3-dev"
+        }
+    }
+}

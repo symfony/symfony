@@ -32,9 +32,9 @@ class DecoratorServicePass implements CompilerPassInterface
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
-            $definitions->insert(array($id, $definition), array($decorated[2], --$order));
+            $definitions->insert([$id, $definition], [$decorated[2], --$order]);
         }
-        $decoratingDefinitions = array();
+        $decoratingDefinitions = [];
 
         foreach ($definitions as list($id, $definition)) {
             list($inner, $renamedId) = $definition->getDecoratedService();
@@ -65,7 +65,7 @@ class DecoratorServicePass implements CompilerPassInterface
             if (isset($decoratingDefinitions[$inner])) {
                 $decoratingDefinition = $decoratingDefinitions[$inner];
                 $definition->setTags(array_merge($decoratingDefinition->getTags(), $definition->getTags()));
-                $decoratingDefinition->setTags(array());
+                $decoratingDefinition->setTags([]);
                 $decoratingDefinitions[$inner] = $definition;
             }
 

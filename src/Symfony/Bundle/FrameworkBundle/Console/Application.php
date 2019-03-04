@@ -32,7 +32,7 @@ class Application extends BaseApplication
 {
     private $kernel;
     private $commandsRegistered = false;
-    private $registrationErrors = array();
+    private $registrationErrors = [];
 
     public function __construct(KernelInterface $kernel)
     {
@@ -62,28 +62,13 @@ class Application extends BaseApplication
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if ($input->hasParameterOption(array('-e', '--env'), true)) {
-            $notice = 'The "--env" option and its "-e" shortcut are deprecated since Symfony 4.2, set the "APP_ENV" environment variable instead.';
-            $io = (new SymfonyStyle($input, $output))->getErrorStyle();
-            $io->warning($notice);
-            @trigger_error($notice, E_USER_DEPRECATED);
-        }
-
-        if ($input->hasParameterOption('--no-debug', true)) {
-            $notice = 'The "--no-debug" option is deprecated since Symfony 4.2, set the "APP_DEBUG" environment variable to "0" instead.';
-            ($io ?? (new SymfonyStyle($input, $output))->getErrorStyle())->warning($notice);
-            @trigger_error($notice, E_USER_DEPRECATED);
-        }
-
-        $this->kernel->boot();
-
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
-
         $this->registerCommands();
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
         }
+
+        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
         return parent::doRun($input, $output);
     }
@@ -96,7 +81,7 @@ class Application extends BaseApplication
         if (!$command instanceof ListCommand) {
             if ($this->registrationErrors) {
                 $this->renderRegistrationErrors($input, $output);
-                $this->registrationErrors = array();
+                $this->registrationErrors = [];
             }
 
             return parent::doRunCommand($command, $input, $output);
@@ -106,7 +91,7 @@ class Application extends BaseApplication
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
-            $this->registrationErrors = array();
+            $this->registrationErrors = [];
         }
 
         return $returnCode;
@@ -192,7 +177,7 @@ class Application extends BaseApplication
         }
 
         if ($container->hasParameter('console.command.ids')) {
-            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : array();
+            $lazyCommandIds = $container->hasParameter('console.lazy_command.ids') ? $container->getParameter('console.lazy_command.ids') : [];
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {
@@ -204,35 +189,6 @@ class Application extends BaseApplication
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Defines the "APP_ENV" and "APP_DEBUG" environment variables by consuming --env and --no-debug from the command line arguments.
-     */
-    public static function bootstrapEnv(array &$argv)
-    {
-        for ($i = 0; $i < \count($argv) && '--' !== $v = $argv[$i]; ++$i) {
-            if ('--no-debug' === $v) {
-                putenv('APP_DEBUG='.$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '0');
-                $argvUnset[$i] = true;
-                break;
-            }
-        }
-
-        for ($i = 0; $i < \count($argv) && '--' !== $v = $argv[$i]; ++$i) {
-            if (!$v || '-' !== $v[0] || !preg_match('/^-(?:-env(?:=|$)|e=?)(.*)$/D', $v, $v)) {
-                continue;
-            }
-            if (!empty($v[1]) || !empty($argv[1 + $i])) {
-                putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = empty($v[1]) ? $argv[1 + $i] : $v[1]);
-                $argvUnset[$i] = $argvUnset[$i + empty($v[1])] = true;
-            }
-            break;
-        }
-
-        if (!empty($argvUnset)) {
-            $argv = array_values(array_diff_key($argv, $argvUnset));
         }
     }
 

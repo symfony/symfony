@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  */
 class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
 {
-    private $config = array();
+    private $config = [];
 
     /**
      * Argon2iPasswordEncoder constructor.
@@ -33,11 +33,11 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
     public function __construct(int $memoryCost = null, int $timeCost = null, int $threads = null)
     {
         if (\defined('PASSWORD_ARGON2I')) {
-            $this->config = array(
+            $this->config = [
                 'memory_cost' => $memoryCost ?? \PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
                 'time_cost' => $timeCost ?? \PASSWORD_ARGON2_DEFAULT_TIME_COST,
                 'threads' => $threads ?? \PASSWORD_ARGON2_DEFAULT_THREADS,
-            );
+            ];
         }
     }
 
@@ -81,7 +81,9 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
      */
     public function isPasswordValid($encoded, $raw, $salt)
     {
-        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I')) {
+        // If $encoded was created via "sodium_crypto_pwhash_str()", the hashing algorithm may be "argon2id" instead of "argon2i".
+        // In this case, "password_verify()" cannot be used.
+        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I') && (false === strpos($encoded, '$argon2id$'))) {
             return !$this->isPasswordTooLong($raw) && password_verify($raw, $encoded);
         }
         if (\function_exists('sodium_crypto_pwhash_str_verify')) {

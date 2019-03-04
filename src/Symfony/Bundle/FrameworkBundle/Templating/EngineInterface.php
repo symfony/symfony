@@ -32,5 +32,5 @@ interface EngineInterface extends BaseEngineInterface
      *
      * @throws \RuntimeException if the template cannot be rendered
      */
-    public function renderResponse($view, array $parameters = array(), Response $response = null);
+    public function renderResponse($view, array $parameters = [], Response $response = null);
 }

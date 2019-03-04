@@ -23,19 +23,19 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 {
     public function testServicesAreOrderedAccordingToPriority()
     {
-        $services = array(
-            'n3' => array(array()),
-            'n1' => array(array('priority' => 200)),
-            'n2' => array(array('priority' => 100)),
-        );
+        $services = [
+            'n3' => [[]],
+            'n1' => [['priority' => 200]],
+            'n2' => [['priority' => 100]],
+        ];
 
-        $expected = array(
+        $expected = [
             new Reference('n1'),
             new Reference('n2'),
             new Reference('n3'),
-        );
+        ];
 
-        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->setDefinition('argument_resolver', $definition);
 
@@ -55,19 +55,19 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
     public function testInDebugWithStopWatchDefinition()
     {
-        $services = array(
-            'n3' => array(array()),
-            'n1' => array(array('priority' => 200)),
-            'n2' => array(array('priority' => 100)),
-        );
+        $services = [
+            'n3' => [[]],
+            'n1' => [['priority' => 200]],
+            'n2' => [['priority' => 100]],
+        ];
 
-        $expected = array(
+        $expected = [
             new Reference('n1'),
             new Reference('n2'),
             new Reference('n3'),
-        );
+        ];
 
-        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->register('debug.stopwatch', Stopwatch::class);
         $container->setDefinition('argument_resolver', $definition);
@@ -92,9 +92,9 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
     public function testInDebugWithouStopWatchDefinition()
     {
-        $expected = array(new Reference('n1'));
+        $expected = [new Reference('n1')];
 
-        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->register('n1')->addTag('controller.argument_value_resolver');
         $container->setDefinition('argument_resolver', $definition);
@@ -110,14 +110,14 @@ class ControllerArgumentValueResolverPassTest extends TestCase
 
     public function testReturningEmptyArrayWhenNoService()
     {
-        $definition = new Definition(ArgumentResolver::class, array(null, array()));
+        $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
         $container->setDefinition('argument_resolver', $definition);
 
         $container->setParameter('kernel.debug', false);
 
         (new ControllerArgumentValueResolverPass())->process($container);
-        $this->assertEquals(array(), $definition->getArgument(1)->getValues());
+        $this->assertEquals([], $definition->getArgument(1)->getValues());
     }
 
     public function testNoArgumentResolver()

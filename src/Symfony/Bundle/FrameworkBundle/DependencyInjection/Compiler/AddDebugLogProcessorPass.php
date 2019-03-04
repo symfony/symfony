@@ -30,6 +30,6 @@ class AddDebugLogProcessorPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('monolog.logger_prototype');
-        $definition->addMethodCall('pushProcessor', array(new Reference('debug.log_processor')));
+        $definition->addMethodCall('pushProcessor', [new Reference('debug.log_processor')]);
     }
 }

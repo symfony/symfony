@@ -18,10 +18,10 @@ class OutputFormatterStyleTest extends TestCase
 {
     public function testConstructor()
     {
-        $style = new OutputFormatterStyle('green', 'black', array('bold', 'underscore'));
+        $style = new OutputFormatterStyle('green', 'black', ['bold', 'underscore']);
         $this->assertEquals("\033[32;40;1;4mfoo\033[39;49;22;24m", $style->apply('foo'));
 
-        $style = new OutputFormatterStyle('red', null, array('blink'));
+        $style = new OutputFormatterStyle('red', null, ['blink']);
         $this->assertEquals("\033[31;5mfoo\033[39;25m", $style->apply('foo'));
 
         $style = new OutputFormatterStyle(null, 'white');
@@ -41,7 +41,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setForeground('default');
         $this->assertEquals("\033[39mfoo\033[39m", $style->apply('foo'));
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $style->setForeground('undefined-color');
     }
 
@@ -58,7 +58,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setBackground('default');
         $this->assertEquals("\033[49mfoo\033[49m", $style->apply('foo'));
 
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $style->setBackground('undefined-color');
     }
 
@@ -66,7 +66,7 @@ class OutputFormatterStyleTest extends TestCase
     {
         $style = new OutputFormatterStyle();
 
-        $style->setOptions(array('reverse', 'conceal'));
+        $style->setOptions(['reverse', 'conceal']);
         $this->assertEquals("\033[7;8mfoo\033[27;28m", $style->apply('foo'));
 
         $style->setOption('bold');
@@ -78,7 +78,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setOption('bold');
         $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
 
-        $style->setOptions(array('bold'));
+        $style->setOptions(['bold']);
         $this->assertEquals("\033[1mfoo\033[22m", $style->apply('foo'));
 
         try {
@@ -95,6 +95,21 @@ class OutputFormatterStyleTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->unsetOption() throws an \InvalidArgumentException when the option does not exist in the available options');
             $this->assertContains('Invalid option specified: "foo"', $e->getMessage(), '->unsetOption() throws an \InvalidArgumentException when the option does not exist in the available options');
+        }
+    }
+
+    public function testHref()
+    {
+        $prevTerminalEmulator = getenv('TERMINAL_EMULATOR');
+        putenv('TERMINAL_EMULATOR');
+
+        $style = new OutputFormatterStyle();
+
+        try {
+            $style->setHref('idea://open/?file=/path/SomeFile.php&line=12');
+            $this->assertSame("\e]8;;idea://open/?file=/path/SomeFile.php&line=12\e\\some URL\e]8;;\e\\", $style->apply('some URL'));
+        } finally {
+            putenv('TERMINAL_EMULATOR'.($prevTerminalEmulator ? "=$prevTerminalEmulator" : ''));
         }
     }
 }

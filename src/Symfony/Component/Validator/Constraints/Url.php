@@ -88,9 +88,9 @@ class Url extends Constraint
 
     const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
-    protected static $errorNames = array(
+    protected static $errorNames = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',
-    );
+    ];
 
     public $message = 'This value is not a valid URL.';
 
@@ -98,7 +98,7 @@ class Url extends Constraint
      * @deprecated since Symfony 4.1
      */
     public $dnsMessage = 'The host could not be resolved.';
-    public $protocols = array('http', 'https');
+    public $protocols = ['http', 'https'];
 
     /**
      * @deprecated since Symfony 4.1
@@ -109,10 +109,10 @@ class Url extends Constraint
     public function __construct($options = null)
     {
         if (\is_array($options)) {
-            if (array_key_exists('checkDNS', $options)) {
+            if (\array_key_exists('checkDNS', $options)) {
                 @trigger_error(sprintf('The "checkDNS" option in "%s" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.', self::class), E_USER_DEPRECATED);
             }
-            if (array_key_exists('dnsMessage', $options)) {
+            if (\array_key_exists('dnsMessage', $options)) {
                 @trigger_error(sprintf('The "dnsMessage" option in "%s" is deprecated since Symfony 4.1.', self::class), E_USER_DEPRECATED);
             }
         }

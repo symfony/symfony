@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'validation' => array(
+$container->loadFromExtension('framework', [
+    'validation' => [
         'strict_email' => true,
-    ),
-));
+    ],
+]);

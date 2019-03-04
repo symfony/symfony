@@ -23,7 +23,7 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $scripts = array(
+    protected static $scripts = [
         'Adlm',
         'Afak',
         'Aghb',
@@ -209,7 +209,7 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
         'Zxxx',
         'Zyyy',
         'Zzzz',
-    );
+    ];
 
     /**
      * @var ScriptDataProvider

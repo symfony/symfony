@@ -154,7 +154,7 @@ class LockTest extends TestCase
 
         $store
             ->method('exists')
-            ->willReturnOnConsecutiveCalls(array(true, false))
+            ->willReturnOnConsecutiveCalls([true, false])
         ;
         $store
             ->expects($this->once())
@@ -173,7 +173,7 @@ class LockTest extends TestCase
 
         $store
             ->method('exists')
-            ->willReturnOnConsecutiveCalls(array(true, false))
+            ->willReturnOnConsecutiveCalls([true, false])
         ;
         $store
             ->expects($this->never())
@@ -243,7 +243,7 @@ class LockTest extends TestCase
 
         $logger->expects($this->atLeastOnce())
             ->method('notice')
-            ->with('Failed to release the "{resource}" lock.', array('resource' => $key));
+            ->with('Failed to release the "{resource}" lock.', ['resource' => $key]);
 
         $store
             ->expects($this->once())
@@ -280,12 +280,12 @@ class LockTest extends TestCase
 
     public function provideExpiredDates()
     {
-        yield array(array(-0.1), true);
-        yield array(array(0.1, -0.1), true);
-        yield array(array(-0.1, 0.1), true);
+        yield [[-0.1], true];
+        yield [[0.1, -0.1], true];
+        yield [[-0.1, 0.1], true];
 
-        yield array(array(), false);
-        yield array(array(0.1), false);
-        yield array(array(-0.1, null), false);
+        yield [[], false];
+        yield [[0.1], false];
+        yield [[-0.1, null], false];
     }
 }

@@ -22,14 +22,13 @@ class ButtonBuilderTest extends TestCase
 {
     public function getValidNames()
     {
-        return array(
-            array('reset'),
-            array('submit'),
-            array('foo'),
-            array('0'),
-            array(0),
-            array('button[]'),
-        );
+        return [
+            ['reset'],
+            ['submit'],
+            ['foo'],
+            ['0'],
+            [0],
+        ];
     }
 
     /**
@@ -40,13 +39,21 @@ class ButtonBuilderTest extends TestCase
         $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testNameContainingIllegalCharacters()
+    {
+        $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder('button[]'));
+    }
+
     public function getInvalidNames()
     {
-        return array(
-            array(''),
-            array(false),
-            array(null),
-        );
+        return [
+            [''],
+            [false],
+            [null],
+        ];
     }
 
     /**

@@ -111,14 +111,14 @@ class ExecutionContext implements ExecutionContextInterface
      *
      * @var array
      */
-    private $validatedObjects = array();
+    private $validatedObjects = [];
 
     /**
      * Stores which class constraint has been validated for which object.
      *
      * @var array
      */
-    private $validatedConstraints = array();
+    private $validatedConstraints = [];
 
     /**
      * Stores which objects have been initialized.
@@ -183,7 +183,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolation($message, array $parameters = array())
+    public function addViolation($message, array $parameters = [])
     {
         $this->violations->add(new ConstraintViolation(
             $this->translator->trans($message, $parameters, $this->translationDomain),
@@ -201,7 +201,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function buildViolation($message, array $parameters = array())
+    public function buildViolation($message, array $parameters = [])
     {
         return new ConstraintViolationBuilder(
             $this->violations,
@@ -307,7 +307,7 @@ class ExecutionContext implements ExecutionContextInterface
     public function markGroupAsValidated($cacheKey, $groupHash)
     {
         if (!isset($this->validatedObjects[$cacheKey])) {
-            $this->validatedObjects[$cacheKey] = array();
+            $this->validatedObjects[$cacheKey] = [];
         }
 
         $this->validatedObjects[$cacheKey][$groupHash] = true;

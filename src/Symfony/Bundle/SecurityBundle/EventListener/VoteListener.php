@@ -43,6 +43,6 @@ class VoteListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array('debug.security.authorization.vote' => 'onVoterVote');
+        return ['debug.security.authorization.vote' => 'onVoterVote'];
     }
 }

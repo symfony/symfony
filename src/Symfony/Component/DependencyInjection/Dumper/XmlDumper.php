@@ -41,14 +41,14 @@ class XmlDumper extends Dumper
      *
      * @return string An xml string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
 
         $container = $this->document->createElementNS('http://symfony.com/schema/dic/services', 'container');
         $container->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd');
+        $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd');
 
         $this->addParameters($container);
         $this->addServices($container);
@@ -227,6 +227,14 @@ class XmlDumper extends Dumper
         if (!$id->isPrivate()) {
             $service->setAttribute('public', $id->isPublic() ? 'true' : 'false');
         }
+
+        if ($id->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($id->getDeprecationMessage('%alias_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
         $parent->appendChild($service);
     }
 
@@ -278,6 +286,14 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof TaggedIteratorArgument) {
                 $element->setAttribute('type', 'tagged');
                 $element->setAttribute('tag', $value->getTag());
+
+                if (null !== $value->getIndexAttribute()) {
+                    $element->setAttribute('index-by', $value->getIndexAttribute());
+                }
+
+                if (null !== $value->getDefaultIndexMethod()) {
+                    $element->setAttribute('default-index-method', $value->getDefaultIndexMethod());
+                }
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');
@@ -307,7 +323,7 @@ class XmlDumper extends Dumper
                 $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
             } else {
-                if (\in_array($value, array('null', 'true', 'false'), true)) {
+                if (\in_array($value, ['null', 'true', 'false'], true)) {
                     $element->setAttribute('type', 'string');
                 }
                 $text = $this->document->createTextNode(self::phpToXml($value));
@@ -324,7 +340,7 @@ class XmlDumper extends Dumper
      */
     private function escape(array $arguments)
     {
-        $args = array();
+        $args = [];
         foreach ($arguments as $k => $v) {
             if (\is_array($v)) {
                 $args[$k] = $this->escape($v);

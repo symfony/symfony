@@ -30,7 +30,7 @@ class AddExpressionLanguageProvidersPass implements CompilerPassInterface
         if ($container->has('security.expression_language')) {
             $definition = $container->findDefinition('security.expression_language');
             foreach ($container->findTaggedServiceIds('security.expression_language_provider', true) as $id => $attributes) {
-                $definition->addMethodCall('registerProvider', array(new Reference($id)));
+                $definition->addMethodCall('registerProvider', [new Reference($id)]);
             }
         }
     }

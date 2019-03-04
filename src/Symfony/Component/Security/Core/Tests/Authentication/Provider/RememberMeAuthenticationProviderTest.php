@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
 use Symfony\Component\Security\Core\Exception\DisabledException;
-use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends TestCase
 {
@@ -57,7 +56,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
             ->method('checkPreAuth')
-            ->will($this->throwException(new DisabledException()));
+            ->willThrowException(new DisabledException());
 
         $provider = $this->getProvider($userChecker);
 
@@ -69,7 +68,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->exactly(2))
              ->method('getRoles')
-             ->will($this->returnValue(array('ROLE_FOO')));
+             ->will($this->returnValue(['ROLE_FOO']));
 
         $provider = $this->getProvider();
 
@@ -78,7 +77,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $authToken);
         $this->assertSame($user, $authToken->getUser());
-        $this->assertEquals(array(new Role('ROLE_FOO')), $authToken->getRoles());
+        $this->assertEquals(['ROLE_FOO'], $authToken->getRoleNames());
         $this->assertEquals('', $authToken->getCredentials());
     }
 
@@ -89,10 +88,10 @@ class RememberMeAuthenticationProviderTest extends TestCase
             $user
                 ->expects($this->any())
                 ->method('getRoles')
-                ->will($this->returnValue(array()));
+                ->will($this->returnValue([]));
         }
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(array('getProviderKey'))->setConstructorArgs(array($user, 'foo', $secret))->getMock();
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['getProviderKey'])->setConstructorArgs([$user, 'foo', $secret])->getMock();
         $token
             ->expects($this->once())
             ->method('getProviderKey')

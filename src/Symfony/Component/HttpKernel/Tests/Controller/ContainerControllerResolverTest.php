@@ -19,10 +19,6 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
-    /**
-     * @group legacy
-     * @expectedDeprecation Referencing controllers with a single colon is deprecated since Symfony 4.1. Use foo::action instead.
-     */
     public function testGetControllerServiceWithSingleColon()
     {
         $service = new ControllerTestService('foo');
@@ -141,12 +137,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(array(ControllerTestService::class => true)))
+            ->will($this->returnValue([ControllerTestService::class => true]))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
         $request = Request::create('/');
-        $request->attributes->set('_controller', array(ControllerTestService::class, 'action'));
+        $request->attributes->set('_controller', [ControllerTestService::class, 'action']);
 
         $resolver->getController($request);
     }
@@ -169,7 +165,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(array('app.my_controller' => true)))
+            ->will($this->returnValue(['app.my_controller' => true]))
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -182,23 +178,23 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     public function getUndefinedControllers()
     {
         $tests = parent::getUndefinedControllers();
-        $tests[0] = array('foo', \InvalidArgumentException::class, 'Controller "foo" does neither exist as service nor as class');
-        $tests[1] = array('oof::bar', \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class');
-        $tests[2] = array(array('oof', 'bar'), \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class');
-        $tests[] = array(
-            array(ControllerTestService::class, 'action'),
+        $tests[0] = ['foo', \InvalidArgumentException::class, 'Controller "foo" does neither exist as service nor as class'];
+        $tests[1] = ['oof::bar', \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class'];
+        $tests[2] = [['oof', 'bar'], \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class'];
+        $tests[] = [
+            [ControllerTestService::class, 'action'],
             \InvalidArgumentException::class,
             'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
-        );
-        $tests[] = array(
+        ];
+        $tests[] = [
             ControllerTestService::class.'::action',
             \InvalidArgumentException::class, 'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
-        );
-        $tests[] = array(
+        ];
+        $tests[] = [
             InvokableControllerService::class,
             \InvalidArgumentException::class,
             'Controller "Symfony\Component\HttpKernel\Tests\Controller\InvokableControllerService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
-        );
+        ];
 
         return $tests;
     }

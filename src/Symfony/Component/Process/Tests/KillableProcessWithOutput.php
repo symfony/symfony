@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-$outputs = array(
+$outputs = [
     'First iteration output',
     'Second iteration output',
     'One more iteration output',
     'This took more time',
-    'This one was sooooo slow',
-);
+];
 
 $iterationTime = 10000;
 

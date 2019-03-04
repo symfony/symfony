@@ -54,12 +54,26 @@ class HttpUtilsTest extends TestCase
         $this->assertTrue($response->isRedirect('http://localhost/blog'));
     }
 
-    public function testCreateRedirectResponseWithBadRequestsDomain()
+    /**
+     * @dataProvider badRequestDomainUrls
+     */
+    public function testCreateRedirectResponseWithBadRequestsDomain($url)
     {
         $utils = new HttpUtils($this->getUrlGenerator(), null, '#^https?://%s$#i');
-        $response = $utils->createRedirectResponse($this->getRequest(), 'http://pirate.net/foo');
+        $response = $utils->createRedirectResponse($this->getRequest(), $url);
 
         $this->assertTrue($response->isRedirect('http://localhost/'));
+    }
+
+    public function badRequestDomainUrls()
+    {
+        return [
+            ['http://pirate.net/foo'],
+            ['http:\\\\pirate.net/foo'],
+            ['http:/\\pirate.net/foo'],
+            ['http:\\/pirate.net/foo'],
+            ['http://////pirate.net/foo'],
+        ];
     }
 
     public function testCreateRedirectResponseWithProtocolRelativeTarget()
@@ -77,7 +91,7 @@ class HttpUtilsTest extends TestCase
         $urlGenerator
             ->expects($this->any())
             ->method('generate')
-            ->with('foobar', array(), UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('foobar', [], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('http://localhost/foo/bar'))
         ;
         $urlGenerator
@@ -159,11 +173,11 @@ class HttpUtilsTest extends TestCase
 
     public function provideSecurityContextAttributes()
     {
-        return array(
-            array(Security::AUTHENTICATION_ERROR),
-            array(Security::ACCESS_DENIED_ERROR),
-            array(Security::LAST_USERNAME),
-        );
+        return [
+            [Security::AUTHENTICATION_ERROR],
+            [Security::ACCESS_DENIED_ERROR],
+            [Security::LAST_USERNAME],
+        ];
     }
 
     public function testCheckRequestPath()
@@ -186,7 +200,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/')
-            ->will($this->throwException(new ResourceNotFoundException()))
+            ->willThrowException(new ResourceNotFoundException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -201,7 +215,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->throwException(new MethodNotAllowedException(array())))
+            ->willThrowException(new MethodNotAllowedException([]))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -215,7 +229,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('match')
             ->with('/foo/bar')
-            ->will($this->returnValue(array('_route' => 'foobar')))
+            ->will($this->returnValue(['_route' => 'foobar']))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -230,7 +244,7 @@ class HttpUtilsTest extends TestCase
             ->expects($this->any())
             ->method('matchRequest')
             ->with($request)
-            ->will($this->returnValue(array('_route' => 'foobar')))
+            ->will($this->returnValue(['_route' => 'foobar']))
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -246,7 +260,7 @@ class HttpUtilsTest extends TestCase
         $urlMatcher
             ->expects($this->any())
             ->method('match')
-            ->will($this->throwException(new \RuntimeException()))
+            ->willThrowException(new \RuntimeException())
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);
@@ -259,7 +273,7 @@ class HttpUtilsTest extends TestCase
         $urlMatcher
             ->expects($this->any())
             ->method('match')
-            ->willReturn(array('_controller' => 'PathController'))
+            ->willReturn(['_controller' => 'PathController'])
         ;
 
         $utils = new HttpUtils(null, $urlMatcher);

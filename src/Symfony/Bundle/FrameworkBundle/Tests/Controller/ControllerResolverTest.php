@@ -88,7 +88,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
 
-        $this->assertSame(array($controller, 'testAction'), $resolver->getController($request));
+        $this->assertSame([$controller, 'testAction'], $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
     }
 
@@ -110,7 +110,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
-        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
         $this->assertSame($container, $controller->setContainer($container));
     }
 
@@ -132,7 +132,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
-        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
     }
 
@@ -152,7 +152,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
 
-        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
         $this->assertSame($controllerContainer, $controller->setContainer($container));
     }
 
@@ -172,7 +172,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
-        $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
+        $this->assertSame([$controller, 'fooAction'], $resolver->getController($request));
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 

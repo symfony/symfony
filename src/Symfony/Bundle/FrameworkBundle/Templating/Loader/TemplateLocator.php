@@ -24,7 +24,7 @@ class TemplateLocator implements FileLocatorInterface
     protected $locator;
     protected $cache;
 
-    private $cacheHits = array();
+    private $cacheHits = [];
 
     /**
      * @param FileLocatorInterface $locator  A FileLocatorInterface instance

@@ -38,16 +38,16 @@ class TraceableVoterTest extends TestCase
         $voter
             ->expects($this->once())
             ->method('vote')
-            ->with($token, 'anysubject', array('attr1'))
+            ->with($token, 'anysubject', ['attr1'])
             ->willReturn(VoterInterface::ACCESS_DENIED);
 
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with('debug.security.authorization.vote', new VoteEvent($voter, 'anysubject', array('attr1'), VoterInterface::ACCESS_DENIED));
+            ->with('debug.security.authorization.vote', new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED));
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
-        $result = $sut->vote($token, 'anysubject', array('attr1'));
+        $result = $sut->vote($token, 'anysubject', ['attr1']);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }

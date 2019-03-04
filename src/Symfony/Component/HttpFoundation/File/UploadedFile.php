@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\Exception\IniSizeFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 use Symfony\Component\HttpFoundation\File\Exception\NoTmpDirFileException;
 use Symfony\Component\HttpFoundation\File\Exception\PartialFileException;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * A file uploaded through a form.
@@ -140,10 +140,7 @@ class UploadedFile extends File
      */
     public function guessClientExtension()
     {
-        $type = $this->getClientMimeType();
-        $guesser = ExtensionGuesser::getInstance();
-
-        return $guesser->guess($type);
+        return MimeTypes::getDefault()->getExtensions($this->getClientMimeType())[0] ?? null;
     }
 
     /**
@@ -281,7 +278,7 @@ class UploadedFile extends File
      */
     public function getErrorMessage()
     {
-        static $errors = array(
+        static $errors = [
             UPLOAD_ERR_INI_SIZE => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',
             UPLOAD_ERR_FORM_SIZE => 'The file "%s" exceeds the upload limit defined in your form.',
             UPLOAD_ERR_PARTIAL => 'The file "%s" was only partially uploaded.',
@@ -289,7 +286,7 @@ class UploadedFile extends File
             UPLOAD_ERR_CANT_WRITE => 'The file "%s" could not be written on disk.',
             UPLOAD_ERR_NO_TMP_DIR => 'File could not be uploaded: missing temporary directory.',
             UPLOAD_ERR_EXTENSION => 'File upload was stopped by a PHP extension.',
-        );
+        ];
 
         $errorCode = $this->error;
         $maxFilesize = UPLOAD_ERR_INI_SIZE === $errorCode ? self::getMaxFilesize() / 1024 : 0;

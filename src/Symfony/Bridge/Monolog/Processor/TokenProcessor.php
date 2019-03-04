@@ -31,11 +31,17 @@ class TokenProcessor
     {
         $records['extra']['token'] = null;
         if (null !== $token = $this->tokenStorage->getToken()) {
-            $records['extra']['token'] = array(
+            if (method_exists($token, 'getRoleNames')) {
+                $roles = $token->getRoleNames();
+            } else {
+                $roles = array_map(function ($role) { return $role->getRole(); }, $token->getRoles(false));
+            }
+
+            $records['extra']['token'] = [
                 'username' => $token->getUsername(),
                 'authenticated' => $token->isAuthenticated(),
-                'roles' => array_map(function ($role) { return $role->getRole(); }, $token->getRoles()),
-            );
+                'roles' => $roles,
+            ];
         }
 
         return $records;

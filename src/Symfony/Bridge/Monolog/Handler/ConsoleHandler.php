@@ -43,13 +43,14 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
     private $output;
-    private $verbosityLevelMap = array(
+    private $verbosityLevelMap = [
         OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
         OutputInterface::VERBOSITY_NORMAL => Logger::WARNING,
         OutputInterface::VERBOSITY_VERBOSE => Logger::NOTICE,
         OutputInterface::VERBOSITY_VERY_VERBOSE => Logger::INFO,
         OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
-    );
+    ];
+    private $consoleFormaterOptions;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -58,7 +59,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * @param array                $verbosityLevelMap Array that maps the OutputInterface verbosity to a minimum logging
      *                                                level (leave empty to use the default mapping)
      */
-    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = array())
+    public function __construct(OutputInterface $output = null, bool $bubble = true, array $verbosityLevelMap = [], array $consoleFormaterOptions = [])
     {
         parent::__construct(Logger::DEBUG, $bubble);
         $this->output = $output;
@@ -66,6 +67,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
         if ($verbosityLevelMap) {
             $this->verbosityLevelMap = $verbosityLevelMap;
         }
+
+        $this->consoleFormaterOptions = $consoleFormaterOptions;
     }
 
     /**
@@ -131,10 +134,10 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ConsoleEvents::COMMAND => array('onCommand', 255),
-            ConsoleEvents::TERMINATE => array('onTerminate', -255),
-        );
+        return [
+            ConsoleEvents::COMMAND => ['onCommand', 255],
+            ConsoleEvents::TERMINATE => ['onTerminate', -255],
+        ];
     }
 
     /**
@@ -155,13 +158,13 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
             return new LineFormatter();
         }
         if (!$this->output) {
-            return new ConsoleFormatter();
+            return new ConsoleFormatter($this->consoleFormaterOptions);
         }
 
-        return new ConsoleFormatter(array(
+        return new ConsoleFormatter(array_replace([
             'colors' => $this->output->isDecorated(),
             'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
-        ));
+        ], $this->consoleFormaterOptions));
     }
 
     /**

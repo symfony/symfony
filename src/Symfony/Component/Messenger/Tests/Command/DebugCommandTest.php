@@ -39,20 +39,20 @@ class DebugCommandTest extends TestCase
     public function testOutput()
     {
         $command = new DebugCommand(
-            array(
-                'command_bus' => array(
-                    DummyCommand::class => array(DummyCommandHandler::class),
-                    MultipleBusesMessage::class => array(MultipleBusesMessageHandler::class),
-                ),
-                'query_bus' => array(
-                    DummyQuery::class => array(DummyQueryHandler::class),
-                    MultipleBusesMessage::class => array(MultipleBusesMessageHandler::class),
-                ),
-            )
+            [
+                'command_bus' => [
+                    DummyCommand::class => [DummyCommandHandler::class],
+                    MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+                ],
+                'query_bus' => [
+                    DummyQuery::class => [DummyQueryHandler::class],
+                    MultipleBusesMessage::class => [MultipleBusesMessageHandler::class],
+                ],
+            ]
         );
 
         $tester = new CommandTester($command);
-        $tester->execute(array(), array('decorated' => false));
+        $tester->execute([], ['decorated' => false]);
 
         $this->assertSame(<<<TXT
 
@@ -88,7 +88,7 @@ TXT
             , $tester->getDisplay(true)
         );
 
-        $tester->execute(array('bus' => 'query_bus'), array('decorated' => false));
+        $tester->execute(['bus' => 'query_bus'], ['decorated' => false]);
 
         $this->assertSame(<<<TXT
 
@@ -115,10 +115,10 @@ TXT
 
     public function testOutputWithoutMessages()
     {
-        $command = new DebugCommand(array('command_bus' => array(), 'query_bus' => array()));
+        $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 
         $tester = new CommandTester($command);
-        $tester->execute(array(), array('decorated' => false));
+        $tester->execute([], ['decorated' => false]);
 
         $this->assertSame(<<<TXT
 
@@ -147,9 +147,9 @@ TXT
      */
     public function testExceptionOnUnknownBusArgument()
     {
-        $command = new DebugCommand(array('command_bus' => array(), 'query_bus' => array()));
+        $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 
         $tester = new CommandTester($command);
-        $tester->execute(array('bus' => 'unknown_bus'), array('decorated' => false));
+        $tester->execute(['bus' => 'unknown_bus'], ['decorated' => false]);
     }
 }

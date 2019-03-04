@@ -15,6 +15,8 @@ use Fig\Link\Link;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -60,7 +62,7 @@ abstract class ControllerTraitTest extends TestCase
     public function testGetUser()
     {
         $user = new User('user', 'pass');
-        $token = new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'));
+        $token = new UsernamePasswordToken($user, 'pass', 'default', ['ROLE_USER']);
 
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage($token));
@@ -122,7 +124,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer(new Container());
 
-        $response = $controller->json(array());
+        $response = $controller->json([]);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
@@ -135,7 +137,7 @@ abstract class ControllerTraitTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with(array(), 'json', array('json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS))
+            ->with([], 'json', ['json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS])
             ->will($this->returnValue('[]'));
 
         $container->set('serializer', $serializer);
@@ -143,7 +145,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->json(array());
+        $response = $controller->json([]);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
     }
@@ -156,7 +158,7 @@ abstract class ControllerTraitTest extends TestCase
         $serializer
             ->expects($this->once())
             ->method('serialize')
-            ->with(array(), 'json', array('json_encode_options' => 0, 'other' => 'context'))
+            ->with([], 'json', ['json_encode_options' => 0, 'other' => 'context'])
             ->will($this->returnValue('[]'));
 
         $container->set('serializer', $serializer);
@@ -164,7 +166,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller = $this->createController();
         $controller->setContainer($container);
 
-        $response = $controller->json(array(), 200, array(), array('json_encode_options' => 0, 'other' => 'context'));
+        $response = $controller->json([], 200, [], ['json_encode_options' => 0, 'other' => 'context']);
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals('[]', $response->getContent());
         $response->setEncodingOptions(JSON_FORCE_OBJECT);
@@ -389,7 +391,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller->setContainer($container);
         $controller->addFlash('foo', 'bar');
 
-        $this->assertSame(array('bar'), $flashBag->get('foo'));
+        $this->assertSame(['bar'], $flashBag->get('foo'));
     }
 
     public function testCreateAccessDeniedException()
@@ -487,7 +489,7 @@ abstract class ControllerTraitTest extends TestCase
 
     public function testCreateForm()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
+        $form = new Form($this->getMockBuilder(FormConfigInterface::class)->getMock());
 
         $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $formFactory->expects($this->once())->method('create')->willReturn($form);

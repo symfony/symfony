@@ -82,12 +82,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var array
      */
-    private $viewTransformers = array();
+    private $viewTransformers = [];
 
     /**
      * @var array
      */
-    private $modelTransformers = array();
+    private $modelTransformers = [];
 
     /**
      * @var DataMapperInterface
@@ -117,7 +117,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var array
      */
-    private $attributes = array();
+    private $attributes = [];
 
     /**
      * @var mixed
@@ -175,7 +175,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
+    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = [])
     {
         self::validateName($name);
 
@@ -244,7 +244,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->viewTransformers = array();
+        $this->viewTransformers = [];
 
         return $this;
     }
@@ -276,7 +276,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->modelTransformers = array();
+        $this->modelTransformers = [];
 
         return $this;
     }
@@ -418,7 +418,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasAttribute($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -426,7 +426,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
+        return \array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -513,7 +513,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasOption($name)
     {
-        return array_key_exists($name, $this->options);
+        return \array_key_exists($name, $this->options);
     }
 
     /**
@@ -521,7 +521,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getOption($name, $default = null)
     {
-        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
+        return \array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     /**

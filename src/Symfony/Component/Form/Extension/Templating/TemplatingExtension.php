@@ -24,10 +24,10 @@ use Symfony\Component\Templating\PhpEngine;
  */
 class TemplatingExtension extends AbstractExtension
 {
-    public function __construct(PhpEngine $engine, CsrfTokenManagerInterface $csrfTokenManager = null, array $defaultThemes = array())
+    public function __construct(PhpEngine $engine, CsrfTokenManagerInterface $csrfTokenManager = null, array $defaultThemes = [])
     {
-        $engine->addHelpers(array(
+        $engine->addHelpers([
             new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfTokenManager)),
-        ));
+        ]);
     }
 }

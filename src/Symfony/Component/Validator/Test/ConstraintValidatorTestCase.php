@@ -176,7 +176,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->will($this->returnValue($validator));
         $validator->expects($this->at(2 * $i + 1))
             ->method('validate')
-            ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
+            ->with($value, $this->logicalOr(null, [], $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
     protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
@@ -225,7 +225,7 @@ class ConstraintViolationAssertion
     private $assertions;
 
     private $message;
-    private $parameters = array();
+    private $parameters = [];
     private $invalidValue = 'InvalidValue';
     private $propertyPath = 'property.path';
     private $plural;
@@ -233,7 +233,7 @@ class ConstraintViolationAssertion
     private $constraint;
     private $cause;
 
-    public function __construct(ExecutionContextInterface $context, $message, Constraint $constraint = null, array $assertions = array())
+    public function __construct(ExecutionContextInterface $context, $message, Constraint $constraint = null, array $assertions = [])
     {
         $this->context = $context;
         $this->message = $message;
@@ -307,7 +307,7 @@ class ConstraintViolationAssertion
 
     public function assertRaised()
     {
-        $expected = array();
+        $expected = [];
         foreach ($this->assertions as $assertion) {
             $expected[] = $assertion->getViolation();
         }

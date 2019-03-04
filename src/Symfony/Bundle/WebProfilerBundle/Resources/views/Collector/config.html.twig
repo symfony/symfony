@@ -64,9 +64,9 @@
 
             <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
                 <b>PHP Extensions</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'red' }}">xdebug</span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'red' }}">APCu</span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasxdebug ? 'green' : 'gray' }}">xdebug {{ collector.hasxdebug ? '✓' : '✗' }}</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'gray' }}">APCu {{ collector.hasapcu ? '✓' : '✗' }}</span>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache {{ collector.haszendopcache ? '✓' : '✗' }}</span>
             </div>
 
             <div class="sf-toolbar-info-piece">
@@ -88,7 +88,7 @@
                 <div class="sf-toolbar-info-piece">
                     <b>Help</b>
                     <span>
-                        <a href="http://symfony.com/support">
+                        <a href="https://symfony.com/support">
                             Symfony Support Channels
                         </a>
                     </span>
@@ -187,12 +187,12 @@
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no-gray') ~ '.svg') }}</span>
             <span class="label">APCu</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no-gray') ~ '.svg') }}</span>
             <span class="label">Xdebug</span>
         </div>
     </div>

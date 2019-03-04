@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -68,6 +68,11 @@
         <service id="form.type.choice" class="Symfony\Component\Form\Extension\Core\Type\ChoiceType">
             <tag name="form.type" />
             <argument type="service" id="form.choice_list_factory"/>
+        </service>
+
+        <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <argument type="service" id="translator" on-invalid="ignore" />
         </service>
 
         <!-- FormTypeHttpFoundationExtension -->

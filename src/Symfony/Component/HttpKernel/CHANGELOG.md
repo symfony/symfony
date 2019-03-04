@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * `KernelInterface` doesn't extend `Serializable` anymore
+ * deprecated the `Kernel::serialize()` and `unserialize()` methods
+ * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
+ * made `Symfony\Component\HttpKernel\EventListenerLocaleListener` set the default locale early
+ * made `FileLinkFormatter` final and not implement `Serializable` anymore
+ * the base `DataCollector` doesn't implement `Serializable` anymore, you should
+   store all the serialized state in the data property instead
+ * `DumpDataCollector` has been marked as `final`
+
 4.2.0
 -----
 
@@ -15,7 +27,7 @@ CHANGELOG
 
  * added orphaned events support to `EventDataCollector`
  * `ExceptionListener` now logs exceptions at priority `0` (previously logged at `-128`)
- * Deprecated `service:action` syntax with a single colon to reference controllers. Use `service::method` instead.
+ * Added support for using `service::method` to reference controllers, making it consistent with other cases. It is recommended over the `service:action` syntax with a single colon, which will be deprecated in the future.
  * Added the ability to profile individual argument value resolvers via the
    `Symfony\Component\HttpKernel\Controller\ArgumentResolver\TraceableValueResolver`
 

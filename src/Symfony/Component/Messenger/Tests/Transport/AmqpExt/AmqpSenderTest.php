@@ -26,13 +26,31 @@ class AmqpSenderTest extends TestCase
     public function testItSendsTheEncodedMessage()
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
-        $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers']);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     */
+    public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('publish')->with($encoded['body'], $encoded['headers'])->willThrowException(new \AMQPException());
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);

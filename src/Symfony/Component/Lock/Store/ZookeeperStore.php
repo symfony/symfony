@@ -106,7 +106,7 @@ class ZookeeperStore implements StoreInterface
     private function createNewLock(string $node, string $value)
     {
         // Default Node Permissions
-        $acl = array(array('perms' => \Zookeeper::PERM_ALL, 'scheme' => 'world', 'id' => 'anyone'));
+        $acl = [['perms' => \Zookeeper::PERM_ALL, 'scheme' => 'world', 'id' => 'anyone']];
         // This ensures that the nodes are deleted when the client session to zookeeper server ends.
         $type = \Zookeeper::EPHEMERAL;
 
@@ -128,7 +128,7 @@ class ZookeeperStore implements StoreInterface
         $resource = (string) $key;
 
         if (false !== \strpos($resource, '/')) {
-            $resource = \strtr($resource, array('/' => '-')).'-'.sha1($resource);
+            $resource = \strtr($resource, ['/' => '-']).'-'.sha1($resource);
         }
 
         if ('' === $resource) {

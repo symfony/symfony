@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\Role;
@@ -19,6 +20,7 @@ use Symfony\Component\Security\Core\Role\Role;
 class RoleVoterTest extends TestCase
 {
     /**
+     * @group legacy
      * @dataProvider getVoteTests
      */
     public function testVote($roles, $attributes, $expected)
@@ -28,22 +30,49 @@ class RoleVoterTest extends TestCase
         $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
     }
 
+    /**
+     * @dataProvider getVoteTests
+     */
+    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    {
+        $voter = new RoleVoter();
+
+        $this->assertSame($expected, $voter->vote($this->getTokenWithRoleNames($roles), null, $attributes));
+    }
+
     public function getVoteTests()
     {
-        return array(
-            array(array(), array(), VoterInterface::ACCESS_ABSTAIN),
-            array(array(), array('FOO'), VoterInterface::ACCESS_ABSTAIN),
-            array(array(), array('ROLE_FOO'), VoterInterface::ACCESS_DENIED),
-            array(array('ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
-            array(array('ROLE_FOO'), array('FOO', 'ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
-            array(array('ROLE_BAR', 'ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
+        return [
+            [[], [], VoterInterface::ACCESS_ABSTAIN],
+            [[], ['FOO'], VoterInterface::ACCESS_ABSTAIN],
+            [[], ['ROLE_FOO'], VoterInterface::ACCESS_DENIED],
+            [['ROLE_FOO'], ['ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_FOO'], ['FOO', 'ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_BAR', 'ROLE_FOO'], ['ROLE_FOO'], VoterInterface::ACCESS_GRANTED],
 
             // Test mixed Types
-            array(array(), array(array()), VoterInterface::ACCESS_ABSTAIN),
-            array(array(), array(new \stdClass()), VoterInterface::ACCESS_ABSTAIN),
-            array(array('ROLE_BAR'), array(new Role('ROLE_BAR')), VoterInterface::ACCESS_GRANTED),
-            array(array('ROLE_BAR'), array(new Role('ROLE_FOO')), VoterInterface::ACCESS_DENIED),
-        );
+            [[], [[]], VoterInterface::ACCESS_ABSTAIN],
+            [[], [new \stdClass()], VoterInterface::ACCESS_ABSTAIN],
+        ];
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getLegacyVoteOnRoleObjectsTests
+     */
+    public function testVoteOnRoleObjects($roles, $attributes, $expected)
+    {
+        $voter = new RoleVoter();
+
+        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+    }
+
+    public function getLegacyVoteOnRoleObjectsTests()
+    {
+        return [
+            [['ROLE_BAR'], [new Role('ROLE_BAR')], VoterInterface::ACCESS_GRANTED],
+            [['ROLE_BAR'], [new Role('ROLE_FOO')], VoterInterface::ACCESS_DENIED],
+        ];
     }
 
     protected function getToken(array $roles)
@@ -54,6 +83,16 @@ class RoleVoterTest extends TestCase
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->once())
               ->method('getRoles')
+              ->will($this->returnValue($roles));
+
+        return $token;
+    }
+
+    protected function getTokenWithRoleNames(array $roles)
+    {
+        $token = $this->getMockBuilder(AbstractToken::class)->getMock();
+        $token->expects($this->once())
+              ->method('getRoleNames')
               ->will($this->returnValue($roles));
 
         return $token;

@@ -70,7 +70,7 @@ class ChoiceType extends AbstractType
 
             // Check if the choices already contain the empty value
             // Only add the placeholder option if this is not the case
-            if (null !== $options['placeholder'] && 0 === \count($choiceList->getChoicesForValues(array('')))) {
+            if (null !== $options['placeholder'] && 0 === \count($choiceList->getChoicesForValues(['']))) {
                 $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved name
@@ -108,7 +108,7 @@ class ChoiceType extends AbstractType
                 $unknownValues = $valueMap;
 
                 // Reconstruct the data as mapping from child names to values
-                $data = array();
+                $data = [];
 
                 /** @var FormInterface $child */
                 foreach ($form as $child) {
@@ -184,7 +184,7 @@ class ChoiceType extends AbstractType
             ? $form->getConfig()->getAttribute('choice_list_view')
             : $this->createChoiceListView($choiceList, $options);
 
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'multiple' => $options['multiple'],
             'expanded' => $options['expanded'],
             'preferred_choices' => $choiceListView->preferredChoices,
@@ -192,7 +192,7 @@ class ChoiceType extends AbstractType
             'separator' => '-------------------',
             'placeholder' => null,
             'choice_translation_domain' => $choiceTranslationDomain,
-        ));
+        ]);
 
         // The decision, whether a choice is selected, is potentially done
         // thousand of times during the rendering of a template. Provide a
@@ -255,7 +255,7 @@ class ChoiceType extends AbstractType
             }
 
             if ($options['multiple']) {
-                return array();
+                return [];
             }
 
             return '';
@@ -296,16 +296,16 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'multiple' => false,
             'expanded' => false,
-            'choices' => array(),
+            'choices' => [],
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => null,
-            'preferred_choices' => array(),
+            'preferred_choices' => [],
             'group_by' => null,
             'empty_data' => $emptyData,
             'placeholder' => $placeholderDefault,
@@ -317,20 +317,20 @@ class ChoiceType extends AbstractType
             'data_class' => null,
             'choice_translation_domain' => true,
             'trim' => false,
-        ));
+        ]);
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
-        $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
-        $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
-        $resolver->setAllowedTypes('choice_loader', array('null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface'));
-        $resolver->setAllowedTypes('choice_label', array('null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-        $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-        $resolver->setAllowedTypes('choice_value', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-        $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-        $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
-        $resolver->setAllowedTypes('group_by', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
+        $resolver->setAllowedTypes('choices', ['null', 'array', '\Traversable']);
+        $resolver->setAllowedTypes('choice_translation_domain', ['null', 'bool', 'string']);
+        $resolver->setAllowedTypes('choice_loader', ['null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface']);
+        $resolver->setAllowedTypes('choice_label', ['null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('choice_name', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('choice_value', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('choice_attr', ['null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('preferred_choices', ['array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
+        $resolver->setAllowedTypes('group_by', ['null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath']);
     }
 
     /**
@@ -367,18 +367,18 @@ class ChoiceType extends AbstractType
      */
     private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options)
     {
-        $choiceOpts = array(
+        $choiceOpts = [
             'value' => $choiceView->value,
             'label' => $choiceView->label,
             'attr' => $choiceView->attr,
             'translation_domain' => $options['translation_domain'],
             'block_name' => 'entry',
-        );
+        ];
 
         if ($options['multiple']) {
             $choiceType = __NAMESPACE__.'\CheckboxType';
             // The user can check 0 or more checkboxes. If required
-            // is true, he is required to check all of them.
+            // is true, they are required to check all of them.
             $choiceOpts['required'] = false;
         } else {
             $choiceType = __NAMESPACE__.'\RadioType';
@@ -397,7 +397,7 @@ class ChoiceType extends AbstractType
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
-        $choices = null !== $options['choices'] ? $options['choices'] : array();
+        $choices = null !== $options['choices'] ? $options['choices'] : [];
 
         return $this->choiceListFactory->createListFromChoices($choices, $options['choice_value']);
     }

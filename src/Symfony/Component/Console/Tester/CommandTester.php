@@ -48,7 +48,7 @@ class CommandTester
      *
      * @return int The command exit code
      */
-    public function execute(array $input, array $options = array())
+    public function execute(array $input, array $options = [])
     {
         // set the command name automatically if the application requires
         // this argument and no command name was passed
@@ -56,13 +56,12 @@ class CommandTester
             && (null !== $application = $this->command->getApplication())
             && $application->getDefinition()->hasArgument('command')
         ) {
-            $input = array_merge(array('command' => $this->command->getName()), $input);
+            $input = array_merge(['command' => $this->command->getName()], $input);
         }
 
         $this->input = new ArrayInput($input);
-        if ($this->inputs) {
-            $this->input->setStream(self::createStream($this->inputs));
-        }
+        // Use an in-memory input stream even if no inputs are set so that QuestionHelper::ask() does not rely on the blocking STDIN.
+        $this->input->setStream(self::createStream($this->inputs));
 
         if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);

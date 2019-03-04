@@ -34,20 +34,20 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidValues()
     {
-        return array(
-            array('foobar'),
-            array(0),
-            array(0.0),
-            array('0'),
-            array(1234),
-        );
+        return [
+            ['foobar'],
+            [0],
+            [0.0],
+            ['0'],
+            [1234],
+        ];
     }
 
     public function testNullIsInvalid()
     {
-        $constraint = new NotBlank(array(
+        $constraint = new NotBlank([
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate(null, $constraint);
 
@@ -59,9 +59,9 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testBlankIsInvalid()
     {
-        $constraint = new NotBlank(array(
+        $constraint = new NotBlank([
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate('', $constraint);
 
@@ -73,9 +73,9 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testFalseIsInvalid()
     {
-        $constraint = new NotBlank(array(
+        $constraint = new NotBlank([
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate(false, $constraint);
 
@@ -87,14 +87,40 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
 
     public function testEmptyArrayIsInvalid()
     {
-        $constraint = new NotBlank(array(
+        $constraint = new NotBlank([
             'message' => 'myMessage',
-        ));
+        ]);
 
-        $this->validator->validate(array(), $constraint);
+        $this->validator->validate([], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
+            ->assertRaised();
+    }
+
+    public function testAllowNullTrue()
+    {
+        $constraint = new NotBlank([
+            'message' => 'myMessage',
+            'allowNull' => true,
+        ]);
+
+        $this->validator->validate(null, $constraint);
+        $this->assertNoViolation();
+    }
+
+    public function testAllowNullFalse()
+    {
+        $constraint = new NotBlank([
+            'message' => 'myMessage',
+            'allowNull' => false,
+        ]);
+
+        $this->validator->validate(null, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'null')
             ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }

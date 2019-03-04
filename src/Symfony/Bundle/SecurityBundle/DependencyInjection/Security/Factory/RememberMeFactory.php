@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class RememberMeFactory implements SecurityFactoryInterface
 {
-    protected $options = array(
+    protected $options = [
         'name' => 'REMEMBERME',
         'lifetime' => 31536000,
         'path' => '/',
@@ -29,7 +29,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         'samesite' => null,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
-    );
+    ];
 
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
@@ -54,7 +54,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container
                 ->getDefinition('security.logout_listener.'.$id)
-                ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)))
+                ->addMethodCall('addHandler', [new Reference($rememberMeServicesId)])
             ;
         }
 
@@ -63,16 +63,16 @@ class RememberMeFactory implements SecurityFactoryInterface
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
-            $rememberMeServices->addMethodCall('setTokenProvider', array(
+            $rememberMeServices->addMethodCall('setTokenProvider', [
                 new Reference($config['token_provider']),
-            ));
+            ]);
         }
 
         // remember-me options
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
 
         // attach to remember-me aware listeners
-        $userProviders = array();
+        $userProviders = [];
         foreach ($container->findTaggedServiceIds('security.remember_me_aware') as $serviceId => $attributes) {
             foreach ($attributes as $attribute) {
                 if (!isset($attribute['id']) || $attribute['id'] !== $id) {
@@ -86,12 +86,12 @@ class RememberMeFactory implements SecurityFactoryInterface
                 $userProviders[] = new Reference($attribute['provider']);
                 $container
                     ->getDefinition($serviceId)
-                    ->addMethodCall('setRememberMeServices', array(new Reference($rememberMeServicesId)))
+                    ->addMethodCall('setRememberMeServices', [new Reference($rememberMeServicesId)])
                 ;
             }
         }
         if ($config['user_providers']) {
-            $userProviders = array();
+            $userProviders = [];
             foreach ($config['user_providers'] as $providerName) {
                 $userProviders[] = new Reference('security.user.provider.concrete.'.$providerName);
             }
@@ -108,7 +108,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
         $listener->replaceArgument(5, $config['catch_exceptions']);
 
-        return array($authProviderId, $listenerId, $defaultEntryPoint);
+        return [$authProviderId, $listenerId, $defaultEntryPoint];
     }
 
     public function getPosition()
@@ -133,7 +133,7 @@ class RememberMeFactory implements SecurityFactoryInterface
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()
-                    ->ifString()->then(function ($v) { return array($v); })
+                    ->ifString()->then(function ($v) { return [$v]; })
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
@@ -142,9 +142,9 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values(array(true, false, 'auto'))->defaultValue('auto' === $value ? null : $value);
+                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue('auto' === $value ? null : $value);
             } elseif ('samesite' === $name) {
-                $builder->enumNode($name)->values(array(null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT))->defaultValue($value);
+                $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT])->defaultValue($value);
             } elseif (\is_bool($value)) {
                 $builder->booleanNode($name)->defaultValue($value);
             } else {

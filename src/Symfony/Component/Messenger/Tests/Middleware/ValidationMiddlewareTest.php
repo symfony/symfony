@@ -40,7 +40,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
     public function testValidateWithStampAndNextMiddleware()
     {
         $message = new DummyMessage('Hey');
-        $envelope = (new Envelope($message))->with(new ValidationStamp($groups = array('Default', 'Extra')));
+        $envelope = (new Envelope($message))->with(new ValidationStamp($groups = ['Default', 'Extra']));
         $validator = $this->createMock(ValidatorInterface::class);
         $validator
             ->expects($this->once())

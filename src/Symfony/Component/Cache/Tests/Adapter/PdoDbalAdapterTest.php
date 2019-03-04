@@ -32,7 +32,7 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');
 
-        $pool = new PdoAdapter(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)));
+        $pool = new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]));
     }
 
     public static function tearDownAfterClass()
@@ -42,6 +42,6 @@ class PdoDbalAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        return new PdoAdapter(DriverManager::getConnection(array('driver' => 'pdo_sqlite', 'path' => self::$dbFile)), '', $defaultLifetime);
+        return new PdoAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile]), '', $defaultLifetime);
     }
 }

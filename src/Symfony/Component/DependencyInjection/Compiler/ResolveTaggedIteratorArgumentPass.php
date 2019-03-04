@@ -31,7 +31,7 @@ class ResolveTaggedIteratorArgumentPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        $value->setValues($this->findAndSortTaggedServices($value->getTag(), $this->container));
+        $value->setValues($this->findAndSortTaggedServices($value, $this->container));
 
         return $value;
     }

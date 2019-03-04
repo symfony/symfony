@@ -234,6 +234,8 @@
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="tag" type="xsd:string" />
+    <xsd:attribute name="index-by" type="xsd:string" />
+    <xsd:attribute name="default-index-method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">

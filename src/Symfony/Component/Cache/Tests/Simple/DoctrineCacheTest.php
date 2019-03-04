@@ -16,13 +16,14 @@ use Symfony\Component\Cache\Tests\Fixtures\ArrayCache;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class DoctrineCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testObjectDoesNotChangeInCache' => 'ArrayCache does not use serialize/unserialize',
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
-    );
+    ];
 
     public function createSimpleCache($defaultLifetime = 0)
     {

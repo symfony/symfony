@@ -17,17 +17,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
 
     public function __construct()
     {
-        $this->services = $this->privates = array();
-        $this->methodMap = array(
+        $this->services = $this->privates = [];
+        $this->methodMap = [
             'App\\Bus' => 'getBusService',
             'App\\Db' => 'getDbService',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -42,7 +42,7 @@ class ProjectServiceContainer extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             'App\\Handler1' => true,
             'App\\Handler2' => true,
             'App\\Processor' => true,
@@ -50,7 +50,7 @@ class ProjectServiceContainer extends Container
             'App\\Schema' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-        );
+        ];
     }
 
     /**
@@ -66,7 +66,7 @@ class ProjectServiceContainer extends Container
 
         $b = ($this->privates['App\Schema'] ?? $this->getSchemaService());
         $c = new \App\Registry();
-        $c->processor = array(0 => $a, 1 => $instance);
+        $c->processor = [0 => $a, 1 => $instance];
 
         $d = new \App\Processor($c, $a);
 

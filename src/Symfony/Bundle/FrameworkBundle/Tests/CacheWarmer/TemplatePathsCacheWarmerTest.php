@@ -39,13 +39,13 @@ class TemplatePathsCacheWarmerTest extends TestCase
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
-            ->setMethods(array('findAllTemplates'))
+            ->setMethods(['findAllTemplates'])
             ->getMock();
 
         $this->fileLocator = $this
             ->getMockBuilder(FileLocator::class)
-            ->setMethods(array('locate'))
-            ->setConstructorArgs(array('/path/to/fallback'))
+            ->setMethods(['locate'])
+            ->setConstructorArgs(['/path/to/fallback'])
             ->getMock();
 
         $this->templateLocator = new TemplateLocator($this->fileLocator);
@@ -68,7 +68,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->templateFinder
             ->expects($this->once())
             ->method('findAllTemplates')
-            ->will($this->returnValue(array($template)));
+            ->will($this->returnValue([$template]));
 
         $this->fileLocator
             ->expects($this->once())
@@ -87,7 +87,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->templateFinder
             ->expects($this->once())
             ->method('findAllTemplates')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue([]));
 
         $this->fileLocator
             ->expects($this->never())

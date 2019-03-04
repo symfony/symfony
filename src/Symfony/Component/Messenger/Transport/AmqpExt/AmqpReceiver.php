@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
@@ -32,7 +33,7 @@ class AmqpReceiver implements ReceiverInterface
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
-        $this->serializer = $serializer ?? Serializer::create();
+        $this->serializer = $serializer ?? new PhpSerializer();
     }
 
     /**
@@ -54,18 +55,28 @@ class AmqpReceiver implements ReceiverInterface
             }
 
             try {
-                $handler($this->serializer->decode(array(
+                $handler($this->serializer->decode([
                     'body' => $AMQPEnvelope->getBody(),
                     'headers' => $AMQPEnvelope->getHeaders(),
-                )));
+                ]));
 
                 $this->connection->ack($AMQPEnvelope);
             } catch (RejectMessageExceptionInterface $e) {
-                $this->connection->reject($AMQPEnvelope);
+                try {
+                    $this->connection->reject($AMQPEnvelope);
+                } catch (\AMQPException $exception) {
+                    throw new TransportException($exception->getMessage(), 0, $exception);
+                }
 
                 throw $e;
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
             } catch (\Throwable $e) {
-                $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
+                try {
+                    $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
+                } catch (\AMQPException $exception) {
+                    throw new TransportException($exception->getMessage(), 0, $exception);
+                }
 
                 throw $e;
             } finally {

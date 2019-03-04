@@ -31,10 +31,10 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
     public function __construct(RequestStack $requestStack, array $exclusions, $actionLevel)
     {
         foreach ($exclusions as $exclusion) {
-            if (!array_key_exists('code', $exclusion)) {
+            if (!\array_key_exists('code', $exclusion)) {
                 throw new \LogicException(sprintf('An exclusion must have a "code" key'));
             }
-            if (!array_key_exists('urls', $exclusion)) {
+            if (!\array_key_exists('urls', $exclusion)) {
                 throw new \LogicException(sprintf('An exclusion must have a "urls" key'));
             }
         }
@@ -60,7 +60,6 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
                     continue;
                 }
 
-                $urlBlacklist = null;
                 if (\count($exclusion['urls'])) {
                     return !preg_match('{('.implode('|', $exclusion['urls']).')}i', $request->getPathInfo());
                 }

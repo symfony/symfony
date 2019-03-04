@@ -23,6 +23,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 abstract class KernelTestCase extends TestCase
 {
+    use KernelShutdownOnTearDownTrait;
+
     protected static $class;
 
     /**
@@ -59,7 +61,7 @@ abstract class KernelTestCase extends TestCase
      *
      * @return KernelInterface A KernelInterface instance
      */
-    protected static function bootKernel(array $options = array())
+    protected static function bootKernel(array $options = [])
     {
         static::ensureKernelShutdown();
 
@@ -82,7 +84,7 @@ abstract class KernelTestCase extends TestCase
      *
      * @return KernelInterface A KernelInterface instance
      */
-    protected static function createKernel(array $options = array())
+    protected static function createKernel(array $options = [])
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();
@@ -112,7 +114,7 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * Shuts the kernel down if it was used in the test.
+     * Shuts the kernel down if it was used in the test - called by the tearDown method by default.
      */
     protected static function ensureKernelShutdown()
     {
@@ -124,13 +126,5 @@ abstract class KernelTestCase extends TestCase
             }
         }
         static::$container = null;
-    }
-
-    /**
-     * Clean up Kernel usage in this test.
-     */
-    protected function tearDown()
-    {
-        static::ensureKernelShutdown();
     }
 }

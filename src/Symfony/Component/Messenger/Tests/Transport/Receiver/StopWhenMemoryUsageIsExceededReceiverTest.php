@@ -30,7 +30,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -51,9 +51,9 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
 
     public function memoryProvider()
     {
-        yield array(2048, 1024, true);
-        yield array(1024, 1024, false);
-        yield array(1024, 2048, false);
+        yield [2048, 1024, true];
+        yield [1024, 1024, false];
+        yield [1024, 2048, false];
     }
 
     public function testReceiverLogsMemoryExceededWhenLoggerIsGiven()
@@ -63,7 +63,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
         };
 
         $decoratedReceiver = $this->getMockBuilder(CallbackReceiver::class)
-            ->setConstructorArgs(array($callable))
+            ->setConstructorArgs([$callable])
             ->enableProxyingToOriginalMethods()
             ->getMock();
 
@@ -72,7 +72,7 @@ class StopWhenMemoryUsageIsExceededReceiverTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')
-            ->with('Receiver stopped due to memory limit of {limit} exceeded', array('limit' => 64 * 1024 * 1024));
+            ->with('Receiver stopped due to memory limit of {limit} exceeded', ['limit' => 64 * 1024 * 1024]);
 
         $memoryResolver = function () {
             return 70 * 1024 * 1024;

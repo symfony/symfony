@@ -22,7 +22,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
      * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
-    private $mappingForMappedObjectCache = array();
+    private $mappingForMappedObjectCache = [];
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)
     {
@@ -55,7 +55,7 @@ class ClassDiscriminatorFromClassMetadata implements ClassDiscriminatorResolverI
         }
 
         $cacheKey = \is_object($object) ? \get_class($object) : $object;
-        if (!array_key_exists($cacheKey, $this->mappingForMappedObjectCache)) {
+        if (!\array_key_exists($cacheKey, $this->mappingForMappedObjectCache)) {
             $this->mappingForMappedObjectCache[$cacheKey] = $this->resolveMappingForMappedObject($object);
         }
 

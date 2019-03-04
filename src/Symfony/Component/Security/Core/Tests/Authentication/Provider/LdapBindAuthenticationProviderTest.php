@@ -73,7 +73,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->will($this->throwException(new ConnectionException()))
+            ->willThrowException(new ConnectionException())
         ;
         $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 
@@ -107,7 +107,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
 
-        $collection = new \ArrayIterator(array(new Entry('')));
+        $collection = new \ArrayIterator([new Entry('')]);
 
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query

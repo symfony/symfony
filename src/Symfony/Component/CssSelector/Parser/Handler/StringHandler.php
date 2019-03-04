@@ -47,7 +47,7 @@ class StringHandler implements HandlerInterface
     {
         $quote = $reader->getSubstring(1);
 
-        if (!\in_array($quote, array("'", '"'))) {
+        if (!\in_array($quote, ["'", '"'])) {
             return false;
         }
 

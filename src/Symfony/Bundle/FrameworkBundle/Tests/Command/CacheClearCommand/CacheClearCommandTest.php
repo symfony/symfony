@@ -42,7 +42,7 @@ class CacheClearCommandTest extends TestCase
 
     public function testCacheIsFreshAfterCacheClearedWithWarmup()
     {
-        $input = new ArrayInput(array('cache:clear'));
+        $input = new ArrayInput(['cache:clear']);
         $application = new Application($this->kernel);
         $application->setCatchExceptions(false);
 
@@ -51,7 +51,7 @@ class CacheClearCommandTest extends TestCase
         // Ensure that all *.meta files are fresh
         $finder = new Finder();
         $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
-        // simply check that cache is warmed up
+        // check that cache is warmed up
         $this->assertNotEmpty($metaFiles);
         $configCacheFactory = new ConfigCacheFactory(true);
 

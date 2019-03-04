@@ -44,17 +44,17 @@ class FileLoaderLoadException extends \Exception
 
             // show tweaked trace to complete the human readable sentence
             if (null === $sourceResource) {
-                $message .= sprintf('(which is loaded in resource "%s")', $this->varToString($resource));
+                $message .= sprintf('(which is loaded in resource "%s")', $resource);
             } else {
-                $message .= sprintf('(which is being imported from "%s")', $this->varToString($sourceResource));
+                $message .= sprintf('(which is being imported from "%s")', $sourceResource);
             }
             $message .= '.';
 
         // if there's no previous message, present it the default way
         } elseif (null === $sourceResource) {
-            $message .= sprintf('Cannot load resource "%s".', $this->varToString($resource));
+            $message .= sprintf('Cannot load resource "%s".', $resource);
         } else {
-            $message .= sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
+            $message .= sprintf('Cannot import resource "%s" from "%s".', $resource, $sourceResource);
         }
 
         // Is the resource located inside a bundle?
@@ -82,7 +82,7 @@ class FileLoaderLoadException extends \Exception
         }
 
         if (\is_array($var)) {
-            $a = array();
+            $a = [];
             foreach ($var as $k => $v) {
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }

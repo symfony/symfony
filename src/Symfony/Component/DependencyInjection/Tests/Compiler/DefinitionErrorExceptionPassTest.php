@@ -29,9 +29,9 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $def->addError('Things went wrong!');
         $def->addError('Now something else!');
         $container->register('foo_service_id')
-            ->setArguments(array(
+            ->setArguments([
                 $def,
-            ));
+            ]);
 
         $pass = new DefinitionErrorExceptionPass();
         $pass->process($container);
@@ -42,9 +42,9 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $container = new ContainerBuilder();
         $def = new Definition();
         $container->register('foo_service_id')
-            ->setArguments(array(
+            ->setArguments([
                 $def,
-            ));
+            ]);
 
         $pass = new DefinitionErrorExceptionPass();
         $pass->process($container);

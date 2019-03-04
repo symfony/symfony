@@ -33,11 +33,11 @@ class FileType extends AbstractType
             $requestHandler = $form->getConfig()->getRequestHandler();
 
             if ($options['multiple']) {
-                $data = array();
+                $data = [];
                 $files = $event->getData();
 
                 if (!\is_array($files)) {
-                    $files = array();
+                    $files = [];
                 }
 
                 foreach ($files as $file) {
@@ -48,7 +48,7 @@ class FileType extends AbstractType
 
                 // Since the array is never considered empty in the view data format
                 // on submission, we need to evaluate the configured empty data here
-                if (array() === $data) {
+                if ([] === $data) {
                     $emptyData = $form->getConfig()->getEmptyData();
                     $data = $emptyData instanceof \Closure ? $emptyData($form, $data) : $emptyData;
                 }
@@ -70,10 +70,10 @@ class FileType extends AbstractType
             $view->vars['attr']['multiple'] = 'multiple';
         }
 
-        $view->vars = array_replace($view->vars, array(
+        $view->vars = array_replace($view->vars, [
             'type' => 'file',
             'value' => '',
-        ));
+        ]);
     }
 
     /**
@@ -97,15 +97,16 @@ class FileType extends AbstractType
         }
 
         $emptyData = function (Options $options) {
-            return $options['multiple'] ? array() : null;
+            return $options['multiple'] ? [] : null;
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'compound' => false,
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'multiple' => false,
-        ));
+            'allow_file_upload' => true,
+        ]);
     }
 
     /**

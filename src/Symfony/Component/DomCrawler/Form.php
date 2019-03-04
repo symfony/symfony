@@ -87,7 +87,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getValues()
     {
-        $values = array();
+        $values = [];
         foreach ($this->fields->all() as $name => $field) {
             if ($field->isDisabled()) {
                 continue;
@@ -108,11 +108,11 @@ class Form extends Link implements \ArrayAccess
      */
     public function getFiles()
     {
-        if (!\in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
-            return array();
+        if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+            return [];
         }
 
-        $files = array();
+        $files = [];
 
         foreach ($this->fields->all() as $name => $field) {
             if ($field->isDisabled()) {
@@ -137,13 +137,13 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpValues()
     {
-        $values = array();
+        $values = [];
         foreach ($this->getValues() as $name => $value) {
-            $qs = http_build_query(array($name => $value), '', '&');
+            $qs = http_build_query([$name => $value], '', '&');
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
-                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
             }
         }
 
@@ -164,9 +164,9 @@ class Form extends Link implements \ArrayAccess
      */
     public function getPhpFiles()
     {
-        $values = array();
+        $values = [];
         foreach ($this->getFiles() as $name => $value) {
-            $qs = http_build_query(array($name => $value), '', '&');
+            $qs = http_build_query([$name => $value], '', '&');
             if (!empty($qs)) {
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, \strlen(key($expandedValue)));
@@ -182,7 +182,7 @@ class Form extends Link implements \ArrayAccess
 
                 reset($expandedValue);
 
-                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+                $values = array_replace_recursive($values, [$varName => current($expandedValue)]);
             }
         }
 
@@ -202,9 +202,9 @@ class Form extends Link implements \ArrayAccess
     {
         $uri = parent::getUri();
 
-        if (!\in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
+        if (!\in_array($this->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
             $query = parse_url($uri, PHP_URL_QUERY);
-            $currentParameters = array();
+            $currentParameters = [];
             if ($query) {
                 parse_str($query, $currentParameters);
             }
@@ -379,7 +379,7 @@ class Form extends Link implements \ArrayAccess
     protected function setNode(\DOMElement $node)
     {
         $this->button = $node;
-        if ('button' === $node->nodeName || ('input' === $node->nodeName && \in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
+        if ('button' === $node->nodeName || ('input' === $node->nodeName && \in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image']))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -443,14 +443,14 @@ class Form extends Link implements \ArrayAccess
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
 
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)]', $formId));
+            $fieldNodes = $xpath->query(sprintf('( descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)] )[not(ancestor::template)]', $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
             // do the xpath query with $this->node as the context node, to only find descendant elements
             // however, descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->node);
+            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[not(ancestor::template)]', $this->node);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
@@ -480,7 +480,7 @@ class Form extends Link implements \ArrayAccess
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
+        } elseif ('input' == $nodeName && !\in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image'])) {
             $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));

@@ -23,10 +23,10 @@ class ChoiceTypeExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('choices', array(
+        $resolver->setDefault('choices', [
             'A' => 'a',
             'B' => 'b',
-        ));
+        ]);
     }
 
     /**
@@ -34,6 +34,6 @@ class ChoiceTypeExtension extends AbstractTypeExtension
      */
     public static function getExtendedTypes(): iterable
     {
-        return array(self::$extendedType);
+        return [self::$extendedType];
     }
 }

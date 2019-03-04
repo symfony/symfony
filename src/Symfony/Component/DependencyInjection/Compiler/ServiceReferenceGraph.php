@@ -28,7 +28,7 @@ class ServiceReferenceGraph
     /**
      * @var ServiceReferenceGraphNode[]
      */
-    private $nodes = array();
+    private $nodes = [];
 
     public function hasNode(string $id): bool
     {
@@ -67,13 +67,13 @@ class ServiceReferenceGraph
         foreach ($this->nodes as $node) {
             $node->clear();
         }
-        $this->nodes = array();
+        $this->nodes = [];
     }
 
     /**
      * Connects 2 nodes together in the Graph.
      */
-    public function connect(?string $sourceId, $sourceValue, ?string $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false)
+    public function connect(?string $sourceId, $sourceValue, ?string $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false)
     {
         if (null === $sourceId || null === $destId) {
             return;
@@ -81,7 +81,7 @@ class ServiceReferenceGraph
 
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
-        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy, $weak);
+        $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy, $weak, $byConstructor);
 
         $sourceNode->addOutEdge($edge);
         $destNode->addInEdge($edge);

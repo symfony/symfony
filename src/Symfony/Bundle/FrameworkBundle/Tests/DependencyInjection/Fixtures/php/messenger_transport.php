@@ -1,14 +1,15 @@
 <?php
 
-$container->loadFromExtension('framework', array(
+$container->loadFromExtension('framework', [
     'serializer' => true,
-    'messenger' => array(
-        'serializer' => array(
+    'messenger' => [
+        'serializer' => [
+            'id' => 'messenger.transport.symfony_serializer',
             'format' => 'csv',
-            'context' => array('enable_max_depth' => true),
-        ),
-        'transports' => array(
+            'context' => ['enable_max_depth' => true],
+        ],
+        'transports' => [
             'default' => 'amqp://localhost/%2f/messages',
-        ),
-    ),
-));
+        ],
+    ],
+]);

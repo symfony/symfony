@@ -98,19 +98,19 @@ final class MetadataAwareNameConverterTest extends TestCase
 
     public function attributeProvider()
     {
-        return array(
-            array('foo', 'baz'),
-            array('bar', 'qux'),
-            array('quux', 'quux'),
-        );
+        return [
+            ['foo', 'baz'],
+            ['bar', 'qux'],
+            ['quux', 'quux'],
+        ];
     }
 
     public function fallbackAttributeProvider()
     {
-        return array(
-            array('foo', 'baz'),
-            array('bar', 'qux'),
-            array('quux', 'QUUX'),
-        );
+        return [
+            ['foo', 'baz'],
+            ['bar', 'qux'],
+            ['quux', 'QUUX'],
+        ];
     }
 }

@@ -26,15 +26,15 @@ class VoteListenerTest extends TestCase
         $traceableAccessDecisionManager = $this
             ->getMockBuilder(TraceableAccessDecisionManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addVoterVote'))
+            ->setMethods(['addVoterVote'])
             ->getMock();
 
         $traceableAccessDecisionManager
             ->expects($this->once())
             ->method('addVoterVote')
-            ->with($voter, array('myattr1', 'myattr2'), VoterInterface::ACCESS_GRANTED);
+            ->with($voter, ['myattr1', 'myattr2'], VoterInterface::ACCESS_GRANTED);
 
         $sut = new VoteListener($traceableAccessDecisionManager);
-        $sut->onVoterVote(new VoteEvent($voter, 'mysubject', array('myattr1', 'myattr2'), VoterInterface::ACCESS_GRANTED));
+        $sut->onVoterVote(new VoteEvent($voter, 'mysubject', ['myattr1', 'myattr2'], VoterInterface::ACCESS_GRANTED));
     }
 }

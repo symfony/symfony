@@ -21,8 +21,17 @@ class WebServerExtensionTest extends TestCase
     public function testLoad()
     {
         $container = new ContainerBuilder();
-        (new WebServerExtension())->load(array(), $container);
+        $container->setParameter('kernel.project_dir', __DIR__);
+        (new WebServerExtension())->load([], $container);
 
+        $this->assertSame(
+            __DIR__.'/test',
+            $container->getDefinition('web_server.command.server_run')->getArgument(0)
+        );
+        $this->assertSame(
+            __DIR__.'/test',
+            $container->getDefinition('web_server.command.server_start')->getArgument(0)
+        );
         $this->assertTrue($container->hasDefinition('web_server.command.server_run'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_start'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_stop'));

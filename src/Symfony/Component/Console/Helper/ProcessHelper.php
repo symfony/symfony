@@ -46,22 +46,22 @@ class ProcessHelper extends Helper
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         if ($cmd instanceof Process) {
-            $cmd = array($cmd);
+            $cmd = [$cmd];
         }
 
         if (!\is_array($cmd)) {
             @trigger_error(sprintf('Passing a command as a string to "%s()" is deprecated since Symfony 4.2, pass it the command as an array of arguments instead.', __METHOD__), E_USER_DEPRECATED);
-            $cmd = array(\method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline($cmd) : new Process($cmd));
+            $cmd = [\method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline($cmd) : new Process($cmd)];
         }
 
         if (\is_string($cmd[0] ?? null)) {
             $process = new Process($cmd);
-            $cmd = array();
+            $cmd = [];
         } elseif (($cmd[0] ?? null) instanceof Process) {
             $process = $cmd[0];
             unset($cmd[0]);
         } else {
-            throw new \InvalidArgumentException(sprintf('Invalid command provided to "%s()": the command should an array whose first is element is either the path to the binary to run of a "Process" object.', __METHOD__));
+            throw new \InvalidArgumentException(sprintf('Invalid command provided to "%s()": the command should be an array whose first element is either the path to the binary to run or a "Process" object.', __METHOD__));
         }
 
         if ($verbosity <= $output->getVerbosity()) {
@@ -136,7 +136,7 @@ class ProcessHelper extends Helper
             $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
-                \call_user_func($callback, $type, $buffer);
+                $callback($type, $buffer);
             }
         };
     }

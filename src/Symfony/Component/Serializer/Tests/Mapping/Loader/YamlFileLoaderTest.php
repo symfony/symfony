@@ -98,10 +98,10 @@ class YamlFileLoaderTest extends TestCase
         $classMetadata = new ClassMetadata(AbstractDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
 
-        $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', array(
+        $expected = new ClassMetadata(AbstractDummy::class, new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
             'second' => AbstractDummySecondChild::class,
-        )));
+        ]));
 
         $expected->addAttributeMetadata(new AttributeMetadata('foo'));
 

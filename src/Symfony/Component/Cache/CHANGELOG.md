@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * removed `psr/simple-cache` dependency, run `composer require psr/simple-cache` if you need it
+ * deprecated all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead
+ * deprecated `SimpleCacheAdapter`, use `Psr16Adapter` instead
+
 4.2.0
 -----
 

@@ -29,7 +29,7 @@ class TwigLoaderPass implements CompilerPassInterface
             return;
         }
 
-        $prioritizedLoaders = array();
+        $prioritizedLoaders = [];
         $found = 0;
 
         foreach ($container->findTaggedServiceIds('twig.loader', true) as $id => $attributes) {
@@ -50,7 +50,7 @@ class TwigLoaderPass implements CompilerPassInterface
 
             foreach ($prioritizedLoaders as $loaders) {
                 foreach ($loaders as $loader) {
-                    $chainLoader->addMethodCall('addLoader', array(new Reference($loader)));
+                    $chainLoader->addMethodCall('addLoader', [new Reference($loader)]);
                 }
             }
 

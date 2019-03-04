@@ -32,7 +32,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         parent::setUp();
 
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
+        $this->builder = new FormBuilder('', null, $this->dispatcher, $this->factory);
     }
 
     protected function tearDown()
@@ -44,7 +44,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
-        $extensions = array();
+        $extensions = [];
 
         if (\in_array(ValidatorExtensionTrait::class, class_uses($this))) {
             $extensions[] = $this->getValidatorExtension();

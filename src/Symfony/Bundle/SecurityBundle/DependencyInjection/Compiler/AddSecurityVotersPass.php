@@ -44,7 +44,7 @@ class AddSecurityVotersPass implements CompilerPassInterface
         }
 
         $debug = $container->getParameter('kernel.debug');
-
+        $voterServices = [];
         foreach ($voters as $voter) {
             $voterServiceId = (string) $voter;
             $definition = $container->getDefinition($voterServiceId);
@@ -56,17 +56,18 @@ class AddSecurityVotersPass implements CompilerPassInterface
             }
 
             if ($debug) {
-                // Decorate original voters with TraceableVoter
-                $debugVoterServiceId = '.debug.security.voter.'.$voterServiceId;
+                $voterServices[] = new Reference($debugVoterServiceId = 'debug.security.voter.'.$voterServiceId);
+
                 $container
                     ->register($debugVoterServiceId, TraceableVoter::class)
-                    ->setDecoratedService($voterServiceId)
-                    ->addArgument(new Reference($debugVoterServiceId.'.inner'))
+                    ->addArgument($voter)
                     ->addArgument(new Reference('event_dispatcher'));
+            } else {
+                $voterServices[] = $voter;
             }
         }
 
-        $adm = $container->getDefinition('security.access.decision_manager');
-        $adm->replaceArgument(0, new IteratorArgument($voters));
+        $container->getDefinition('security.access.decision_manager')
+            ->replaceArgument(0, new IteratorArgument($voterServices));
     }
 }

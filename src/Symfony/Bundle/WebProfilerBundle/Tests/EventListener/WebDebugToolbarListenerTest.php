@@ -33,15 +33,15 @@ class WebDebugToolbarListenerTest extends TestCase
 
         $response = new Response($content);
 
-        $m->invoke($listener, $response, Request::create('/'), array('csp_script_nonce' => 'scripto', 'csp_style_nonce' => 'stylo'));
+        $m->invoke($listener, $response, Request::create('/'), ['csp_script_nonce' => 'scripto', 'csp_style_nonce' => 'stylo']);
         $this->assertEquals($expected, $response->getContent());
     }
 
     public function getInjectToolbarTests()
     {
-        return array(
-            array('<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"),
-            array('<html>
+        return [
+            ['<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"],
+            ['<html>
             <head></head>
             <body>
             <textarea><html><head></head><body></body></html></textarea>
@@ -51,8 +51,8 @@ class WebDebugToolbarListenerTest extends TestCase
             <body>
             <textarea><html><head></head><body></body></html></textarea>
             \nWDT\n</body>
-            </html>"),
-        );
+            </html>"],
+        ];
     }
 
     /**
@@ -134,12 +134,12 @@ class WebDebugToolbarListenerTest extends TestCase
 
     public function provideRedirects()
     {
-        return array(
-            array(301, true),
-            array(302, true),
-            array(301, false),
-            array(302, false),
-        );
+        return [
+            [301, true],
+            [302, true],
+            [301, false],
+            [302, false],
+        ];
     }
 
     /**
@@ -230,7 +230,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', array('token' => 'xxxxxxxx'), UrlGeneratorInterface::ABSOLUTE_URL)
+            ->with('_profiler', ['token' => 'xxxxxxxx'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('http://mydomain.com/_profiler/xxxxxxxx'))
         ;
 
@@ -251,8 +251,8 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', array('token' => 'xxxxxxxx'))
-            ->will($this->throwException(new \Exception('foo')))
+            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->willThrowException(new \Exception('foo'))
         ;
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -272,8 +272,8 @@ class WebDebugToolbarListenerTest extends TestCase
         $urlGenerator
             ->expects($this->once())
             ->method('generate')
-            ->with('_profiler', array('token' => 'xxxxxxxx'))
-            ->will($this->throwException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline")))
+            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->willThrowException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline"))
         ;
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -286,7 +286,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->setMethods(array('getSession', 'isXmlHttpRequest', 'getRequestFormat'))->disableOriginalConstructor()->getMock();
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->setMethods(['getSession', 'isXmlHttpRequest', 'getRequestFormat'])->disableOriginalConstructor()->getMock();
         $request->expects($this->any())
             ->method('isXmlHttpRequest')
             ->will($this->returnValue($isXmlHttpRequest));

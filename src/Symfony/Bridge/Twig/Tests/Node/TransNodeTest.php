@@ -29,12 +29,12 @@ class TransNodeTest extends TestCase
         $vars = new NameExpression('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('strict_variables' => true));
+        $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), ['strict_variables' => true]);
         $compiler = new Compiler($env);
 
         $this->assertEquals(
             sprintf(
-                'echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(array("%%var%%" => %s), %s), "messages");',
+                'echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->trans("trans %%var%%", array_merge(["%%var%%" => %s], %s), "messages");',
                 $this->getVariableGetterWithoutStrictCheck('var'),
                 $this->getVariableGetterWithStrictCheck('foo')
              ),
@@ -49,12 +49,8 @@ class TransNodeTest extends TestCase
 
     protected function getVariableGetterWithStrictCheck($name)
     {
-        if (Environment::VERSION_ID > 20404) {
-            return sprintf('(isset($context["%s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name);
-        }
-
         if (Environment::MAJOR_VERSION >= 2) {
-            return sprintf('(isset($context["%s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%1$s" does not exist.\', 0, $this->getSourceContext()); })())', $name);
+            return sprintf('(isset($context["%1$s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new %2$s(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name, Environment::VERSION_ID >= 20700 ? 'RuntimeError' : 'Twig_Error_Runtime');
         }
 
         return sprintf('($context["%s"] ?? $this->getContext($context, "%1$s"))', $name);

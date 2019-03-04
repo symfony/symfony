@@ -17,6 +17,9 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * @group legacy
+ */
 class RedirectableUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()
@@ -26,7 +29,7 @@ class RedirectableUrlMatcherTest extends TestCase
 
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
 
-        $this->assertEquals(array(
+        $this->assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo/',
                 'permanent' => true,
@@ -34,7 +37,7 @@ class RedirectableUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
-            ),
+            ],
             $matcher->match('/foo')
         );
     }
@@ -42,11 +45,11 @@ class RedirectableUrlMatcherTest extends TestCase
     public function testSchemeRedirect()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
+        $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
 
         $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
 
-        $this->assertEquals(array(
+        $this->assertEquals([
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path' => '/foo',
                 'permanent' => true,
@@ -54,7 +57,7 @@ class RedirectableUrlMatcherTest extends TestCase
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
                 '_route' => 'foo',
-            ),
+            ],
             $matcher->match('/foo')
         );
     }

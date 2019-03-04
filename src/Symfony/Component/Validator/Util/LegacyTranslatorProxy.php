@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Util;
 
 use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,6 +24,9 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
 
     public function __construct(TranslatorInterface $translator)
     {
+        if (!$translator instanceof LocaleAwareInterface) {
+            throw new \InvalidArgumentException(sprintf('The translator passed to "%s()" must implement "%s".', __METHOD__, LocaleAwareInterface::class));
+        }
         $this->translator = $translator;
     }
 
@@ -50,7 +54,7 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
@@ -58,8 +62,8 @@ class LegacyTranslatorProxy implements LegacyTranslatorInterface, TranslatorInte
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
-        return $this->translator->trans($id, array('%count%' => $number) + $parameters, $domain, $locale);
+        return $this->translator->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
     }
 }

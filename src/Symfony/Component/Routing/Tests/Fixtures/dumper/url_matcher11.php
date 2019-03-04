@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherTrait;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherTrait;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -9,54 +9,61 @@ use Symfony\Component\Routing\RequestContext;
  */
 class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher
 {
-    use PhpMatcherTrait;
+    use CompiledUrlMatcherTrait;
 
     public function __construct(RequestContext $context)
     {
         $this->context = $context;
-        $this->regexpList = array(
+        $this->regexpList = [
             0 => '{^(?'
                     .'|/(en|fr)/(?'
-                        .'|admin/post/(?'
-                            .'|(*:33)'
-                            .'|new(*:43)'
-                            .'|(\\d+)(*:55)'
-                            .'|(\\d+)/edit(*:72)'
-                            .'|(\\d+)/delete(*:91)'
-                        .')'
-                        .'|blog/(?'
-                            .'|(*:107)'
-                            .'|rss\\.xml(*:123)'
-                            .'|p(?'
-                                .'|age/([^/]++)(*:147)'
-                                .'|osts/([^/]++)(*:168)'
+                        .'|admin/post(?'
+                            .'|(*:32)'
+                            .'|/(?'
+                                .'|new(*:46)'
+                                .'|(\\d+)(*:58)'
+                                .'|(\\d+)/edit(*:75)'
+                                .'|(\\d+)/delete(*:94)'
                             .')'
-                            .'|comments/(\\d+)/new(*:195)'
-                            .'|search(*:209)'
+                        .')'
+                        .'|blog(?'
+                            .'|(*:110)'
+                            .'|/(?'
+                                .'|rss\\.xml(*:130)'
+                                .'|p(?'
+                                    .'|age/([^/]++)(*:154)'
+                                    .'|osts/([^/]++)(*:175)'
+                                .')'
+                                .'|comments/(\\d+)/new(*:202)'
+                                .'|search(*:216)'
+                            .')'
                         .')'
                         .'|log(?'
-                            .'|in(*:226)'
-                            .'|out(*:237)'
+                            .'|in(*:234)'
+                            .'|out(*:245)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:256)'
-                .')$}sD',
-        );
-        $this->dynamicRoutes = array(
-            33 => array(array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, null)),
-            43 => array(array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null, null)),
-            55 => array(array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            72 => array(array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            91 => array(array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            107 => array(array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, null)),
-            123 => array(array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null, null)),
-            147 => array(array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
-            168 => array(array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null, null)),
-            195 => array(array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null, null)),
-            209 => array(array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null, null)),
-            226 => array(array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null, null)),
-            237 => array(array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null, null)),
-            256 => array(array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null, null)),
-        );
+                    .'|/(en|fr)?(*:264)'
+                .')/?$}sD',
+        ];
+        $this->dynamicRoutes = [
+            32 => [[['_route' => 'a', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
+            46 => [[['_route' => 'b', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            58 => [[['_route' => 'c', '_locale' => 'en'], ['_locale', 'id'], null, null, false, true, null]],
+            75 => [[['_route' => 'd', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            94 => [[['_route' => 'e', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            110 => [[['_route' => 'f', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
+            130 => [[['_route' => 'g', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            154 => [[['_route' => 'h', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
+            175 => [[['_route' => 'i', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
+            202 => [[['_route' => 'j', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            216 => [[['_route' => 'k', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            234 => [[['_route' => 'l', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            245 => [[['_route' => 'm', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            264 => [
+                [['_route' => 'n', '_locale' => 'en'], ['_locale'], null, null, false, true, null],
+                [null, null, null, null, false, false, 0],
+            ],
+        ];
     }
 }

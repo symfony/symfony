@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added the `form_parent()` function that allows to reliably retrieve the parent form in Twig templates
+
 4.2.0
 -----
 
@@ -45,7 +50,7 @@ CHANGELOG
    use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 
    // ...
-   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'));
+   $rendererEngine = new TwigRendererEngine(['form_div_layout.html.twig']);
    $rendererEngine->setEnvironment($twig);
    $twig->addExtension(new FormExtension(new TwigRenderer($rendererEngine, $csrfTokenManager)));
    ```
@@ -54,13 +59,13 @@ CHANGELOG
 
    ```php
    // ...
-   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
+   $rendererEngine = new TwigRendererEngine(['form_div_layout.html.twig'], $twig);
    // require Twig 1.30+
-   $twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader(array(
+   $twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader([
        TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
            return new TwigRenderer($rendererEngine, $csrfTokenManager);
        },
-   )));
+   ]));
    $twig->addExtension(new FormExtension());
    ```
  * Deprecated the `TwigRendererEngineInterface` interface.

@@ -21,11 +21,11 @@ use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
  */
 class Registry
 {
-    public static $reflectors = array();
-    public static $prototypes = array();
-    public static $factories = array();
-    public static $cloneable = array();
-    public static $instantiableWithoutConstructor = array();
+    public static $reflectors = [];
+    public static $prototypes = [];
+    public static $factories = [];
+    public static $cloneable = [];
+    public static $instantiableWithoutConstructor = [];
 
     public function __construct(array $classes)
     {
@@ -60,7 +60,7 @@ class Registry
     {
         $reflector = self::$reflectors[$class] ?? self::getClassReflector($class, true, false);
 
-        return self::$factories[$class] = \Closure::fromCallable(array($reflector, 'newInstanceWithoutConstructor'));
+        return self::$factories[$class] = \Closure::fromCallable([$reflector, 'newInstanceWithoutConstructor']);
     }
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
@@ -93,15 +93,9 @@ class Registry
                     throw new NotInstantiableTypeException($class);
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
                 try {
-                    if (!$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
-                        serialize($proto);
-                    } elseif ($instantiableWithoutConstructor) {
-                        serialize($reflector->newInstanceWithoutConstructor());
-                    } else {
-                        serialize(unserialize(($proto instanceof \Serializable ? 'C:' : 'O:').\strlen($class).':"'.$class.'":0:{}'));
-                    }
+                    serialize($proto);
                 } catch (\Exception $e) {
                     throw new NotInstantiableTypeException($class, $e);
                 }
@@ -124,17 +118,17 @@ class Registry
             static $setTrace;
 
             if (null === $setTrace) {
-                $setTrace = array(
+                $setTrace = [
                     new \ReflectionProperty(\Error::class, 'trace'),
                     new \ReflectionProperty(\Exception::class, 'trace'),
-                );
+                ];
                 $setTrace[0]->setAccessible(true);
                 $setTrace[1]->setAccessible(true);
-                $setTrace[0] = \Closure::fromCallable(array($setTrace[0], 'setValue'));
-                $setTrace[1] = \Closure::fromCallable(array($setTrace[1], 'setValue'));
+                $setTrace[0] = \Closure::fromCallable([$setTrace[0], 'setValue']);
+                $setTrace[1] = \Closure::fromCallable([$setTrace[1], 'setValue']);
             }
 
-            $setTrace[$proto instanceof \Exception]($proto, array());
+            $setTrace[$proto instanceof \Exception]($proto, []);
         }
 
         return self::$reflectors[$class] = $reflector;

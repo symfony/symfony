@@ -23,17 +23,17 @@ class Dummy implements NormalizableInterface, DenormalizableInterface
     public $baz;
     public $qux;
 
-    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array())
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = [])
     {
-        return array(
+        return [
             'foo' => $this->foo,
             'bar' => $this->bar,
             'baz' => $this->baz,
             'qux' => $this->qux,
-        );
+        ];
     }
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = [])
     {
         $this->foo = $data['foo'];
         $this->bar = $data['bar'];

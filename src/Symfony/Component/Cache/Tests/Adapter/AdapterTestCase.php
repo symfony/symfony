@@ -22,7 +22,7 @@ abstract class AdapterTestCase extends CachePoolTest
     {
         parent::setUp();
 
-        if (!array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
+        if (!\array_key_exists('testPrune', $this->skippedTests) && !$this->createCachePool() instanceof PruneableInterface) {
             $this->skippedTests['testPrune'] = 'Not a pruneable cache pool.';
         }
     }
@@ -34,6 +34,7 @@ abstract class AdapterTestCase extends CachePoolTest
         }
 
         $cache = $this->createCachePool();
+        $cache->clear();
 
         $value = mt_rand();
 
@@ -76,10 +77,10 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $item = $cache->getItem('foo');
 
-        $expected = array(
+        $expected = [
             CacheItem::METADATA_EXPIRY => 9.5 + time(),
             CacheItem::METADATA_CTIME => 1000,
-        );
+        ];
         $this->assertEquals($expected, $item->getMetadata(), 'Item metadata should embed expiry and ctime.', .6);
     }
 
@@ -138,11 +139,11 @@ abstract class AdapterTestCase extends CachePoolTest
         $item = $cache->getItem('foo');
         $this->assertFalse($item->isHit());
 
-        foreach ($cache->getItems(array('foo')) as $item) {
+        foreach ($cache->getItems(['foo']) as $item) {
         }
         $cache->save($item->set(new NotUnserializable()));
 
-        foreach ($cache->getItems(array('foo')) as $item) {
+        foreach ($cache->getItems(['foo']) as $item) {
         }
         $this->assertFalse($item->isHit());
     }
@@ -214,14 +215,9 @@ abstract class AdapterTestCase extends CachePoolTest
     }
 }
 
-class NotUnserializable implements \Serializable
+class NotUnserializable
 {
-    public function serialize()
-    {
-        return serialize(123);
-    }
-
-    public function unserialize($ser)
+    public function __wakeup()
     {
         throw new \Exception(__CLASS__);
     }

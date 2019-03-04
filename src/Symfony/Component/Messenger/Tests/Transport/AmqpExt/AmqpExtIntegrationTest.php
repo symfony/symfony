@@ -41,7 +41,7 @@ class AmqpExtIntegrationTest extends TestCase
     public function testItSendsAndReceivesMessages()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
@@ -67,7 +67,7 @@ class AmqpExtIntegrationTest extends TestCase
     public function testItReceivesSignals()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
@@ -79,10 +79,10 @@ class AmqpExtIntegrationTest extends TestCase
 
         $amqpReadTimeout = 30;
         $dsn = getenv('MESSENGER_AMQP_DSN').'?read_timeout='.$amqpReadTimeout;
-        $process = new PhpProcess(file_get_contents(__DIR__.'/Fixtures/long_receiver.php'), null, array(
+        $process = new PhpProcess(file_get_contents(__DIR__.'/Fixtures/long_receiver.php'), null, [
             'COMPONENT_ROOT' => __DIR__.'/../../../',
             'DSN' => $dsn,
-        ));
+        ]);
 
         $process->start();
 
@@ -116,10 +116,10 @@ TXT
     public function testItSupportsTimeoutAndTicksNullMessagesToTheHandler()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
-        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), array('read_timeout' => '1'));
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['read_timeout' => '1']);
         $connection->setup();
         $connection->queue()->purge();
 

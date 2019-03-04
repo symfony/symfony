@@ -44,9 +44,9 @@ final class CachePoolClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
-            ))
+            ])
             ->setDescription('Clears cache pools')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command clears the given cache pools or cache pool clearers.
@@ -64,8 +64,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $kernel = $this->getApplication()->getKernel();
-        $pools = array();
-        $clearers = array();
+        $pools = [];
+        $clearers = [];
 
         foreach ($input->getArgument('pools') as $id) {
             if ($this->poolClearer->hasPool($id)) {

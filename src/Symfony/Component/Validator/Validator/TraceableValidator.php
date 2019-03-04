@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\ResetInterface;
 class TraceableValidator implements ValidatorInterface, ResetInterface
 {
     private $validator;
-    private $collectedData = array();
+    private $collectedData = [];
 
     public function __construct(ValidatorInterface $validator)
     {
@@ -39,7 +39,7 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
 
     public function reset()
     {
-        $this->collectedData = array();
+        $this->collectedData = [];
     }
 
     /**
@@ -93,11 +93,11 @@ class TraceableValidator implements ValidatorInterface, ResetInterface
         $name = str_replace('\\', '/', $file);
         $name = substr($name, strrpos($name, '/') + 1);
 
-        $this->collectedData[] = array(
+        $this->collectedData[] = [
             'caller' => compact('name', 'file', 'line'),
             'context' => compact('value', 'constraints', 'groups'),
             'violations' => iterator_to_array($violations),
-        );
+        ];
 
         return $violations;
     }

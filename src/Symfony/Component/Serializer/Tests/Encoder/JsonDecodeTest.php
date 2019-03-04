@@ -47,11 +47,11 @@ class JsonDecodeTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->foo = 'bar';
 
-        $assoc = array('foo' => 'bar');
+        $assoc = ['foo' => 'bar'];
 
         return array(
-            array('{"foo": "bar"}', $stdClass, array()),
-            array('{"foo": "bar"}', $assoc, array('json_decode_associative' => true)),
+            ['{"foo": "bar"}', $stdClass, []],
+            ['{"foo": "bar"}', $assoc, ['json_decode_associative' => true]],
             array('{"baz": {"foo": "bar"}}', $stdClass, array(JsonEncoder::JSON_PROPERTY_PATH => 'baz')),
             array('{"baz": {"foo": "bar"}}', null, array(JsonEncoder::JSON_PROPERTY_PATH => 'baz.inner')),
             array('{"baz": {"foo": "bar"}}', $assoc, array(JsonEncoder::JSON_PROPERTY_PATH => '[baz]', 'json_decode_associative' => true)),
@@ -71,9 +71,9 @@ class JsonDecodeTest extends TestCase
 
     public function decodeProviderException()
     {
-        return array(
-            array("{'foo': 'bar'}"),
-            array('kaboom!'),
-        );
+        return [
+            ["{'foo': 'bar'}"],
+            ['kaboom!'],
+        ];
     }
 }

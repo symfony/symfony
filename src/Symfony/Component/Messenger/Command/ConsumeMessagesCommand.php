@@ -40,7 +40,7 @@ class ConsumeMessagesCommand extends Command
     private $receiverNames;
     private $busNames;
 
-    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = array(), array $busNames = array())
+    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], array $busNames = [])
     {
         $this->busLocator = $busLocator;
         $this->receiverLocator = $receiverLocator;
@@ -60,13 +60,13 @@ class ConsumeMessagesCommand extends Command
         $defaultBusName = 1 === \count($this->busNames) ? current($this->busNames) : null;
 
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('receiver', $defaultReceiverName ? InputArgument::OPTIONAL : InputArgument::REQUIRED, 'Name of the receiver', $defaultReceiverName),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched', $defaultBusName),
-            ))
+            ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -186,7 +186,7 @@ EOF
 
     private function findAlternatives($name, array $collection)
     {
-        $alternatives = array();
+        $alternatives = [];
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
             if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {

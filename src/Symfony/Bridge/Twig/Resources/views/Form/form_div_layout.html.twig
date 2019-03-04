@@ -28,7 +28,7 @@
 {%- endblock form_widget_compound -%}
 
 {%- block collection_widget -%}
-    {% if prototype is defined %}
+    {% if prototype is defined and not prototype.rendered %}
         {%- set attr = attr|merge({'data-prototype': form_row(prototype) }) -%}
     {% endif %}
     {{- block('form_widget') -}}
@@ -170,7 +170,7 @@
 {%- endblock dateinterval_widget -%}
 
 {%- block number_widget -%}
-    {# type="number" doesn't work with floats #}
+    {# type="number" doesn't work with floats in localized formats #}
     {%- set type = type|default('text') -%}
     {{ block('form_widget_simple') }}
 {%- endblock number_widget -%}
@@ -232,7 +232,7 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -279,7 +279,7 @@
             {%- if translation_domain is same as(false) -%}
                 {{- label -}}
             {%- else -%}
-                {{- label|trans({}, translation_domain) -}}
+                {{- label|trans(label_translation_parameters, translation_domain) -}}
             {%- endif -%}
         </{{ element|default('label') }}>
     {%- endif -%}
@@ -292,12 +292,19 @@
 {% block form_help -%}
     {%- if help is not empty -%}
         {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' help-text')|trim}) -%}
-
-        <p id="{{ id }}_help" {% for attrname, attrvalue in help_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+        <p id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
             {%- if translation_domain is same as(false) -%}
-                {{- help -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help -}}
+                {%- else -%}
+                    {{- help|raw -}}
+                {%- endif -%}
             {%- else -%}
-                {{- help|trans({}, translation_domain) -}}
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+                {%- endif -%}
             {%- endif -%}
         </p>
     {%- endif -%}
@@ -352,7 +359,7 @@
     {%- else -%}
         {% set form_method = "POST" %}
     {%- endif -%}
-    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{{ block('attributes') }}{% if multipart %} enctype="multipart/form-data"{% endif %}>
     {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
@@ -426,7 +433,7 @@
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
-            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"
+            {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans(attr_translation_parameters, translation_domain) }}"
         {%- elseif attrvalue is same as(true) -%}
             {{- attrname }}="{{ attrname }}"
         {%- elseif attrvalue is not same as(false) -%}

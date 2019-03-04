@@ -32,7 +32,7 @@ class RedirectResponse extends Response
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      */
-    public function __construct(?string $url, int $status = 302, array $headers = array())
+    public function __construct(?string $url, int $status = 302, array $headers = [])
     {
         parent::__construct('', $status, $headers);
 
@@ -42,7 +42,7 @@ class RedirectResponse extends Response
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
         }
 
-        if (301 == $status && !array_key_exists('cache-control', $headers)) {
+        if (301 == $status && !\array_key_exists('cache-control', $headers)) {
             $this->headers->remove('cache-control');
         }
     }
@@ -56,7 +56,7 @@ class RedirectResponse extends Response
      *
      * @return static
      */
-    public static function create($url = '', $status = 302, $headers = array())
+    public static function create($url = '', $status = 302, $headers = [])
     {
         return new static($url, $status, $headers);
     }

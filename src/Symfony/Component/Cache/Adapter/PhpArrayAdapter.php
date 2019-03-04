@@ -82,7 +82,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (null === $this->values) {
             $this->initialize();
@@ -90,10 +90,10 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
         if (!isset($this->keys[$key])) {
             get_from_pool:
             if ($this->pool instanceof CacheInterface) {
-                return $this->pool->get($key, $callback, $beta);
+                return $this->pool->get($key, $callback, $beta, $metadata);
             }
 
-            return $this->doGet($this->pool, $key, $callback, $beta);
+            return $this->doGet($this->pool, $key, $callback, $beta, $metadata);
         }
         $value = $this->values[$this->keys[$key]];
 
@@ -149,7 +149,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
             if (!\is_string($key)) {
@@ -199,7 +199,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     public function deleteItems(array $keys)
     {
         $deleted = true;
-        $fallbackKeys = array();
+        $fallbackKeys = [];
 
         foreach ($keys as $key) {
             if (!\is_string($key)) {
@@ -258,7 +258,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     private function generateItems(array $keys): \Generator
     {
         $f = $this->createCacheItem;
-        $fallbackKeys = array();
+        $fallbackKeys = [];
 
         foreach ($keys as $key) {
             if (isset($this->keys[$key])) {
@@ -294,10 +294,10 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
     {
         $e = new \ReflectionException("Class $class does not exist");
         $trace = $e->getTrace();
-        $autoloadFrame = array(
+        $autoloadFrame = [
             'function' => 'spl_autoload_call',
-            'args' => array($class),
-        );
+            'args' => [$class],
+        ];
         $i = 1 + array_search($autoloadFrame, $trace, true);
 
         if (isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {

@@ -15,11 +15,11 @@ class JsonSerializableDummy implements \JsonSerializable
 {
     public function jsonSerialize()
     {
-        return array(
+        return [
             'foo' => 'a',
             'bar' => 'b',
             'baz' => 'c',
             'qux' => $this,
-        );
+        ];
     }
 }

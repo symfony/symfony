@@ -26,9 +26,9 @@ class ResolveHotPathPassTest extends TestCase
 
         $container->register('foo')
             ->addTag('container.hot_path')
-            ->addArgument(new IteratorArgument(array(new Reference('lazy'))))
+            ->addArgument(new IteratorArgument([new Reference('lazy')]))
             ->addArgument(new Reference('service_container'))
-            ->addArgument(new Definition('', array(new Reference('bar'))))
+            ->addArgument(new Definition('', [new Reference('bar')]))
             ->addArgument(new Reference('baz', ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE))
             ->addArgument(new Reference('missing'))
         ;

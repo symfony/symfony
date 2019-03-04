@@ -324,7 +324,11 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Este valor debería ser un múltiplo de {{ compared_value }}.</target>
+                <target>Este valor debería ser múltiplo de {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Este Código de Identificación Bancaria (BIC) no está asociado con el IBAN {{ iban }}.</target>
             </trans-unit>
         </body>
     </file>

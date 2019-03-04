@@ -43,7 +43,7 @@ class YamlDumper extends Dumper
      *
      * @return string A YAML string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = [])
     {
         if (!class_exists('Symfony\Component\Yaml\Dumper')) {
             throw new LogicException('Unable to dump the container as the Symfony Yaml Component is not installed.');
@@ -74,7 +74,7 @@ class YamlDumper extends Dumper
         $tagsCode = '';
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
-                $att = array();
+                $att = [];
                 foreach ($attributes as $key => $value) {
                     $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
@@ -155,11 +155,13 @@ class YamlDumper extends Dumper
 
     private function addServiceAlias(string $alias, Alias $id): string
     {
+        $deprecated = $id->isDeprecated() ? sprintf("        deprecated: %s\n", $id->getDeprecationMessage('%alias_id%')) : '';
+
         if ($id->isPrivate()) {
-            return sprintf("    %s: '@%s'\n", $alias, $id);
+            return sprintf("    %s: '@%s'\n%s", $alias, $id, $deprecated);
         }
 
-        return sprintf("    %s:\n        alias: %s\n        public: %s\n", $alias, $id, $id->isPublic() ? 'true' : 'false');
+        return sprintf("    %s:\n        alias: %s\n        public: %s\n%s", $alias, $id, $id->isPublic() ? 'true' : 'false', $deprecated);
     }
 
     private function addServices(): string
@@ -192,7 +194,7 @@ class YamlDumper extends Dumper
 
         $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isCompiled());
 
-        return $this->dumper->dump(array('parameters' => $parameters), 2);
+        return $this->dumper->dump(['parameters' => $parameters], 2);
     }
 
     /**
@@ -206,9 +208,9 @@ class YamlDumper extends Dumper
     {
         if (\is_array($callable)) {
             if ($callable[0] instanceof Reference) {
-                $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
+                $callable = [$this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]];
             } else {
-                $callable = array($callable[0], $callable[1]);
+                $callable = [$callable[0], $callable[1]];
             }
         }
 
@@ -231,6 +233,19 @@ class YamlDumper extends Dumper
         }
         if ($value instanceof ArgumentInterface) {
             if ($value instanceof TaggedIteratorArgument) {
+                if (null !== $value->getIndexAttribute()) {
+                    $taggedValueContent = [
+                        'tag' => $value->getTag(),
+                        'index_by' => $value->getIndexAttribute(),
+                    ];
+
+                    if (null !== $value->getDefaultIndexMethod()) {
+                        $taggedValueContent['default_index_method'] = $value->getDefaultIndexMethod();
+                    }
+
+                    return new TaggedValue('tagged', $taggedValueContent);
+                }
+
                 return new TaggedValue('tagged', $value->getTag());
             }
             if ($value instanceof IteratorArgument) {
@@ -245,7 +260,7 @@ class YamlDumper extends Dumper
         }
 
         if (\is_array($value)) {
-            $code = array();
+            $code = [];
             foreach ($value as $k => $v) {
                 $code[$k] = $this->dumpValue($v);
             }
@@ -292,7 +307,7 @@ class YamlDumper extends Dumper
 
     private function prepareParameters(array $parameters, bool $escape = true): array
     {
-        $filtered = array();
+        $filtered = [];
         foreach ($parameters as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->prepareParameters($value, $escape);
@@ -308,7 +323,7 @@ class YamlDumper extends Dumper
 
     private function escape(array $arguments): array
     {
-        $args = array();
+        $args = [];
         foreach ($arguments as $k => $v) {
             if (\is_array($v)) {
                 $args[$k] = $this->escape($v);

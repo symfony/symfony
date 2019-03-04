@@ -30,10 +30,10 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = array(CaseSensitiveClass::class => new BoundArgument(new Reference('foo')));
+        $bindings = [CaseSensitiveClass::class => new BoundArgument(new Reference('foo'))];
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
-        $definition->setArguments(array(1 => '123'));
+        $definition->setArguments([1 => '123']);
         $definition->addMethodCall('setSensitiveClass');
         $definition->setBindings($bindings);
 
@@ -43,8 +43,8 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals(array(new Reference('foo'), '123'), $definition->getArguments());
-        $this->assertEquals(array(array('setSensitiveClass', array(new Reference('foo')))), $definition->getMethodCalls());
+        $this->assertEquals([new Reference('foo'), '123'], $definition->getArguments());
+        $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
     /**
@@ -56,7 +56,7 @@ class ResolveBindingsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
-        $definition->setBindings(array('$quz' => '123'));
+        $definition->setBindings(['$quz' => '123']);
 
         $pass = new ResolveBindingsPass();
         $pass->process($container);
@@ -71,7 +71,7 @@ class ResolveBindingsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register(ParentNotExists::class, ParentNotExists::class);
-        $definition->setBindings(array('$quz' => '123'));
+        $definition->setBindings(['$quz' => '123']);
 
         $pass = new ResolveBindingsPass();
         $pass->process($container);
@@ -81,7 +81,7 @@ class ResolveBindingsPassTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $bindings = array(CaseSensitiveClass::class => new BoundArgument(new Reference('foo')));
+        $bindings = [CaseSensitiveClass::class => new BoundArgument(new Reference('foo'))];
 
         // Explicit service id
         $definition1 = $container->register('def1', NamedArgumentsDummy::class);
@@ -95,8 +95,8 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $this->assertEquals(array($typedRef), $container->getDefinition('def1')->getArguments());
-        $this->assertEquals(array(new Reference('foo')), $container->getDefinition('def2')->getArguments());
+        $this->assertEquals([$typedRef], $container->getDefinition('def1')->getArguments());
+        $this->assertEquals([new Reference('foo')], $container->getDefinition('def2')->getArguments());
     }
 
     public function testScalarSetter()
@@ -104,22 +104,22 @@ class ResolveBindingsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->autowire('foo', ScalarSetter::class);
-        $definition->setBindings(array('$defaultLocale' => 'fr'));
+        $definition->setBindings(['$defaultLocale' => 'fr']);
 
         (new AutowireRequiredMethodsPass())->process($container);
         (new ResolveBindingsPass())->process($container);
 
-        $this->assertEquals(array(array('setDefaultLocale', array('fr'))), $definition->getMethodCalls());
+        $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
     }
 
     public function testTupleBinding()
     {
         $container = new ContainerBuilder();
 
-        $bindings = array(
+        $bindings = [
             '$c' => new BoundArgument(new Reference('bar')),
             CaseSensitiveClass::class.'$c' => new BoundArgument(new Reference('foo')),
-        );
+        ];
 
         $definition = $container->register(NamedArgumentsDummy::class, NamedArgumentsDummy::class);
         $definition->addMethodCall('setSensitiveClass');
@@ -129,10 +129,10 @@ class ResolveBindingsPassTest extends TestCase
         $pass = new ResolveBindingsPass();
         $pass->process($container);
 
-        $expected = array(
-            array('setSensitiveClass', array(new Reference('foo'))),
-            array('setAnotherC', array(new Reference('bar'))),
-        );
+        $expected = [
+            ['setSensitiveClass', [new Reference('foo')]],
+            ['setAnotherC', [new Reference('bar')]],
+        ];
         $this->assertEquals($expected, $definition->getMethodCalls());
     }
 }

@@ -34,13 +34,13 @@ class ValidateWorkflowsPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($this->definitionTag, true);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $tag) {
-                if (!array_key_exists('name', $tag)) {
+                if (!\array_key_exists('name', $tag)) {
                     throw new RuntimeException(sprintf('The "name" for the tag "%s" of service "%s" must be set.', $this->definitionTag, $id));
                 }
-                if (!array_key_exists('type', $tag)) {
+                if (!\array_key_exists('type', $tag)) {
                     throw new RuntimeException(sprintf('The "type" for the tag "%s" of service "%s" must be set.', $this->definitionTag, $id));
                 }
-                if (!array_key_exists('marking_store', $tag)) {
+                if (!\array_key_exists('marking_store', $tag)) {
                     throw new RuntimeException(sprintf('The "marking_store" for the tag "%s" of service "%s" must be set.', $this->definitionTag, $id));
                 }
 

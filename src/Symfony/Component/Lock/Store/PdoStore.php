@@ -45,7 +45,7 @@ class PdoStore implements StoreInterface
     private $expirationCol = 'key_expiration';
     private $username = '';
     private $password = '';
-    private $connectionOptions = array();
+    private $connectionOptions = [];
     private $gcProbability;
     private $initialTtl;
 
@@ -61,7 +61,7 @@ class PdoStore implements StoreInterface
      *  * db_expiration_col: The column where to store the expiration [default: key_expiration]
      *  * db_username: The username when lazy-connect [default: '']
      *  * db_password: The password when lazy-connect [default: '']
-     *  * db_connection_options: An array of driver-specific connection options [default: array()]
+     *  * db_connection_options: An array of driver-specific connection options [default: []]
      *
      * @param \PDO|Connection|string $connOrDsn     A \PDO or Connection instance or DSN string or null
      * @param array                  $options       An associative array of options
@@ -73,7 +73,7 @@ class PdoStore implements StoreInterface
      * @throws InvalidArgumentException When namespace contains invalid characters
      * @throws InvalidArgumentException When the initial ttl is not valid
      */
-    public function __construct($connOrDsn, array $options = array(), float $gcProbability = 0.01, int $initialTtl = 300)
+    public function __construct($connOrDsn, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
     {
         if ($gcProbability < 0 || $gcProbability > 1) {
             throw new InvalidArgumentException(sprintf('"%s" requires gcProbability between 0 and 1, "%f" given.', __METHOD__, $gcProbability));
@@ -164,11 +164,13 @@ class PdoStore implements StoreInterface
 
         $key->reduceLifetime($ttl);
 
-        $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + $ttl, $this->tokenCol = :token WHERE $this->idCol = :id AND ($this->tokenCol = :token OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
+        $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + $ttl, $this->tokenCol = :token1 WHERE $this->idCol = :id AND ($this->tokenCol = :token2 OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
         $stmt = $this->getConnection()->prepare($sql);
 
+        $uniqueToken = $this->getUniqueToken($key);
         $stmt->bindValue(':id', $this->getHashedKey($key));
-        $stmt->bindValue(':token', $this->getUniqueToken($key));
+        $stmt->bindValue(':token1', $uniqueToken);
+        $stmt->bindValue(':token2', $uniqueToken);
         $stmt->execute();
 
         // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
@@ -214,7 +216,7 @@ class PdoStore implements StoreInterface
      */
     private function getHashedKey(Key $key): string
     {
-        return hash('sha256', $key);
+        return hash('sha256', (string) $key);
     }
 
     private function getUniqueToken(Key $key): string
@@ -256,10 +258,10 @@ class PdoStore implements StoreInterface
         if ($conn instanceof Connection) {
             $schema = new Schema();
             $table = $schema->createTable($this->table);
-            $table->addColumn($this->idCol, 'string', array('length' => 64));
-            $table->addColumn($this->tokenCol, 'string', array('length' => 44));
-            $table->addColumn($this->expirationCol, 'integer', array('unsigned' => true));
-            $table->setPrimaryKey(array($this->idCol));
+            $table->addColumn($this->idCol, 'string', ['length' => 64]);
+            $table->addColumn($this->tokenCol, 'string', ['length' => 44]);
+            $table->addColumn($this->expirationCol, 'integer', ['unsigned' => true]);
+            $table->setPrimaryKey([$this->idCol]);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
                 $conn->exec($sql);

@@ -14,6 +14,9 @@ namespace Symfony\Component\Security\Core\Tests\Role;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * @group legacy
+ */
 class RoleTest extends TestCase
 {
     public function testGetRole()

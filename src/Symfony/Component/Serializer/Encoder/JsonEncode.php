@@ -23,16 +23,17 @@ class JsonEncode implements EncoderInterface
 {
     const OPTIONS = 'json_encode_options';
 
+    private $defaultContext = [
     private $propertyAccessor;
-    private $defaultContext = array(
+    private $defaultContext = []
         self::OPTIONS => 0,
         JsonEncoder::JSON_PROPERTY_PATH => null,
-    );
+    ];
 
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = array())
+    public function __construct($defaultContext = [])
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         if (!\is_array($defaultContext)) {
@@ -49,7 +50,7 @@ class JsonEncode implements EncoderInterface
      *
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
         $propertyPath = $context[JsonEncoder::JSON_PROPERTY_PATH] ?? $this->defaultContext[JsonEncoder::JSON_PROPERTY_PATH];

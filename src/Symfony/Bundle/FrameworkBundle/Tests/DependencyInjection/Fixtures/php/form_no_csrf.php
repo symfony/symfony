@@ -1,9 +1,9 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'form' => array(
-        'csrf_protection' => array(
+$container->loadFromExtension('framework', [
+    'form' => [
+        'csrf_protection' => [
             'enabled' => false,
-        ),
-    ),
-));
+        ],
+    ],
+]);

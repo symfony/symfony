@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -40,8 +41,8 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $handler = null;
         $message = $envelope->getMessage();
-        foreach ($this->handlersLocator->getHandlers($envelope) as $handler) {
-            $handler($message);
+        foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
+            $envelope = $envelope->with(HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null));
         }
         if (null === $handler && !$this->allowNoHandlers) {
             throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));

@@ -68,7 +68,7 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
                 ->enumNode('session_fixation_strategy')
-                    ->values(array(SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE))
+                    ->values([SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE])
                     ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
                 ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
@@ -78,7 +78,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->enumNode('strategy')
-                            ->values(array(AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS))
+                            ->values([AccessDecisionManager::STRATEGY_AFFIRMATIVE, AccessDecisionManager::STRATEGY_CONSENSUS, AccessDecisionManager::STRATEGY_UNANIMOUS])
                         ->end()
                         ->scalarNode('service')->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
@@ -110,7 +110,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->useAttributeAsKey('id')
                     ->prototype('array')
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(function ($v) { return array('value' => $v); })->end()
+                        ->beforeNormalization()->ifString()->then(function ($v) { return ['value' => $v]; })->end()
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_array($v) && isset($v['value']); })
                             ->then(function ($v) { return preg_split('/\s*,\s*/', $v['value']); })
@@ -142,7 +142,7 @@ class MainConfiguration implements ConfigurationInterface
                             ->scalarNode('host')->defaultNull()->end()
                             ->integerNode('port')->defaultNull()->end()
                             ->arrayNode('ips')
-                                ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
+                                ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                                 ->prototype('scalar')->end()
                             ->end()
                             ->arrayNode('methods')
@@ -204,7 +204,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1.')
             ->end()
             ->arrayNode('logout')
-                ->treatTrueLike(array())
+                ->treatTrueLike([])
                 ->canBeUnset()
                 ->children()
                     ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
@@ -218,9 +218,26 @@ class MainConfiguration implements ConfigurationInterface
                 ->fixXmlConfig('delete_cookie')
                 ->children()
                     ->arrayNode('delete_cookies')
+                        ->normalizeKeys(false)
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return \is_array($v) && \is_int(key($v)); })
-                            ->then(function ($v) { return array_map(function ($v) { return array('name' => $v); }, $v); })
+                            ->then(function ($v) { return array_map(function ($v) { return ['name' => $v]; }, $v); })
+                        ->end()
+                        ->beforeNormalization()
+                            ->ifArray()->then(function ($v) {
+                                foreach ($v as $originalName => $cookieConfig) {
+                                    if (false !== strpos($originalName, '-')) {
+                                        $normalizedName = str_replace('-', '_', $originalName);
+                                        @trigger_error(sprintf('Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "%s" cookie configured in "logout.delete_cookies" will delete the "%s" cookie instead of the "%s" cookie.', $originalName, $originalName, $normalizedName), E_USER_DEPRECATED);
+
+                                        // normalize cookie names manually for BC reasons. Remove it in Symfony 5.0.
+                                        $v[$normalizedName] = $cookieConfig;
+                                        unset($v[$originalName]);
+                                    }
+                                }
+
+                                return $v;
+                            })
                         ->end()
                         ->useAttributeAsKey('name')
                         ->prototype('array')
@@ -258,7 +275,7 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
         ;
 
-        $abstractFactoryKeys = array();
+        $abstractFactoryKeys = [];
         foreach ($factories as $factoriesAtPosition) {
             foreach ($factoriesAtPosition as $factory) {
                 $name = str_replace('-', '_', $factory->getKey());
@@ -308,17 +325,17 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('provider')
             ->children()
                 ->arrayNode('providers')
-                    ->example(array(
-                        'my_memory_provider' => array(
-                            'memory' => array(
-                                'users' => array(
-                                    'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
-                                    'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]'),
-                                ),
-                            ),
-                        ),
-                        'my_entity_provider' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username')),
-                    ))
+                    ->example([
+                        'my_memory_provider' => [
+                            'memory' => [
+                                'users' => [
+                                    'foo' => ['password' => 'foo', 'roles' => 'ROLE_USER'],
+                                    'bar' => ['password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]'],
+                                ],
+                            ],
+                        ],
+                        'my_entity_provider' => ['entity' => ['class' => 'SecurityBundle:User', 'property' => 'username']],
+                    ])
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
@@ -367,19 +384,19 @@ class MainConfiguration implements ConfigurationInterface
             ->fixXmlConfig('encoder')
             ->children()
                 ->arrayNode('encoders')
-                    ->example(array(
+                    ->example([
                         'App\Entity\User1' => 'bcrypt',
-                        'App\Entity\User2' => array(
+                        'App\Entity\User2' => [
                             'algorithm' => 'bcrypt',
                             'cost' => 13,
-                        ),
-                    ))
+                        ],
+                    ])
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('class')
                     ->prototype('array')
                         ->canBeUnset()
                         ->performNoDeepMerging()
-                        ->beforeNormalization()->ifString()->then(function ($v) { return array('algorithm' => $v); })->end()
+                        ->beforeNormalization()->ifString()->then(function ($v) { return ['algorithm' => $v]; })->end()
                         ->children()
                             ->scalarNode('algorithm')->cannotBeEmpty()->end()
                             ->scalarNode('hash_algorithm')->info('Name of hashing algorithm for PBKDF2 (i.e. sha256, sha512, etc..) See hash_algos() for a list of supported algorithms.')->defaultValue('sha512')->end()

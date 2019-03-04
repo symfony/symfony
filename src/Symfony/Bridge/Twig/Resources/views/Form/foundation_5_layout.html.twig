@@ -258,7 +258,7 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {% endif %}
-    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+    <label{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
         {{ widget|raw }}
         {{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}
     </label>

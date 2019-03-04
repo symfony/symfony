@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
         <defaults public="false" />
@@ -11,7 +11,8 @@
             <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
         </service>
 
-        <service id="cache.app.simple" class="Symfony\Component\Cache\Simple\Psr6Cache">
+        <service id="cache.app.simple" class="Symfony\Component\Cache\Psr16Cache">
+            <deprecated>The "Psr\SimpleCache\CacheInterface" / "%service_id%" service is deprecated since Symfony 4.3. Use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.</deprecated>
             <argument type="service" id="cache.app" />
         </service>
 

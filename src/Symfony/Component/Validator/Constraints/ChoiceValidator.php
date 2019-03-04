@@ -48,13 +48,13 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if ($constraint->callback) {
-            if (!\is_callable($choices = array($this->context->getObject(), $constraint->callback))
-                && !\is_callable($choices = array($this->context->getClassName(), $constraint->callback))
+            if (!\is_callable($choices = [$this->context->getObject(), $constraint->callback])
+                && !\is_callable($choices = [$this->context->getClassName(), $constraint->callback])
                 && !\is_callable($choices = $constraint->callback)
             ) {
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
-            $choices = \call_user_func($choices);
+            $choices = $choices();
         } else {
             $choices = $constraint->choices;
         }
@@ -68,6 +68,7 @@ class ChoiceValidator extends ConstraintValidator
                 if (!\in_array($_value, $choices, true)) {
                     $this->context->buildViolation($constraint->multipleMessage)
                         ->setParameter('{{ value }}', $this->formatValue($_value))
+                        ->setParameter('{{ choices }}', $this->formatValues($choices))
                         ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
                         ->setInvalidValue($_value)
                         ->addViolation();
@@ -100,6 +101,7 @@ class ChoiceValidator extends ConstraintValidator
         } elseif (!\in_array($value, $choices, true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setParameter('{{ choices }}', $this->formatValues($choices))
                 ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
                 ->addViolation();
         }

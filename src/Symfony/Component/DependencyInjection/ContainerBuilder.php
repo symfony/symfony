@@ -54,29 +54,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @var ExtensionInterface[]
      */
-    private $extensions = array();
+    private $extensions = [];
 
     /**
      * @var ExtensionInterface[]
      */
-    private $extensionsByNs = array();
+    private $extensionsByNs = [];
 
     /**
      * @var Definition[]
      */
-    private $definitions = array();
+    private $definitions = [];
 
     /**
      * @var Alias[]
      */
-    private $aliasDefinitions = array();
+    private $aliasDefinitions = [];
 
     /**
      * @var ResourceInterface[]
      */
-    private $resources = array();
+    private $resources = [];
 
-    private $extensionConfigs = array();
+    private $extensionConfigs = [];
 
     /**
      * @var Compiler
@@ -98,33 +98,33 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @var ExpressionFunctionProviderInterface[]
      */
-    private $expressionLanguageProviders = array();
+    private $expressionLanguageProviders = [];
 
     /**
      * @var string[] with tag names used by findTaggedServiceIds
      */
-    private $usedTags = array();
+    private $usedTags = [];
 
     /**
      * @var string[][] a map of env var names to their placeholders
      */
-    private $envPlaceholders = array();
+    private $envPlaceholders = [];
 
     /**
      * @var int[] a map of env vars to their resolution counter
      */
-    private $envCounters = array();
+    private $envCounters = [];
 
     /**
      * @var string[] the list of vendor directories
      */
     private $vendors;
 
-    private $autoconfiguredInstanceof = array();
+    private $autoconfiguredInstanceof = [];
 
-    private $removedIds = array();
+    private $removedIds = [];
 
-    private static $internalTypes = array(
+    private static $internalTypes = [
         'int' => true,
         'float' => true,
         'string' => true,
@@ -136,7 +136,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         'callable' => true,
         'iterable' => true,
         'mixed' => true,
-    );
+    ];
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -350,7 +350,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $resource = new ClassExistenceResource($class, false);
                 $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
             } else {
-                $classReflector = new \ReflectionClass($class);
+                $classReflector = class_exists($class) ? new \ReflectionClass($class) : false;
             }
         } catch (\ReflectionException $e) {
             if ($throw) {
@@ -431,7 +431,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (\func_num_args() < 2) {
-            $values = array();
+            $values = [];
         }
 
         $namespace = $this->getExtension($extension)->getAlias();
@@ -563,7 +563,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
         if (null === $inlineServices) {
             $isConstructorArgument = true;
-            $inlineServices = array();
+            $inlineServices = [];
         }
         try {
             if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
@@ -579,7 +579,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior, $inlineServices, $isConstructorArgument);
+            $alias = $this->aliasDefinitions[$id];
+
+            if ($alias->isDeprecated()) {
+                @trigger_error($alias->getDeprecationMessage($id), E_USER_DEPRECATED);
+            }
+
+            return $this->doGet((string) $alias, $invalidBehavior, $inlineServices, $isConstructorArgument);
         }
 
         try {
@@ -592,7 +598,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw $e;
         }
 
-        if ($e = $definition->getErrors()) {
+        if ($definition->hasErrors() && $e = $definition->getErrors()) {
             throw new RuntimeException(reset($e));
         }
 
@@ -618,7 +624,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * the parameters passed to the container constructor to have precedence
      * over the loaded ones.
      *
-     *     $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
+     *     $container = new ContainerBuilder(new ParameterBag(['foo' => 'bar']));
      *     $loader = new LoaderXXX($container);
      *     $loader->load('resource_name');
      *     $container->register('foo', 'stdClass');
@@ -647,7 +653,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         foreach ($this->extensions as $name => $extension) {
             if (!isset($this->extensionConfigs[$name])) {
-                $this->extensionConfigs[$name] = array();
+                $this->extensionConfigs[$name] = [];
             }
 
             $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $container->getExtensionConfig($name));
@@ -657,7 +663,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $envPlaceholders = $container->getParameterBag()->getEnvPlaceholders();
             $this->getParameterBag()->mergeEnvPlaceholders($container->getParameterBag());
         } else {
-            $envPlaceholders = array();
+            $envPlaceholders = [];
         }
 
         foreach ($container->envCounters as $env => $count) {
@@ -690,7 +696,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getExtensionConfig($name)
     {
         if (!isset($this->extensionConfigs[$name])) {
-            $this->extensionConfigs[$name] = array();
+            $this->extensionConfigs[$name] = [];
         }
 
         return $this->extensionConfigs[$name];
@@ -705,7 +711,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function prependExtensionConfig($name, array $config)
     {
         if (!isset($this->extensionConfigs[$name])) {
-            $this->extensionConfigs[$name] = array();
+            $this->extensionConfigs[$name] = [];
         }
 
         array_unshift($this->extensionConfigs[$name], $config);
@@ -753,7 +759,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        $this->extensionConfigs = array();
+        $this->extensionConfigs = [];
 
         if ($bag instanceof EnvPlaceholderParameterBag) {
             if ($resolveEnvPlaceholders) {
@@ -807,7 +813,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setAliases(array $aliases)
     {
-        $this->aliasDefinitions = array();
+        $this->aliasDefinitions = [];
         $this->addAliases($aliases);
     }
 
@@ -947,7 +953,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setDefinitions(array $definitions)
     {
-        $this->definitions = array();
+        $this->definitions = [];
         $this->addDefinitions($definitions);
     }
 
@@ -1031,7 +1037,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = (string) $id;
 
-        $seen = array();
+        $seen = [];
         while (isset($this->aliasDefinitions[$id])) {
             $id = (string) $this->aliasDefinitions[$id];
 
@@ -1103,7 +1109,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (null !== $factory = $definition->getFactory()) {
             if (\is_array($factory)) {
-                $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlineServices, $isConstructorArgument), $factory[1]);
+                $factory = [$this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlineServices, $isConstructorArgument), $factory[1]];
             } elseif (!\is_string($factory)) {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }
@@ -1162,7 +1168,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new InvalidArgumentException(sprintf('The configure callable for class "%s" is not a callable.', \get_class($service)));
             }
 
-            \call_user_func($callable, $service);
+            $callable($service);
         }
 
         return $service;
@@ -1181,7 +1187,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->doResolveServices($value);
     }
 
-    private function doResolveServices($value, array &$inlineServices = array(), $isConstructorArgument = false)
+    private function doResolveServices($value, array &$inlineServices = [], $isConstructorArgument = false)
     {
         if (\is_array($value)) {
             foreach ($value as $k => $v) {
@@ -1228,13 +1234,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $count;
             });
         } elseif ($value instanceof ServiceLocatorArgument) {
-            $refs = array();
+            $refs = [];
             foreach ($value->getValues() as $k => $v) {
                 if ($v) {
-                    $refs[$k] = array($v);
+                    $refs[$k] = [$v];
                 }
             }
-            $value = new ServiceLocator(\Closure::fromCallable(array($this, 'resolveServices')), $refs);
+            $value = new ServiceLocator(\Closure::fromCallable([$this, 'resolveServices']), $refs);
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {
@@ -1242,7 +1248,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } elseif ($value instanceof Parameter) {
             $value = $this->getParameter((string) $value);
         } elseif ($value instanceof Expression) {
-            $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
+            $value = $this->getExpressionLanguage()->evaluate($value, ['container' => $this]);
         }
 
         return $value;
@@ -1253,7 +1259,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * Example:
      *
-     *     $container->register('foo')->addTag('my.tag', array('hello' => 'world'));
+     *     $container->register('foo')->addTag('my.tag', ['hello' => 'world']);
      *
      *     $serviceIds = $container->findTaggedServiceIds('my.tag');
      *     foreach ($serviceIds as $serviceId => $tags) {
@@ -1270,7 +1276,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function findTaggedServiceIds($name, $throwOnAbstract = false)
     {
         $this->usedTags[] = $name;
-        $tags = array();
+        $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
             if ($definition->hasTag($name)) {
                 if ($throwOnAbstract && $definition->isAbstract()) {
@@ -1290,7 +1296,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findTags()
     {
-        $tags = array();
+        $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
             $tags = array_merge(array_keys($definition->getTags()), $tags);
         }
@@ -1388,8 +1394,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $bag->resolveValue($value);
         }
 
+        if ($value instanceof Definition) {
+            $value = (array) $value;
+        }
+
         if (\is_array($value)) {
-            $result = array();
+            $result = [];
             foreach ($value as $k => $v) {
                 $result[\is_string($k) ? $this->resolveEnvPlaceholders($k, $format, $usedEnvs) : $k] = $this->resolveEnvPlaceholders($v, $format, $usedEnvs);
             }
@@ -1471,7 +1481,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public static function getServiceConditionals($value)
     {
-        $services = array();
+        $services = [];
 
         if (\is_array($value)) {
             foreach ($value as $v) {
@@ -1495,7 +1505,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public static function getInitializedConditionals($value)
     {
-        $services = array();
+        $services = [];
 
         if (\is_array($value)) {
             foreach ($value as $v) {
@@ -1519,7 +1529,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $hash = substr(base64_encode(hash('sha256', serialize($value), true)), 0, 7);
 
-        return str_replace(array('/', '+'), array('.', '_'), $hash);
+        return str_replace(['/', '+'], ['.', '_'], $hash);
     }
 
     /**
@@ -1534,11 +1544,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $value;
         }
 
-        foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
-            if (isset($placeholders[$value])) {
-                $bag = new ParameterBag($bag->all());
+        $envPlaceholders = $bag->getEnvPlaceholders();
+        if (isset($envPlaceholders[$name][$value])) {
+            $bag = new ParameterBag($bag->all());
 
-                return $bag->unescapeValue($bag->get("env($name)"));
+            return $bag->unescapeValue($bag->get("env($name)"));
+        }
+        foreach ($envPlaceholders as $env => $placeholders) {
+            if (isset($placeholders[$value])) {
+                return $this->getEnv($env);
             }
         }
 

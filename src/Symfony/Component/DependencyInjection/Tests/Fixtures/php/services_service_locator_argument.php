@@ -17,22 +17,22 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 {
     private $parameters;
-    private $targetDirs = array();
+    private $targetDirs = [];
     private $getService;
 
     public function __construct()
     {
-        $this->getService = \Closure::fromCallable(array($this, 'getService'));
-        $this->services = $this->privates = array();
-        $this->syntheticIds = array(
+        $this->getService = \Closure::fromCallable([$this, 'getService']);
+        $this->services = $this->privates = [];
+        $this->syntheticIds = [
             'foo5' => true,
-        );
-        $this->methodMap = array(
+        ];
+        $this->methodMap = [
             'bar' => 'getBarService',
             'foo1' => 'getFoo1Service',
-        );
+        ];
 
-        $this->aliases = array();
+        $this->aliases = [];
     }
 
     public function compile()
@@ -47,14 +47,14 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
 
     public function getRemovedIds()
     {
-        return array(
+        return [
             '.service_locator.38dy3OH' => true,
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
             'foo3' => true,
             'foo4' => true,
-        );
+        ];
     }
 
     /**
@@ -66,13 +66,13 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
     {
         $this->services['bar'] = $instance = new \stdClass();
 
-        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, array(
-            'foo1' => array('services', 'foo1', 'getFoo1Service', false),
-            'foo2' => array('privates', 'foo2', 'getFoo2Service', false),
-            'foo3' => array(false, 'foo3', 'getFoo3Service', false),
-            'foo4' => array('privates', 'foo4', NULL, 'BOOM'),
-            'foo5' => array('services', 'foo5', NULL, false),
-        ));
+        $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($this->getService, [
+            'foo1' => ['services', 'foo1', 'getFoo1Service', false],
+            'foo2' => ['privates', 'foo2', 'getFoo2Service', false],
+            'foo3' => [false, 'foo3', 'getFoo3Service', false],
+            'foo4' => ['privates', 'foo4', NULL, 'BOOM'],
+            'foo5' => ['services', 'foo5', NULL, false],
+        ]);
 
         return $instance;
     }

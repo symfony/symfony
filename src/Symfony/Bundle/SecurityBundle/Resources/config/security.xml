@@ -2,7 +2,7 @@
 
 <container xmlns="http://symfony.com/schema/dic/services"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
         <parameter key="security.authentication.trust_resolver.anonymous_class">null</parameter>
@@ -98,6 +98,7 @@
             <argument>%security.role_hierarchy.roles%</argument>
         </service>
         <service id="Symfony\Component\Security\Core\Role\RoleHierarchyInterface" alias="security.role_hierarchy" />
+        <service id="Symfony\Component\Security\Core\Role\RoleHierarchy" alias="security.role_hierarchy" />
 
 
         <!-- Security Voters -->

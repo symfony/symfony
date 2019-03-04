@@ -19,12 +19,13 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
 
 /**
  * @group time-sensitive
+ * @group legacy
  */
 class ChainCacheTest extends CacheTestCase
 {
     public function createSimpleCache($defaultLifetime = 0)
     {
-        return new ChainCache(array(new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)), $defaultLifetime);
+        return new ChainCache([new ArrayCache($defaultLifetime), new FilesystemCache('', $defaultLifetime)], $defaultLifetime);
     }
 
     /**
@@ -33,7 +34,7 @@ class ChainCacheTest extends CacheTestCase
      */
     public function testEmptyCachesException()
     {
-        new ChainCache(array());
+        new ChainCache([]);
     }
 
     /**
@@ -42,7 +43,7 @@ class ChainCacheTest extends CacheTestCase
      */
     public function testInvalidCacheException()
     {
-        new ChainCache(array(new \stdClass()));
+        new ChainCache([new \stdClass()]);
     }
 
     public function testPrune()
@@ -51,18 +52,18 @@ class ChainCacheTest extends CacheTestCase
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
         }
 
-        $cache = new ChainCache(array(
+        $cache = new ChainCache([
             $this->getPruneableMock(),
             $this->getNonPruneableMock(),
             $this->getPruneableMock(),
-        ));
+        ]);
         $this->assertTrue($cache->prune());
 
-        $cache = new ChainCache(array(
+        $cache = new ChainCache([
             $this->getPruneableMock(),
             $this->getFailingPruneableMock(),
             $this->getPruneableMock(),
-        ));
+        ]);
         $this->assertFalse($cache->prune());
     }
 

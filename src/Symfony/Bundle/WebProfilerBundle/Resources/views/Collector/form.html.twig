@@ -177,6 +177,12 @@
             color: inherit;
             text-decoration: inherit;
         }
+        h2 + h3.form-data-type {
+            margin-top: 0;
+        }
+        h3.form-data-type + h3 {
+            margin-top: 1em;
+        }
     </style>
 {% endblock %}
 
@@ -455,9 +461,10 @@
 {% macro form_tree_details(name, data, forms_by_hash, show) %}
     {% import _self as tree %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
-        <h2 class="dump-inline">
-            {{ name|default('(no name)') }} {% if data.type_class is defined %}({{ profiler_dump(data.type_class) }}){% endif %}
-        </h2>
+        <h2>{{ name|default('(no name)') }}</h2>
+        {% if data.type_class is defined %}
+            <h3 class="dump-inline form-data-type">{{ profiler_dump(data.type_class) }}</h3>
+        {% endif %}
 
         {% if data.errors is defined and data.errors|length > 0 %}
         <div class="errors">

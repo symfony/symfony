@@ -17,14 +17,14 @@ ini_set('display_errors', 0);
 $eHandler = set_error_handler('var_dump');
 $xHandler = set_exception_handler('var_dump');
 
-var_dump(array(
+var_dump([
     $eHandler[0] === $xHandler[0] ? 'Error and exception handlers do match' : 'Error and exception handlers are different',
-));
+]);
 
 $eHandler[0]->setExceptionHandler('print_r');
 
 if (true) {
-    class Broken implements \Serializable
+    class Broken implements \JsonSerializable
     {
     }
 }
@@ -37,6 +37,6 @@ array(1) {
 }
 object(Symfony\Component\Debug\Exception\FatalErrorException)#%d (%d) {
   ["message":protected]=>
-  string(199) "Error: Class Symfony\Component\Debug\Broken contains 2 abstract methods and must therefore be declared abstract or implement the remaining methods (Serializable::serialize, Serializable::unserialize)"
+  string(179) "Error: Class Symfony\Component\Debug\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
 %a
 }

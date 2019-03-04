@@ -33,7 +33,7 @@ final class PhpDocTypeHelper
      */
     public function getTypes(DocType $varType): array
     {
-        $types = array();
+        $types = [];
         $nullable = false;
 
         if ($varType instanceof Nullable) {
@@ -54,7 +54,7 @@ final class PhpDocTypeHelper
             return $types;
         }
 
-        $varTypes = array();
+        $varTypes = [];
         for ($typeIndex = 0; $varType->has($typeIndex); ++$typeIndex) {
             $type = $varType->get($typeIndex);
 
@@ -152,9 +152,9 @@ final class PhpDocTypeHelper
     private function getPhpTypeAndClass(string $docType): array
     {
         if (\in_array($docType, Type::$builtinTypes)) {
-            return array($docType, null);
+            return [$docType, null];
         }
 
-        return array('object', substr($docType, 1));
+        return ['object', substr($docType, 1)];
     }
 }

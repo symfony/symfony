@@ -43,8 +43,8 @@ class MinuteTransformer extends Transformer
      */
     public function extractDateOptions(string $matched, int $length): array
     {
-        return array(
+        return [
             'minute' => (int) $matched,
-        );
+        ];
     }
 }

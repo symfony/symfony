@@ -4,12 +4,17 @@ UPGRADE FROM 4.x to 5.0
 BrowserKit
 ----------
 
+ * Removed the possibility to extend `Response` by making it final.
+ * Removed `Response::buildHeader()`
+ * Removed `Response::getStatus()`, use `Response::getStatusCode()` instead
  * The `Client::submit()` method has a new `$serverParameters` argument.
 
 Cache
 -----
 
  * Removed `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
+ * Removed all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
+ * Removed `SimpleCacheAdapter`, use `Psr16Adapter instead.
 
 Config
 ------
@@ -18,6 +23,7 @@ Config
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
  * The `Processor` class has been made final
  * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead.
+ * Using environment variables with `cannotBeEmpty()` if the value is validated with `validate()` will throw an exception.
 
 Console
 -------
@@ -64,6 +70,12 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
 
+Filesystem
+----------
+
+ * The `Filesystem::dumpFile()` method no longer supports arrays in the `$content` argument.
+ * The `Filesystem::appendToFile()` method no longer supports arrays in the `$content` argument.
+
 Finder
 ------
 
@@ -71,7 +83,13 @@ Finder
 
 Form
 ----
-
+ 
+ * Removed support for using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled.
+ * Using names for buttons that do not start with a letter, a digit, or an underscore leads to an exception.
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons leads to an
+   exception.
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
  * The `getExtendedType()` method was removed from the `FormTypeExtensionInterface`. It is replaced by the the static
    `getExtendedTypes()` method which must return an iterable of extended types.
 
@@ -126,7 +144,9 @@ Form
 FrameworkBundle
 ---------------
 
- * Removed support for `bundle:controller:action` and `service:action` syntaxes to reference controllers. Use `serviceOrFqcn::method`
+ * The project dir argument of the constructor of `AssetsInstallCommand` is required.
+
+ * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
 
    Before:
@@ -136,11 +156,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: FrameworkBundle:Redirect:redirect
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller:myAction
    ```
 
    After:
@@ -150,11 +165,6 @@ FrameworkBundle
        path: /
        defaults:
            _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
-
-   service_controller:
-       path: /
-       defaults:
-           _controller: app.my_controller::myAction
    ```
 
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`.
@@ -164,32 +174,10 @@ FrameworkBundle
  * Added support for the SameSite attribute for session cookies. It is highly recommended to set this setting (`framework.session.cookie_samesite`) to `lax` for increased security against CSRF attacks.
  * The `ContainerAwareCommand` class has been removed, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` and `--no-debug` console options have been removed, define the `APP_ENV` and
-   `APP_DEBUG` environment variables instead.
-   If you want to keep using `--env` and `--no-debug`, update your `bin/console` file to make it call
-   `Application::bootstrapEnv()`.
-
-   Before:
-   ```php
-   $input = new ArgvInput();
-   $env = $input->getParameterOption(['--env', '-e'], $_SERVER['APP_ENV'] ?? 'dev', true);
-   $debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env)) && !$input->hasParameterOption('--no-debug', true);
-   $kernel = new Kernel($env, $debug);
-   $application = new Application($kernel);
-   $application->run($input);
-   ```
-
-   After:
-   ```php
-   Application::bootstrapEnv($_SERVER['argv']);
-   $kernel = new Kernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG']);
-   $application = new Application($kernel);
-   $application->run();
-   ```
-
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been removed, use the `trans()` one instead with a `%count%` parameter.
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
+ * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
 
 HttpFoundation
 --------------
@@ -199,6 +187,14 @@ HttpFoundation
  * The `getSession()` method of the `Request` class throws an exception when session is null.
  * The default value of the "$secure" and "$samesite" arguments of Cookie's constructor
    changed respectively from "false" to "null" and from "null" to "lax".
+ * The `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` interfaces have been removed,
+   use `Symfony\Component\Mime\MimeTypesInterface` instead.
+ * The `MimeType` and `MimeTypeExtensionGuesser` classes have been removed,
+   use `Symfony\Component\Mime\MimeTypes` instead.
+ * The `FileBinaryMimeTypeGuesser` class has been removed,
+   use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
+ * The `FileinfoMimeTypeGuesser` class has been removed,
+   use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
 
 HttpKernel
 ----------
@@ -206,7 +202,7 @@ HttpKernel
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
  * Removed the first and second constructor argument of `ConfigDataCollector`
- * Removed `ConfigDataCollector::getApplicationName()` 
+ * Removed `ConfigDataCollector::getApplicationName()`
  * Removed `ConfigDataCollector::getApplicationVersion()`
 
 Monolog
@@ -233,9 +229,22 @@ Process
    $process = Process::fromShellCommandline('ls -l');
    ```
 
+Routing
+-------
+
+ * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
+   options have been removed.
+ * `Route` and `CompiledRoute` don't implement `Serializable` anymore; if you serialize them, please
+   ensure your unserialization logic can recover from a failure related to an updated serialization format
+
 Security
 --------
 
+ * The `Role` and `SwitchUserRole` classes have been removed.
+ * The `RoleHierarchyInterface` has been removed.
+ * The `getReachableRoles()` method of the `RoleHierarchy` class has been removed.
+ * The `getRoles()` method has been removed from the `TokenInterface`. It has been replaced by the new
+   `getRoleNames()` method.
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
  * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
  * The `ExpressionVoter::addExpressionLanguageProvider()` method has been removed.
@@ -246,6 +255,37 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
+   thus `serialize()` and `unserialize()` aren't available.
+   Use `getState()` and `setState()` instead.
+
+   Before:
+   ```php
+   public function serialize()
+   {
+       return [$this->myLocalVar, parent::serialize()];
+   }
+
+   public function unserialize($serialized)
+   {
+       [$this->myLocalVar, $parentSerialized] = unserialize($serialized);
+       parent::unserialize($parentSerialized);
+   }
+   ```
+
+   After:
+   ```php
+   protected function getState(): array
+   {
+       return [$this->myLocalVar, parent::getState()];
+   }
+
+   protected function setState(array $data)
+   {
+       [$this->myLocalVar, $parentData] = $data;
+       parent::setState($parentData);
+   }
+   ```
 
 SecurityBundle
 --------------
@@ -261,6 +301,11 @@ SecurityBundle
    use Guard instead.
  * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
    use Guard instead.
+ * The names of the cookies configured in the `logout.delete_cookies` option are
+   no longer normalized. If any of your cookie names has dashes they won't be
+   changed to underscores.
+   Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
+   After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
 
 Serializer
 ----------
@@ -306,8 +351,8 @@ Workflow
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
 
-WebServerBundle
----------------
+Yaml
+----
 
-* Omitting the `$environment` argument of  the `ServerRunCommand` and
-  `ServerStartCommand` constructors now throws a `\TypeError`.
+ * The parser is now stricter and will throw a `ParseException` when a
+   mapping is found inside a multi-line string.

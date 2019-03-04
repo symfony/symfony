@@ -151,40 +151,40 @@ class NumberFormatter
     /**
      * Default values for the en locale.
      */
-    private $attributes = array(
+    private $attributes = [
         self::FRACTION_DIGITS => 0,
         self::GROUPING_USED => 1,
         self::ROUNDING_MODE => self::ROUND_HALFEVEN,
-    );
+    ];
 
     /**
      * Holds the initialized attributes code.
      */
-    private $initializedAttributes = array();
+    private $initializedAttributes = [];
 
     /**
      * The supported styles to the constructor $styles argument.
      */
-    private static $supportedStyles = array(
+    private static $supportedStyles = [
         'CURRENCY' => self::CURRENCY,
         'DECIMAL' => self::DECIMAL,
-    );
+    ];
 
     /**
      * Supported attributes to the setAttribute() $attr argument.
      */
-    private static $supportedAttributes = array(
+    private static $supportedAttributes = [
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
         'GROUPING_USED' => self::GROUPING_USED,
         'ROUNDING_MODE' => self::ROUNDING_MODE,
-    );
+    ];
 
     /**
      * The available rounding modes for setAttribute() usage with
      * NumberFormatter::ROUNDING_MODE. NumberFormatter::ROUND_DOWN
      * and NumberFormatter::ROUND_UP does not have a PHP only equivalent.
      */
-    private static $roundingModes = array(
+    private static $roundingModes = [
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
         'ROUND_HALFUP' => self::ROUND_HALFUP,
@@ -192,7 +192,7 @@ class NumberFormatter
         'ROUND_FLOOR' => self::ROUND_FLOOR,
         'ROUND_DOWN' => self::ROUND_DOWN,
         'ROUND_UP' => self::ROUND_UP,
-    );
+    ];
 
     /**
      * The mapping between NumberFormatter rounding modes to the available
@@ -200,23 +200,23 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/function.round.php
      */
-    private static $phpRoundingMap = array(
+    private static $phpRoundingMap = [
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
         self::ROUND_HALFUP => \PHP_ROUND_HALF_UP,
-    );
+    ];
 
     /**
      * The list of supported rounding modes which aren't available modes in
      * PHP's round() function, but there's an equivalent. Keys are rounding
      * modes, values does not matter.
      */
-    private static $customRoundingList = array(
+    private static $customRoundingList = [
         self::ROUND_CEILING => true,
         self::ROUND_FLOOR => true,
         self::ROUND_DOWN => true,
         self::ROUND_UP => true,
-    );
+    ];
 
     /**
      * The maximum value of the integer type in 32 bit platforms.
@@ -230,15 +230,15 @@ class NumberFormatter
      */
     private static $int64Max = 9223372036854775807;
 
-    private static $enSymbols = array(
-        self::DECIMAL => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
-        self::CURRENCY => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
-    );
+    private static $enSymbols = [
+        self::DECIMAL => ['.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','],
+        self::CURRENCY => ['.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','],
+    ];
 
-    private static $enTextAttributes = array(
-        self::DECIMAL => array('', '', '-', '', ' ', 'XXX', ''),
-        self::CURRENCY => array('¤', '', '-¤', '', ' ', 'XXX'),
-    );
+    private static $enTextAttributes = [
+        self::DECIMAL => ['', '', '-', '', ' ', 'XXX', ''],
+        self::CURRENCY => ['¤', '', '-¤', '', ' ', 'XXX'],
+    ];
 
     /**
      * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
@@ -460,7 +460,7 @@ class NumberFormatter
      */
     public function getSymbol($attr)
     {
-        return array_key_exists($this->style, self::$enSymbols) && array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::$enSymbols) && \array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
     }
 
     /**
@@ -474,7 +474,7 @@ class NumberFormatter
      */
     public function getTextAttribute($attr)
     {
-        return array_key_exists($this->style, self::$enTextAttributes) && array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
+        return \array_key_exists($this->style, self::$enTextAttributes) && \array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
     }
 
     /**
@@ -484,7 +484,7 @@ class NumberFormatter
      * @param string $currency Parameter to receive the currency name (reference)
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return bool|string The parsed numeric value of false on error
+     * @return bool|string The parsed numeric value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parsecurrency.php
      *
@@ -502,7 +502,7 @@ class NumberFormatter
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default.
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return int|float|false The parsed value of false on error
+     * @return int|float|false The parsed value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parse.php
      */
@@ -638,8 +638,8 @@ class NumberFormatter
     /**
      * Not supported. Set a text attribute.
      *
-     * @param int $attr  An attribute specifier, one of the text attribute constants
-     * @param int $value The attribute value
+     * @param int    $attr  An attribute specifier, one of the text attribute constants
+     * @param string $value The attribute value
      *
      * @return bool true on success or false on failure
      *

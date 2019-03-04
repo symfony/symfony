@@ -60,7 +60,7 @@ class TemplateLocatorTest extends TestCase
         $fileLocator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->throwException(new \InvalidArgumentException($errorMessage)))
+            ->willThrowException(new \InvalidArgumentException($errorMessage))
         ;
 
         $locator = new TemplateLocator($fileLocator);
@@ -90,8 +90,8 @@ class TemplateLocatorTest extends TestCase
     {
         return $this
             ->getMockBuilder('Symfony\Component\Config\FileLocator')
-            ->setMethods(array('locate'))
-            ->setConstructorArgs(array('/path/to/fallback'))
+            ->setMethods(['locate'])
+            ->setConstructorArgs(['/path/to/fallback'])
             ->getMock()
         ;
     }

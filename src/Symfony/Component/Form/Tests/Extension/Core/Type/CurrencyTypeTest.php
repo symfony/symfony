@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CurrencyTypeTest extends BaseTypeTest
@@ -41,9 +42,9 @@ class CurrencyTypeTest extends BaseTypeTest
     public function testChoiceTranslationLocaleOption()
     {
         $choices = $this->factory
-            ->create(static::TESTED_TYPE, null, array(
+            ->create(static::TESTED_TYPE, null, [
                 'choice_translation_locale' => 'uk',
-            ))
+            ])
             ->createView()->vars['choices'];
 
         // Don't check objects for identity
@@ -55,5 +56,20 @@ class CurrencyTypeTest extends BaseTypeTest
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'EUR', $expectedData = 'EUR')
+    {
+        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testInvalidChoiceValuesAreDropped()
+    {
+        $type = new CurrencyType();
+
+        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

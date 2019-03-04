@@ -28,6 +28,9 @@
         "symfony/validator": "~3.4|~4.0",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/security-guard": "<4.3"
+    },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",
         "symfony/event-dispatcher": "",
@@ -45,7 +48,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

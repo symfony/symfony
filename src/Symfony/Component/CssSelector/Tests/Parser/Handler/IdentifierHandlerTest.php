@@ -20,24 +20,24 @@ class IdentifierHandlerTest extends AbstractHandlerTest
 {
     public function getHandleValueTestData()
     {
-        return array(
-            array('foo', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), ''),
-            array('foo|bar', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '|bar'),
-            array('foo.class', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '.class'),
-            array('foo[attr]', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '[attr]'),
-            array('foo bar', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), ' bar'),
-        );
+        return [
+            ['foo', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), ''],
+            ['foo|bar', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '|bar'],
+            ['foo.class', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '.class'],
+            ['foo[attr]', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), '[attr]'],
+            ['foo bar', new Token(Token::TYPE_IDENTIFIER, 'foo', 0), ' bar'],
+        ];
     }
 
     public function getDontHandleValueTestData()
     {
-        return array(
-            array('>'),
-            array('+'),
-            array(' '),
-            array('*|foo'),
-            array('/* comment */'),
-        );
+        return [
+            ['>'],
+            ['+'],
+            [' '],
+            ['*|foo'],
+            ['/* comment */'],
+        ];
     }
 
     protected function generateHandler()

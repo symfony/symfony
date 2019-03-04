@@ -50,7 +50,7 @@ class MessengerDataCollectorTest extends TestCase
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
@@ -80,7 +80,7 @@ DUMP;
         $message = new DummyMessage('dummy message');
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
-        $bus->method('dispatch')->with($message)->will($this->throwException(new \RuntimeException('foo')));
+        $bus->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -95,7 +95,7 @@ DUMP;
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(1, $messages);
 
         $file = __FILE__;
@@ -145,7 +145,7 @@ DUMP
 
         $collector->lateCollect();
 
-        $messages = iterator_to_array($collector->getMessages());
+        $messages = $collector->getMessages();
         $this->assertCount(5, $messages);
 
         $this->assertSame('#1', $messages[0]['message']['value']['message']);

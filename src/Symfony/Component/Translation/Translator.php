@@ -34,7 +34,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * @var MessageCatalogueInterface[]
      */
-    protected $catalogues = array();
+    protected $catalogues = [];
 
     /**
      * @var string
@@ -44,17 +44,17 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * @var array
      */
-    private $fallbackLocales = array();
+    private $fallbackLocales = [];
 
     /**
      * @var LoaderInterface[]
      */
-    private $loaders = array();
+    private $loaders = [];
 
     /**
      * @var array
      */
-    private $resources = array();
+    private $resources = [];
 
     /**
      * @var MessageFormatterInterface
@@ -134,10 +134,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
 
         $this->assertValidLocale($locale);
 
-        $this->resources[$locale][] = array($format, $resource, $domain);
+        $this->resources[$locale][] = [$format, $resource, $domain];
 
         if (\in_array($locale, $this->fallbackLocales)) {
-            $this->catalogues = array();
+            $this->catalogues = [];
         } else {
             unset($this->catalogues[$locale]);
         }
@@ -170,7 +170,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     public function setFallbackLocales(array $locales)
     {
         // needed as the fallback locales are linked to the already loaded catalogues
-        $this->catalogues = array();
+        $this->catalogues = [];
 
         foreach ($locales as $locale) {
             $this->assertValidLocale($locale);
@@ -184,7 +184,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      *
      * @internal since Symfony 4.2
      *
-     * @return array $locales The fallback locales
+     * @return array The fallback locales
      */
     public function getFallbackLocales()
     {
@@ -194,7 +194,7 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
     /**
      * {@inheritdoc}
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -203,20 +203,17 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
         $id = (string) $id;
         $catalogue = $this->getCatalogue($locale);
         $locale = $catalogue->getLocale();
-        $intlDomain = $this->hasIntlFormatter ? $domain.IntlFormatterInterface::DOMAIN_SUFFIX : null;
-        while (true) {
-            if (null !== $intlDomain && $catalogue->defines($id, $intlDomain)) {
-                return $this->formatter->formatIntl($catalogue->get($id, $intlDomain), $locale, $parameters);
-            }
-            if ($catalogue->defines($id, $domain)) {
-                break;
-            }
+        while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
                 $locale = $catalogue->getLocale();
             } else {
                 break;
             }
+        }
+
+        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, $parameters);
         }
 
         return $this->formatter->format($catalogue->get($id, $domain), $locale, $parameters);
@@ -227,9 +224,9 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
      *
      * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%count%" parameter.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the trans() one instead with a "%%count%%" parameter.', __METHOD__), E_USER_DEPRECATED);
 
         if (!$this->formatter instanceof ChoiceMessageFormatterInterface) {
             throw new LogicException(sprintf('The formatter "%s" does not support plural translations.', \get_class($this->formatter)));
@@ -249,6 +246,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
             } else {
                 break;
             }
+        }
+
+        if ($this->hasIntlFormatter && $catalogue->defines($id, $domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+            return $this->formatter->formatIntl($catalogue->get($id, $domain), $locale, ['%count%' => $number] + $parameters);
         }
 
         return $this->formatter->choiceFormat($catalogue->get($id, $domain), $number, $locale, $parameters);
@@ -352,7 +353,7 @@ return \$catalogue;
 EOF
             ,
             $locale,
-            var_export($this->catalogues[$locale]->all(), true),
+            var_export($this->getAllMessages($this->catalogues[$locale]), true),
             $fallbackContent
         );
 
@@ -378,7 +379,7 @@ EOF
                 ,
                 $fallbackSuffix,
                 $fallback,
-                var_export($fallbackCatalogue->all(), true),
+                var_export($this->getAllMessages($fallbackCatalogue), true),
                 $currentSuffix,
                 $fallbackSuffix
             );
@@ -417,7 +418,7 @@ EOF
                 $this->initializeCatalogue($fallback);
             }
 
-            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
+            $fallbackCatalogue = new MessageCatalogue($fallback, $this->getAllMessages($this->catalogues[$fallback]));
             foreach ($this->catalogues[$fallback]->getResources() as $resource) {
                 $fallbackCatalogue->addResource($resource);
             }
@@ -432,7 +433,7 @@ EOF
             $parentLocales = \json_decode(\file_get_contents(__DIR__.'/Resources/data/parents.json'), true);
         }
 
-        $locales = array();
+        $locales = [];
         foreach ($this->fallbackLocales as $fallback) {
             if ($fallback === $locale) {
                 continue;
@@ -485,5 +486,22 @@ EOF
         }
 
         return $this->configCacheFactory;
+    }
+
+    private function getAllMessages(MessageCatalogueInterface $catalogue): array
+    {
+        $allMessages = [];
+
+        foreach ($catalogue->all() as $domain => $messages) {
+            if ($intlMessages = $catalogue->all($domain.MessageCatalogue::INTL_DOMAIN_SUFFIX)) {
+                $allMessages[$domain.MessageCatalogue::INTL_DOMAIN_SUFFIX] = $intlMessages;
+                $messages = array_diff_key($messages, $intlMessages);
+            }
+            if ($messages) {
+                $allMessages[$domain] = $messages;
+            }
+        }
+
+        return $allMessages;
     }
 }

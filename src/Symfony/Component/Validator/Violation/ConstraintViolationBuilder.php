@@ -157,7 +157,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         } elseif ($this->translator instanceof TranslatorInterface) {
             $translatedMessage = $this->translator->trans(
                 $this->message,
-                array('%count%' => $this->plural) + $this->parameters,
+                ['%count%' => $this->plural] + $this->parameters,
                 $this->translationDomain
             );
         } else {

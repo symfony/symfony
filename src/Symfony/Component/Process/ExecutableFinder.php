@@ -19,7 +19,7 @@ namespace Symfony\Component\Process;
  */
 class ExecutableFinder
 {
-    private $suffixes = array('.exe', '.bat', '.cmd', '.com');
+    private $suffixes = ['.exe', '.bat', '.cmd', '.com'];
 
     /**
      * Replaces default suffixes of executable.
@@ -42,17 +42,17 @@ class ExecutableFinder
     /**
      * Finds an executable by name.
      *
-     * @param string $name      The executable name (without the extension)
-     * @param string $default   The default to return if no executable is found
-     * @param array  $extraDirs Additional dirs to check into
+     * @param string      $name      The executable name (without the extension)
+     * @param string|null $default   The default to return if no executable is found
+     * @param array       $extraDirs Additional dirs to check into
      *
-     * @return string The executable path or default value
+     * @return string|null The executable path or default value
      */
-    public function find($name, $default = null, array $extraDirs = array())
+    public function find($name, $default = null, array $extraDirs = [])
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));
-            $dirs = array();
+            $dirs = [];
             foreach ($searchPath as $path) {
                 // Silencing against https://bugs.php.net/69240
                 if (@is_dir($path)) {
@@ -70,7 +70,7 @@ class ExecutableFinder
             );
         }
 
-        $suffixes = array('');
+        $suffixes = [''];
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $pathExt = getenv('PATHEXT');
             $suffixes = array_merge($pathExt ? explode(PATH_SEPARATOR, $pathExt) : $this->suffixes, $suffixes);

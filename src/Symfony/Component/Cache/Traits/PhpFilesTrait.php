@@ -31,8 +31,8 @@ trait PhpFilesTrait
 
     private $includeHandler;
     private $appendOnly;
-    private $values = array();
-    private $files = array();
+    private $values = [];
+    private $files = [];
 
     private static $startTime;
 
@@ -54,7 +54,11 @@ trait PhpFilesTrait
         set_error_handler($this->includeHandler);
         try {
             foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-                list($expiresAt) = include $file;
+                try {
+                    list($expiresAt) = include $file;
+                } catch (\ErrorException $e) {
+                    $expiresAt = $time;
+                }
 
                 if ($time >= $expiresAt) {
                     $pruned = $this->doUnlink($file) && !file_exists($file) && $pruned;
@@ -74,13 +78,13 @@ trait PhpFilesTrait
     {
         if ($this->appendOnly) {
             $now = 0;
-            $missingIds = array();
+            $missingIds = [];
         } else {
             $now = time();
             $missingIds = $ids;
-            $ids = array();
+            $ids = [];
         }
-        $values = array();
+        $values = [];
 
         begin:
         foreach ($ids as $id) {
@@ -111,7 +115,7 @@ trait PhpFilesTrait
                     if ($now >= $expiresAt) {
                         unset($this->values[$id], $missingIds[$k]);
                     }
-                } catch (\Exception $e) {
+                } catch (\ErrorException $e) {
                     unset($missingIds[$k]);
                 }
             }
@@ -120,7 +124,7 @@ trait PhpFilesTrait
         }
 
         $ids = $missingIds;
-        $missingIds = array();
+        $missingIds = [];
         goto begin;
     }
 
@@ -137,6 +141,8 @@ trait PhpFilesTrait
         try {
             $file = $this->files[$id] ?? $this->files[$id] = $this->getFile($id);
             list($expiresAt, $value) = include $file;
+        } catch (\ErrorException $e) {
+            return false;
         } finally {
             restore_error_handler();
         }
@@ -189,7 +195,7 @@ trait PhpFilesTrait
 
             $file = $this->files[$key] = $this->getFile($key, true);
             // Since OPcache only compiles files older than the script execution start, set the file's mtime in the past
-            $ok = $this->write($file, "<?php return array({$expiry}, {$value});\n", self::$startTime - 10) && $ok;
+            $ok = $this->write($file, "<?php return [{$expiry}, {$value}];\n", self::$startTime - 10) && $ok;
 
             if ($allowCompile) {
                 @opcache_invalidate($file, true);
@@ -209,7 +215,7 @@ trait PhpFilesTrait
      */
     protected function doClear($namespace)
     {
-        $this->values = array();
+        $this->values = [];
 
         return $this->doCommonClear($namespace);
     }

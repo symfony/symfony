@@ -12,6 +12,10 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -22,7 +26,7 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class RecursiveValidatorTest extends AbstractTest
 {
-    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
+    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = [])
     {
         $translator = new IdentityTranslator();
         $translator->setLocale('en');
@@ -40,26 +44,26 @@ class RecursiveValidatorTest extends AbstractTest
         $childB = new ChildB();
         $childA->name = false;
         $childB->name = 'fake';
-        $entity->childA = array($childA);
-        $entity->childB = array($childB);
+        $entity->childA = [$childA];
+        $entity->childB = [$childB];
         $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')
-            ->with($entity, null, array())
+            ->with($entity, null, [])
             ->willReturnSelf();
 
         $validator = $this
             ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()
-            ->setMethods(array('startContext'))
+            ->setMethods(['startContext'])
             ->getMock();
         $validator
             ->expects($this->once())
             ->method('startContext')
             ->willReturn($validatorContext);
 
-        $validator->validate($entity, null, array());
+        $validator->validate($entity, null, []);
     }
 
     public function testRelationBetweenChildAAndChildB()
@@ -73,26 +77,60 @@ class RecursiveValidatorTest extends AbstractTest
 
         $childA->name = false;
         $childB->name = 'fake';
-        $entity->childA = array($childA);
-        $entity->childB = array($childB);
+        $entity->childA = [$childA];
+        $entity->childB = [$childB];
 
         $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')
-            ->with($entity, null, array())
+            ->with($entity, null, [])
             ->willReturnSelf();
 
         $validator = $this
             ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()
-            ->setMethods(array('startContext'))
+            ->setMethods(['startContext'])
             ->getMock();
         $validator
             ->expects($this->once())
             ->method('startContext')
             ->willReturn($validatorContext);
 
-        $validator->validate($entity, null, array());
+        $validator->validate($entity, null, []);
+    }
+
+    public function testCollectionConstraintValidateAllGroupsForNestedConstraints()
+    {
+        $this->metadata->addPropertyConstraint('data', new Collection(['fields' => [
+            'one' => [new NotBlank(['groups' => 'one']), new Length(['min' => 2, 'groups' => 'two'])],
+            'two' => [new NotBlank(['groups' => 'two'])],
+        ]]));
+
+        $entity = new Entity();
+        $entity->data = ['one' => 't', 'two' => ''];
+
+        $violations = $this->validator->validate($entity, null, ['one', 'two']);
+
+        $this->assertCount(2, $violations);
+        $this->assertInstanceOf(Length::class, $violations->get(0)->getConstraint());
+        $this->assertInstanceOf(NotBlank::class, $violations->get(1)->getConstraint());
+    }
+
+    public function testAllConstraintValidateAllGroupsForNestedConstraints()
+    {
+        $this->metadata->addPropertyConstraint('data', new All(['constraints' => [
+            new NotBlank(['groups' => 'one']),
+            new Length(['min' => 2, 'groups' => 'two']),
+        ]]));
+
+        $entity = new Entity();
+        $entity->data = ['one' => 't', 'two' => ''];
+
+        $violations = $this->validator->validate($entity, null, ['one', 'two']);
+
+        $this->assertCount(2, $violations);
+        $this->assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
+        $this->assertInstanceOf(Length::class, $violations->get(1)->getConstraint());
     }
 }

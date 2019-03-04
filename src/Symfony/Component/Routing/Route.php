@@ -21,11 +21,11 @@ class Route implements \Serializable
 {
     private $path = '/';
     private $host = '';
-    private $schemes = array();
-    private $methods = array();
-    private $defaults = array();
-    private $requirements = array();
-    private $options = array();
+    private $schemes = [];
+    private $methods = [];
+    private $defaults = [];
+    private $requirements = [];
+    private $options = [];
     private $condition = '';
 
     /**
@@ -50,7 +50,7 @@ class Route implements \Serializable
      * @param string|string[] $methods      A required HTTP method or an array of restricted methods
      * @param string          $condition    A condition that should evaluate to true for the route to match
      */
-    public function __construct(string $path, array $defaults = array(), array $requirements = array(), array $options = array(), ?string $host = '', $schemes = array(), $methods = array(), ?string $condition = '')
+    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', $schemes = [], $methods = [], ?string $condition = '')
     {
         $this->setPath($path);
         $this->addDefaults($defaults);
@@ -63,11 +63,11 @@ class Route implements \Serializable
     }
 
     /**
-     * {@inheritdoc}
+     * @internal since Symfony 4.3, will be removed in Symfony 5 as the class won't implement Serializable anymore
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             'path' => $this->path,
             'host' => $this->host,
             'defaults' => $this->defaults,
@@ -77,11 +77,11 @@ class Route implements \Serializable
             'methods' => $this->methods,
             'condition' => $this->condition,
             'compiled' => $this->compiled,
-        ));
+        ]);
     }
 
     /**
-     * {@inheritdoc}
+     * @internal since Symfony 4.3, will be removed in Symfony 5 as the class won't implement Serializable anymore
      */
     public function unserialize($serialized)
     {
@@ -262,9 +262,9 @@ class Route implements \Serializable
      */
     public function setOptions(array $options)
     {
-        $this->options = array(
+        $this->options = [
             'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
-        );
+        ];
 
         return $this->addOptions($options);
     }
@@ -327,7 +327,7 @@ class Route implements \Serializable
      */
     public function hasOption($name)
     {
-        return array_key_exists($name, $this->options);
+        return \array_key_exists($name, $this->options);
     }
 
     /**
@@ -351,7 +351,7 @@ class Route implements \Serializable
      */
     public function setDefaults(array $defaults)
     {
-        $this->defaults = array();
+        $this->defaults = [];
 
         return $this->addDefaults($defaults);
     }
@@ -396,7 +396,7 @@ class Route implements \Serializable
      */
     public function hasDefault($name)
     {
-        return array_key_exists($name, $this->defaults);
+        return \array_key_exists($name, $this->defaults);
     }
 
     /**
@@ -436,7 +436,7 @@ class Route implements \Serializable
      */
     public function setRequirements(array $requirements)
     {
-        $this->requirements = array();
+        $this->requirements = [];
 
         return $this->addRequirements($requirements);
     }
@@ -481,7 +481,7 @@ class Route implements \Serializable
      */
     public function hasRequirement($key)
     {
-        return array_key_exists($key, $this->requirements);
+        return \array_key_exists($key, $this->requirements);
     }
 
     /**

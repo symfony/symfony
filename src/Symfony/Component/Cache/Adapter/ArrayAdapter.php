@@ -52,9 +52,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         $item = $this->getItem($key);
+        $metadata = $item->getMetadata();
 
         // ArrayAdapter works in memory, we don't care about stampede protection
         if (INF === $beta || !$item->isHit()) {
@@ -82,7 +83,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
             if (!\is_string($key) || !isset($this->expiries[$key])) {
@@ -123,7 +124,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
 
             return true;
         }
-        if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+        if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
             return false;
         }
         if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {

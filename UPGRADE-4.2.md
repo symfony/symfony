@@ -68,6 +68,7 @@ Finder
 Form
 ----
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
    extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
 
@@ -175,29 +176,6 @@ FrameworkBundle
    ```
  * The `ContainerAwareCommand` class has been deprecated, use `Symfony\Component\Console\Command\Command`
    with dependency injection instead.
- * The `--env` and `--no-debug` console options have been deprecated, define the `APP_ENV` and
-   `APP_DEBUG` environment variables instead.
-   If you want to keep using `--env` and `--no-debug`, update your `bin/console` file to make it call
-   `Application::bootstrapEnv()`.
-
-   Before:
-   ```php
-   $input = new ArgvInput();
-   $env = $input->getParameterOption(['--env', '-e'], $_SERVER['APP_ENV'] ?? 'dev', true);
-   $debug = (bool) ($_SERVER['APP_DEBUG'] ?? ('prod' !== $env)) && !$input->hasParameterOption('--no-debug', true);
-   $kernel = new Kernel($env, $debug);
-   $application = new Application($kernel);
-   $application->run($input);
-   ```
-
-   After:
-   ```php
-   Application::bootstrapEnv($_SERVER['argv']);
-   $kernel = new Kernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG']);
-   $application = new Application($kernel);
-   $application->run();
-   ```
-
  * The `Templating\Helper\TranslatorHelper::transChoice()` method has been deprecated, use the `trans()` one instead with a `%count%` parameter.
  * Deprecated support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been deprecated.
@@ -222,7 +200,10 @@ Messenger
 ---------
 
  * The `MiddlewareInterface::handle()` and `SenderInterface::send()` methods must now return an `Envelope` instance.
- * The return value of handlers is ignored. If you used to return a value, e.g in query bus handlers, you can either:
+ * The return value of handlers isn't forwarded anymore by middleware and buses. 
+   If you used to return a value, e.g in query bus handlers, you can either:
+    - get the result from the `HandledStamp` in the envelope returned by the bus.
+    - use the `HandleTrait` to leverage a message bus, expecting a single, synchronous message handling and returning its result.
     - make your `Query` mutable to allow setting & getting a result:
       ```php
       // When dispatching:
@@ -232,15 +213,6 @@ Messenger
       // In your handler:
       $query->setResult($yourResult);
       ```
-    - define a callable on your `Query` to be called in your handler:
-      ```php
-      // When dispatching:
-      $bus->dispatch(new Query([$this, 'onResult']));
-
-      // In your handler:
-      $query->executeCallback($yourResult);
-      ```
-
  * The `EnvelopeAwareInterface` was removed and the `MiddlewareInterface::handle()` method now requires an `Envelope` object
    as first argument. When using built-in middleware with the provided `MessageBus`, you will not have to do anything.  
    If you use your own `MessageBusInterface` implementation, you must wrap the message in an `Envelope` before passing it to middleware.  
@@ -314,6 +286,23 @@ Messenger
    ```
  * The `EncoderInterface` and `DecoderInterface` interfaces have been replaced by a unified `Symfony\Component\Messenger\Transport\Serialization\SerializerInterface`.
    Each interface method have been merged untouched into the `Serializer` interface, so you can simply merge your two implementations together and implement the new interface.
+ * The `HandlerLocator` class was replaced with `Symfony\Component\Messenger\Handler\HandlersLocator`.
+
+   Before:
+   ```php
+   new HandlerLocator([
+        YourMessage::class => $handlerCallable,
+   ]);
+   ```
+
+   After:
+   ```php
+   new HandlersLocator([
+        YourMessage::class => [
+            $handlerCallable,
+        ]
+   ]);
+   ```
 
 Monolog
 -------
@@ -393,6 +382,7 @@ TwigBundle
 Validator
 ---------
 
+ * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `checkMX` and `checkHost` options of the `Email` constraint are deprecated
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final
@@ -400,9 +390,3 @@ Validator
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
  * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated
  * Using the `Expression` constraint without `symfony/expression-language` is deprecated
-
-WebServerBundle
----------------
-
-* Omitting the `$environment` argument of the `ServerRunCommand` and 
-  `ServerStartCommand` constructors is deprecated.

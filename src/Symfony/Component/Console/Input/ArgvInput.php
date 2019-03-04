@@ -169,7 +169,7 @@ class ArgvInput extends Input
         // if input is expecting another argument, add it
         if ($this->definition->hasArgument($c)) {
             $arg = $this->definition->getArgument($c);
-            $this->arguments[$arg->getName()] = $arg->isArray() ? array($token) : $token;
+            $this->arguments[$arg->getName()] = $arg->isArray() ? [$token] : $token;
 
         // if last argument isArray(), append token to last argument
         } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
@@ -224,11 +224,11 @@ class ArgvInput extends Input
             throw new RuntimeException(sprintf('The "--%s" option does not accept a value.', $name));
         }
 
-        if (\in_array($value, array('', null), true) && $option->acceptValue() && \count($this->parsed)) {
+        if (\in_array($value, ['', null], true) && $option->acceptValue() && \count($this->parsed)) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
             $next = array_shift($this->parsed);
-            if ((isset($next[0]) && '-' !== $next[0]) || \in_array($next, array('', null), true)) {
+            if ((isset($next[0]) && '-' !== $next[0]) || \in_array($next, ['', null], true)) {
                 $value = $next;
             } else {
                 array_unshift($this->parsed, $next);
@@ -257,8 +257,27 @@ class ArgvInput extends Input
      */
     public function getFirstArgument()
     {
-        foreach ($this->tokens as $token) {
+        $isOption = false;
+        foreach ($this->tokens as $i => $token) {
             if ($token && '-' === $token[0]) {
+                if (false !== strpos($token, '=') || !isset($this->tokens[$i + 1])) {
+                    continue;
+                }
+
+                // If it's a long option, consider that everything after "--" is the option name.
+                // Otherwise, use the last char (if it's a short option set, only the last one can take a value with space separator)
+                $name = '-' === $token[1] ? substr($token, 2) : substr($token, -1);
+                if (!isset($this->options[$name]) && !$this->definition->hasShortcut($name)) {
+                    // noop
+                } elseif ((isset($this->options[$name]) || isset($this->options[$name = $this->definition->shortcutToName($name)])) && $this->tokens[$i + 1] === $this->options[$name]) {
+                    $isOption = true;
+                }
+
+                continue;
+            }
+
+            if ($isOption) {
+                $isOption = false;
                 continue;
             }
 

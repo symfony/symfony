@@ -47,7 +47,7 @@ class RoleVoter implements VoterInterface
 
             $result = VoterInterface::ACCESS_DENIED;
             foreach ($roles as $role) {
-                if ($attribute === $role->getRole()) {
+                if ($attribute === $role) {
                     return VoterInterface::ACCESS_GRANTED;
                 }
             }
@@ -58,6 +58,12 @@ class RoleVoter implements VoterInterface
 
     protected function extractRoles(TokenInterface $token)
     {
-        return $token->getRoles();
+        if (method_exists($token, 'getRoleNames')) {
+            return $token->getRoleNames();
+        }
+
+        @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
+
+        return array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
     }
 }

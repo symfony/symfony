@@ -26,7 +26,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
      */
     public function testRequestShouldNotBeNull()
     {
-        $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'));
+        $this->requestHandler->handleRequest($this->createForm('name', 'GET'));
     }
 
     /**
@@ -34,12 +34,12 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
      */
     public function testRequestShouldBeInstanceOfRequest()
     {
-        $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), new \stdClass());
+        $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
     }
 
-    protected function setRequestData($method, $data, $files = array())
+    protected function setRequestData($method, $data, $files = [])
     {
-        $this->request = Request::create('http://localhost', $method, $data, array(), $files);
+        $this->request = Request::create('http://localhost', $method, $data, [], $files);
     }
 
     protected function getRequestHandler()
@@ -47,7 +47,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
         return new HttpFoundationRequestHandler($this->serverParams);
     }
 
-    protected function getMockFile($suffix = '')
+    protected function getUploadedFile($suffix = '')
     {
         return new UploadedFile(__DIR__.'/../../Fixtures/foo'.$suffix, 'foo'.$suffix);
     }

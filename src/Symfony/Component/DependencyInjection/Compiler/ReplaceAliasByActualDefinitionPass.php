@@ -34,8 +34,8 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
     public function process(ContainerBuilder $container)
     {
         // First collect all alias targets that need to be replaced
-        $seenAliasTargets = array();
-        $replacements = array();
+        $seenAliasTargets = [];
+        $replacements = [];
         foreach ($container->getAliases() as $definitionId => $target) {
             $targetId = (string) $target;
             // Special case: leave this target alone
@@ -56,7 +56,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
                 $definition = $container->getDefinition($targetId);
             } catch (ServiceNotFoundException $e) {
                 if ('' !== $e->getId() && '@' === $e->getId()[0]) {
-                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, array(substr($e->getId(), 1)));
+                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);
                 }
 
                 throw $e;
@@ -74,7 +74,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         $this->replacements = $replacements;
 
         parent::process($container);
-        $this->replacements = array();
+        $this->replacements = [];
     }
 
     /**

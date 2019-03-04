@@ -29,7 +29,7 @@ class EntityType extends DoctrineType
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
             if (\is_callable($queryBuilder)) {
-                $queryBuilder = \call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+                $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
 
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
@@ -40,7 +40,7 @@ class EntityType extends DoctrineType
         };
 
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
+        $resolver->setAllowedTypes('query_builder', ['null', 'callable', 'Doctrine\ORM\QueryBuilder']);
     }
 
     /**
@@ -78,10 +78,10 @@ class EntityType extends DoctrineType
      */
     public function getQueryBuilderPartsForCachingHash($queryBuilder)
     {
-        return array(
+        return [
             $queryBuilder->getQuery()->getSQL(),
-            array_map(array($this, 'parameterToArray'), $queryBuilder->getParameters()->toArray()),
-        );
+            array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),
+        ];
     }
 
     /**
@@ -91,6 +91,6 @@ class EntityType extends DoctrineType
      */
     private function parameterToArray(Parameter $parameter)
     {
-        return array($parameter->getName(), $parameter->getType(), $parameter->getValue());
+        return [$parameter->getName(), $parameter->getType(), $parameter->getValue()];
     }
 }

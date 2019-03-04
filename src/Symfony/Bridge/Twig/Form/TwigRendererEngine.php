@@ -40,7 +40,7 @@ class TwigRendererEngine extends AbstractRendererEngine
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $resource, $blockName, array $variables = array())
+    public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
@@ -169,7 +169,7 @@ class TwigRendererEngine extends AbstractRendererEngine
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
-        $context = $this->environment->mergeGlobals(array());
+        $context = $this->environment->mergeGlobals([]);
 
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid

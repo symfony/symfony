@@ -30,7 +30,7 @@ class SendersLocator implements SendersLocatorInterface
      * @param SenderInterface[][] $senders
      * @param bool[]              $sendAndHandle
      */
-    public function __construct(array $senders, array $sendAndHandle = array())
+    public function __construct(array $senders, array $sendAndHandle = [])
     {
         $this->senders = $senders;
         $this->sendAndHandle = $sendAndHandle;
@@ -43,12 +43,12 @@ class SendersLocator implements SendersLocatorInterface
     {
         $handle = false;
         $sender = null;
-        $seen = array();
+        $seen = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
-            foreach ($this->senders[$type] ?? array() as $sender) {
+            foreach ($this->senders[$type] ?? [] as $alias => $sender) {
                 if (!\in_array($sender, $seen, true)) {
-                    yield $seen[] = $sender;
+                    yield $alias => $seen[] = $sender;
                 }
             }
             $handle = $handle ?: $this->sendAndHandle[$type] ?? false;

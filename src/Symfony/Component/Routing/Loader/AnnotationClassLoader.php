@@ -120,12 +120,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         if (0 === $collection->count() && $class->hasMethod('__invoke')) {
+            $globals = $this->resetGlobals();
             foreach ($this->reader->getClassAnnotations($class) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
-                    $globals['path'] = '';
-                    $globals['name'] = '';
-                    $globals['localized_paths'] = array();
-
                     $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
                 }
             }
@@ -168,7 +165,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
         $path = $annot->getLocalizedPaths() ?: $annot->getPath();
         $prefix = $globals['localized_paths'] ?: $globals['path'];
-        $paths = array();
+        $paths = [];
 
         if (\is_array($path)) {
             if (!\is_array($prefix)) {
@@ -262,18 +259,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
     protected function getGlobals(\ReflectionClass $class)
     {
-        $globals = array(
-            'path' => null,
-            'localized_paths' => array(),
-            'requirements' => array(),
-            'options' => array(),
-            'defaults' => array(),
-            'schemes' => array(),
-            'methods' => array(),
-            'host' => '',
-            'condition' => '',
-            'name' => '',
-        );
+        $globals = $this->resetGlobals();
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
             if (null !== $annot->getName()) {
@@ -322,6 +308,22 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
 
         return $globals;
+    }
+
+    private function resetGlobals()
+    {
+        return [
+            'path' => null,
+            'localized_paths' => [],
+            'requirements' => [],
+            'options' => [],
+            'defaults' => [],
+            'schemes' => [],
+            'methods' => [],
+            'host' => '',
+            'condition' => '',
+            'name' => '',
+        ];
     }
 
     protected function createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition)

@@ -21,39 +21,39 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitDateInterval()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'dateinterval'));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'dateinterval']);
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
-        ));
+        ]);
 
         $this->assertDateIntervalEquals(new \DateInterval('P7Y6M5D'), $form->getData());
     }
 
     public function testSubmitString()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'string'));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
-        ));
+        ]);
 
         $this->assertSame('P7Y6M5D', $form->getData());
     }
 
     public function testSubmitArray()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('input' => 'array'));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'array']);
 
-        $input = array(
+        $input = [
             'years' => '7',
             'months' => '6',
             'days' => '5',
-        );
+        ];
 
         $form->submit($input);
 
@@ -64,16 +64,16 @@ class DateIntervalTypeTest extends BaseTypeTest
     {
         $interval = new \DateInterval('P7Y5D');
 
-        $form = $this->factory->create(static::TESTED_TYPE, $interval, array(
+        $form = $this->factory->create(static::TESTED_TYPE, $interval, [
             'input' => 'dateinterval',
             'with_months' => false,
-        ));
+        ]);
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
-        ));
+        ]);
 
         $this->assertDateIntervalEquals($interval, $form->getData());
         $this->assertTrue($form->isSynchronized());
@@ -82,21 +82,21 @@ class DateIntervalTypeTest extends BaseTypeTest
     public function testSubmitWithTime()
     {
         $interval = new \DateInterval('P7Y6M5DT4H3M2S');
-        $form = $this->factory->create(static::TESTED_TYPE, $interval, array(
+        $form = $this->factory->create(static::TESTED_TYPE, $interval, [
             'input' => 'dateinterval',
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ));
+        ]);
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'hours' => '4',
             'minutes' => '3',
             'seconds' => '2',
-        ));
+        ]);
 
         $this->assertDateIntervalEquals($interval, $form->getData());
         $this->assertTrue($form->isSynchronized());
@@ -104,34 +104,34 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitWithWeeks()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y'), array(
+        $form = $this->factory->create(static::TESTED_TYPE, new \DateInterval('P0Y'), [
             'input' => 'dateinterval',
             'with_years' => false,
             'with_months' => false,
             'with_weeks' => true,
             'with_days' => false,
-        ));
+        ]);
 
-        $form->submit(array(
+        $form->submit([
             'weeks' => '30',
-        ));
+        ]);
 
         $this->assertDateIntervalEquals(new \DateInterval('P30W'), $form->getData());
     }
 
     public function testSubmitWithInvert()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'dateinterval',
             'with_invert' => true,
-        ));
+        ]);
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'invert' => true,
-        ));
+        ]);
 
         $interval = new \DateInterval('P7Y6M5D');
         $interval->invert = 1;
@@ -141,10 +141,10 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitStringSingleText()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'string',
             'widget' => 'single_text',
-        ));
+        ]);
 
         $interval = 'P7Y6M5D';
 
@@ -156,13 +156,13 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitStringSingleTextWithSeconds()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'string',
             'widget' => 'single_text',
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ));
+        ]);
 
         $interval = 'P7Y6M5DT4H3M2S';
 
@@ -174,19 +174,19 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitArrayInteger()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'integer',
             'with_invert' => true,
-        ));
+        ]);
 
         $years = '7';
 
-        $form->submit(array(
+        $form->submit([
             'years' => '7',
             'months' => '6',
             'days' => '5',
             'invert' => true,
-        ));
+        ]);
 
         $this->assertSame($years, $form['years']->getData());
         $this->assertSame($years, $form['years']->getViewData());
@@ -201,10 +201,10 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertSame('', $view['years']->vars['placeholder']);
@@ -215,10 +215,10 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassNoPlaceholderToViewIfRequired()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertNull($view['years']->vars['placeholder']);
@@ -229,10 +229,10 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassPlaceholderAsString()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
             'placeholder' => 'Empty',
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertSame('Empty', $view['years']->vars['placeholder']);
@@ -243,19 +243,19 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassPlaceholderAsArray()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
-            'placeholder' => array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'placeholder' => [
                 'years' => 'Empty years',
                 'months' => 'Empty months',
                 'days' => 'Empty days',
                 'hours' => 'Empty hours',
                 'minutes' => 'Empty minutes',
                 'seconds' => 'Empty seconds',
-            ),
+            ],
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
@@ -268,18 +268,18 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
-            'placeholder' => array(
+            'placeholder' => [
                 'years' => 'Empty years',
                 'days' => 'Empty days',
                 'hours' => 'Empty hours',
                 'seconds' => 'Empty seconds',
-            ),
+            ],
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
@@ -292,18 +292,18 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
     {
-        $view = $this->factory->create(static::TESTED_TYPE, null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
-            'placeholder' => array(
+            'placeholder' => [
                 'years' => 'Empty years',
                 'days' => 'Empty days',
                 'hours' => 'Empty hours',
                 'seconds' => 'Empty seconds',
-            ),
+            ],
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ))
+        ])
             ->createView();
 
         $this->assertSame('Empty years', $view['years']->vars['placeholder']);
@@ -321,18 +321,18 @@ class DateIntervalTypeTest extends BaseTypeTest
 
         $form['years']->addError($error);
 
-        $this->assertSame(array(), iterator_to_array($form['years']->getErrors()));
-        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
+        $this->assertSame([], iterator_to_array($form['years']->getErrors()));
+        $this->assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
     public function testTranslationsAreDisabledForChoiceWidget()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'choice',
             'with_hours' => true,
             'with_minutes' => true,
             'with_seconds' => true,
-        ));
+        ]);
 
         $this->assertFalse($form->get('years')->getConfig()->getOption('choice_translation_domain'));
         $this->assertFalse($form->get('months')->getConfig()->getOption('choice_translation_domain'));
@@ -344,11 +344,11 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testInvertDoesNotInheritRequiredOption()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'input' => 'dateinterval',
             'with_invert' => true,
             'required' => true,
-        ));
+        ]);
 
         $this->assertFalse($form->get('invert')->getConfig()->getOption('required'));
     }
@@ -358,13 +358,13 @@ class DateIntervalTypeTest extends BaseTypeTest
         $form = $this->factory->create(
             static::TESTED_TYPE,
             null,
-            array(
+            [
                 'required' => true,
                 'with_invert' => true,
                 'with_hours' => true,
                 'with_minutes' => true,
                 'with_seconds' => true,
-                'labels' => array(
+                'labels' => [
                     'invert' => 'form.trans.invert',
                     'years' => 'form.trans.years',
                     'months' => 'form.trans.months',
@@ -372,8 +372,8 @@ class DateIntervalTypeTest extends BaseTypeTest
                     'hours' => 'form.trans.hours',
                     'minutes' => 'form.trans.minutes',
                     'seconds' => 'form.trans.seconds',
-                ),
-            )
+                ],
+            ]
         );
 
         $view = $form->createView();
@@ -388,15 +388,15 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testInvertDefaultLabel()
     {
-        $form = $this->factory->create(static::TESTED_TYPE, null, array('with_invert' => true));
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['with_invert' => true]);
 
         $view = $form->createView();
         $this->assertSame('Negative interval', $view['invert']->vars['label']);
 
-        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
             'with_invert' => true,
-            'labels' => array('invert' => null),
-        ));
+            'labels' => ['invert' => null],
+        ]);
 
         $view = $form->createView();
         $this->assertSame('Negative interval', $view['invert']->vars['label']);
@@ -404,10 +404,51 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        parent::testSubmitNull($expected, $norm, array(
+        parent::testSubmitNull($expected, $norm, [
             'years' => '',
             'months' => '',
             'days' => '',
-        ));
+        ]);
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'empty_data' => $emptyData,
+        ]);
+        $form->submit(null);
+
+        // view transformer writes back empty strings in the view data
+        $this->assertSame(['years' => '', 'months' => '', 'days' => ''], $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    /**
+     * @dataProvider provideEmptyData
+     */
+    public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => $widget,
+            'empty_data' => $emptyData,
+        ]);
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertEquals($expectedData, $form->getNormData());
+        $this->assertEquals($expectedData, $form->getData());
+    }
+
+    public function provideEmptyData()
+    {
+        $expectedData = \DateInterval::createFromDateString('6 years and 4 months');
+
+        return [
+            'Simple field' => ['single_text', 'P6Y4M0D', $expectedData],
+            'Compound text field' => ['text', ['years' => '06', 'months' => '04', 'days' => '00'], $expectedData],
+            'Compound integer field' => ['integer', ['years' => '6', 'months' => '4', 'days' => '0'], $expectedData],
+            'Compound choice field' => ['choice', ['years' => '6', 'months' => '4', 'days' => '0'], $expectedData],
+        ];
     }
 }

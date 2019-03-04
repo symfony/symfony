@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\Role;
-
 /**
  * PreAuthenticatedToken implements a pre-authenticated token.
  *
@@ -24,12 +22,12 @@ class PreAuthenticatedToken extends AbstractToken
     private $providerKey;
 
     /**
-     * @param string|object   $user        The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
-     * @param mixed           $credentials The user credentials
-     * @param string          $providerKey The provider key
-     * @param (Role|string)[] $roles       An array of roles
+     * @param string|object $user        The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
+     * @param mixed         $credentials The user credentials
+     * @param string        $providerKey The provider key
+     * @param string[]      $roles       An array of roles
      */
-    public function __construct($user, $credentials, string $providerKey, array $roles = array())
+    public function __construct($user, $credentials, string $providerKey, array $roles = [])
     {
         parent::__construct($roles);
 
@@ -77,17 +75,17 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
+        return [$this->credentials, $this->providerKey, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    protected function setState(array $data)
     {
-        list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
-        parent::unserialize($parentStr);
+        [$this->credentials, $this->providerKey, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

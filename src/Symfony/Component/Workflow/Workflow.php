@@ -61,6 +61,8 @@ class Workflow implements WorkflowInterface
 
             // update the subject with the new marking
             $this->markingStore->setMarking($subject, $marking);
+
+            $this->entered($subject, null, $marking);
         }
 
         // check that the subject has a known place
@@ -119,7 +121,15 @@ class Workflow implements WorkflowInterface
             $transitionBlockerList = $this->buildTransitionBlockerListForTransition($subject, $marking, $transition);
 
             if ($transitionBlockerList->isEmpty()) {
-                continue;
+                return $transitionBlockerList;
+            }
+
+            // We prefer to return transitions blocker by something else than
+            // marking. Because it means the marking was OK. Transitions are
+            // deterministic: it's not possible to have many transitions enabled
+            // at the same time that match the same marking with the same name
+            if (!$transitionBlockerList->has(TransitionBlocker::BLOCKED_BY_MARKING)) {
+                return $transitionBlockerList;
             }
         }
 
@@ -139,7 +149,7 @@ class Workflow implements WorkflowInterface
 
         $transitionBlockerList = null;
         $applied = false;
-        $approvedTransitionQueue = array();
+        $approvedTransitionQueue = [];
 
         foreach ($this->definition->getTransitions() as $transition) {
             if ($transition->getName() !== $transitionName) {
@@ -187,7 +197,7 @@ class Workflow implements WorkflowInterface
      */
     public function getEnabledTransitions($subject)
     {
-        $enabledTransitions = array();
+        $enabledTransitions = [];
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {
@@ -236,9 +246,9 @@ class Workflow implements WorkflowInterface
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
-                return new TransitionBlockerList(array(
+                return new TransitionBlockerList([
                     TransitionBlocker::createBlockedByMarking($marking),
-                ));
+                ]);
             }
         }
 
@@ -323,7 +333,7 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function entered($subject, Transition $transition, Marking $marking): void
+    private function entered($subject, Transition $transition = null, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -334,8 +344,10 @@ class Workflow implements WorkflowInterface
         $this->dispatcher->dispatch('workflow.entered', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.entered', $this->name), $event);
 
-        foreach ($transition->getTos() as $place) {
-            $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
+        if ($transition) {
+            foreach ($transition->getTos() as $place) {
+                $this->dispatcher->dispatch(sprintf('workflow.%s.entered.%s', $this->name, $place), $event);
+            }
         }
     }
 

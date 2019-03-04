@@ -1,0 +1,19 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo_service:
+        class: Foo
+        tags:
+            - { name: foo }
+    foo_service_tagged:
+        class: Bar
+        arguments: [!tagged { tag: foo, index_by: barfoo, default_index_method: foobar }]
+    Psr\Container\ContainerInterface:
+        alias: service_container
+        public: false
+    Symfony\Component\DependencyInjection\ContainerInterface:
+        alias: service_container
+        public: false

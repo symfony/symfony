@@ -23,9 +23,9 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
     /**
      * @param TransitionBlocker[] $blockers
      */
-    public function __construct(array $blockers = array())
+    public function __construct(array $blockers = [])
     {
-        $this->blockers = array();
+        $this->blockers = [];
 
         foreach ($blockers as $blocker) {
             $this->add($blocker);
@@ -37,9 +37,20 @@ final class TransitionBlockerList implements \IteratorAggregate, \Countable
         $this->blockers[] = $blocker;
     }
 
+    public function has(string $code): bool
+    {
+        foreach ($this->blockers as $blocker) {
+            if ($code === $blocker->getCode()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function clear(): void
     {
-        $this->blockers = array();
+        $this->blockers = [];
     }
 
     public function isEmpty(): bool

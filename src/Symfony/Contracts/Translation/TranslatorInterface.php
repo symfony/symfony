@@ -61,21 +61,5 @@ interface TranslatorInterface
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null);
-
-    /**
-     * Sets the current locale.
-     *
-     * @param string $locale The locale
-     *
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     */
-    public function setLocale($locale);
-
-    /**
-     * Returns the current locale.
-     *
-     * @return string The locale
-     */
-    public function getLocale();
+    public function trans($id, array $parameters = [], $domain = null, $locale = null);
 }

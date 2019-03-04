@@ -23,10 +23,10 @@ class AccessMapTest extends TestCase
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
         $map = new AccessMap();
-        $map->add($requestMatcher1, array('ROLE_ADMIN'), 'http');
-        $map->add($requestMatcher2, array('ROLE_USER'), 'https');
+        $map->add($requestMatcher1, ['ROLE_ADMIN'], 'http');
+        $map->add($requestMatcher2, ['ROLE_USER'], 'https');
 
-        $this->assertSame(array(array('ROLE_USER'), 'https'), $map->getPatterns($request));
+        $this->assertSame([['ROLE_USER'], 'https'], $map->getPatterns($request));
     }
 
     public function testReturnsEmptyPatternIfNoneMatched()
@@ -35,9 +35,9 @@ class AccessMapTest extends TestCase
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();
-        $map->add($requestMatcher, array('ROLE_USER'), 'https');
+        $map->add($requestMatcher, ['ROLE_USER'], 'https');
 
-        $this->assertSame(array(null, null), $map->getPatterns($request));
+        $this->assertSame([null, null], $map->getPatterns($request));
     }
 
     private function getRequestMatcher($request, $matches)

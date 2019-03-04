@@ -3,8 +3,8 @@
 namespace Symfony\Component\Debug\Tests\Fixtures;
 
 /**
- * @final
+ * @method string traitMethod()
  */
-class FinalClass
+trait VirtualTrait
 {
 }

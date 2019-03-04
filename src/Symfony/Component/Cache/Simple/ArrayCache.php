@@ -12,16 +12,20 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', ArrayCache::class, ArrayAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+ * @deprecated since Symfony 4.3, use ArrayAdapter and type-hint for CacheInterface instead.
  */
-class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
+class ArrayCache implements Psr16CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait {
         ArrayTrait::deleteItem as delete;
@@ -104,7 +108,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
             CacheItem::validateKey($key);
         }
 
-        return $this->setMultiple(array($key => $value), $ttl);
+        return $this->setMultiple([$key => $value], $ttl);
     }
 
     /**
@@ -115,7 +119,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
-        $valuesArray = array();
+        $valuesArray = [];
 
         foreach ($values as $key => $value) {
             if (!\is_int($key) && !(\is_string($key) && isset($this->expiries[$key]))) {
@@ -129,7 +133,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
         $expiry = 0 < $ttl ? microtime(true) + $ttl : PHP_INT_MAX;
 
         foreach ($valuesArray as $key => $value) {
-            if ($this->storeSerialized && null === $value = $this->freeze($value)) {
+            if ($this->storeSerialized && null === $value = $this->freeze($value, $key)) {
                 return false;
             }
             $this->values[$key] = $value;

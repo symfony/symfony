@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 class MessengerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $traceableBuses = array();
+    private $traceableBuses = [];
 
     public function registerBus(string $name, TraceableMessageBus $bus)
     {
@@ -45,13 +45,13 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
      */
     public function lateCollect()
     {
-        $this->data = array('messages' => array(), 'buses' => array_keys($this->traceableBuses));
+        $this->data = ['messages' => [], 'buses' => array_keys($this->traceableBuses)];
 
-        $messages = array();
+        $messages = [];
         foreach ($this->traceableBuses as $busName => $bus) {
             foreach ($bus->getDispatchedMessages() as $message) {
                 $debugRepresentation = $this->cloneVar($this->collectMessage($busName, $message));
-                $messages[] = array($debugRepresentation, $message['callTime']);
+                $messages[] = [$debugRepresentation, $message['callTime']];
             }
         }
 
@@ -75,7 +75,7 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
      */
     public function reset()
     {
-        $this->data = array();
+        $this->data = [];
         foreach ($this->traceableBuses as $traceableBus) {
             $traceableBus->reset();
         }
@@ -85,23 +85,23 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
     {
         $message = $tracedMessage['message'];
 
-        $debugRepresentation = array(
+        $debugRepresentation = [
             'bus' => $busName,
             'stamps' => $tracedMessage['stamps'] ?? null,
-            'message' => array(
+            'message' => [
                 'type' => new ClassStub(\get_class($message)),
                 'value' => $message,
-            ),
+            ],
             'caller' => $tracedMessage['caller'],
-        );
+        ];
 
         if (isset($tracedMessage['exception'])) {
             $exception = $tracedMessage['exception'];
 
-            $debugRepresentation['exception'] = array(
+            $debugRepresentation['exception'] = [
                 'type' => \get_class($exception),
                 'value' => $exception,
-            );
+            ];
         }
 
         return $debugRepresentation;
@@ -117,13 +117,15 @@ class MessengerDataCollector extends DataCollector implements LateDataCollectorI
         return $count;
     }
 
-    public function getMessages(string $bus = null): iterable
+    public function getMessages(string $bus = null): array
     {
-        foreach ($this->data['messages'] ?? array() as $message) {
-            if (null === $bus || $bus === $message['bus']) {
-                yield $message;
-            }
+        if (null === $bus) {
+            return $this->data['messages'];
         }
+
+        return array_filter($this->data['messages'], function ($message) use ($bus) {
+            return $bus === $message['bus'];
+        });
     }
 
     public function getBuses(): array

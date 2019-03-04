@@ -48,13 +48,13 @@ final class VarExporter
         }
 
         $objectsPool = new \SplObjectStorage();
-        $refsPool = array();
+        $refsPool = [];
         $objectsCount = 0;
 
         try {
-            $value = Exporter::prepare(array($value), $objectsPool, $refsPool, $objectsCount, $isStaticValue)[0];
+            $value = Exporter::prepare([$value], $objectsPool, $refsPool, $objectsCount, $isStaticValue)[0];
         } finally {
-            $references = array();
+            $references = [];
             foreach ($refsPool as $i => $v) {
                 if ($v[0]->count) {
                     $references[1 + $i] = $v[2];
@@ -67,9 +67,9 @@ final class VarExporter
             return Exporter::export($value);
         }
 
-        $classes = array();
-        $values = array();
-        $wakeups = array();
+        $classes = [];
+        $values = [];
+        $wakeups = [];
         foreach ($objectsPool as $i => $v) {
             list(, $classes[], $values[], $wakeup) = $objectsPool[$v];
             if ($wakeup) {
@@ -78,7 +78,7 @@ final class VarExporter
         }
         ksort($wakeups);
 
-        $properties = array();
+        $properties = [];
         foreach ($values as $i => $vars) {
             foreach ($vars as $class => $values) {
                 foreach ($values as $name => $v) {

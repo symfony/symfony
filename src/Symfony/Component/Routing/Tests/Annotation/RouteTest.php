@@ -21,7 +21,7 @@ class RouteTest extends TestCase
      */
     public function testInvalidRouteParameter()
     {
-        $route = new Route(array('foo' => 'bar'));
+        $route = new Route(['foo' => 'bar']);
     }
 
     /**
@@ -29,7 +29,7 @@ class RouteTest extends TestCase
      */
     public function testTryingToSetLocalesDirectly()
     {
-        $route = new Route(array('locales' => array('nl' => 'bar')));
+        $route = new Route(['locales' => ['nl' => 'bar']]);
     }
 
     /**
@@ -37,23 +37,23 @@ class RouteTest extends TestCase
      */
     public function testRouteParameters($parameter, $value, $getter)
     {
-        $route = new Route(array($parameter => $value));
+        $route = new Route([$parameter => $value]);
         $this->assertEquals($route->$getter(), $value);
     }
 
     public function getValidParameters()
     {
-        return array(
-            array('value', '/Blog', 'getPath'),
-            array('requirements', array('locale' => 'en'), 'getRequirements'),
-            array('options', array('compiler_class' => 'RouteCompiler'), 'getOptions'),
-            array('name', 'blog_index', 'getName'),
-            array('defaults', array('_controller' => 'MyBlogBundle:Blog:index'), 'getDefaults'),
-            array('schemes', array('https'), 'getSchemes'),
-            array('methods', array('GET', 'POST'), 'getMethods'),
-            array('host', '{locale}.example.com', 'getHost'),
-            array('condition', 'context.getMethod() == "GET"', 'getCondition'),
-            array('value', array('nl' => '/hier', 'en' => '/here'), 'getLocalizedPaths'),
-        );
+        return [
+            ['value', '/Blog', 'getPath'],
+            ['requirements', ['locale' => 'en'], 'getRequirements'],
+            ['options', ['compiler_class' => 'RouteCompiler'], 'getOptions'],
+            ['name', 'blog_index', 'getName'],
+            ['defaults', ['_controller' => 'MyBlogBundle:Blog:index'], 'getDefaults'],
+            ['schemes', ['https'], 'getSchemes'],
+            ['methods', ['GET', 'POST'], 'getMethods'],
+            ['host', '{locale}.example.com', 'getHost'],
+            ['condition', 'context.getMethod() == "GET"', 'getCondition'],
+            ['value', ['nl' => '/hier', 'en' => '/here'], 'getLocalizedPaths'],
+        ];
     }
 }

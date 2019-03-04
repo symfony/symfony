@@ -23,6 +23,6 @@ class SubmitTypeValidatorExtension extends BaseValidatorExtension
      */
     public static function getExtendedTypes(): iterable
     {
-        return array(SubmitType::class);
+        return [SubmitType::class];
     }
 }

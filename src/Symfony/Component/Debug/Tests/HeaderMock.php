@@ -25,11 +25,11 @@ namespace Symfony\Component\Debug\Tests;
 
 function testHeader()
 {
-    static $headers = array();
+    static $headers = [];
 
     if (!$h = \func_get_args()) {
         $h = $headers;
-        $headers = array();
+        $headers = [];
 
         return $h;
     }

@@ -64,17 +64,17 @@ class NodeExtension extends AbstractExtension
      */
     public function getNodeTranslators()
     {
-        return array(
-            'Selector' => array($this, 'translateSelector'),
-            'CombinedSelector' => array($this, 'translateCombinedSelector'),
-            'Negation' => array($this, 'translateNegation'),
-            'Function' => array($this, 'translateFunction'),
-            'Pseudo' => array($this, 'translatePseudo'),
-            'Attribute' => array($this, 'translateAttribute'),
-            'Class' => array($this, 'translateClass'),
-            'Hash' => array($this, 'translateHash'),
-            'Element' => array($this, 'translateElement'),
-        );
+        return [
+            'Selector' => [$this, 'translateSelector'],
+            'CombinedSelector' => [$this, 'translateCombinedSelector'],
+            'Negation' => [$this, 'translateNegation'],
+            'Function' => [$this, 'translateFunction'],
+            'Pseudo' => [$this, 'translatePseudo'],
+            'Attribute' => [$this, 'translateAttribute'],
+            'Class' => [$this, 'translateClass'],
+            'Hash' => [$this, 'translateHash'],
+            'Element' => [$this, 'translateElement'],
+        ];
     }
 
     public function translateSelector(Node\SelectorNode $node, Translator $translator): XPathExpr

@@ -29,10 +29,10 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
      */
     public function testGetThrowsOnUndefinedService()
     {
-        $locator = $this->getServiceLocator(array(
+        $locator = $this->getServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
-        ));
+        ]);
 
         $locator->get('dummy');
     }
@@ -55,18 +55,32 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
-        $subscriber->container = $this->getServiceLocator(array('bar' => function () {}));
+        $subscriber->container = $this->getServiceLocator(['bar' => function () {}]);
         $subscriber->container = $subscriber->container->withContext('caller', $container);
 
         $subscriber->getFoo();
     }
 
+    /**
+     * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage Service "foo" not found: even though it exists in the app's container, the container inside "foo" is a smaller service locator that is empty... Try using dependency injection instead.
+     */
+    public function testGetThrowsServiceNotFoundException()
+    {
+        $container = new Container();
+        $container->set('foo', new \stdClass());
+
+        $locator = new ServiceLocator([]);
+        $locator = $locator->withContext('foo', $container);
+        $locator->get('foo');
+    }
+
     public function testInvoke()
     {
-        $locator = $this->getServiceLocator(array(
+        $locator = $this->getServiceLocator([
             'foo' => function () { return 'bar'; },
             'bar' => function () { return 'baz'; },
-        ));
+        ]);
 
         $this->assertSame('bar', $locator('foo'));
         $this->assertSame('baz', $locator('bar'));
@@ -85,6 +99,6 @@ class SomeServiceSubscriber implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return array('bar' => 'stdClass');
+        return ['bar' => 'stdClass'];
     }
 }

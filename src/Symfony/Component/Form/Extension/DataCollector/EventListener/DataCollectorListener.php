@@ -36,12 +36,12 @@ class DataCollectorListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             // High priority in order to be called as soon as possible
-            FormEvents::POST_SET_DATA => array('postSetData', 255),
+            FormEvents::POST_SET_DATA => ['postSetData', 255],
             // Low priority in order to be called as late as possible
-            FormEvents::POST_SUBMIT => array('postSubmit', -255),
-        );
+            FormEvents::POST_SUBMIT => ['postSubmit', -255],
+        ];
     }
 
     /**

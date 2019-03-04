@@ -36,10 +36,6 @@ class ServerRunCommand extends Command
 
     public function __construct(string $documentRoot = null, string $environment = null)
     {
-        if (!$environment) {
-            @trigger_error(sprintf('Omitting the $environment argument of the "%s" constructor is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
-        }
-
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
 
@@ -52,11 +48,11 @@ class ServerRunCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
-            ))
+            ])
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> runs a local web server: By default, the server
@@ -103,7 +99,6 @@ EOF
             $documentRoot = $this->documentRoot;
         }
 
-        // @deprecated since Symfony 4.2
         if (!$env = $this->environment) {
             if ($input->hasOption('env') && !$env = $input->getOption('env')) {
                 $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');

@@ -67,8 +67,8 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
      */
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'twig' => Environment::class,
-        );
+        ];
     }
 }

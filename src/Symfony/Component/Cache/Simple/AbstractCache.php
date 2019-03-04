@@ -12,16 +12,20 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3, use "%s" and type-hint for "%s" instead.', AbstractCache::class, AbstractAdapter::class, CacheInterface::class), E_USER_DEPRECATED);
 
 /**
- * @author Nicolas Grekas <p@tchwork.com>
+ * @deprecated since Symfony 4.3, use AbstractAdapter and type-hint for CacheInterface instead.
  */
-abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
+abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractTrait {
         deleteItems as private;
@@ -48,11 +52,11 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
         $id = $this->getId($key);
 
         try {
-            foreach ($this->doFetch(array($id)) as $value) {
+            foreach ($this->doFetch([$id]) as $value) {
                 return $value;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', array('key' => $key, 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', ['key' => $key, 'exception' => $e]);
         }
 
         return $default;
@@ -65,7 +69,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
     {
         CacheItem::validateKey($key);
 
-        return $this->setMultiple(array($key => $value), $ttl);
+        return $this->setMultiple([$key => $value], $ttl);
     }
 
     /**
@@ -78,7 +82,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
         } elseif (!\is_array($keys)) {
             throw new InvalidArgumentException(sprintf('Cache keys must be array or Traversable, "%s" given', \is_object($keys) ? \get_class($keys) : \gettype($keys)));
         }
-        $ids = array();
+        $ids = [];
 
         foreach ($keys as $key) {
             $ids[] = $this->getId($key);
@@ -86,8 +90,8 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
         try {
             $values = $this->doFetch($ids);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested values', array('keys' => $keys, 'exception' => $e));
-            $values = array();
+            CacheItem::log($this->logger, 'Failed to fetch requested values', ['keys' => $keys, 'exception' => $e]);
+            $values = [];
         }
         $ids = array_combine($ids, $keys);
 
@@ -102,7 +106,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
         if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new InvalidArgumentException(sprintf('Cache values must be array or Traversable, "%s" given', \is_object($values) ? \get_class($values) : \gettype($values)));
         }
-        $valuesById = array();
+        $valuesById = [];
 
         foreach ($values as $key => $value) {
             if (\is_int($key)) {
@@ -118,14 +122,14 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
             $e = $this->doSave($valuesById, $ttl);
         } catch (\Exception $e) {
         }
-        if (true === $e || array() === $e) {
+        if (true === $e || [] === $e) {
             return true;
         }
-        $keys = array();
+        $keys = [];
         foreach (\is_array($e) ? $e : array_keys($valuesById) as $id) {
             $keys[] = substr($id, \strlen($this->namespace));
         }
-        CacheItem::log($this->logger, 'Failed to save values', array('keys' => $keys, 'exception' => $e instanceof \Exception ? $e : null));
+        CacheItem::log($this->logger, 'Failed to save values', ['keys' => $keys, 'exception' => $e instanceof \Exception ? $e : null]);
 
         return false;
     }
@@ -171,7 +175,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
                 yield $key => $value;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested values', array('keys' => array_values($keys), 'exception' => $e));
+            CacheItem::log($this->logger, 'Failed to fetch requested values', ['keys' => array_values($keys), 'exception' => $e]);
         }
 
         foreach ($keys as $key) {

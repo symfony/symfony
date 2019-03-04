@@ -31,7 +31,7 @@ abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server = array();
+    protected $server = [];
     protected $internalRequest;
     protected $request;
     protected $internalResponse;
@@ -44,7 +44,7 @@ abstract class Client
 
     private $maxRedirects = -1;
     private $redirectCount = 0;
-    private $redirects = array();
+    private $redirects = [];
     private $isMainRequest = true;
 
     /**
@@ -52,7 +52,7 @@ abstract class Client
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
      */
-    public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
+    public function __construct(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
         $this->history = $history ?: new History();
@@ -131,9 +131,9 @@ abstract class Client
      */
     public function setServerParameters(array $server)
     {
-        $this->server = array_merge(array(
+        $this->server = array_merge([
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
-        ), $server);
+        ], $server);
     }
 
     /**
@@ -160,7 +160,7 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
-    public function xmlHttpRequest(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
+    public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
 
@@ -313,14 +313,14 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array()/*, array $serverParameters = array()*/)
+    public function submit(Form $form, array $values = []/*, array $serverParameters = []*/)
     {
         if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = array()" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "%s()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $form->setValues($values);
-        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : array();
+        $serverParameters = 2 < \func_num_args() ? func_get_arg(2) : [];
 
         return $this->request($form->getMethod(), $form->getUri(), $form->getPhpValues(), $form->getPhpFiles(), $serverParameters);
     }
@@ -330,11 +330,11 @@ abstract class Client
      * uses it to submit the given form field values.
      *
      * @param string $button           The text content, id, value or name of the form <button> or <input type="submit">
-     * @param array  $fieldValues      Use this syntax: array('my_form[name]' => '...', 'my_form[email]' => '...')
+     * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
      */
-    public function submitForm(string $button, array $fieldValues = array(), string $method = 'POST', array $serverParameters = array()): Crawler
+    public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
     {
         if (null === $this->crawler) {
             throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
@@ -343,7 +343,7 @@ abstract class Client
         $buttonNode = $this->crawler->selectButton($button);
         $form = $buttonNode->form($fieldValues, $method);
 
-        return $this->submit($form, array(), $serverParameters);
+        return $this->submit($form, [], $serverParameters);
     }
 
     /**
@@ -359,7 +359,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true)
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -367,11 +367,17 @@ abstract class Client
             ++$this->redirectCount;
         }
 
+        $originalUri = $uri;
+
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
 
-        if (isset($server['HTTPS'])) {
+        if (!empty($server['HTTP_HOST']) && null === parse_url($originalUri, PHP_URL_HOST)) {
+            $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
+        }
+
+        if (isset($server['HTTPS']) && null === parse_url($originalUri, PHP_URL_SCHEME)) {
             $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
         }
 
@@ -403,7 +409,7 @@ abstract class Client
 
         $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
-        $status = $this->internalResponse->getStatus();
+        $status = $this->internalResponse->getStatusCode();
 
         if ($status >= 300 && $status < 400) {
             $this->redirect = $this->internalResponse->getHeader('Location');
@@ -449,7 +455,7 @@ abstract class Client
         if (file_exists($deprecationsFile)) {
             $deprecations = file_get_contents($deprecationsFile);
             unlink($deprecationsFile);
-            foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
+            foreach ($deprecations ? unserialize($deprecations) : [] as $deprecation) {
                 if ($deprecation[0]) {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
@@ -542,7 +548,7 @@ abstract class Client
     {
         do {
             $request = $this->history->back();
-        } while (array_key_exists(serialize($request), $this->redirects));
+        } while (\array_key_exists(serialize($request), $this->redirects));
 
         return $this->requestFromRequest($request, false);
     }
@@ -556,7 +562,7 @@ abstract class Client
     {
         do {
             $request = $this->history->forward();
-        } while (array_key_exists(serialize($request), $this->redirects));
+        } while (\array_key_exists(serialize($request), $this->redirects));
 
         return $this->requestFromRequest($request, false);
     }
@@ -593,9 +599,9 @@ abstract class Client
 
         $request = $this->internalRequest;
 
-        if (\in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
+        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303])) {
             $method = 'GET';
-            $files = array();
+            $files = [];
             $content = null;
         } else {
             $method = $request->getMethod();
@@ -605,7 +611,7 @@ abstract class Client
 
         if ('GET' === strtoupper($method)) {
             // Don't forward parameters for GET request as it should reach the redirection URI
-            $parameters = array();
+            $parameters = [];
         } else {
             $parameters = $request->getParameters();
         }
@@ -628,7 +634,7 @@ abstract class Client
     private function getMetaRefreshUrl(): ?string
     {
         $metaRefresh = $this->getCrawler()->filter('head meta[http-equiv="refresh"]');
-        foreach ($metaRefresh->extract(array('content')) as $content) {
+        foreach ($metaRefresh->extract(['content']) as $content) {
             if (preg_match('/^\s*0\s*;\s*URL\s*=\s*(?|\'([^\']++)|"([^"]++)|([^\'"].*))/i', $content, $m)) {
                 return str_replace("\t\r\n", '', rtrim($m[1]));
             }

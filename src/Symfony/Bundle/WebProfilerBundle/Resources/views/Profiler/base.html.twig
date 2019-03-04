@@ -15,7 +15,7 @@
     </head>
     <body>
         <script async>
-            document.body.classList.add(localStorage.getItem('symfony/profiler/theme'), localStorage.getItem('symfony/profiler/width'));
+            document.body.classList.add(localStorage.getItem('symfony/profiler/theme') || 'theme-light', localStorage.getItem('symfony/profiler/width') || 'width-normal');
         </script>
 
         {% block body '' %}

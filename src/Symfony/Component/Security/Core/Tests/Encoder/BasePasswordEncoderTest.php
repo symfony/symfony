@@ -35,9 +35,9 @@ class BasePasswordEncoderTest extends TestCase
 
     public function testDemergePasswordAndSalt()
     {
-        $this->assertEquals(array('password', 'salt'), $this->invokeDemergePasswordAndSalt('password{salt}'));
-        $this->assertEquals(array('password', ''), $this->invokeDemergePasswordAndSalt('password'));
-        $this->assertEquals(array('', ''), $this->invokeDemergePasswordAndSalt(''));
+        $this->assertEquals(['password', 'salt'], $this->invokeDemergePasswordAndSalt('password{salt}'));
+        $this->assertEquals(['password', ''], $this->invokeDemergePasswordAndSalt('password'));
+        $this->assertEquals(['', ''], $this->invokeDemergePasswordAndSalt(''));
     }
 
     public function testMergePasswordAndSalt()

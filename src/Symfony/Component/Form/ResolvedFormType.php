@@ -42,7 +42,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     private $optionsResolver;
 
-    public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
+    public function __construct(FormTypeInterface $innerType, array $typeExtensions = [], ResolvedFormTypeInterface $parent = null)
     {
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
@@ -90,7 +90,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array())
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
     {
         $options = $this->getOptionsResolver()->resolve($options);
 
@@ -205,7 +205,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * Override this method if you want to customize the builder class.
      *
      * @param string               $name      The name of the builder
-     * @param string               $dataClass The data class
+     * @param string|null          $dataClass The data class
      * @param FormFactoryInterface $factory   The current form factory
      * @param array                $options   The builder options
      *

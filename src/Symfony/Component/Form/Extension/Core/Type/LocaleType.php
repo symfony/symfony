@@ -15,7 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
-use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -40,12 +39,8 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'choice_loader' => function (Options $options) {
-                if (!class_exists(Intl::class)) {
-                    throw new LogicException(sprintf('The "symfony/intl" component is required to use "%s".', static::class));
-                }
-
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
                 return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
@@ -54,9 +49,9 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
-        ));
+        ]);
 
-        $resolver->setAllowedTypes('choice_translation_locale', array('null', 'string'));
+        $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);
     }
 
     /**
@@ -103,12 +98,7 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $values = array_filter($values);
         if (empty($values)) {
-            return array();
-        }
-
-        // If no callable is set, values are the same as choices
-        if (null === $value) {
-            return $values;
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -126,7 +116,7 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
         // Optimize
         $choices = array_filter($choices);
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // If no callable is set, choices are the same as values

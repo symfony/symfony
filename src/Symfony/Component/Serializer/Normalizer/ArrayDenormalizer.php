@@ -36,7 +36,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (null === $this->serializer) {
             throw new BadMethodCallException('Please set a serializer before calling denormalize()!');
@@ -53,7 +53,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
 
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
-            if (null !== $builtinType && !\call_user_func('is_'.$builtinType, $key)) {
+            if (null !== $builtinType && !('is_'.$builtinType)($key)) {
                 throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, \gettype($key)));
             }
 
@@ -66,7 +66,7 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Serializer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
         return '[]' === substr($type, -2)
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);

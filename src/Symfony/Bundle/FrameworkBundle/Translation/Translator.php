@@ -27,11 +27,11 @@ class Translator extends BaseTranslator implements WarmableInterface
     protected $container;
     protected $loaderIds;
 
-    protected $options = array(
+    protected $options = [
         'cache_dir' => null,
         'debug' => false,
-        'resource_files' => array(),
-    );
+        'resource_files' => [],
+    ];
 
     /**
      * @var array
@@ -44,7 +44,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @var array
      */
-    private $resources = array();
+    private $resources = [];
 
     private $resourceFiles;
 
@@ -65,7 +65,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, string $defaultLocale, array $loaderIds = [], array $options = [])
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -92,7 +92,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             return;
         }
 
-        $locales = array_merge($this->getFallbackLocales(), array($this->getLocale()), $this->resourceLocales);
+        $locales = array_merge($this->getFallbackLocales(), [$this->getLocale()], $this->resourceLocales);
         foreach (array_unique($locales) as $locale) {
             // reset catalogue in case it's already loaded during the dump of the other locales.
             if (isset($this->catalogues[$locale])) {
@@ -108,7 +108,7 @@ class Translator extends BaseTranslator implements WarmableInterface
         if ($this->resourceFiles) {
             $this->addResourceFiles();
         }
-        $this->resources[] = array($format, $resource, $locale, $domain);
+        $this->resources[] = [$format, $resource, $locale, $domain];
     }
 
     /**
@@ -129,7 +129,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             list($format, $resource, $locale, $domain) = $params;
             parent::addResource($format, $resource, $locale, $domain);
         }
-        $this->resources = array();
+        $this->resources = [];
 
         foreach ($this->loaderIds as $id => $aliases) {
             foreach ($aliases as $alias) {
@@ -141,7 +141,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     private function addResourceFiles()
     {
         $filesByLocale = $this->resourceFiles;
-        $this->resourceFiles = array();
+        $this->resourceFiles = [];
 
         foreach ($filesByLocale as $locale => $files) {
             foreach ($files as $key => $file) {

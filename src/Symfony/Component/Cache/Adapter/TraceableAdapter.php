@@ -28,7 +28,7 @@ use Symfony\Contracts\Service\ResetInterface;
 class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
     protected $pool;
-    private $calls = array();
+    private $calls = [];
 
     public function __construct(AdapterInterface $pool)
     {
@@ -38,7 +38,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (!$this->pool instanceof CacheInterface) {
             throw new \BadMethodCallException(sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', \get_class($this->pool), CacheInterface::class));
@@ -53,7 +53,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
         $event = $this->start(__FUNCTION__);
         try {
-            $value = $this->pool->get($key, $callback, $beta);
+            $value = $this->pool->get($key, $callback, $beta, $metadata);
             $event->result[$key] = \is_object($value) ? \get_class($value) : \gettype($value);
         } finally {
             $event->end = microtime(true);
@@ -142,7 +142,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         $event = $this->start(__FUNCTION__);
         try {
@@ -151,7 +151,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
             $event->end = microtime(true);
         }
         $f = function () use ($result, $event) {
-            $event->result = array();
+            $event->result = [];
             foreach ($result as $key => $item) {
                 if ($event->result[$key] = $item->isHit()) {
                     ++$event->hits;
@@ -257,7 +257,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
 
     public function clearCalls()
     {
-        $this->calls = array();
+        $this->calls = [];
     }
 
     protected function start($name)

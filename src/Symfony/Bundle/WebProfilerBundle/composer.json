@@ -32,6 +32,7 @@
     "conflict": {
         "symfony/dependency-injection": "<3.4",
         "symfony/event-dispatcher": "<3.4",
+        "symfony/messenger": "<4.2",
         "symfony/var-dumper": "<3.4"
     },
     "autoload": {
@@ -43,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "4.3-dev"
         }
     }
 }

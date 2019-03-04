@@ -12,9 +12,6 @@ return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
                 $o[1],
                 123,
             ],
-            'bis' => [
-                1 => 123,
-            ],
             'baz' => [
                 1 => 123,
             ],

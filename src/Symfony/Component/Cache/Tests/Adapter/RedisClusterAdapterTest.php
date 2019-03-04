@@ -26,7 +26,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
             self::markTestSkipped('REDIS_CLUSTER_HOSTS env var is not defined.');
         }
 
-        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', array('lazy' => true, 'redis_cluster' => true));
+        self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']', ['lazy' => true, 'redis_cluster' => true]);
     }
 
     public function createCachePool($defaultLifetime = 0)
@@ -49,10 +49,10 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTest
 
     public function provideFailedCreateConnection()
     {
-        return array(
-            array('redis://localhost:1234?redis_cluster=1'),
-            array('redis://foo@localhost?redis_cluster=1'),
-            array('redis://localhost/123?redis_cluster=1'),
-        );
+        return [
+            ['redis://localhost:1234?redis_cluster=1'],
+            ['redis://foo@localhost?redis_cluster=1'],
+            ['redis://localhost/123?redis_cluster=1'],
+        ];
     }
 }

@@ -62,9 +62,9 @@ class LdapTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('createQuery')
-            ->with('foo', 'bar', array('baz'))
+            ->with('foo', 'bar', ['baz'])
         ;
-        $this->ldap->query('foo', 'bar', array('baz'));
+        $this->ldap->query('foo', 'bar', ['baz']);
     }
 
     /**
@@ -78,7 +78,7 @@ class LdapTest extends TestCase
 
     public function testCreateWithInvalidAdapterName()
     {
-        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(DriverNotFoundException::class);
+        $this->expectException(DriverNotFoundException::class);
         Ldap::create('foo');
     }
 }

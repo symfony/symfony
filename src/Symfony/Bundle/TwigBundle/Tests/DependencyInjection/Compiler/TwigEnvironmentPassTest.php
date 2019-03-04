@@ -29,11 +29,11 @@ class TwigEnvironmentPassTest extends TestCase
         $pass = new TwigEnvironmentPass();
 
         $definition = new Definition('test_extension_1');
-        $definition->addTag('twig.extension', array('priority' => 100));
+        $definition->addTag('twig.extension', ['priority' => 100]);
         $builder->setDefinition('test_extension_1', $definition);
 
         $definition = new Definition('test_extension_2');
-        $definition->addTag('twig.extension', array('priority' => 200));
+        $definition->addTag('twig.extension', ['priority' => 200]);
         $builder->setDefinition('test_extension_2', $definition);
 
         $pass->process($builder);

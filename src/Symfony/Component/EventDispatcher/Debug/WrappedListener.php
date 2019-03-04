@@ -22,6 +22,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 class WrappedListener
 {
     private $listener;
+    private $optimizedListener;
     private $name;
     private $called;
     private $stoppedPropagation;
@@ -29,11 +30,13 @@ class WrappedListener
     private $dispatcher;
     private $pretty;
     private $stub;
+    private $priority;
     private static $hasClassStub;
 
-    public function __construct($listener, $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null)
+    public function __construct(callable $listener, ?string $name, Stopwatch $stopwatch, EventDispatcherInterface $dispatcher = null)
     {
         $this->listener = $listener;
+        $this->optimizedListener = $listener instanceof \Closure ? $listener : \Closure::fromCallable($listener);
         $this->stopwatch = $stopwatch;
         $this->dispatcher = $dispatcher;
         $this->called = false;
@@ -46,10 +49,8 @@ class WrappedListener
             $r = new \ReflectionFunction($listener);
             if (false !== strpos($r->name, '{closure}')) {
                 $this->pretty = $this->name = 'closure';
-            } elseif ($this->name = $r->getClosureScopeClass()) {
-                $this->pretty = $this->name.'::'.$r->name;
-            } elseif ($class = $r->getClosureThis()) {
-                $this->name = \get_class($class);
+            } elseif ($class = $r->getClosureScopeClass()) {
+                $this->name = $class->name;
                 $this->pretty = $this->name.'::'.$r->name;
             } else {
                 $this->pretty = $this->name = $r->name;
@@ -96,21 +97,24 @@ class WrappedListener
             $this->stub = self::$hasClassStub ? new ClassStub($this->pretty.'()', $this->listener) : $this->pretty.'()';
         }
 
-        return array(
+        return [
             'event' => $eventName,
-            'priority' => null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null,
+            'priority' => null !== $this->priority ? $this->priority : (null !== $this->dispatcher ? $this->dispatcher->getListenerPriority($eventName, $this->listener) : null),
             'pretty' => $this->pretty,
             'stub' => $this->stub,
-        );
+        ];
     }
 
     public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)
     {
+        $dispatcher = $this->dispatcher ?: $dispatcher;
+
         $this->called = true;
+        $this->priority = $dispatcher->getListenerPriority($eventName, $this->listener);
 
         $e = $this->stopwatch->start($this->name, 'event_listener');
 
-        \call_user_func($this->listener, $event, $eventName, $this->dispatcher ?: $dispatcher);
+        ($this->optimizedListener)($event, $eventName, $dispatcher);
 
         if ($e->isStarted()) {
             $e->stop();

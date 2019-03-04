@@ -29,11 +29,11 @@ abstract class CompleteConfigurationTest extends TestCase
     public function testRolesHierarchy()
     {
         $container = $this->getContainer('container1');
-        $this->assertEquals(array(
-            'ROLE_ADMIN' => array('ROLE_USER'),
-            'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE' => array('ROLE_USER', 'ROLE_ADMIN'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
+        $this->assertEquals([
+            'ROLE_ADMIN' => ['ROLE_USER'],
+            'ROLE_SUPER_ADMIN' => ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'],
+            'ROLE_REMOTE' => ['ROLE_USER', 'ROLE_ADMIN'],
+        ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
     public function testUserProviders()
@@ -42,30 +42,30 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $providers = array_values(array_filter($container->getServiceIds(), function ($key) { return 0 === strpos($key, 'security.user.provider.concrete'); }));
 
-        $expectedProviders = array(
+        $expectedProviders = [
             'security.user.provider.concrete.default',
             'security.user.provider.concrete.digest',
             'security.user.provider.concrete.basic',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
-        );
+        ];
 
-        $this->assertEquals(array(), array_diff($expectedProviders, $providers));
-        $this->assertEquals(array(), array_diff($providers, $expectedProviders));
+        $this->assertEquals([], array_diff($expectedProviders, $providers));
+        $this->assertEquals([], array_diff($providers, $expectedProviders));
 
         // chain provider
-        $this->assertEquals(array(new IteratorArgument(array(
+        $this->assertEquals([new IteratorArgument([
             new Reference('security.user.provider.concrete.service'),
             new Reference('security.user.provider.concrete.basic'),
-        ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
+        ])], $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
     public function testFirewalls()
     {
         $container = $this->getContainer('container1');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = array();
-        $configs = array();
+        $listeners = [];
+        $configs = [];
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
@@ -80,14 +80,14 @@ abstract class CompleteConfigurationTest extends TestCase
         $configs[0][2] = strtolower($configs[0][2]);
         $configs[2][2] = strtolower($configs[2][2]);
 
-        $this->assertEquals(array(
-            array(
+        $this->assertEquals([
+            [
                 'simple',
                 'security.user_checker',
                 '.security.request_matcher.xmi9dcw',
                 false,
-            ),
-            array(
+            ],
+            [
                 'secure',
                 'security.user_checker',
                 null,
@@ -98,7 +98,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.form_entry_point.secure',
                 null,
                 null,
-                array(
+                [
                     'switch_user',
                     'x509',
                     'remote_user',
@@ -106,14 +106,14 @@ abstract class CompleteConfigurationTest extends TestCase
                     'http_basic',
                     'remember_me',
                     'anonymous',
-                ),
-                array(
+                ],
+                [
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
                     'stateless' => false,
-                ),
-            ),
-            array(
+                ],
+            ],
+            [
                 'host',
                 'security.user_checker',
                 '.security.request_matcher.iw4hyjb',
@@ -124,13 +124,13 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.basic_entry_point.host',
                 null,
                 null,
-                array(
+                [
                     'http_basic',
                     'anonymous',
-                ),
+                ],
                 null,
-            ),
-            array(
+            ],
+            [
                 'with_user_checker',
                 'app.user_checker',
                 null,
@@ -141,17 +141,17 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.basic_entry_point.with_user_checker',
                 null,
                 null,
-                array(
+                [
                     'http_basic',
                     'anonymous',
-                ),
+                ],
                 null,
-            ),
-        ), $configs);
+            ],
+        ], $configs);
 
-        $this->assertEquals(array(
-            array(),
-            array(
+        $this->assertEquals([
+            [],
+            [
                 'security.channel_listener',
                 'security.authentication.listener.x509.secure',
                 'security.authentication.listener.remote_user.secure',
@@ -161,22 +161,22 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.anonymous.secure',
                 'security.authentication.switchuser_listener.secure',
                 'security.access_listener',
-            ),
-            array(
+            ],
+            [
                 'security.channel_listener',
                 'security.context_listener.0',
                 'security.authentication.listener.basic.host',
                 'security.authentication.listener.anonymous.host',
                 'security.access_listener',
-            ),
-            array(
+            ],
+            [
                 'security.channel_listener',
                 'security.context_listener.1',
                 'security.authentication.listener.basic.with_user_checker',
                 'security.authentication.listener.anonymous.with_user_checker',
                 'security.access_listener',
-            ),
-        ), $listeners);
+            ],
+        ], $listeners);
 
         $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
@@ -186,7 +186,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $container = $this->getContainer('container1');
 
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $matchers = array();
+        $matchers = [];
 
         foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
@@ -195,16 +195,16 @@ abstract class CompleteConfigurationTest extends TestCase
             }
         }
 
-        $this->assertEquals(array(
-            array(
+        $this->assertEquals([
+            [
                 '/login',
-            ),
-            array(
+            ],
+            [
                 '/test',
                 'foo\\.example\\.org',
-                array('GET', 'POST'),
-            ),
-        ), $matchers);
+                ['GET', 'POST'],
+            ],
+        ], $matchers);
     }
 
     public function testUserCheckerAliasIsRegistered()
@@ -219,14 +219,14 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('container1');
 
-        $rules = array();
+        $rules = [];
         foreach ($container->getDefinition('security.access_map')->getMethodCalls() as $call) {
             if ('add' == $call[0]) {
-                $rules[] = array((string) $call[1][0], $call[1][1], $call[1][2]);
+                $rules[] = [(string) $call[1][0], $call[1][1], $call[1][2]];
             }
         }
 
-        $matcherIds = array();
+        $matcherIds = [];
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
@@ -235,17 +235,17 @@ abstract class CompleteConfigurationTest extends TestCase
 
             $i = \count($matcherIds);
             if (1 === $i) {
-                $this->assertEquals(array('ROLE_USER'), $attributes);
+                $this->assertEquals(['ROLE_USER'], $attributes);
                 $this->assertEquals('https', $channel);
                 $this->assertEquals(
-                    array('/blog/524', null, array('GET', 'POST'), array(), array(), null, 8000),
+                    ['/blog/524', null, ['GET', 'POST'], [], [], null, 8000],
                     $requestMatcher->getArguments()
                 );
             } elseif (2 === $i) {
-                $this->assertEquals(array('IS_AUTHENTICATED_ANONYMOUSLY'), $attributes);
+                $this->assertEquals(['IS_AUTHENTICATED_ANONYMOUSLY'], $attributes);
                 $this->assertNull($channel);
                 $this->assertEquals(
-                    array('/blog/.*'),
+                    ['/blog/.*'],
                     $requestMatcher->getArguments()
                 );
             } elseif (3 === $i) {
@@ -260,22 +260,22 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('merge');
 
-        $this->assertEquals(array(
-            'FOO' => array('MOO'),
-            'ADMIN' => array('USER'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
+        $this->assertEquals([
+            'FOO' => ['MOO'],
+            'ADMIN' => ['USER'],
+        ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
     public function testEncoders()
     {
         $container = $this->getContainer('container1');
 
-        $this->assertEquals(array(array(
-            'JMS\FooBundle\Entity\User1' => array(
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => array(false),
-            ),
-            'JMS\FooBundle\Entity\User2' => array(
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
                 'algorithm' => 'sha1',
                 'encode_as_base64' => false,
                 'iterations' => 5,
@@ -286,8 +286,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
-            ),
-            'JMS\FooBundle\Entity\User3' => array(
+            ],
+            'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
@@ -298,17 +298,17 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
-            ),
+            ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => array(
+            'JMS\FooBundle\Entity\User5' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => array('sha1', false, 5, 30),
-            ),
-            'JMS\FooBundle\Entity\User6' => array(
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => array(15),
-            ),
-        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
+                'arguments' => [15],
+            ],
+        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testEncodersWithLibsodium()
@@ -319,12 +319,12 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $container = $this->getContainer('argon2i_encoder');
 
-        $this->assertEquals(array(array(
-            'JMS\FooBundle\Entity\User1' => array(
+        $this->assertEquals([[
+            'JMS\FooBundle\Entity\User1' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
-                'arguments' => array(false),
-            ),
-            'JMS\FooBundle\Entity\User2' => array(
+                'arguments' => [false],
+            ],
+            'JMS\FooBundle\Entity\User2' => [
                 'algorithm' => 'sha1',
                 'encode_as_base64' => false,
                 'iterations' => 5,
@@ -335,8 +335,8 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
-            ),
-            'JMS\FooBundle\Entity\User3' => array(
+            ],
+            'JMS\FooBundle\Entity\User3' => [
                 'algorithm' => 'md5',
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
@@ -347,21 +347,21 @@ abstract class CompleteConfigurationTest extends TestCase
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
-            ),
+            ],
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
-            'JMS\FooBundle\Entity\User5' => array(
+            'JMS\FooBundle\Entity\User5' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
-                'arguments' => array('sha1', false, 5, 30),
-            ),
-            'JMS\FooBundle\Entity\User6' => array(
+                'arguments' => ['sha1', false, 5, 30],
+            ],
+            'JMS\FooBundle\Entity\User6' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => array(15),
-            ),
-            'JMS\FooBundle\Entity\User7' => array(
+                'arguments' => [15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => array(256, 1, 2),
-            ),
-        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
+                'arguments' => [256, 1, 2],
+            ],
+        ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testRememberMeThrowExceptionsDefault()
@@ -470,8 +470,8 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $container = $this->getContainer('simple_auth');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = array();
-        $configs = array();
+        $listeners = [];
+        $configs = [];
         foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
@@ -481,7 +481,7 @@ abstract class CompleteConfigurationTest extends TestCase
             $configs[] = array_values($configDef->getArguments());
         }
 
-        $this->assertSame(array(array(
+        $this->assertSame([[
             'simple_auth',
             'security.user_checker',
             null,
@@ -492,18 +492,32 @@ abstract class CompleteConfigurationTest extends TestCase
             'security.authentication.form_entry_point.simple_auth',
             null,
             null,
-            array('simple_form', 'anonymous',
-            ),
+            ['simple_form', 'anonymous',
+            ],
             null,
-        )), $configs);
+        ]], $configs);
 
-        $this->assertSame(array(array(
+        $this->assertSame([[
             'security.channel_listener',
             'security.context_listener.0',
             'security.authentication.listener.simple_form.simple_auth',
             'security.authentication.listener.anonymous.simple_auth',
             'security.access_listener',
-        )), $listeners);
+        ]], $listeners);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie1-name" cookie configured in "logout.delete_cookies" will delete the "cookie1-name" cookie instead of the "cookie1_name" cookie.
+     * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie3-long_name" cookie configured in "logout.delete_cookies" will delete the "cookie3-long_name" cookie instead of the "cookie3_long_name" cookie.
+     */
+    public function testLogoutDeleteCookieNamesNormalization()
+    {
+        $container = $this->getContainer('logout_delete_cookies');
+        $cookiesToDelete = $container->getDefinition('security.logout.handler.cookie_clearing.main')->getArgument(0);
+        $expectedCookieNames = ['cookie2_name', 'cookie1_name', 'cookie3_long_name'];
+
+        $this->assertSame($expectedCookieNames, array_keys($cookiesToDelete));
     }
 
     protected function getContainer($file)
@@ -520,8 +534,8 @@ abstract class CompleteConfigurationTest extends TestCase
         $bundle->build($container); // Attach all default factories
         $this->getLoader($container)->load($file);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->compile();
 
         return $container;

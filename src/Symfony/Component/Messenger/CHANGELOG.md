@@ -1,9 +1,27 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * Added `PhpSerializer` which uses PHP's native `serialize()` and
+   `unserialize()` to serialize messages to a transport
+
+ * [BC BREAK] If no serializer were passed, the default serializer
+   changed from `Serializer` to `PhpSerializer` inside `AmqpReceiver`,
+   `AmqpSender`, `AmqpTransport` and `AmqpTransportFactory`.
+
+ * Added `TransportException` to mark an exception transport-related
+
+ * [BC BREAK] If listening to exceptions while using `AmqpSender` or `AmqpReceiver`, `\AMQPException` is
+   no longer thrown in favor of `TransportException`.
+
 4.2.0
 -----
 
+ * Added `HandleTrait` leveraging a message bus instance to return a single 
+   synchronous message handling result
+ * Added `HandledStamp` & `SentStamp` stamps
  * All the changes below are BC BREAKS
  * Senders and handlers subscribing to parent interfaces now receive *all* matching messages, wildcard included
  * `MessageBusInterface::dispatch()`, `MiddlewareInterface::handle()` and `SenderInterface::send()` return `Envelope`
@@ -33,6 +51,8 @@ CHANGELOG
  * `ActivationMiddlewareDecorator` has been renamed `ActivationMiddleware`
  * `AllowNoHandlerMiddleware` has been removed in favor of a new constructor argument on `HandleMessageMiddleware`
  * The `ContainerHandlerLocator`, `AbstractHandlerLocator`, `SenderLocator` and `AbstractSenderLocator` classes have been removed
+ * `Envelope::all()` takes a new optional `$stampFqcn` argument and returns the stamps for the specified FQCN, or all stamps by their class name
+ * `Envelope::get()` has been renamed `Envelope::last()`
 
 4.1.0
 -----

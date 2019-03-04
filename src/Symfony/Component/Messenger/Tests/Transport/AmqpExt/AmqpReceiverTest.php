@@ -30,14 +30,14 @@ class AmqpReceiverTest extends TestCase
     public function testItSendTheDecodedMessageToTheHandlerAndAcknowledgeIt()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
@@ -57,14 +57,14 @@ class AmqpReceiverTest extends TestCase
     public function testItNonAcknowledgeTheMessageIfAnExceptionHappened()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
@@ -83,14 +83,14 @@ class AmqpReceiverTest extends TestCase
     public function testItRejectsTheMessageIfTheExceptionIsARejectMessageExceptionInterface()
     {
         $serializer = new Serializer(
-            new SerializerComponent\Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()))
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
         );
 
         $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
-        $envelope->method('getHeaders')->willReturn(array(
+        $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,
-        ));
+        ]);
 
         $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
         $connection->method('get')->willReturn($envelope);
@@ -99,6 +99,83 @@ class AmqpReceiverTest extends TestCase
         $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->receive(function () {
             throw new WillNeverWorkException('Well...');
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     */
+    public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn([
+            'type' => DummyMessage::class,
+        ]);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($envelope);
+
+        $connection->method('ack')->with($envelope)->willThrowException(new \AMQPException());
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $receiver->receive(function (?Envelope $envelope) use ($receiver) {
+            $receiver->stop();
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     */
+    public function testItThrowsATransportExceptionIfItCannotRejectMessage()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn([
+            'type' => DummyMessage::class,
+        ]);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($envelope);
+        $connection->method('reject')->with($envelope)->willThrowException(new \AMQPException());
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $receiver->receive(function () {
+            throw new WillNeverWorkException('Well...');
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     */
+    public function testItThrowsATransportExceptionIfItCannotNonAcknowledgeMessage()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+
+        $envelope = $this->getMockBuilder(\AMQPEnvelope::class)->getMock();
+        $envelope->method('getBody')->willReturn('{"message": "Hi"}');
+        $envelope->method('getHeaders')->willReturn([
+            'type' => DummyMessage::class,
+        ]);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->method('get')->willReturn($envelope);
+
+        $connection->method('nack')->with($envelope)->willThrowException(new \AMQPException());
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $receiver->receive(function () {
+            throw new InterruptException('Well...');
         });
     }
 }

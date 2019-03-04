@@ -27,12 +27,7 @@ class IntlCallbackChoiceLoader extends CallbackChoiceLoader
         // Optimize
         $values = array_filter($values);
         if (empty($values)) {
-            return array();
-        }
-
-        // If no callable is set, values are the same as choices
-        if (null === $value) {
-            return $values;
+            return [];
         }
 
         return $this->loadChoiceList($value)->getChoicesForValues($values);
@@ -46,7 +41,7 @@ class IntlCallbackChoiceLoader extends CallbackChoiceLoader
         // Optimize
         $choices = array_filter($choices);
         if (empty($choices)) {
-            return array();
+            return [];
         }
 
         // If no callable is set, choices are the same as values

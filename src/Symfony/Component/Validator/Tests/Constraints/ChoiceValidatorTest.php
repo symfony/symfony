@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 function choice_callback()
 {
-    return array('foo', 'bar');
+    return ['foo', 'bar'];
 }
 
 class ChoiceValidatorTest extends ConstraintValidatorTestCase
@@ -29,12 +29,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public static function staticCallback()
     {
-        return array('foo', 'bar');
+        return ['foo', 'bar'];
     }
 
     public function objectMethodCallback()
     {
-        return array('foo', 'bar');
+        return ['foo', 'bar'];
     }
 
     /**
@@ -42,10 +42,10 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
      */
     public function testExpectArrayIfMultipleIsTrue()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar'],
             'multiple' => true,
-        ));
+        ]);
 
         $this->validator->validate('asdf', $constraint);
     }
@@ -55,9 +55,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate(
             null,
             new Choice(
-                array(
-                    'choices' => array('foo', 'bar'),
-                )
+                [
+                    'choices' => ['foo', 'bar'],
+                ]
             )
         );
 
@@ -77,12 +77,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidCallbackExpected()
     {
-        $this->validator->validate('foobar', new Choice(array('callback' => 'abcd')));
+        $this->validator->validate('foobar', new Choice(['callback' => 'abcd']));
     }
 
     public function testValidChoiceArray()
     {
-        $constraint = new Choice(array('choices' => array('foo', 'bar')));
+        $constraint = new Choice(['choices' => ['foo', 'bar']]);
 
         $this->validator->validate('bar', $constraint);
 
@@ -91,7 +91,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceCallbackFunction()
     {
-        $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
+        $constraint = new Choice(['callback' => __NAMESPACE__.'\choice_callback']);
 
         $this->validator->validate('bar', $constraint);
 
@@ -101,11 +101,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     public function testValidChoiceCallbackClosure()
     {
         $constraint = new Choice(
-            array(
+            [
                 'callback' => function () {
-                    return array('foo', 'bar');
+                    return ['foo', 'bar'];
                 },
-            )
+            ]
         );
 
         $this->validator->validate('bar', $constraint);
@@ -115,7 +115,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceCallbackStaticMethod()
     {
-        $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback')));
+        $constraint = new Choice(['callback' => [__CLASS__, 'staticCallback']]);
 
         $this->validator->validate('bar', $constraint);
 
@@ -127,7 +127,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         // search $this for "staticCallback"
         $this->setObject($this);
 
-        $constraint = new Choice(array('callback' => 'staticCallback'));
+        $constraint = new Choice(['callback' => 'staticCallback']);
 
         $this->validator->validate('bar', $constraint);
 
@@ -139,7 +139,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         // search $this for "objectMethodCallback"
         $this->setObject($this);
 
-        $constraint = new Choice(array('callback' => 'objectMethodCallback'));
+        $constraint = new Choice(['callback' => 'objectMethodCallback']);
 
         $this->validator->validate('bar', $constraint);
 
@@ -148,60 +148,63 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testMultipleChoices()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar', 'baz'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar', 'baz'],
             'multiple' => true,
-        ));
+        ]);
 
-        $this->validator->validate(array('baz', 'bar'), $constraint);
+        $this->validator->validate(['baz', 'bar'], $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testInvalidChoice()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar'],
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate('baz', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
     public function testInvalidChoiceEmptyChoices()
     {
-        $constraint = new Choice(array(
+        $constraint = new Choice([
             // May happen when the choices are provided dynamically, e.g. from
             // the DB or the model
-            'choices' => array(),
+            'choices' => [],
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate('baz', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setParameter('{{ choices }}', '')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
     public function testInvalidChoiceMultiple()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar'],
             'multipleMessage' => 'myMessage',
             'multiple' => true,
-        ));
+        ]);
 
-        $this->validator->validate(array('foo', 'baz'), $constraint);
+        $this->validator->validate(['foo', 'baz'], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setParameter('{{ choices }}', '"foo", "bar"')
             ->setInvalidValue('baz')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
@@ -209,14 +212,14 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testTooFewChoices()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar', 'moo', 'maa'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar', 'moo', 'maa'],
             'multiple' => true,
             'min' => 2,
             'minMessage' => 'myMessage',
-        ));
+        ]);
 
-        $value = array('foo');
+        $value = ['foo'];
 
         $this->setValue($value);
 
@@ -232,14 +235,14 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testTooManyChoices()
     {
-        $constraint = new Choice(array(
-            'choices' => array('foo', 'bar', 'moo', 'maa'),
+        $constraint = new Choice([
+            'choices' => ['foo', 'bar', 'moo', 'maa'],
             'multiple' => true,
             'max' => 2,
             'maxMessage' => 'myMessage',
-        ));
+        ]);
 
-        $value = array('foo', 'bar', 'moo');
+        $value = ['foo', 'bar', 'moo'];
 
         $this->setValue($value);
 
@@ -255,9 +258,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testStrictAllowsExactValue()
     {
-        $constraint = new Choice(array(
-            'choices' => array(1, 2),
-        ));
+        $constraint = new Choice([
+            'choices' => [1, 2],
+        ]);
 
         $this->validator->validate(2, $constraint);
 
@@ -266,31 +269,33 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testStrictDisallowsDifferentType()
     {
-        $constraint = new Choice(array(
-            'choices' => array(1, 2),
+        $constraint = new Choice([
+            'choices' => [1, 2],
             'message' => 'myMessage',
-        ));
+        ]);
 
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"2"')
+            ->setParameter('{{ choices }}', '1, 2')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
     public function testStrictWithMultipleChoices()
     {
-        $constraint = new Choice(array(
-            'choices' => array(1, 2, 3),
+        $constraint = new Choice([
+            'choices' => [1, 2, 3],
             'multiple' => true,
             'multipleMessage' => 'myMessage',
-        ));
+        ]);
 
-        $this->validator->validate(array(2, '3'), $constraint);
+        $this->validator->validate([2, '3'], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
+            ->setParameter('{{ choices }}', '1, 2, 3')
             ->setInvalidValue('3')
             ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();

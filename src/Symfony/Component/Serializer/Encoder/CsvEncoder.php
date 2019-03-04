@@ -29,32 +29,34 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const HEADERS_KEY = 'csv_headers';
     const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
     const AS_COLLECTION_KEY = 'as_collection';
+    const NO_HEADERS_KEY = 'no_headers';
 
-    private $formulasStartCharacters = array('=', '-', '+', '@');
-    private $defaultContext = array(
+    private $formulasStartCharacters = ['=', '-', '+', '@'];
+    private $defaultContext = [
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '\\',
         self::ESCAPE_FORMULAS_KEY => false,
-        self::HEADERS_KEY => array(),
+        self::HEADERS_KEY => [],
         self::KEY_SEPARATOR_KEY => '.',
-    );
+        self::NO_HEADERS_KEY => false,
+    ];
 
     /**
      * @param array $defaultContext
      */
-    public function __construct($defaultContext = array(), string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
+    public function __construct($defaultContext = [], string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
     {
         if (!\is_array($defaultContext)) {
             @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
 
-            $defaultContext = array(
+            $defaultContext = [
                 self::DELIMITER_KEY => (string) $defaultContext,
                 self::ENCLOSURE_KEY => $enclosure,
                 self::ESCAPE_CHAR_KEY => $escapeChar,
                 self::KEY_SEPARATOR_KEY => $keySeparator,
                 self::ESCAPE_FORMULAS_KEY => $escapeFormulas,
-            );
+            ];
         }
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
@@ -63,20 +65,20 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = [])
     {
         $handle = fopen('php://temp,', 'w+');
 
         if (!\is_array($data)) {
-            $data = array(array($data));
+            $data = [[$data]];
         } elseif (empty($data)) {
-            $data = array(array());
+            $data = [[]];
         } else {
             // Sequential arrays of arrays are considered as collections
             $i = 0;
             foreach ($data as $key => $value) {
                 if ($i !== $key || !\is_array($value)) {
-                    $data = array($data);
+                    $data = [$data];
                     break;
                 }
 
@@ -87,7 +89,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         list($delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas) = $this->getCsvOptions($context);
 
         foreach ($data as &$value) {
-            $flattened = array();
+            $flattened = [];
             $this->flatten($value, $flattened, $keySeparator, '', $escapeFormulas);
             $value = $flattened;
         }
@@ -95,7 +97,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = array_merge(array_values($headers), array_diff($this->extractHeaders($data), $headers));
 
-        fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+        if (!($context[self::NO_HEADERS_KEY] ?? false)) {
+            fputcsv($handle, $headers, $delimiter, $enclosure, $escapeChar);
+        }
 
         $headers = array_fill_keys($headers, '');
         foreach ($data as $row) {
@@ -120,7 +124,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = array())
+    public function decode($data, $format, array $context = [])
     {
         $handle = fopen('php://temp', 'r+');
         fwrite($handle, $data);
@@ -128,8 +132,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = null;
         $nbHeaders = 0;
-        $headerCount = array();
-        $result = array();
+        $headerCount = [];
+        $result = [];
 
         list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
 
@@ -139,16 +143,23 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             if (null === $headers) {
                 $nbHeaders = $nbCols;
 
-                foreach ($cols as $col) {
-                    $header = explode($keySeparator, $col);
-                    $headers[] = $header;
-                    $headerCount[] = \count($header);
-                }
+                if ($context[self::NO_HEADERS_KEY] ?? false) {
+                    for ($i = 0; $i < $nbCols; ++$i) {
+                        $headers[] = [$i];
+                    }
+                    $headerCount = array_fill(0, $nbCols, 1);
+                } else {
+                    foreach ($cols as $col) {
+                        $header = explode($keySeparator, $col);
+                        $headers[] = $header;
+                        $headerCount[] = \count($header);
+                    }
 
-                continue;
+                    continue;
+                }
             }
 
-            $item = array();
+            $item = [];
             for ($i = 0; ($i < $nbCols) && ($i < $nbHeaders); ++$i) {
                 $depth = $headerCount[$i];
                 $arr = &$item;
@@ -161,7 +172,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     }
 
                     if (!isset($arr[$headers[$i][$j]])) {
-                        $arr[$headers[$i][$j]] = array();
+                        $arr[$headers[$i][$j]] = [];
                     }
 
                     $arr = &$arr[$headers[$i][$j]];
@@ -227,7 +238,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, \gettype($headers)));
         }
 
-        return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas);
+        return [$delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas];
     }
 
     /**
@@ -235,8 +246,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
      */
     private function extractHeaders(array $data)
     {
-        $headers = array();
-        $flippedHeaders = array();
+        $headers = [];
+        $flippedHeaders = [];
 
         foreach ($data as $row) {
             $previousHeader = null;

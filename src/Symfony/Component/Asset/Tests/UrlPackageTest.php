@@ -29,33 +29,33 @@ class UrlPackageTest extends TestCase
 
     public function getConfigs()
     {
-        return array(
-            array('http://example.net', '', 'http://example.com/foo', 'http://example.com/foo'),
-            array('http://example.net', '', 'https://example.com/foo', 'https://example.com/foo'),
-            array('http://example.net', '', '//example.com/foo', '//example.com/foo'),
-            array('file:///example/net', '', 'file:///example/com/foo', 'file:///example/com/foo'),
-            array('ftp://example.net', '', 'ftp://example.com', 'ftp://example.com'),
+        return [
+            ['http://example.net', '', 'http://example.com/foo', 'http://example.com/foo'],
+            ['http://example.net', '', 'https://example.com/foo', 'https://example.com/foo'],
+            ['http://example.net', '', '//example.com/foo', '//example.com/foo'],
+            ['file:///example/net', '', 'file:///example/com/foo', 'file:///example/com/foo'],
+            ['ftp://example.net', '', 'ftp://example.com', 'ftp://example.com'],
 
-            array('http://example.com', '', '/foo', 'http://example.com/foo?v1'),
-            array('http://example.com', '', 'foo', 'http://example.com/foo?v1'),
-            array('http://example.com/', '', 'foo', 'http://example.com/foo?v1'),
-            array('http://example.com/foo', '', 'foo', 'http://example.com/foo/foo?v1'),
-            array('http://example.com/foo/', '', 'foo', 'http://example.com/foo/foo?v1'),
-            array('file:///example/com/foo/', '', 'foo', 'file:///example/com/foo/foo?v1'),
+            ['http://example.com', '', '/foo', 'http://example.com/foo?v1'],
+            ['http://example.com', '', 'foo', 'http://example.com/foo?v1'],
+            ['http://example.com/', '', 'foo', 'http://example.com/foo?v1'],
+            ['http://example.com/foo', '', 'foo', 'http://example.com/foo/foo?v1'],
+            ['http://example.com/foo/', '', 'foo', 'http://example.com/foo/foo?v1'],
+            ['file:///example/com/foo/', '', 'foo', 'file:///example/com/foo/foo?v1'],
 
-            array(array('http://example.com'), '', '/foo', 'http://example.com/foo?v1'),
-            array(array('http://example.com', 'http://example.net'), '', '/foo', 'http://example.com/foo?v1'),
-            array(array('http://example.com', 'http://example.net'), '', '/fooa', 'http://example.net/fooa?v1'),
-            array(array('file:///example/com', 'file:///example/net'), '', '/foo', 'file:///example/com/foo?v1'),
-            array(array('ftp://example.com', 'ftp://example.net'), '', '/fooa', 'ftp://example.net/fooa?v1'),
+            [['http://example.com'], '', '/foo', 'http://example.com/foo?v1'],
+            [['http://example.com', 'http://example.net'], '', '/foo', 'http://example.com/foo?v1'],
+            [['http://example.com', 'http://example.net'], '', '/fooa', 'http://example.net/fooa?v1'],
+            [['file:///example/com', 'file:///example/net'], '', '/foo', 'file:///example/com/foo?v1'],
+            [['ftp://example.com', 'ftp://example.net'], '', '/fooa', 'ftp://example.net/fooa?v1'],
 
-            array('http://example.com', 'version-%2$s/%1$s', '/foo', 'http://example.com/version-v1/foo'),
-            array('http://example.com', 'version-%2$s/%1$s', 'foo', 'http://example.com/version-v1/foo'),
-            array('http://example.com', 'version-%2$s/%1$s', 'foo/', 'http://example.com/version-v1/foo/'),
-            array('http://example.com', 'version-%2$s/%1$s', '/foo/', 'http://example.com/version-v1/foo/'),
-            array('file:///example/com', 'version-%2$s/%1$s', '/foo/', 'file:///example/com/version-v1/foo/'),
-            array('ftp://example.com', 'version-%2$s/%1$s', '/foo/', 'ftp://example.com/version-v1/foo/'),
-        );
+            ['http://example.com', 'version-%2$s/%1$s', '/foo', 'http://example.com/version-v1/foo'],
+            ['http://example.com', 'version-%2$s/%1$s', 'foo', 'http://example.com/version-v1/foo'],
+            ['http://example.com', 'version-%2$s/%1$s', 'foo/', 'http://example.com/version-v1/foo/'],
+            ['http://example.com', 'version-%2$s/%1$s', '/foo/', 'http://example.com/version-v1/foo/'],
+            ['file:///example/com', 'version-%2$s/%1$s', '/foo/', 'file:///example/com/version-v1/foo/'],
+            ['ftp://example.com', 'version-%2$s/%1$s', '/foo/', 'ftp://example.com/version-v1/foo/'],
+        ];
     }
 
     /**
@@ -70,18 +70,18 @@ class UrlPackageTest extends TestCase
 
     public function getContextConfigs()
     {
-        return array(
-            array(false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com', 'https://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(false, array('http://example.com', 'https://example.com'), '', 'fooa', 'https://example.com/fooa?v1'),
-            array(false, array('http://example.com/bar'), '', 'foo', 'http://example.com/bar/foo?v1'),
-            array(false, array('http://example.com/bar/'), '', 'foo', 'http://example.com/bar/foo?v1'),
-            array(false, array('//example.com/bar/'), '', 'foo', '//example.com/bar/foo?v1'),
+        return [
+            [false, 'http://example.com', '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [false, ['http://example.com', 'https://example.com'], '', 'fooa', 'https://example.com/fooa?v1'],
+            [false, ['http://example.com/bar'], '', 'foo', 'http://example.com/bar/foo?v1'],
+            [false, ['http://example.com/bar/'], '', 'foo', 'http://example.com/bar/foo?v1'],
+            [false, ['//example.com/bar/'], '', 'foo', '//example.com/bar/foo?v1'],
 
-            array(true, array('http://example.com'), '', 'foo', 'http://example.com/foo?v1'),
-            array(true, array('http://example.com', 'https://example.com'), '', 'foo', 'https://example.com/foo?v1'),
-        );
+            [true, ['http://example.com'], '', 'foo', 'http://example.com/foo?v1'],
+            [true, ['http://example.com', 'https://example.com'], '', 'foo', 'https://example.com/foo?v1'],
+        ];
     }
 
     public function testVersionStrategyGivesAbsoluteURL()
@@ -100,7 +100,7 @@ class UrlPackageTest extends TestCase
      */
     public function testNoBaseUrls()
     {
-        new UrlPackage(array(), new EmptyVersionStrategy());
+        new UrlPackage([], new EmptyVersionStrategy());
     }
 
     /**
@@ -115,10 +115,10 @@ class UrlPackageTest extends TestCase
 
     public function getWrongBaseUrlConfig()
     {
-        return array(
-            array('not-a-url'),
-            array('not-a-url-with-query?query=://'),
-        );
+        return [
+            ['not-a-url'],
+            ['not-a-url-with-query?query=://'],
+        ];
     }
 
     private function getContext($secure)

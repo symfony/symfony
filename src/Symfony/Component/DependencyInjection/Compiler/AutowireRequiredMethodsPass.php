@@ -34,7 +34,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
             return $value;
         }
 
-        $alreadyCalledMethods = array();
+        $alreadyCalledMethods = [];
 
         foreach ($value->getMethodCalls() as list($method)) {
             $alreadyCalledMethods[strtolower($method)] = true;

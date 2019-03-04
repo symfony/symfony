@@ -15,7 +15,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -27,6 +26,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Templating\EngineInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 
 /**
@@ -65,7 +65,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function getParameter(string $name)
     {
         if (!$this->container->has('parameter_bag')) {
-            throw new ServiceNotFoundException('parameter_bag', null, null, array(), sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', \get_class($this)));
+            throw new ServiceNotFoundException('parameter_bag', null, null, [], sprintf('The "%s::getParameter()" method is missing a parameter bag to work properly. Did you forget to register your controller as a service subscriber? This can be fixed either by using autoconfiguration or by manually wiring a "parameter_bag" in the service locator passed to the controller.', \get_class($this)));
         }
 
         return $this->container->get('parameter_bag')->get($name);
@@ -73,7 +73,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     public static function getSubscribedServices()
     {
-        return array(
+        return [
             'router' => '?'.RouterInterface::class,
             'request_stack' => '?'.RequestStack::class,
             'http_kernel' => '?'.HttpKernelInterface::class,
@@ -88,6 +88,6 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'message_bus' => '?'.MessageBusInterface::class,
-        );
+        ];
     }
 }

@@ -13,7 +13,7 @@ return function (ContainerConfigurator $c) {
         ->set('foo')
             ->parent(BarService::class)
             ->decorate('bar', 'b', 1)
-            ->args(array(ref('b')))
+            ->args([ref('b')])
             ->class('Class2')
             ->file('file.php')
             ->parent('bar')

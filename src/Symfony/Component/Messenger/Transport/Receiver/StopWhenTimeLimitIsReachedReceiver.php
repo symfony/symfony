@@ -43,7 +43,7 @@ class StopWhenTimeLimitIsReachedReceiver implements ReceiverInterface
             if ($endTime < microtime(true)) {
                 $this->stop();
                 if (null !== $this->logger) {
-                    $this->logger->info('Receiver stopped due to time limit of {timeLimit}s reached', array('timeLimit' => $this->timeLimitInSeconds));
+                    $this->logger->info('Receiver stopped due to time limit of {timeLimit}s reached', ['timeLimit' => $this->timeLimitInSeconds]);
                 }
             }
         });

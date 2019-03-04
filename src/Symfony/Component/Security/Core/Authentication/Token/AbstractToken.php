@@ -25,26 +25,33 @@ use Symfony\Component\Security\Core\User\UserInterface;
 abstract class AbstractToken implements TokenInterface
 {
     private $user;
-    private $roles = array();
+    private $roles = [];
+    private $roleNames = [];
     private $authenticated = false;
-    private $attributes = array();
+    private $attributes = [];
 
     /**
-     * @param (Role|string)[] $roles An array of roles
+     * @param string[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $roles = array())
+    public function __construct(array $roles = [])
     {
         foreach ($roles as $role) {
             if (\is_string($role)) {
-                $role = new Role($role);
+                $role = new Role($role, false);
             } elseif (!$role instanceof Role) {
                 throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or Role instances, but got %s.', \gettype($role)));
             }
 
             $this->roles[] = $role;
+            $this->roleNames[] = (string) $role;
         }
+    }
+
+    public function getRoleNames(): array
+    {
+        return $this->roleNames;
     }
 
     /**
@@ -52,6 +59,10 @@ abstract class AbstractToken implements TokenInterface
      */
     public function getRoles()
     {
+        if (0 === \func_num_args() || func_get_arg(0)) {
+            @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.3. Use the getRoleNames() method instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         return $this->roles;
     }
 
@@ -133,25 +144,74 @@ abstract class AbstractToken implements TokenInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @final since Symfony 4.3, use getState() instead
+     *
+     * @internal since Symfony 4.3, use getState() instead
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                \is_object($this->user) ? clone $this->user : $this->user,
-                $this->authenticated,
-                array_map(function ($role) { return clone $role; }, $this->roles),
-                $this->attributes,
-            )
-        );
+        $serialized = $this->getState();
+
+        if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
+        }
+
+        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @final since Symfony 4.3, use setState() instead
+     *
+     * @internal since Symfony 4.3, use setState() instead
      */
     public function unserialize($serialized)
     {
-        list($this->user, $this->authenticated, $this->roles, $this->attributes) = unserialize($serialized);
+        $this->setState(\is_array($serialized) ? $serialized : unserialize($serialized));
+    }
+
+    /**
+     * Returns all the necessary state of the object for serialization purposes.
+     *
+     * There is no need to serialize any entry, they should be returned as-is.
+     * If you extend this method, keep in mind you MUST guarantee parent data is present in the state.
+     * Here is an example of how to extend this method:
+     * <code>
+     *     protected function getState(): array
+     *     {
+     *         return [$this->childAttribute, parent::getState()];
+     *     }
+     * </code>
+     *
+     * @see setState()
+     */
+    protected function getState(): array
+    {
+        return [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames];
+    }
+
+    /**
+     * Restores the object state from an array given by getState().
+     *
+     * There is no need to unserialize any entry in $data, they are already ready-to-use.
+     * If you extend this method, keep in mind you MUST pass the parent data to its respective class.
+     * Here is an example of how to extend this method:
+     * <code>
+     *     protected function setState(array $data)
+     *     {
+     *         [$this->childAttribute, $parentData] = $data;
+     *         parent::setState($parentData);
+     *     }
+     * </code>
+     *
+     * @see getState()
+     */
+    protected function setState(array $data)
+    {
+        [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames] = $data;
     }
 
     /**
@@ -183,7 +243,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function hasAttribute($name)
     {
-        return array_key_exists($name, $this->attributes);
+        return \array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -197,7 +257,7 @@ abstract class AbstractToken implements TokenInterface
      */
     public function getAttribute($name)
     {
-        if (!array_key_exists($name, $this->attributes)) {
+        if (!\array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
         }
 
@@ -223,7 +283,7 @@ abstract class AbstractToken implements TokenInterface
         $class = \get_class($this);
         $class = substr($class, strrpos($class, '\\') + 1);
 
-        $roles = array();
+        $roles = [];
         foreach ($this->roles as $role) {
             $roles[] = $role->getRole();
         }

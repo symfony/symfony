@@ -34,6 +34,19 @@ class NullAdapterTest extends TestCase
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
     }
 
+    public function testGet()
+    {
+        $adapter = $this->createCachePool();
+
+        $fetched = [];
+        $item = $adapter->get('myKey', function ($item) use (&$fetched) { $fetched[] = $item; });
+        $this->assertCount(1, $fetched);
+        $item = $fetched[0];
+        $this->assertFalse($item->isHit());
+        $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
+        $this->assertSame('myKey', $item->getKey());
+    }
+
     public function testHasItem()
     {
         $this->assertFalse($this->createCachePool()->hasItem('key'));
@@ -43,7 +56,7 @@ class NullAdapterTest extends TestCase
     {
         $adapter = $this->createCachePool();
 
-        $keys = array('foo', 'bar', 'baz', 'biz');
+        $keys = ['foo', 'bar', 'baz', 'biz'];
 
         /** @var CacheItemInterface[] $items */
         $items = $adapter->getItems($keys);
@@ -89,7 +102,7 @@ class NullAdapterTest extends TestCase
 
     public function testDeleteItems()
     {
-        $this->assertTrue($this->createCachePool()->deleteItems(array('key', 'foo', 'bar')));
+        $this->assertTrue($this->createCachePool()->deleteItems(['key', 'foo', 'bar']));
     }
 
     public function testSave()

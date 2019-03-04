@@ -78,7 +78,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
                 }
                 if ($metadata) {
                     // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
-                    $item["\0*\0value"] = array("\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item["\0*\0value"]);
+                    $item["\0*\0value"] = ["\x9D".pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME])."\x5F" => $item["\0*\0value"]];
                 }
                 $innerItem->set($item["\0*\0value"]);
                 $innerItem->expiresAt(null !== $item["\0*\0expiry"] ? \DateTime::createFromFormat('U.u', sprintf('%.6f', $item["\0*\0expiry"])) : null);
@@ -91,10 +91,10 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, float $beta = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         if (!$this->pool instanceof CacheInterface) {
-            return $this->doGet($this, $key, $callback, $beta);
+            return $this->doGet($this, $key, $callback, $beta, $metadata);
         }
 
         return $this->pool->get($this->getId($key), function ($innerItem) use ($key, $callback) {
@@ -103,7 +103,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             ($this->setInnerItem)($innerItem, (array) $item);
 
             return $value;
-        }, $beta);
+        }, $beta, $metadata);
     }
 
     /**
@@ -120,7 +120,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         if ($this->namespaceLen) {
             foreach ($keys as $i => $key) {

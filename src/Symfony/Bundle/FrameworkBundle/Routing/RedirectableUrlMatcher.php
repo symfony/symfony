@@ -11,10 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3.', RedirectableUrlMatcher::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcher as BaseMatcher;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.3
  */
 class RedirectableUrlMatcher extends BaseMatcher
 {
@@ -29,7 +33,7 @@ class RedirectableUrlMatcher extends BaseMatcher
      */
     public function redirect($path, $route, $scheme = null)
     {
-        return array(
+        return [
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
             'path' => $path,
             'permanent' => true,
@@ -37,6 +41,6 @@ class RedirectableUrlMatcher extends BaseMatcher
             'httpPort' => $this->context->getHttpPort(),
             'httpsPort' => $this->context->getHttpsPort(),
             '_route' => $route,
-        );
+        ];
     }
 }

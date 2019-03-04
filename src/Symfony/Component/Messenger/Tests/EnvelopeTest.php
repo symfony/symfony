@@ -29,7 +29,7 @@ class EnvelopeTest extends TestCase
 
         $this->assertSame($dummy, $envelope->getMessage());
         $this->assertArrayHasKey(ReceivedStamp::class, $stamps = $envelope->all());
-        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class][0]);
     }
 
     public function testWithReturnsNewInstance()
@@ -39,26 +39,26 @@ class EnvelopeTest extends TestCase
         $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
     }
 
-    public function testGet()
+    public function testLast()
     {
         $receivedStamp = new ReceivedStamp();
         $envelope = new Envelope($dummy = new DummyMessage('dummy'), $receivedStamp);
 
-        $this->assertSame($receivedStamp, $envelope->get(ReceivedStamp::class));
-        $this->assertNull($envelope->get(ValidationStamp::class));
+        $this->assertSame($receivedStamp, $envelope->last(ReceivedStamp::class));
+        $this->assertNull($envelope->last(ValidationStamp::class));
     }
 
     public function testAll()
     {
         $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
             ->with($receivedStamp = new ReceivedStamp())
-            ->with($validationStamp = new ValidationStamp(array('foo')))
+            ->with($validationStamp = new ValidationStamp(['foo']))
         ;
 
         $stamps = $envelope->all();
         $this->assertArrayHasKey(ReceivedStamp::class, $stamps);
-        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class]);
+        $this->assertSame($receivedStamp, $stamps[ReceivedStamp::class][0]);
         $this->assertArrayHasKey(ValidationStamp::class, $stamps);
-        $this->assertSame($validationStamp, $stamps[ValidationStamp::class]);
+        $this->assertSame($validationStamp, $stamps[ValidationStamp::class][0]);
     }
 }

@@ -22,8 +22,8 @@ class HttpFoundationExtension extends AbstractExtension
 {
     protected function loadTypeExtensions()
     {
-        return array(
+        return [
             new Type\FormTypeHttpFoundationExtension(),
-        );
+        ];
     }
 }

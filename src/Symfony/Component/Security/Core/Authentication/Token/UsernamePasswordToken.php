@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\Role;
-
 /**
  * UsernamePasswordToken implements a username and password token.
  *
@@ -24,14 +22,14 @@ class UsernamePasswordToken extends AbstractToken
     private $providerKey;
 
     /**
-     * @param string|object   $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed           $credentials This usually is the password of the user
-     * @param string          $providerKey The provider key
-     * @param (Role|string)[] $roles       An array of roles
+     * @param string|object $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
+     * @param mixed         $credentials This usually is the password of the user
+     * @param string        $providerKey The provider key
+     * @param string[]      $roles       An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, string $providerKey, array $roles = array())
+    public function __construct($user, $credentials, string $providerKey, array $roles = [])
     {
         parent::__construct($roles);
 
@@ -89,17 +87,17 @@ class UsernamePasswordToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    protected function getState(): array
     {
-        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
+        return [$this->credentials, $this->providerKey, parent::getState()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->credentials, $this->providerKey, $parentData] = $data;
+        parent::setState($parentData);
     }
 }

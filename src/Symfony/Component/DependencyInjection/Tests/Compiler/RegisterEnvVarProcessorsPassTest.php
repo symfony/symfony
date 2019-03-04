@@ -28,20 +28,23 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
         $this->assertTrue($container->has('container.env_var_processors_locator'));
         $this->assertInstanceOf(SimpleProcessor::class, $container->get('container.env_var_processors_locator')->get('foo'));
 
-        $expected = array(
-            'foo' => array('string'),
-            'base64' => array('string'),
-            'bool' => array('bool'),
-            'const' => array('bool', 'int', 'float', 'string', 'array'),
-            'csv' => array('array'),
-            'file' => array('string'),
-            'float' => array('float'),
-            'int' => array('int'),
-            'json' => array('array'),
-            'key' => array('bool', 'int', 'float', 'string', 'array'),
-            'resolve' => array('string'),
-            'string' => array('string'),
-        );
+        $expected = [
+            'foo' => ['string'],
+            'base64' => ['string'],
+            'bool' => ['bool'],
+            'const' => ['bool', 'int', 'float', 'string', 'array'],
+            'csv' => ['array'],
+            'file' => ['string'],
+            'float' => ['float'],
+            'int' => ['int'],
+            'json' => ['array'],
+            'key' => ['bool', 'int', 'float', 'string', 'array'],
+            'nullable' => ['bool', 'int', 'float', 'string', 'array'],
+            'resolve' => ['string'],
+            'default' => ['bool', 'int', 'float', 'string', 'array'],
+            'string' => ['string'],
+            'trim' => ['string'],
+        ];
 
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());
     }
@@ -77,7 +80,7 @@ class SimpleProcessor implements EnvVarProcessorInterface
 
     public static function getProvidedTypes()
     {
-        return array('foo' => 'string');
+        return ['foo' => 'string'];
     }
 }
 
@@ -85,6 +88,6 @@ class BadProcessor extends SimpleProcessor
 {
     public static function getProvidedTypes()
     {
-        return array('foo' => 'string|foo');
+        return ['foo' => 'string|foo'];
     }
 }

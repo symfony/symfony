@@ -314,7 +314,7 @@ class ProgressBarTest extends TestCase
 
     public function testOverwriteWithSectionOutput()
     {
-        $sections = array();
+        $sections = [];
         $stream = $this->getOutputStream(true);
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
@@ -336,7 +336,7 @@ class ProgressBarTest extends TestCase
 
     public function testOverwriteMultipleProgressBarsWithSectionOutputs()
     {
-        $sections = array();
+        $sections = [];
         $stream = $this->getOutputStream(true);
         $output1 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
         $output2 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
@@ -365,7 +365,7 @@ class ProgressBarTest extends TestCase
 
     public function testMultipleSectionsWithCustomFormat()
     {
-        $sections = array();
+        $sections = [];
         $stream = $this->getOutputStream(true);
         $output1 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
         $output2 = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
@@ -859,11 +859,46 @@ class ProgressBarTest extends TestCase
      */
     public function provideFormat()
     {
-        return array(
-            array('normal'),
-            array('verbose'),
-            array('very_verbose'),
-            array('debug'),
+        return [
+            ['normal'],
+            ['verbose'],
+            ['very_verbose'],
+            ['debug'],
+        ];
+    }
+
+    public function testIterate(): void
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+
+        $this->assertEquals([1, 2], \iterator_to_array($bar->iterate([1, 2])));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/2 [>---------------------------]   0%'.
+            $this->generateOutput(' 1/2 [==============>-------------]  50%').
+            $this->generateOutput(' 2/2 [============================] 100%').
+            $this->generateOutput(' 2/2 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testIterateUncountable(): void
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+
+        $this->assertEquals([1, 2], \iterator_to_array($bar->iterate((function () {
+            yield 1;
+            yield 2;
+        })())));
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    1 [->--------------------------]').
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    2 [============================]'),
+            stream_get_contents($output->getStream())
         );
     }
 

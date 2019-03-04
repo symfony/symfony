@@ -21,12 +21,12 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
 
     public function __construct(array $array = null)
     {
-        $this->array = $array ?: array();
+        $this->array = $array ?: [];
     }
 
     public function offsetExists($offset)
     {
-        return array_key_exists($offset, $this->array);
+        return \array_key_exists($offset, $this->array);
     }
 
     public function offsetGet($offset)

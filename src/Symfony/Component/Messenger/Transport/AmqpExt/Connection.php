@@ -24,6 +24,15 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  */
 class Connection
 {
+    private const ARGUMENTS_AS_INTEGER = [
+        'x-delay',
+        'x-expires',
+        'x-max-length',
+        'x-max-length-bytes',
+        'x-max-priority',
+        'x-message-ttl',
+    ];
+
     private $connectionCredentials;
     private $exchangeConfiguration;
     private $queueConfiguration;
@@ -54,24 +63,24 @@ class Connection
         $this->amqpFactory = $amqpFactory ?: new AmqpFactory();
     }
 
-    public static function fromDsn(string $dsn, array $options = array(), bool $debug = false, AmqpFactory $amqpFactory = null): self
+    public static function fromDsn(string $dsn, array $options = [], bool $debug = false, AmqpFactory $amqpFactory = null): self
     {
         if (false === $parsedUrl = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given AMQP DSN "%s" is invalid.', $dsn));
         }
 
-        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : array();
-        $amqpOptions = array_replace_recursive(array(
+        $pathParts = isset($parsedUrl['path']) ? explode('/', trim($parsedUrl['path'], '/')) : [];
+        $amqpOptions = array_replace_recursive([
             'host' => $parsedUrl['host'] ?? 'localhost',
             'port' => $parsedUrl['port'] ?? 5672,
             'vhost' => isset($pathParts[0]) ? urldecode($pathParts[0]) : '/',
-            'queue' => array(
+            'queue' => [
                 'name' => $queueName = $pathParts[1] ?? 'messages',
-            ),
-            'exchange' => array(
+            ],
+            'exchange' => [
                 'name' => $queueName,
-            ),
-        ), $options);
+            ],
+        ], $options);
 
         if (isset($parsedUrl['user'])) {
             $amqpOptions['login'] = $parsedUrl['user'];
@@ -89,22 +98,45 @@ class Connection
 
         $exchangeOptions = $amqpOptions['exchange'];
         $queueOptions = $amqpOptions['queue'];
-
         unset($amqpOptions['queue'], $amqpOptions['exchange']);
 
+        if (\is_array($queueOptions['arguments'] ?? false)) {
+            $queueOptions['arguments'] = self::normalizeQueueArguments($queueOptions['arguments']);
+        }
+
         return new self($amqpOptions, $exchangeOptions, $queueOptions, $debug, $amqpFactory);
+    }
+
+    private static function normalizeQueueArguments(array $arguments): array
+    {
+        foreach (self::ARGUMENTS_AS_INTEGER as $key) {
+            if (!\array_key_exists($key, $arguments)) {
+                continue;
+            }
+
+            if (!\is_numeric($arguments[$key])) {
+                throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", %s given.', $key, \gettype($arguments[$key])));
+            }
+
+            $arguments[$key] = (int) $arguments[$key];
+        }
+
+        return $arguments;
     }
 
     /**
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = array()): void
+    public function publish(string $body, array $headers = []): void
     {
         if ($this->debug && $this->shouldSetup()) {
             $this->setup();
         }
 
-        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, AMQP_NOPARAM, array('headers' => $headers));
+        $flags = $this->queueConfiguration['flags'] ?? AMQP_NOPARAM;
+        $attributes = array_merge_recursive($this->queueConfiguration['attributes'] ?? [], ['headers' => $headers]);
+
+        $this->exchange()->publish($body, $this->queueConfiguration['routing_key'] ?? null, $flags, $attributes);
     }
 
     /**
@@ -224,6 +256,6 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        return !array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], array(false, 'false'), true);
+        return !\array_key_exists('auto-setup', $this->connectionCredentials) || !\in_array($this->connectionCredentials['auto-setup'], [false, 'false'], true);
     }
 }

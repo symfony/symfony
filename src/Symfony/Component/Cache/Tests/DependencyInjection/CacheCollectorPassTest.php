@@ -37,10 +37,10 @@ class CacheCollectorPassTest extends TestCase
         $collector = $container->register('data_collector.cache', CacheDataCollector::class);
         (new CacheCollectorPass())->process($container);
 
-        $this->assertEquals(array(
-            array('addInstance', array('fs', new Reference('fs'))),
-            array('addInstance', array('tagged_fs', new Reference('tagged_fs'))),
-        ), $collector->getMethodCalls());
+        $this->assertEquals([
+            ['addInstance', ['fs', new Reference('fs')]],
+            ['addInstance', ['tagged_fs', new Reference('tagged_fs')]],
+        ], $collector->getMethodCalls());
 
         $this->assertSame(TraceableAdapter::class, $container->findDefinition('fs')->getClass());
         $this->assertSame(TraceableTagAwareAdapter::class, $container->getDefinition('tagged_fs')->getClass());

@@ -50,11 +50,13 @@ class TranslationDebugCommand extends Command
     private $extractor;
     private $defaultTransPath;
     private $defaultViewsPath;
+    private $transPaths;
+    private $viewsPaths;
 
     /**
      * @param TranslatorInterface $translator
      */
-    public function __construct($translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null)
+    public function __construct($translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null, array $transPaths = [], array $viewsPaths = [])
     {
         if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
             throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
@@ -66,6 +68,8 @@ class TranslationDebugCommand extends Command
         $this->extractor = $extractor;
         $this->defaultTransPath = $defaultTransPath;
         $this->defaultViewsPath = $defaultViewsPath;
+        $this->transPaths = $transPaths;
+        $this->viewsPaths = $viewsPaths;
     }
 
     /**
@@ -74,14 +78,14 @@ class TranslationDebugCommand extends Command
     protected function configure()
     {
         $this
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
-            ))
+            ])
             ->setDescription('Displays translation messages information')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
@@ -131,7 +135,7 @@ EOF
         $rootDir = $kernel->getContainer()->getParameter('kernel.root_dir');
 
         // Define Root Paths
-        $transPaths = array();
+        $transPaths = $this->transPaths;
         if (is_dir($dir = $rootDir.'/Resources/translations')) {
             if ($dir !== $this->defaultTransPath) {
                 $notice = sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
@@ -142,7 +146,7 @@ EOF
         if ($this->defaultTransPath) {
             $transPaths[] = $this->defaultTransPath;
         }
-        $viewsPaths = array();
+        $viewsPaths = $this->viewsPaths;
         if (is_dir($dir = $rootDir.'/Resources/views')) {
             if ($dir !== $this->defaultViewsPath) {
                 $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
@@ -158,7 +162,7 @@ EOF
         if (null !== $input->getArgument('bundle')) {
             try {
                 $bundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = array($bundle->getPath().'/Resources/translations');
+                $transPaths = [$bundle->getPath().'/Resources/translations'];
                 if ($this->defaultTransPath) {
                     $transPaths[] = $this->defaultTransPath;
                 }
@@ -167,7 +171,7 @@ EOF
                     $notice = sprintf('Storing translations files for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $dir, $bundle->getName());
                     @trigger_error($notice.($this->defaultTransPath ? sprintf('use the "%s" directory instead.', $this->defaultTransPath) : 'configure and use "framework.translator.default_path" instead.'), E_USER_DEPRECATED);
                 }
-                $viewsPaths = array($bundle->getPath().'/Resources/views');
+                $viewsPaths = [$bundle->getPath().'/Resources/views'];
                 if ($this->defaultViewsPath) {
                     $viewsPaths[] = $this->defaultViewsPath;
                 }
@@ -180,7 +184,7 @@ EOF
                 // such a bundle does not exist, so treat the argument as path
                 $path = $input->getArgument('bundle');
 
-                $transPaths = array($path.'/translations');
+                $transPaths = [$path.'/translations'];
                 if (is_dir($dir = $path.'/Resources/translations')) {
                     if ($dir !== $this->defaultTransPath) {
                         @trigger_error(sprintf('Storing translations in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/translations'), E_USER_DEPRECATED);
@@ -188,7 +192,7 @@ EOF
                     $transPaths[] = $dir;
                 }
 
-                $viewsPaths = array($path.'/templates');
+                $viewsPaths = [$path.'/templates'];
                 if (is_dir($dir = $path.'/Resources/views')) {
                     if ($dir !== $this->defaultViewsPath) {
                         @trigger_error(sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
@@ -227,7 +231,7 @@ EOF
         $mergeOperation = new MergeOperation($extractedCatalogue, $currentCatalogue);
         $allMessages = $mergeOperation->getResult()->all($domain);
         if (null !== $domain) {
-            $allMessages = array($domain => $allMessages);
+            $allMessages = [$domain => $allMessages];
         }
 
         // No defined or extracted messages
@@ -247,16 +251,16 @@ EOF
         $fallbackCatalogues = $this->loadFallbackCatalogues($locale, $transPaths);
 
         // Display header line
-        $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = ['State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale)];
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
-        $rows = array();
+        $rows = [];
         // Iterate all message ids and determine their state
         foreach ($allMessages as $domain => $messages) {
             foreach (array_keys($messages) as $messageId) {
                 $value = $currentCatalogue->get($messageId, $domain);
-                $states = array();
+                $states = [];
 
                 if ($extractedCatalogue->defines($messageId, $domain)) {
                     if (!$currentCatalogue->defines($messageId, $domain)) {
@@ -279,7 +283,7 @@ EOF
                     }
                 }
 
-                $row = array($this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value));
+                $row = [$this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value)];
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }
@@ -310,7 +314,7 @@ EOF
 
     private function formatStates(array $states): string
     {
-        $result = array();
+        $result = [];
         foreach ($states as $state) {
             $result[] = $this->formatState($state);
         }
@@ -342,7 +346,7 @@ EOF
     {
         $extractedCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            if (is_dir($path)) {
+            if (is_dir($path) || is_file($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
         }
@@ -367,7 +371,7 @@ EOF
      */
     private function loadFallbackCatalogues(string $locale, array $transPaths): array
     {
-        $fallbackCatalogues = array();
+        $fallbackCatalogues = [];
         if ($this->translator instanceof Translator || $this->translator instanceof DataCollectorTranslator || $this->translator instanceof LoggingTranslator) {
             foreach ($this->translator->getFallbackLocales() as $fallbackLocale) {
                 if ($fallbackLocale === $locale) {

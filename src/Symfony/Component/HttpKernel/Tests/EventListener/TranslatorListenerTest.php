@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class TranslatorListenerTest extends TestCase
 {
@@ -27,7 +27,7 @@ class TranslatorListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $this->translator = $this->getMockBuilder(LocaleAwareInterface::class)->getMock();
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $this->listener = new TranslatorListener($this->translator, $this->requestStack);
     }
@@ -48,7 +48,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(0))
             ->method('setLocale')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')
@@ -85,7 +85,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(0))
             ->method('setLocale')
-            ->will($this->throwException(new \InvalidArgumentException()));
+            ->willThrowException(new \InvalidArgumentException());
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')

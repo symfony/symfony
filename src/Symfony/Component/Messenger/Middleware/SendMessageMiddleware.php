@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
 
 /**
@@ -35,15 +36,15 @@ class SendMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($envelope->get(ReceivedStamp::class)) {
+        if ($envelope->all(ReceivedStamp::class)) {
             // it's a received message, do not send it back
             return $stack->next()->handle($envelope, $stack);
         }
         $handle = false;
         $sender = null;
 
-        foreach ($this->sendersLocator->getSenders($envelope, $handle) as $sender) {
-            $envelope = $sender->send($envelope);
+        foreach ($this->sendersLocator->getSenders($envelope, $handle) as $alias => $sender) {
+            $envelope = $sender->send($envelope)->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null));
         }
 
         if (null === $sender || $handle) {

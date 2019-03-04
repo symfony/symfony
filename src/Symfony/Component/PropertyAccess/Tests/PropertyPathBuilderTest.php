@@ -204,10 +204,10 @@ class PropertyPathBuilderTest extends TestCase
 
     public function provideInvalidOffsets()
     {
-        return array(
-            array(6),
-            array(-7),
-        );
+        return [
+            [6],
+            [-7],
+        ];
     }
 
     public function testReplaceWithLengthGreaterOne()
@@ -284,5 +284,26 @@ class PropertyPathBuilderTest extends TestCase
     public function testRemoveDoesNotAllowNegativeOffsets()
     {
         $this->builder->remove(-1);
+    }
+
+    public function testRemoveAndAppendAtTheEnd()
+    {
+        $this->builder->remove($this->builder->getLength() - 1);
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5]');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+
+        $this->builder->appendProperty('old7');
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5].old7');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+
+        $this->builder->remove($this->builder->getLength() - 1);
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5]');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
     }
 }

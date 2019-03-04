@@ -33,7 +33,7 @@ class LdapUserProviderTest extends TestCase
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->will($this->throwException(new ConnectionException()))
+            ->willThrowException(new ConnectionException())
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
@@ -123,10 +123,10 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array(
-                    'sAMAccountName' => array('foo'),
-                    'userpassword' => array('bar', 'baz'),
-                )
+            ->will($this->returnValue(new Entry('foo', [
+                    'sAMAccountName' => ['foo'],
+                    'userpassword' => ['bar', 'baz'],
+                ]
             )))
         ;
         $result
@@ -145,7 +145,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue($query))
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, array(), 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')
@@ -166,7 +166,7 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array())))
+            ->will($this->returnValue(new Entry('foo', [])))
         ;
         $result
             ->expects($this->once())
@@ -184,7 +184,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue($query))
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, array(), 'sAMAccountName', '({uid_key}={username})');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})');
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')
@@ -208,9 +208,9 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array(
-                    'sAMAccountName' => array('foo'),
-                )
+            ->will($this->returnValue(new Entry('foo', [
+                    'sAMAccountName' => ['foo'],
+                ]
             )))
         ;
         $result
@@ -229,7 +229,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue($query))
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, array(), 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')
@@ -250,9 +250,9 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array(
-                    'sAMAccountName' => array('foo'),
-                )
+            ->will($this->returnValue(new Entry('foo', [
+                    'sAMAccountName' => ['foo'],
+                ]
             )))
         ;
         $result
@@ -292,9 +292,9 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array(
-                    'sAMAccountName' => array('foo'),
-                )
+            ->will($this->returnValue(new Entry('foo', [
+                    'sAMAccountName' => ['foo'],
+                ]
             )))
         ;
         $result
@@ -331,10 +331,10 @@ class LdapUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
-            ->will($this->returnValue(new Entry('foo', array(
-                    'sAMAccountName' => array('foo'),
-                    'userpassword' => array('bar'),
-                )
+            ->will($this->returnValue(new Entry('foo', [
+                    'sAMAccountName' => ['foo'],
+                    'userpassword' => ['bar'],
+                ]
             )))
         ;
         $result
@@ -353,7 +353,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue($query))
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, array(), 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')

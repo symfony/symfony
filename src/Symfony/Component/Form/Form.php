@@ -31,24 +31,26 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  *   (1) the "model" format required by the form's object
  *   (2) the "normalized" format for internal processing
- *   (3) the "view" format used for display
+ *   (3) the "view" format used for display simple fields
+ *       or map children model data for compound fields
  *
  * A date field, for example, may store a date as "Y-m-d" string (1) in the
  * object. To facilitate processing in the field, this value is normalized
  * to a DateTime object (2). In the HTML representation of your form, a
- * localized string (3) is presented to and modified by the user.
+ * localized string (3) may be presented to and modified by the user, or it could be an array of values
+ * to be mapped to choices fields.
  *
  * In most cases, format (1) and format (2) will be the same. For example,
  * a checkbox field uses a Boolean value for both internal processing and
- * storage in the object. In these cases you simply need to set a value
- * transformer to convert between formats (2) and (3). You can do this by
- * calling addViewTransformer().
+ * storage in the object. In these cases you need to set a view transformer
+ * to convert between formats (2) and (3). You can do this by calling
+ * addViewTransformer().
  *
  * In some cases though it makes sense to make format (1) configurable. To
  * demonstrate this, let's extend our above date field to store the value
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
- * to DateTime you can set a normalization transformer by calling
+ * to DateTime you can set a model transformer by calling
  * addModelTransformer(). The normalized data is then converted to the displayed
  * data as described before.
  *
@@ -86,7 +88,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @var FormError[] An array of FormError instances
      */
-    private $errors = array();
+    private $errors = [];
 
     /**
      * Whether this form was submitted.
@@ -128,7 +130,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      *
      * @var array
      */
-    private $extraData = array();
+    private $extraData = [];
 
     /**
      * Returns the transformation failure generated during submission, if any.
@@ -217,7 +219,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if (null === $this->getName() || '' === $this->getName()) {
-            return;
+            return null;
         }
 
         $parent = $this->parent;
@@ -340,8 +342,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $modelData = $event->getData();
         }
 
-        // Treat data as strings unless a value transformer exists
-        if (!$this->config->getViewTransformers() && !$this->config->getModelTransformers() && is_scalar($modelData)) {
+        // Treat data as strings unless a transformer exists
+        if (is_scalar($modelData) && !$this->config->getViewTransformers() && !$this->config->getModelTransformers()) {
             $modelData = (string) $modelData;
         }
 
@@ -505,7 +507,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
         // Initialize errors in the very beginning so that we don't lose any
         // errors added during listeners
-        $this->errors = array();
+        $this->errors = [];
 
         // Obviously, a disabled form should not change its data upon submission.
         if ($this->isDisabled()) {
@@ -530,6 +532,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $submittedData = null;
         } elseif (is_scalar($submittedData)) {
             $submittedData = (string) $submittedData;
+        } elseif ($this->config->getRequestHandler()->isFileUpload($submittedData)) {
+            if (!$this->config->getOption('allow_file_upload')) {
+                $submittedData = null;
+                $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
+            }
+        } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->hasOption('multiple')) {
+            $submittedData = null;
+            $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
 
         $dispatcher = $this->config->getEventDispatcher();
@@ -539,6 +549,10 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         $viewData = null;
 
         try {
+            if (null !== $this->transformationFailure) {
+                throw $this->transformationFailure;
+            }
+
             // Hook to change content of the data submitted by the browser
             if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
                 $event = new FormEvent($this, $submittedData);
@@ -552,7 +566,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             // (think of empty collection forms)
             if ($this->config->getCompound()) {
                 if (null === $submittedData) {
-                    $submittedData = array();
+                    $submittedData = [];
                 }
 
                 if (!\is_array($submittedData)) {
@@ -560,7 +574,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 }
 
                 foreach ($this->children as $name => $child) {
-                    $isSubmitted = array_key_exists($name, $submittedData);
+                    $isSubmitted = \array_key_exists($name, $submittedData);
 
                     if ($isSubmitted || $clearMissing) {
                         $child->submit($isSubmitted ? $submittedData[$name] : null, $clearMissing);
@@ -796,7 +810,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
      */
     public function clearErrors(bool $deep = false): self
     {
-        $this->errors = array();
+        $this->errors = [];
 
         if ($deep) {
             // Clear errors from children
@@ -821,7 +835,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * {@inheritdoc}
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = [])
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('You cannot add children to a submitted form');
@@ -884,7 +898,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         $child->setParent($this);
 
         if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
-            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child->getName() => $child)));
+            $iterator = new InheritDataAwareIterator(new \ArrayIterator([$child->getName() => $child]));
             $iterator = new \RecursiveIteratorIterator($iterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $iterator);
         }
@@ -1035,7 +1049,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     }
 
     /**
-     * Normalizes the value if a normalization transformer is set.
+     * Normalizes the value if a model transformer is set.
      *
      * @param mixed $value The value to transform
      *
@@ -1057,7 +1071,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     }
 
     /**
-     * Reverse transforms a value if a normalization transformer is set.
+     * Reverse transforms a value if a model transformer is set.
      *
      * @param string $value The value to reverse transform
      *
@@ -1081,7 +1095,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     }
 
     /**
-     * Transforms the value if a value transformer is set.
+     * Transforms the value if a view transformer is set.
      *
      * @param mixed $value The value to transform
      *
@@ -1112,7 +1126,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     }
 
     /**
-     * Reverse transforms a value if a value transformer is set.
+     * Reverse transforms a value if a view transformer is set.
      *
      * @param string $value The value to reverse transform
      *

@@ -47,7 +47,7 @@ class LoggingTranslatorPass implements CompilerPassInterface
                         $warmer->addTag('container.service_subscriber', $v);
                     }
                 }
-                $warmer->addTag('container.service_subscriber', array('key' => 'translator', 'id' => 'translator.logging.inner'));
+                $warmer->addTag('container.service_subscriber', ['key' => 'translator', 'id' => 'translator.logging.inner']);
             }
         }
     }

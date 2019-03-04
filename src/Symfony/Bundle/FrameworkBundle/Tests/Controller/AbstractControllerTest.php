@@ -30,7 +30,7 @@ class AbstractControllerTest extends ControllerTraitTest
     public function testSubscribedServices()
     {
         $subscribed = AbstractController::getSubscribedServices();
-        $expectedServices = array(
+        $expectedServices = [
             'router' => '?Symfony\\Component\\Routing\\RouterInterface',
             'request_stack' => '?Symfony\\Component\\HttpFoundation\\RequestStack',
             'http_kernel' => '?Symfony\\Component\\HttpKernel\\HttpKernelInterface',
@@ -45,7 +45,7 @@ class AbstractControllerTest extends ControllerTraitTest
             'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
-        );
+        ];
 
         $this->assertEquals($expectedServices, $subscribed, 'Subscribed core services in AbstractController have changed');
     }
@@ -56,7 +56,7 @@ class AbstractControllerTest extends ControllerTraitTest
             $this->markTestSkipped('ContainerBag class does not exist');
         }
 
-        $container = new Container(new FrozenParameterBag(array('foo' => 'bar')));
+        $container = new Container(new FrozenParameterBag(['foo' => 'bar']));
         $container->set('parameter_bag', new ContainerBag($container));
 
         $controller = $this->createController();

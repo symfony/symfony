@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * added `DsCaster` to support dumping the contents of data structures from the Ds extension
+
 4.2.0
 -----
 
@@ -34,4 +39,4 @@ CHANGELOG
 2.7.0
 -----
 
- * deprecated Cloner\Data::getLimitedClone(). Use withMaxDepth, withMaxItemsPerDepth or withRefHandles instead.
+ * deprecated `Cloner\Data::getLimitedClone()`. Use `withMaxDepth`, `withMaxItemsPerDepth` or `withRefHandles` instead.

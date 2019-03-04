@@ -130,18 +130,18 @@ class DecoratorServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container
             ->register('foo')
-            ->setTags(array('bar' => array('attr' => 'baz')))
+            ->setTags(['bar' => ['attr' => 'baz']])
         ;
         $container
             ->register('baz')
-            ->setTags(array('foobar' => array('attr' => 'bar')))
+            ->setTags(['foobar' => ['attr' => 'bar']])
             ->setDecoratedService('foo')
         ;
 
         $this->process($container);
 
         $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
-        $this->assertEquals(array('bar' => array('attr' => 'baz'), 'foobar' => array('attr' => 'bar')), $container->getDefinition('baz')->getTags());
+        $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar']], $container->getDefinition('baz')->getTags());
     }
 
     public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
@@ -150,7 +150,7 @@ class DecoratorServicePassTest extends TestCase
         $container
             ->register('foo')
             ->setPublic(true)
-            ->setTags(array('bar' => array('attr' => 'baz')))
+            ->setTags(['bar' => ['attr' => 'baz']])
         ;
         $container
             ->register('deco1')
@@ -164,7 +164,7 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
 
         $this->assertEmpty($container->getDefinition('deco1')->getTags());
-        $this->assertEquals(array('bar' => array('attr' => 'baz')), $container->getDefinition('deco2')->getTags());
+        $this->assertEquals(['bar' => ['attr' => 'baz']], $container->getDefinition('deco2')->getTags());
     }
 
     protected function process(ContainerBuilder $container)

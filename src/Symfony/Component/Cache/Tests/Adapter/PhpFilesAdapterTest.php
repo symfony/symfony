@@ -19,9 +19,9 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
  */
 class PhpFilesAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
-    );
+    ];
 
     public function createCachePool()
     {

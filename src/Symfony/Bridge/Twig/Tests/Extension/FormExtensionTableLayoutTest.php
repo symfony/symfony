@@ -30,34 +30,36 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
      */
     private $renderer;
 
+    protected static $supportedFeatureSetVersion = 403;
+
     protected function setUp()
     {
         parent::setUp();
 
-        $loader = new StubFilesystemLoader(array(
+        $loader = new StubFilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
-        ));
+        ]);
 
-        $environment = new Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, ['strict_variables' => true]);
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         $environment->addExtension(new FormExtension());
 
-        $rendererEngine = new TwigRendererEngine(array(
+        $rendererEngine = new TwigRendererEngine([
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
-        ), $environment);
+        ], $environment);
         $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -66,10 +68,10 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     public function testStartTagHasActionAttributeWhenActionIsZero()
     {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
             'action' => '0',
-        ));
+        ]);
 
         $html = $this->renderStart($form->createView());
 
@@ -78,12 +80,12 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     public function testHelpAttr()
     {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
-            'help_attr' => array(
+            'help_attr' => [
                 'class' => 'class-test',
-            ),
-        ));
+            ],
+        ]);
         $view = $form->createView();
         $html = $this->renderHelp($view);
 
@@ -96,15 +98,98 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         );
     }
 
-    protected function renderForm(FormView $view, array $vars = array())
+    public function testHelpHtmlDefaultIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+'
+        );
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    /b
+    [.="text"]
+', 0
+        );
+    }
+
+    public function testHelpHtmlIsFalse()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+            'help_html' => false,
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+'
+        );
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    /b
+    [.="text"]
+', 0
+        );
+    }
+
+    public function testHelpHtmlIsTrue()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help <b>text</b> test!',
+            'help_html' => true,
+        ]);
+
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    [.="[trans]Help <b>text</b> test![/trans]"]
+', 0
+        );
+
+        $this->assertMatchesXpath($html,
+            '/p
+    [@id="name_help"]
+    [@class="help-text"]
+    /b
+    [.="text"]
+'
+        );
+    }
+
+    protected function renderForm(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderLabel(FormView $view, $label = null, array $vars = array())
+    protected function renderLabel(FormView $view, $label = null, array $vars = [])
     {
         if (null !== $label) {
-            $vars += array('label' => $label);
+            $vars += ['label' => $label];
         }
 
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
@@ -120,27 +205,27 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
-    protected function renderWidget(FormView $view, array $vars = array())
+    protected function renderWidget(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
-    protected function renderRow(FormView $view, array $vars = array())
+    protected function renderRow(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
-    protected function renderRest(FormView $view, array $vars = array())
+    protected function renderRest(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
-    protected function renderStart(FormView $view, array $vars = array())
+    protected function renderStart(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
-    protected function renderEnd(FormView $view, array $vars = array())
+    protected function renderEnd(FormView $view, array $vars = [])
     {
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }

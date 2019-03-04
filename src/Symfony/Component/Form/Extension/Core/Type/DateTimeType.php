@@ -39,21 +39,21 @@ class DateTimeType extends AbstractType
      */
     const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-    private static $acceptedFormats = array(
+    private static $acceptedFormats = [
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
-    );
+    ];
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $parts = array('year', 'month', 'day', 'hour');
-        $dateParts = array('year', 'month', 'day');
-        $timeParts = array('hour');
+        $parts = ['year', 'month', 'day', 'hour'];
+        $dateParts = ['year', 'month', 'day'];
+        $timeParts = ['hour'];
 
         if ($options['with_minutes']) {
             $parts[] = 'minute';
@@ -91,8 +91,11 @@ class DateTimeType extends AbstractType
                 ));
             }
         } else {
+            // when the form is compound the entries of the array are ignored in favor of children data
+            // so we need to handle the cascade setting here
+            $emptyData = $builder->getEmptyData() ?: [];
             // Only pass a subset of the options to children
-            $dateOptions = array_intersect_key($options, array_flip(array(
+            $dateOptions = array_intersect_key($options, array_flip([
                 'years',
                 'months',
                 'days',
@@ -103,9 +106,13 @@ class DateTimeType extends AbstractType
                 'html5',
                 'invalid_message',
                 'invalid_message_parameters',
-            )));
+            ]));
 
-            $timeOptions = array_intersect_key($options, array_flip(array(
+            if (isset($emptyData['date'])) {
+                $dateOptions['empty_data'] = $emptyData['date'];
+            }
+
+            $timeOptions = array_intersect_key($options, array_flip([
                 'hours',
                 'minutes',
                 'seconds',
@@ -118,7 +125,11 @@ class DateTimeType extends AbstractType
                 'html5',
                 'invalid_message',
                 'invalid_message_parameters',
-            )));
+            ]));
+
+            if (isset($emptyData['time'])) {
+                $timeOptions['empty_data'] = $emptyData['time'];
+            }
 
             if (false === $options['label']) {
                 $dateOptions['label'] = false;
@@ -148,14 +159,18 @@ class DateTimeType extends AbstractType
             $dateOptions['input'] = $timeOptions['input'] = 'array';
             $dateOptions['error_bubbling'] = $timeOptions['error_bubbling'] = true;
 
+            if (isset($dateOptions['format']) && DateType::HTML5_FORMAT !== $dateOptions['format']) {
+                $dateOptions['html5'] = false;
+            }
+
             $builder
-                ->addViewTransformer(new DataTransformerChain(array(
+                ->addViewTransformer(new DataTransformerChain([
                     new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
-                    new ArrayToPartsTransformer(array(
+                    new ArrayToPartsTransformer([
                         'date' => $dateParts,
                         'time' => $timeParts,
-                    )),
-                )))
+                    ]),
+                ]))
                 ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
                 ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
             ;
@@ -165,7 +180,7 @@ class DateTimeType extends AbstractType
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], $options['input_format'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -205,15 +220,15 @@ class DateTimeType extends AbstractType
 
         // Defaults to the value of "widget"
         $dateWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
         // Defaults to the value of "widget"
         $timeWidget = function (Options $options) {
-            return $options['widget'];
+            return 'single_text' === $options['widget'] ? null : $options['widget'];
         };
 
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'input' => 'datetime',
             'model_timezone' => null,
             'view_timezone' => null,
@@ -237,11 +252,15 @@ class DateTimeType extends AbstractType
             'compound' => $compound,
             'date_label' => null,
             'time_label' => null,
-        ));
+            'empty_data' => function (Options $options) {
+                return $options['compound'] ? [] : '';
+            },
+            'input_format' => 'Y-m-d H:i:s',
+        ]);
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
-        $resolver->setDefined(array(
+        $resolver->setDefined([
             'placeholder',
             'choice_translation_domain',
             'years',
@@ -250,34 +269,69 @@ class DateTimeType extends AbstractType
             'hours',
             'minutes',
             'seconds',
-        ));
+        ]);
 
-        $resolver->setAllowedValues('input', array(
+        $resolver->setAllowedValues('input', [
             'datetime',
             'datetime_immutable',
             'string',
             'timestamp',
             'array',
-        ));
-        $resolver->setAllowedValues('date_widget', array(
+        ]);
+        $resolver->setAllowedValues('date_widget', [
             null, // inherit default from DateType
             'single_text',
             'text',
             'choice',
-        ));
-        $resolver->setAllowedValues('time_widget', array(
+        ]);
+        $resolver->setAllowedValues('time_widget', [
             null, // inherit default from TimeType
             'single_text',
             'text',
             'choice',
-        ));
+        ]);
         // This option will overwrite "date_widget" and "time_widget" options
-        $resolver->setAllowedValues('widget', array(
+        $resolver->setAllowedValues('widget', [
             null, // default, don't overwrite options
             'single_text',
             'text',
             'choice',
-        ));
+        ]);
+
+        $resolver->setAllowedTypes('input_format', 'string');
+
+        $resolver->setDeprecated('date_format', function (Options $options, $dateFormat) {
+            if (null !== $dateFormat && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+                return sprintf('Using the "date_format" option of %s with an HTML5 date widget is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "date_format" option of the %s with an HTML5 date.', self::class));
+            }
+
+            return '';
+        });
+        $resolver->setDeprecated('date_widget', function (Options $options, $dateWidget) {
+            if (null !== $dateWidget && 'single_text' === $options['widget']) {
+                return sprintf('Using the "date_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "date_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return '';
+        });
+        $resolver->setDeprecated('time_widget', function (Options $options, $timeWidget) {
+            if (null !== $timeWidget && 'single_text' === $options['widget']) {
+                return sprintf('Using the "time_widget" option of %s when the "widget" option is set to "single_text" is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "time_widget" option of the %s when the "widget" option is set to "single_text".', self::class));
+            }
+
+            return '';
+        });
+        $resolver->setDeprecated('html5', function (Options $options, $html5) {
+            if ($html5 && self::HTML5_FORMAT !== $options['format']) {
+                return sprintf('Using a custom format when the "html5" option of %s is enabled is deprecated since Symfony 4.3 and will lead to an exception in 5.0.', self::class);
+                //throw new LogicException(sprintf('Cannot use the "format" option of %s when the "html5" option is disabled.', self::class));
+            }
+
+            return '';
+        });
     }
 
     /**

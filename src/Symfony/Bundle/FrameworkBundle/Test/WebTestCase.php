@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * WebTestCase is the base class for functional tests.
@@ -28,11 +29,16 @@ abstract class WebTestCase extends KernelTestCase
      *
      * @return Client A Client instance
      */
-    protected static function createClient(array $options = array(), array $server = array())
+    protected static function createClient(array $options = [], array $server = [])
     {
         $kernel = static::bootKernel($options);
 
-        $client = $kernel->getContainer()->get('test.client');
+        try {
+            $client = $kernel->getContainer()->get('test.client');
+        } catch (ServiceNotFoundException $e) {
+            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
+        }
+
         $client->setServerParameters($server);
 
         return $client;

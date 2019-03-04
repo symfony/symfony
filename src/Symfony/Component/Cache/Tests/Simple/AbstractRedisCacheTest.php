@@ -13,13 +13,16 @@ namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Simple\RedisCache;
 
+/**
+ * @group legacy
+ */
 abstract class AbstractRedisCacheTest extends CacheTestCase
 {
-    protected $skippedTests = array(
+    protected $skippedTests = [
         'testSetTtl' => 'Testing expiration slows down the test suite',
         'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
-    );
+    ];
 
     protected static $redis;
 

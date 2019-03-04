@@ -22,22 +22,22 @@ class TemplateIteratorTest extends TestCase
         $bundle->expects($this->any())->method('getPath')->will($this->returnValue(__DIR__.'/Fixtures/templates/BarBundle'));
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')->disableOriginalConstructor()->getMock();
-        $kernel->expects($this->any())->method('getBundles')->will($this->returnValue(array(
+        $kernel->expects($this->any())->method('getBundles')->will($this->returnValue([
             $bundle,
-        )));
-        $iterator = new TemplateIterator($kernel, __DIR__.'/Fixtures/templates', array(__DIR__.'/Fixtures/templates/Foo' => 'Foo'), __DIR__.'/DependencyInjection/Fixtures/templates');
+        ]));
+        $iterator = new TemplateIterator($kernel, __DIR__.'/Fixtures/templates', [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
         $sorted = iterator_to_array($iterator);
         sort($sorted);
         $this->assertEquals(
-            array(
+            [
                 '@Bar/base.html.twig',
                 '@Bar/index.html.twig',
                 '@Bar/layout.html.twig',
                 '@Foo/index.html.twig',
                 'layout.html.twig',
                 'sub/sub.html.twig',
-            ),
+            ],
             $sorted
         );
     }

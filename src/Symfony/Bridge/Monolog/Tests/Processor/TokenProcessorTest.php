@@ -25,18 +25,17 @@ class TokenProcessorTest extends TestCase
 {
     public function testProcessor()
     {
-        $token = new UsernamePasswordToken('user', 'password', 'provider', array('ROLE_USER'));
+        $token = new UsernamePasswordToken('user', 'password', 'provider', ['ROLE_USER']);
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->method('getToken')->willReturn($token);
 
         $processor = new TokenProcessor($tokenStorage);
-        $record = array('extra' => array());
+        $record = ['extra' => []];
         $record = $processor($record);
 
         $this->assertArrayHasKey('token', $record['extra']);
         $this->assertEquals($token->getUsername(), $record['extra']['token']['username']);
         $this->assertEquals($token->isAuthenticated(), $record['extra']['token']['authenticated']);
-        $roles = array_map(function ($role) { return $role->getRole(); }, $token->getRoles());
-        $this->assertEquals($roles, $record['extra']['token']['roles']);
+        $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
     }
 }

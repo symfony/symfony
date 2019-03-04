@@ -43,7 +43,7 @@ class StopwatchEventTest extends TestCase
     public function testGetPeriods()
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertEquals(array(), $event->getPeriods());
+        $this->assertEquals([], $event->getPeriods());
 
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();

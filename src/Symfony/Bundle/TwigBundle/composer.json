@@ -27,7 +27,7 @@
     "require-dev": {
         "symfony/asset": "~3.4|~4.0",
         "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/dependency-injection": "~4.1",
+        "symfony/dependency-injection": "^4.2.5",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",

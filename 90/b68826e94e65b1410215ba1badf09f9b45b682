@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2018-11-20T06:07:55Z
+
+Thank you for your contribution.
+Can you please show some output with a screenshot?
+
+---------------------------------------------------------------------------
+
+by soufianZantar at 2018-11-20T08:25:42Z
+
+@OskarStark thank you for your review.
+Yes, i will show you the output tonight (sadly i can't now).
+
+---------------------------------------------------------------------------
+
+by soufianZantar at 2018-11-20T21:36:58Z
+
+Hi @OskarStark this is the srceenshots
+
+> bin/console debug:router routing_without_condition
+
+![routing-1](https://user-images.githubusercontent.com/26696532/48803823-4e61e480-ed13-11e8-8669-7bb0173328bb.png)
+
+> bin/console debug:router routing_with_condition
+
+![routing-2](https://user-images.githubusercontent.com/26696532/48804020-d21bd100-ed13-11e8-9f2d-087fefeed239.png)
+
+> bin/console debug:router --format=json
+
+![routing-3](https://user-images.githubusercontent.com/26696532/48804076-f2e42680-ed13-11e8-85bd-3521b85e6103.png)
+
+> bin/console debug:router --format=md
+
+![routing-4](https://user-images.githubusercontent.com/26696532/48804125-17400300-ed14-11e8-9ccd-e78ee27051af.png)
+
+> bin/console debug:router --format=xml
+
+![routing-5](https://user-images.githubusercontent.com/26696532/48804194-3f2f6680-ed14-11e8-9341-756ad78f3be3.png)
+
+---------------------------------------------------------------------------
+
+by soufianZantar at 2018-11-22T22:17:05Z
+
+hi @ro0NL
+I have added your suggestion, what you think now?
+
+and why **AppVeyor** return `Command exited with code -1073741819`? all tests was passed, is that normal?

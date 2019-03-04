@@ -64,7 +64,6 @@ class FinalClass6
  * @author John Doe
  *
  * @final another
- *
  *        multiline comment...
  *
  * @return string

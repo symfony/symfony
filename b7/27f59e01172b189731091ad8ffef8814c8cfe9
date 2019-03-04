@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by kunicmarko20 at 2019-02-25T14:39:38Z
+
+Should it also be added here:
+
+https://github.com/symfony/messenger/blob/0c0e9cfc2fd50a5b6e242204c80855f2f385f9cb/Transport/AmqpExt/AmqpReceiver.php#L70 ?
+
+Didn't check what exception can occur here but I guess it should be consistent.
+
+---------------------------------------------------------------------------
+
+by lolmx at 2019-02-27T10:15:14Z
+
+I added a catch block whenever the `$this->connection->ack($AMQPEnvelope);` fails in the receiver, and surrounded `$this->connection->reject($AMQPEnvelope);` & `$this->connection->nack($AMQPEnvelope);` because they can fail too.
+
+I did not alter [this throw](https://github.com/symfony/messenger/blob/0c0e9cfc2fd50a5b6e242204c80855f2f385f9cb/Transport/AmqpExt/AmqpReceiver.php#L70) because it's not transport-related.
+
+Although [this one](https://github.com/symfony/messenger/blob/0c0e9cfc2fd50a5b6e242204c80855f2f385f9cb/Transport/AmqpExt/AmqpReceiver.php#L66) is related to transport, I choose to not trow a `TransportException` because it's an exception manually raised by client code, thus I let client do his stuff :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-03T18:10:58Z
+
+Can you rebase your pull request on current master? You merged master and it makes the PR non-mergeable. thank you.
+
+---------------------------------------------------------------------------
+
+by lolmx at 2019-03-04T10:16:58Z
+
+My bad, here it is :)
+
+---------------------------------------------------------------------------
+
+by lolmx at 2019-03-04T10:50:22Z
+
+I checked tests errors, it's Component/Debug and Bundle/FrameworkBundle, which are failing on upstream/master too

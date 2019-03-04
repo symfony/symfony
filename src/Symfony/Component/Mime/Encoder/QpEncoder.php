@@ -14,8 +14,6 @@ namespace Symfony\Component\Mime\Encoder;
 use Symfony\Component\Mime\CharacterStream;
 
 /**
- * @final
- *
  * @author Chris Corbyn
  *
  * @experimental in 4.3

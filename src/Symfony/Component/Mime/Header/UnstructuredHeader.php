@@ -14,8 +14,6 @@ namespace Symfony\Component\Mime\Header;
 /**
  * A Simple MIME Header.
  *
- * @final
- *
  * @author Chris Corbyn
  *
  * @experimental in 4.3

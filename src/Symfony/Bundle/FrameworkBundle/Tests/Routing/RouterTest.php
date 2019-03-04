@@ -27,7 +27,7 @@ class RouterTest extends TestCase
      */
     public function testConstructThrowsOnNonSymfonyNorPsr11Container()
     {
-        new Router($this->getMockBuilder(ContainerInterface::class)->getMock(), 'foo');
+        new Router($this->createMock(ContainerInterface::class), 'foo');
     }
 
     public function testGenerateWithServiceParam()
@@ -445,6 +445,24 @@ class RouterTest extends TestCase
         $routeCollection = $router->getRouteCollection();
 
         $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
+    }
+
+    public function testBooleanContainerParametersWithinRouteCondition()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setCondition('%parameter.true% or %parameter.false%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag(['parameter.true' => true, 'parameter.false' => false]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertSame('1 or 0', $route->getCondition());
     }
 
     public function getNonStringValues()

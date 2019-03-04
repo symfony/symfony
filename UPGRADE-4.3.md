@@ -50,6 +50,11 @@ HttpFoundation
  * The `FileinfoMimeTypeGuesser` class has been deprecated,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
 
+Messenger
+---------
+
+ * `Amqp` transport does not throw `\AMQPException` anymore, catch `TransportException` instead.
+
 Routing
 -------
 

@@ -60,6 +60,10 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
+        if ('' !== $route->getCondition()) {
+            $output .= "\n".'- Condition: '.$route->getCondition();
+        }
+
         $this->write(isset($options['name'])
             ? $options['name']."\n".str_repeat('-', \strlen($options['name']))."\n\n".$output
             : $output);

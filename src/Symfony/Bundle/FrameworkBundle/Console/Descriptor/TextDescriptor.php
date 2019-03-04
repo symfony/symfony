@@ -92,6 +92,10 @@ class TextDescriptor extends Descriptor
             ['Options', $this->formatRouterConfig($route->getOptions())],
         ];
 
+        if ('' !== $route->getCondition()) {
+            $tableRows[] = array('Condition', $route->getCondition());
+        }
+
         $table = new Table($this->getOutput());
         $table->setHeaders($tableHeaders)->setRows($tableRows);
         $table->render();

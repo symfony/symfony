@@ -193,7 +193,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function getRouteData(Route $route)
     {
-        return [
+        $data = [
             'path' => $route->getPath(),
             'pathRegex' => $route->compile()->getRegex(),
             'host' => '' !== $route->getHost() ? $route->getHost() : 'ANY',

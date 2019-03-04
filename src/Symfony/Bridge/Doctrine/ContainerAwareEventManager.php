@@ -41,8 +41,8 @@ class ContainerAwareEventManager extends EventManager
      *
      * @param string    $eventName The name of the event to dispatch. The name of the event is
      *                             the name of the method that is invoked on listeners.
-     * @param EventArgs $eventArgs The event arguments to pass to the event handlers/listeners.
-     *                             If not supplied, the single empty EventArgs instance is used.
+     * @param EventArgs $eventArgs the event arguments to pass to the event handlers/listeners.
+     *                             If not supplied, the single empty EventArgs instance is used
      *
      * @return bool
      */

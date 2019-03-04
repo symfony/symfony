@@ -23,9 +23,8 @@ class JsonEncode implements EncoderInterface
 {
     const OPTIONS = 'json_encode_options';
 
-    private $defaultContext = [
     private $propertyAccessor;
-    private $defaultContext = []
+    private $defaultContext = [
         self::OPTIONS => 0,
         JsonEncoder::JSON_PROPERTY_PATH => null,
     ];
@@ -78,7 +77,7 @@ class JsonEncode implements EncoderInterface
      */
     private function wrapEncodableData($propertyPath, $data)
     {
-        $wrappedData = array();
+        $wrappedData = [];
         $this->propertyAccessor->setValue($wrappedData, $propertyPath, $data);
 
         return $wrappedData;

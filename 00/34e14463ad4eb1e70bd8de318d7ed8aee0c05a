@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-03T18:15:14Z
+
+@GaryPEGEOT Please, don't change code that your PR does not change (even if fabbot ask for it).
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2019-03-03T18:48:38Z
+
+@javiereguiluz where should I document the new option?

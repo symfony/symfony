@@ -151,7 +151,14 @@ abstract class AbstractToken implements TokenInterface
      */
     public function serialize()
     {
-        return $this->doSerialize($this->getState(), \func_num_args() ? \func_get_arg(0) : null);
+        $serialized = $this->getState();
+
+        if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
+        }
+
+        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
     }
 
     /**
@@ -282,19 +289,6 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
-    }
-
-    /**
-     * @internal
-     */
-    protected function doSerialize($serialized, $isCalledFromOverridingMethod)
-    {
-        if (null === $isCalledFromOverridingMethod) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
-            $isCalledFromOverridingMethod = isset($trace[2]['function'], $trace[2]['object']) && 'serialize' === $trace[2]['function'] && $this === $trace[2]['object'];
-        }
-
-        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
     }
 
     private function hasUserChanged(UserInterface $user)

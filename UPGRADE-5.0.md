@@ -234,6 +234,8 @@ Routing
 
  * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
    options have been removed.
+ * `Route` and `CompiledRoute` don't implement `Serializable` anymore; if you serialize them, please
+   ensure your unserialization logic can recover from a failure related to an updated serialization format
 
 Security
 --------

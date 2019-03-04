@@ -833,15 +833,48 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
+    /**
+     * @deprecated since Symfony 4.3
+     */
     public function serialize()
     {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+
         return serialize([$this->environment, $this->debug]);
     }
 
+    /**
+     * @deprecated since Symfony 4.3
+     */
     public function unserialize($data)
     {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
         list($environment, $debug) = unserialize($data, ['allowed_classes' => false]);
 
         $this->__construct($environment, $debug);
+    }
+
+    public function __sleep()
+    {
+        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
+            $this->serialized = $this->serialize();
+
+            return ['serialized'];
+        }
+
+        return ['environment', 'debug'];
+    }
+
+    public function __wakeup()
+    {
+        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
+            $this->unserialize($this->serialized);
+            unset($this->serialized);
+
+            return;
+        }
+        $this->__construct($this->environment, $this->debug);
     }
 }

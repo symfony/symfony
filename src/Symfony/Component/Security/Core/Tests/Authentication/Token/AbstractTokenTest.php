@@ -278,15 +278,15 @@ class ConcreteToken extends AbstractToken
         }
     }
 
-    public function serialize()
+    protected function getState(): array
     {
-        return serialize([$this->credentials, parent::serialize()]);
+        return [$this->credentials, parent::getState()];
     }
 
-    public function unserialize($serialized)
+    protected function setState(array $data)
     {
-        list($this->credentials, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->credentials, $parentState] = $data;
+        parent::setState($parentState);
     }
 
     public function getCredentials()

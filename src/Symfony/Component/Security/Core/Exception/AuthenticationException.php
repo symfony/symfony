@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Alexander <iam.asm89@gmail.com>
  */
-class AuthenticationException extends RuntimeException implements \Serializable
+class AuthenticationException extends RuntimeException
 {
     private $token;
 
@@ -47,7 +47,14 @@ class AuthenticationException extends RuntimeException implements \Serializable
      */
     public function serialize()
     {
-        return $this->doSerialize($this->getState(), \func_num_args() ? \func_get_arg(0) : null);
+        $serialized = $this->getState();
+
+        if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
+        }
+
+        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
     }
 
     /**
@@ -60,6 +67,30 @@ class AuthenticationException extends RuntimeException implements \Serializable
     public function unserialize($serialized)
     {
         $this->setState(\is_array($serialized) ? $serialized : unserialize($serialized));
+    }
+
+    public function __sleep()
+    {
+        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
+            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3, implement the getState() and setState() methods instead.', $c), E_USER_DEPRECATED);
+            $this->serialized = $this->serialize();
+        } else {
+            $this->serialized = $this->getState();
+        }
+
+        return ['serialized'];
+    }
+
+    public function __wakeup()
+    {
+        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'unserialize'))->getDeclaringClass()->name) {
+            @trigger_error(sprintf('Implementing the "%s::unserialize()" method is deprecated since Symfony 4.3, implement the getState() and setState() methods instead.', $c), E_USER_DEPRECATED);
+            $this->unserialize($this->serialized);
+        } else {
+            $this->setState($this->serialized);
+        }
+
+        unset($this->serialized);
     }
 
     /**
@@ -101,19 +132,6 @@ class AuthenticationException extends RuntimeException implements \Serializable
     protected function setState(array $data)
     {
         [$this->token, $this->code, $this->message, $this->file, $this->line] = $data;
-    }
-
-    /**
-     * @internal
-     */
-    protected function doSerialize($serialized, $isCalledFromOverridingMethod)
-    {
-        if (null === $isCalledFromOverridingMethod) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
-            $isCalledFromOverridingMethod = isset($trace[2]['function'], $trace[2]['object']) && 'serialize' === $trace[2]['function'] && $this === $trace[2]['object'];
-        }
-
-        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
     }
 
     /**

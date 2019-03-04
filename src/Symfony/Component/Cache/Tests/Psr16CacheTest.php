@@ -159,14 +159,9 @@ class Psr16CacheTest extends SimpleCacheTest
     }
 }
 
-class NotUnserializable implements \Serializable
+class NotUnserializable
 {
-    public function serialize()
-    {
-        return serialize(123);
-    }
-
-    public function unserialize($ser)
+    public function __wakeup()
     {
         throw new \Exception(__CLASS__);
     }

@@ -394,6 +394,10 @@ class FrameworkExtension extends Extension
             // remove tagged iterator argument for resource checkers
             $container->getDefinition('config_cache_factory')->setArguments([]);
         }
+
+        if (!$config['disallow_search_engine_index'] ?? false) {
+            $container->removeDefinition('disallow_search_engine_index_response_listener');
+        }
     }
 
     /**

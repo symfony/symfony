@@ -1327,6 +1327,27 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition('session_listener')->getArgument(0)->getValues()));
     }
 
+    public function testRobotsTagListenerIsRegisteredInDebugMode()
+    {
+        $container = $this->createContainer(['kernel.debug' => true]);
+        (new FrameworkExtension())->load([], $container);
+        $this->assertTrue($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should be registered');
+
+        $definition = $container->getDefinition('disallow_search_engine_index_response_listener');
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'), 'DisallowRobotsIndexingListener should have the correct tag');
+
+        $container = $this->createContainer(['kernel.debug' => true]);
+        (new FrameworkExtension())->load([['disallow_search_engine_index' => false]], $container);
+        $this->assertFalse(
+            $container->has('disallow_search_engine_index_response_listener'),
+            'DisallowRobotsIndexingListener should not be registered when explicitly disabled'
+        );
+
+        $container = $this->createContainer(['kernel.debug' => false]);
+        (new FrameworkExtension())->load([], $container);
+        $this->assertFalse($container->has('disallow_search_engine_index_response_listener'), 'DisallowRobotsIndexingListener should NOT be registered');
+    }
+
     protected function createContainer(array $data = [])
     {
         return new ContainerBuilder(new ParameterBag(array_merge([

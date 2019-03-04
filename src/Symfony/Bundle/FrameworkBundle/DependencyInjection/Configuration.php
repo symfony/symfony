@@ -108,6 +108,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
         $this->addMessengerSection($rootNode);
+        $this->addRobotsIndexSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1152,6 +1153,19 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRobotsIndexSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->booleanNode('disallow_search_engine_index')
+                    ->info('Enabled by default when debug is enabled.')
+                    ->defaultValue($this->debug)
+                    ->treatNullLike($this->debug)
                 ->end()
             ->end()
         ;

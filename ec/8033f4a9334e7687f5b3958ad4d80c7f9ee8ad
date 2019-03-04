@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-25T20:13:13Z
+
+I like it, can you please send a doc PR? 🙏
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2019-02-26T17:40:26Z
+
+> I like it, can you please send a doc PR? pray
+
+sure :+1: wondering what exactly to add there :smile:
+
+https://symfony.com/doc/master/routing/service_container_parameters.html
+
+Should it be one of those "NEW... since Symfony 4.3 you can also use boolean parameters" box?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-26T17:41:15Z
+
+Not sure myself how/if this should be documented :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-26T17:43:09Z
+
+Yes you should add a `.. versionadded:: 4.3` directive 👍

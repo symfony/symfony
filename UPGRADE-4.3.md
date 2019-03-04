@@ -37,6 +37,7 @@ FrameworkBundle
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
+ * The `generate()` method of the `UrlGenerator` class can return an empty string instead of null.
 
 HttpFoundation
 --------------

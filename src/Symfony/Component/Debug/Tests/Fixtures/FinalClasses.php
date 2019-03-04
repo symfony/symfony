@@ -30,6 +30,7 @@ class FinalClass3
 
 /**
  * @final
+ *
  * @author John Doe
  */
 class FinalClass4
@@ -76,6 +77,7 @@ class FinalClass7
 /**
  * @author John Doe
  * @final
+ *
  * @return string
  */
 class FinalClass8

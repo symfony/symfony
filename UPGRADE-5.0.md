@@ -335,6 +335,7 @@ Validator
  * The `checkMX` and `checkHost` options of the `Email` constraint were removed
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
+ * The `EmailValidator` default mode "loose" does not accept email addresses beginning with whitespace characters anymore.
  * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
  * The `ValidatorBuilderInterface` has been removed and `ValidatorBuilder` is now final

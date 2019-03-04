@@ -32,7 +32,7 @@ class EmailValidator extends ConstraintValidator
     /**
      * @internal
      */
-    const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
+    const PATTERN_LOOSE = '/^\S+\@\S+\.\S+$/';
 
     private static $emailPatterns = [
         Email::VALIDATION_MODE_LOOSE => self::PATTERN_LOOSE,

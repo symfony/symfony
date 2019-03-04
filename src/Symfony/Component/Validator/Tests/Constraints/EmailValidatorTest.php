@@ -138,6 +138,8 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             ['example@'],
             ['example@localhost'],
             ['foo@example.com bar'],
+            [' foo@example.com'],
+            ['foo@example.com foo@example.com'],
         ];
     }
 
@@ -265,6 +267,8 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         return [
             ['test@example.com test'],
+            [' test@example.com'],
+            ['test@example.com test@example.com'],
             ['user  name@example.com'],
             ['user   name@example.com'],
             ['example.@example.co.uk'],

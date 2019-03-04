@@ -97,7 +97,7 @@ class Message extends RawMessage
         }
 
         if (!$headers->has('Message-ID')) {
-            $headers->addIdHeader('Message-ID', $this->generateMessageId($sender->toString()));
+            $headers->addIdHeader('Message-ID', $this->generateMessageId($sender->getAddress()));
         }
 
         // remove the Bcc field which should NOT be part of the sent message

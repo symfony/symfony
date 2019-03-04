@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\NamedAddress;
 use Symfony\Component\Mime\Part\TextPart;
 
 class MessageTest extends TestCase
@@ -88,6 +89,15 @@ class MessageTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         (new Message())->getPreparedHeaders();
+    }
+
+    public function testGetPreparedHeadersWithNamedFrom()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new NamedAddress('fabien@symfony.com', 'Fabien')]);
+        $h = $message->getPreparedHeaders();
+        $this->assertEquals(new MailboxListHeader('From', [new NamedAddress('fabien@symfony.com', 'Fabien')]), $h->get('From'));
+        $this->assertTrue($h->has('Message-Id'));
     }
 
     public function testGetPreparedHeadersHasSenderWhenNeeded()

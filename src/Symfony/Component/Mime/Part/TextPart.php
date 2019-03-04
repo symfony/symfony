@@ -18,8 +18,6 @@ use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
- * @final
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in 4.3

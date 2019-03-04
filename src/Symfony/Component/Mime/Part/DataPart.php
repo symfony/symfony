@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypes;
 
 /**
- * @final
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @experimental in 4.3

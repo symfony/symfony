@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-27T08:18:41Z
+
+We would also need to update the docblock of the `ConfigurableRequirementsInterface` where `null` is explicitly documented.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-28T14:58:27Z
+
+This should be merged in 3.4 if we consider it as a bug fix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T06:38:30Z
+
+After thinking about it a bit more, I would rather merge it in master and add a note in the changelogs about the change.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T07:27:25Z
+
+@eborges78 Can you rebase on current master instead of merging? Merge commits forbids us from merging the PR. Thank you.

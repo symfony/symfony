@@ -205,6 +205,12 @@ class JsonDescriptor extends Descriptor
             'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
         ];
+
+        if ('' !== $route->getCondition()) {
+            $data['condition'] = $route->getCondition();
+        }
+
+        return $data;
     }
 
     private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false): array

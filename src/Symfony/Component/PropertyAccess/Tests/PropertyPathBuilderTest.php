@@ -285,4 +285,25 @@ class PropertyPathBuilderTest extends TestCase
     {
         $this->builder->remove(-1);
     }
+
+    public function testRemoveAndAppendAtTheEnd()
+    {
+        $this->builder->remove($this->builder->getLength() - 1);
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5]');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+
+        $this->builder->appendProperty('old7');
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5].old7');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+
+        $this->builder->remove($this->builder->getLength() - 1);
+
+        $path = new PropertyPath('old1[old2].old3[old4][old5]');
+
+        $this->assertEquals($path, $this->builder->getPropertyPath());
+    }
 }

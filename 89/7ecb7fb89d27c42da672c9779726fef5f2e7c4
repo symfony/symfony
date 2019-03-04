@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-27T10:26:06Z
+
+Can you revert the second commit? We use the backslash only for a limited set of functions that are known to be optimised in this case.
+
+---------------------------------------------------------------------------
+
+by GregOriol at 2019-02-27T13:24:22Z
+
+@xabbuh Fixed
+
+Also, I replace \array_splice (which shouldn't have the \ if I understood correctly?) with \array_slice (which does?), because it seems to be ~1.5x faster in this case
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-03T21:24:46Z
+
+As this is a bug fix, it should target 3.4 instead of master.
+
+---------------------------------------------------------------------------
+
+by GregOriol at 2019-03-03T21:31:46Z
+
+Indeed, fixed! (I hope, sorry, only my 2nd little PR on this project)

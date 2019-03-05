@@ -33,6 +33,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
     public function getAcceptData()
     {
         $lessThan1 = [
+            '.gitignore',
             '.git',
             'test.py',
             'foo',
@@ -51,6 +52,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
         ];
 
         $lessThanOrEqualTo1 = [
+            '.gitignore',
             '.git',
             'test.py',
             'foo',

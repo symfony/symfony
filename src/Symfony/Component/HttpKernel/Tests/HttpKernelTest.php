@@ -215,20 +215,19 @@ class HttpKernelTest extends TestCase
     public function testHandleWhenTheControllerDoesNotReturnAResponse()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getHttpKernel($dispatcher, function () { return 'foo'; });
+        $kernel = $this->getHttpKernel($dispatcher, function () {});
 
         try {
             $kernel->handle(new Request());
 
             $this->fail('The kernel should throw an exception.');
         } catch (ControllerDoesNotReturnResponseException $e) {
+            $first = $e->getTrace()[0];
+
+            // `file` index the array starting at 0, and __FILE__ starts at 1
+            $line = file($first['file'])[$first['line'] - 2];
+            $this->assertContains('// call controller', $line);
         }
-
-        $first = $e->getTrace()[0];
-
-        // `file` index the array starting at 0, and __FILE__ starts at 1
-        $line = file($first['file'])[$first['line'] - 2];
-        $this->assertContains('// call controller', $line);
     }
 
     public function testHandleWhenTheControllerDoesNotReturnAResponseButAViewIsRegistered()

@@ -1082,7 +1082,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ]);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
-            '/div
+'/div
     [@class="input-group"]
     [
         ./div
@@ -1108,7 +1108,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $form = $this->factory->createNamed('name', PercentType::class, 0.1);
 
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
-            '/div
+'/div
     [@class="input-group"]
     [
         ./input
@@ -1123,6 +1123,45 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     ./span
                     [@class="input-group-text"]
                     [contains(.., "%")]
+                ]
+    ]
+'
+        );
+    }
+
+    public function testPercentNoSymbol()
+    {
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false]);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
+'/input
+    [@id="my&id"]
+    [@type="text"]
+    [@name="name"]
+    [@class="my&class form-control"]
+    [@value="10"]
+'
+        );
+    }
+
+    public function testPercentCustomSymbol()
+    {
+        $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱']);
+        $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
+'/div
+    [@class="input-group"]
+    [
+        ./input
+            [@id="my&id"]
+            [@type="text"]
+            [@name="name"]
+            [@class="my&class form-control"]
+            [@value="10"]
+            /following-sibling::div
+                [@class="input-group-append"]
+                [
+                    ./span
+                    [@class="input-group-text"]
+                    [contains(.., "‱")]
                 ]
     ]
 '

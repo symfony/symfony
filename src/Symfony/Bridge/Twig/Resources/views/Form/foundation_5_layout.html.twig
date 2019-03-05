@@ -43,12 +43,18 @@
 
 {% block percent_widget -%}
     <div class="row collapse">
-        <div class="small-9 large-10 columns">
-            {{- block('form_widget_simple') -}}
-        </div>
-        <div class="small-3 large-2 columns">
-            <span class="postfix">%</span>
-        </div>
+        {%- if symbol -%}
+            <div class="small-9 large-10 columns">
+                {{- block('form_widget_simple') -}}
+            </div>
+            <div class="small-3 large-2 columns">
+                <span class="postfix">{{ symbol|default('%') }}</span>
+            </div>
+        {%- else -%}
+            <div class="small-12 large-12 columns">
+                {{- block('form_widget_simple') -}}
+            </div>
+        {%- endif -%}
     </div>
 {%- endblock percent_widget %}
 

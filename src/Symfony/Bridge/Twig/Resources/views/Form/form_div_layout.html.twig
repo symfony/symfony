@@ -196,7 +196,7 @@
 
 {%- block percent_widget -%}
     {%- set type = type|default('text') -%}
-    {{ block('form_widget_simple') }} %
+    {{ block('form_widget_simple') }}{% if symbol %} {{ symbol|default('%') }}{% endif %}
 {%- endblock percent_widget -%}
 
 {%- block password_widget -%}

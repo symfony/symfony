@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-02-28T17:46:01Z
+
+looks like Fabbot is broken.
+
+Anyway, this patch is much better, because it actually does the work. BTW, introducing the method `reset()` without calling the parent was a BC break, isn't ?
+
+But it is still not perfect. ATM we rely on the fact that processors and handlers are shared among all loggers. But there is one logger per channel. So when we call `Logger::reset()`, we call it on only one logger. Not all!
+
+Let me explain this a bit more. Let's consider this config:
+```yaml
+monolog:
+    handlers:
+        main:
+            type: fingers_crossed
+            action_level: error
+            handler: buffer
+            buffer_size: 50
+            channels: ["!php"]
+        buffer:
+            type: buffer
+            handler: file
+        file:
+            type: stream
+            path: '%kernel.logs_dir%/%kernel.environment%.log'
+
+        php:
+            type: fingers_crossed
+            action_level: error
+            handler: php_file
+            buffer_size: 50
+            channels: ["php"]
+        php_file:
+            type: stream
+            path: '%kernel.logs_dir%/%kernel.environment%-php.log'
+```
+
+And with this PHP script:
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$k = new AppKernel('dev', true);
+$k->boot();
+$c = $k->getContainer();
+
+// (I had to patch SF to make theses services public)
+$c->get('monolog.logger.php')->debug('debug from php - XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
+$c->get('monolog.logger.consumer')->debug('debug from consumer - YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY');
+$c->get('monolog.logger.consumer')->reset();
+
+dump([
+    'logger php' => $c->get('monolog.logger.php'),
+    'logger consumer' => $c->get('monolog.logger.consumer')
+]);
+```
+
+We can simulate our issue. In my consumer, I got `monolog.logger.consumer` logger. And when I call `reset()` it's well reset. But the `monolog.logger.php` is not reset :/
+
+In my application, I don't have this issue because our configuration is more classical. But I know some people are doing this kind of configuration. We need to know that :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T20:13:14Z
+
+Isn't it something we can do on 3.4?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-05T09:34:30Z
+
+@fabpot The `Logger::reset()` did not exist in [3.4](https://github.com/symfony/symfony/blob/3.4/src/Symfony/Bridge/Monolog/Logger.php). So I guess it's not possible as it would be a new feature. on 4.2 it's a bug fix.

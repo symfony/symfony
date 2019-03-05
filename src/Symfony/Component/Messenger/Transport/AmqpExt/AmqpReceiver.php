@@ -12,7 +12,8 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
+use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RecoverableMessageExceptionInterface;
+use Symfony\Component\Messenger\Transport\AmqpExt\Exception\UnrecoverableMessageExceptionInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -61,24 +62,34 @@ class AmqpReceiver implements ReceiverInterface
                 ]));
 
                 $this->connection->ack($AMQPEnvelope);
-            } catch (RejectMessageExceptionInterface $e) {
-                try {
-                    $this->connection->reject($AMQPEnvelope);
-                } catch (\AMQPException $exception) {
-                    throw new TransportException($exception->getMessage(), 0, $exception);
-                }
-
-                throw $e;
-            } catch (\AMQPException $e) {
-                throw new TransportException($e->getMessage(), 0, $e);
-            } catch (\Throwable $e) {
+            } catch (RecoverableMessageExceptionInterface $e) {
                 try {
                     $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
                 } catch (\AMQPException $exception) {
                     throw new TransportException($exception->getMessage(), 0, $exception);
                 }
-
-                throw $e;
+            } catch (UnrecoverableMessageExceptionInterface $e) {
+                try {
+                    $this->connection->nack($AMQPEnvelope, AMQP_NOPARAM);
+                } catch (\AMQPException $exception) {
+                    throw new TransportException($exception->getMessage(), 0, $exception);
+                }
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
+            } catch (\Throwable $e) {
+                $connectionCredentials = $this->connection->getConnectionCredentials() + [
+                        'consume_fatal' => true,
+                        'consume_requeue' => false
+                ];
+                $flag = $connectionCredentials['consume_requeue'] ? AMQP_REQUEUE : AMQP_NOPARAM;
+                try {
+                    $this->connection->nack($AMQPEnvelope, $flag);
+                } catch (\AMQPException $exception) {
+                    throw new TransportException($exception->getMessage(), 0, $exception);
+                }
+                if ($connectionCredentials['consume_fatal']) {
+                    throw $e;
+                }
             } finally {
                 if (\function_exists('pcntl_signal_dispatch')) {
                     pcntl_signal_dispatch();

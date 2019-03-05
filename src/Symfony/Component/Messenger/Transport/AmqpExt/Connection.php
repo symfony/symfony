@@ -185,7 +185,7 @@ class Connection
 
     public function setup(): void
     {
-        if (!$this->channel()->isConnected()) {
+        if (null === $this->amqpChannel || false === $this->amqpChannel->isConnected()) {
             $this->clear();
         }
 
@@ -206,6 +206,9 @@ class Connection
             }
 
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
+            if (isset($this->connectionCredentials['prefetch_count'])) {
+                $this->amqpChannel->setPrefetchCount($this->connectionCredentials['prefetch_count']);
+            }
         }
 
         return $this->amqpChannel;

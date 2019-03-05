@@ -251,6 +251,22 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[attributes][headers][token]=uuid&queue[flags]=1', [], true, $factory);
         $connection->publish('body', $headers);
     }
+
+    public function testSetChannelPrefetchWhenSetup()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->exactly(2))->method('setPrefetchCount')->with(2);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?prefetch_count=2', [], true, $factory);
+        $connection->setup();
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', ['prefetch_count' => 2], true, $factory);
+        $connection->setup();
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

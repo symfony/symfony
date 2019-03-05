@@ -15,6 +15,15 @@ CHANGELOG
 
  * [BC BREAK] If listening to exceptions while using `AmqpSender` or `AmqpReceiver`, `\AMQPException` is
    no longer thrown in favor of `TransportException`.
+   
+ * Added `prefetch_count` AMQP option which set the channel prefetch count
+ 
+ * Added `consume_fatal` (default `true`) and `consume_requeue` (default `false`) AMQP options which allow consumer to
+   continue processing messages or nack it with requeue.
+
+ * Added `UnrecoverableMessageExceptionInterface` and `RecoverableMessageExceptionInterface` into AMQP transport
+   exception for nack with or without requeue, and then continue to consume the other messages.
+ 
 
 4.2.0
 -----

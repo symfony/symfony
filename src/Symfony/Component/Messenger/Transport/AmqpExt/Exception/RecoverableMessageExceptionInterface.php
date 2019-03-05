@@ -20,12 +20,8 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt\Exception;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
- * @deprecated use RecoverableMessageExceptionInterface or UnrecoverableMessageExceptionInterface instead. Now, it is
- * handle as a `\Throwable`: `nack` instead of `reject`
- *
- *
  * @experimental in 4.2
  */
-interface RejectMessageExceptionInterface extends \Throwable
+interface RecoverableMessageExceptionInterface extends \Throwable
 {
 }

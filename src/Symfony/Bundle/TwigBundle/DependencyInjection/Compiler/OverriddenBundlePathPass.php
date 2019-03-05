@@ -64,7 +64,7 @@ final class OverriddenBundlePathPass implements CompilerPassInterface
         }
     }
 
-    private function normalizeBundleName($name)
+    private function normalizeBundleName(string $name): string
     {
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);

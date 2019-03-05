@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T09:26:30Z
+
+@OskarStark Do you think it's possible to keep ownership of the commit to the original author?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-04T09:33:25Z
+
+I am not sure, I talked to @xabbuh and we decided to create a new PR, the repository of the original author is deleted and I don't have some access to get the commits somehow.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T09:37:50Z
+
+ok, fair enough, can you fixed fabbot issues (mainly array() -> [])?
+Tests look broken as well for the added feature.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-04T09:43:48Z
+
+> can you fixed fabbot issues (mainly array() -> [])?
+
+sure thing, will have a look
+
+> Tests look broken as well for the added feature.
+
+still onto it and try to understand whats wrong here 👍
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-04T11:37:22Z
+
+*normal* and *deps=low* build failures are not related to this change.
+
+*deps=high* needs to be skipped
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-04T12:24:13Z
+
+Looks like the tests are 💚
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-05T08:34:46Z
+
+@fabpot I applied your comments

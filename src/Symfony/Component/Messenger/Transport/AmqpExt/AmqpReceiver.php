@@ -79,7 +79,7 @@ class AmqpReceiver implements ReceiverInterface
             } catch (\Throwable $e) {
                 $connectionCredentials = $this->connection->getConnectionCredentials() + [
                         'consume_fatal' => true,
-                        'consume_requeue' => false
+                        'consume_requeue' => false,
                 ];
                 $flag = $connectionCredentials['consume_requeue'] ? AMQP_REQUEUE : AMQP_NOPARAM;
                 try {

@@ -201,8 +201,8 @@ class AmqpReceiverTest extends TestCase
         $receiver = new AmqpReceiver($connection, $serializer);
         $count = 0;
         $receiver->receive(function () use (&$count, $receiver) {
-            $count++;
-            if ($count === 1) {
+            ++$count;
+            if (1 === $count) {
                 throw new UnrecoverableMessageException('Temporary...');
             }
             $receiver->stop();
@@ -230,8 +230,8 @@ class AmqpReceiverTest extends TestCase
         $receiver = new AmqpReceiver($connection, $serializer);
         $count = 0;
         $receiver->receive(function () use (&$count, $receiver) {
-            $count++;
-            if ($count === 1) {
+            ++$count;
+            if (1 === $count) {
                 throw new InterruptException('Temporary...');
             }
             $receiver->stop();

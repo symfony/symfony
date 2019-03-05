@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-23T16:32:47Z
+
+Hi, thanks. Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by mantis at 2019-02-23T17:19:25Z
+
+@nicolas-grekas you asked the one question that I hoped you wouldn't ask - anyway, I've added my first attempt at using phpunit ;)
+
+---------------------------------------------------------------------------
+
+by mantis at 2019-02-23T17:47:36Z
+
+Thanks ;) I made the mistake of just doing this change through github's editor - hence the multiple formatting commits. But equally 'easier' if you don't have everything checked out.
+
+In terms of the failing travis/appveyor builds, i'd used changes to the test fixtures that went in with 4.2 - and applied the fix to 4.1 branch. I'll leave you guys to decide what if anything you want to do there ;)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-23T17:50:42Z
+
+`4.1` only receive security fixes, and this is not a security fix, so `4.2? should be right, as its a bug fix.
+My question was, if you are sure that this "bug" is not present in `3.4`, in this case you must target `3.4`
+
+`master` is only for new features
+
+You can check the maintained versions on the [roadmap](https://symfony.com/roadmap)
+
+---------------------------------------------------------------------------
+
+by mantis at 2019-02-23T17:59:00Z
+
+The issue was introduced in December 2017 by https://github.com/symfony/property-info/commit/e168420b9ca6bbadbd3d7fefe8f5683ca04efe56#diff-818203fea9c55d86a0556b0d436126df
+
+That's been tagged as 4.1.0beta1 -> 4.2.3
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-23T19:08:59Z
+
+Yes then `4.2` is the correct base branch
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T08:44:33Z
+
+@mantis  Can you fix the tests and change the target to 4.2?
+
+---------------------------------------------------------------------------
+
+by mantis at 2019-03-04T08:47:47Z
+
+@fabpot - when i tried to change the target to 4.2, it started to want to pull in changes to the changelog,, and I got confused... IIRC, I think the test failures were only due to the target not being 4.2
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-04T09:11:47Z
+
+First you should rebase your feature branch against 4.2 and push `--force`, afterwards change the target base branch to 4.2 in the github UI
+
+This should work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T09:13:23Z
+
+@mantis I can do it for you if you want.
+
+---------------------------------------------------------------------------
+
+by mantis at 2019-03-04T22:59:59Z
+
+@OskarStark @fabpot - I forced it - the tests were failing from adding in one of oskar's review comments. Current patch set passes as above, so I guess over to you guys ;)

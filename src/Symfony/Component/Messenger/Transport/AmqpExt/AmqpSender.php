@@ -41,7 +41,7 @@ class AmqpSender implements SenderInterface
     {
         $encodedMessage = $this->serializer->encode($envelope);
 
-        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+        $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'] ?? []);
 
         return $envelope;
     }

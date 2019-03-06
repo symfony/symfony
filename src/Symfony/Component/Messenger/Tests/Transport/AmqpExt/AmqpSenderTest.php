@@ -37,4 +37,19 @@ class AmqpSenderTest extends TestCase
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);
     }
+
+    public function testItSendsTheEncodedMessageWithoutHeaders()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...'];
+
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], []);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
 }

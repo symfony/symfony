@@ -1,0 +1,247 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-08T16:39:27Z
+
+I thought it will be easy, but the Property Access does not support passing 2 arguments to a setter (super logic after all).
+
+I don't know how to achieve this. Some randome ideas
+
+1. Pass a `PlaceAndContext` to the POPO. but the BC layer will be impossible
+1. do not rely on the the `PropertyAccess` anymore (but this imply re-code a (small) part of it in the workflow)
+1. Add a `MarkingStoreWithContext` that does not rely on `ProperyAccess` and support only `setXXXX` method call (or with an Interface)
+1. use the `PropertyAccess` to call `setMarking` then `setContext`
+
+Have you other ideas ?  What do you prefer ?
+
+Actually I prefer the 2/
+It quite easy. we only need to check if a property if public or if method `marking()` exist, or `setMarking()` exist. We could still use the `PropertyAccessor` for `getMarking`.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-11-08T16:57:47Z
+
+@lyrixx I think you are forgetting the fact that PropertyAccess takes a property path as input, not just a property name. Using PropertyAccess to read but a simpler implementation supporting only property names to write will not work.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-08T17:30:28Z
+
+Ah you are right. So we should go to 3/
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-08T18:38:32Z
+
+Just one question, as we do not mention we are using the Property Path component, is it a BC break a change the implementation ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-08T21:00:30Z
+
+Not if nothing changes on the outside surface.What would be the user visible side effect?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-08T21:17:13Z
+
+@nicolas-grekas It could change someting to the end user if they use this kind of configuration:
+
+```yaml
+framework:
+    workflows:
+        my_workflow:
+            marking_store:
+                type: multiple_state
+                arguments:
+                    - 'property1.property2'
+```
+
+1. the `arguments` is documented there : https://symfony.com/doc/current/workflow/usage.html#creating-a-workflow
+2. We don't explain that `property1.property2` is supported.
+
+So, if no one is using this feature (we can not be sure, I know, but really I doubt someone is using it), there are no difference for the end user
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-08T21:35:09Z
+
+I case of you think it's a BC break, what do you think if the last commit?
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-11-09T17:16:49Z
+
+@lyrixx thank you on coding this 👍
+
+just a question: what is the aim behind `MethodSingleStateMarkingStore`? not sure to understand (i mainly use this component with single state)
+
+also, how can we deal with sort of "validation" of the context?
+optionresolver? interface? i think it could be safer to have this kind of control
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-12T09:26:45Z
+
+The aim of `MethodSingleStateMarkingStore` is to be able to call `$subject->setMarking($place, $context)`.
+
+> also, how can we deal with sort of "validation" of the context?
+
+We will not validate the context. It's not the role of the workflow component to do that.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-11-12T11:05:30Z
+
+fair enough :) 👍
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-11-13T23:32:55Z
+
+Here we go. I think this PR is ready.
+
+Here is the diff the developer will have to do to use this new feature:
+https://github.com/lyrixx/SFLive-Paris2016-Workflow/pull/21
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-04T07:51:34Z
+
+Note: I lost the integration with the framework bundle. I will fix it asap
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-04T17:31:49Z
+
+Hi!
+
+I finished this PR
+
+**But** (in another PR) I would like to:
+
+* deprecate `SingleStateMarkingStore` and `MultipleStateMarkingStore`. The new `MethodMarkingStore`  could replace them for most a use case. If people are doing very complex thing, I would suggest using a service for that. We already have all infrastructure for it. My motivation are simplicity and expliciteness. the semantic configuration will me more explicit (instead of `arguments: [true, marking]`  will could have `arguments: {single_state: true, property: marking}`). Thus I will be able to delete some code :heart:
+
+* I don't really understand why we have the `ValidateWorkflowsPass`. It adds some complexity and I don't really see the use case here. @Nyholm Why did you added it ? We could directly validate the definition in the Framework Extension
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-12-04T17:42:09Z
+
+Sure. But that will not validate workflow that are manually defined as services. (Which was sometimes needed since the yaml support was not great a year ago).
+
+I’m okey with removing the compiler pass but to keep the functionality.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-04T17:53:40Z
+
+@Nyholm I was sure you will tell that :) I don't know how someone could register a definition manually **and** keep our private / internal conventions. We are using some very specific naming and it's not documented. So it's almost impossible to create a fully functional workflow that is registered like we register workflow in the extension. Instead, they register a workflow service and that's all.
+
+Just as a reminder, we are talking of this code https://github.com/symfony/symfony/blob/c7fe1b6bcbb90874bcce78763e98584de9fc8238/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L508-L676
+
+So, this feature was impossible to use, that's why I suggest to inline it in the extension directly.
+If people people that register workflow manually want validation, they could simple call this code:
+
+```php
+(new WorkflowValidator())->validate($definition)
+```
+
+More over this is much more simple than having to register the definition as a service, and adding 3 or 4 tags on it
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-12-04T18:09:52Z
+
+I agree with you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-05T07:57:21Z
+
+If we consider this as an acceptable BC break (*sic*) - we should at least mark the class `@internal` in the maintained branch where it has been introduced first.
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-12-08T13:24:13Z
+
+@lyrixx please can you take a look when you can on https://github.com/symfony/symfony-docs/pull/10751
+
+thank you
+
+---------------------------------------------------------------------------
+
+by jhaoda at 2018-12-13T13:41:02Z
+
+@lyrixx what about adding a context into the `Marking` class too?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-14T14:25:17Z
+
+@jhaoda What is you use case ?
+
+---------------------------------------------------------------------------
+
+by jhaoda at 2018-12-14T14:38:28Z
+
+@lyrixx needs to store an additional data when writing the current place.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-14T14:42:12Z
+
+Yes, It got it. But what kind of information do you need to store?
+
+---------------------------------------------------------------------------
+
+by jhaoda at 2018-12-14T15:06:26Z
+
+@lyrixx e.g. when order transit into the `assembling` state, then the ID of the employee that will perform this operation must be stored. So, usually it's an `array`/`object` as json.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-14T15:24:40Z
+
+But as soon as the object will pass a new transition, this information will be lost.
+More over, if it's stored in the marking, it should be retrieved through `getMarking`. IMHO this is a bad idea. An anyway, with the current implementation you will be able to achieve this with the same ease
+
+---------------------------------------------------------------------------
+
+by jhaoda at 2018-12-14T15:37:01Z
+
+@lyrixx in my case each state (marked place) is separated entity not just property.
+> it should be retrieved through `getMarking`. IMHO this is a bad idea
+
+Why? Something like that:
+```php
+public function getMarking($subject)
+{
+    /** @var State $place */
+    $state = $subject->states()->orderByDesc('id')->first();
+    if ($state) {
+        return (new Marking([$state->getName() => 1]))
+            ->setContext($state->getContext());
+    }
+    return new Marking();
+}
+```
+> with the current implementation you will be able to achieve this with the same ease
+
+How? With custom `WorkflowInterface`, `MarkingStoreInterface` and `Marking` implementations?
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-02-26T14:18:04Z
+
+@lyrixx friendly ping for this feature :)
+any chance to rebase it and make it mergeable for 4.3?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-02-26T14:51:00Z
+
+@noniagriconomie Sure. I will finish that ASAP ;)

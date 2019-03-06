@@ -1,4 +1,4 @@
 services:
   my_awesome_service_with_yaml_inside:
     arguments:
-      - !yaml_file test_yaml_file.yaml
+      - !yaml_file file_not_found.yaml

@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -803,12 +804,25 @@ class YamlFileLoaderTest extends TestCase
 
     public function testYamlFileTag()
     {
-        $path = self::$fixturesPath.'/yaml';
         $container = new ContainerBuilder();
-        $container->setParameter('fixture_dir', $path);
 
-        $loader = new YamlFileLoader($container, new FileLocator($path));
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services_with_yaml_file_tag.yml');
+
+        $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
+        $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));
+    }
+
+    public function testYamlFileTagNotFound()
+    {
+        $rootDir = self::$fixturesPath.'/yaml';
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Unable to locate file \"file_not_found.yaml\". Please provide a path relative to \"$rootDir\" or an absolute path.");
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator($rootDir));
+        $loader->load('services_with_yaml_file_tag_invalid_path.yml');
 
         $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
         $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));

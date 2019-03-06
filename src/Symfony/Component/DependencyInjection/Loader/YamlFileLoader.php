@@ -759,7 +759,12 @@ class YamlFileLoader extends FileLoader
                 return new Reference($id);
             }
             if ('yaml_file' === $value->getTag()) {
-                $file = $this->container->resolveEnvPlaceholders($argument, true);
+                $rootDir = \dirname($file);
+                $file = \is_file($argument) ? $argument : "$rootDir/$argument";
+
+                if (!\is_file($file)) {
+                    throw new InvalidArgumentException("Unable to locate file \"$argument\". Please provide a path relative to \"$rootDir\" or an absolute path.");
+                }
 
                 return $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT);
             }

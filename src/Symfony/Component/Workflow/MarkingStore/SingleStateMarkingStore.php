@@ -51,7 +51,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function setMarking($subject, Marking $marking)
+    public function setMarking($subject, Marking $marking, array $context = [])
     {
         $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
     }

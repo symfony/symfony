@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Trigger `entered` event for subject entering in the Workflow for the first time
+ * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
 
 4.1.0
 -----

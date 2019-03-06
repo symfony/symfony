@@ -143,7 +143,7 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function apply($subject, $transitionName)
+    public function apply($subject, $transitionName, array $context = [])
     {
         $marking = $this->getMarking($subject);
 
@@ -172,7 +172,7 @@ class Workflow implements WorkflowInterface
 
             $this->enter($subject, $transition, $marking);
 
-            $this->markingStore->setMarking($subject, $marking);
+            $this->markingStore->setMarking($subject, $marking, $context);
 
             $this->entered($subject, $transition, $marking);
 

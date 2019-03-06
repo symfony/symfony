@@ -215,7 +215,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $workflowDefinition->getArgument(0),
             'Places are passed to the workflow definition'
         );
-        $this->assertSame(['workflow.definition' => [['name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state']]], $workflowDefinition->getTags());
+        $this->assertSame(['workflow.definition' => [['name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state', 'single_state' => false]]], $workflowDefinition->getTags());
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame('draft', $workflowDefinition->getArgument(2));
 
@@ -237,7 +237,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $stateMachineDefinition->getArgument(0),
             'Places are passed to the state machine definition'
         );
-        $this->assertSame(['workflow.definition' => [['name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state']]], $stateMachineDefinition->getTags());
+        $this->assertSame(['workflow.definition' => [['name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state', 'single_state' => false]]], $stateMachineDefinition->getTags());
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
 

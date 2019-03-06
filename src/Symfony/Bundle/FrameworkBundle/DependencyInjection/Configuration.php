@@ -268,7 +268,7 @@ class Configuration implements ConfigurationInterface
                                         ->fixXmlConfig('argument')
                                         ->children()
                                             ->enumNode('type')
-                                                ->values(['multiple_state', 'single_state'])
+                                                ->values(['multiple_state', 'single_state', 'method'])
                                             ->end()
                                             ->arrayNode('arguments')
                                                 ->beforeNormalization()

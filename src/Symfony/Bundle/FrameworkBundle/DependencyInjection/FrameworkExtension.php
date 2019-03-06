@@ -615,14 +615,14 @@ class FrameworkExtension extends Extension
 
             // Create places
             $places = array_column($workflow['places'], 'name');
-            $initialPlace = $workflow['initial_place'] ?? null;
+            $initialPlaces = $workflow['initial_places'] ?? $workflow['initial_place'] ?? [];
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
             $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
-            $definitionDefinition->addArgument($initialPlace);
+            $definitionDefinition->addArgument($initialPlaces);
             $definitionDefinition->addArgument($metadataStoreDefinition);
 
             // Create MarkingStore
@@ -670,7 +670,7 @@ class FrameworkExtension extends Extension
                     ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
                         return $container->get((string) $ref);
                     }, $transitions))
-                    ->setInitialPlace($initialPlace)
+                    ->setInitialPlace($initialPlaces)
                     ->build()
                 ;
                 $validator->validate($realDefinition, $name);

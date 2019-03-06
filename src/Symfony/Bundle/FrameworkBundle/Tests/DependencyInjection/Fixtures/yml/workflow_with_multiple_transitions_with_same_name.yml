@@ -6,7 +6,7 @@ framework:
                 type: multiple_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: draft
+            initial_places: [draft]
             places:
                 - draft
                 - wait_for_journalist

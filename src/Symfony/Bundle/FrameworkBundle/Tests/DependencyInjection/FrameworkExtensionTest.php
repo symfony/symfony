@@ -217,7 +217,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'Places are passed to the workflow definition'
         );
         $this->assertCount(4, $workflowDefinition->getArgument(1));
-        $this->assertSame('draft', $workflowDefinition->getArgument(2));
+        $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
 
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
@@ -238,7 +238,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'Places are passed to the state machine definition'
         );
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
-        $this->assertSame('start', $stateMachineDefinition->getArgument(2));
+        $this->assertSame(['start'], $stateMachineDefinition->getArgument(2));
 
         $metadataStoreDefinition = $stateMachineDefinition->getArgument(3);
         $this->assertInstanceOf(Definition::class, $metadataStoreDefinition);
@@ -269,6 +269,28 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('workflow.registry'), 'Workflow registry is registered as a service');
         $registryDefinition = $container->getDefinition('workflow.registry');
         $this->assertGreaterThan(0, \count($registryDefinition->getMethodCalls()));
+    }
+
+    public function testWorkflowLegacy()
+    {
+        $container = $this->createContainerFromFile('workflow-legacy');
+
+        $this->assertTrue($container->hasDefinition('workflow.legacy'), 'Workflow is registered as a service');
+        $this->assertSame('workflow.abstract', $container->getDefinition('workflow.legacy')->getParent());
+        $this->assertTrue($container->hasDefinition('workflow.legacy.definition'), 'Workflow definition is registered as a service');
+
+        $workflowDefinition = $container->getDefinition('workflow.legacy.definition');
+
+        $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
+
+        $this->assertSame(
+            [
+                'draft',
+                'published',
+            ],
+            $workflowDefinition->getArgument(0),
+            'Places are passed to the workflow definition'
+        );
     }
 
     /**

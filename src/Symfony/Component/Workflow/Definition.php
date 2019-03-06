@@ -24,14 +24,15 @@ final class Definition
 {
     private $places = [];
     private $transitions = [];
-    private $initialPlace;
+    private $initialPlaces = [];
     private $metadataStore;
 
     /**
-     * @param string[]     $places
-     * @param Transition[] $transitions
+     * @param string[]             $places
+     * @param Transition[]         $transitions
+     * @param string|string[]|null $initialPlaces
      */
-    public function __construct(array $places, array $transitions, string $initialPlace = null, MetadataStoreInterface $metadataStore = null)
+    public function __construct(array $places, array $transitions, $initialPlaces = null, MetadataStoreInterface $metadataStore = null)
     {
         foreach ($places as $place) {
             $this->addPlace($place);
@@ -41,17 +42,33 @@ final class Definition
             $this->addTransition($transition);
         }
 
-        $this->setInitialPlace($initialPlace);
+        $this->setInitialPlaces($initialPlaces);
 
         $this->metadataStore = $metadataStore ?: new InMemoryMetadataStore();
     }
 
     /**
+     * @deprecated since Symfony 4.3. Use the getInitialPlaces() instead.
+     *
      * @return string|null
      */
     public function getInitialPlace()
     {
-        return $this->initialPlace;
+        @trigger_error(sprintf('Calling %s::getInitialPlace() is deprecated. Call %s::getInitialPlaces() instead.', __CLASS__, __CLASS__));
+
+        if (!$this->initialPlaces) {
+            return null;
+        }
+
+        return reset($this->initialPlaces);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getInitialPlaces(): array
+    {
+        return $this->initialPlaces;
     }
 
     /**
@@ -75,23 +92,27 @@ final class Definition
         return $this->metadataStore;
     }
 
-    private function setInitialPlace(string $place = null)
+    private function setInitialPlaces($places = null)
     {
-        if (null === $place) {
+        if (null === $places) {
             return;
         }
 
-        if (!isset($this->places[$place])) {
-            throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+        $places = (array) $places;
+
+        foreach ($places as $place) {
+            if (!isset($this->places[$place])) {
+                throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
+            }
         }
 
-        $this->initialPlace = $place;
+        $this->initialPlaces = $places;
     }
 
     private function addPlace(string $place)
     {
         if (!\count($this->places)) {
-            $this->initialPlace = $place;
+            $this->initialPlaces = [$place];
         }
 
         $this->places[$place] = $place;

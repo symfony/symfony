@@ -6,7 +6,7 @@ framework:
                 type: multiple_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: draft
+            initial_places: [draft]
             places:
                 # simple format
                 - draft
@@ -33,7 +33,7 @@ framework:
                 type: single_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            initial_place: start
+            initial_places: [start]
             metadata:
                 title: workflow title
             places:

@@ -12,7 +12,7 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'initial_place' => 'draft',
+            'initial_places' => ['draft'],
             'places' => [
                 'draft',
                 'wait_for_journalist',

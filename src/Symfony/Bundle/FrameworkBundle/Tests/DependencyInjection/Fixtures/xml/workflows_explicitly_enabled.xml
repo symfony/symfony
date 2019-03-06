@@ -6,7 +6,8 @@
                         http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config>
-        <framework:workflow enabled="true" name="foo" type="workflow" initial-place="bar">
+        <framework:workflow enabled="true" name="foo" type="workflow">
+            <framework:initial-place>bar</framework:initial-place>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place>bar</framework:place>
             <framework:place>baz</framework:place>

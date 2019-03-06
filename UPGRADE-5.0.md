@@ -368,6 +368,7 @@ Workflow
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
  * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
+ * Removed support of `initial_place`. Use `initial_places` instead.
 
 Yaml
 ----

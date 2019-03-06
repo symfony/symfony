@@ -15,7 +15,7 @@ class DefinitionBuilderTest extends TestCase
         $builder->setInitialPlace('b');
         $definition = $builder->build();
 
-        $this->assertEquals('b', $definition->getInitialPlace());
+        $this->assertEquals(['b'], $definition->getInitialPlaces());
     }
 
     public function testAddTransition()

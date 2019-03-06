@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 interface DefinitionValidatorInterface
 {

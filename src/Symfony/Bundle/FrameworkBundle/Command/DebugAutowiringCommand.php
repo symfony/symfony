@@ -12,11 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
  * A console command for autowiring information.
@@ -28,6 +30,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DebugAutowiringCommand extends ContainerDebugCommand
 {
     protected static $defaultName = 'debug:autowiring';
+    private $supportsHref;
+    private $fileLinkFormatter;
+
+    public function __construct(string $name = null, FileLinkFormatter $fileLinkFormatter = null)
+    {
+        $this->supportsHref = method_exists(OutputFormatterStyle::class, 'setHref');
+        $this->fileLinkFormatter = $fileLinkFormatter;
+        parent::__construct($name);
+    }
 
     /**
      * {@inheritdoc}
@@ -101,7 +112,12 @@ EOF
                 }
                 $previousId = $serviceId.' $';
             }
+
             $serviceLine = sprintf('<fg=yellow>%s</>', $serviceId);
+            if ($this->supportsHref && '' !== $fileLink = $this->getFileLink($serviceId)) {
+                $serviceLine = sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $serviceId);
+            }
+
             if ($builder->hasAlias($serviceId)) {
                 $hasAlias[$serviceId] = true;
                 $serviceAlias = $builder->getAlias($serviceId);
@@ -117,5 +133,15 @@ EOF
             $io->text($text);
         }
         $io->newLine();
+    }
+
+    private function getFileLink(string $class): string
+    {
+        if (null === $this->fileLinkFormatter
+            || (null === $r = $this->getContainerBuilder()->getReflectionClass($class, false))) {
+            return '';
+        }
+
+        return (string) $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
     }
 }

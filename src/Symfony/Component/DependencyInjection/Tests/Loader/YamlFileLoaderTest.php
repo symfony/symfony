@@ -823,8 +823,5 @@ class YamlFileLoaderTest extends TestCase
 
         $loader = new YamlFileLoader($container, new FileLocator($rootDir));
         $loader->load('services_with_yaml_file_tag_invalid_path.yml');
-
-        $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
-        $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));
     }
 }

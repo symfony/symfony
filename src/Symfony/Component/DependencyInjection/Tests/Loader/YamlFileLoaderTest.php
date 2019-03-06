@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -823,5 +824,14 @@ class YamlFileLoaderTest extends TestCase
 
         $loader = new YamlFileLoader($container, new FileLocator($rootDir));
         $loader->load('services_with_yaml_file_tag_invalid_path.yml');
+    }
+
+    public function testYamlFileTagWithXml()
+    {
+        $this->expectException(ParseException::class);
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_yaml_file_tag_invalid_extension.yml');
     }
 }

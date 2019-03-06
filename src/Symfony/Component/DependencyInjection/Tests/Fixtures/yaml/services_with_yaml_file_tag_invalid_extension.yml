@@ -1,0 +1,4 @@
+services:
+  my_awesome_service_with_yaml_inside:
+    arguments:
+      - !yaml_file ../xml/services1.xml

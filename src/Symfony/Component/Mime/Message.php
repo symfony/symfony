@@ -122,9 +122,7 @@ class Message extends RawMessage
         }
 
         yield $this->getPreparedHeaders()->toString();
-        foreach ($body->toIterable() as $chunk) {
-            yield $chunk;
-        }
+        yield from $body->toIterable();
     }
 
     private function generateMessageId(string $email): string

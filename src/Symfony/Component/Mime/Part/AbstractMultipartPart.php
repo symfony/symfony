@@ -81,9 +81,7 @@ abstract class AbstractMultipartPart extends AbstractPart
 
         foreach ($parts as $part) {
             yield '--'.$this->getBoundary()."\r\n";
-            foreach ($part->toIterable() as $chunk) {
-                yield $chunk;
-            }
+            yield from $part->toIterable();
             yield "\r\n";
         }
         yield '--'.$this->getBoundary()."--\r\n";

@@ -131,7 +131,7 @@ Content-Transfer-Encoding: quoted-printable
 
 EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable()))));
+        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
 
         $message = new Message(null, new TextPart('content'));
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -146,6 +146,6 @@ Content-Transfer-Encoding: quoted-printable
 content
 EOF;
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", $message->toString()));
-        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable()))));
+        $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
     }
 }

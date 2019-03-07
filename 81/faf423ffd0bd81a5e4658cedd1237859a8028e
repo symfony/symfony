@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-02-25T20:16:01Z
+
+Please add a doc PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-02-25T21:51:53Z
+
+Can you provide a link to a source for the card scheme?
+
+---------------------------------------------------------------------------
+
+by antonch1989 at 2019-02-26T10:15:15Z
+
+> Can you provide a link to a source for the card scheme?
+
+https://en.wikipedia.org/wiki/Payment_card_number
+
+---------------------------------------------------------------------------
+
+by antonch1989 at 2019-02-26T10:23:27Z
+
+Docs PR: https://github.com/symfony/symfony-docs/pull/11056

@@ -71,10 +71,16 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     {
         $allowedClientA = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '1.1.1.1']);
         $allowedClientB = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '2.2.2.2']);
+        $allowedClientC = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '203.0.113.0']);
         $barredClient = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => $config], ['REMOTE_ADDR' => '192.168.1.1']);
 
         $this->assertAllowed($allowedClientA, '/secured-by-two-ips');
         $this->assertAllowed($allowedClientB, '/secured-by-two-ips');
+
+        $this->assertRestricted($allowedClientA, '/secured-by-one-real-ip');
+        $this->assertRestricted($allowedClientA, '/secured-by-one-real-ipv6');
+        $this->assertAllowed($allowedClientC, '/secured-by-one-real-ip-with-mask');
+
         $this->assertRestricted($barredClient, '/secured-by-two-ips');
     }
 
@@ -98,6 +104,15 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $allowedClient->submit($form);
         $this->assertRedirect($allowedClient->getResponse(), '/protected-via-expression');
         $this->assertAllowed($allowedClient, '/protected-via-expression');
+    }
+
+    public function testInvalidIpsInAccessControl()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The given "256.357.458.559" value in the "access_control" config option is not a valid IP address.');
+
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
+        $client->request('GET', '/unprotected_resource');
     }
 
     private function assertAllowed($client, $path)

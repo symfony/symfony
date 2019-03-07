@@ -102,9 +102,9 @@ class FormPass implements CompilerPassInterface
             } elseif (method_exists($serviceDefinition->getClass(), 'getExtendedTypes')) {
                 $extendsTypes = false;
 
+                $typeExtensionsClasses[] = $serviceDefinition->getClass();
                 foreach ($serviceDefinition->getClass()::getExtendedTypes() as $extendedType) {
                     $typeExtensions[$extendedType][] = new Reference($serviceId);
-                    $typeExtensionsClasses[] = $serviceDefinition->getClass();
                     $extendsTypes = true;
                 }
 

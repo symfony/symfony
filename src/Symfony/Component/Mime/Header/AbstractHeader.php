@@ -263,7 +263,7 @@ abstract class AbstractHeader implements HeaderInterface
         foreach ($tokens as $i => $token) {
             // Line longer than specified maximum or token was just a new line
             if (("\r\n" === $token) ||
-                ($i > 0 && \strlen($currentLine.$token) > $this->lineLength)
+                ($this->lineLength > 0 && $i > 0 && \strlen($currentLine.$token) > $this->lineLength)
                 && 0 < \strlen($currentLine)) {
                 $headerLines[] = '';
                 $currentLine = &$headerLines[$lineCount++];

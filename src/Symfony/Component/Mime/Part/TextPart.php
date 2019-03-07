@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Part;
 
 use Symfony\Component\Mime\Encoder\Base64ContentEncoder;
 use Symfony\Component\Mime\Encoder\ContentEncoderInterface;
+use Symfony\Component\Mime\Encoder\EightBitContentEncoder;
 use Symfony\Component\Mime\Encoder\QpContentEncoder;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
@@ -31,8 +32,7 @@ class TextPart extends AbstractPart
     private $subtype;
     private $disposition;
     private $name;
-
-    protected $encoding;
+    private $encoding;
 
     /**
      * @param resource|string $body
@@ -49,12 +49,11 @@ class TextPart extends AbstractPart
         $this->charset = $charset;
         $this->subtype = $subtype;
 
-        // FIXME: can also be 7BIT, 8BIT, ...
         if (null === $encoding) {
             $this->encoding = $this->chooseEncoding();
         } else {
-            if ('quoted-printable' !== $encoding && 'base64' !== $encoding) {
-                throw new InvalidArgumentException(sprintf('The encoding must be one of "quoted-printable" or "base64" ("%s" given).', $encoding));
+            if ('quoted-printable' !== $encoding && 'base64' !== $encoding && '8bit' !== $encoding) {
+                throw new InvalidArgumentException(sprintf('The encoding must be one of "quoted-printable", "base64", or "8bit" ("%s" given).', $encoding));
             }
             $this->encoding = $encoding;
         }
@@ -149,8 +148,12 @@ class TextPart extends AbstractPart
         return $headers;
     }
 
-    protected function getEncoder(): ContentEncoderInterface
+    private function getEncoder(): ContentEncoderInterface
     {
+        if ('8bit' === $this->encoding) {
+            return self::$encoders[$this->encoding] ?? (self::$encoders[$this->encoding] = new EightBitContentEncoder());
+        }
+
         if ('quoted-printable' === $this->encoding) {
             return self::$encoders[$this->encoding] ?? (self::$encoders[$this->encoding] = new QpContentEncoder());
         }

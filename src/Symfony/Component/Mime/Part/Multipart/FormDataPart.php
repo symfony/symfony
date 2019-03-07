@@ -42,7 +42,7 @@ final class FormDataPart extends AbstractMultipartPart
             $this->fields[$name] = $value;
         }
         // HTTP does not support \r\n in header values
-        $this->getHeaders()->setMaxLineLength(1000);
+        $this->getHeaders()->setMaxLineLength(-1);
     }
 
     public function getMediaSubtype(): string
@@ -58,15 +58,11 @@ final class FormDataPart extends AbstractMultipartPart
     private function prepareFields(array $fields): array
     {
         $values = [];
-        foreach ($fields as $name => $value) {
-            if (\is_array($value)) {
-                foreach ($value as $v) {
-                    $values[] = $this->preparePart($name, $v);
-                }
-            } else {
-                $values[] = $this->preparePart($name, $value);
+        array_walk_recursive($fields, function ($item, $key) use (&$values) {
+            if (!\is_array($item)) {
+                $values[] = $this->preparePart($key, $item);
             }
-        }
+        });
 
         return $values;
     }
@@ -74,7 +70,7 @@ final class FormDataPart extends AbstractMultipartPart
     private function preparePart($name, $value): TextPart
     {
         if (\is_string($value)) {
-            return $this->configurePart($name, new TextPart($value));
+            return $this->configurePart($name, new TextPart($value, 'utf-8', 'plain', '8bit'));
         }
 
         return $this->configurePart($name, $value);
@@ -82,10 +78,18 @@ final class FormDataPart extends AbstractMultipartPart
 
     private function configurePart(string $name, TextPart $part): TextPart
     {
+        static $r;
+
+        if (null === $r) {
+            $r = new \ReflectionProperty(TextPart::class, 'encoding');
+            $r->setAccessible(true);
+        }
+
         $part->setDisposition('form-data');
         $part->setName($name);
         // HTTP does not support \r\n in header values
-        $part->getHeaders()->setMaxLineLength(1000);
+        $part->getHeaders()->setMaxLineLength(-1);
+        $r->setValue($part, '8bit');
 
         return $part;
     }

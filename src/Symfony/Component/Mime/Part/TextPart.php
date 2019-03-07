@@ -118,9 +118,7 @@ class TextPart extends AbstractPart
             if (stream_get_meta_data($this->body)['seekable'] ?? false) {
                 rewind($this->body);
             }
-            foreach ($this->getEncoder()->encodeByteStream($this->body) as $chunk) {
-                yield $chunk;
-            }
+            yield from $this->getEncoder()->encodeByteStream($this->body);
         } else {
             yield $this->getEncoder()->encodeString($this->body);
         }

@@ -34,7 +34,7 @@ class RawMessage
             return $this->message;
         }
 
-        return $this->message = implode('', iterator_to_array($this->message));
+        return $this->message = implode('', iterator_to_array($this->message, false));
     }
 
     public function toIterable(): iterable

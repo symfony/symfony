@@ -49,9 +49,7 @@ abstract class AbstractPart
     {
         yield $this->getPreparedHeaders()->toString();
         yield "\r\n";
-        foreach ($this->bodyToIterable() as $chunk) {
-            yield $chunk;
-        }
+        yield from $this->bodyToIterable();
     }
 
     abstract public function bodyToString(): string;

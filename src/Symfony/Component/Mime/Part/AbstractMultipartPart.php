@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Mime\Part;
 
-use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Header\Headers;
 
 /**
@@ -57,11 +56,6 @@ abstract class AbstractMultipartPart extends AbstractPart
     public function bodyToString(): string
     {
         $parts = $this->getParts();
-
-        if (\count($parts) < 2) {
-            throw new LogicException(sprintf('A "%s" instance must have at least 2 parts.', __CLASS__));
-        }
-
         $string = '';
         foreach ($parts as $part) {
             $string .= '--'.$this->getBoundary()."\r\n".$part->toString()."\r\n";
@@ -74,11 +68,6 @@ abstract class AbstractMultipartPart extends AbstractPart
     public function bodyToIterable(): iterable
     {
         $parts = $this->getParts();
-
-        if (\count($parts) < 2) {
-            throw new LogicException(sprintf('A "%s" instance must have at least 2 parts.', __CLASS__));
-        }
-
         foreach ($parts as $part) {
             yield '--'.$this->getBoundary()."\r\n";
             foreach ($part->toIterable() as $chunk) {

@@ -350,6 +350,32 @@ class IntegrationTest extends TestCase
         ];
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $same);
     }
+
+    public function testTaggedServiceLocatorWithFqcnFallback()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo_bar', null, null, true)))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        /** @var ServiceLocator $serviceLocator */
+        $serviceLocator = $s->getParam();
+        $this->assertTrue($s->getParam() instanceof ServiceLocator, sprintf('Wrong instance, should be an instance of ServiceLocator, %s given', \is_object($serviceLocator) ? \get_class($serviceLocator) : \gettype($serviceLocator)));
+
+        $same = [
+            BarTagClass::class => $serviceLocator->get(BarTagClass::class),
+        ];
+        $this->assertSame([BarTagClass::class => $container->get(BarTagClass::class)], $same);
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface

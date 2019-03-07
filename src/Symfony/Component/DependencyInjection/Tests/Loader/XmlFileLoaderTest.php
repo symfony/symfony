@@ -329,6 +329,8 @@ class XmlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar');
         $this->assertEquals($taggedIterator, $container->getDefinition('foo_tagged_iterator')->getArgument(0));
+
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_tagged_locator')->getArgument(0));
     }
 

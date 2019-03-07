@@ -711,31 +711,28 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps of "@service" references in "%s".', $file));
                 }
             }
-            if ('tagged' === $value->getTag()) {
+            if (\in_array($value->getTag(), ['tagged', 'tagged_locator'], true)) {
+                $forLocator = 'tagged_locator' === $value->getTag();
+
                 if (\is_string($argument) && $argument) {
-                    return new TaggedIteratorArgument($argument);
+                    return new TaggedIteratorArgument($argument, null, null, $forLocator);
                 }
 
                 if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
                     if ($diff = array_diff(array_keys($argument), ['tag', 'index_by', 'default_index_method'])) {
-                        throw new InvalidArgumentException(sprintf('"!tagged" tag contains unsupported key "%s"; supported ones are "tag", "index_by" and "default_index_method".', implode('"", "', $diff)));
+                        throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "tag", "index_by" and "default_index_method".', $value->getTag(), implode('"", "', $diff)));
                     }
 
-                    return new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null);
-                }
+                    $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'], $argument['default_index_method'] ?? null, $forLocator);
 
-                throw new InvalidArgumentException(sprintf('"!tagged" tags only accept a non empty string or an array with a key "tag" in "%s".', $file));
-            }
-            if ('tagged_locator' === $value->getTag()) {
-                if (\is_array($argument) && isset($argument['tag'], $argument['index_by']) && $argument['tag'] && $argument['index_by']) {
-                    if ($diff = array_diff(array_keys($argument), ['tag', 'index_by', 'default_index_method'])) {
-                        throw new InvalidArgumentException(sprintf('"!tagged_locator" tag contains unsupported key "%s"; supported ones are "tag", "index_by" and "default_index_method".', implode('"", "', $diff)));
+                    if ($forLocator) {
+                        $argument = new ServiceLocatorArgument($argument);
                     }
 
-                    return new ServiceLocatorArgument(new TaggedIteratorArgument($argument['tag'], $argument['index_by'], $argument['default_index_method'] ?? null));
+                    return $argument;
                 }
 
-                throw new InvalidArgumentException(sprintf('"!tagged_locator" tags only accept an array with at least keys "tag" and "index_by" in "%s".', $file));
+                throw new InvalidArgumentException(sprintf('"!%s" tags only accept a non empty string or an array with a key "tag" in "%s".', $value->getTag(), $file));
             }
             if ('service' === $value->getTag()) {
                 if ($isParameter) {

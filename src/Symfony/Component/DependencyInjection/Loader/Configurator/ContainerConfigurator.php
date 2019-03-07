@@ -126,7 +126,7 @@ function tagged(string $tag, string $indexAttribute = null, string $defaultIndex
  */
 function tagged_locator(string $tag, string $indexAttribute, string $defaultIndexMethod = null): ServiceLocatorArgument
 {
-    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod));
+    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, true));
 }
 
 /**

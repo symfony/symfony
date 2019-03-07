@@ -117,10 +117,12 @@ class MessageCatalogueTest extends TestCase
         $catalogue = new MessageCatalogue('fr_FR', ['domain1' => ['foo' => 'foo'], 'domain2' => ['bar' => 'bar']]);
         $catalogue->addResource($r);
 
-        $catalogue1 = new MessageCatalogue('fr', ['domain1' => ['foo' => 'bar', 'foo1' => 'foo1']]);
+        $catalogue1 = new MessageCatalogue('fr', ['domain1' => ['foo' => 'bar', 'foo1' => 'foo1', 'empty' => '']]);
         $catalogue1->addResource($r1);
 
-        $catalogue2 = new MessageCatalogue('en');
+        $this->assertEquals('', $catalogue1->get('empty', 'domain1'));
+
+        $catalogue2 = new MessageCatalogue('en', ['domain1' => ['empty' => 'nonempty']]);
         $catalogue2->addResource($r2);
 
         $catalogue->addFallbackCatalogue($catalogue1);
@@ -128,6 +130,7 @@ class MessageCatalogueTest extends TestCase
 
         $this->assertEquals('foo', $catalogue->get('foo', 'domain1'));
         $this->assertEquals('foo1', $catalogue->get('foo1', 'domain1'));
+        $this->assertEquals('nonempty', $catalogue1->get('empty', 'domain1'));
 
         $this->assertEquals([$r, $r1, $r2], $catalogue->getResources());
     }

@@ -12,15 +12,14 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt\Exception;
 
 /**
- * If something goes wrong while consuming and handling a message from the AMQP broker, there are two choices: rejecting
- * or re-queuing the message.
+ * If something goes wrong while consuming and handling a message from the AMQP broker, if the exception that is thrown
+ * by the bus while dispatching the message implements this interface, the message will be nack and re-queued.
  *
- * If the exception that is thrown by the bus while dispatching the message implements this interface, the message will
- * be rejected. Otherwise, it will be re-queued.
+ * Bus continue handling messages.
  *
- * @author Samuel Roze <samuel.roze@gmail.com>
+ * @author Frederic Bouchery <frederic@bouchery.fr>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 interface RecoverableMessageExceptionInterface extends \Throwable
 {

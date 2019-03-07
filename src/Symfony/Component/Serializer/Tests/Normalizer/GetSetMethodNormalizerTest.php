@@ -329,6 +329,25 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->doTestUncallableCallbacks(true);
     }
 
+    public function testIgnoredAttributesInContext()
+    {
+        $ignoredAttributes = ['foo', 'bar', 'baz', 'object'];
+        $this->createNormalizer([GetSetMethodNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes]);
+
+        $obj = new GetSetDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setCamelCase(true);
+
+        $this->assertEquals(
+            [
+                'fooBar' => 'foobar',
+                'camelCase' => true,
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     private function doTestUncallableCallbacks(bool $legacy = false)
     {
         $callbacks = ['bar' => null];

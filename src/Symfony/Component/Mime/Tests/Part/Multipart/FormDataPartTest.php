@@ -35,14 +35,14 @@ class FormDataPartTest extends TestCase
         $t = new TextPart($content, 'utf-8', 'plain', '8bit');
         $t->setDisposition('form-data');
         $t->setName('foo');
-        $t->getHeaders()->setMaxLineLength(-1);
+        $t->getHeaders()->setMaxLineLength(PHP_INT_MAX);
         $b->setDisposition('form-data');
         $b->setName('bar');
-        $b->getHeaders()->setMaxLineLength(-1);
+        $b->getHeaders()->setMaxLineLength(PHP_INT_MAX);
         $r->setValue($b, '8bit');
         $c->setDisposition('form-data');
         $c->setName('baz');
-        $c->getHeaders()->setMaxLineLength(-1);
+        $c->getHeaders()->setMaxLineLength(PHP_INT_MAX);
         $r->setValue($c, '8bit');
         $this->assertEquals([$t, $b, $c], $f->getParts());
     }

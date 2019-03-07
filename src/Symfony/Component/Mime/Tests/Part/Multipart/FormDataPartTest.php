@@ -20,6 +20,9 @@ class FormDataPartTest extends TestCase
 {
     public function testConstructor()
     {
+        $r = new \ReflectionProperty(TextPart::class, 'encoding');
+        $r->setAccessible(true);
+
         $b = new TextPart('content');
         $c = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
         $f = new FormDataPart([
@@ -29,16 +32,35 @@ class FormDataPartTest extends TestCase
         ]);
         $this->assertEquals('multipart', $f->getMediaType());
         $this->assertEquals('form-data', $f->getMediaSubtype());
-        $t = new TextPart($content);
+        $t = new TextPart($content, 'utf-8', 'plain', '8bit');
         $t->setDisposition('form-data');
         $t->setName('foo');
-        $t->getHeaders()->setMaxLineLength(1000);
+        $t->getHeaders()->setMaxLineLength(-1);
         $b->setDisposition('form-data');
         $b->setName('bar');
-        $b->getHeaders()->setMaxLineLength(1000);
+        $b->getHeaders()->setMaxLineLength(-1);
+        $r->setValue($b, '8bit');
         $c->setDisposition('form-data');
         $c->setName('baz');
-        $c->getHeaders()->setMaxLineLength(1000);
+        $c->getHeaders()->setMaxLineLength(-1);
+        $r->setValue($c, '8bit');
         $this->assertEquals([$t, $b, $c], $f->getParts());
+    }
+
+    public function testToString()
+    {
+        $p = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
+        $this->assertEquals(base64_encode(file_get_contents($file)), $p->bodyToString());
+    }
+
+    public function testContentLineLength()
+    {
+        $f = new FormDataPart([
+            'foo' => new DataPart($foo = str_repeat('foo', 1000), 'foo.txt', 'text/plain'),
+            'bar' => $bar = str_repeat('bar', 1000),
+        ]);
+        $parts = $f->getParts();
+        $this->assertEquals($foo, $parts[0]->bodyToString());
+        $this->assertEquals($bar, $parts[1]->bodyToString());
     }
 }

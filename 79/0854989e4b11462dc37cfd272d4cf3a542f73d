@@ -1,0 +1,1048 @@
+---------------------------------------------------------------------------
+
+by gnugat at 2019-03-01T09:57:24Z
+
+It seems like a shame for `HttpClientInterface` not to extend PSR-18 `ClientInterface`, and go for a `Psr18Client` adapter instead, but that seems consistent with the rest of the codebase so that sounds fine.
+
+A pity `HttpClientInterface` defines `send(string $method, string $url, iterable $options): ResponseInterface` rather than `send(RequestInterface $request): ResponseInterface`. That design choice seems strange when compared to the HttpKernelInterface approach.
+
+Finally it seems odd to define a new `ResponseInterface` rather than use the HttpFoundation one, but that's arguable (HttpFoundation might be more Server oriented, defining a new Response allows for an optimal client usage).
+
+Sounds like this component was tailored for Symfony's internal use only (to be used by the Mail component), and is being made available for anyone who would want to use it, but given the choice between this component and Guzzle I think Guzzle would still be the go to solution.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-01T11:18:53Z
+
+@fancyweb thanks, comments addressed.
+
+> why not use the `OptionsResolver` component
+
+@Taluu because that would add a dependency and we prefer keeping the component standalone.
+
+> Sounds like this component was tailored for Symfony's internal use only
+
+@gnugat not the case at all. The component is standalone and relies on decoupled interfaces. Your choice to use Guzzle. I'm going to replace it personnaly - in "Symfony apps" or "non-Symfony" ones.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-01T15:35:48Z
+
+From what i have seen (correct me if i'm wrong) responses are not interoperable between different client implementation, which means a response created by `CurlHttpClient` cannot be used in the `stream` method of another Client (for a good reason).
+
+Is there no way to ensure this interoperability ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-01T21:48:41Z
+
+Looks like the next challenge is making the CI green on Travis where an old version of curl is used, and on appveyor where `php -S` refuses to start...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-01T22:08:57Z
+
+@joelwurtz:
+
+> a response created by CurlHttpClient cannot be used in the stream method of another Client (for a good reason).
+
+Absolutely correct, that's an important design choice. Here, ResponseInterface is a byproduct of HttpClientInterface. Very much like cache items are byproducts of their pools. That's what allows the stream method to work, like you spotted.
+
+> Is there no way to ensure this interoperability ?
+
+I guess so: we don't care for generic/standalone responses here. We only need something that represents a response from a client we just requested. This design enables this powerful stream method in return.
+
+---------------------------------------------------------------------------
+
+by gmponos at 2019-03-02T08:52:07Z
+
+Hello,
+
+I am lost a little bit with this sentence:
+
+> Consumers are expected to check the response status code and deal with 3xx, 4xx or 5xx. When they don't do so, an exception is thrown.
+
+Maybe you could give an example or rephrase it some way.. Is it only me that I don't get it? Will the client throw an exception for 4xx/5xx.. what does it mean `When they don't do so, an exception is thrown.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-02T08:59:20Z
+
+@gmponos sure: this means that when you call `getStatusCode()`, we consider you checked the status code. But when you didn't and you use e.g. `getContent()` directly, an exception is thrown on 3/4/5xx status codes.
+
+---------------------------------------------------------------------------
+
+by barryvdh at 2019-03-02T09:09:47Z
+
+Wouldn't that make it difficult to debug behavior, as it changes when you log some more information for example?
+
+---------------------------------------------------------------------------
+
+by beberlei at 2019-03-02T09:09:54Z
+
+@nicolas-grekas I both like and dislike this decision :-) First, I find often in reviews that status code is not checked, so an API that enforces this is appreciated, but specifically in APIs often code looks like this:
+
+```php
+$content = json_decode($response->getContent(), true);
+
+if ($response->getStatusCode() >= 400) {
+    throw new \RuntimeException($content['error']);
+}
+
+// $content is of the right format here.
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-02T09:51:50Z
+
+@beberlei (but also @gmponos and @barryvdh - same topic) I considered two alternatives:
+
+A. always throw on 3/4/5xx: that'd provide safety thus robustness to consumers. That's an important feature of the component as a whole: I really tried to make it as robust as I could so that no errors could be too easily forgotten. But safety shouldn't go against features: how would you get the content of a 4xx if you actually want it but `getContent()` throws? We'd need a separate API to deal with 3/4/5xx responses. Dead end.
+
+B. never throw and tell consumers to always check the response code. That's what some other clients do. That also means telling users: "well, you didn't check the status code, your fault". or "here is the boilerplate you *always* need to add around calls to the client". Power users will like it, but we not always are in a situation where we take the time to do all the checks properly.
+
+That's what made me chose for the current behavior:
+- if you're a power user as described before, you can and should add the proper boilerplate to check the status code. You can do it in a buggy way (like in your example), but that's life. And more importantly, that means you're using the client as if it belongs to the B group of clients.
+- if you're a lazy user (and I'm going to be that one myself most of the time), then you'll not check the status code. In that case, I'd like to still be safe. Using a B-group client, I wouldn't be.
+
+So here, the behavior adapts in the best possible way to each situation. I invite all of you to actually play with the code and report back how you('d) like it.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T11:01:48Z
+
+Users will rely on these safety behaviours, such as `getContent()` throwing exceptions. The problem is that calling `getStatusCode()` changes the behaviour of `getContent()` (`getContent()` will not throw if `getStatusCode()` has been called before). So, `getContent()`'s behaviour is neither safe of robust.
+
+I could easily see myself writing a LoggingHttpClient that logs the status code of all responses, and accidentally breaking `getContent()`'s behaviour.
+
+It's too easy to mis-use this API.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T11:17:56Z
+
+An alternative C would be to let `HttpClientInterface::request()` throw the exceptions. However, it seems that a technical reason makes this alternative impossible: `HttpClientInterface::request()` returns lazy responses.
+
+Is it absolutely required to return lazy responses ? They seem to be used to implement `HttpClientInterface::stream(ResponseInterface[] $responses)`. Is there an other use-case ? Could `HttpClientInterface::stream()` accept an array of requests instead ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-02T11:54:03Z
+
+Laziness is a core requirement to me. There is alternative D: add an option that controls if we do A or B.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T11:56:19Z
+
+Finishing my review, sorry for the spam:
+
+- Thank you for not exposing PHP streams like PSR-7 <3
+- Thank you for having non-zero timeouts by default <3
+- It seems that the design would have benefited from using less traits and more composition.
+
+Explaining my last point:
+
+I know you know, but just in case I was not clear, here is an example:
+
+ ```
+ class HttpClient implements HttpClientInterface {
+     /** @var ClientAdapterInterface */
+     private $adapter;
+ }
+
+ class CurlAdapter implements ClientAdapterInterface;
+ class NativeAdapter implements ClientAdapterInterface;
+ ```
+
+ A HttpClient class using a ClientAdapterInterface internally instead of a trait would:
+
+  - Make it easier to read and understand the code (less back and forth from the class to the trait while reading the code)
+  - Make it easier to implement a new backend / adapter by making the extension points clearer
+  - Make it easier to implement common, backend-independant behaviours directly in the Client class
+  - Make private methods really private. Any class can _use_ HttpClientTrait and access its privates; so all methods/members of the trait need to maintain backwards compatibility. The trait could be declared @internal, however this would make it more difficult to implement third party backends.
+
+It appears that this is how Psr18Client was implemented in this component. The non-PSR client would benefit from this as well.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T11:57:13Z
+
+@nicolas-grekas
+
+> Laziness is a core requirement to me
+
+Could you explain why ? Isn't there an other way to achieve the same use-cases without laziness ?
+
+---------------------------------------------------------------------------
+
+by barryvdh at 2019-03-02T12:02:22Z
+
+I think PSR-18 chose to NOT throw errors on 4xx/5xx and not make it configurable because you want the behavior to be consistent for 3rd party libraries, which require an implementation of the contract.
+ If you have a response, I would just return it regardless of the status code.
+Any magic based on checking the content would in my opinion just lead to weird situations, like different behavior when a request logger is attached.
+
+---------------------------------------------------------------------------
+
+by deleugpn at 2019-03-02T12:31:58Z
+
+For me the simplest (and lazy) use case is: I have a process that makes lots of HTTP request. If a request fails and throws exception, it will end up in my logging system.
+
+```
+    public function put(string $endpoint, array $headers, array $params): ResponseInterface
+    {
+        $options = [
+            'headers' => $headers,
+            'form_params' => $params,
+            'connect_timeout' => 5,  // Guzzle never timeout by default.
+        ];
+
+        return $this->client->put($endpoint, $options);
+    }
+```
+
+The biggest painpoint for me here is the fact that Guzzle will truncate the response body to 120 characters and my log won't tell me what's really wrong with the request. My only alternative here is to always catch and re-throw a non-guzzle exception where the message is the body of the response.
+
+Ref: https://github.com/guzzle/guzzle/issues/2185
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-02T13:59:36Z
+
+@arnaud-lb
+
+> I could easily see myself writing a LoggingHttpClient that logs the status code of all responses, and accidentally breaking getContent()'s behaviour.
+
+Sure. You could also easily make the LoggingHttpClient break laziness by making it force a synchronous operation (like calling `getStatusCode` ;) ) That's what `getInfo('http_code')` is for: allow decorators to access the detailed state of the response without breaking the contract. Because a client that behaves as you describe would be breaking the contracts of the interface of course - ie "bug is yours". Of course, you can rightfully tell me that the API didn't help. Then, the matter is: should the API make it easy for consumers to write decorators? or should it make it safe by default to consume responses? That's the choice we need to do here: not throwing the exception means telling everyone: "add this boilerplate or bug is yours". I think there are thousands more lines of code that will consume requests than there are that will define decorators. I preferred pushing the burden on decorator authors than on HTTP endpoint consumers. Thus the current design.
+
+> Is it absolutely required to return lazy responses ?
+
+I can't imagine that the state-of-the-art in PHP in 2019 is still doing synchronous requests. I've been needing concurrent requests to e.g. make composer faster by a significant margin [via flex](https://github.com/symfony/flex/pull/261). We're also doing concurrent requests in the [Blackfire Player](https://github.com/blackfireio/player/). In both cases, it's a real pain...
+
+> They seem to be used to implement HttpClientInterface::stream(ResponseInterface[] $responses). Is there an other use-case ?
+
+Laziness allows doing current requests without using stream:
+```php
+$r1 = $client->request('GET', 'https://.../page1.html');
+$r2 = $client->request('GET', 'https://.../page2.html');
+
+// this call is synchronous, but $r2 is monitored while $r1 progresses - both requests are concurrent
+// that's implementation dependend of course: currently only `CurlHttpClient` allows that - but that's a nice one
+$r1->getContent();
+```
+
+> Could HttpClientInterface::stream() accept an array of requests instead ?
+
+Having `Request` objects is another path we didn't want to take. It has a wider range of challenges, from both design and DX perspective.
+
+> Finishing my review, sorry for the spam: Thank you for not exposing PHP streams like PSR-7 <3 Thank you for having non-zero timeouts by default <3
+
+That's much appreciated, thank you for digging that deep! It helps me brain-dump all the work and the "why" that has been put here :)
+
+> A HttpClient class using a ClientAdapterInterface internally instead of a trait would:
+
+That'd mean define a `ClientAdapterInterface`, which would be another interface to define a client. There would be no way to make it only "internal".
+
+>  Make private methods really private. Any class can use HttpClientTrait and access its privates; so all methods/members of the trait need to maintain backwards compatibility.
+
+Sure! That's part of the deal:  the trait provides an immutable set of methods. That's the case of all not `@internal` traits, covered by the BC promise. That's why most traits are internal - and that's also why this one (`HttpClientTrait`) isn't: it provides pure behaviors that implementers *do* need (eg RFC-compliant URL resolution) but should not expose on their public API. Traits allow this kind of reusability - shipping behaviors without polluting the type system.
+
+> It appears that this is how Psr18Client was implemented in this component. The non-PSR client would benefit from this as well.
+
+Not sure to get what you mean here - the psr18 client is standalone, just a few lines of code.
+
+@barryvdh
+
+> I think PSR-18 chose to NOT throw errors on 4xx/5xx and not make it configurable because you want the behavior to be consistent for 3rd party libraries
+
+:100: that's why I didn't go that way (option D above - ie adding an option to control the behavior)
+
+@deleugpn
+
+> For me the simplest (and lazy) use case is: I have a process that makes lots of HTTP request. If a request fails and throws exception, it will end up in my logging system.
+
+nice, that fits the current behavior :) (logging is not addressed yet but that's on the todo)
+
+> catch and re-throw a non-guzzle exception where the message is the body of the response.
+
+The exceptions that are thrown for now don't embed nor give access to the body of the response. Something to add on the todo?
+
+---------------------------------------------------------------------------
+
+by deleugpn at 2019-03-02T14:35:38Z
+
+@nicolas-grekas What I would like is an Exception where the `getMessage()` method **is** the body of the response. As a client, If I get a 4xx, the only 100% reliable way of knowing what went wrong is by looking at the body of the response.
+Sure, 404 is self-explanatory because the problem is in the URL, but a 422 basically means that the body of the request is invalid and I can't automatically know why the body of my request is invalid if the server doesn't tell me. The server will tell me inside the body, there's no way around that.
+This is the true pain-point that Guzzle brings, imo. It breaks the `Throwable` interface. The `Throwable` interface defines the `getMessage()` to tell the user why the exception was thrown. If an Http Client exception just tells me `Your request failed with 422` that means nothing to me and if I have to do `$e->getResponse()->getContent()` in order to know why an exception was thrown then I will need a special case in my logging system to treat the Http Client that wants to break the rules.
+
+```
+public function report(Throwable $e): void
+{
+    $this->logger->error($e->getMessage(), ['context']);
+}
+```
+
+vs
+
+```
+public function report(Throwable $e): void
+{
+    if ($e instanceof SpecialExceptionWithUselessMessage) {
+        return $this->error($e->getResponse()->getBody(), ['context']);
+    }
+
+    $this->logger->error($e->getMessage(), ['context']);
+}
+```
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T15:44:18Z
+
+> I can't imagine that the state-of-the-art in PHP in 2019 is still doing synchronous requests. I've been needing concurrent requests to e.g. make composer faster by a significant margin via flex. We're also doing concurrent requests in the Blackfire Player. In both cases, it's a real pain...
+
+I can not agree more. It would be great if newer HTTP clients supported more general I/O concurrency and could be used with react-php or amphp. curl_multi clients are good for batching but can not be used for more complex workflows.
+
+> Having Request objects is another path we didn't want to take. It has a wider range of challenges, from both design and DX perspective.
+
+Regarding DX, here is what it could look like with requests instead of responses:
+
+```
+$request1 = $client->prepare('GET', 'http://example.com/');
+$request2 = $client->prepare('GET', 'http://example.com/');
+$client->stream([$request1, $request2]);
+```
+
+Developer experience is not degraded in any way (I only replaced a call to `request()` by a call to an hypothetical method `prepare()`). Since the responses returned by `stream()` can now have a better API, DX might even have improved.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-02T15:58:18Z
+
+> Traits allow this kind of reusability - shipping behaviors without polluting the type system.
+
+Is this really a thing in Symfony now ? Using traits to avoid introducing interfaces ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-02T23:52:53Z
+
+@ostrolucky I'm shocked by the tone and the wording of your review. I do not thank you for my current blood pressure.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-03T09:53:49Z
+
+@ostrolucky despite its form, I'm going to normalize your review and focus on its content. I wish I shouldn't have to do that. Please consider the style you used here and the impact it can have on me and on the community. If one is wondering why tech communities are not diverse enough, I think ppl should have a look here for an example.
+
+> No Uri object, making uri reusability harder
+> No middleware support, making plugin ecosystem evolve much harder
+> Exceptions not carrying requests/responses
+> Most of the things internal [...] difficult without reusing parts
+> Forbidden to use baked in json mechanism for sending non-array json body
+> No real support for multipart/form-data
+> No way to inject custom curlopts
+> No way to inject custom JSON flags
+> No mock client
+
+This is OSS, you can provide anything in the list by sending PRs if you want to.
+This PR is aimed at being the beginning of the component, not its end.
+
+> PSR adapter does not respect spec.
+
+Can you provide some code to highlight what you mean? To me, it's compliant.
+
+> No help solving the pain of current HTTP clients when we need to do json_decode($response->getContents()) all over the applications
+
+See last commits in #30414
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-03-03T11:20:17Z
+
+@ostrolucky, I understand that yet another HTTP client in the PHP ecosystem can be a touchy subject for some but please remember that you're reviewing the hard work of another human being, not just abstract code. Your review was unfortunately not the constructive feedback we strive to give in the Symfony community (Michael Lynch wrote a brilliant [couple of blog posts on this subject](https://mtlynch.io/human-code-reviews-1/)).
+
+While your review came across as rude, you obviously have an interest in this component. Some of your points are valid and it would be great if you could contribute or collaborate to improve the component in the near future just as @nicolas-grekas is inviting you to do.  Symfony is a continuously-evolving project and the points you made would make a great checklist of nice-to-have's people could pick up and make pull requests for once the component has been merged in.
+
+This component has been created with a specific purpose in mind (to support and be compatible with other components that require a HTTP client) and I would argue that the points you make are outside the scope of this pull request.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-03-03T11:41:36Z
+
+Thanks @nicolas-grekas for working on this component! If this package wasn't needed, it wouldn't have been developed. I would love to see a blog post by @fabpot (or Nicolas) to explain why the decision was made to craft something for Symfony specific. Until then, I can only give some guesses.
+
+While guzzle is de facto standard when it comes to http requests, it's outside of Symfony's control. This means that if there are critical bugs or security issues (which is easy with http), it doesn't follow the symfony security process. If Symfony doesn't control the release process nor the code, they cannot guarantee the quality of the package, meaning a core (and important) component of Symfony -the mailer-, would depend on a vendor package. PSR would indeed mean interop for this, but if Symfony can't provide a default implementation, the first issue still applies. In this scenario, PSR doesn't really add much.
+
+Another option would've been to take over guzzle, they've done this for swift mailer and twig for example. This doesn't solve the problem that it might not be fully compatible with their intentions of the Symfony mailer though, and would also lead to issues with the design of guzzle. I'm personally not a fan of how guzzle is used within your application, the DX feels counter intuitive when using inside a DIC, so I can imagine this to be another reason for a self-crafted component.
+
+On top of this, the component _doesn't exist yet, it's still in development_. This PR is the perfect place to add ideas to make interop easier, for example: the ability to have an adapter towards a PSR. I haven't dived into this component itself so I can't really comment on this in details.
+
+If you want to help Nicolas improve the implementation, leave your **constructive** feedback here, ranting about it on twitter, slack or where-ever is extremely counter productive.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-03-03T12:15:25Z
+
+Hey hey sorry for my wording, it could be better, but I didn't mean any harm! I have reworded some points, let me know in PM if it seems still harsh.
+
+@zanbaldwin
+
+> This component has been created with a specific purpose in mind (to support and be compatible with other components that require a HTTP client) and I would argue that the points you make are outside the scope of this pull request.
+
+No it wasn't, viz
+
+> The existing state-of-the-art puts a quite high bar in terms of features we must
+support if we want any adoption. The code in this PR aims at implementing an
+even better HTTP client for PHP than existing ones, with more (useful) features
+and a better architecture.
+
+Hence this deserves any critique for missing features available in other packages. It solves solved problem, so it better be better.
+
+Furthermore, I don't see any need for stream, lazyness and HTTP/2 in any of the referenced issues. Can you point out some?
+
+@nicolas-grekas
+> PSR adapter does not respect spec.
+>> Can you provide some code to highlight what you mean? To me, it's compliant.
+
+Please use full quote of mine:
+> PSR adapter does not respect spec. Client MUST NOT throw exception for well-formed request
+
+> This is OSS, you can provide anything in the list by sending PRs if you want to.
+This PR is aimed at being the beginning of the component, not its end.
+
+No need to tell me what OSS is, I did plenty contributions on my own and have lot of future contribution plans in my backlog. There are also some contributions of mine still ignored. Hence I need to pick my battles and it would be very unrational for me to spend time solving something that is already solved better in other packages. I will do that when it turns out using API of this client in my projects is inevitable and too deficient. Despite that, this component is highly disapproved in community and somebody had to take a ball to stand here as representative, so I at least did a review, since nobody else from the group did one.
+
+@linaori
+> Leave your constructive feedback here, ranting about it on twitter, slack or where-ever is extremely counter productive.
+
+I spent lot of hours reviewing this. My review IS constructive. Now people make me a monster and am receiving CoC e-mails, while I broke no rules? Not recommended.
+
+Also, community showed its disapproval for this not implementing PSR a ~ month ago. It was not listented to and symfony went through it disregarding it. We never did receive answer what exact technical detail of PSR-18 is preventing its implementation. All I've seen is applicable in servers only, not clients.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-03-03T12:22:18Z
+
+> Hey hey sorry for my wording, it could be better, but I didn't mean any harm!
+
+You should learn that communication is not only about your intent but also about the way other people will perceive your message. If everyone agree your message is wrongly perceived, you should consider improving the way you communicate with others.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-03-03T12:32:37Z
+
+https://symfony.com/doc/current/contributing/community/review-comments.html#giving-positive-feedback
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-03T12:44:27Z
+
+@nicolas-grekas  what do you suggest for lib authors/components that need a http client. Should they favor this new contract as a main entrypoint (e.g. constructor typehint)? Or does PSR still has its place here?
+
+I would really like the client PSR succeed the same as logger PSR did. Truly interop.
+
+Is e.g. `$clientWithSimpleApi = new SF\Component\HttpClient\SimpleClient($psrClient);` debatable?
+
+If so, the http-client component can hard require the psr dependency. Once you use this component you can do either `HttpClient::createPsr()` or `createSimple()`. Everybody happy, and we dont mess with existing ecosystem.
+
+```php
+// some lib service
+public function __contruct(PsrClient $c = null)
+{
+   if (null === $c) {
+     if (!class_exists(HttpOptions::class)) {
+         throw new LogicException('try running composer ....');
+     }
+
+     $c = HttpClient::createPsr();
+  }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-03T13:55:59Z
+
+@arnaud-lb
+
+> Regarding DX, here is what it could look like with requests instead of responses:
+```php
+$request1 = $client->prepare('GET', 'http://example.com/');
+$request2 = $client->prepare('GET', 'http://example.com/');
+$client->stream([$request1, $request2]);
+```
+
+how would that work when *not* doing concurrent requests? Am I correct when I understand that the stream method would now be a must-call, even when synchronous is enough? That's where the DX is different, isn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-03T22:50:09Z
+
+> There is just no good way to compose a request in a distributed way.
+
+I don't understand what this means, could you please elaborate?
+
+I'll check how I can split in more methods.
+
+Honestly, I don't get the PSR dogma. This feels more like politics than technology.
+
+If you look at the feature list in the PR description, this work is a significant progress over existing solutions. I personally favor having powerful tools rather than the lowest common denominator.
+
+I'm really fine if anyone prefers to use PSR 18/7. But I'm not when it means everyone must stick to it for non technical reasons.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-03T22:57:41Z
+
+@ro0nl I don't have the power to decide for anyone else what they should use. For Symfony, I think other components should use the proposed interface yes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-03-04T00:14:06Z
+
+> > There is just no good way to compose a request in a distributed way.
+>
+> I don't understand what this means, could you please elaborate?
+
+Let's say I want to query multiple endpoints of an API. In that case, my application logic would receive a preconfigured HTTP client and submit a request with a HTTP method, a relative path to the desired endpoint and maybe a request body and some headers specific to that request.
+
+Everything else, like common headers, authentication, additional query parameters etc. would then be added transparently by the client – because my application logic shouldn't bother about those things. Also, the client would complete the relative path to an absolute URL.
+
+The problem is that the information that is to be added is not always static. If you're implementing OAuth 1 for instance (yeah, I know, old – but it's still around), you need the request body before you can compute the Authorization header. So you need to somehow hook in a piece of code that modifies the request.
+
+This is what I meant with creating a request in a distributed way: Multiple parts of the application work together to build a request that is eventually sent to the server. In Guzzle, you would use middlewares for that purpose. I'm missing that kind of extension point in the current design of the component.
+
+That being said, a middleware architecture can always be implemented on top of PSR-18, so with your adapter we get the best of both worlds. 😃
+
+> If you look at the feature list in the PR description, this work is a significant progress over existing solutions. I personally favor having powerful tools rather than the lowest common denominator.
+
+The intention of the PSRs is not to dictate the feature set of your client implementation, but to provide a generic approach to interacting with an HTTP client. Thus, the PSR interfaces provide a high-level abstraction on HTTP to decouple the application logic from the implementation of the HTTP client library. As I said earlier: I think it's totally fine if you're not using PSR-7 as the internal representation of request and response.
+
+If it takes a couple of milliseconds to map between a generic PSR-7 request to something your client understands, I might decide to take that penalty if that would allow me to build a cleaner and more decoupled application and/or use existing libraries that support PSR-7. I understand that I won't be able to access the full feature set via PSR interfaces, but that might be okay as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-04T06:14:13Z
+
+@derrabus to me, everything you said is covered by the PR, and more. i.e. the abstraction provided here covers all the domain that PSR 18 covers, and more (streaming concurrent requests and transport). Because I may be missing something, I propose we experiment your point with some code so that we can discuss it in a less abstract way. We can do that using Slack and report back here if that's ok for you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-04T11:03:03Z
+
+Now green on Travis. The challenge there was supporting an old version of curl (7.35 from 2014).
+Now working on appveyor.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2019-03-04T11:03:24Z
+
+I heard many times that PSR-7 should have been an implementation instead of a set of interfaces.
+
+Could we (maybe you already tried such approach) try to not introduce a ResponseInterface which will be part of the public API?
+
+This could be achieved by introducing an internal interface that would be responsible to hold all the client specific code?
+
+IMHO, this would improve the component architecture and enforce more behavior than using a trait for common features.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-04T18:21:34Z
+
+PR is now green on Travis and on appveyor. All technical comments are addressed.
+
+- the code is now split into more methods
+- ~client/response traits moved to abstract classes~ (kept as traits because horizontal reuse is required), all in the component now
+- I removed the `__toString()` method from `ChunkInterface` in favor of `getContent()`
+- I added more docblocks and comments where I thought it could help
+
+Remaining comments can be addressed after merge to me. This should help the discussion by making the component and the contracts easier to experiment with.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T18:39:30Z
+
+We need to mark this new component as experimental (`@experimental`) so that we have more time to work on the definitive API?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-04T19:01:09Z
+
+@fabpot here you are, I added the annotation on all non-internal classes/interfaces/traits.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-05T17:05:46Z
+
+Thanks @weaverryan, comments addressed. I also renamed option "data" to "user_data" as we discussed on Slack. See last commit.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-05T23:32:31Z
+
+I'm trying to image how someone would write a decoration around the `HttpClientInterface` to add some behaviors, so let's start by an example with a simple log decoration system.
+
+A naive approach could looks like:
+
+<details>
+
+```php
+class HttpClientLogger implements HttpClientInterface
+{
+   private const LOG_BUFFER_SIZE = 1024; //1kb of body in logs: can be an option but not the point here
+
+    private $logger;
+
+    private $client;
+
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->client = $client;
+    }
+
+    public function request(string $method, string $url, array $options = []): ResponseInterface
+    {
+        $response = $this->client->request($method, $url, $options);
+
+        $this->logger("$method request on $uri", ['response' => [
+            'status_code' => $response->getStatusCode(),
+            'body' => substr($response->getContent(), 0, self::LOG_BUFFER_SIZE),
+        ]]);
+
+        return $response;
+    }
+
+    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    {
+        return $this->client->stream($responses, $timeout);
+    }
+}
+```
+</details>
+
+This decorator is valid but breaks a lot of promises given by the HttpClientInterface:
+
+ * It breaks laziness for the ResponseInterface (so no more async)
+ * It breaks the promise of giving exception if the user don't use the getStatusCode (but was already discuted before so will not extends on that subject)
+ * Also it may break consumer application if he was using non buffered response stream (as it will throw an exception when getting the content)
+
+So let's try to make it work on async by adding a new decorator:
+
+<details>
+
+```php
+class HttpClientLogger implements HttpClientInterface
+{
+    public const LOG_BUFFER_SIZE = 1024; //1kb of body in logs: can be an option but not the point here
+
+    private $logger;
+
+    private $client;
+
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->client = $client;
+    }
+
+    public function request(string $method, string $url, array $options = []): ResponseInterface
+    {
+        return $this->client->request($method, $url, $options);
+    }
+
+    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    {
+        $responseStream = $this->client->stream($responses, $timeout);
+
+        return new ResponseStreamLogger($responseStream, $this->logger);
+    }
+}
+
+class ResponseStreamLogger implements ResponseStreamInterface
+{
+    private $responseStream;
+    private $logger;
+    private $responsesBuffer = [];
+
+    public function __construct(ResponseStreamInterface $responseStream, LoggerInterface $logger)
+    {
+        $this->responseStream = $responseStream;
+        $this->logger = $logger;
+    }
+
+    public function key(): ResponseInterface
+    {
+        return $this->responseStream->key();
+    }
+
+    public function current(): ChunkInterface
+    {
+        $chunk = $this->responseStream->current();
+
+        // Buffer body
+        $response = $this->key();
+        $responseKey = spl_object_hash($response);
+
+        if (!array_key_exists($responseKey, $this->responsesBuffer)) {
+            $this->responsesBuffer[$responseKey] = "";
+        }
+
+        if (strlen($this->responsesBuffer[$responseKey]) < HttpClientLogger::LOG_BUFFER_SIZE) {
+            $this->responsesBuffer[$responseKey] .= $chunk->getContent();
+        }
+
+        // Last chunk receive, response should be complete so safe to use some methods here
+        if ($chunk->isLast()) {
+            $url = $response->getInfo('url');
+
+            $this->logger("Request on $url", ['response' => [
+                'status_code' => $response->getStatusCode(),
+                'body' => $this->responsesBuffer[$responseKey],
+            ]]);
+        }
+
+        return $this->responseStream->current();
+    }
+
+    public function next(): void
+    {
+        $this->responseStream->next();
+    }
+
+    public function rewind(): void
+    {
+        $this->responseStream->rewind();
+    }
+
+    public function valid(): bool
+    {
+        return $this->responseStream->valid();
+    }
+}
+```
+</details>
+
+Here we introduce 2 decorators
+
+ * One on the response stream that allow logging when response is complete
+ * One on the http client so we can decorate the response stream
+
+Async is no longer a problem since we only rely on the stream method and log once a response is complete.
+
+But there are other problems here :
+
+ * We don't have the method nor the original url (if there was a redirection) on the log message, but this can be simply fixed by adding those parameters to the info array of the ResponseInterface (should this be done in a decorator also ?)
+ * If someone don't use stream method and only need a sync context, the logger will never be called.
+
+Then the only solution to make it works in all context and having the original url and method is by adding a third decorator on the `ResponseInterface`:
+
+<details>
+
+```php
+class HttpClientLogger implements HttpClientInterface
+{
+    public const LOG_BUFFER_SIZE = 1024; //1kb of body in logs: can be an option but not the point here
+
+    private $logger;
+
+    private $client;
+
+    public function __construct(HttpClientInterface $client, LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        $this->client = $client;
+    }
+
+    public function request(string $method, string $url, array $options = []): ResponseInterface
+    {
+        return new ResponseLogger($this->client->request($method, $url, $options), $this->logger, $method, $url);
+    }
+
+    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    {
+        $subResponses = [];
+        $indexedResponses = [];
+
+        foreach ($responses as $response) {
+            if ($response instanceof ResponseLogger) {
+                // Make sure we pass the decorated response to the underlying client
+                $subResponses[] = $response->getDecoratedResponse();
+                $indexedResponses[spl_object_hash($response->getDecoratedResponse())] = $response;
+            } else {
+                $subResponses[] = $response;
+            }
+        }
+
+        $responseStream = $this->client->stream($responses, $timeout);
+
+        return new ResponseStreamLogger($responseStream, $this->logger, $indexedResponses);
+    }
+}
+
+class ResponseLogger implements ResponseInterface
+{
+    private $response;
+
+    private $logger;
+
+    private $requestMethod;
+
+    private $requestUrl;
+
+    private $hasLogged = false;
+
+    public function __construct(ResponseInterface $response, LoggerInterface $logger, string $requestMethod, string $requestUrl)
+    {
+        $this->response = $response;
+        $this->logger = $logger;
+        $this->requestMethod = $requestMethod;
+        $this->requestUrl = $requestUrl;
+    }
+
+    public function getDecoratedResponse()
+    {
+        return $this->response;
+    }
+
+    public function getStatusCode()
+    {
+        $responseCode = $this->response->getStatusCode();
+
+        if (!$this->hasLogged) {
+            // Body may not be retrieved or not wanted avoid logging it
+            $this->logger("$this->requestMethod request on $this->requestUrl", ['response' => [
+                'status_code' => $responseCode,
+            ]]);
+
+            $this->hasLogged = true;
+        }
+
+        return $responseCode;
+    }
+
+    public function getHeaders()
+    {
+        if (!$this->hasLogged) {
+            // Body may not be retrieve or not wanted avoid logging it
+            // However safe to get status code since it should be before headers or in the headers (for http2)
+            $this->logger("$this->requestMethod request on $this->requestUrl", ['response' => [
+                'status_code' => $this->response->getStatusCode(),
+            ]]);
+
+            $this->hasLogged = true;
+        }
+
+        return $this->response->getHeaders();
+    }
+
+    public function getContent()
+    {
+        $content = $this->response->getContent();
+
+        if (!$this->hasLogged) {
+            // Safe to get content
+            $this->logger("$this->requestMethod request on $this->requestUrl", ['response' => [
+                'status_code' => $this->response->getStatusCode(),
+                'body' => substr($content, 0, HttpClientLogger::LOG_BUFFER_SIZE),
+            ]]);
+
+            $this->hasLogged = true;
+        }
+
+        return $content;
+    }
+
+    public function getInfo(string $type = null)
+    {
+        $info = $this->response->getInfo();
+        $info['request_method'] = $this->requestMethod;
+        $info['request_url'] = $this->requestUrl;
+
+        if (null !== $type) {
+            return $info[$type];
+        }
+
+        return $info;
+    }
+}
+
+class ResponseStreamLogger implements ResponseStreamInterface
+{
+    private $responseStream;
+    private $logger;
+    private $responsesBuffer = [];
+    private $indexedResponses;
+
+    public function __construct(ResponseStreamInterface $responseStream, LoggerInterface $logger, $indexedResponses)
+    {
+        $this->responseStream = $responseStream;
+        $this->logger = $logger;
+        $this->indexedResponses = $indexedResponses;
+    }
+
+    public function key(): ResponseInterface
+    {
+        return $this->responseStream->key();
+    }
+
+    public function current(): ChunkInterface
+    {
+        $chunk = $this->responseStream->current();
+
+        // Buffer body
+        $response = $this->key();
+        $responseKey = spl_object_hash($response);
+
+        if (!array_key_exists($responseKey, $this->responsesBuffer)) {
+            $this->responsesBuffer[$responseKey] = "";
+        }
+
+        if (strlen($this->responsesBuffer[$responseKey]) < HttpClientLogger::LOG_BUFFER_SIZE) {
+            $this->responsesBuffer[$responseKey] .= $chunk->getContent();
+        }
+
+        // Everything is good about the reponse so we are safe here as status code should be set
+        if ($chunk->isLast()) {
+            // Get status code before getting the log response to avoid double log
+            $statusCode = $response->getStatusCode();
+
+            // Get the log response from the indexed response
+            if (!$response instanceof ResponseInterface) {
+                if (!array_key_exists($responseKey, $this->indexedResponses)) {
+                    return $chunk;
+                }
+
+                $response = $this->indexedResponses[$responseKey];
+            }
+
+            $url = $response->getInfo('request_url');
+            $method = $response->getInfo('request_method');
+
+            $this->logger("$method request on $url", ['response' => [
+                'status_code' => $statusCode,
+                'body' => $this->responsesBuffer[$responseKey],
+            ]]);
+        }
+
+        return $chunk;
+    }
+
+    public function next(): void
+    {
+        return $this->responseStream->next();
+    }
+
+    public function rewind(): void
+    {
+        return $this->responseStream->rewind();
+    }
+
+    public function valid(): bool
+    {
+        return $this->responseStream->valid();
+    }
+}
+```
+</details>
+
+Even if the code gets longer, we now have a fully logger that sould work, with a small problem on the logging that may different given the first function used by the consumer when in sync context. (but would call it good enough for a first try)
+
+Also had to add a lot of code to ensure that the correct response is passed to the underlying decorator
+on the stream method, and getting back the log response on the decorator. (So we get the correct request method and url in log).
+
+Any middleware / decorator that needs to act on the response will need a system like this and I find this rather complex. It's, however, straightforward when only acting on the request.
+
+Maybe there is a simpler solution by using the `on_progress` callback or another method (would love to have a example if there is), if not the case this may need a new interface in the future to handle those kind of middleware: like an event system that tell when the response is complete / has headers ready / has status ready or an other system (don't have a real idea ATM), in order to avoid a lot of pitfalls
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-06T08:13:34Z
+
+@joelwurtz wow very nice analysis :)
+
+The naive decorator is indeed broken, authors must respect the laziness of responses. If that's on purpose, getting the status code should be done using `getInfo('http_code')`, but only after `getHeaders()` has been called. Not a use case we should further optimize to me.
+
+In #30414, you can find a decorator that changes the type of responses: it replaces streaming of chunks by streaming of completed responses (see `complete()` method on `ApiClientInterface`.)
+There is a wide range of alternative streaming decorators we could build also, e.g. streaming of SSE messages, streaming of [JSONs](https://en.wikipedia.org/wiki/JSON_streaming), etc. That's not exactly your topic as such decorators don't implement `HttpClientInterface`.
+
+About decorators that implement `HttpClientInterface`:
+
+The 2nd one is broken also, because it doesn't wrap the methods of `ResponseInterface` as you spotted.
+
+> We don't have the method nor the original url (if there was a redirection) on the log message, but this can be simply fixed by adding those parameters to the info array of the ResponseInterface (should this be done in a decorator also ?)
+
+Not sure: there are many trivial ways around. I'd prefer keeping info clean with actual info that one cannot reasonably get on their own (at least for the core info - you can extend it as you wish of course.)
+
+Your 3rd try is the good one. There is one mistake: you should use `getInfo('http_code')` instead of `getStatusCode()`. Also, you could log it on `$chunk->isFirst()`.
+
+And I reached the same conclusion as yours!
+
+> Any middleware / decorator that needs to act on the response will need a system like this and I find this rather complex.
+> Maybe there is a simpler solution by using the on_progress callback
+
+:100: : the progress callback would have worked for the need. The only thing that you don't get in the progress callback is the body. Should we pass `?string $chunk` to the callback? That'd make it even more powerful.
+
+> It's, however, straightforward when only acting on the request.
+
+On purpose: I think that's what most decorators will do; adjust the options of the request.
+
+> this may need a new interface in the future to handle those kinds of middleware: like an event system that tell when the response is complete / has headers ready / has status ready or an other system
+
+:100: again! You're right about the difficulty of adding a full decorator. We could ship one in the component and make it hook-able via callbacks and/or some middleware interface.
+That'd be a really interesting future step for the component!
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-06T09:31:59Z
+
+>  Also, you could log it on $chunk->isFirst().
+
+Depend if we went to log the body or not, but yeah we can log as soon as we have a max body size reached or a last chunk.
+
+> the progress callback would have worked for the need. The only thing that you don't get in the progress callback is the body. Should we pass ?string $chunk to the callback? That'd make it even more powerful.
+
+Progress callback would indeed make the case if we had the `?string chunk`. However you said that this callback is called at different step, i would imagine that some parameters have special value given the step (like -1 for the end ?). Having a constant in the callback would definitely help like:
+
+```php
+function progress(string $step, int $streamedSize, int $totalSize, array $info, ?string $chunk);
+
+public const DNS_RESOLVED_STEP  = 'dns_resolved_step';
+public const UPLOAD_PROGRESS_STEP = 'upload_progress_step';
+public const HEADER_RECEIVE_STEP = 'header_receive_step';
+public const DOWNLOAD_PROGRESS_STEP = 'download_progress_step';
+public const RESPONSE_COMPLETE_STEP = 'response_complete_step';
+```
+
+However if we want to also log on error, maybe the progress callback would still not work (since we would have no log on dns resolution failure, as progress callback will never be called)
+
+And it was only an exemple on a logger. Another middleware may not work as expected with the progress callback, i would imagine a `Retry` middleware, which goals is to retry request when the remote server failed, to not be feasible using the `on_progress` callback (or would be very hacky). So yes definitely need another interface for middleware.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-06T10:51:06Z
+
+I'm super happy to tell you that I found a way to remove the state change when calling `getStatusCode()`. I "just" had to replace it by an argument to getHeaders/getContent. So here we are, their signature is now: `getHeaders(bool $throw = true)`/`getContent(bool $throw = true)`. See last commit for the patch. No need for special gymnastic anymore!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-06T10:54:55Z
+
+@joelwurtz, unfortunately, there is no way to implement the steps you describe: e.g. curl has no concept like that and it would be extremely hard to recreate it. fopen also is missing a lot of steps but I reimplemented the major missing ones in fact.
+
+---------------------------------------------------------------------------
+
+by arnaud-lb at 2019-03-07T12:12:31Z
+
+Since I came here to say what I disliked (and what I liked as well), I also need to say it when those things have changed or if I changed my mind.
+
+The component actually does a great job at hiding an asynchronous internal and exposing
+a synchronous-friendly API.
+
+With the removal of `ChunkInterface::__toString()` and the `getStatusCode()` mutation, all the easy traps I could think of have disappeared.
+
+The fact that other requests are running when waiting for a single request (even when not explicitly multiplexing with `HttpClientInterface::stream()`) is something that I initially overlooked (read too fast, or this was not in the initial PR description, I don't know). With this, having lazy responses completely make sense. I could think of way to avoid them, but not without making the API more complex, or requiring more steps.

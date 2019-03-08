@@ -28,7 +28,6 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 trait ResponseTrait
 {
-    private $statusCode = 0;
     private $headers = [];
 
     /**
@@ -43,6 +42,7 @@ trait ResponseTrait
 
     private $info = [
         'raw_headers' => [],
+        'http_code' => 0,
         'error' => null,
     ];
 
@@ -63,7 +63,7 @@ trait ResponseTrait
             $this->initializer = null;
         }
 
-        return $this->statusCode;
+        return $this->info['http_code'];
     }
 
     /**
@@ -141,35 +141,35 @@ trait ResponseTrait
      */
     abstract protected static function select(\stdClass $multi, float $timeout): int;
 
-    private function addRawHeaders(array $rawHeaders): void
+    private static function addRawHeaders(array $rawHeaders, array &$info, array &$headers): void
     {
         foreach ($rawHeaders as $h) {
             if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h, $m)) {
-                $this->headers = [];
-                $this->info['http_code'] = $this->statusCode = (int) $m[1];
+                $headers = [];
+                $info['http_code'] = (int) $m[1];
             } elseif (2 === \count($m = explode(':', $h, 2))) {
-                $this->headers[strtolower($m[0])][] = ltrim($m[1]);
+                $headers[strtolower($m[0])][] = ltrim($m[1]);
             }
 
-            $this->info['raw_headers'][] = $h;
+            $info['raw_headers'][] = $h;
         }
 
-        if (!$this->statusCode) {
+        if (!$info['http_code']) {
             throw new TransportException('Invalid or missing HTTP status line.');
         }
     }
 
     private function checkStatusCode()
     {
-        if (500 <= $this->statusCode) {
+        if (500 <= $this->info['http_code']) {
             throw new ServerException($this);
         }
 
-        if (400 <= $this->statusCode) {
+        if (400 <= $this->info['http_code']) {
             throw new ClientException($this);
         }
 
-        if (300 <= $this->statusCode) {
+        if (300 <= $this->info['http_code']) {
             throw new RedirectionException($this);
         }
     }

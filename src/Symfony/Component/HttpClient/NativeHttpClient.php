@@ -97,6 +97,7 @@ final class NativeHttpClient implements HttpClientInterface
             'raw_headers' => [],
             'url' => $url,
             'error' => null,
+            'http_method' => $method,
             'http_code' => 0,
             'redirect_count' => 0,
             'start_time' => 0.0,
@@ -336,8 +337,8 @@ final class NativeHttpClient implements HttpClientInterface
             }
         }
 
-        return static function (\stdClass $multi, int $statusCode, ?string $location, $context) use ($redirectHeaders, $proxy, $noProxy, &$info, $maxRedirects, $onProgress): ?string {
-            if (null === $location || $statusCode < 300 || 400 <= $statusCode) {
+        return static function (\stdClass $multi, ?string $location, $context) use ($redirectHeaders, $proxy, $noProxy, &$info, $maxRedirects, $onProgress): ?string {
+            if (null === $location || $info['http_code'] < 300 || 400 <= $info['http_code']) {
                 $info['redirect_url'] = null;
 
                 return null;
@@ -356,11 +357,11 @@ final class NativeHttpClient implements HttpClientInterface
             $info['redirect_time'] = $now - $info['start_time'];
 
             // Do like curl and browsers: turn POST to GET on 301, 302 and 303
-            if (\in_array($statusCode, [301, 302, 303], true)) {
+            if (\in_array($info['http_code'], [301, 302, 303], true)) {
                 $options = stream_context_get_options($context)['http'];
 
-                if ('POST' === $options['method'] || 303 === $statusCode) {
-                    $options['method'] = 'HEAD' === $options['method'] ? 'HEAD' : 'GET';
+                if ('POST' === $options['method'] || 303 === $info['http_code']) {
+                    $info['http_method'] = $options['method'] = 'HEAD' === $options['method'] ? 'HEAD' : 'GET';
                     $options['content'] = '';
                     $options['header'] = array_filter($options['header'], static function ($h) {
                         return 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:');

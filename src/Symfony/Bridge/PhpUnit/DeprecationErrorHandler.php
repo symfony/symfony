@@ -98,14 +98,14 @@ class DeprecationErrorHandler
             'legacyCount' => 0,
             'otherCount' => 0,
             'remaining vendorCount' => 0,
-            'unsilenced' => array(),
-            'remaining' => array(),
-            'legacy' => array(),
-            'other' => array(),
-            'remaining vendor' => array(),
+            'unsilenced' => [],
+            'remaining' => [],
+            'legacy' => [],
+            'other' => [],
+            'remaining vendor' => [],
         ];
         $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
-            if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode = $getMode()) {
+            if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || self::MODE_DISABLED === $mode = $getMode()) {
                 $ErrorHandler = $UtilPrefix.'ErrorHandler';
 
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);

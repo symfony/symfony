@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for the Mailer component
+ * added support for the HttpClient component
  * added button to clear the ajax request tab
  * deprecated the `ExceptionController::templateExists()` method
  * deprecated the `TemplateManager::templateExists()` method

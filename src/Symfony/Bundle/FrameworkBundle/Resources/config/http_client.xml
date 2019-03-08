@@ -22,5 +22,17 @@
             <argument type="service" id="Psr\Http\Message\StreamFactoryInterface" on-invalid="ignore" />
         </service>
         <service id="Psr\Http\Client\ClientInterface" alias="psr18.http_client" />
+
+        <service id="data_collector.http_client" class="Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector">
+            <tag name="data_collector" template="@WebProfiler/Collector/http_client.html.twig" id="http_client" priority="240" />
+            <call method="addClient">
+                <argument>http_client</argument>
+                <argument type="service" id="debug.http_client" />
+            </call>
+        </service>
+
+        <service id="debug.http_client" class="Symfony\Component\HttpClient\TraceableHttpClient" decorates="http_client">
+            <argument type="service" id="debug.http_client.inner" />
+        </service>
     </services>
 </container>

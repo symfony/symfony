@@ -62,6 +62,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -1874,6 +1875,15 @@ class FrameworkExtension extends Extension
     {
         $loader->load('http_client.xml');
 
+        $collectorDefinition = $container->getDefinition('data_collector.http_client');
+
+        if (!$debug = $container->getParameter('kernel.debug')) {
+            $container->removeDefinition('debug.http_client');
+            $collectorDefinition
+                ->setMethodCalls([])
+                ->clearTag('data_collector');
+        }
+
         $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
@@ -1896,6 +1906,19 @@ class FrameworkExtension extends Extension
             } else {
                 $container->register($name, ScopingHttpClient::class)
                     ->setArguments([new Reference('http_client'), [$scope => $scopeConfig], $scope]);
+            }
+
+            if ($debug) {
+                $innerId = '.'.$name.'.inner';
+
+                $container->setDefinition($innerId, $container->getDefinition($name)
+                    ->replaceArgument(0, new Reference('debug.http_client.inner'))
+                );
+
+                $container->register($name, TraceableHttpClient::class)
+                    ->setArguments([new Reference($innerId)]);
+
+                $collectorDefinition->addMethodCall('addClient', [$name, new Reference($name)]);
             }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);

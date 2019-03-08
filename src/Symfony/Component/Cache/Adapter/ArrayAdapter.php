@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
+use Symfony\Component\Cache\Traits\KeyTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
 /**
@@ -24,6 +25,7 @@ use Symfony\Contracts\Cache\CacheInterface;
 class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait;
+    use KeyTrait;
 
     private $createCacheItem;
 
@@ -70,6 +72,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      */
     public function getItem($key)
     {
+        $key = $this->encodeKey($key);
         if (!$isHit = $this->hasItem($key)) {
             $this->values[$key] = $value = null;
         } else {
@@ -86,6 +89,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     public function getItems(array $keys = [])
     {
         foreach ($keys as $key) {
+            $key = $this->encodeKey($key);
             if (!\is_string($key) || !isset($this->expiries[$key])) {
                 CacheItem::validateKey($key);
             }
@@ -100,6 +104,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     public function deleteItems(array $keys)
     {
         foreach ($keys as $key) {
+            $key = $this->encodeKey($key);
             $this->deleteItem($key);
         }
 
@@ -158,6 +163,6 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
      */
     public function delete(string $key): bool
     {
-        return $this->deleteItem($key);
+        return $this->deleteItem($this->encodeKey($key));
     }
 }

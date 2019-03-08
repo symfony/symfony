@@ -20,6 +20,7 @@ use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\KeyTrait;
 use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
@@ -28,6 +29,7 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
 class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterface
 {
     use ProxyTrait;
+    use KeyTrait;
 
     private const METADATA_EXPIRY_OFFSET = 1527506807;
 
@@ -89,6 +91,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
      */
     public function set($key, $value, $ttl = null)
     {
+        $key = $this->encodeKey($key);
         try {
             if (null !== $f = $this->createCacheItem) {
                 $item = $f($key, $value);
@@ -113,6 +116,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     public function delete($key)
     {
         try {
+            $key = $this->encodeKey($key);
             return $this->pool->deleteItem($key);
         } catch (SimpleCacheException $e) {
             throw $e;
@@ -151,6 +155,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
 
         if (!$this->pool instanceof AdapterInterface) {
             foreach ($items as $key => $item) {
+                $key = $this->encodeKey($key);
                 $values[$key] = $item->isHit() ? $item->get() : $default;
             }
 
@@ -158,6 +163,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         }
 
         foreach ($items as $key => $item) {
+            $key = $this->encodeKey($key);
             if (!$item->isHit()) {
                 $values[$key] = $default;
                 continue;
@@ -192,11 +198,13 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
             if (null !== $f = $this->createCacheItem) {
                 $valuesIsArray = false;
                 foreach ($values as $key => $value) {
+                    $key = $this->encodeKey($key);
                     $items[$key] = $f($key, $value, true);
                 }
             } elseif ($valuesIsArray) {
                 $items = [];
                 foreach ($values as $key => $value) {
+                    $key = $this->encodeKey($key);
                     $items[] = (string) $key;
                 }
                 $items = $this->pool->getItems($items);
@@ -205,6 +213,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                     if (\is_int($key)) {
                         $key = (string) $key;
                     }
+                    $key = $this->encodeKey($key);
                     $items[$key] = $this->pool->getItem($key)->set($value);
                 }
             }
@@ -217,7 +226,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
 
         foreach ($items as $key => $item) {
             if ($valuesIsArray) {
-                $item->set($values[$key]);
+                $item->set($values[$this->encodeKey($key)]);
             }
             if (null !== $ttl) {
                 $item->expiresAfter($ttl);
@@ -254,6 +263,7 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     public function has($key)
     {
         try {
+            $key = $this->encodeKey($key);
             return $this->pool->hasItem($key);
         } catch (SimpleCacheException $e) {
             throw $e;

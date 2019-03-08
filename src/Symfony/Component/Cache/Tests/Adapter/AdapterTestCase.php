@@ -27,6 +27,33 @@ abstract class AdapterTestCase extends CachePoolTest
         }
     }
 
+    /**
+     * Data provider for invalid keys.
+     * @todo  : Override method from cache/integration-tests for remove 2 keys (with @ and /) ! See how to update it without override the method ?
+     *
+     * @return array
+     */
+    public static function invalidKeys()
+    {
+        return [
+            [true],
+            [false],
+            [null],
+            [2],
+            [2.5],
+            ['{str'],
+            ['rand{'],
+            ['rand{str'],
+            ['rand}str'],
+            ['rand(str'],
+            ['rand)str'],
+            ['rand\\str'],
+            ['rand:str'],
+            [new \stdClass()],
+            [['array']],
+        ];
+    }
+
     public function testGet()
     {
         if (isset($this->skippedTests[__FUNCTION__])) {

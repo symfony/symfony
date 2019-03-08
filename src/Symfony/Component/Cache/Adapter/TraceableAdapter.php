@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\KeyTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -27,6 +28,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInterface, ResettableInterface
 {
+    use KeyTrait;
+
     protected $pool;
     private $calls = [];
 
@@ -44,6 +47,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
             throw new \BadMethodCallException(sprintf('Cannot call "%s::get()": this class doesn\'t implement "%s".', \get_class($this->pool), CacheInterface::class));
         }
 
+        $key = $this->encodeKey($key);
         $isHit = true;
         $callback = function (CacheItem $item) use ($callback, &$isHit) {
             $isHit = $item->isHit();
@@ -73,6 +77,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     public function getItem($key)
     {
         $event = $this->start(__FUNCTION__);
+        $key = $this->encodeKey($key);
         try {
             $item = $this->pool->getItem($key);
         } finally {
@@ -83,7 +88,6 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         } else {
             ++$event->misses;
         }
-
         return $item;
     }
 
@@ -92,6 +96,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      */
     public function hasItem($key)
     {
+        $key = $this->encodeKey($key);
         $event = $this->start(__FUNCTION__);
         try {
             return $event->result[$key] = $this->pool->hasItem($key);
@@ -105,6 +110,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
      */
     public function deleteItem($key)
     {
+        $key = $this->encodeKey($key);
         $event = $this->start(__FUNCTION__);
         try {
             return $event->result[$key] = $this->pool->deleteItem($key);
@@ -153,6 +159,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         $f = function () use ($result, $event) {
             $event->result = [];
             foreach ($result as $key => $item) {
+                $key = $this->encodeKey($key);
                 if ($event->result[$key] = $item->isHit()) {
                     ++$event->hits;
                 } else {
@@ -184,6 +191,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     public function deleteItems(array $keys)
     {
         $event = $this->start(__FUNCTION__);
+        $keys = array_map([$this, 'encodeKey'], $keys);
         $event->result['keys'] = $keys;
         try {
             return $event->result['result'] = $this->pool->deleteItems($keys);
@@ -243,6 +251,7 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
     public function delete(string $key): bool
     {
         $event = $this->start(__FUNCTION__);
+        $key = $this->encodeKey($key);
         try {
             return $event->result[$key] = $this->pool->deleteItem($key);
         } finally {

@@ -26,6 +26,34 @@ abstract class CacheTestCase extends SimpleCacheTest
         }
     }
 
+    /**
+     * Data provider for invalid keys.
+     * @todo : Override method from cache/integration-tests for remove 2 keys (with @ and /) ! See how to update it without override the method ?
+     *
+     * @return array
+     */
+    public static function invalidKeys()
+    {
+        return [
+            [''],
+            [true],
+            [false],
+            [null],
+            [2],
+            [2.5],
+            ['{str'],
+            ['rand{'],
+            ['rand{str'],
+            ['rand}str'],
+            ['rand(str'],
+            ['rand)str'],
+            ['rand\\str'],
+            ['rand:str'],
+            [new \stdClass()],
+            [['array']],
+        ];
+    }
+
     public static function validKeys()
     {
         return array_merge(parent::validKeys(), [["a\0b"]]);

@@ -256,7 +256,7 @@ final class CurlHttpClient implements HttpClientInterface
             }
         }
 
-        return new CurlResponse($this->multi, $ch, $options, self::createRedirectResolver($options, $host));
+        return new CurlResponse($this->multi, $ch, $options, $method, self::createRedirectResolver($options, $host));
     }
 
     /**
@@ -361,7 +361,7 @@ final class CurlHttpClient implements HttpClientInterface
         }
 
         return static function ($ch, string $location) use ($redirectHeaders) {
-            if ($host = parse_url($location, PHP_URL_HOST)) {
+            if ($redirectHeaders && $host = parse_url($location, PHP_URL_HOST)) {
                 $rawHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $rawHeaders);
             }

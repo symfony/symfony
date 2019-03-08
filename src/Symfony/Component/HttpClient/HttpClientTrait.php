@@ -201,10 +201,16 @@ trait HttpClientTrait
             if ($r->isGenerator()) {
                 $body = $body(self::$CHUNK_SIZE);
                 $body = function () use ($body) {
-                    $chunk = $body->valid() ? $body->current() : '';
-                    $body->next();
+                    while ($body->valid()) {
+                        $chunk = $body->current();
+                        $body->next();
 
-                    return $chunk;
+                        if ('' !== $chunk) {
+                            return $chunk;
+                        }
+                    }
+
+                    return '';
                 };
             }
 

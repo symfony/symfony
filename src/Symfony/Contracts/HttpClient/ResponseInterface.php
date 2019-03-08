@@ -71,6 +71,7 @@ interface ResponseInterface
      *  - redirect_count - the number of redirects followed while executing the request
      *  - redirect_url - the resolved location of redirect responses, null otherwise
      *  - start_time - the time when the request was sent or 0.0 when it's pending
+     *  - http_method - the HTTP verb of the last request
      *  - http_code - the last response code or 0 when it is not known yet
      *  - error - the error message when the transfer was aborted, null otherwise
      *  - data - the value of the "data" request option, null if not set

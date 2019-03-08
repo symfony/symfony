@@ -29,7 +29,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(\stdClass $multi, $ch, array $options = null, callable $resolveRedirect = null)
+    public function __construct(\stdClass $multi, $ch, array $options = null, string $method = 'GET', callable $resolveRedirect = null)
     {
         $this->multi = $multi;
 
@@ -42,9 +42,11 @@ final class CurlResponse implements ResponseInterface
 
         $this->id = $id = (int) $ch;
         $this->timeout = $options['timeout'] ?? null;
+        $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
         $info = &$this->info;
+        $headers = &$this->headers;
 
         if (!$info['raw_headers']) {
             // Used to keep track of what we're waiting for
@@ -62,8 +64,8 @@ final class CurlResponse implements ResponseInterface
             $content = ($options['buffer'] ?? true) ? $content : null;
         }
 
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, $options, $multi, $id, &$location, $resolveRedirect): int {
-            return self::parseHeaderLine($ch, $data, $info, $options, $multi, $id, $location, $resolveRedirect);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect): int {
+            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect);
         });
 
         if (null === $options) {
@@ -116,8 +118,6 @@ final class CurlResponse implements ResponseInterface
             curl_setopt($ch, CURLOPT_HEADERFUNCTION, null);
             curl_setopt($ch, CURLOPT_READFUNCTION, null);
             curl_setopt($ch, CURLOPT_INFILE, null);
-
-            $response->addRawHeaders($response->info['raw_headers']);
         };
 
         // Schedule the request in a non-blocking way
@@ -243,7 +243,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * Parses header lines as curl yields them to us.
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, ?array $options, \stdClass $multi, int $id, ?string &$location, ?callable $resolveRedirect): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, \stdClass $multi, int $id, ?string &$location, ?callable $resolveRedirect): int
     {
         if (!\in_array($waitFor = @curl_getinfo($ch, CURLINFO_PRIVATE), ['headers', 'destruct'], true)) {
             return \strlen($data); // Ignore HTTP trailers
@@ -251,7 +251,16 @@ final class CurlResponse implements ResponseInterface
 
         if ("\r\n" !== $data) {
             // Regular header line: add it to the list
-            $info['raw_headers'][] = substr($data, 0, -2);
+            self::addRawHeaders([substr($data, 0, -2)], $info, $headers);
+
+            if (0 === strpos($data, 'HTTP') && 300 <= $info['http_code'] && $info['http_code'] < 400) {
+                if (curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+                } elseif (303 === $info['http_code'] || ('POST' === $info['http_method'] && \in_array($info['http_code'], [301, 302], true))) {
+                    $info['http_method'] = 'HEAD' === $info['http_method'] ? 'HEAD' : 'GET';
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+                }
+            }
 
             if (0 === stripos($data, 'Location:')) {
                 $location = trim(substr($data, 9, -2));

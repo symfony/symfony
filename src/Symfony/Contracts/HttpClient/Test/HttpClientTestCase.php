@@ -214,7 +214,9 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient();
         $response = $client->request('POST', 'http://localhost:8057/301', [
             'auth' => 'foo:bar',
-            'body' => 'foo=bar',
+            'body' => function () {
+                yield 'foo=bar';
+            },
         ]);
 
         $body = json_decode($response->getContent(), true);
@@ -236,7 +238,9 @@ abstract class HttpClientTestCase extends TestCase
             'Content-Type: application/json',
         ];
 
-        $filteredHeaders = array_intersect($expected, $response->getInfo('raw_headers'));
+        $filteredHeaders = array_values(array_filter($response->getInfo('raw_headers'), function ($h) {
+            return \in_array(substr($h, 0, 4), ['HTTP', 'Loca', 'Cont'], true) && 'Content-Encoding: gzip' !== $h;
+        }));
 
         $this->assertSame($expected, $filteredHeaders);
     }
@@ -261,6 +265,16 @@ abstract class HttpClientTestCase extends TestCase
     public function testRedirect307()
     {
         $client = $this->getHttpClient();
+
+        $response = $client->request('POST', 'http://localhost:8057/307', [
+            'body' => function () {
+                yield 'foo=bar';
+            },
+            'max_redirects' => 0,
+        ]);
+
+        $this->assertSame(307, $response->getStatusCode());
+
         $response = $client->request('POST', 'http://localhost:8057/307', [
             'body' => 'foo=bar',
         ]);
@@ -297,7 +311,9 @@ abstract class HttpClientTestCase extends TestCase
             'Content-Type: application/json',
         ];
 
-        $filteredHeaders = array_intersect($expected, $response->getInfo('raw_headers'));
+        $filteredHeaders = array_values(array_filter($response->getInfo('raw_headers'), function ($h) {
+            return \in_array(substr($h, 0, 4), ['HTTP', 'Loca', 'Cont'], true);
+        }));
 
         $this->assertSame($expected, $filteredHeaders);
     }
@@ -416,6 +432,7 @@ abstract class HttpClientTestCase extends TestCase
         $response = $client->request('POST', 'http://localhost:8057/post', [
             'body' => function () {
                 yield 'foo';
+                yield '';
                 yield '=';
                 yield '0123456789';
             },

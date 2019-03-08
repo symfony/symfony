@@ -26,10 +26,7 @@ if (PHP_VERSION_ID >= 70200) {
     $PHPUNIT_VERSION = '4.8';
 }
 
-if ('composer.json' !== $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json') {
-    putenv('COMPOSER=composer.json');
-    $_SERVER['COMPOSER'] = $_ENV['COMPOSER'] = 'composer.json';
-}
+$COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
 
 $root = __DIR__;
 while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
@@ -45,6 +42,19 @@ $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
+}
+
+$defaultEnvs = [
+    'COMPOSER' => 'composer.json',
+    'COMPOSER_VENDOR_DIR' => 'vendor',
+    'COMPOSER_BIN_DIR' => 'bin',
+];
+
+foreach ($defaultEnvs as $envName => $envValue) {
+    if ($envValue !== getenv($envName)) {
+        putenv("$envName=$envValue");
+        $_SERVER[$envName] = $_ENV[$envName] = $envValue;
+    }
 }
 
 $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar 2> /dev/null`))

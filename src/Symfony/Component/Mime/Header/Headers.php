@@ -210,13 +210,23 @@ final class Headers
     public function toString(): string
     {
         $string = '';
-        foreach ($this->getAll() as $header) {
-            if ('' !== $header->getBodyAsString()) {
-                $string .= $header->toString()."\r\n";
-            }
+        foreach ($this->toArray() as $str) {
+            $string .= $str."\r\n";
         }
 
         return $string;
+    }
+
+    public function toArray(): array
+    {
+        $arr = [];
+        foreach ($this->getAll() as $header) {
+            if ('' !== $header->getBodyAsString()) {
+                $arr[] = $header->toString();
+            }
+        }
+
+        return $arr;
     }
 
     /**

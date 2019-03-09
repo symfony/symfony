@@ -83,7 +83,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
                 new InputOption('no-prefix', null, InputOption::VALUE_NONE, '[DEPRECATED] If set, no prefix is added to the translations'),
-                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yaml'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),

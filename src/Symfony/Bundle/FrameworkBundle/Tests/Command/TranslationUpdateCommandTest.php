@@ -143,7 +143,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->expects($this->any())
             ->method('getFormats')
             ->will(
-                $this->returnValue(['xlf', 'yml'])
+                $this->returnValue(['xlf', 'yml', 'yaml'])
             );
 
         if (null === $kernel) {

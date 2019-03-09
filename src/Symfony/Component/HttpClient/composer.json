@@ -20,7 +20,8 @@
     },
     "require": {
         "php": "^7.1.3",
-        "symfony/contracts": "^1.1"
+        "symfony/contracts": "^1.1",
+        "symfony/polyfill-php73": "^1.11"
     },
     "require-dev": {
         "nyholm/psr7": "^1.0",

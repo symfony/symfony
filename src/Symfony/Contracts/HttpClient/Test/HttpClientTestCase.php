@@ -58,6 +58,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(['application/json'], $headers['content-type']);
 
         $body = json_decode($response->getContent(), true);
+        $this->assertSame($body, $response->toArray());
 
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
         $this->assertSame('/', $body['REQUEST_URI']);
@@ -79,7 +80,7 @@ abstract class HttpClientTestCase extends TestCase
             'headers' => ['Foo' => 'baR'],
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
         $this->assertSame('baR', $body['HTTP_FOO']);
 
         $this->expectException(TransportExceptionInterface::class);
@@ -106,7 +107,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('HTTP/1.0 200 OK', $response->getInfo('raw_headers')[0]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertSame('HTTP/1.0', $body['SERVER_PROTOCOL']);
         $this->assertSame('GET', $body['REQUEST_METHOD']);
@@ -203,7 +204,7 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient();
         $response = $client->request('GET', 'http://foo:bar%3Dbar@localhost:8057');
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertSame('foo', $body['PHP_AUTH_USER']);
         $this->assertSame('bar=bar', $body['PHP_AUTH_PW']);
@@ -219,7 +220,7 @@ abstract class HttpClientTestCase extends TestCase
             },
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
         $this->assertSame('GET', $body['REQUEST_METHOD']);
         $this->assertSame('Basic Zm9vOmJhcg==', $body['HTTP_AUTHORIZATION']);
         $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
@@ -250,7 +251,8 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient();
         $response = $client->request('GET', 'http://localhost:8057/302/relative');
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
+
         $this->assertSame('/', $body['REQUEST_URI']);
         $this->assertNull($response->getInfo('redirect_url'));
 
@@ -279,7 +281,7 @@ abstract class HttpClientTestCase extends TestCase
             'body' => 'foo=bar',
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertSame(['foo' => 'bar', 'REQUEST_METHOD' => 'POST'], $body);
     }
@@ -388,7 +390,7 @@ abstract class HttpClientTestCase extends TestCase
             'on_progress' => function (...$state) use (&$steps) { $steps[] = $state; },
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
         $this->assertSame([0, 0], \array_slice($steps[0], 0, 2));
@@ -405,7 +407,7 @@ abstract class HttpClientTestCase extends TestCase
             'body' => ['foo' => 'bar'],
         ]);
 
-        $this->assertSame(['foo' => 'bar', 'REQUEST_METHOD' => 'POST'], json_decode($response->getContent(), true));
+        $this->assertSame(['foo' => 'bar', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 
     public function testPostResource()
@@ -420,7 +422,7 @@ abstract class HttpClientTestCase extends TestCase
             'body' => $h,
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
     }
@@ -438,7 +440,7 @@ abstract class HttpClientTestCase extends TestCase
             },
         ]);
 
-        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], json_decode($response->getContent(), true));
+        $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 
     public function testOnProgressCancel()
@@ -581,7 +583,7 @@ abstract class HttpClientTestCase extends TestCase
             'proxy' => 'http://localhost:8057',
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
         $this->assertSame('localhost:8057', $body['HTTP_HOST']);
         $this->assertRegexp('#^http://(localhost|127\.0\.0\.1):8057/$#', $body['REQUEST_URI']);
 
@@ -589,7 +591,7 @@ abstract class HttpClientTestCase extends TestCase
             'proxy' => 'http://foo:b%3Dar@localhost:8057',
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
         $this->assertSame('Basic Zm9vOmI9YXI=', $body['HTTP_PROXY_AUTHORIZATION']);
     }
 
@@ -603,7 +605,7 @@ abstract class HttpClientTestCase extends TestCase
                 'proxy' => 'http://localhost:8057',
             ]);
 
-            $body = json_decode($response->getContent(), true);
+            $body = $response->toArray();
 
             $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
             $this->assertSame('/', $body['REQUEST_URI']);
@@ -629,7 +631,7 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(['Accept-Encoding'], $headers['vary']);
         $this->assertContains('gzip', $headers['content-encoding'][0]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
 
         $this->assertContains('gzip', $body['HTTP_ACCEPT_ENCODING']);
     }
@@ -652,7 +654,7 @@ abstract class HttpClientTestCase extends TestCase
             'query' => ['b' => 'b'],
         ]);
 
-        $body = json_decode($response->getContent(), true);
+        $body = $response->toArray();
         $this->assertSame('GET', $body['REQUEST_METHOD']);
         $this->assertSame('/?a=a&b=b', $body['REQUEST_URI']);
     }
@@ -673,10 +675,9 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertContains('gzip', $headers['content-encoding'][0]);
 
         $body = $response->getContent();
-
         $this->assertSame("\x1F", $body[0]);
-        $body = json_decode(gzdecode($body), true);
 
+        $body = json_decode(gzdecode($body), true);
         $this->assertSame('gzip', $body['HTTP_ACCEPT_ENCODING']);
     }
 

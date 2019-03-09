@@ -34,7 +34,7 @@
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php72": "~1.5",
-        "symfony/polyfill-php73": "^1.8"
+        "symfony/polyfill-php73": "^1.11"
     },
     "replace": {
         "symfony/asset": "self.version",

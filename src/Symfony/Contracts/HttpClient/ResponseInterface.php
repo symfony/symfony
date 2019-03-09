@@ -60,6 +60,18 @@ interface ResponseInterface
     public function getContent(bool $throw = true): string;
 
     /**
+     * Gets the response body decoded as array, typically from a JSON payload.
+     *
+     * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
+     *
+     * @throws TransportExceptionInterface   When the body cannot be decoded or when a network error occurs
+     * @throws RedirectionExceptionInterface On a 3xx when $throw is true and the "max_redirects" option has been reached
+     * @throws ClientExceptionInterface      On a 4xx when $throw is true
+     * @throws ServerExceptionInterface      On a 5xx when $throw is true
+     */
+    public function toArray(bool $throw = true): array;
+
+    /**
      * Returns info coming from the transport layer.
      *
      * This method SHOULD NOT throw any ExceptionInterface and SHOULD be non-blocking.

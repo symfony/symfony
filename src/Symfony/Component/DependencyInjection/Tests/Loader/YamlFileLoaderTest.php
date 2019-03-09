@@ -803,15 +803,28 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
 
-    public function testYamlFileTag()
+    /**
+     * @dataProvider provideYamlFileResources
+     */
+    public function testYamlFileTag(string $resource)
     {
+        $path = self::$fixturesPath.'/yaml';
         $container = new ContainerBuilder();
+        $container->setParameter('fixture_path', "$path/baz");
 
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('services_with_yaml_file_tag.yml');
+        $loader = new YamlFileLoader($container, new FileLocator($path));
+        $loader->load($resource);
 
         $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
         $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));
+    }
+
+    public function provideYamlFileResources(): array
+    {
+        return [
+            'Relative path' => ['services_with_yaml_file_tag.yml'],
+            'Path with parameter' => ['services_with_yaml_file_tag_with_params.yml'],
+        ];
     }
 
     public function testYamlFileTagNotFound()

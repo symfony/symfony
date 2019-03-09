@@ -759,14 +759,18 @@ class YamlFileLoader extends FileLoader
                 return new Reference($id);
             }
             if ('yaml_file' === $value->getTag()) {
+                $filePath = $this->container->getParameterBag()->resolveValue((string) $argument);
                 $rootDir = \dirname($file);
-                $file = \is_file($argument) ? $argument : "$rootDir/$argument";
 
-                if (!\is_file($file)) {
+                if (!\is_file($filePath)) {
+                    $filePath = "$rootDir/$filePath";
+                }
+
+                if (!\is_file($filePath)) {
                     throw new InvalidArgumentException("Unable to locate file \"$argument\". Please provide a path relative to \"$rootDir\" or an absolute path.");
                 }
 
-                return $this->yamlParser->parseFile($file, Yaml::PARSE_CONSTANT);
+                return $this->yamlParser->parseFile($filePath, Yaml::PARSE_CONSTANT);
             }
 
             throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));

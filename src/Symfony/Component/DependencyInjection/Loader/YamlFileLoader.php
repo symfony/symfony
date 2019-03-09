@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
@@ -769,6 +770,8 @@ class YamlFileLoader extends FileLoader
                 if (!\is_file($filePath)) {
                     throw new InvalidArgumentException("Unable to locate file \"$argument\". Please provide a path relative to \"$rootDir\" or an absolute path.");
                 }
+
+                $this->container->addResource(new FileResource($filePath));
 
                 return $this->yamlParser->parseFile($filePath, Yaml::PARSE_CONSTANT);
             }

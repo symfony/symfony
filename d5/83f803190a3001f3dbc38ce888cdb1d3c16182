@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-07T10:52:52Z
+
+What about a generic trait that would call a private `doSetUp()` method?
+
+---------------------------------------------------------------------------
+
+by garak at 2019-03-07T10:56:28Z
+
+> What about a generic trait that would call a private `doSetUp()` method?
+
+You mean a single trait with all methods for the 3 classes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-07T10:56:51Z
+
+yes, and keep the code in the current classes
+
+---------------------------------------------------------------------------
+
+by garak at 2019-03-07T11:59:19Z
+
+Well, it makes sense.
+But I'm not sure about the place where to put such unique trait, being the 3 classes spread in 2 components (Form and Validator)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-07T12:13:21Z
+
+:thinking: 3 proposals: one trait per component, add the trait in the bridge, add the trait in contracts. Pick one :)
+
+---------------------------------------------------------------------------
+
+by garak at 2019-03-07T12:29:29Z
+
+Better now? Let me know, I'll squash
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-07T12:39:45Z
+
+Looks like we're converging on something nice :)

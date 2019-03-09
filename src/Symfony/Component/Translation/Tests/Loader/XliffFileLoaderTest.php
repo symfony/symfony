@@ -86,6 +86,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals(utf8_decode('bär'), $catalogue->get('foo', 'domain1'));
         $this->assertEquals(
             [
+                'source' => 'foo',
                 'notes' => [['content' => utf8_decode('bäz')]],
                 'id' => '1',
                 'file' => [
@@ -175,6 +176,7 @@ class XliffFileLoaderTest extends TestCase
 
         $this->assertEquals(
             [
+                'source' => 'foo',
                 'notes' => [['priority' => 1, 'content' => 'foo']],
                 'id' => '1',
                 'file' => [
@@ -186,6 +188,7 @@ class XliffFileLoaderTest extends TestCase
         // message without target
         $this->assertEquals(
             [
+                'source' => 'extrasource',
                 'notes' => [['content' => 'bar', 'from' => 'foo']],
                 'id' => '2',
                 'file' => [
@@ -197,6 +200,7 @@ class XliffFileLoaderTest extends TestCase
         // message with empty target
         $this->assertEquals(
             [
+                'source' => 'key',
                 'notes' => [
                     ['content' => 'baz'],
                     ['priority' => 2, 'from' => 'bar', 'content' => 'qux'],
@@ -304,6 +308,7 @@ class XliffFileLoaderTest extends TestCase
 
         $this->assertEquals(
             [
+                'source' => 'foo',
                 'id' => '1',
                 'file' => [
                     'original' => 'file.ext',
@@ -313,6 +318,7 @@ class XliffFileLoaderTest extends TestCase
         );
         $this->assertEquals(
             [
+                'source' => 'test',
                 'notes' => [['content' => 'note']],
                 'id' => '4',
                 'file' => [

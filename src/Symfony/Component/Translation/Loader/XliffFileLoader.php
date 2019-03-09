@@ -105,6 +105,7 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->set((string) $source, $target, $domain);
 
                 $metadata = [
+                    'source' => (string) $translation->source,
                     'file' => [
                         'original' => (string) $fileAttributes['original'],
                     ],

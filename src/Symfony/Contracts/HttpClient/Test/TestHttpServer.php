@@ -27,11 +27,6 @@ class TestHttpServer
             return;
         }
 
-        $spec = [
-            1 => ['file', '\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null', 'w'],
-            2 => ['file', '\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null', 'w'],
-        ];
-
         $finder = new PhpExecutableFinder();
         $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', '127.0.0.1:8057']));
         $process->setWorkingDirectory(__DIR__.'/Fixtures/web');

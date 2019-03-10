@@ -41,7 +41,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'int' => 'int',
             'json' => 'array',
             'key' => 'bool|int|float|string|array',
-            'nullable' => 'bool|int|float|string|array',
             'resolve' => 'string',
             'default' => 'bool|int|float|string|array',
             'string' => 'string',
@@ -84,15 +83,21 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             $next = substr($name, $i + 1);
             $default = substr($name, 0, $i);
 
-            if (!$this->container->hasParameter($default)) {
+            if ('' !== $default && !$this->container->hasParameter($default)) {
                 throw new RuntimeException(sprintf('Invalid env fallback in "default:%s": parameter "%s" not found.', $name, $default));
             }
 
             try {
-                return $getEnv($next);
+                $env = $getEnv($next);
+
+                if ('' !== $env && null !== $env) {
+                    return $env;
+                }
             } catch (EnvNotFoundException $e) {
-                return $this->container->getParameter($default);
+                // no-op
             }
+
+            return '' === $default ? null : $this->container->getParameter($default);
         }
 
         if ('file' === $prefix) {
@@ -194,10 +199,6 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
         if ('csv' === $prefix) {
             return str_getcsv($env);
-        }
-
-        if ('nullable' === $prefix) {
-            return '' === $env ? null : $env;
         }
 
         if ('trim' === $prefix) {

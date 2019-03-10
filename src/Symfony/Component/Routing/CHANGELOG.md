@@ -10,6 +10,7 @@ CHANGELOG
  * deprecated `generator_base_class`, `generator_cache_class`, `matcher_base_class` and `matcher_cache_class` router options
  * deprecated implementing `Serializable` for `Route` and `CompiledRoute`; if you serialize them, please
    ensure your unserialization logic can recover from a failure related to an updated serialization format
+ * exposed `utf8` Route option, defaults "locale" and "format" in configuration loaders and configurators
 
 4.2.0
 -----

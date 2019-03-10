@@ -52,6 +52,9 @@
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
     <xsd:attribute name="controller" type="xsd:string" />
+    <xsd:attribute name="locale" type="xsd:string" />
+    <xsd:attribute name="format" type="xsd:string" />
+    <xsd:attribute name="utf8" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="import">
@@ -67,7 +70,10 @@
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
     <xsd:attribute name="controller" type="xsd:string" />
+    <xsd:attribute name="locale" type="xsd:string" />
+    <xsd:attribute name="format" type="xsd:string" />
     <xsd:attribute name="trailing-slash-on-root" type="xsd:boolean" />
+    <xsd:attribute name="utf8" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="default" mixed="true">

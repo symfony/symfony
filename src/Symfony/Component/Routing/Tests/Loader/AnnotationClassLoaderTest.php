@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\AbstractClassCon
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\DefaultValueController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\ExplicitLocalizedActionPathController;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\GlobalDefaultsClass;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\InvokableController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\InvokableLocalizedController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\LocalizedActionPathController;
@@ -35,6 +36,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionLo
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\PrefixedActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RequirementsWithoutPlaceholderNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\RouteWithPrefixController;
+use Symfony\Component\Routing\Tests\Fixtures\AnnotationFixtures\Utf8ActionControllers;
 
 class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 {
@@ -155,6 +157,32 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertCount(4, $routes);
         $this->assertEquals('/the/path', $routes->get('put.en')->getPath());
         $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
+    }
+
+    public function testGlobalDefaultsRoutesLoadWithAnnotation()
+    {
+        $routes = $this->loader->load(GlobalDefaultsClass::class);
+        $this->assertCount(2, $routes);
+
+        $specificLocaleRoute = $routes->get('specific_locale');
+
+        $this->assertSame('/defaults/specific-locale', $specificLocaleRoute->getPath());
+        $this->assertSame('s_locale', $specificLocaleRoute->getDefault('_locale'));
+        $this->assertSame('g_format', $specificLocaleRoute->getDefault('_format'));
+
+        $specificFormatRoute = $routes->get('specific_format');
+
+        $this->assertSame('/defaults/specific-format', $specificFormatRoute->getPath());
+        $this->assertSame('g_locale', $specificFormatRoute->getDefault('_locale'));
+        $this->assertSame('s_format', $specificFormatRoute->getDefault('_format'));
+    }
+
+    public function testUtf8RoutesLoadWithAnnotation()
+    {
+        $routes = $this->loader->load(Utf8ActionControllers::class);
+        $this->assertCount(2, $routes);
+        $this->assertTrue($routes->get('one')->getOption('utf8'), 'The route must accept utf8');
+        $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
     }
 
     public function testRouteWithPathWithPrefix()

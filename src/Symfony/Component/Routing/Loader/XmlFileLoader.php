@@ -168,6 +168,7 @@ class XmlFileLoader extends FileLoader
 
         $this->setCurrentDir(\dirname($path));
 
+        /** @var RouteCollection[] $imported */
         $imported = $this->import($resource, ('' !== $type ? $type : null), false, $file);
 
         if (!\is_array($imported)) {
@@ -311,6 +312,15 @@ class XmlFileLoader extends FileLoader
             }
 
             $defaults['_controller'] = $controller;
+        }
+        if ($node->hasAttribute('locale')) {
+            $defaults['_locale'] = $node->getAttribute('locale');
+        }
+        if ($node->hasAttribute('format')) {
+            $defaults['_format'] = $node->getAttribute('format');
+        }
+        if ($node->hasAttribute('utf8')) {
+            $options['utf8'] = XmlUtils::phpize($node->getAttribute('utf8'));
         }
 
         return [$defaults, $requirements, $options, $condition, $paths, $prefixes];

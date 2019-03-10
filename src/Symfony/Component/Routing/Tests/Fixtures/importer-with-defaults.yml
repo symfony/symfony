@@ -1,0 +1,5 @@
+defaults:
+  resource: imported-with-defaults.yml
+  prefix: /defaults
+  locale: g_locale
+  format: g_format

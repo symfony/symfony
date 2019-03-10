@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Tests;
 
 use Monolog\Handler\TestHandler;
+use Monolog\ResettableInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
@@ -106,6 +107,22 @@ class LoggerTest extends TestCase
 
         $this->assertEmpty($logger->getLogs());
         $this->assertSame(0, $logger->countErrors());
+    }
+
+    public function testReset()
+    {
+        $handler = new TestHandler();
+        $logger = new Logger('test', [$handler]);
+        $logger->pushProcessor(new DebugProcessor());
+
+        $logger->info('test');
+        $logger->reset();
+
+        $this->assertEmpty($logger->getLogs());
+        $this->assertSame(0, $logger->countErrors());
+        if (class_exists(ResettableInterface::class)) {
+            $this->assertEmpty($handler->getRecords());
+        }
     }
 
     /**

@@ -43,7 +43,7 @@ class AmqpSender implements SenderInterface
         $encodedMessage = $this->serializer->encode($envelope);
 
         try {
-            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers']);
+            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'] ?? []);
         } catch (\AMQPException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

@@ -897,4 +897,16 @@ class XmlFileLoaderTest extends TestCase
         $dump = $dumper->dump();
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_tsantos.php', $dumper->dump());
     }
+
+    public function testYamlFileTag()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('fixture_path', realpath(self::$fixturesPath.'/yaml'));
+
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_with_yaml_file_argument.xml');
+
+        $definition = $container->getDefinition('my_awesome_service_with_yaml_inside');
+        $this->assertSame(['foo' => ['bar' => true, 'baz' => 42]], $definition->getArgument(0));
+    }
 }

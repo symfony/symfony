@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * XmlFileLoader loads XML files service definitions.
@@ -559,6 +561,26 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'constant':
                     $arguments[$key] = \constant(trim($arg->nodeValue));
+                    break;
+                case 'yaml_file':
+                    if (!\class_exists('Symfony\Component\Yaml\Yaml')) {
+                        throw new \InvalidArgumentException('You need to install the YAML component to parse YAML files.');
+                    }
+
+                    $filePath = $this->container->getParameterBag()->resolveValue((string) $arg->nodeValue);
+                    $rootDir = \dirname($file);
+
+                    if (!\is_file($filePath)) {
+                        $filePath = "$rootDir/$filePath";
+                    }
+
+                    if (!\is_file($filePath)) {
+                        throw new InvalidArgumentException("Unable to locate file \"{$arg->nodeValue}\". Please provide a path relative to \"$rootDir\" or an absolute path.");
+                    }
+
+                    $this->container->addResource(new FileResource($filePath));
+
+                    $arguments[$key] = Yaml::parseFile($filePath, Yaml::PARSE_CONSTANT);
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($arg->nodeValue);

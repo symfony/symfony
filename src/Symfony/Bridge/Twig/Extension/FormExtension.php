@@ -18,7 +18,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\Extension\InitRuntimeInterface;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
@@ -41,7 +40,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
         if ($renderer instanceof TwigRendererInterface) {
             @trigger_error(sprintf('Passing a Twig Form Renderer to the "%s" constructor is deprecated since Symfony 3.2 and won\'t be possible in 4.0. Pass the Twig\Environment to the TwigRendererEngine constructor instead.', static::class), E_USER_DEPRECATED);
         } elseif (null !== $renderer && !(\is_array($renderer) && isset($renderer[0], $renderer[1]) && $renderer[0] instanceof ContainerInterface)) {
-            throw new \InvalidArgumentException(sprintf('Passing any arguments the constructor of %s is reserved for internal use.', __CLASS__));
+            throw new \InvalidArgumentException(sprintf('Passing any arguments to the constructor of %s is reserved for internal use.', __CLASS__));
         }
         $this->renderer = $renderer;
     }

@@ -209,7 +209,7 @@
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
     <xsd:attribute name="tag" type="xsd:string" />
-    <xsd:attribute name="yaml_file" type="xsd:string" />
+    <xsd:attribute name="yaml-file" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="bind" mixed="true">
@@ -237,7 +237,7 @@
     <xsd:attribute name="tag" type="xsd:string" />
     <xsd:attribute name="index-by" type="xsd:string" />
     <xsd:attribute name="default-index-method" type="xsd:string" />
-    <xsd:attribute name="yaml_file" type="xsd:string" />
+    <xsd:attribute name="yaml-file" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -267,7 +267,7 @@
       <xsd:enumeration value="service_locator" />
       <xsd:enumeration value="tagged" />
       <xsd:enumeration value="tagged_locator" />
-      <xsd:enumeration value="yaml_file" />
+      <xsd:enumeration value="yaml-file" />
     </xsd:restriction>
   </xsd:simpleType>
 

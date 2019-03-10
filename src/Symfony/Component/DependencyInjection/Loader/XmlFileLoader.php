@@ -562,7 +562,7 @@ class XmlFileLoader extends FileLoader
                 case 'constant':
                     $arguments[$key] = \constant(trim($arg->nodeValue));
                     break;
-                case 'yaml_file':
+                case 'yaml-file':
                     if (!\class_exists('Symfony\Component\Yaml\Yaml')) {
                         throw new \InvalidArgumentException('You need to install the YAML component to parse YAML files.');
                     }

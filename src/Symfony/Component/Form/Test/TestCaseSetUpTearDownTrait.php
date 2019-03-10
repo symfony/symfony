@@ -31,12 +31,12 @@ if (method_exists(\ReflectionMethod::class, 'hasReturnType') && (new \Reflection
         private function doTearDown(): void
         {
         }
-    
+
         protected function setUp(): void
         {
             $this->doSetUp();
         }
-        
+
         protected function tearDown(): void
         {
             $this->doTearDown();

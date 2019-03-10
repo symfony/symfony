@@ -399,6 +399,21 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame('http://localhost:8057/post', $steps[0][2]['url']);
     }
 
+    public function testPostJson()
+    {
+        $client = $this->getHttpClient();
+
+        $response = $client->request('POST', 'http://localhost:8057/post', [
+            'json' => ['foo' => 'bar'],
+        ]);
+
+        $body = $response->toArray();
+
+        $this->assertContains('json', $body['content-type']);
+        unset($body['content-type']);
+        $this->assertSame(['foo' => 'bar', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
     public function testPostArray()
     {
         $client = $this->getHttpClient();

@@ -66,6 +66,15 @@ TXT
         $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
     }
 
+    public function testDebugDateTimeType()
+    {
+        $tester = $this->createCommandTester();
+        $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
+
+        $this->assertEquals(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
+    }
+
     public function testDebugFormTypeOption()
     {
         $tester = $this->createCommandTester();

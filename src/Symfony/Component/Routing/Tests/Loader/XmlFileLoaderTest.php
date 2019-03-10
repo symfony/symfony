@@ -83,6 +83,26 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testUtf8Route()
+    {
+        $loader = new XmlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
+        $routeCollection = $loader->load('utf8.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $utf8Route = $routeCollection->get('app_utf8');
+
+        $this->assertSame('/utf8', $utf8Route->getPath());
+        $this->assertTrue($utf8Route->getOption('utf8'), 'Must be utf8');
+
+        $noUtf8Route = $routeCollection->get('app_no_utf8');
+
+        $this->assertSame('/no-utf8', $noUtf8Route->getPath());
+        $this->assertFalse($noUtf8Route->getOption('utf8'), 'Must not be utf8');
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-03-10T09:18:28Z
+
+But it was my 1st PR! 😥
+
+_(French contributors will remind "mais t'avais dit qu'on ferait des knacki!")_
+
+More seriously, that's a good idea 🙂 thank you @nicolas-grekas !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-10T17:35:08Z
+
+@jderusse @bpolaszek would you mind sending a doc PR please? (see #10722)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-03-10T19:38:59Z
+
+done in https://github.com/symfony/symfony-docs/pull/11127

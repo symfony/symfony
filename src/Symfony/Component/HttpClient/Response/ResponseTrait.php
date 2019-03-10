@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -52,6 +53,7 @@ trait ResponseTrait
     private $timeout;
     private $finalInfo;
     private $offset = 0;
+    private $jsonData;
 
     /**
      * {@inheritdoc}
@@ -119,6 +121,47 @@ trait ResponseTrait
         rewind($this->content);
 
         return stream_get_contents($this->content);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(bool $throw = true): array
+    {
+        if ('' === $content = $this->getContent($throw)) {
+            throw new TransportException('Response body is empty.');
+        }
+
+        if (null !== $this->jsonData) {
+            return $this->jsonData;
+        }
+
+        $contentType = $this->headers['content-type'][0] ?? 'application/json';
+
+        if (!preg_match('/\bjson\b/i', $contentType)) {
+            throw new JsonException(sprintf('Response content-type is "%s" while a JSON-compatible one was expected.', $contentType));
+        }
+
+        try {
+            $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
+        } catch (\JsonException $e) {
+            throw new JsonException($e->getMessage(), $e->getCode());
+        }
+
+        if (\PHP_VERSION_ID < 70300 && JSON_ERROR_NONE !== json_last_error()) {
+            throw new JsonException(json_last_error_msg(), json_last_error());
+        }
+
+        if (!\is_array($content)) {
+            throw new JsonException(sprintf('JSON content was expected to decode to an array, %s returned.', \gettype($content)));
+        }
+
+        if (null !== $this->content) {
+            // Option "buffer" is true
+            return $this->jsonData = $content;
+        }
+
+        return $content;
     }
 
     /**

@@ -385,7 +385,7 @@ trait RedisTrait
             return true;
         }
 
-        if ($this->redis instanceof \Predis\Client) {
+        if ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof ClusterInterface) {
             $this->pipeline(function () use ($ids) {
                 foreach ($ids as $id) {
                     yield 'del' => [$id];

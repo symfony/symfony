@@ -237,5 +237,14 @@ class HttpFoundationFactoryTest extends TestCase
 
         $this->assertEquals('The response body', $symfonyResponse->getContent());
         $this->assertEquals(200, $symfonyResponse->getStatusCode());
+
+        $symfonyResponse = $this->factory->createResponse($response, true);
+
+        ob_start();
+        $symfonyResponse->sendContent();
+        $sentContent = ob_get_clean();
+
+        $this->assertEquals('The response body', $sentContent);
+        $this->assertEquals(200, $symfonyResponse->getStatusCode());
     }
 }

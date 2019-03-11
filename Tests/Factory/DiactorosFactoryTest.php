@@ -16,6 +16,8 @@ use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antonio J. García Lagar <aj@garcialagar.es>
+ *
+ * @group legacy
  */
 class DiactorosFactoryTest extends AbstractHttpMessageFactoryTest
 {

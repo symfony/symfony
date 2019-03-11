@@ -24,6 +24,13 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
 {
     private $propertyInfoExtractor;
     private $cacheItemPool;
+
+    /**
+     * A cache of property information, first keyed by the method called and
+     * then by the serialized method arguments.
+     *
+     * @var array
+     */
     private $arrayCache = [];
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
@@ -103,22 +110,34 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         }
 
         // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
-        $key = rawurlencode($method.'.'.$serializedArguments);
-
-        if (\array_key_exists($key, $this->arrayCache)) {
-            return $this->arrayCache[$key];
+        $encodedMethod = \rawurlencode($method);
+        if (\array_key_exists($encodedMethod, $this->arrayCache) && \array_key_exists($serializedArguments, $this->arrayCache[$encodedMethod])) {
+            return $this->arrayCache[$encodedMethod][$serializedArguments];
         }
 
-        $item = $this->cacheItemPool->getItem($key);
+        $item = $this->cacheItemPool->getItem($encodedMethod);
 
+        $data = $item->get();
         if ($item->isHit()) {
-            return $this->arrayCache[$key] = $item->get();
+            $this->arrayCache[$encodedMethod] = $data[$encodedMethod];
+            // Only match if the specific arguments have been cached.
+            if (\array_key_exists($serializedArguments, $data[$encodedMethod])) {
+                return $this->arrayCache[$encodedMethod][$serializedArguments];
+            }
+        }
+
+        // It's possible that the method has been called, but with different
+        // arguments, in which case $data will already be initialized.
+        if (!$data) {
+            $data = [];
         }
 
         $value = $this->propertyInfoExtractor->{$method}(...$arguments);
-        $item->set($value);
+        $data[$encodedMethod][$serializedArguments] = $value;
+        $this->arrayCache[$encodedMethod][$serializedArguments] = $value;
+        $item->set($data);
         $this->cacheItemPool->save($item);
 
-        return $this->arrayCache[$key] = $value;
+        return $this->arrayCache[$encodedMethod][$serializedArguments];
     }
 }

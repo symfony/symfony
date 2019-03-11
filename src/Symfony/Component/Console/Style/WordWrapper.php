@@ -8,7 +8,7 @@ namespace Symfony\Component\Console\Style;
 class WordWrapper
 {
     /**
-     * How many charachters one line can contain.
+     * How many characters one line can contain.
      *
      * @var int
      */

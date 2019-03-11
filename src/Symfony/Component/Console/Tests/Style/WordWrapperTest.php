@@ -10,23 +10,23 @@ class WordWrapperTest extends TestCase
     /**
      * @param int    $width
      * @param string $break
-     * @param string $exceptionClass
      *
      * @dataProvider dpTestConstructorExceptions
+     *
+     * @expectedException \InvalidArgumentException
      */
-    public function testConstructorExceptions($width, $break, $exceptionClass)
+    public function testConstructorExceptions($width, $break)
     {
-        $this->expectException($exceptionClass);
         $wordWrapper = new WordWrapper($width, $break);
     }
 
     public function dpTestConstructorExceptions()
     {
         return array(
-            array(0, PHP_EOL, \InvalidArgumentException::class),
-            array(-1, PHP_EOL, \InvalidArgumentException::class),
-            array(0, '', \InvalidArgumentException::class),
-            array(1, '', \InvalidArgumentException::class),
+            array(0, PHP_EOL),
+            array(-1, PHP_EOL),
+            array(0, ''),
+            array(1, ''),
         );
     }
 
@@ -110,7 +110,7 @@ class WordWrapperTest extends TestCase
     {
         $file = __DIR__.'/../Fixtures/Style/WordWrapper/input/'.$filenameOrText;
 
-        return file_exists($file)
+        return file_exists($file) && is_file($file)
             ? file_get_contents($file)
             : $filenameOrText;
     }
@@ -119,7 +119,7 @@ class WordWrapperTest extends TestCase
     {
         $file = __DIR__.'/../Fixtures/Style/WordWrapper/output/'.$filenameOrText;
 
-        return file_exists($file)
+        return file_exists($file) && is_file($file)
             ? file_get_contents($file)
             : $filenameOrText;
     }

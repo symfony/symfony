@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
+@trigger_error(sprintf('The "%s" class is deprecated since symfony/psr-http-message-bridge 1.2, use PsrHttpFactory instea.', DiactorosFactory::class), E_USER_DEPRECATED);
+
 use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -28,6 +30,8 @@ use Zend\Diactoros\UploadedFile as DiactorosUploadedFile;
  * Builds Psr\HttpMessage instances using the Zend Diactoros implementation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since symfony/psr-http-message-bridge 1.2, use PsrHttpFactory instead
  */
 class DiactorosFactory implements HttpMessageFactoryInterface
 {

@@ -2,7 +2,7 @@
     "name": "symfony/psr-http-message-bridge",
     "type": "symfony-bridge",
     "description": "PSR HTTP message bridge",
-    "keywords": ["http", "psr-7", "http-message"],
+    "keywords": ["http", "psr-7", "psr-17", "http-message"],
     "homepage": "http://symfony.com",
     "license": "MIT",
     "authors": [
@@ -21,12 +21,11 @@
         "symfony/http-foundation": "^2.3.42 || ^3.4 || ^4.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^3.4 || 4.0"
+        "symfony/phpunit-bridge": "^3.4 || ^4.0",
+        "nyholm/psr7": "^1.1"
     },
     "suggest": {
-        "psr/http-message-implementation": "To use the HttpFoundation factory",
-        "zendframework/zend-diactoros": "To use the Zend Diactoros factory",
-        "psr/http-factory-implementation": "To use the PSR-17 factory"
+        "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\PsrHttpMessage\\": "" }

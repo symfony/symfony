@@ -30,8 +30,12 @@ class FirewallContext
     /**
      * @param LogoutListener|null $logoutListener
      */
-    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, $logoutListener = null, FirewallConfig $config = null)
-    {
+    public function __construct(
+      iterable $listeners,
+      ExceptionListener $exceptionListener = null,
+      $logoutListener = null,
+      FirewallConfig $config = null
+      ) {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
         if ($logoutListener instanceof FirewallConfig) {

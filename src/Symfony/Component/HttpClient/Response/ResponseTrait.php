@@ -100,14 +100,16 @@ trait ResponseTrait
         }
 
         if (null === $this->content) {
-            $content = '';
+            $content = null;
             $chunk = null;
 
             foreach (self::stream([$this]) as $chunk) {
-                $content .= $chunk->getContent();
+                if (!$chunk->isLast()) {
+                    $content .= $chunk->getContent();
+                }
             }
 
-            if (null === $chunk) {
+            if (null === $content) {
                 throw new TransportException('Cannot get the content of the response twice: the request was issued with option "buffer" set to false.');
             }
 
@@ -280,12 +282,14 @@ trait ResponseTrait
                             $response->offset += \strlen($chunk);
                             $chunk = new DataChunk($response->offset, $chunk);
                         } elseif (null === $chunk) {
-                            if (null !== $e = $response->info['error'] ?? $multi->handlesActivity[$j][0]) {
+                            $e = $multi->handlesActivity[$j][0];
+                            unset($responses[$j], $multi->handlesActivity[$j]);
+                            $response->close();
+
+                            if (null !== $e) {
                                 $response->info['error'] = $e->getMessage();
 
                                 if ($e instanceof \Error) {
-                                    unset($responses[$j], $multi->handlesActivity[$j]);
-                                    $response->close();
                                     throw $e;
                                 }
 
@@ -293,9 +297,6 @@ trait ResponseTrait
                             } else {
                                 $chunk = new LastChunk($response->offset);
                             }
-
-                            unset($responses[$j]);
-                            $response->close();
                         } elseif ($chunk instanceof ErrorChunk) {
                             unset($responses[$j]);
                             $isTimeout = true;

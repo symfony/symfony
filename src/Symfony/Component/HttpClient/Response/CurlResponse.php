@@ -80,11 +80,12 @@ final class CurlResponse implements ResponseInterface
         if ($onProgress = $options['on_progress']) {
             $url = isset($info['url']) ? ['url' => $info['url']] : [];
             curl_setopt($ch, CURLOPT_NOPROGRESS, false);
-            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url) {
+            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url, $multi) {
                 try {
                     $onProgress($dlNow, $dlSize, $url + curl_getinfo($ch) + $info);
                 } catch (\Throwable $e) {
-                    $info['error'] = $e;
+                    $multi->handlesActivity[(int) $ch][] = null;
+                    $multi->handlesActivity[(int) $ch][] = $e;
 
                     return 1; // Abort the request
                 }
@@ -109,6 +110,7 @@ final class CurlResponse implements ResponseInterface
                     }
                     self::stream([$response])->current();
                 } catch (\Throwable $e) {
+                    // Persist timeouts thrown during initialization
                     $response->info['error'] = $e->getMessage();
                     $response->close();
                     throw $e;
@@ -201,12 +203,16 @@ final class CurlResponse implements ResponseInterface
      */
     protected static function schedule(self $response, array &$runningResponses): void
     {
-        if ('' === curl_getinfo($ch = $response->handle, CURLINFO_PRIVATE)) {
-            // no-op - response already completed
-        } elseif (isset($runningResponses[$i = (int) $response->multi->handle])) {
+        if (isset($runningResponses[$i = (int) $response->multi->handle])) {
             $runningResponses[$i][1][$response->id] = $response;
         } else {
             $runningResponses[$i] = [$response->multi, [$response->id => $response]];
+        }
+
+        if ('' === curl_getinfo($ch = $response->handle, CURLINFO_PRIVATE)) {
+            // Response already completed
+            $response->multi->handlesActivity[$response->id][] = null;
+            $response->multi->handlesActivity[$response->id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
         }
     }
 

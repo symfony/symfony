@@ -72,4 +72,18 @@ class DebugAutowiringCommandTest extends WebTestCase
         $this->assertContains('No autowirable classes or interfaces found matching "foo_fake"', $tester->getErrorOutput());
         $this->assertEquals(1, $tester->getStatusCode());
     }
+
+    public function testSearchNotAliasedService()
+    {
+        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'debug:autowiring', 'search' => 'redirect'));
+
+        $this->assertContains('Symfony\Bundle\FrameworkBundle\Controller\RedirectController', $tester->getDisplay());
+        $this->assertNotContains('Symfony\Component\Routing\RouterInterface', $tester->getDisplay());
+    }
 }

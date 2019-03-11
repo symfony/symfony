@@ -110,7 +110,7 @@ EOF
                 if ($serviceAlias->isDeprecated()) {
                     $serviceLine .= ' - <fg=magenta>deprecated</>';
                 }
-            } elseif (!$all) {
+            } elseif (!$all && !$search) {
                 continue;
             }
             $text[] = $serviceLine;

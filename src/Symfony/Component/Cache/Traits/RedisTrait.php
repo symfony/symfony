@@ -272,7 +272,17 @@ trait RedisTrait
      */
     protected function doDelete(array $ids)
     {
-        if ($ids) {
+        if (!$ids) {
+            return true;
+        }
+
+        if ($this->redis instanceof \Predis\Client && $this->redis->getConnection() instanceof ClusterInterface) {
+            $this->pipeline(function () use ($ids) {
+                foreach ($ids as $id) {
+                    yield 'del' => [$id];
+                }
+            })->rewind();
+        } else {
             $this->redis->del($ids);
         }
 

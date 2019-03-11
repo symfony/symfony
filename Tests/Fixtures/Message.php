@@ -64,7 +64,9 @@ class Message implements MessageInterface
 
     public function withHeader($name, $value)
     {
-        throw new \BadMethodCallException('Not implemented.');
+        $this->headers[$name] = (array) $value;
+
+        return $this;
     }
 
     public function withAddedHeader($name, $value)

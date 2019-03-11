@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\BundleViewPathPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
@@ -177,6 +178,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
@@ -194,9 +196,9 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            [__DIR__.'/Fixtures/templates'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
-            [__DIR__.'/Fixtures/templates'],
         ], $paths);
     }
 
@@ -212,6 +214,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
@@ -230,10 +233,10 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path3', 'namespace3'],
             [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [__DIR__.'/../Fixtures/templates/Resources/views'],
             [__DIR__.'/Fixtures/templates'],
+            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
+            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
         ], $paths);
     }
 

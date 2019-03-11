@@ -113,11 +113,6 @@ class TwigExtension extends Extension
             foreach ($paths as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, $namespace]);
             }
-
-            if ($paths) {
-                // the last path must be the bundle views directory
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$path, '!'.$namespace]);
-            }
         }
 
         if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
@@ -187,11 +182,6 @@ class TwigExtension extends Extension
                 $bundleHierarchy[$name][] = $defaultOverrideBundlePath;
             }
             $container->addResource(new FileExistenceResource($defaultOverrideBundlePath));
-
-            if (file_exists($dir = $bundle['path'].'/Resources/views')) {
-                $bundleHierarchy[$name][] = $dir;
-            }
-            $container->addResource(new FileExistenceResource($dir));
         }
 
         return $bundleHierarchy;

@@ -3,19 +3,19 @@
 namespace Symfony\Component\Console\Style;
 
 /**
- * This class can help you to create well formatted text blocks with "tags", like: <comment>, <info>, <question>
+ * This class can help you to create well formatted text blocks with "tags", like: <comment>, <info>, <question>.
  */
 class WordWrapper
 {
     /**
-     * How many charachters one line can contain
+     * How many charachters one line can contain.
      *
      * @var int
      */
     protected $width;
 
     /**
-     * End of the lines
+     * End of the lines.
      *
      * @var string
      */
@@ -29,7 +29,7 @@ class WordWrapper
     protected $newLines;
 
     /**
-     * The current line "words"
+     * The current line "words".
      *
      * @var array
      */
@@ -47,7 +47,7 @@ class WordWrapper
         if ($width <= 0) {
             throw new \InvalidArgumentException('You have to set more than 0 width!');
         }
-        if (mb_strlen($break) == 0) {
+        if (0 == mb_strlen($break)) {
             throw new \InvalidArgumentException('You have to use existing end of the line character or string!');
         }
         $this->width = $width;
@@ -55,13 +55,13 @@ class WordWrapper
     }
 
     /**
-     * Close a line
+     * Close a line.
      */
     protected function closeLine()
     {
         if (\count($this->newLineTokens)) {
             $this->newLines[] = implode(' ', $this->newLineTokens);
-            $this->newLineTokens = [];
+            $this->newLineTokens = array();
             $this->currentLength = 0;
         }
     }
@@ -79,7 +79,7 @@ class WordWrapper
     }
 
     /**
-     * Close everything and build the formatted text
+     * Close everything and build the formatted text.
      *
      * @return string
      */
@@ -95,12 +95,12 @@ class WordWrapper
      */
     protected function reset()
     {
-        $this->newLineTokens = [];
-        $this->newLines = [];
+        $this->newLineTokens = array();
+        $this->newLines = array();
     }
 
     /**
-     * How long the current line is: currentLength + number of spaces (token numbers - 1)
+     * How long the current line is: currentLength + number of spaces (token numbers - 1).
      *
      * @return int
      */
@@ -112,7 +112,7 @@ class WordWrapper
     /**
      * Virtual token length = length without "formatter tags". Eg:
      *      - lorem --> 5
-     *      - <comment>lorem</comment> --> 5
+     *      - <comment>lorem</comment> --> 5.
      *
      * @param $token
      *
@@ -215,17 +215,17 @@ class WordWrapper
     protected function sliceTokenBlock($tokenBlock, $freeChars)
     {
         if ('<' == $tokenBlock[0] && '>' == mb_substr($tokenBlock, -1)) {
-            return [$tokenBlock, '', 0];
+            return array($tokenBlock, '', 0);
         }
         $blockLength = mb_strlen($tokenBlock);
         if ($blockLength <= $freeChars) {
-            return [$tokenBlock, '', $blockLength];
+            return array($tokenBlock, '', $blockLength);
         }
 
-        return [
+        return array(
             mb_substr($tokenBlock, 0, $freeChars),
             mb_substr($tokenBlock, $freeChars),
             $freeChars,
-        ];
+        );
     }
 }

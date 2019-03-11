@@ -39,7 +39,7 @@ class SymfonyStyle extends OutputStyle
     private $progressBar;
     private $lineLength;
     private $bufferedOutput;
-    private $wordWrappers = [];
+    private $wordWrappers = array();
 
     public function __construct(InputInterface $input, OutputInterface $output)
     {
@@ -430,12 +430,12 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * Cache for WordWrappers
+     * Cache for WordWrappers.
      */
     private function getWordWrapper($width, $break)
     {
         $key = sprintf('%d - %s', $width, $break);
-        if (!array_key_exists($key, $this->wordWrappers)) {
+        if (!\array_key_exists($key, $this->wordWrappers)) {
             $this->wordWrappers[$key] = new WordWrapper($width, $break);
         }
 

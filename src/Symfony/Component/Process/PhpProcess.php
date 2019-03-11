@@ -33,11 +33,10 @@ class PhpProcess extends Process
      */
     public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60, array $php = null)
     {
-        $executableFinder = new PhpExecutableFinder();
-        if (false === $php = $php ?? $executableFinder->find(false)) {
-            $php = null;
-        } else {
-            $php = array_merge([$php], $executableFinder->findArguments());
+        if (null === $php) {
+            $executableFinder = new PhpExecutableFinder();
+            $php = $executableFinder->find(false);
+            $php = false === $php ? null : array_merge([$php], $executableFinder->findArguments());
         }
         if ('phpdbg' === \PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');

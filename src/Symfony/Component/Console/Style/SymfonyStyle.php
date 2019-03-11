@@ -39,6 +39,7 @@ class SymfonyStyle extends OutputStyle
     private $progressBar;
     private $lineLength;
     private $bufferedOutput;
+    private $wordWrappers = [];
 
     public function __construct(InputInterface $input, OutputInterface $output)
     {
@@ -387,17 +388,18 @@ class SymfonyStyle extends OutputStyle
 
         if (null !== $type) {
             $type = sprintf('[%s] ', $type);
-            $indentLength = \strlen($type);
+            $indentLength = \mb_strlen($type);
             $lineIndentation = str_repeat(' ', $indentLength);
         }
 
+        $wordWrapper = $this->getWordWrapper($this->lineLength - $prefixLength - $indentLength, PHP_EOL);
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             if ($escape) {
                 $message = OutputFormatter::escape($message);
             }
 
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL, true)));
+            $lines = array_merge($lines, explode(PHP_EOL, $wordWrapper->formattedStringWordwrap($message, true)));
 
             if (\count($messages) > 1 && $key < \count($messages) - 1) {
                 $lines[] = '';
@@ -425,5 +427,18 @@ class SymfonyStyle extends OutputStyle
         }
 
         return $lines;
+    }
+
+    /**
+     * Cache for WordWrappers
+     */
+    private function getWordWrapper($width, $break)
+    {
+        $key = sprintf('%d - %s', $width, $break);
+        if (!array_key_exists($key, $this->wordWrappers)) {
+            $this->wordWrappers[$key] = new WordWrapper($width, $break);
+        }
+
+        return $this->wordWrappers[$key];
     }
 }

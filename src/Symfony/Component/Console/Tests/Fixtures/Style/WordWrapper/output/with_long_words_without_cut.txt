@@ -1,0 +1,16 @@
+Lorem <comment>ipsum</comment> dolor sit amet:
+https://www.google.com/search?safe=off&ei=5jSGXIGbGofCkwWcpLGIBA&q=Lorem+ipsum+dolor+sit+amet%2C+consectetur+adipiscing+elit.&oq=Lorem+ipsum+dolor+sit+amet%2C+consectetur+adipiscing+elit.&gs_l=psy-ab.3..0j0i22i30l9.24765.24765..26089...0.0..0.98.98.1......0....2j1..gws-wiz.......0i71.RLWmD-mYSAY
+Lorem ipsum dolor
+
+Test longer than 5 chars in
+the end:
+Simple long word:
+thisisaverylongwordthisisaverylongwordthisisaverylongword
+
+Test less than 5 chars in the
+end:
+Simple long word.........:
+thisisaverylongwordthisisaverylongwordthisisaverylongword
+
+Long word with "tags":
+<question>thisisaverylongword<comment>thisisaverylongword</comment><info>thisisaverylongword</info></question>

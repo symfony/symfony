@@ -22,20 +22,20 @@ class WordWrapperTest extends TestCase
 
     public function dpTestConstructorExceptions()
     {
-        return [
-            [0, PHP_EOL, \InvalidArgumentException::class],
-            [-1, PHP_EOL, \InvalidArgumentException::class],
-            [0, '', \InvalidArgumentException::class],
-            [1, '', \InvalidArgumentException::class],
-        ];
+        return array(
+            array(0, PHP_EOL, \InvalidArgumentException::class),
+            array(-1, PHP_EOL, \InvalidArgumentException::class),
+            array(0, '', \InvalidArgumentException::class),
+            array(1, '', \InvalidArgumentException::class),
+        );
     }
 
     /**
-     * @param string  $input
-     * @param integer $width
-     * @param string  $break
-     * @param boolean $cut
-     * @param string  $output
+     * @param string $input
+     * @param int    $width
+     * @param string $break
+     * @param bool   $cut
+     * @param string $output
      *
      * @dataProvider dpFormattedStringWordwrap
      */
@@ -52,63 +52,64 @@ class WordWrapperTest extends TestCase
         $baseBreak = "\n";
         $customBreak = "__break__\n";
 
-        return [
+        return array(
             // Check empty
-            ['', 120, $baseBreak, true, ''],
-            [$baseBreak, 120, $baseBreak, true, $baseBreak],
+            array('', 120, $baseBreak, true, ''),
+            array($baseBreak, 120, $baseBreak, true, $baseBreak),
             // Check limit and UTF-8
-            [
+            array(
                 'utf120.txt',
                 120,
                 $baseBreak,
                 true,
                 'utf120.txt',
-            ],
+            ),
             // Check simple text
-            [
+            array(
                 'lipsum.txt',
                 120,
                 $baseBreak,
                 true,
                 'lipsum.txt',
-            ],
+            ),
             // Check colored text
-            [
+            array(
                 'lipsum_with_tags.txt',
                 120,
                 $baseBreak,
                 true,
                 'lipsum_with_tags.txt',
-            ],
+            ),
             // Check custom break
-            [
+            array(
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
                 $customBreak,
                 true,
                 'lipsum_with_tags_and_custom_break.txt',
-            ],
+            ),
             // Check long words
-            [
+            array(
                 'with_long_words.txt',
                 30,
                 $baseBreak,
                 true,
                 'with_long_words_with_cut.txt',
-            ],
-            [
+            ),
+            array(
                 'with_long_words.txt',
                 30,
                 $baseBreak,
                 false,
                 'with_long_words_without_cut.txt',
-            ],
-        ];
+            ),
+        );
     }
 
     protected function getInputContents($filenameOrText)
     {
-        $file = __DIR__ . '/../Fixtures/Style/WordWrapper/input/' . $filenameOrText;
+        $file = __DIR__.'/../Fixtures/Style/WordWrapper/input/'.$filenameOrText;
+
         return file_exists($file)
             ? file_get_contents($file)
             : $filenameOrText;
@@ -116,7 +117,8 @@ class WordWrapperTest extends TestCase
 
     protected function getOutputContents($filenameOrText)
     {
-        $file = __DIR__ . '/../Fixtures/Style/WordWrapper/output/' . $filenameOrText;
+        $file = __DIR__.'/../Fixtures/Style/WordWrapper/output/'.$filenameOrText;
+
         return file_exists($file)
             ? file_get_contents($file)
             : $filenameOrText;

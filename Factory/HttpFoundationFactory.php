@@ -210,6 +210,12 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
 
                 continue;
             }
+
+            if ('samesite' === strtolower($name) && null !== $value) {
+                $samesite = $value;
+
+                continue;
+            }
         }
 
         if (!isset($cookieName)) {
@@ -223,7 +229,9 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             isset($cookiePath) ? $cookiePath : '/',
             isset($cookieDomain) ? $cookieDomain : null,
             isset($cookieSecure),
-            isset($cookieHttpOnly)
+            isset($cookieHttpOnly),
+            false,
+            isset($samesite) ? $samesite : null
         );
     }
 }

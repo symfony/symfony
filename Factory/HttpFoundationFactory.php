@@ -11,8 +11,8 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
@@ -33,7 +33,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      */
     public function createRequest(ServerRequestInterface $psrRequest)
     {
-        $server = array();
+        $server = [];
         $uri = $psrRequest->getUri();
 
         if ($uri instanceof UriInterface) {
@@ -48,7 +48,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
         $server = array_replace($server, $psrRequest->getServerParams());
 
         $parsedBody = $psrRequest->getParsedBody();
-        $parsedBody = is_array($parsedBody) ? $parsedBody : array();
+        $parsedBody = \is_array($parsedBody) ? $parsedBody : [];
 
         $request = new Request(
             $psrRequest->getQueryParams(),
@@ -73,7 +73,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      */
     private function getFiles(array $uploadedFiles)
     {
-        $files = array();
+        $files = [];
 
         foreach ($uploadedFiles as $key => $value) {
             if ($value instanceof UploadedFileInterface) {
@@ -141,7 +141,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     public function createResponse(ResponseInterface $psrResponse)
     {
         $cookies = $psrResponse->getHeader('Set-Cookie');
-        $psrResponse = $psrResponse->withHeader('Set-Cookie', array());
+        $psrResponse = $psrResponse->withHeader('Set-Cookie', []);
 
         $response = new Response(
             $psrResponse->getBody()->__toString(),

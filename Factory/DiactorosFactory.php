@@ -52,12 +52,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
             : \Zend\Diactoros\normalizeServer($symfonyRequest->server->all());
         $headers = $symfonyRequest->headers->all();
 
-        if (PHP_VERSION_ID < 50600) {
-            $body = new DiactorosStream('php://temp', 'wb+');
-            $body->write($symfonyRequest->getContent());
-        } else {
-            $body = new DiactorosStream($symfonyRequest->getContent(true));
-        }
+        $body = new DiactorosStream($symfonyRequest->getContent(true));
 
         $files = method_exists('Zend\Diactoros\ServerRequestFactory', 'normalizeFiles')
             ? DiactorosRequestFactory::normalizeFiles($this->getFiles($symfonyRequest->files->all()))
@@ -95,7 +90,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
      */
     private function getFiles(array $uploadedFiles)
     {
-        $files = array();
+        $files = [];
 
         foreach ($uploadedFiles as $key => $value) {
             if (null === $value) {
@@ -157,7 +152,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
         if (!isset($headers['Set-Cookie']) && !isset($headers['set-cookie'])) {
             $cookies = $symfonyResponse->headers->getCookies();
             if (!empty($cookies)) {
-                $headers['Set-Cookie'] = array();
+                $headers['Set-Cookie'] = [];
                 foreach ($cookies as $cookie) {
                     $headers['Set-Cookie'][] = $cookie->__toString();
                 }

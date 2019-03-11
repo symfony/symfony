@@ -42,7 +42,7 @@ final class FirewallConfig
       string $accessDeniedUrl = null,
       array $listeners = [],
       $switchUser = null
-      ) {
+    ) {
         $this->name = $name;
         $this->userChecker = $userChecker;
         $this->requestMatcher = $requestMatcher;

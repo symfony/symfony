@@ -35,7 +35,7 @@ class FirewallContext
       ExceptionListener $exceptionListener = null,
       $logoutListener = null,
       FirewallConfig $config = null
-      ) {
+    ) {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
         if ($logoutListener instanceof FirewallConfig) {

@@ -45,8 +45,8 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $stdClass = new \stdClass();
         $request = new Request(
             [
-                'foo' => '1',
                 'bar' => ['baz' => '42'],
+                'foo' => '1',
             ],
             [
                 'twitter' => [
@@ -71,8 +71,8 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
                 'REQUEST_METHOD' => 'POST',
                 'HTTP_HOST' => 'dunglas.fr',
                 'HTTP_X_SYMFONY' => '2.8',
-                'REQUEST_URI' => '/testCreateRequest?foo=1&bar[baz]=42',
-                'QUERY_STRING' => 'foo=1&bar[baz]=42',
+                'REQUEST_URI' => '/testCreateRequest?bar[baz]=42&foo=1',
+                'QUERY_STRING' => 'bar[baz]=42&foo=1',
             ],
             'Content'
         );
@@ -86,7 +86,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
         $this->assertEquals('42', $queryParams['bar']['baz']);
 
         $requestTarget = $psrRequest->getRequestTarget();
-        $this->assertEquals('/testCreateRequest?foo=1&bar[baz]=42', urldecode($requestTarget));
+        $this->assertEquals('/testCreateRequest?bar[baz]=42&foo=1', urldecode($requestTarget));
 
         $parsedBody = $psrRequest->getParsedBody();
         $this->assertEquals('Kévin Dunglas', $parsedBody['twitter']['@dunglas']);
@@ -150,7 +150,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
             202,
             ['X-Symfony' => ['3.4']]
         );
-        $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, null));
+        $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, 'lax'));
 
         $psrResponse = $this->factory->createResponse($response);
         $this->assertEquals('Response content.', $psrResponse->getBody()->__toString());

@@ -100,6 +100,7 @@ EOF
         $hasAlias = [];
         $all = $input->getOption('all');
         $previousId = '-';
+        $serviceIdsNb = 0;
         foreach ($serviceIds as $serviceId) {
             $text = [];
             if (0 !== strpos($serviceId, $previousId)) {
@@ -127,11 +128,22 @@ EOF
                     $serviceLine .= ' - <fg=magenta>deprecated</>';
                 }
             } elseif (!$all) {
+                ++$serviceIdsNb;
                 continue;
             }
             $text[] = $serviceLine;
             $io->text($text);
         }
+
+        $io->newLine();
+
+        if (0 < $serviceIdsNb) {
+            $io->text(sprintf('%s more concrete service%s would be displayed when adding the "--all" option.', $serviceIdsNb, $serviceIdsNb > 1 ? 's' : ''));
+        }
+        if ($all) {
+            $io->text('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.');
+        }
+
         $io->newLine();
     }
 

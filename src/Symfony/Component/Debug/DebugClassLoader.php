@@ -334,7 +334,7 @@ class DebugClassLoader
             if ($finalOrInternal || $method->isConstructor() || false === \strpos($doc, '@param') || StatelessInvocation::class === $class) {
                 continue;
             }
-            if (!preg_match_all('#\n\s+\* @param (.*?)(?<= )\$([a-zA-Z0-9_\x7f-\xff]++)#', $doc, $matches, PREG_SET_ORDER)) {
+            if (!preg_match_all('#\n\s+\* @param ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff[\]<>]+)? \$([a-zA-Z0-9_\x7f-\xff]++)#', $doc, $matches, PREG_SET_ORDER)) {
                 continue;
             }
             if (!isset(self::$annotatedParameters[$class][$method->name])) {

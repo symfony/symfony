@@ -31,4 +31,11 @@ class ClassWithAnnotatedParameters
     public function isSymfony()
     {
     }
+
+    /**
+     * @param callable (string $foo) $callback a callback
+     */
+    public function methodWithCallback(callable $callback)
+    {
+    }
 }

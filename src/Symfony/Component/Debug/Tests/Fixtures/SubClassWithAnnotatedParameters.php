@@ -21,4 +21,8 @@ class SubClassWithAnnotatedParameters extends ClassWithAnnotatedParameters imple
     public function whereAmI()
     {
     }
+
+    public function methodWithCallback(callable $callback)
+    {
+    }
 }

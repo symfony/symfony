@@ -194,8 +194,8 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame($response, $r);
         $this->assertNotNull($chunk->getError());
 
+        $this->expectException(TransportExceptionInterface::class);
         foreach ($client->stream($response) as $chunk) {
-            $this->fail('Already errored responses shouldn\'t be yielded');
         }
     }
 
@@ -340,6 +340,16 @@ abstract class HttpClientTestCase extends TestCase
 
         $this->assertSame($response, $r);
         $this->assertSame(['f', 'l'], $result);
+
+        $chunk = null;
+        $i = 0;
+
+        foreach ($client->stream($response) as $chunk) {
+            ++$i;
+        }
+
+        $this->assertSame(1, $i);
+        $this->assertTrue($chunk->isLast());
     }
 
     public function testAddToStream()

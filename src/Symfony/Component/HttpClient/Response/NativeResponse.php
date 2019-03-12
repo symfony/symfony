@@ -165,10 +165,6 @@ final class NativeResponse implements ResponseInterface
      */
     private static function schedule(self $response, array &$runningResponses): void
     {
-        if (null === $response->buffer) {
-            return;
-        }
-
         if (!isset($runningResponses[$i = $response->multi->id])) {
             $runningResponses[$i] = [$response->multi, []];
         }
@@ -177,6 +173,12 @@ final class NativeResponse implements ResponseInterface
             $response->multi->pendingResponses[] = $response;
         } else {
             $runningResponses[$i][1][$response->id] = $response;
+        }
+
+        if (null === $response->buffer) {
+            // Response already completed
+            $response->multi->handlesActivity[$response->id][] = null;
+            $response->multi->handlesActivity[$response->id][] = null !== $response->info['error'] ? new TransportException($response->info['error']) : null;
         }
     }
 

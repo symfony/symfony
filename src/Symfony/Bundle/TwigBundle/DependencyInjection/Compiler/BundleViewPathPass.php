@@ -22,18 +22,7 @@ final class BundleViewPathPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $twigFilesystemLoaderId = 'twig.loader.filesystem';
-        if ($container->hasDefinition($twigFilesystemLoaderId)) {
-            $twigFilesystemLoaderDefinition = $container->getDefinition($twigFilesystemLoaderId);
-        } elseif ($container->hasAlias($twigFilesystemLoaderId)) {
-            $aliasedService = (string) $container->getAlias($twigFilesystemLoaderId);
-            if (false === $container->hasDefinition($aliasedService)) {
-                return;
-            }
-            $twigFilesystemLoaderDefinition = $container->getDefinition($aliasedService);
-        } else {
-            return;
-        }
+        $twigFilesystemLoaderDefinition = $container->findDefinition('twig.loader.filesystem');
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if (file_exists($dir = $bundle['path'].'/Resources/views')) {

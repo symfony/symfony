@@ -180,7 +180,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
         $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');
@@ -217,7 +217,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
         $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         $this->compileContainer($container);
 
         $def = $container->getDefinition('twig.loader.native_filesystem');

@@ -133,7 +133,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *                                     resource
      * @param FormView $view               The form view for finding the applying
      *                                     themes
-     * @param array    $blockNameHierarchy The block hierarchy, with the most
+     * @param string[] $blockNameHierarchy The block hierarchy, with the most
      *                                     specific block name at the end
      * @param int      $hierarchyLevel     The level in the block hierarchy that
      *                                     should be loaded

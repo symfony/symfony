@@ -74,7 +74,7 @@ interface FormRendererEngineInterface
      *                                     First the themes  attached directly to
      *                                     the view with {@link setTheme()} are
      *                                     considered, then the ones of its parent etc.
-     * @param array    $blockNameHierarchy The block name hierarchy, with the root block
+     * @param string[] $blockNameHierarchy The block name hierarchy, with the root block
      *                                     at the beginning
      * @param int      $hierarchyLevel     The level in the hierarchy at which to start
      *                                     looking. Level 0 indicates the root block, i.e.
@@ -112,7 +112,7 @@ interface FormRendererEngineInterface
      *                                     First the themes  attached directly to
      *                                     the view with {@link setTheme()} are
      *                                     considered, then the ones of its parent etc.
-     * @param array    $blockNameHierarchy The block name hierarchy, with the root block
+     * @param string[] $blockNameHierarchy The block name hierarchy, with the root block
      *                                     at the beginning
      * @param int      $hierarchyLevel     The level in the hierarchy at which to start
      *                                     looking. Level 0 indicates the root block, i.e.

@@ -49,8 +49,8 @@ interface FormTypeGuesserInterface
     /**
      * Returns a guess about the field's pattern.
      *
-     * - When you have a min value, you guess a min length of this min (LOW_CONFIDENCE) , lines below
-     * - If this value is a float type, this is wrong so you guess null with MEDIUM_CONFIDENCE to override the previous guess.
+     * - When you have a min value, you guess a min length of this min (LOW_CONFIDENCE)
+     * - Then line below, if this value is a float type, this is wrong so you guess null with MEDIUM_CONFIDENCE to override the previous guess.
      * Example:
      *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
      *

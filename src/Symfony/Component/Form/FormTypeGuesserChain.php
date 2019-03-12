@@ -19,7 +19,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
     private $guessers = [];
 
     /**
-     * @param FormTypeGuesserInterface[] $guessers Guessers as instances of FormTypeGuesserInterface
+     * @param FormTypeGuesserInterface[] $guessers
      *
      * @throws UnexpectedTypeException if any guesser does not implement FormTypeGuesserInterface
      */

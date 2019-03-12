@@ -54,6 +54,26 @@ class SimpleFormTest_Traversable implements \IteratorAggregate
 
 class SimpleFormTest extends AbstractFormTest
 {
+    /**
+     * @dataProvider provideFormNames
+     */
+    public function testGetPropertyPath($name, $propertyPath)
+    {
+        $config = new FormConfigBuilder($name, null, $this->dispatcher);
+        $form = new Form($config);
+
+        $this->assertEquals(new PropertyPath($propertyPath), $form->getPropertyPath());
+    }
+
+    public function provideFormNames()
+    {
+        yield [null, null];
+        yield ['', null];
+        yield ['0', '0'];
+        yield [0, '0'];
+        yield ['name', 'name'];
+    }
+
     public function testDataIsInitializedToConfiguredValue()
     {
         $model = new FixedDataTransformer([
@@ -76,7 +96,7 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @expectedException        \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Unable to transform value for property path "name": No mapping for value "arg"
+     * @expectedExceptionMessage Unable to transform data for property path "name": No mapping for value "arg"
      */
     public function testDataTransformationFailure()
     {

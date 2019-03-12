@@ -34,20 +34,34 @@ final class FormEvents
     const PRE_SUBMIT = 'form.pre_bind';
 
     /**
-     * The SUBMIT event is dispatched just before the Form::submit() method
-     * transforms back the normalized data to the model and view data.
+     * The SUBMIT event is dispatched after the Form::submit() method
+     * has changed the view data by the request data, or submitted and mapped
+     * the children if the form is compound, and after reverse transformation
+     * to normalized representation.
      *
-     * It can be used to change data from the normalized representation of the data.
+     * It's also dispatched just before the Form::submit() method transforms back
+     * the normalized data to the model and view data.
+     *
+     * So at this stage children of compound forms are submitted and synchronized, unless
+     * their transformation failed, but a parent would still be at the PRE_SUBMIT level.
+     *
+     * Since the current form is not synchronized yet, it is still possible to add and
+     * remove fields.
      *
      * @Event("Symfony\Component\Form\FormEvent")
      */
     const SUBMIT = 'form.bind';
 
     /**
-     * The FormEvents::POST_SUBMIT event is dispatched after the Form::submit()
-     * once the model and view data have been denormalized.
+     * The FormEvents::POST_SUBMIT event is dispatched at the very end of the Form::submit().
+     *
+     * It this stage the model and view data may have been denormalized. Otherwise the form
+     * is desynchronized because transformation failed during submission.
      *
      * It can be used to fetch data after denormalization.
+     *
+     * The event attaches the current view data. To know whether this is the renormalized data
+     * or the invalid request data, call Form::isSynchronized() first.
      *
      * @Event("Symfony\Component\Form\FormEvent")
      */
@@ -58,7 +72,7 @@ final class FormEvents
      *
      * It can be used to:
      *  - Modify the data given during pre-population;
-     *  - Modify a form depending on the pre-populated data (adding or removing fields dynamically).
+     *  - Keep synchronized the form depending on the data (adding or removing fields dynamically).
      *
      * @Event("Symfony\Component\Form\FormEvent")
      */
@@ -67,7 +81,8 @@ final class FormEvents
     /**
      * The FormEvents::POST_SET_DATA event is dispatched at the end of the Form::setData() method.
      *
-     * This event is mostly here for reading data after having pre-populated the form.
+     * This event can be used to modify the form depending on the final state of the underlying data
+     * accessible in every representation: model, normalized and view.
      *
      * @Event("Symfony\Component\Form\FormEvent")
      */

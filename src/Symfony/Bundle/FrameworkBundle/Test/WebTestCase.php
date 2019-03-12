@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
@@ -22,12 +22,12 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 abstract class WebTestCase extends KernelTestCase
 {
     /**
-     * Creates a Client.
+     * Creates a KernelBrowser.
      *
      * @param array $options An array of options to pass to the createKernel method
      * @param array $server  An array of server parameters
      *
-     * @return Client A Client instance
+     * @return KernelBrowser A KernelBrowser instance
      */
     protected static function createClient(array $options = [], array $server = [])
     {

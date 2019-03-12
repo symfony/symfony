@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
 use Symfony\Bundle\FullStack;
-use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -207,7 +207,7 @@ class FrameworkExtension extends Extension
         if (!empty($config['test'])) {
             $loader->load('test.xml');
 
-            if (!class_exists(Client::class)) {
+            if (!class_exists(AbstractBrowser::class)) {
                 $container->removeDefinition('test.client');
             }
         }

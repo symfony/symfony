@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * renamed `Client` to `HttpKernelBrowser`
  * `KernelInterface` doesn't extend `Serializable` anymore
  * deprecated the `Kernel::serialize()` and `unserialize()` methods
  * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`

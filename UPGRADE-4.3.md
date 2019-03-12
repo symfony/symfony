@@ -4,6 +4,7 @@ UPGRADE FROM 4.2 to 4.3
 BrowserKit
 ----------
 
+ * Renamed `Client` to `AbstractBrowser`
  * Marked `Response` final.
  * Deprecated `Response::buildHeader()`
  * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
@@ -50,6 +51,11 @@ HttpFoundation
    use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
  * The `FileinfoMimeTypeGuesser` class has been deprecated,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
+
+HttpKernel
+----------
+
+ * renamed `Client` to `HttpKernelBrowser`
 
 Messenger
 ---------

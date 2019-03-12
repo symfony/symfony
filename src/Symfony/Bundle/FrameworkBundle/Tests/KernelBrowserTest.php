@@ -11,18 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class ClientTest extends WebTestCase
+class KernelBrowserTest extends WebTestCase
 {
     public function testRebootKernelBetweenRequests()
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');
 
-        $client = new Client($mock);
+        $client = new KernelBrowser($mock);
         $client->request('GET', '/');
         $client->request('GET', '/');
     }
@@ -32,7 +32,7 @@ class ClientTest extends WebTestCase
         $mock = $this->getKernelMock();
         $mock->expects($this->never())->method('shutdown');
 
-        $client = new Client($mock);
+        $client = new KernelBrowser($mock);
         $client->disableReboot();
         $client->request('GET', '/');
         $client->request('GET', '/');
@@ -43,7 +43,7 @@ class ClientTest extends WebTestCase
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');
 
-        $client = new Client($mock);
+        $client = new KernelBrowser($mock);
         $client->disableReboot();
         $client->request('GET', '/');
         $client->request('GET', '/');

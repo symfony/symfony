@@ -4,6 +4,7 @@ UPGRADE FROM 4.x to 5.0
 BrowserKit
 ----------
 
+ * Removed `Client`, use `AbstractBrowser` instead
  * Removed the possibility to extend `Response` by making it final.
  * Removed `Response::buildHeader()`
  * Removed `Response::getStatus()`, use `Response::getStatusCode()` instead
@@ -199,6 +200,7 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Removed `Client`, use `HttpKernelBrowser` instead
  * The `Kernel::getRootDir()` and the `kernel.root_dir` parameter have been removed
  * The `KernelInterface::getName()` and the `kernel.name` parameter have been removed
  * Removed the first and second constructor argument of `ConfigDataCollector`

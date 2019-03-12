@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * Renamed `Client` to `AbstractBrowser`
  * Marked `Response` final.
  * Deprecated `Response::buildHeader()`
  * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead

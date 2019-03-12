@@ -12,7 +12,7 @@
 namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
@@ -22,7 +22,7 @@ class SpecialResponse extends Response
 {
 }
 
-class TestClient extends Client
+class TestClient extends AbstractBrowser
 {
     protected $nextResponse = null;
     protected $nextScript = null;
@@ -73,7 +73,7 @@ EOF;
     }
 }
 
-class ClientTest extends TestCase
+class AbstractBrowserTest extends TestCase
 {
     public function testGetHistory()
     {
@@ -97,7 +97,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetRequestNull()
     {
@@ -135,7 +135,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetResponseNull()
     {
@@ -156,7 +156,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetInternalResponseNull()
     {
@@ -184,7 +184,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetCrawlerNull()
     {
@@ -886,7 +886,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testInternalRequestNull()
     {
@@ -896,7 +896,7 @@ class ClientTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "Symfony\Component\BrowserKit\Client::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     * @expectedDeprecation The "Symfony\Component\BrowserKit\AbstractBrowser::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
      */
     public function testInheritedClassCallSubmitWithTwoArguments()
     {
@@ -906,7 +906,7 @@ class ClientTest extends TestCase
     }
 }
 
-class ClassThatInheritClient extends Client
+class ClassThatInheritClient extends AbstractBrowser
 {
     protected $nextResponse = null;
 

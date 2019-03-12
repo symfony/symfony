@@ -16,17 +16,17 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
 /**
  * @group time-sensitive
  */
-class ClientTest extends TestCase
+class HttpKernelBrowserTest extends TestCase
 {
     public function testDoRequest()
     {
-        $client = new Client(new TestHttpKernel());
+        $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $client->request('GET', '/');
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->doRequest() uses the request handler to make the request');
@@ -54,7 +54,7 @@ class ClientTest extends TestCase
 
     public function testFilterResponseConvertsCookies()
     {
-        $client = new Client(new TestHttpKernel());
+        $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
@@ -75,7 +75,7 @@ class ClientTest extends TestCase
 
     public function testFilterResponseSupportsStreamedResponses()
     {
-        $client = new Client(new TestHttpKernel());
+        $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
@@ -97,7 +97,7 @@ class ClientTest extends TestCase
         @unlink($target);
 
         $kernel = new TestHttpKernel();
-        $client = new Client($kernel);
+        $client = new HttpKernelBrowser($kernel);
 
         $files = [
             ['tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => null, 'error' => UPLOAD_ERR_OK],
@@ -128,7 +128,7 @@ class ClientTest extends TestCase
     public function testUploadedFileWhenNoFileSelected()
     {
         $kernel = new TestHttpKernel();
-        $client = new Client($kernel);
+        $client = new HttpKernelBrowser($kernel);
 
         $file = ['tmp_name' => '', 'name' => '', 'type' => '', 'size' => 0, 'error' => UPLOAD_ERR_NO_FILE];
 
@@ -145,7 +145,7 @@ class ClientTest extends TestCase
         $source = tempnam(sys_get_temp_dir(), 'source');
 
         $kernel = new TestHttpKernel();
-        $client = new Client($kernel);
+        $client = new HttpKernelBrowser($kernel);
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')

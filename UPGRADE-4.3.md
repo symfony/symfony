@@ -116,3 +116,28 @@ Yaml
 ----
 
  * Using a mapping inside a multi-line string is deprecated and will throw a `ParseException` in 5.0.
+
+Workflow
+--------
+
+ * `MarkingStoreInterface::setMarking()` will have a third argument in Symfony 5.0.
+
+   Before:
+   ```php
+   class MyMarkingStore implements MarkingStoreInterface
+   {
+       public function setMarking($subject, Marking $marking)
+       {
+       }
+   }
+   ```
+
+   After:
+   ```php
+   class MyMarkingStore implements MarkingStoreInterface
+   {
+       public function setMarking($subject, Marking $marking , array $context = [])
+       {
+       }
+   }
+   ```

@@ -84,7 +84,7 @@ Finder
 
 Form
 ----
- 
+
  * Removed support for using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled.
  * Using names for buttons that do not start with a letter, a digit, or an underscore leads to an exception.
  * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons leads to an
@@ -352,6 +352,7 @@ Workflow
  * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
  * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
+ * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
 
 Yaml
 ----

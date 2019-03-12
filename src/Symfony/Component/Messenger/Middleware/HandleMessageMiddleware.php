@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
@@ -23,6 +25,8 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {
+    use LoggerAwareTrait;
+
     private $handlersLocator;
     private $allowNoHandlers;
 
@@ -30,6 +34,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $this->handlersLocator = $handlersLocator;
         $this->allowNoHandlers = $allowNoHandlers;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -41,11 +46,24 @@ class HandleMessageMiddleware implements MiddlewareInterface
     {
         $handler = null;
         $message = $envelope->getMessage();
+
+        $context = [
+            'message' => $message,
+            'class' => \get_class($message),
+        ];
+
         foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
-            $envelope = $envelope->with(HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null));
+            $handledStamp = HandledStamp::fromCallable($handler, $handler($message), \is_string($alias) ? $alias : null);
+            $envelope = $envelope->with($handledStamp);
+            $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getCallableName()]);
         }
-        if (null === $handler && !$this->allowNoHandlers) {
-            throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', \get_class($envelope->getMessage())));
+
+        if (null === $handler) {
+            if (!$this->allowNoHandlers) {
+                throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
+            }
+
+            $this->logger->info('No handler for message "{class}"', $context);
         }
 
         return $stack->next()->handle($envelope, $stack);

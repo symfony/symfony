@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -28,12 +30,20 @@ final class HttpClient
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public static function create(array $defaultOptions = [], int $maxHostConnections = 6): HttpClientInterface
+    public static function create(array $defaultOptions = [], LoggerInterface $logger = null, int $maxHostConnections = 6): HttpClientInterface
     {
-        if (\extension_loaded('curl')) {
-            return new CurlHttpClient($defaultOptions, $maxHostConnections);
+        if (null === $logger) {
+            $logger = new NullLogger();
         }
 
-        return new NativeHttpClient($defaultOptions, $maxHostConnections);
+        if (\extension_loaded('curl')) {
+            $logger->debug('Curl extension is enabled. Creating client.', ['client' => CurlHttpClient::class]);
+
+            return new CurlHttpClient($defaultOptions, $logger, $maxHostConnections);
+        }
+
+        $logger->debug('Curl extension is disabled. Creating client.', ['client' => NativeHttpClient::class]);
+
+        return new NativeHttpClient($defaultOptions, $logger, $maxHostConnections);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\CurlResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -34,6 +36,7 @@ final class CurlHttpClient implements HttpClientInterface
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
     private $multi;
+    private $logger;
 
     /**
      * @param array $defaultOptions     Default requests' options
@@ -41,8 +44,10 @@ final class CurlHttpClient implements HttpClientInterface
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6)
+    public function __construct(array $defaultOptions = [], LoggerInterface $logger = null, int $maxHostConnections = 6)
     {
+        $this->logger = $logger ?? new NullLogger();
+
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
@@ -86,6 +91,7 @@ final class CurlHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $this->logger->notice('Making a request', ['url' => $url, 'method' => $method, 'client' => static::class]);
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $scheme = $url['scheme'];
         $authority = $url['authority'];
@@ -103,6 +109,7 @@ final class CurlHttpClient implements HttpClientInterface
             ];
 
             if ('GET' === $method && !$options['body'] && $expectedHeaders === $pushedHeaders) {
+                $this->logger->debug('Creating pushed response');
                 // Reinitialize the pushed response with request's options
                 $pushedResponse->__construct($this->multi, $url, $options);
 
@@ -156,7 +163,7 @@ final class CurlHttpClient implements HttpClientInterface
                 // DNS cache removals require curl 7.42 or higher
                 // On lower versions, we have to create a new multi handle
                 curl_multi_close($this->multi->handle);
-                $this->multi->handle = (new self())->multi->handle;
+                $this->multi->handle = (new self([], $this->logger))->multi->handle;
             }
 
             foreach ($options['resolve'] as $host => $ip) {

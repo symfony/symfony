@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\NativeResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -34,6 +36,7 @@ final class NativeHttpClient implements HttpClientInterface
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
     private $multi;
+    private $logger;
 
     /**
      * @param array $defaultOptions     Default requests' options
@@ -41,8 +44,10 @@ final class NativeHttpClient implements HttpClientInterface
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6)
+    public function __construct(array $defaultOptions = [], LoggerInterface $logger = null, int $maxHostConnections = 6)
     {
+        $this->logger = $logger ?? new NullLogger();
+
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
@@ -68,6 +73,7 @@ final class NativeHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        $this->logger->notice('Making a request', ['url' => $url, 'method' => $method, 'client' => static::class]);
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
         if ($options['bindto'] && file_exists($options['bindto'])) {

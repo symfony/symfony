@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use ThirdParty\BarExtensionBundle\DependencyInjection\Compiler\OverrideBarBundlePathPass;
 
 class TwigExtensionTest extends TestCase
 {
@@ -183,8 +184,9 @@ class TwigExtensionTest extends TestCase
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         $this->compileContainer($container);
 
-        $def = $container->getDefinition('twig.loader.native_filesystem');
+        $def = $container->findDefinition('twig.loader.filesystem');
         $paths = [];
+
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
                 $paths[] = $call[1];
@@ -198,9 +200,12 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            // [__DIR__.'/Fixtures/templates/bundles/BarBundle', 'Bar'],
             [__DIR__.'/Fixtures/templates'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            // [realpath(__DIR__.'/../..').'/Resources/views', 'Bar'],
+            // [realpath(__DIR__.'/../..').'/Resources/views', '!Bar'],
         ], $paths);
     }
 
@@ -220,7 +225,7 @@ class TwigExtensionTest extends TestCase
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         $this->compileContainer($container);
 
-        $def = $container->getDefinition('twig.loader.native_filesystem');
+        $def = $container->findDefinition('twig.loader.filesystem');
         $paths = [];
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
@@ -240,6 +245,78 @@ class TwigExtensionTest extends TestCase
             [__DIR__.'/Fixtures/templates'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+        ], $paths);
+    }
+
+    /**
+     * @dataProvider getFormats
+     */
+    public function testThirdPartyBundlesMayOverrideBetweenThem($format)
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'full', $format);
+        $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new ExtensionPass());
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
+        // Adds 2 third-party bundles whom second overrides first one's templates
+        require_once(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/BarExtensionBundle.php');
+        require_once(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/DependencyInjection/Compiler/OverrideBarBundlePathPass.php');
+        $container->setParameter(
+            'kernel.bundles',
+            \array_merge(
+                $container->getParameter('kernel.bundles'),
+                [
+                    'BarBundle' => 'ThirdParty\\BarBundle\\BarBundle',
+                    'BarExtensionBundle' => 'ThirdParty\\BarExtensionBundle\\BarExtensionBundle',
+                ]
+            )
+        );
+        $container->setParameter(
+            'kernel.bundles_metadata',
+            \array_merge(
+                $container->getParameter('kernel.bundles_metadata'),
+                [
+                    'BarBundle' => [
+                        'namespace' => 'ThirdParty\\BarBundle',
+                        'path' => realpath(__DIR__.'/Fixtures/vendor/third-party/BarBundle'),
+                    ],
+                    'BarExtensionBundle' => [
+                        'namespace' => 'ThirdParty\\BarExtensionBundle',
+                        'path' => realpath(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle'),
+                    ],
+                ]
+            )
+        );
+        $container->addCompilerPass(new OverrideBarBundlePathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+
+        $this->compileContainer($container);
+
+        $def = $container->findDefinition('twig.loader.filesystem');
+        $paths = [];
+
+        foreach ($def->getMethodCalls() as $call) {
+            if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
+                $paths[] = $call[1];
+            }
+        }
+
+        $this->assertEquals([
+            ['path1'],
+            ['path2'],
+            ['namespaced_path1', 'namespace1'],
+            ['namespaced_path2', 'namespace2'],
+            ['namespaced_path3', 'namespace3'],
+            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
+            [__DIR__.'/Fixtures/templates/bundles/BarBundle', 'Bar'],
+            [__DIR__.'/Fixtures/templates'],
+            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', 'Bar'],
+            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
+            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
+            [__DIR__.'/Fixtures/vendor/third-party/BarBundle/Resources/views', 'Bar'],
+            [__DIR__.'/Fixtures/vendor/third-party/BarBundle/Resources/views', '!Bar'],
+            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', 'BarExtension'],
+            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', '!BarExtension'],
         ], $paths);
     }
 

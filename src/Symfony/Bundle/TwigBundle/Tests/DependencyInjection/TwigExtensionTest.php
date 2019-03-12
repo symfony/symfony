@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\BundleViewPathPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
@@ -178,6 +179,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new ExtensionPass());
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 
@@ -214,6 +216,7 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $this->loadFromFile($container, 'full', $format);
         $this->loadFromFile($container, 'extra', $format);
+        $container->addCompilerPass(new ExtensionPass());
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->compileContainer($container);
 

@@ -37,8 +37,8 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new ExceptionListenerPass());
+        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     public function registerCommands(Application $application)

@@ -260,8 +260,8 @@ class TwigExtensionTest extends TestCase
         $container->addCompilerPass(new ExtensionPass());
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         // Adds 2 third-party bundles whom second overrides first one's templates
-        require_once __DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/BarExtensionBundle.php';
-        require_once __DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/DependencyInjection/Compiler/OverrideBarBundlePathPass.php';
+        require_once realpath(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/BarExtensionBundle.php');
+        require_once realpath(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/DependencyInjection/Compiler/OverrideBarBundlePathPass.php');
         $container->setParameter(
             'kernel.bundles',
             \array_merge(

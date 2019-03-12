@@ -30,6 +30,6 @@ class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 
     public function testMessengerMiddlewareFactoryErroneousFormat()
     {
-        $this->markTestSkipped('XML configuration will not allow eeroneous format.');
+        $this->markTestSkipped('XML configuration will not allow erroneous format.');
     }
 }

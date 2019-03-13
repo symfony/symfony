@@ -310,10 +310,10 @@ class TwigExtensionTest extends TestCase
             [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views'), 'Bar'],
             [realpath(__DIR__.'/../../Resources/views'), 'Twig'],
             [realpath(__DIR__.'/../../Resources/views'), '!Twig'],
-            [realpath(__DIR__.'/Fixtures/third-party/BarBundle/Resources/views'), 'Bar'],
-            [realpath(__DIR__.'/Fixtures/third-party/BarBundle/Resources/views'), '!Bar'],
-            [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views'), 'BarExtension'],
-            [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views'), '!BarExtension'],
+            [realpath(__DIR__.'/Fixtures/third-party/BarBundle').'/Resources/views', 'Bar'],
+            [realpath(__DIR__.'/Fixtures/third-party/BarBundle').'/Resources/views', '!Bar'],
+            [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle').'/Resources/views', 'BarExtension'],
+            [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle').'/Resources/views', '!BarExtension'],
         ], $paths);
     }
 

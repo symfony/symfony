@@ -249,6 +249,7 @@ class ConfigurationTest extends TestCase
             'property_access' => [
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
+                'throw_exception_on_invalid_property_path' => true,
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),

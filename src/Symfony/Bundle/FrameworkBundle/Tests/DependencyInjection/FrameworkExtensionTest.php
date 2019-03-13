@@ -80,6 +80,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $def = $container->getDefinition('property_accessor');
         $this->assertFalse($def->getArgument(0));
         $this->assertFalse($def->getArgument(1));
+        $this->assertTrue($def->getArgument(3));
     }
 
     public function testPropertyAccessWithOverriddenValues()
@@ -88,6 +89,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $def = $container->getDefinition('property_accessor');
         $this->assertTrue($def->getArgument(0));
         $this->assertTrue($def->getArgument(1));
+        $this->assertFalse($def->getArgument(3));
     }
 
     public function testPropertyAccessCache()

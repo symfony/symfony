@@ -15,11 +15,12 @@ namespace Symfony\Component\Console\Helper;
  */
 class WordWrapper
 {
+    // Defaults
     const DEFAULT_WIDTH = 120;
     const DEFAULT_BREAK = PHP_EOL;
-    const DEFAULT_LONG_WORDS_CUT_LIMIT = 5;
     const DEFAULT_CUT = self::CUT_LONG_WORDS;
 
+    // Cut options
     const CUT_DISABLE = 0;
     const CUT_LONG_WORDS = 1;
     const CUT_WORDS = 3; // Cut long words too
@@ -60,7 +61,15 @@ class WordWrapper
         return self::$instance;
     }
 
-    public static function wrap($string, $width = self::DEFAULT_WIDTH, $break = self::DEFAULT_BREAK, $cutOptions = self::DEFAULT_CUT)
+    /**
+     * @param string $string     The text
+     * @param int    $width      Character width of one line
+     * @param string $break      The line breaking character(s)
+     * @param int    $cutOptions You can mix your needs with CUT_* constants
+     *
+     * @return string
+     */
+    public static function wrap(string $string, int $width = self::DEFAULT_WIDTH, string $break = self::DEFAULT_BREAK, int $cutOptions = self::DEFAULT_CUT): string
     {
         $wrapper = self::getInstance();
 
@@ -68,13 +77,14 @@ class WordWrapper
     }
 
     /**
-     * @param string $string       The text
-     * @param bool   $cutLongWords How the function handles the too long words that is longer then a line. It ignores
-     *                             this settings if the word is an URL!
+     * @param string $string     The text
+     * @param int    $width      Character width of one line
+     * @param string $break      The line breaking character(s)
+     * @param int    $cutOptions You can mix your needs with CUT_* constants
      *
      * @return string
      */
-    public function wordwrap($string, $width = self::DEFAULT_WIDTH, $break = self::DEFAULT_BREAK, $cutOptions = self::DEFAULT_CUT)
+    public function wordwrap(string $string, int $width = self::DEFAULT_WIDTH, string $break = self::DEFAULT_BREAK, int $cutOptions = self::DEFAULT_CUT): string
     {
         if ($width <= 0) {
             throw new \InvalidArgumentException('You have to set more than 0 width!');
@@ -101,7 +111,15 @@ class WordWrapper
         return $this->finish($break);
     }
 
-    protected function handleLineEnding($token, $virtualTokenLength, $width, $cutOptions)
+    /**
+     * This function handles what what does
+     *
+     * @param string $token
+     * @param int    $virtualTokenLength
+     * @param int    $width
+     * @param int    $cutOptions
+     */
+    protected function handleLineEnding(string $token, int $virtualTokenLength, int $width, int $cutOptions)
     {
         switch (true) {
             // Token is an URL and we don't want to cut it
@@ -145,12 +163,12 @@ class WordWrapper
     }
 
     /**
-     * Register a token with setted length.
+     * Register a token with set length.
      *
      * @param string $token
      * @param int    $virtualTokenLength
      */
-    protected function addTokenToLine($token, $virtualTokenLength)
+    protected function addTokenToLine(string $token, int $virtualTokenLength)
     {
         $this->newLineTokens[] = $token;
         $this->currentLength += $virtualTokenLength;
@@ -159,9 +177,11 @@ class WordWrapper
     /**
      * Close everything and build the formatted text.
      *
+     * @param string $break
+     *
      * @return string
      */
-    protected function finish($break)
+    protected function finish(string $break)
     {
         $this->closeLine();
 
@@ -192,11 +212,11 @@ class WordWrapper
      *      - lorem --> 5
      *      - <comment>lorem</comment> --> 5.
      *
-     * @param $token
+     * @param string $token
      *
      * @return int
      */
-    protected function getVirtualTokenLength($token)
+    protected function getVirtualTokenLength(string $token): int
     {
         $virtualTokenLength = mb_strlen($token);
         if (false !== strpos($token, '<')) {
@@ -207,12 +227,17 @@ class WordWrapper
         return $virtualTokenLength;
     }
 
-    protected function tokenIsAnUrl($token)
+    /**
+     * @param string $token
+     *
+     * @return bool
+     */
+    protected function tokenIsAnUrl(string $token): bool
     {
         return false !== mb_strpos($token, 'http://') || false !== mb_strpos($token, 'https://');
     }
 
-    protected function sliceToken($token, $freeChars, $width)
+    protected function sliceToken(string $token, int $freeChars, int $width)
     {
         // We try to finds "formatter tags":
         // verylongword<comment>withtags</comment> --> verylongword <comment> withtags </comment>
@@ -242,12 +267,12 @@ class WordWrapper
     /**
      * It handles the long word "blocks".
      *
-     * @param $tokenBlock
-     * @param $freeChars
+     * @param string $tokenBlock
+     * @param int    $freeChars
      *
      * @return array [$token, $block, $blockLength]
      */
-    protected function sliceTokenBlock($tokenBlock, $freeChars)
+    protected function sliceTokenBlock(string $tokenBlock, int $freeChars): array
     {
         if ('<' == $tokenBlock[0] && '>' == mb_substr($tokenBlock, -1)) {
             return [$tokenBlock, '', 0];
@@ -264,12 +289,39 @@ class WordWrapper
         ];
     }
 
-    protected function hasCutOption($option, $cutOptions)
+    /**
+     * It checks the cut option is set. See the CUT_* constants.
+     *
+     * @param int $option
+     * @param int $cutOptions
+     *
+     * @return bool
+     */
+    protected function hasCutOption(int $option, int $cutOptions): bool
     {
         return ($cutOptions & $option) === $option;
     }
 
-    protected function pregReplaceTags($replacement, $string)
+    /**
+     * It replaces all tags to something different. If you want to use original tags, use the `\\0` placeholder:
+     *
+     * Eg:
+     *      $replacement = 'STARTTAG>\\0<ENDTAG'
+     *                          ^^^ placeholder
+     *      $string = '<comment>Test comment</comment>'
+     *      return: 'STARTTAG><comment><ENDTAGTest commentSTARTTAG></comment><ENDTAG'
+     *
+     * All placeholders:
+     *      \\0: <comment> and </comment>
+     *      \\1: comment and /comment or / (!: the close tag could be `</>`)
+     *      \\2: comment or '' (if the close tag is `</>`)
+     *
+     * @param string $replacement
+     * @param string $string
+     *
+     * @return string
+     */
+    protected function pregReplaceTags(string $replacement, string $string): string
     {
         return preg_replace(
             sprintf('{<((%1$s)|/(%1$s)?)>}', self::TAG_REGEX),

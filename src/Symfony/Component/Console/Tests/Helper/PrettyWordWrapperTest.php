@@ -3,7 +3,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\WordWrapper;
+use Symfony\Component\Console\Helper\PrettyWordWrapper;
 
 /**
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
@@ -20,7 +20,7 @@ class WordWrapperTest extends TestCase
      */
     public function testConstructorExceptions($width, $break)
     {
-        $wordWrapper = new WordWrapper();
+        $wordWrapper = new PrettyWordWrapper();
         $wordWrapper->wordwrap('test', $width, $break);
     }
 
@@ -45,7 +45,7 @@ class WordWrapperTest extends TestCase
      */
     public function testWordwrap($input, $width, $break, $cutOptions, $output)
     {
-        $wordWrapper = new WordWrapper();
+        $wordWrapper = new PrettyWordWrapper();
         $response = $wordWrapper->wordwrap($this->getInputContents($input), $width, $break, $cutOptions);
 
         $this->assertEquals($this->getOutputContents($output), $response);
@@ -64,7 +64,7 @@ class WordWrapperTest extends TestCase
      */
     public function testStaticWrap($input, $width, $break, $cutOptions, $output)
     {
-        $response = WordWrapper::wrap($this->getInputContents($input), $width, $break, $cutOptions);
+        $response = PrettyWordWrapper::wrap($this->getInputContents($input), $width, $break, $cutOptions);
 
         $this->assertEquals($this->getOutputContents($output), $response);
     }
@@ -83,7 +83,7 @@ class WordWrapperTest extends TestCase
                 'utf120.txt',
                 120,
                 $baseBreak,
-                WordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::DEFAULT_CUT,
                 'utf120.txt',
             ],
             // Check simple text
@@ -91,7 +91,7 @@ class WordWrapperTest extends TestCase
                 'lipsum.txt',
                 120,
                 $baseBreak,
-                WordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::DEFAULT_CUT,
                 'lipsum.txt',
             ],
             // Check colored text
@@ -99,7 +99,7 @@ class WordWrapperTest extends TestCase
                 'lipsum_with_tags.txt',
                 120,
                 $baseBreak,
-                WordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::DEFAULT_CUT,
                 'lipsum_with_tags.txt',
             ],
             // Check custom break
@@ -107,7 +107,7 @@ class WordWrapperTest extends TestCase
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
                 $customBreak,
-                WordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::DEFAULT_CUT,
                 'lipsum_with_tags_and_custom_break.txt',
             ],
             // Check long words
@@ -115,21 +115,21 @@ class WordWrapperTest extends TestCase
                 'with_long_words.txt',
                 30,
                 $baseBreak,
-                WordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::DEFAULT_CUT,
                 'with_long_words_with_default_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
                 $baseBreak,
-                WordWrapper::CUT_DISABLE,
+                PrettyWordWrapper::CUT_DISABLE,
                 'with_long_words_without_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
                 $baseBreak,
-                WordWrapper::CUT_ALL,
+                PrettyWordWrapper::CUT_ALL,
                 'with_long_words_with_cut_all.txt',
             ],
         ];

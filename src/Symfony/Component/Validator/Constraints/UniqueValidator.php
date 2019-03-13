@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Yevgeniy Zholkevskiy <zhenya.zholkevskiy@gmail.com>
@@ -33,13 +33,13 @@ class UniqueValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_array($value) && !$value instanceof \IteratorAggregate) {
-            throw new UnexpectedTypeException($value, 'IteratorAggregate');
+        if (!\is_array($value) && !$value instanceof \IteratorAggregate) {
+            throw new UnexpectedValueException($value, 'array|IteratorAggregate');
         }
 
-        $collectionElements = array();
+        $collectionElements = [];
         foreach ($value as $element) {
-            if (in_array($element, $collectionElements, true)) {
+            if (\in_array($element, $collectionElements, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Unique::IS_NOT_UNIQUE)

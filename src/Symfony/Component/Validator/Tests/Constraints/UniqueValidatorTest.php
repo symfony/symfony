@@ -23,7 +23,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedValueException
      */
     public function testExpectsUniqueConstraintCompatibleType()
     {
@@ -42,19 +42,19 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidValues()
     {
-        return array(
-            yield 'null' => array(array(null)),
-            yield 'empty array' => array(array()),
-            yield 'single integer' => array(array(5)),
-            yield 'single string' => array(array('a')),
-            yield 'single object' => array(array(new \stdClass())),
-            yield 'unique booleans' => array(array(true, false)),
-            yield 'unique integers' => array(array(1, 2, 3, 4, 5, 6)),
-            yield 'unique floats' => array(array(0.1, 0.2, 0.3)),
-            yield 'unique strings' => array(array('a', 'b', 'c')),
-            yield 'unique arrays' => array(array(array(1, 2), array(2, 4), array(4, 6))),
-            yield 'unique objects' => array(array(new \stdClass(), new \stdClass())),
-        );
+        return [
+            yield 'null' => [[null]],
+            yield 'empty array' => [[]],
+            yield 'single integer' => [[5]],
+            yield 'single string' => [['a']],
+            yield 'single object' => [[new \stdClass()]],
+            yield 'unique booleans' => [[true, false]],
+            yield 'unique integers' => [[1, 2, 3, 4, 5, 6]],
+            yield 'unique floats' => [[0.1, 0.2, 0.3]],
+            yield 'unique strings' => [['a', 'b', 'c']],
+            yield 'unique arrays' => [[[1, 2], [2, 4], [4, 6]]],
+            yield 'unique objects' => [[new \stdClass(), new \stdClass()]],
+        ];
     }
 
     /**
@@ -62,9 +62,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value)
     {
-        $constraint = new Unique(array(
+        $constraint = new Unique([
             'message' => 'myMessage',
-        ));
+        ]);
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
@@ -77,13 +77,13 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
 
-        return array(
-            yield 'not unique booleans' => array(array(true, true)),
-            yield 'not unique integers' => array(array(1, 2, 3, 3)),
-            yield 'not unique floats' => array(array(0.1, 0.2, 0.1)),
-            yield 'not unique string' => array(array('a', 'b', 'a')),
-            yield 'not unique arrays' => array(array(array(1, 1), array(2, 3), array(1, 1))),
-            yield 'not unique objects' => array(array($object, $object)),
-        );
+        return [
+            yield 'not unique booleans' => [[true, true]],
+            yield 'not unique integers' => [[1, 2, 3, 3]],
+            yield 'not unique floats' => [[0.1, 0.2, 0.1]],
+            yield 'not unique string' => [['a', 'b', 'a']],
+            yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]]],
+            yield 'not unique objects' => [[$object, $object]],
+        ];
     }
 }

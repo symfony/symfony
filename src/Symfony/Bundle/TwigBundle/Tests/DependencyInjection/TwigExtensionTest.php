@@ -200,12 +200,9 @@ class TwigExtensionTest extends TestCase
             ['namespaced_path2', 'namespace2'],
             ['namespaced_path3', 'namespace3'],
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            // [__DIR__.'/Fixtures/templates/bundles/BarBundle', 'Bar'],
             [__DIR__.'/Fixtures/templates'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
-            // [realpath(__DIR__.'/../..').'/Resources/views', 'Bar'],
-            // [realpath(__DIR__.'/../..').'/Resources/views', '!Bar'],
         ], $paths);
     }
 
@@ -260,8 +257,8 @@ class TwigExtensionTest extends TestCase
         $container->addCompilerPass(new ExtensionPass());
         $container->addCompilerPass(new BundleViewPathPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -16);
         // Adds 2 third-party bundles whom second overrides first one's templates
-        require_once realpath(__DIR__).'/Fixtures/vendor/third-party/BarExtensionBundle/BarExtensionBundle.php';
-        require_once realpath(__DIR__).'/Fixtures/vendor/third-party/BarExtensionBundle/DependencyInjection/Compiler/OverrideBarBundlePathPass.php';
+        require_once __DIR__.'/Fixtures/third-party/BarExtensionBundle/BarExtensionBundle.php';
+        require_once __DIR__.'/Fixtures/third-party/BarExtensionBundle/DependencyInjection/Compiler/OverrideBarBundlePathPass.php';
         $container->setParameter(
             'kernel.bundles',
             \array_merge(
@@ -279,11 +276,11 @@ class TwigExtensionTest extends TestCase
                 [
                     'BarBundle' => [
                         'namespace' => 'ThirdParty\\BarBundle',
-                        'path' => realpath(__DIR__.'/Fixtures/vendor/third-party/BarBundle'),
+                        'path' => __DIR__.'/Fixtures/third-party/BarBundle',
                     ],
                     'BarExtensionBundle' => [
                         'namespace' => 'ThirdParty\\BarExtensionBundle',
-                        'path' => realpath(__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle'),
+                        'path' => __DIR__.'/Fixtures/third-party/BarExtensionBundle',
                     ],
                 ]
             )
@@ -310,13 +307,13 @@ class TwigExtensionTest extends TestCase
             [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
             [__DIR__.'/Fixtures/templates/bundles/BarBundle', 'Bar'],
             [__DIR__.'/Fixtures/templates'],
-            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', 'Bar'],
+            [__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views', 'Bar'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
-            [__DIR__.'/Fixtures/vendor/third-party/BarBundle/Resources/views', 'Bar'],
-            [__DIR__.'/Fixtures/vendor/third-party/BarBundle/Resources/views', '!Bar'],
-            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', 'BarExtension'],
-            [__DIR__.'/Fixtures/vendor/third-party/BarExtensionBundle/Resources/views', '!BarExtension'],
+            [__DIR__.'/Fixtures/third-party/BarBundle/Resources/views', 'Bar'],
+            [__DIR__.'/Fixtures/third-party/BarBundle/Resources/views', '!Bar'],
+            [__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views', 'BarExtension'],
+            [__DIR__.'/Fixtures/third-party/BarExtensionBundle/Resources/views', '!BarExtension'],
         ], $paths);
     }
 

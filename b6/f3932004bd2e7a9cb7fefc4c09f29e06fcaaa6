@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-24T10:34:03Z
+
+https://github.com/symfony/symfony/blob/f9414a8e818988ebaff4f6ec219cccce811f06c2/src/Symfony/Component/Console/Logger/ConsoleLogger.php#L27
+
+?
+
+So yeah, let Worker/Receiver produce PSR logs. And provide a new ConsoleLogger or "the logger" in the "messenger" channel for that matter from the command?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-11-26T12:18:40Z
+
+> do we have a standard way of decorating an Output instance with a logger to achieve that?
+
+was also wondering about that recently. There is `Symfony\Bridge\Monolog\Handler\ConsoleHandler` but its specific to Monolog :yum:
+
+---------------------------------------------------------------------------
+
+by Koc at 2018-12-04T13:45:58Z
+
+What about adding also some `writeln` like `Start consuming messages from transport "amqp".`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-12T18:21:31Z
+
+This bothers me too.
+
+> What about adding also some writeln like `Start consuming messages from transport "amqp".?`
+
++1 for this
+
+> which then leads to: shouldn't we inject a logger instead of an output instance?
+
+Yea, let's inject `monolog.logger.messenger` and just log to it. Then, of course, people won't see the log messages in the console, by default. That can be solved by telling the user to use `-v`:
+
+> Consuming messages from transport "amqp".
+> Re-run the command with a `-v` option to see more details.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-12T20:52:54Z
+
+Status: needs review

@@ -19,6 +19,12 @@ use Symfony\Component\Workflow\Marking;
  *
  * This store deals with a "single state" or "multiple state" Marking.
  *
+ * "single state" Marking means a subject can be in one and only one state at
+ * the same time. Use it with state machine or specific workflow.
+ *
+ * "multiple state" Marking means a subject can be in many states at the same
+ * time. Use it with workflow.
+ *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class MethodMarkingStore implements MarkingStoreInterface

@@ -57,7 +57,11 @@ class MockClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        return $this->getNextResponse();
+        if (!\count($this->responses)) {
+            throw new TransportException('No predefined response to send. Please add one or more using "addResponse" method.');
+        }
+
+        return \array_shift($this->responses);
     }
 
     /**
@@ -82,20 +86,11 @@ class MockClient implements HttpClientInterface
     }
 
     /**
-     * Clear all predefined responses and requests.
+     * Clear all predefined responses.
      */
     public function clear(): void
     {
         $this->responses = [];
-    }
-
-    private function getNextResponse(): ResponseInterface
-    {
-        if (!\count($this->responses)) {
-            throw new TransportException('No predefined response to send. Please add one or more using "addResponse" method.');
-        }
-
-        return \array_shift($this->responses);
     }
 
     private function streamResponses(iterable $responses): \Generator

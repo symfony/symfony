@@ -11,7 +11,13 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Symfony\Component\HttpClient\Chunk\DataChunk;
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
+use Symfony\Component\HttpClient\Chunk\FirstChunk;
+use Symfony\Component\HttpClient\Chunk\LastChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -23,8 +29,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  */
 class MockClient implements HttpClientInterface
 {
-    use HttpClientTrait;
-
     /**
      * Predefined responses. Throw a TransportExceptionInterface when none provided.
      *
@@ -33,29 +37,27 @@ class MockClient implements HttpClientInterface
     private $responses = [];
 
     /**
-     * Predefined streamed responses. Throw a TransportExceptionInterface when none provided.
+     * MockClient constructor.
      *
-     * @var ResponseStreamInterface[]
+     * @param iterable|ResponseInterface[] $responses
      */
-    private $streams = [];
+    public function __construct(iterable $responses = [])
+    {
+        foreach ($responses as $response) {
+            if (!$response instanceof ResponseInterface) {
+                throw new \InvalidArgumentException(sprintf('All responses must implement "%s"', ResponseInterface::class));
+            }
 
-    private $requests = [];
-
-    private $streamedRequests = [];
+            $this->responses[] = $response;
+        }
+    }
 
     /**
      * {@inheritdoc}
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        if (!\count($this->responses)) {
-            throw new TransportException('No predefined response to send. Please add one or more using "addResponse" method.');
-        }
-
-        [$url, $options] = static::prepareRequest($method, $url, $options, [], true);
-        $this->requests[] = compact('method', 'url', 'options');
-
-        return \array_shift($this->responses);
+        return $this->getNextResponse();
     }
 
     /**
@@ -63,13 +65,7 @@ class MockClient implements HttpClientInterface
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
-        if (!\count($this->streams)) {
-            throw new TransportException('No predefined response to send. Please add one or more using "addResponseStream" method.');
-        }
-
-        $this->streamedRequests[] = $responses;
-
-        return \array_shift($this->streams);
+        return new ResponseStream($this->streamNext());
     }
 
     public function addResponse(ResponseInterface $response): self
@@ -79,37 +75,41 @@ class MockClient implements HttpClientInterface
         return $this;
     }
 
-    public function addResponseStream(ResponseStreamInterface $response): self
-    {
-        $this->streams[] = $response;
-
-        return $this;
-    }
-
-    /**
-     * Get all the call to ::request() made by the client.
-     */
-    public function getRequests(): array
-    {
-        return $this->requests;
-    }
-
-    /**
-     * Get all the call to ::stream() made by the client.
-     */
-    public function getStreamedRequests(): array
-    {
-        return $this->streamedRequests;
-    }
-
     /**
      * Clear all predefined responses and requests.
      */
     public function clear(): void
     {
         $this->responses = [];
-        $this->streams = [];
-        $this->requests = [];
-        $this->streamedRequests = [];
+    }
+
+    private function getNextResponse(): ResponseInterface
+    {
+        if (!\count($this->responses)) {
+            throw new TransportException('No predefined response to send. Please add one or more using "addResponse" method.');
+        }
+
+        return \array_shift($this->responses);
+    }
+
+    private function streamNext(): \Generator
+    {
+        $response = $this->getNextResponse();
+
+        try {
+            $response->getHeaders(true);
+        } catch (TransportExceptionInterface $e) {
+            yield new ErrorChunk($didThrow, 0, $e);
+        }
+
+        try {
+            $content = $response->getContent(true);
+
+            yield new FirstChunk(0, $content);
+            yield new DataChunk(1, $content);
+            yield new LastChunk(2, $content);
+        } catch (TransportExceptionInterface $e) {
+            yield new ErrorChunk($didThrow, 0, $e);
+        }
     }
 }

@@ -14,7 +14,7 @@ lacus. Proin eleifend nisi id neque porta tincidunt. Quisque tempus purus sit am
 nisi eros. In hac habitasse platea dictumst. Ut ut metus eu diam aliquam feugiat. Pellentesque leo urna, efficitur ac
 velit quis, tempor molestie odio. Cras vitae cursus leo.
 
-<question>Duis in libero ut <comment>odio</comment> <info>porta</info> dignissim. In molestie diam at ante dictum ullamcorper. Ut auctor eros elit, nec molestie
+<question>Duis in libero ut <comment>odio</comment> <info>porta</info> dignissim. <fg=green;options=bold>In molestie diam at ante dictum ullamcorper.</> Ut auctor eros elit, nec molestie
 erat viverra ut. Vestibulum nisl ex, cursus quis magna id, pulvinar condimentum sem. Nunc ac orci volutpat turpis luctus
 tempor. Phasellus non ultrices est. Proin quis risus ut risus interdum pellentesque. Vestibulum lobortis, est in
 accumsan porttitor, nunc neque vulputate ipsum, vel varius metus orci condimentum magna. Duis vulputate leo et mi

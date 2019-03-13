@@ -325,7 +325,7 @@ class PrettyWordWrapper
      *
      * Eg:
      *      $replacement = 'STARTTAG>\\0<ENDTAG'
-     *                          ^^^ placeholder
+     *                               ^^^ placeholder
      *      $string = '<comment>Test comment</comment>'
      *      return: 'STARTTAG><comment><ENDTAGTest commentSTARTTAG></comment><ENDTAG'
      *

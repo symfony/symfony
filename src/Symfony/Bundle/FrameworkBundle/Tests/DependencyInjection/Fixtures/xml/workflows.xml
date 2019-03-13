@@ -29,12 +29,12 @@
                 <framework:to>approved_by_journalist</framework:to>
             </framework:transition>
             <framework:transition name="spellchecker_approval">
-                <framework:from>wait_for_spellcheker</framework:from>
-                <framework:to>approved_by_spellchker</framework:to>
+                <framework:from>wait_for_spellchecker</framework:from>
+                <framework:to>approved_by_spellchecker</framework:to>
             </framework:transition>
             <framework:transition name="publish">
                 <framework:from>approved_by_journalist</framework:from>
-                <framework:from>approved_by_spellchker</framework:from>
+                <framework:from>approved_by_spellchecker</framework:from>
                 <framework:to>published</framework:to>
             </framework:transition>
         </framework:workflow>

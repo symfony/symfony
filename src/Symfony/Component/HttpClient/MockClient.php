@@ -45,7 +45,7 @@ class MockClient implements HttpClientInterface
     {
         foreach ($responses as $response) {
             if (!$response instanceof ResponseInterface) {
-                throw new \InvalidArgumentException(sprintf('All responses must implement "%s"', ResponseInterface::class));
+                throw new \TypeError(sprintf('Each predefined response must an instance of %s, %s given.', ResponseInterface::class, \is_object($response) ? \get_class($response) : \gettype($response)));
             }
 
             $this->responses[] = $response;
@@ -65,7 +65,13 @@ class MockClient implements HttpClientInterface
      */
     public function stream($responses, float $timeout = null): ResponseStreamInterface
     {
-        return new ResponseStream($this->streamNext());
+        if ($responses instanceof ResponseInterface) {
+            $responses = [$responses];
+        } elseif (!\is_iterable($responses)) {
+            throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of ResponseInterface objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
+        }
+
+        return new ResponseStream($this->streamResponses($responses));
     }
 
     public function addResponse(ResponseInterface $response): self
@@ -92,25 +98,26 @@ class MockClient implements HttpClientInterface
         return \array_shift($this->responses);
     }
 
-    private function streamNext(): \Generator
+    private function streamResponses(iterable $responses): \Generator
     {
-        $response = $this->getNextResponse();
-        $didThrow = false;
+        foreach ($responses as $response) {
+            $didThrow = false;
 
-        try {
-            $response->getHeaders(true);
-        } catch (TransportExceptionInterface $e) {
-            yield new ErrorChunk($didThrow, 0, $e);
-        }
+            try {
+                $response->getHeaders(true);
+            } catch (TransportExceptionInterface $e) {
+                yield $response => new ErrorChunk($didThrow, 0, $e);
+            }
 
-        try {
-            $content = $response->getContent(true);
+            try {
+                $content = $response->getContent(true);
 
-            yield new FirstChunk(0, $content);
-            yield new DataChunk(1, $content);
-            yield new LastChunk(2, $content);
-        } catch (TransportExceptionInterface $e) {
-            yield new ErrorChunk($didThrow, 0, $e);
+                yield $response => new FirstChunk(0, $content);
+                yield $response => new DataChunk(1, $content);
+                yield $response => new LastChunk(2, $content);
+            } catch (TransportExceptionInterface $e) {
+                yield $response => new ErrorChunk($didThrow, 0, $e);
+            }
         }
     }
 }

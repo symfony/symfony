@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockClient;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -25,9 +24,9 @@ class MockClientTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->expects($this->any())->method('getContent')->willReturn('{"foo": "bar"}');
 
-        $client = new MockClient([$response]);
+        $client = new MockClient();
 
-        foreach ($client->stream([]) as $chunk) {
+        foreach ($client->stream($response) as $chunk) {
             $this->assertInstanceOf(ChunkInterface::class, $chunk);
 
             if ($chunk->isLast()) {
@@ -38,19 +37,16 @@ class MockClientTest extends TestCase
 
     public function testStreamWithUnhappyResponse()
     {
+        $client = new MockClient();
         $response = $this->createMock(ResponseInterface::class);
         $e = new TransportException('Something is broken :(');
 
         $response->method('getHeaders')->willThrowException($e);
-        $response->method('getContent')->willThrowException($e);
 
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage($e->getMessage());
 
-        foreach ((new MockClient([$response]))->stream([]) as $chunk) {
-            $this->assertInstanceOf(ErrorChunk::class, $chunk);
-            $this->assertSame($e->getMessage(), $chunk->getContent());
-        }
+        $client->stream($response)->valid();
     }
 
     public function testRequest()
@@ -69,5 +65,13 @@ class MockClientTest extends TestCase
         $this->expectExceptionMessage('No predefined response to send. Please add one or more using "addResponse" method.');
 
         (new MockClient())->request('GET', '/whatever?q=foo', ['base_uri' => 'http://example.org']);
+    }
+
+    public function testConstructWithInvalidType()
+    {
+        $this->expectException('TypeError');
+        $this->expectExceptionMessage('Each predefined response must an instance of Symfony\Contracts\HttpClient\ResponseInterface, stdClass given.');
+
+        new MockClient([new \stdClass()]);
     }
 }

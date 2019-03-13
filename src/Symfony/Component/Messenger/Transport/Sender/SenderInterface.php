@@ -22,6 +22,9 @@ interface SenderInterface
 {
     /**
      * Sends the given envelope.
+     *
+     * The sender can read different stamps for transport configuration,
+     * like delivery delay.
      */
     public function send(Envelope $envelope): Envelope;
 }

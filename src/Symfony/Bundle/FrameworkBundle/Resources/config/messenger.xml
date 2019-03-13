@@ -64,5 +64,18 @@
             <tag name="messenger.transport_factory" />
             <argument type="service" id="messenger.transport.serializer" />
         </service>
+
+        <!-- retry -->
+        <service id="messenger.retry_strategy_locator">
+            <tag name="container.service_locator" />
+            <argument type="collection" />
+        </service>
+
+        <service id="messenger.retry.abstract_multiplier_retry_strategy" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy" abstract="true">
+            <argument /> <!-- max retries -->
+            <argument /> <!-- delay ms -->
+            <argument /> <!-- multiplier -->
+            <argument /> <!-- max delay ms -->
+        </service>
     </services>
 </container>

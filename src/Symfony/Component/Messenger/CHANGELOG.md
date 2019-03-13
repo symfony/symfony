@@ -3,7 +3,34 @@ CHANGELOG
 
 4.3.0
 -----
-
+ 
+ * [BC BREAK] 2 new methods were added to `ReceiverInterface`:
+   `ack()` and `reject()`.
+ * [BC BREAK] Error handling was moved from the receivers into
+   `Worker`. Implementations of `ReceiverInterface::handle()`
+   should now allow all exceptions to be thrown, except for transport
+   exceptions. They should also not retry (e.g. if there's a queue,
+   remove from the queue) if there is a problem decoding the message.
+ * [BC BREAK] `RejectMessageExceptionInterface` was removed and replaced
+   by `Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException`,
+   which has the same behavior: a message will not be retried
+ * The default command name for `ConsumeMessagesCommand` was
+   changed from `messenger:consume-messages` to `messenger:consume`
+ * `ConsumeMessagesCommand` has two new optional constructor arguments
+ * `Worker` has 4 new option constructor arguments.
+ * The `Worker` class now handles calling `pcntl_signal_dispatch()` the
+   receiver no longer needs to call this.
+ * The `AmqpSender` will now retry messages using a dead-letter exchange
+   and delayed queues, instead of retrying via `nack()`
+ * Senders now receive the `Envelope` with the `SentStamp` on it. Previously,
+   the `Envelope` was passed to the sender and *then* the `SentStamp`
+   was added.
+ * `SerializerInterface` implementations should now throw a
+   `Symfony\Component\Messenger\Exception\MessageDecodingFailedException`
+   if `decode()` fails for any reason.
+ * [BC BREAK] The default `Serializer` will now throw a
+   `MessageDecodingFailedException` if `decode()` fails, instead
+   of the underlying exceptions from the Serializer component.
  * Added `PhpSerializer` which uses PHP's native `serialize()` and
    `unserialize()` to serialize messages to a transport
  * [BC BREAK] If no serializer were passed, the default serializer

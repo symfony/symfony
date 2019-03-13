@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -34,9 +35,19 @@ class EnvelopeTest extends TestCase
 
     public function testWithReturnsNewInstance()
     {
-        $envelope = new Envelope($dummy = new DummyMessage('dummy'));
+        $envelope = new Envelope(new DummyMessage('dummy'));
 
         $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
+    }
+
+    public function testWithoutAll()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'), new ReceivedStamp(), new ReceivedStamp(), new DelayStamp(5000));
+
+        $envelope = $envelope->withoutAll(ReceivedStamp::class);
+
+        $this->assertEmpty($envelope->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelope->all(DelayStamp::class));
     }
 
     public function testLast()

@@ -251,6 +251,7 @@ class MessengerPassTest extends TestCase
         $container->register('console.command.messenger_consume_messages', ConsumeMessagesCommand::class)->setArguments([
             null,
             new Reference('messenger.receiver_locator'),
+            new Reference('messenger.retry_strategy_locator'),
             null,
             null,
             null,
@@ -603,6 +604,14 @@ class DummyReceiver implements ReceiverInterface
     }
 
     public function stop(): void
+    {
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+    }
+
+    public function reject(Envelope $envelope): void
     {
     }
 }

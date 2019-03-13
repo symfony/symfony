@@ -55,4 +55,14 @@ class StopWhenMemoryUsageIsExceededReceiver implements ReceiverInterface
     {
         $this->decoratedReceiver->stop();
     }
+
+    public function ack(Envelope $envelope): void
+    {
+        $this->decoratedReceiver->ack($envelope);
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+        $this->decoratedReceiver->reject($envelope);
+    }
 }

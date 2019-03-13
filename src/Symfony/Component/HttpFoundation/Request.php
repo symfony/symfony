@@ -1330,7 +1330,7 @@ class Request
      *
      * @param string|null $default The default format
      *
-     * @return string The request format
+     * @return string|null The request format
      */
     public function getRequestFormat($default = 'html')
     {

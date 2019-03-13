@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @internal
+ * @experimental in 4.3
  */
 final class ServerException extends \RuntimeException implements ServerExceptionInterface
 {

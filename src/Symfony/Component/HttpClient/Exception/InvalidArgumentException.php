@@ -16,7 +16,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @internal
+ * @experimental in 4.3
  */
 final class InvalidArgumentException extends \InvalidArgumentException implements TransportExceptionInterface
 {

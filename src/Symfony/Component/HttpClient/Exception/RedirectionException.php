@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @internal
+ * @experimental in 4.3
  */
 final class RedirectionException extends \RuntimeException implements RedirectionExceptionInterface
 {

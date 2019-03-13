@@ -14,7 +14,7 @@ Cache
 
  * The `psr/simple-cache` dependency has been removed - run `composer require psr/simple-cache` if you need it.
  * Deprecated all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
- * Deprecated `SimpleCacheAdapter`, use `Psr16Adapter instead.
+ * Deprecated `SimpleCacheAdapter`, use `Psr16Adapter` instead.
 
 Config
 ------

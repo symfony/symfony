@@ -115,7 +115,7 @@ EOF
                 sort($options[$k]);
             }
         } else {
-            if (!class_exists($class)) {
+            if (!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) {
                 $class = $this->getFqcnTypeClass($input, $io, $class);
             }
             $resolvedType = $this->formRegistry->getType($class);

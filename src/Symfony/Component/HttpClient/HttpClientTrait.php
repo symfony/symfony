@@ -71,18 +71,30 @@ trait HttpClientTrait
             throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, %s given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
         }
 
-        if (!\is_string($options['auth'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('Option "auth" must be string, %s given.', \gettype($options['auth'])));
+        if (!\is_string($options['auth_basic'] ?? '')) {
+            throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string, %s given.', \gettype($options['auth_basic'])));
+        }
+
+        if (!\is_string($options['auth_bearer'] ?? '')) {
+            throw new InvalidArgumentException(sprintf('Option "auth_bearer" must be string, %s given.', \gettype($options['auth_bearer'])));
+        }
+
+        if (isset($options['auth_basic'], $options['auth_bearer'])) {
+            throw new InvalidArgumentException('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         }
 
         if (null !== $url) {
             // Merge auth with headers
-            if (($options['auth'] ?? false) && !($headers['authorization'] ?? false)) {
-                $rawHeaders[] = 'authorization: '.$headers['authorization'][] = 'Basic '.base64_encode($options['auth']);
+            if (($options['auth_basic'] ?? false) && !($headers['authorization'] ?? false)) {
+                $rawHeaders[] = 'authorization: '.$headers['authorization'][] = 'Basic '.base64_encode($options['auth_basic']);
+            }
+            // Merge bearer with headers
+            if (($options['auth_bearer'] ?? false) && !($headers['authorization'] ?? false)) {
+                $rawHeaders[] = 'authorization: '.$headers['authorization'][] = 'Bearer '.$options['auth_bearer'];
             }
 
             $options['raw_headers'] = $rawHeaders;
-            unset($options['auth']);
+            unset($options['auth_basic'], $options['auth_bearer']);
 
             // Parse base URI
             if (\is_string($options['base_uri'])) {

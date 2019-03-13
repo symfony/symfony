@@ -185,8 +185,25 @@ class HttpClientTraitTest extends TestCase
      * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
      * @expectedExceptionMessage Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.
      */
-    public function testSetBasicAndBearerOption()
+    public function testSetAuthBasicAndBearerOptions()
     {
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
+    public function providePrepareAuthBasic()
+    {
+        yield ['foo:bar', 'Zm9vOmJhcg=='];
+        yield [['foo', 'bar'], 'Zm9vOmJhcg=='];
+        yield ['foo', 'Zm9v'];
+        yield [['foo'], 'Zm9v'];
+    }
+
+    /**
+     * @dataProvider providePrepareAuthBasic
+     */
+    public function testPrepareAuthBasic($arg, $result)
+    {
+        [, $options] = $this->prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
+        $this->assertSame('Basic '.$result, $options['headers']['authorization'][0]);
     }
 }

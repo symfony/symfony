@@ -34,9 +34,12 @@ class HttpOptions
     /**
      * @return $this
      */
-    public function setAuthBasic(string $userinfo)
+    public function setAuthBasic(string $user, string $password = '')
     {
-        $this->options['auth'] = $userinfo;
+        $this->options['auth_basic'] = $user;
+        if ('' !== $password) {
+            $this->options['auth_basic'] .= ':'.$password;
+        }
 
         return $this;
     }

@@ -95,6 +95,7 @@ class MockClient implements HttpClientInterface
     private function streamNext(): \Generator
     {
         $response = $this->getNextResponse();
+        $didThrow = false;
 
         try {
             $response->getHeaders(true);

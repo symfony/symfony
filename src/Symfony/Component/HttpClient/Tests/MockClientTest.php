@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockClient;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -32,6 +33,23 @@ class MockClientTest extends TestCase
             if ($chunk->isLast()) {
                 $this->assertSame('{"foo": "bar"}', $chunk->getContent());
             }
+        }
+    }
+
+    public function testStreamWithUnhappyResponse()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $e = new TransportException('Something is broken :(');
+
+        $response->method('getHeaders')->willThrowException($e);
+        $response->method('getContent')->willThrowException($e);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage($e->getMessage());
+
+        foreach ((new MockClient([$response]))->stream([]) as $chunk) {
+            $this->assertInstanceOf(ErrorChunk::class, $chunk);
+            $this->assertSame($e->getMessage(), $chunk->getContent());
         }
     }
 

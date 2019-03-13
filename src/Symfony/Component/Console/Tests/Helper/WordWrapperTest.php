@@ -26,12 +26,12 @@ class WordWrapperTest extends TestCase
 
     public function dpTestConstructorExceptions()
     {
-        return array(
-            array(0, PHP_EOL),
-            array(-1, PHP_EOL),
-            array(0, ''),
-            array(1, ''),
-        );
+        return [
+            [0, PHP_EOL],
+            [-1, PHP_EOL],
+            [0, ''],
+            [1, ''],
+        ];
     }
 
     /**
@@ -74,70 +74,70 @@ class WordWrapperTest extends TestCase
         $baseBreak = "\n";
         $customBreak = "__break__\n";
 
-        return array(
+        return [
             // Check empty
-            array('', 120, $baseBreak, true, ''),
-            array($baseBreak, 120, $baseBreak, true, $baseBreak),
+            ['', 120, $baseBreak, true, ''],
+            [$baseBreak, 120, $baseBreak, true, $baseBreak],
             // Check limit and UTF-8
-            array(
+            [
                 'utf120.txt',
                 120,
                 $baseBreak,
                 WordWrapper::DEFAULT_CUT,
                 'utf120.txt',
-            ),
+            ],
             // Check simple text
-            array(
+            [
                 'lipsum.txt',
                 120,
                 $baseBreak,
                 WordWrapper::DEFAULT_CUT,
                 'lipsum.txt',
-            ),
+            ],
             // Check colored text
-            array(
+            [
                 'lipsum_with_tags.txt',
                 120,
                 $baseBreak,
                 WordWrapper::DEFAULT_CUT,
                 'lipsum_with_tags.txt',
-            ),
+            ],
             // Check custom break
-            array(
+            [
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
                 $customBreak,
                 WordWrapper::DEFAULT_CUT,
                 'lipsum_with_tags_and_custom_break.txt',
-            ),
+            ],
             // Check long words
-            array(
+            [
                 'with_long_words.txt',
                 30,
                 $baseBreak,
                 WordWrapper::DEFAULT_CUT,
                 'with_long_words_with_default_cut.txt',
-            ),
-            array(
+            ],
+            [
                 'with_long_words.txt',
                 30,
                 $baseBreak,
                 WordWrapper::CUT_DISABLE,
                 'with_long_words_without_cut.txt',
-            ),
-            array(
+            ],
+            [
                 'with_long_words.txt',
                 30,
                 $baseBreak,
                 WordWrapper::CUT_ALL,
                 'with_long_words_with_cut_all.txt',
-            ),
-        );
+            ],
+        ];
     }
 
     protected function getInputContents($filenameOrText)
     {
-        $file = __DIR__ . '/../Fixtures/Helper/WordWrapper/input/' .$filenameOrText;
+        $file = __DIR__.'/../Fixtures/Helper/WordWrapper/input/'.$filenameOrText;
 
         return file_exists($file) && is_file($file)
             ? file_get_contents($file)
@@ -146,7 +146,7 @@ class WordWrapperTest extends TestCase
 
     protected function getOutputContents($filenameOrText)
     {
-        $file = __DIR__ . '/../Fixtures/Helper/WordWrapper/output/' .$filenameOrText;
+        $file = __DIR__.'/../Fixtures/Helper/WordWrapper/output/'.$filenameOrText;
 
         return file_exists($file) && is_file($file)
             ? file_get_contents($file)

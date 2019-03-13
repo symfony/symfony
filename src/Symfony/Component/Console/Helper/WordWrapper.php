@@ -139,7 +139,7 @@ class WordWrapper
     {
         if (\count($this->newLineTokens)) {
             $this->newLines[] = implode(' ', $this->newLineTokens);
-            $this->newLineTokens = array();
+            $this->newLineTokens = [];
             $this->currentLength = 0;
         }
     }
@@ -173,8 +173,8 @@ class WordWrapper
      */
     protected function reset()
     {
-        $this->newLineTokens = array();
-        $this->newLines = array();
+        $this->newLineTokens = [];
+        $this->newLines = [];
     }
 
     /**
@@ -250,18 +250,18 @@ class WordWrapper
     protected function sliceTokenBlock($tokenBlock, $freeChars)
     {
         if ('<' == $tokenBlock[0] && '>' == mb_substr($tokenBlock, -1)) {
-            return array($tokenBlock, '', 0);
+            return [$tokenBlock, '', 0];
         }
         $blockLength = mb_strlen($tokenBlock);
         if ($blockLength <= $freeChars) {
-            return array($tokenBlock, '', $blockLength);
+            return [$tokenBlock, '', $blockLength];
         }
 
-        return array(
+        return [
             mb_substr($tokenBlock, 0, $freeChars),
             mb_substr($tokenBlock, $freeChars),
             $freeChars,
-        );
+        ];
     }
 
     protected function hasCutOption($option, $cutOptions)

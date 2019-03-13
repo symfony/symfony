@@ -15,7 +15,7 @@ Cache
 
  * Removed `CacheItem::getPreviousTags()`, use `CacheItem::getMetadata()` instead.
  * Removed all PSR-16 adapters, use `Psr16Cache` or `Symfony\Contracts\Cache\CacheInterface` implementations instead.
- * Removed `SimpleCacheAdapter`, use `Psr16Adapter instead.
+ * Removed `SimpleCacheAdapter`, use `Psr16Adapter` instead.
 
 Config
 ------

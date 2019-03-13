@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\PrettyWordWrapper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -1057,7 +1058,7 @@ TABLE
             ->setRows([
                 ['Divine Comedy', 'A Tale of Two Cities', 'The Lord of the Rings', 'And Then There Were None'],
             ])
-            ->setColumnMaxWidth(1, 5)
+            ->setColumnMaxWidth(1, 5, PrettyWordWrapper::CUT_ALL)
             ->setColumnMaxWidth(2, 10)
             ->setColumnMaxWidth(3, 15);
 
@@ -1065,12 +1066,12 @@ TABLE
 
         $expected =
             <<<TABLE
-+---------------+-------+------------+-----------------+
-| Divine Comedy | A Tal | The Lord o | And Then There  |
-|               | e of  | f the Ring | Were None       |
-|               | Two C | s          |                 |
-|               | ities |            |                 |
-+---------------+-------+------------+-----------------+
++---------------+-------+----------+----------------+
+| Divine Comedy | A Tal | The Lord | And Then There |
+|               | e of  | of the   | Were None      |
+|               | Two C | Rings    |                |
+|               | ities |          |                |
++---------------+-------+----------+----------------+
 
 TABLE;
 

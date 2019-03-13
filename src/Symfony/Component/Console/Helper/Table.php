@@ -82,6 +82,7 @@ class Table
      */
     private $columnWidths = [];
     private $columnMaxWidths = [];
+    private $columnWordWrapCutOptions = [];
 
     private static $styles;
 
@@ -228,13 +229,14 @@ class Table
      *
      * @return $this
      */
-    public function setColumnMaxWidth(int $columnIndex, int $width): self
+    public function setColumnMaxWidth(int $columnIndex, int $width, int $cutOptions = PrettyWordWrapper::CUT_LONG_WORDS): self
     {
         if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
             throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, \get_class($this->output->getFormatter())));
         }
 
         $this->columnMaxWidths[$columnIndex] = $width;
+        $this->columnWordWrapCutOptions[$columnIndex] = $cutOptions;
 
         return $this;
     }
@@ -523,7 +525,11 @@ class Table
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
                 if (isset($this->columnMaxWidths[$column]) && Helper::strlenWithoutDecoration($formatter, $cell) > $this->columnMaxWidths[$column]) {
-                    $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column]);
+                    $cell = $formatter->format(PrettyWordWrapper::wrap(
+                        $cell,
+                        $this->columnMaxWidths[$column],
+                        $this->columnWordWrapCutOptions[$column]
+                    ));
                 }
                 if (!strstr($cell, "\n")) {
                     continue;

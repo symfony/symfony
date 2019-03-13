@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-12-07T14:43:29Z
+
+The compiler pass should be deprecated, not removed. It don't think making such BC break is actually worth it compared to the deprecation path.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-12-07T14:46:10Z
+
+Okay, Il will deprecate it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-12T13:14:41Z
+
+Hi. I rebased and finished this PR. I put back the ValidateWorkflowsPass but I deprecate it.
+I think it's OK now
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-12T15:55:49Z
+
+@stof @xabbuh Are you OK with this one? Could I merge it?

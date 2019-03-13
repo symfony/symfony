@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-12T11:03:16Z
+
+@xabbuh @nicolas-grekas Thanks for your feedback. I addressed them. But the trick with the extra argument does not work for me :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-12T17:19:56Z
+
+`MultipleStateMarkingStore`, `MultipleStateMarkingStore` and `SingleStateMarkingStore` need the same approach also, they still break BC for now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-13T09:13:58Z
+
+@nicolas-grekas Good catch. I removed the thirs param on both implem (not used anyway). More over, I will deprecate theses implemems in another PR

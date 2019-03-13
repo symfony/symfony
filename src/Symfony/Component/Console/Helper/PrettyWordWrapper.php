@@ -11,9 +11,27 @@
 namespace Symfony\Component\Console\Helper;
 
 /**
+ * It helps you to wrap long text with pretty breaks and useful cuts. You can control the cuts with the control option:
+ *      - CUT_DISABLE:      Always break the text at word boundary.
+ *      - CUT_LONG_WORDS:   If the word is longer than one row it will be cut.
+ *      - CUT_WORDS:        Always break at set length, it will cut all words. It would be useful if you have little
+ *                          space. (Info: It "contains" the CUT_LONG_WORDS option)
+ *      - CUT_URLS:         Lots of terminal can recognize URL-s in text and make them clickable (if there isn't break
+ *                          inside the URL) The URLS can be long, default we keep it in one block even if it gets ugly
+ *                          response. You can switch this behavior off with this option. The result will be pretty,
+ *                          but the URL won't be clickable.
+ *
+ * <code>
+ *      $message = "<comment>This is a comment message with <info>info</info></comment> ...";
+ *      // Default:
+ *      $output->writeln(PrettyWordWrapper::wrap($message, 120);
+ *      // Use custom settings:
+ *      $output->writeln(PrettyWordWrapper::wrap($message, 20, PrettyWordWrapper::CUT_ALL, PHP_EOL);
+ * </code>
+ *
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
  */
-class WordWrapper
+class PrettyWordWrapper
 {
     // Defaults
     const DEFAULT_WIDTH = 120;
@@ -64,27 +82,27 @@ class WordWrapper
     /**
      * @param string $string     The text
      * @param int    $width      Character width of one line
-     * @param string $break      The line breaking character(s)
      * @param int    $cutOptions You can mix your needs with CUT_* constants
+     * @param string $break      The line breaking character(s)
      *
      * @return string
      */
-    public static function wrap(string $string, int $width = self::DEFAULT_WIDTH, string $break = self::DEFAULT_BREAK, int $cutOptions = self::DEFAULT_CUT): string
+    public static function wrap(string $string, int $width = self::DEFAULT_WIDTH, int $cutOptions = self::DEFAULT_CUT, string $break = self::DEFAULT_BREAK): string
     {
         $wrapper = self::getInstance();
 
-        return $wrapper->wordwrap($string, $width, $break, $cutOptions);
+        return $wrapper->wordwrap($string, $width, $cutOptions, $break);
     }
 
     /**
      * @param string $string     The text
      * @param int    $width      Character width of one line
-     * @param string $break      The line breaking character(s)
      * @param int    $cutOptions You can mix your needs with CUT_* constants
+     * @param string $break      The line breaking character(s)
      *
      * @return string
      */
-    public function wordwrap(string $string, int $width = self::DEFAULT_WIDTH, string $break = self::DEFAULT_BREAK, int $cutOptions = self::DEFAULT_CUT): string
+    public function wordwrap(string $string, int $width = self::DEFAULT_WIDTH, int $cutOptions = self::DEFAULT_CUT, string $break = self::DEFAULT_BREAK): string
     {
         if ($width <= 0) {
             throw new \InvalidArgumentException('You have to set more than 0 width!');
@@ -112,7 +130,7 @@ class WordWrapper
     }
 
     /**
-     * This function handles what what does
+     * This function handles what to happen at end of the line.
      *
      * @param string $token
      * @param int    $virtualTokenLength

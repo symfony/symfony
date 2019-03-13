@@ -8,20 +8,19 @@ use Symfony\Component\Console\Helper\PrettyWordWrapper;
 /**
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
  */
-class WordWrapperTest extends TestCase
+class PrettyWordWrapperTest extends TestCase
 {
     /**
      * @param int    $width
      * @param string $break
      *
      * @dataProvider dpTestConstructorExceptions
-     *
-     * @expectedException \InvalidArgumentException
      */
     public function testConstructorExceptions($width, $break)
     {
         $wordWrapper = new PrettyWordWrapper();
-        $wordWrapper->wordwrap('test', $width, $break);
+        $this->expectException(\InvalidArgumentException::class);
+        $wordWrapper->wordwrap('test', $width, PrettyWordWrapper::DEFAULT_CUT, $break);
     }
 
     public function dpTestConstructorExceptions()
@@ -43,10 +42,10 @@ class WordWrapperTest extends TestCase
      *
      * @dataProvider dpWordwrap
      */
-    public function testWordwrap($input, $width, $break, $cutOptions, $output)
+    public function testWordwrap($input, $width, $cutOptions, $break, $output)
     {
         $wordWrapper = new PrettyWordWrapper();
-        $response = $wordWrapper->wordwrap($this->getInputContents($input), $width, $break, $cutOptions);
+        $response = $wordWrapper->wordwrap($this->getInputContents($input), $width, $cutOptions, $break);
 
         $this->assertEquals($this->getOutputContents($output), $response);
     }
@@ -62,9 +61,9 @@ class WordWrapperTest extends TestCase
      *
      * @dataProvider dpWordwrap
      */
-    public function testStaticWrap($input, $width, $break, $cutOptions, $output)
+    public function testStaticWrap($input, $width, $cutOptions, $break, $output)
     {
-        $response = PrettyWordWrapper::wrap($this->getInputContents($input), $width, $break, $cutOptions);
+        $response = PrettyWordWrapper::wrap($this->getInputContents($input), $width, $cutOptions, $break);
 
         $this->assertEquals($this->getOutputContents($output), $response);
     }
@@ -76,60 +75,60 @@ class WordWrapperTest extends TestCase
 
         return [
             // Check empty
-            ['', 120, $baseBreak, true, ''],
-            [$baseBreak, 120, $baseBreak, true, $baseBreak],
+            ['', 120, PrettyWordWrapper::DEFAULT_CUT, $baseBreak, ''],
+            [$baseBreak, 120, PrettyWordWrapper::DEFAULT_CUT, $baseBreak, $baseBreak],
             // Check limit and UTF-8
             [
                 'utf120.txt',
                 120,
-                $baseBreak,
                 PrettyWordWrapper::DEFAULT_CUT,
+                $baseBreak,
                 'utf120.txt',
             ],
             // Check simple text
             [
                 'lipsum.txt',
                 120,
-                $baseBreak,
                 PrettyWordWrapper::DEFAULT_CUT,
+                $baseBreak,
                 'lipsum.txt',
             ],
             // Check colored text
             [
                 'lipsum_with_tags.txt',
                 120,
-                $baseBreak,
                 PrettyWordWrapper::DEFAULT_CUT,
+                $baseBreak,
                 'lipsum_with_tags.txt',
             ],
             // Check custom break
             [
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
-                $customBreak,
                 PrettyWordWrapper::DEFAULT_CUT,
+                $customBreak,
                 'lipsum_with_tags_and_custom_break.txt',
             ],
             // Check long words
             [
                 'with_long_words.txt',
                 30,
-                $baseBreak,
                 PrettyWordWrapper::DEFAULT_CUT,
+                $baseBreak,
                 'with_long_words_with_default_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
-                $baseBreak,
                 PrettyWordWrapper::CUT_DISABLE,
+                $baseBreak,
                 'with_long_words_without_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
-                $baseBreak,
                 PrettyWordWrapper::CUT_ALL,
+                $baseBreak,
                 'with_long_words_with_cut_all.txt',
             ],
         ];

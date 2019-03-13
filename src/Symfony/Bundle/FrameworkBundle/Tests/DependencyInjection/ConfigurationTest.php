@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -332,8 +333,7 @@ class ConfigurationTest extends TestCase
             ],
             'disallow_search_engine_index' => true,
             'http_client' => [
-                'enabled' => false,
-                'max_host_connections' => 6,
+                'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
                 'clients' => [],
             ],
         ];

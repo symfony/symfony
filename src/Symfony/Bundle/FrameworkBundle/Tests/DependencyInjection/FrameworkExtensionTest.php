@@ -1363,8 +1363,6 @@ abstract class FrameworkExtensionTest extends TestCase
             'query' => [],
             'headers' => [],
             'resolve' => [],
-            'peer_fingerprint' => [],
-            'http_version' => '',
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
 
@@ -1387,13 +1385,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $defaultOptions = $container->getDefinition('http_client')->getArguments()[0];
 
-        $this->assertSame('foo:bar', $defaultOptions['auth']);
+        $this->assertSame('foo:bar', $defaultOptions['auth_basic']);
         $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], $defaultOptions['query']);
         $this->assertSame(['x-powered' => ['PHP']], $defaultOptions['headers']);
         $this->assertSame(2, $defaultOptions['max_redirects']);
         $this->assertSame(2.0, (float) $defaultOptions['http_version']);
         $this->assertSame('http://example.com', $defaultOptions['base_uri']);
-        $this->assertTrue($defaultOptions['buffer']);
         $this->assertSame(['localhost' => '127.0.0.1'], $defaultOptions['resolve']);
         $this->assertSame('proxy.org', $defaultOptions['proxy']);
         $this->assertSame(3.5, $defaultOptions['timeout']);

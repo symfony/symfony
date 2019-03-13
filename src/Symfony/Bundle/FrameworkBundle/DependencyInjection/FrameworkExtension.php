@@ -1771,9 +1771,16 @@ class FrameworkExtension extends Extension
             public function merge(array $options, array $defaultOptions)
             {
                 try {
-                    [, $options] = $this->prepareRequest(null, null, $options, $defaultOptions);
+                    [, $mergedOptions] = $this->prepareRequest(null, null, $options, $defaultOptions);
 
-                    return $options;
+                    foreach ($mergedOptions as $k => $v) {
+                        if (!isset($options[$k]) && !isset($defaultOptions[$k])) {
+                            // Remove options added by prepareRequest()
+                            unset($mergedOptions[$k]);
+                        }
+                    }
+
+                    return $mergedOptions;
                 } catch (TransportExceptionInterface $e) {
                     throw new InvalidArgumentException($e->getMessage(), 0, $e);
                 }
@@ -1783,6 +1790,11 @@ class FrameworkExtension extends Extension
         $defaultOptions = $merger->merge($config['default_options'] ?? [], []);
         $container->getDefinition('http_client')->setArguments([$defaultOptions, $config['max_host_connections'] ?? 6]);
 
+        if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
+            $container->removeDefinition('psr18.http_client');
+            $container->removeAlias(ClientInterface::class);
+        }
+
         foreach ($config['clients'] as $name => $clientConfig) {
             $options = $merger->merge($clientConfig['default_options'] ?? [], $defaultOptions);
 
@@ -1790,12 +1802,15 @@ class FrameworkExtension extends Extension
                 ->setFactory([HttpClient::class, 'create'])
                 ->setArguments([$options, $clientConfig['max_host_connections'] ?? $config['max_host_connections'] ?? 6]);
 
-            $container->register('psr18.'.$name, Psr18Client::class)
-                ->setAutowired(true)
-                ->setArguments([new Reference($name)]);
-
             $container->registerAliasForArgument($name, HttpClientInterface::class);
-            $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
+
+            if ($hasPsr18) {
+                $container->register('psr18.'.$name, Psr18Client::class)
+                    ->setAutowired(true)
+                    ->setArguments([new Reference($name)]);
+
+                $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
+            }
         }
     }
 

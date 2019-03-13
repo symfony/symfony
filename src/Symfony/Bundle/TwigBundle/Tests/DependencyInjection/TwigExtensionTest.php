@@ -307,7 +307,7 @@ class TwigExtensionTest extends TestCase
             [realpath(__DIR__).'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
             [realpath(__DIR__).'/Fixtures/templates/bundles/BarBundle', 'Bar'],
             [realpath(__DIR__).'/Fixtures/templates'],
-            [realpath(__DIR__).'/Fixtures/third-party/BarExtensionBundle/Resources/views', 'Bar'],
+            [realpath(__DIR__.'/Fixtures/third-party/BarExtensionBundle').'/Resources/views', 'Bar'],
             [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
             [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
             [realpath(__DIR__).'/Fixtures/third-party/BarBundle/Resources/views', 'Bar'],

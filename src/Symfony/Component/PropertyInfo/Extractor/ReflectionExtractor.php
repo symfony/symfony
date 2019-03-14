@@ -89,13 +89,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;
             }
-            if (!$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
-                $propertyName = lcfirst($propertyName);
+            if (!$reflectionClass->hasProperty($propertyName) && !\preg_match('/^[A-Z]{2,}/', $propertyName)) {
+                $propertyName = \lcfirst($propertyName);
             }
             $properties[$propertyName] = $propertyName;
         }
 
-        return $properties ? array_values($properties) : null;
+        return $properties ? \array_values($properties) : null;
     }
 
     /**
@@ -128,7 +128,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return true;
         }
 
-        list($reflectionMethod) = $this->getAccessorMethod($class, $property);
+        [$reflectionMethod] = $this->getAccessorMethod($class, $property);
 
         return null !== $reflectionMethod;
     }
@@ -142,7 +142,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return true;
         }
 
-        list($reflectionMethod) = $this->getMutatorMethod($class, $property);
+        [$reflectionMethod] = $this->getMutatorMethod($class, $property);
 
         return null !== $reflectionMethod;
     }
@@ -307,7 +307,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function getAccessorMethod(string $class, string $property): ?array
     {
-        $ucProperty = ucfirst($property);
+        $ucProperty = \ucfirst($property);
 
         foreach ($this->accessorPrefixes as $prefix) {
             try {
@@ -333,7 +333,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function getMutatorMethod(string $class, string $property): ?array
     {
-        $ucProperty = ucfirst($property);
+        $ucProperty = \ucfirst($property);
         $ucSingulars = (array) Inflector::singularize($ucProperty);
 
         foreach ($this->mutatorPrefixes as $prefix) {
@@ -364,7 +364,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function getPropertyName(string $methodName, array $reflectionProperties): ?string
     {
-        $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
+        $pattern = \implode('|', \array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
             if (!\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
@@ -373,7 +373,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             foreach ($reflectionProperties as $reflectionProperty) {
                 foreach ((array) Inflector::singularize($reflectionProperty->name) as $name) {
-                    if (strtolower($name) === strtolower($matches[2])) {
+                    if (\strtolower($name) === \strtolower($matches[2])) {
                         return $reflectionProperty->name;
                     }
                 }

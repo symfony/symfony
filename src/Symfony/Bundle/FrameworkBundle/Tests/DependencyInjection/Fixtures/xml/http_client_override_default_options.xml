@@ -10,11 +10,10 @@
             <framework:default-options>
                 <framework:header name="foo">bar</framework:header>
             </framework:default-options>
-            <framework:client name="foo" max-host-connections="5">
-                <framework:default-options>
-                    <framework:header name="bar">baz</framework:header>
-                </framework:default-options>
-            </framework:client>
+            <framework:scope name="foo">
+                <framework:base-uri>http://example.com</framework:base-uri>
+                <framework:header name="bar">baz</framework:header>
+            </framework:scope>
         </framework:http-client>
     </framework:config>
 </container>

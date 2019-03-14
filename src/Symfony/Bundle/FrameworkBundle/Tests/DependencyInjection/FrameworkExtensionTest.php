@@ -35,6 +35,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -51,7 +52,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Workflow;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -1398,14 +1398,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('http_client'), '->registerHttpClientConfiguration() loads http_client.xml');
 
         $defaultOptions = [
-            'query' => [],
             'headers' => [],
             'resolve' => [],
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
-        $this->assertSame(HttpClientInterface::class, $container->getDefinition('foo')->getClass());
+        $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('foo')->getArguments());
     }
 
@@ -1415,8 +1414,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame(['foo' => ['bar']], $container->getDefinition('http_client')->getArgument(0)['headers']);
         $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
-        $this->assertSame(['bar' => ['baz'], 'foo' => ['bar']], $container->getDefinition('foo')->getArgument(0)['headers']);
-        $this->assertSame(5, $container->getDefinition('foo')->getArgument(1));
+        $this->assertSame(['bar' => 'baz'], $container->getDefinition($container->getDefinition('foo')->getArgument(0))->getArgument(1)['headers']);
+        $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
     }
 
     public function testHttpClientFullDefaultOptions()

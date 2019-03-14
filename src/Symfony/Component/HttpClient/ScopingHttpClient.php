@@ -61,7 +61,7 @@ class ScopingHttpClient implements HttpClientInterface
         }
 
         foreach ($this->defaultOptionsByRegexp as $regexp => $defaultOptions) {
-            if (preg_match("{{$regexp}}A", $url)) {
+            if (preg_match("{{$regexp}([:/?#]|$)}A", $url)) {
                 $options = self::mergeDefaultOptions($options, $defaultOptions, true);
                 break;
             }

@@ -71,8 +71,17 @@ trait HttpClientTrait
             throw new InvalidArgumentException(sprintf('Option "on_progress" must be callable, %s given.', \is_object($onProgress) ? \get_class($onProgress) : \gettype($onProgress)));
         }
 
+        if (\is_array($options['auth_basic'] ?? null)) {
+            $count = \count($options['auth_basic']);
+            if ($count <= 0 || $count > 2) {
+                throw new InvalidArgumentException(sprintf('Option "auth_basic" must contain 1 or 2 elements, %s given.', $count));
+            }
+
+            $options['auth_basic'] = implode(':', $options['auth_basic']);
+        }
+
         if (!\is_string($options['auth_basic'] ?? '')) {
-            throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string, %s given.', \gettype($options['auth_basic'])));
+            throw new InvalidArgumentException(sprintf('Option "auth_basic" must be string or an array, %s given.', \gettype($options['auth_basic'])));
         }
 
         if (!\is_string($options['auth_bearer'] ?? '')) {

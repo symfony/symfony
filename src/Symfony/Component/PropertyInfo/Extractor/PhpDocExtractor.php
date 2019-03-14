@@ -71,7 +71,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getShortDescription($class, $property, array $context = [])
     {
         /** @var $docBlock DocBlock */
-        list($docBlock) = $this->getDocBlock($class, $property);
+        [$docBlock] = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return;
         }
@@ -113,7 +113,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     public function getTypes($class, $property, array $context = [])
     {
         /** @var $docBlock DocBlock */
-        list($docBlock, $source, $prefix) = $this->getDocBlock($class, $property);
+        [$docBlock, $source, $prefix] = $this->getDocBlock($class, $property);
         if (!$docBlock) {
             return;
         }
@@ -136,7 +136,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
             if ($tag && null !== $tag->getType()) {
-                $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
+                $types = \array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
             }
         }
 
@@ -144,7 +144,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        if (!\in_array($prefix, $this->arrayMutatorPrefixes)) {
+        if (!\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
             return $types;
         }
 

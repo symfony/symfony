@@ -54,9 +54,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true)
     {
-        $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
-        $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
-        $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
+        $this->mutatorPrefixes = $mutatorPrefixes ?? self::$defaultMutatorPrefixes;
+        $this->accessorPrefixes = $accessorPrefixes ?? self::$defaultAccessorPrefixes;
+        $this->arrayMutatorPrefixes = $arrayMutatorPrefixes ?? self::$defaultArrayMutatorPrefixes;
         $this->enableConstructorExtraction = $enableConstructorExtraction;
     }
 
@@ -180,7 +180,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromMutator(string $class, string $property): ?array
     {
-        list($reflectionMethod, $prefix) = $this->getMutatorMethod($class, $property);
+        [$reflectionMethod, $prefix] = $this->getMutatorMethod($class, $property);
         if (null === $reflectionMethod) {
             return null;
         }
@@ -193,7 +193,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
         $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod);
 
-        if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
+        if (\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
             $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type);
         }
 
@@ -207,7 +207,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromAccessor(string $class, string $property): ?array
     {
-        list($reflectionMethod, $prefix) = $this->getAccessorMethod($class, $property);
+        [$reflectionMethod, $prefix] = $this->getAccessorMethod($class, $property);
         if (null === $reflectionMethod) {
             return null;
         }
@@ -291,9 +291,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function isPublicProperty(string $class, string $property): bool
     {
         try {
-            $reflectionProperty = new \ReflectionProperty($class, $property);
-
-            return $reflectionProperty->isPublic();
+            return (new \ReflectionProperty($class, $property))->isPublic();
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }
@@ -340,7 +338,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         foreach ($this->mutatorPrefixes as $prefix) {
             $names = [$ucProperty];
-            if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
+            if (\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
                 $names = array_merge($names, $ucSingulars);
             }
 
@@ -369,7 +367,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
-            if (!\in_array($matches[1], $this->arrayMutatorPrefixes)) {
+            if (!\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
                 return $matches[2];
             }
 

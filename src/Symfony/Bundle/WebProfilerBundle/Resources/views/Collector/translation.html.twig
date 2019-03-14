@@ -59,14 +59,16 @@
     <h2>Translation</h2>
 
     <div class="metrics">
-        <div class="metric">
-            <span class="value">{{ collector.locale|default('-') }}</span>
-            <span class="label">Locale</span>
-        </div>
-        <div class="metric">
-            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
-            <span class="label">Fallback locale{{ collector.fallbackLocales|length != 1 ? 's' }}</span>
-        </div>
+        {% block metrics %}    
+            <div class="metric">
+                <span class="value">{{ collector.locale|default('-') }}</span>
+                <span class="label">Locale</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+                <span class="label">Fallback locale{{ collector.fallbackLocales|length != 1 ? 's' }}</span>
+            </div>
+        {% endblock %}
     </div>
 
     <h2>Messages</h2>

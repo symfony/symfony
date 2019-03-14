@@ -51,6 +51,11 @@
             <tag name="controller.argument_value_resolver" priority="-150" />
         </service>
 
+        <service id="argument_resolver.controller_not_registered_as_service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ControllerNotRegisteredAsServiceValueResolver">
+            <tag name="controller.argument_value_resolver" priority="-200" />
+            <argument />
+        </service>
+
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>

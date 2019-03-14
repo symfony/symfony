@@ -94,6 +94,7 @@ class FrameworkBundle extends Bundle
 
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
+        $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass('argument_resolver.controller_not_registered_as_service'));
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RoutingResolverPass());
         $container->addCompilerPass(new ProfilerPass());

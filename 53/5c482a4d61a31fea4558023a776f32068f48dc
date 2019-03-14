@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T13:56:27Z
+
+I thought about it, but do we really need it, when the alternative is that one?
+`$client->request(..., ['bearer' => $bearer]);`
+vs
+`$client->request(..., ['headers' => ['authorization: Bearer '.$bearer]]);`
+
+Yes, it's shorter, but adding the option means added burden when implementing the interface.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-13T13:59:50Z
+
+Using a Bearer token is very common when requesting an API (more common than Basic). Also, it can be error prone (for instance, your example is wrong because the `B` of `Bearer` must be uppercased according to the RFC).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-13T14:00:31Z
+
+Regarding the burden, as this trait isn't internal, it should not be a big deal.

@@ -18,6 +18,6 @@ namespace Symfony\Contracts\HttpClient\Exception;
  *
  * @experimental in 1.1
  */
-interface RedirectionExceptionInterface extends ExceptionInterface
+interface RedirectionExceptionInterface extends HttpExceptionInterface
 {
 }

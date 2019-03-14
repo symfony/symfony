@@ -19,7 +19,7 @@ use Symfony\Component\HttpClient\HttpOptions;
  */
 class HttpOptionsTest extends TestCase
 {
-    public function provideSetAuth()
+    public function provideSetAuthBasic()
     {
         yield ['user:password', 'user', 'password'];
         yield ['user:password', 'user:password'];
@@ -28,10 +28,15 @@ class HttpOptionsTest extends TestCase
     }
 
     /**
-     * @dataProvider provideSetAuth
+     * @dataProvider provideSetAuthBasic
      */
-    public function testSetAuth(string $expected, string $user, string $password = '')
+    public function testSetAuthBasic(string $expected, string $user, string $password = '')
     {
         $this->assertSame($expected, (new HttpOptions())->setAuthBasic($user, $password)->toArray()['auth_basic']);
+    }
+
+    public function testSetAuthBearer()
+    {
+        $this->assertSame('foobar', (new HttpOptions())->setAuthBearer('foobar')->toArray()['auth_bearer']);
     }
 }

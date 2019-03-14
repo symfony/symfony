@@ -49,7 +49,7 @@ class HttpOptions
      */
     public function setAuthBearer(string $token)
     {
-        $this->options['bearer'] = $token;
+        $this->options['auth_bearer'] = $token;
 
         return $this;
     }

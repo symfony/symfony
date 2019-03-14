@@ -20,6 +20,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 abstract class Helper implements HelperInterface
 {
+    const FORMAT_TAG_REGEX = '[a-z][a-z0-9,_=;-]*+';
+
     protected $helperSet = null;
 
     /**
@@ -121,6 +123,25 @@ abstract class Helper implements HelperInterface
     public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
     {
         return self::strlen(self::removeDecoration($formatter, $string));
+    }
+
+    /**
+     * Sometimes we need to find the format tags. This regex "placeholders":
+     *      - \\0 --> full open or close tag
+     *      - \\1 --> tag "inside"
+     *      - \\2 --> only tag name
+     *
+     *      |     \\0    |    \\1   |   \\2   |
+     *      | ---------- | -------- | ------- |
+     *      | <comment>  | comment  | comment |
+     *      | </comment> | /comment | comment |
+     *      | </>        | /        | (empty) |
+     *
+     * @return string
+     */
+    public static function getFormatTagRegexPattern(): string
+    {
+        return sprintf('{<((%1$s)|/(%1$s)?)>}ix', self::FORMAT_TAG_REGEX);
     }
 
     public static function removeDecoration(OutputFormatterInterface $formatter, $string)

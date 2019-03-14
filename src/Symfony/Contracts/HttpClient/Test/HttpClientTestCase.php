@@ -214,7 +214,7 @@ abstract class HttpClientTestCase extends TestCase
     {
         $client = $this->getHttpClient();
         $response = $client->request('POST', 'http://localhost:8057/301', [
-            'auth' => 'foo:bar',
+            'auth_basic' => 'foo:bar',
             'body' => function () {
                 yield 'foo=bar';
             },
@@ -291,7 +291,7 @@ abstract class HttpClientTestCase extends TestCase
         $client = $this->getHttpClient();
         $response = $client->request('GET', 'http://localhost:8057/301', [
             'max_redirects' => 1,
-            'auth' => 'foo:bar',
+            'auth_basic' => 'foo:bar',
         ]);
 
         try {

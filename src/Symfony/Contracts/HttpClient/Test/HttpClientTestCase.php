@@ -25,7 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 abstract class HttpClientTestCase extends TestCase
 {
     private static $server;
-
     public static function setUpBeforeClass()
     {
         TestHttpServer::start();

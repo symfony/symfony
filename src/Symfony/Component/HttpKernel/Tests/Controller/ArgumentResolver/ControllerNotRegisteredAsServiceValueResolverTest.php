@@ -22,7 +22,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testDoSupportWhenControllerDoNotExists()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'my_controller']);
 
         $this->assertTrue($resolver->supports($request, $argument));
@@ -34,12 +34,12 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
             'App\\Controller\\Mine::method' => function () {
                 return new ServiceLocator([
                     'dummy' => function () {
-                        return new DummyService();
+                        return new \stdClass();
                     },
                 ]);
             },
         ]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
 
         $this->assertFalse($resolver->supports($request, $argument));
@@ -48,7 +48,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testDoNotSupportEmptyController()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '']);
 
         $this->assertFalse($resolver->supports($request, $argument));
@@ -61,7 +61,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testController()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::method']);
 
         $this->assertTrue($resolver->supports($request, $argument));
@@ -75,7 +75,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testControllerWithATrailingBackSlash()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => '\\App\\Controller\\Mine::method']);
 
         $this->assertTrue($resolver->supports($request, $argument));
@@ -89,7 +89,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testControllerWithMethodNameStartUppercase()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => 'App\\Controller\\Mine::Method']);
 
         $this->assertTrue($resolver->supports($request, $argument));
@@ -103,7 +103,7 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
     public function testControllerNameIsAnArray()
     {
         $resolver = new ControllerNotRegisteredAsServiceValueResolver(new ServiceLocator([]));
-        $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
+        $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
         $request = $this->requestWithAttributes(['_controller' => ['App\\Controller\\Mine', 'method']]);
 
         $this->assertTrue($resolver->supports($request, $argument));
@@ -120,8 +120,4 @@ class ControllerNotRegisteredAsServiceValueResolverTest extends TestCase
 
         return $request;
     }
-}
-
-class DummyService
-{
 }

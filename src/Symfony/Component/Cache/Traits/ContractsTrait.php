@@ -40,7 +40,7 @@ trait ContractsTrait
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         $previousWrapper = $this->callbackWrapper;
-        $this->callbackWrapper = $callbackWrapper ?? function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool) {
+        $this->callbackWrapper = $callbackWrapper ?? function (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata) {
             return $callback($item, $save);
         };
 
@@ -56,17 +56,19 @@ trait ContractsTrait
         static $setMetadata;
 
         $setMetadata = $setMetadata ?? \Closure::bind(
-            function (AdapterInterface $pool, ItemInterface $item, float $startTime) {
+            function (CacheItem $item, float $startTime, ?array &$metadata) {
                 if ($item->expiry > $endTime = microtime(true)) {
-                    $item->newMetadata[ItemInterface::METADATA_EXPIRY] = $item->expiry;
-                    $item->newMetadata[ItemInterface::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
+                    $item->newMetadata[CacheItem::METADATA_EXPIRY] = $metadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
+                    $item->newMetadata[CacheItem::METADATA_CTIME] = $metadata[CacheItem::METADATA_CTIME] = 1000 * (int) ($endTime - $startTime);
+                } else {
+                    unset($metadata[CacheItem::METADATA_EXPIRY], $metadata[CacheItem::METADATA_CTIME]);
                 }
             },
             null,
             CacheItem::class
         );
 
-        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata) {
+        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata) {
             // don't wrap nor save recursive calls
             if (null === $callbackWrapper = $this->callbackWrapper) {
                 $value = $callback($item, $save);
@@ -78,8 +80,10 @@ trait ContractsTrait
             $startTime = microtime(true);
 
             try {
-                $value = $callbackWrapper($callback, $item, $save, $pool);
-                $setMetadata($pool, $item, $startTime);
+                $value = $callbackWrapper($callback, $item, $save, $pool, function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
+                    $setMetadata($item, $startTime, $metadata);
+                });
+                $setMetadata($item, $startTime, $metadata);
 
                 return $value;
             } finally {

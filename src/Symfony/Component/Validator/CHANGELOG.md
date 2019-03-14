@@ -16,6 +16,8 @@ CHANGELOG
  * added `PositiveOrZero` constraint
  * added `Negative` constraint
  * added `NegativeOrZero` constraint
+ * added `ContainsWord` constraint
+ * added `NotContainsWord` constraint
  * added `StringContains` constraint
  * added `StringNotContains` constraint
 

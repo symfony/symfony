@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -21,8 +22,7 @@ class MockClientTest extends TestCase
 {
     public function testStream()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->any())->method('getContent')->willReturn('{"foo": "bar"}');
+        $response = new MockResponse('{"foo": "bar"}');
 
         $client = new MockClient();
 
@@ -52,7 +52,7 @@ class MockClientTest extends TestCase
     public function testRequest()
     {
         /** @var ResponseInterface $response */
-        $response = $this->createMock(ResponseInterface::class);
+        $response = new MockResponse();
         $client = new MockClient();
         $client->addResponse($response);
 

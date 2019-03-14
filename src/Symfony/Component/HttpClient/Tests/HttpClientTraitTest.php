@@ -174,11 +174,20 @@ class HttpClientTraitTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "auth_bearer" must be string, object given.
+     * @expectedExceptionMessage Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, object given.
      */
     public function testInvalidAuthBearerOption()
     {
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Option "auth_bearer" must be a string containing only characters from the base 64 alphabet, invalid string given.
+     */
+    public function testInvalidAuthBearerValue()
+    {
+        self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
     /**

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-09T21:10:15Z
+
+Could you please have a look at the failures? Aren't they related?
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-03-14T12:36:47Z
+
+> Could you please have a look at the failures? Aren't they related?
+
+I took a look (please see https://github.com/symfony/symfony/pull/30487#discussion_r265546369)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-15T13:34:41Z
+
+Thanks @dimabory

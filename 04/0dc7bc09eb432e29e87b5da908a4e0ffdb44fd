@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-02-28T14:48:54Z
+
+Is there any possibility to index by a class name?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-28T14:50:16Z
+
+@vudaltsov sure: implement getDefautKeyName and make it return self::class.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-02-28T14:53:40Z
+
+That will be a new static method in the interface which all tagged services implement...
+What if we could add such a possibility out of the box? It's quite common to index by a class name. Because it's automatically a unique identifier and a key that is easy to use in the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-28T14:55:57Z
+
+@vudaltsov then make all such classes extends some base class, and make the method of that class return static::class. That's almost what is done right now for form types.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-02-28T15:04:43Z
+
+@nicolas-grekas , not true: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/DependencyInjection/FormPass.php#L73
+same for constraint validators:
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/DependencyInjection/AddConstraintValidatorsPass.php#L48
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-03-06T12:33:09Z
+
+@XuruDragon  , what about `default_index_method: '::class'`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-07T14:34:13Z
+
+@vudaltsov thanks for facts checking :) Indexing by FQCN is now implemented as a fallback when the attribute or the method are either not defined in the tag or not found on the service.
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-11T13:35:20Z
+
+branch has been rebase on up-to-date master

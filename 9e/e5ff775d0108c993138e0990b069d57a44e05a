@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-14T10:22:17Z
+
+In my experience, when using bearer tokens and Guzzle I passed the token "as is". Will this change require us to do a manual `base64_encode($token)` whenever we want to use this Bearer authentication?
+
+It looks cumbersome and too low-level. Also, Basic authentication is base64-encoded when including it as a HTTP header, but we don't force users to do a `base64_encode($user)` and `base64_encode($password)`, right? This asymmetry looks confusing.
+
+I agree with Nico's main argument about potential security issues ... but we can instead throw an error when the token doesn't include "normal" characters.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-14T10:25:06Z
+
+>  we can instead throw an error when the token doesn't include "normal" characters.
+
+that's exactly what happens here. the RFC says that only some characters are allowed, so this is what the regexp checks, only that.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-14T10:45:54Z
+
+@nicolas-grekas ah sorry! My confusion then is that the error message says that *"this must be a base-64 encoded string"* ... but that's "not true", at least not always. Maybe Kévin proposal is better? Thanks.

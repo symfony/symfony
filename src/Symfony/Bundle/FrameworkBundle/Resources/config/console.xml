@@ -66,6 +66,8 @@
         </service>
 
         <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
+            <argument>null</argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null"/>
             <tag name="console.command" command="debug:autowiring" />
         </service>
 

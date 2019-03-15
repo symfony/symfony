@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T07:19:04Z
+
+> It fits its purpose: general debug logs about message lifecycle in the bus and exception, independently of where the exception occurred in the bus (whereas you arbitrary chose to catch in send middleware here). It's also a simple & great showcase on how can be written and used a middleware.
+
+I 💯 disagree here :) Logging is a [cross-cutting concern](https://en.m.wikipedia.org/wiki/Cross-cutting_concern). What this means is that it's a bad fit for a middleware. Keeping it as an example of middleware is spreading the idea that logging can be split in its own isolated layer. That's wrong. Because the LoggingMiddleware is a bad fit, its messages are of very low value. I don't want my logs to be filled with many uninformative log lines per messages. Thus the proposal to drop it.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-14T18:01:57Z
+
+Ping @ogizanagi !

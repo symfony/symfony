@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2019-03-07T09:07:57Z
+
+Hi @nicolas-grekas,
+
+Thanks for your review. I still have the problem with that the service alias is getting linked too. Do you know where I should look at?
+
+edit: might be a problem of zsh (I think it assumes that cache.app is a url)
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2019-03-12T07:31:02Z
+
+Status: Needs Review

@@ -10,6 +10,7 @@ CHANGELOG
  * made `ContainerParametersResource` final and not implement `Serializable` anymore
  * added `ReverseContainer`: a container that turns services back to their ids
  * added ability to define an index for a tagged collection
+ * added ability to define an index for services in an injected service locator argument
 
 4.2.0
 -----

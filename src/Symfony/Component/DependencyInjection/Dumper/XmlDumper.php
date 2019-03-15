@@ -280,19 +280,19 @@ class XmlDumper extends Dumper
             if ($value instanceof ServiceClosureArgument) {
                 $value = $value->getValues()[0];
             }
-            if (\is_array($value)) {
+            if (\is_array($tag = $value)) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
-            } elseif ($value instanceof TaggedIteratorArgument) {
-                $element->setAttribute('type', 'tagged');
-                $element->setAttribute('tag', $value->getTag());
+            } elseif ($value instanceof TaggedIteratorArgument || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())) {
+                $element->setAttribute('type', $value instanceof TaggedIteratorArgument ? 'tagged' : 'tagged_locator');
+                $element->setAttribute('tag', $tag->getTag());
 
-                if (null !== $value->getIndexAttribute()) {
-                    $element->setAttribute('index-by', $value->getIndexAttribute());
-                }
+                if (null !== $tag->getIndexAttribute()) {
+                    $element->setAttribute('index-by', $tag->getIndexAttribute());
 
-                if (null !== $value->getDefaultIndexMethod()) {
-                    $element->setAttribute('default-index-method', $value->getDefaultIndexMethod());
+                    if (null !== $tag->getDefaultIndexMethod()) {
+                        $element->setAttribute('default-index-method', $tag->getDefaultIndexMethod());
+                    }
                 }
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');

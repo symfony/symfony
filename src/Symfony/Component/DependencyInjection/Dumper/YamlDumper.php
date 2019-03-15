@@ -232,22 +232,25 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
         }
         if ($value instanceof ArgumentInterface) {
-            if ($value instanceof TaggedIteratorArgument) {
-                if (null !== $value->getIndexAttribute()) {
-                    $taggedValueContent = [
-                        'tag' => $value->getTag(),
-                        'index_by' => $value->getIndexAttribute(),
+            $tag = $value;
+
+            if ($value instanceof TaggedIteratorArgument || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())) {
+                if (null === $tag->getIndexAttribute()) {
+                    $content = $tag->getTag();
+                } else {
+                    $content = [
+                        'tag' => $tag->getTag(),
+                        'index_by' => $tag->getIndexAttribute(),
                     ];
 
-                    if (null !== $value->getDefaultIndexMethod()) {
-                        $taggedValueContent['default_index_method'] = $value->getDefaultIndexMethod();
+                    if (null !== $tag->getDefaultIndexMethod()) {
+                        $content['default_index_method'] = $tag->getDefaultIndexMethod();
                     }
-
-                    return new TaggedValue('tagged', $taggedValueContent);
                 }
 
-                return new TaggedValue('tagged', $value->getTag());
+                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged' : 'tagged_locator', $content);
             }
+
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
             } elseif ($value instanceof ServiceLocatorArgument) {

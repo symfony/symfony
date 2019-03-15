@@ -72,6 +72,11 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
+        /*
+         * @uses AccessDecisionManager::decideAffirmative()
+         * @uses AccessDecisionManager::decideConsensus()
+         * @uses AccessDecisionManager::decideUnanimous()
+         */
         return $this->{$this->strategy}($token, $attributes, $object);
     }
 

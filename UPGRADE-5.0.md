@@ -207,6 +207,11 @@ HttpKernel
  * Removed `ConfigDataCollector::getApplicationName()`
  * Removed `ConfigDataCollector::getApplicationVersion()`
 
+Messenger
+---------
+
+ * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+
 Monolog
 -------
 

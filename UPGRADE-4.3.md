@@ -61,6 +61,7 @@ Messenger
 ---------
 
  * `Amqp` transport does not throw `\AMQPException` anymore, catch `TransportException` instead.
+ * Deprecated the `LoggingMiddleware` class, pass a logger to `SendMessageMiddleware` instead.
 
 Routing
 -------

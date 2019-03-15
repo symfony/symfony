@@ -1598,7 +1598,7 @@ class FrameworkExtension extends Extension
         }
 
         $defaultMiddleware = [
-            'before' => [['id' => 'logging']],
+            'before' => [],
             'after' => [['id' => 'send_message'], ['id' => 'handle_message']],
         ];
         foreach ($config['buses'] as $busId => $bus) {

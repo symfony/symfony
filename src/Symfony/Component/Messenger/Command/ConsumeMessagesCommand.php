@@ -170,8 +170,8 @@ EOF
 
         $io->comment('Quit the worker with CONTROL-C.');
 
-        if (!$output->isDebug()) {
-            $io->comment('Re-run the command with a -vvv option to see logs about consumed messages.');
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
         $worker = new Worker($receiver, $bus);

@@ -17,6 +17,9 @@ use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
+/**
+ * @group legacy
+ */
 class LoggingMiddlewareTest extends MiddlewareTestCase
 {
     public function testDebugLogAndNextMiddleware()

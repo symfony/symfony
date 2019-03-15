@@ -6,15 +6,13 @@ CHANGELOG
 
  * Added `PhpSerializer` which uses PHP's native `serialize()` and
    `unserialize()` to serialize messages to a transport
-
  * [BC BREAK] If no serializer were passed, the default serializer
    changed from `Serializer` to `PhpSerializer` inside `AmqpReceiver`,
    `AmqpSender`, `AmqpTransport` and `AmqpTransportFactory`.
-
  * Added `TransportException` to mark an exception transport-related
-
  * [BC BREAK] If listening to exceptions while using `AmqpSender` or `AmqpReceiver`, `\AMQPException` is
    no longer thrown in favor of `TransportException`.
+ * Deprecated `LoggingMiddleware`, pass a logger to `SendMessageMiddleware` instead.
 
 4.2.0
 -----

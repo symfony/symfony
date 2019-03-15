@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -24,11 +26,14 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
  */
 class SendMessageMiddleware implements MiddlewareInterface
 {
+    use LoggerAwareTrait;
+
     private $sendersLocator;
 
     public function __construct(SendersLocatorInterface $sendersLocator)
     {
         $this->sendersLocator = $sendersLocator;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -36,19 +41,33 @@ class SendMessageMiddleware implements MiddlewareInterface
      */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($envelope->all(ReceivedStamp::class)) {
-            // it's a received message, do not send it back
-            return $stack->next()->handle($envelope, $stack);
-        }
+        $context = [
+            'message' => $envelope->getMessage(),
+            'class' => \get_class($envelope->getMessage()),
+        ];
+
         $handle = false;
         $sender = null;
 
-        foreach ($this->sendersLocator->getSenders($envelope, $handle) as $alias => $sender) {
-            $envelope = $sender->send($envelope)->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null));
-        }
+        try {
+            if ($envelope->all(ReceivedStamp::class)) {
+                // it's a received message, do not send it back
+                $this->logger->info('Received message "{class}"', $context);
+            } else {
+                foreach ($this->sendersLocator->getSenders($envelope, $handle) as $alias => $sender) {
+                    $this->logger->info('Sending message "{class}" with "{sender}"', $context + ['sender' => \get_class($sender)]);
+                    $envelope = $sender->send($envelope)->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null));
+                }
+            }
 
-        if (null === $sender || $handle) {
-            return $stack->next()->handle($envelope, $stack);
+            if (null === $sender || $handle) {
+                return $stack->next()->handle($envelope, $stack);
+            }
+        } catch (\Throwable $e) {
+            $context['exception'] = $e;
+            $this->logger->warning('An exception occurred while handling message "{class}"', $context);
+
+            throw $e;
         }
 
         // message should only be sent and not be handled by the next middleware

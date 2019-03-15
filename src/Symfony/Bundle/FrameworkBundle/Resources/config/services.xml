@@ -73,5 +73,11 @@
         </service>
 
         <service id="services_resetter" class="Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter" public="true" />
+
+        <service id="reverse_container" class="Symfony\Component\DependencyInjection\ReverseContainer">
+            <argument type="service" id="service_container" />
+            <argument type="service_locator" />
+        </service>
+        <service id="Symfony\Component\DependencyInjection\ReverseContainer" alias="reverse_container" />
     </services>
 </container>

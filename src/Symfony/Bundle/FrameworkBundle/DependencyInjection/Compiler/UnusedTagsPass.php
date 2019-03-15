@@ -26,6 +26,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'cache.pool.clearer',
         'console.command',
         'container.hot_path',
+        'container.reversible',
         'container.service_locator',
         'container.service_subscriber',
         'controller.service_arguments',

@@ -61,7 +61,6 @@
         <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
             <tag name="messenger.transport_factory" />
             <argument type="service" id="messenger.transport.serializer" />
-            <argument>%kernel.debug%</argument>
         </service>
     </services>
 </container>

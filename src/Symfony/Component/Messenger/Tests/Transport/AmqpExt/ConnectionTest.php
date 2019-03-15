@@ -128,7 +128,7 @@ class ConnectionTest extends TestCase
                     'alternate-exchange' => 'alternate',
                 ],
             ],
-        ], true, $factory);
+        ], $factory);
         $connection->publish('body');
     }
 
@@ -171,9 +171,11 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock()
         );
 
+        // makes sure the channel looks connected, so it's not re-created
+        $amqpChannel->expects($this->once())->method('isConnected')->willReturn(true);
         $amqpConnection->expects($this->once())->method('connect');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', [], false, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', [], $factory);
         $connection->publish('body');
     }
 
@@ -186,13 +188,15 @@ class ConnectionTest extends TestCase
             $amqpExchange = $this->getMockBuilder(\AMQPExchange::class)->disableOriginalConstructor()->getMock()
         );
 
+        // makes sure the channel looks connected, so it's not re-created
+        $amqpChannel->expects($this->once())->method('isConnected')->willReturn(true);
         $amqpConnection->expects($this->once())->method('pconnect');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?persistent=true', [], false, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?persistent=true', [], $factory);
         $connection->publish('body');
     }
 
-    public function testItSetupsTheConnectionWhenDebug()
+    public function testItSetupsTheConnectionByDefault()
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->getMockBuilder(\AMQPConnection::class)->disableOriginalConstructor()->getMock(),
@@ -206,7 +210,7 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->once())->method('declareQueue');
         $amqpQueue->expects($this->once())->method('bind')->with('exchange_name', 'my_key');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', [], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', [], $factory);
         $connection->publish('body');
     }
 
@@ -224,13 +228,13 @@ class ConnectionTest extends TestCase
         $amqpQueue->expects($this->never())->method('declareQueue');
         $amqpQueue->expects($this->never())->method('bind');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => 'false'], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => 'false'], $factory);
         $connection->publish('body');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => false], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key', ['auto-setup' => false], $factory);
         $connection->publish('body');
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', [], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[routing_key]=my_key&auto-setup=false', [], $factory);
         $connection->publish('body');
     }
 
@@ -248,7 +252,7 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('publish')
             ->with('body', null, 1, ['delivery_mode' => 2, 'headers' => ['token' => 'uuid', 'type' => '*']]);
 
-        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[attributes][headers][token]=uuid&queue[flags]=1', [], true, $factory);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?queue[attributes][delivery_mode]=2&queue[attributes][headers][token]=uuid&queue[flags]=1', [], $factory);
         $connection->publish('body', $headers);
     }
 }

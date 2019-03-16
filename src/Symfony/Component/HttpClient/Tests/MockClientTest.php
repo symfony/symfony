@@ -25,14 +25,15 @@ class MockClientTest extends TestCase
         $response = new MockResponse('{"foo": "bar"}');
 
         $client = new MockClient();
+        $chunks = '';
 
         foreach ($client->stream($response) as $chunk) {
             $this->assertInstanceOf(ChunkInterface::class, $chunk);
 
-            if ($chunk->isLast()) {
-                $this->assertSame('{"foo": "bar"}', $chunk->getContent());
-            }
+            $chunks .= $chunk->getContent();
         }
+
+        $this->assertSame('{"foo": "bar"}', $chunks);
     }
 
     public function testStreamWithUnhappyResponse()

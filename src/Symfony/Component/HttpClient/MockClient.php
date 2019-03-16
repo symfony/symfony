@@ -78,7 +78,10 @@ class MockClient implements HttpClientInterface
         return new ResponseStream($this->streamResponses($responses));
     }
 
-    public function addResponse(ResponseInterface $response): self
+    /**
+     * @return $this
+     */
+    public function addResponse(ResponseInterface $response)
     {
         $this->responses[] = $response;
 
@@ -102,14 +105,14 @@ class MockClient implements HttpClientInterface
                 $response->getHeaders(true);
             } catch (TransportExceptionInterface $e) {
                 yield $response => new ErrorChunk($didThrow, 0, $e);
+
+                continue;
             }
 
             try {
-                $content = $response->getContent(true);
-
-                yield $response => new FirstChunk(0, $content);
-                yield $response => new DataChunk(1, $content);
-                yield $response => new LastChunk(2, $content);
+                yield $response => new FirstChunk();
+                yield $response => new DataChunk(0, $content = $response->getContent(true));
+                yield $response => new LastChunk(\strlen($content));
             } catch (TransportExceptionInterface $e) {
                 yield $response => new ErrorChunk($didThrow, 0, $e);
             }

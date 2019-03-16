@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ $1 == force || ! $(docker ps -a | grep symfony-intl) ]]; then
+    docker rm -f symfony-intl
+    docker create --name symfony-intl -it -v /tmp:/tmp -v $(pwd):/app -w /app jakzal/php-intl:7.2-63.1 bash
+    docker start symfony-intl
+    docker exec symfony-intl bash -xc "apt-get update && apt-get -y install build-essential"
+else
+    docker start symfony-intl
+fi;
+
+docker exec -u $(id -u):$(id -g) symfony-intl php src/Symfony/Component/Intl/Resources/bin/update-data.php

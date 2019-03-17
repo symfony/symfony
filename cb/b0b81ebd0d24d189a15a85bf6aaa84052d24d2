@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-23T08:42:01Z
+
+Would calling reset() periodically in your worker's main loop work? `$logger->reset()` or `$logger->getDebugLogger()->reset()`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-02-24T13:21:27Z
+
+@nicolas-grekas This is another solution but A/ it's not buildin B/ it's useless to have this collector anyway
+That's why I prefer this way of doing thing
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-25T10:02:48Z
+
+Related to #25876
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-02-28T16:58:42Z
+
+@nicolas-grekas Let's merge it ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-16T01:23:41Z
+
+@stof Are you OK with this one now?

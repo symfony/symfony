@@ -233,7 +233,6 @@
         "ms": "malay",
         "mt": "maltese",
         "mua": "mundang",
-        "mul": "plure linguas",
         "mus": "creek",
         "mwl": "mirandese",
         "my": "birmano",
@@ -361,7 +360,6 @@
         "ug": "uighur",
         "uk": "ukrainiano",
         "umb": "umbundu",
-        "und": "lingua incognite",
         "ur": "urdu",
         "uz": "uzbeko",
         "vai": "vai",
@@ -388,7 +386,6 @@
         "zh_Hant": "chinese traditional",
         "zu": "zulu",
         "zun": "zuni",
-        "zxx": "sin contento linguistic",
         "zza": "zaza"
     }
 }

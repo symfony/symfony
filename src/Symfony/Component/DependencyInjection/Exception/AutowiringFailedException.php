@@ -47,7 +47,11 @@ class AutowiringFailedException extends RuntimeException
                 $messageCallback = $this->messageCallback;
                 $this->messageCallback = null;
 
-                return $this->message = $messageCallback();
+                try {
+                    return $this->message = $messageCallback();
+                } catch (\Throwable $e) {
+                    return $this->message = $e->getMessage();
+                }
             }
         };
     }

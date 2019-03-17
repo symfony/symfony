@@ -226,7 +226,16 @@ class AutowirePass extends AbstractRecursivePass
                     if ($parameter->isDefaultValueAvailable()) {
                         $value = $parameter->getDefaultValue();
                     } elseif (!$parameter->allowsNull()) {
-                        throw new AutowiringFailedException($this->currentId, $failureMessage);
+                        if (\function_exists('xdebug_disable')) {
+                            xdebug_disable();
+                        }
+                        try {
+                            throw new AutowiringFailedException($this->currentId, $failureMessage);
+                        } finally {
+                            if (\function_exists('xdebug_enable')) {
+                                xdebug_enable();
+                            }
+                        }
                     }
                 }
 

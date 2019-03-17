@@ -84,10 +84,15 @@ class PassConfig
             new RemoveUnusedDefinitionsPass(),
             new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()),
             new AnalyzeServiceReferencesPass(),
-            new DefinitionErrorExceptionPass(),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
             new ResolveHotPathPass(),
         ]];
+
+        $this->afterRemovingPasses = [
+            100 => [
+                new DefinitionErrorExceptionPass(),
+            ],
+        ];
     }
 
     /**

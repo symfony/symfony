@@ -99,21 +99,15 @@ class MockClient implements HttpClientInterface
     private function streamResponses(iterable $responses): \Generator
     {
         foreach ($responses as $response) {
-            $didThrow = false;
-
             try {
                 $response->getHeaders(true);
-            } catch (TransportExceptionInterface $e) {
-                yield $response => new ErrorChunk($didThrow, 0, $e);
 
-                continue;
-            }
-
-            try {
                 yield $response => new FirstChunk();
                 yield $response => new DataChunk(0, $content = $response->getContent(true));
                 yield $response => new LastChunk(\strlen($content));
             } catch (TransportExceptionInterface $e) {
+                $didThrow = false;
+
                 yield $response => new ErrorChunk($didThrow, 0, $e);
             }
         }

@@ -141,7 +141,9 @@ trait HttpClientTrait
         // Option "query" is never inherited from defaults
         $options['query'] = $options['query'] ?? [];
 
-        $options += $defaultOptions;
+        foreach ($defaultOptions as $k => $v) {
+            $options[$k] = $options[$k] ?? $v;
+        }
 
         if ($defaultOptions['resolve'] ?? false) {
             $options['resolve'] += array_change_key_case($defaultOptions['resolve']);

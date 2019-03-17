@@ -17,10 +17,12 @@ use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -109,6 +111,7 @@ class Configuration implements ConfigurationInterface
         $this->addLockSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addRobotsIndexSection($rootNode);
+        $this->addHttpClientSection($rootNode);
 
         return $treeBuilder;
     }
@@ -1166,6 +1169,153 @@ class Configuration implements ConfigurationInterface
                     ->info('Enabled by default when debug is enabled.')
                     ->defaultValue($this->debug)
                     ->treatNullLike($this->debug)
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHttpClientSection(ArrayNodeDefinition $rootNode)
+    {
+        $subNode = $rootNode
+            ->children()
+                ->arrayNode('http_client')
+                    ->info('HTTP Client configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(HttpClient::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->fixXmlConfig('client')
+                    ->children();
+
+        $this->addHttpClientOptionsSection($subNode);
+
+        $subNode = $subNode
+                        ->arrayNode('clients')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->arrayPrototype()
+                                ->children();
+
+        $this->addHttpClientOptionsSection($subNode);
+
+        $subNode = $subNode
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHttpClientOptionsSection(NodeBuilder $rootNode)
+    {
+        $rootNode
+            ->integerNode('max_host_connections')
+                ->info('The maximum number of connections to a single host.')
+            ->end()
+            ->arrayNode('default_options')
+                ->fixXmlConfig('header')
+                ->children()
+                    ->scalarNode('auth_basic')
+                        ->info('An HTTP Basic authentication "username:password".')
+                    ->end()
+                    ->scalarNode('auth_bearer')
+                        ->info('A token enabling HTTP Bearer authorization.')
+                    ->end()
+                    ->arrayNode('query')
+                        ->info('Associative array of query string values merged with URL parameters.')
+                        ->useAttributeAsKey('key')
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                if (!\is_array($config)) {
+                                    return [];
+                                }
+                                if (!isset($config['key'])) {
+                                    return $config;
+                                }
+
+                                return [$config['key'] => $config['value']];
+                            })
+                        ->end()
+                        ->normalizeKeys(false)
+                        ->scalarPrototype()->end()
+                    ->end()
+                    ->arrayNode('headers')
+                        ->info('Associative array: header => value(s).')
+                        ->useAttributeAsKey('name')
+                        ->normalizeKeys(false)
+                        ->variablePrototype()->end()
+                    ->end()
+                    ->integerNode('max_redirects')
+                        ->info('The maximum number of redirects to follow.')
+                    ->end()
+                    ->scalarNode('http_version')
+                        ->info('The default HTTP version, typically 1.1 or 2.0. Leave to null for the best version.')
+                    ->end()
+                    ->scalarNode('base_uri')
+                        ->info('The URI to resolve relative URLs, following rules in RFC 3986, section 2.')
+                    ->end()
+                    ->arrayNode('resolve')
+                        ->info('Associative array: domain => IP.')
+                        ->useAttributeAsKey('host')
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                if (!\is_array($config)) {
+                                    return [];
+                                }
+                                if (!isset($config['host'])) {
+                                    return $config;
+                                }
+
+                                return [$config['host'] => $config['value']];
+                            })
+                        ->end()
+                        ->normalizeKeys(false)
+                        ->scalarPrototype()->end()
+                    ->end()
+                    ->scalarNode('proxy')
+                        ->info('The URL of the proxy to pass requests through or null for automatic detection.')
+                    ->end()
+                    ->scalarNode('no_proxy')
+                        ->info('A comma separated list of hosts that do not require a proxy to be reached.')
+                    ->end()
+                    ->floatNode('timeout')
+                        ->info('Defaults to "default_socket_timeout" ini parameter.')
+                    ->end()
+                    ->scalarNode('bindto')
+                        ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')
+                    ->end()
+                    ->booleanNode('verify_peer')
+                        ->info('Indicates if the peer should be verified in a SSL/TLS context.')
+                    ->end()
+                    ->booleanNode('verify_host')
+                        ->info('Indicates if the host should exist as a certificate common name.')
+                    ->end()
+                    ->scalarNode('cafile')
+                        ->info('A certificate authority file.')
+                    ->end()
+                    ->scalarNode('capath')
+                        ->info('A directory that contains multiple certificate authority files.')
+                    ->end()
+                    ->scalarNode('local_cert')
+                        ->info('A PEM formatted certificate file.')
+                    ->end()
+                    ->scalarNode('local_pk')
+                        ->info('A private key file.')
+                    ->end()
+                    ->scalarNode('passphrase')
+                        ->info('The passphrase used to encrypt the "local_pk" file.')
+                    ->end()
+                    ->scalarNode('ciphers')
+                        ->info('A list of SSL/TLS ciphers separated by colons, commas or spaces (e.g. "RC4-SHA:TLS13-AES-128-GCM-SHA256"...)')
+                    ->end()
+                    ->arrayNode('peer_fingerprint')
+                        ->info('Associative array: hashing algorithm => hash(es).')
+                        ->normalizeKeys(false)
+                        ->children()
+                            ->variableNode('sha1')->end()
+                            ->variableNode('pin-sha256')->end()
+                            ->variableNode('md5')->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

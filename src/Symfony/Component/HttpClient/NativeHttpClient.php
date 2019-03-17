@@ -52,7 +52,7 @@ final class NativeHttpClient implements HttpClientInterface
             'openHandles' => [],
             'handlesActivity' => [],
             'pendingResponses' => [],
-            'maxHostConnections' => $maxHostConnections,
+            'maxHostConnections' => 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX,
             'responseCount' => 0,
             'dnsCache' => [],
             'handles' => [],

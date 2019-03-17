@@ -53,7 +53,7 @@ final class CurlHttpClient implements HttpClientInterface
         if (\defined('CURLPIPE_MULTIPLEX')) {
             curl_multi_setopt($mh, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
         }
-        curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, $maxHostConnections);
+        curl_multi_setopt($mh, CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX);
 
         // Use an internal stdClass object to share state between the client and its responses
         $this->multi = $multi = (object) [

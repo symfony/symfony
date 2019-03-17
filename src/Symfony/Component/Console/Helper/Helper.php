@@ -129,7 +129,7 @@ abstract class Helper implements HelperInterface
      * Sometimes we need to find the format tags. This regex "placeholders":
      *      - \\0 --> full open or close tag
      *      - \\1 --> tag "inside"
-     *      - \\2 --> only tag name
+     *      - \\2 --> only tag name.
      *
      *      |     \\0    |    \\1   |   \\2   |
      *      | ---------- | -------- | ------- |

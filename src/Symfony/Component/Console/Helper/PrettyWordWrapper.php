@@ -74,7 +74,7 @@ class PrettyWordWrapper
     const CUT_FILL_UP_MISSING = 8;
 
     /**
-     * This is a ZERO_WIDTH_SPACE UTF-8 character. It is used when we try to protect the escaped tags, eg: `\<error>`
+     * This is a ZERO_WIDTH_SPACE UTF-8 character. It is used when we try to protect the escaped tags, eg: `\<error>`.
      *
      * @see https://en.wikipedia.org/wiki/Zero-width_space
      * @see https://www.fileformat.info/info/unicode/char/200b/index.htm
@@ -251,7 +251,7 @@ class PrettyWordWrapper
     {
         if (\count($this->newLineTokens)) {
             // If the last word is empty, and there are other words, we drop it.
-            if (\count($this->newLineTokens) > 1 && $this->newLineTokens[\count($this->newLineTokens) - 1] == '') {
+            if (\count($this->newLineTokens) > 1 && '' == $this->newLineTokens[\count($this->newLineTokens) - 1]) {
                 array_pop($this->newLineTokens);
             }
             $line = $this->unescape(trim(implode(' ', $this->newLineTokens)));
@@ -278,7 +278,7 @@ class PrettyWordWrapper
      *
      * @param string $token
      * @param int    $virtualTokenLength
-     * @param bool   $appendToLast       We set it true if we slice a longer word with tags eg.
+     * @param bool   $appendToLast       we set it true if we slice a longer word with tags eg
      */
     protected function addTokenToLine(string $token, int $virtualTokenLength, bool $appendToLast = false): void
     {
@@ -286,14 +286,14 @@ class PrettyWordWrapper
             $last = \count($this->newLineTokens) > 0
                 ? array_pop($this->newLineTokens)
                 : '';
-            $token = $last . $token;
+            $token = $last.$token;
         }
         $this->newLineTokens[] = $token;
         $this->currentLength += $virtualTokenLength;
     }
 
     /**
-     * We try to protect every escaped characters, especially the escaped formatting tags:
+     * We try to protect every escaped characters, especially the escaped formatting tags:.
      *
      *      \<error> --> [ZERO_WIDTH_SPACE]\<[ZERO_WIDTH_SPACE]error>
      *
@@ -317,11 +317,11 @@ class PrettyWordWrapper
             $protectedBlock = $match[0];
             // Don't use the mb_* function here!!!
             $output .= substr($string, $offset, $pos - $offset)
-                . self::ESCAPE_PROTECTION_CHAR
-                . $protectedBlock
-                . self::ESCAPE_PROTECTION_CHAR;
+                .self::ESCAPE_PROTECTION_CHAR
+                .$protectedBlock
+                .self::ESCAPE_PROTECTION_CHAR;
             // Don't use the mb_* function here!!!
-            $offset = $pos + strlen($protectedBlock);
+            $offset = $pos + \strlen($protectedBlock);
         }
         // Don't use the mb_* function here!!!
         $output .= substr($string, $offset);
@@ -331,7 +331,7 @@ class PrettyWordWrapper
 
     protected function unescape(string $string): string
     {
-        return preg_replace('{' . self::ESCAPE_PROTECTION_CHAR . '(\\\\<)' . self::ESCAPE_PROTECTION_CHAR . '}u', '\\1', $string);
+        return preg_replace('{'.self::ESCAPE_PROTECTION_CHAR.'(\\\\<)'.self::ESCAPE_PROTECTION_CHAR.'}u', '\\1', $string);
     }
 
     /**
@@ -356,8 +356,8 @@ class PrettyWordWrapper
     /**
      * Reset and set properties.
      *
-     * @param int $width
-     * @param int $cutOptions
+     * @param int    $width
+     * @param int    $cutOptions
      * @param string $break
      */
     protected function reset(int $width, int $cutOptions, string $break): void
@@ -444,7 +444,7 @@ class PrettyWordWrapper
             $offset = $pos + \strlen($tag);
 
             $this->breakLongToken($block);
-            if ($this->getFreeSpace() == 0 && $tag[1] != '/') {
+            if (0 == $this->getFreeSpace() && '/' != $tag[1]) {
                 $this->closeLine();
             }
             $this->addTokenToLine($tag, 0, true);
@@ -463,8 +463,8 @@ class PrettyWordWrapper
         $prefix = \mb_substr($token, 0, $freeChars);
         $this->addTokenToLine($prefix, \mb_strlen($prefix), true);
         $tokenLength = \mb_strlen($token);
-        for ($offset = $freeChars;$offset<$tokenLength;$offset+=$this->width) {
-            $subLength = min($this->width, $tokenLength-$offset);
+        for ($offset = $freeChars; $offset < $tokenLength; $offset += $this->width) {
+            $subLength = min($this->width, $tokenLength - $offset);
             $subToken = \mb_substr($token, $offset, $subLength);
             if ($subLength + $this->getCurrentLineLength() > $this->width) {
                 $this->closeLine();
@@ -487,7 +487,7 @@ class PrettyWordWrapper
     }
 
     /**
-     * It replaces all tags to something different. If you want to use original tags, use the `\\0` placeholder:
+     * It replaces all tags to something different. If you want to use original tags, use the `\\0` placeholder:.
      *
      * Eg:
      *      $replacement = 'STARTTAG>\\0<ENDTAG'

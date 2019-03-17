@@ -78,7 +78,7 @@ class PrettyWordWrapperTest extends TestCase
             ['', 2, PrettyWordWrapper::CUT_ALL, $baseBreak, ''],
             ['', 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  '],
             [$baseBreak, 2, PrettyWordWrapper::CUT_ALL, $baseBreak, $baseBreak],
-            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  ' . $baseBreak . '  '],
+            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  '.$baseBreak.'  '],
             // Check limit and UTF-8
             [
                 'öüóőúéáű',
@@ -92,14 +92,14 @@ class PrettyWordWrapperTest extends TestCase
                 4,
                 PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
                 $baseBreak,
-                'öüóő' . $baseBreak . 'úéáű',
+                'öüóő'.$baseBreak.'úéáű',
             ],
             [
                 'öüóőúéáű',
                 6,
                 PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
                 $baseBreak,
-                'öüóőúé' . $baseBreak . 'áű    ',
+                'öüóőúé'.$baseBreak.'áű    ',
             ],
             // UTF-8 + tags
             [
@@ -128,7 +128,7 @@ class PrettyWordWrapperTest extends TestCase
                 2,
                 PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
                 $baseBreak,
-                implode($baseBreak, ['fo', 'o ','<error>ba', 'r</error> ', 'ba', 'z ']),
+                implode($baseBreak, ['fo', 'o ', '<error>ba', 'r</error> ', 'ba', 'z ']),
             ],
             // Escaped tags
             [

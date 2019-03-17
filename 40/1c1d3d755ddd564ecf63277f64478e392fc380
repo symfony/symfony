@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-01T15:51:25Z
+
+@Ioni14 thanks for your hard work on this feature!
+
+A minor question: could we maintain the global `default_options` option ... but remove it from the individual HTTP clients? In the example you showed in the description, we'd maintain the first `default_options` but we'd remove the other two. Don't they look a bit redundant? Thanks.
+
+---------------------------------------------------------------------------
+
+by Ioni14 at 2019-03-01T15:55:26Z
+
+@javiereguiluz thanks ;)
+
+It's probably "YAGNI" but if we want to add other configuration keys for clients in the future it'll be useful to have `default_options`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-11T12:52:24Z
+
+PR and description updated, ready.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-13T23:03:43Z
+
+If/when #30547 is merged, the `auth` option in the config will need to change and the bearer_auth will need to be added.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-17T14:12:19Z
+
+Tests failing on low deps, but other than that - +1 from me!

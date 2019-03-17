@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-08T10:39:52Z
+
+Note: adding this by default might break CI testing API endpoint responses, but I don't see much more reasons not to do so. So, better keep adding by default, or add a context option for this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-11-08T12:25:25Z
+
+it may be better to make this behaviour opt-in
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-11-08T20:51:15Z
+
+We don't guarantee that the output of the normalizers will never change. Especially, we don't guarantee that will not add fields. I'm in favor of adding it by default, but only if at least one parameter exists.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-02-24T11:07:45Z
+
+Now rebased :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-16T01:03:12Z
+
+this one is OK too. let's merge it. /cc @dunglas (easy pick)

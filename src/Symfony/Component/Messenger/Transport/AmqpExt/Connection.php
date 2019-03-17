@@ -199,10 +199,14 @@ class Connection
             $connection = $this->amqpFactory->createConnection($this->connectionCredentials);
             $connectMethod = 'true' === ($this->connectionCredentials['persistent'] ?? 'false') ? 'pconnect' : 'connect';
 
-            if (false === $connection->{$connectMethod}()) {
-                throw new \AMQPException('Could not connect to the AMQP server. Please verify the provided DSN.');
-            }
+            try {
+                $connection->{$connectMethod}();
+            } catch (\AMQPConnectionException $e) {
+                $credentials = $this->connectionCredentials;
+                $credentials['password'] = '********';
 
+                throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s)', json_encode($credentials)), 0, $e);
+            }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
         }
 

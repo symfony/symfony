@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-17T14:01:43Z
+
+Thanks for checking this out. The fix doesn't work, unfortunately. But I HAVE just added a reproducer to the issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-17T15:56:47Z
+
+Works around xdebug by disabling it around the `throw` that triggers its faulty behavior.

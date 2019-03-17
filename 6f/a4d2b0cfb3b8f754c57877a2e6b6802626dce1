@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-09-03T13:21:40Z
+
+I like it but I have some comments
+
+1. The RouteProcessor does not work well. The "RouteData" should be unset on "kernel.finish_request".
+1. The RoutePRocessor might be merged with the https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Monolog/Processor/WebProcessor.php ?
+
+---------------------------------------------------------------------------
+
+by trakos at 2018-09-03T20:31:45Z
+
+1. Yes, you're right, I didn't consider subrequests. I've updated it - I've made it so that it includes an array of (sub)requests, kind of like a stacktrace:
+
+```
+[
+    {
+        "controller": "App\\Controller\\SomeController::number",
+        "route": "index",
+        "route_params": []
+    },
+    {
+        "controller": "App\\Controller\\SomeController::other",
+        "route": "other",
+        "route_params": {
+            "page": "235"
+        }
+    }
+]
+```
+
+The last one is the current one. It pops last entry during "kernel.finish_request". What do you think?
+
+2. I can combine them if you prefer. There's some things to consider:
+
+   - Users won't be aware that update will make their log messages longer
+   - WebProcessor is an extend of monolog's WebProcessor, I think it's supposed to add the same information to the log
+   - There's probably some users that enable WebProcessor just to have IP logged and won't be happy about lengthier messages
+
+@lyrixx What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:18:33Z
+
+@lyrixx Can you review the latest version of this PR? Thank you.
+
+---------------------------------------------------------------------------
+
+by trakos at 2018-10-12T14:52:54Z
+
+Thanks for your feedback @lyrixx . I've updated the changes.
+
+In RouteProcessor I've decided to use `spl_object_id` instead of `SplObjectStorage`, there's less code that way. Is that OK?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-10T20:00:16Z
+
+meanwhile, ProcessorInterface has been removed from the bridge and added to Monolog directly in https://github.com/Seldaek/monolog/pull/1204
+If we don't want to bump the minimum version of Monolog, we should register the new classes for autoconfiguration, see https://github.com/symfony/monolog-bundle/pull/285
+
+---------------------------------------------------------------------------
+
+by trakos at 2018-11-10T20:46:15Z
+
+Would you like me to create PR in symfony/monolog-bundle registering this classes, or should I wait till some decision is made?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-10T20:55:36Z
+
+Let's first finish this one :)
+
+---------------------------------------------------------------------------
+
+by trakos at 2018-11-13T19:05:41Z
+
+@lyrixx thanks, I've made the change. I've also removed extending ProcessorInterface, since it's no longer there. It should be ready now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-16T01:00:21Z
+
+let's merge this one (except for native English, I can not tell)

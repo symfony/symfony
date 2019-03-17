@@ -38,7 +38,7 @@ class ConstraintViolationListNormalizerTest extends TestCase
     public function testNormalize()
     {
         $list = new ConstraintViolationList([
-            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'f'),
+            new ConstraintViolation('a', 'b', ['value' => 'foo'], 'c', 'd', 'e', null, 'f'),
             new ConstraintViolation('1', '2', [], '3', '4', '5', null, '6'),
         ]);
 
@@ -52,11 +52,15 @@ class ConstraintViolationListNormalizerTest extends TestCase
                         'propertyPath' => 'd',
                         'title' => 'a',
                         'type' => 'urn:uuid:f',
+                        'parameters' => [
+                            'value' => 'foo',
+                        ],
                     ],
                     [
                         'propertyPath' => '4',
                         'title' => '1',
                         'type' => 'urn:uuid:6',
+                        'parameters' => [],
                     ],
                 ],
         ];

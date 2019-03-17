@@ -75,21 +75,88 @@ class PrettyWordWrapperTest extends TestCase
 
         return [
             // Check empty
-            ['', 120, PrettyWordWrapper::DEFAULT_CUT, $baseBreak, ''],
-            [$baseBreak, 120, PrettyWordWrapper::DEFAULT_CUT, $baseBreak, $baseBreak],
+            ['', 2, PrettyWordWrapper::CUT_ALL, $baseBreak, ''],
+            ['', 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  '],
+            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL, $baseBreak, $baseBreak],
+            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  ' . $baseBreak . '  '],
             // Check limit and UTF-8
             [
-                'utf120.txt',
-                120,
-                PrettyWordWrapper::DEFAULT_CUT,
+                'öüóőúéáű',
+                8,
+                PrettyWordWrapper::CUT_LONG_WORDS,
                 $baseBreak,
-                'utf120.txt',
+                'öüóőúéáű',
+            ],
+            [
+                'öüóőúéáű',
+                4,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                'öüóő' . $baseBreak . 'úéáű',
+            ],
+            [
+                'öüóőúéáű',
+                6,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                'öüóőúé' . $baseBreak . 'áű    ',
+            ],
+            // UTF-8 + tags
+            [
+                '<error>öüóőúéáű</error>',
+                8,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                '<error>öüóőúéáű</error>',
+            ],
+            [
+                'öüó<error>őú</error>éáű',
+                8,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                'öüó<error>őú</error>éáű',
+            ],
+            [
+                'foo <error>bar</error> baz',
+                3,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                implode($baseBreak, ['foo', '<error>bar</error>', 'baz']),
+            ],
+            [
+                'foo <error>bar</error> baz',
+                2,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                implode($baseBreak, ['fo', 'o ','<error>ba', 'r</error> ', 'ba', 'z ']),
+            ],
+            // Escaped tags
+            [
+                'foo \<error>bar\</error> baz',
+                3,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                implode($baseBreak, ['foo', '\<e', 'rro', 'r>b', 'ar\\', '</e', 'rro', 'r> ', 'baz']),
+            ],
+            [
+                'foo<error>bar</error>baz foo',
+                3,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                implode($baseBreak, ['foo', '<error>bar</error>', 'baz', 'foo']),
+            ],
+            [
+                'foo<error>bar</error>baz foo',
+                2,
+                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                $baseBreak,
+                implode($baseBreak, ['fo', 'o<error>b', 'ar</error>', 'ba', 'z ', 'fo', 'o ']),
             ],
             // Check simple text
             [
                 'lipsum.txt',
                 120,
-                PrettyWordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::CUT_LONG_WORDS,
                 $baseBreak,
                 'lipsum.txt',
             ],
@@ -97,7 +164,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'lipsum_with_tags.txt',
                 120,
-                PrettyWordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::CUT_LONG_WORDS,
                 $baseBreak,
                 'lipsum_with_tags.txt',
             ],
@@ -105,7 +172,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
-                PrettyWordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::CUT_LONG_WORDS,
                 $customBreak,
                 'lipsum_with_tags_and_custom_break.txt',
             ],
@@ -113,7 +180,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'with_long_words.txt',
                 30,
-                PrettyWordWrapper::DEFAULT_CUT,
+                PrettyWordWrapper::CUT_LONG_WORDS,
                 $baseBreak,
                 'with_long_words_with_default_cut.txt',
             ],

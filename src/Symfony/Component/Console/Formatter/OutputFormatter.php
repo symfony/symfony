@@ -12,18 +12,22 @@
 namespace Symfony\Component\Console\Formatter;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\PrettyWordWrapper;
 
 /**
  * Formatter class for console output.
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
  * @author Roland Franssen <franssen.roland@gmail.com>
+ * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
  */
 class OutputFormatter implements WrappableOutputFormatterInterface
 {
     private $decorated;
     private $styles = [];
     private $styleStack;
+    private $wrapCutOptions = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING;
 
     /**
      * Escapes "<" special char in given text.
@@ -127,23 +131,36 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
-    public function format($message)
+    public function getWrapCutOptions(): int
     {
-        return $this->formatAndWrap((string) $message, 0);
+        return $this->wrapCutOptions;
+    }
+
+    /**
+     * @param int $wrapCutOptions
+     *
+     * @return $this
+     *
+     * @see PrettyWordWrapper
+     */
+    public function setWrapCutOptions(int $wrapCutOptions)
+    {
+        $this->wrapCutOptions = $wrapCutOptions;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formatAndWrap(string $message, int $width)
+    public function format($message)
     {
+        $message = (string) $message;
         $offset = 0;
         $output = '';
-        $tagRegex = '[a-z][a-z0-9,_=;-]*+';
-        $currentLineLength = 0;
-        preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#ix", $message, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all(Helper::getFormatTagRegexPattern(), $message, $matches, PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
             $text = $match[0];
@@ -153,7 +170,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
 
             // add the text up to the next tag
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset), $output, $width, $currentLineLength);
+            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
             $offset = $pos + \strlen($text);
 
             // opening tag?
@@ -166,8 +183,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             if (!$open && !$tag) {
                 // </>
                 $this->styleStack->pop();
-            } elseif (false === $style = $this->createStyleFromString($tag)) {
-                $output .= $this->applyCurrentStyle($text, $output, $width, $currentLineLength);
+            } elseif (false === $style = $this->createStyleFromString(strtolower($tag))) {
+                $output .= $this->applyCurrentStyle($text);
             } elseif ($open) {
                 $this->styleStack->push($style);
             } else {
@@ -175,13 +192,29 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
+        $output .= $this->applyCurrentStyle(substr($message, $offset));
 
         if (false !== strpos($output, "\0")) {
             return strtr($output, ["\0" => '\\', '\\<' => '<']);
         }
 
         return str_replace('\\<', '<', $output);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formatAndWrap(string $message, int $width)
+    {
+        return $this->format($this->wordwrap($message, $width));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wordwrap(string $message, int $width, int $cutOptions = null): string
+    {
+        return PrettyWordWrapper::wrap($message, $width, null === $cutOptions ? $this->wrapCutOptions : $cutOptions);
     }
 
     /**
@@ -194,6 +227,8 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
     /**
      * Tries to create new style instance from string.
+     *
+     * @param string $string
      *
      * @return OutputFormatterStyle|false False if string is not format string
      */
@@ -233,46 +268,17 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * Applies current style from stack to text, if must be applied.
      */
-    private function applyCurrentStyle(string $text, string $current, int $width, int &$currentLineLength): string
+    private function applyCurrentStyle(string $text): string
     {
-        if ('' === $text) {
-            return '';
-        }
-
-        if (!$width) {
-            return $this->isDecorated() ? $this->styleStack->getCurrent()->apply($text) : $text;
-        }
-
-        if (!$currentLineLength && '' !== $current) {
-            $text = ltrim($text);
-        }
-
-        if ($currentLineLength) {
-            $prefix = substr($text, 0, $i = $width - $currentLineLength)."\n";
-            $text = substr($text, $i);
-        } else {
-            $prefix = '';
-        }
-
-        preg_match('~(\\n)$~', $text, $matches);
-        $text = $prefix.preg_replace('~([^\\n]{'.$width.'})\\ *~', "\$1\n", $text);
-        $text = rtrim($text, "\n").($matches[1] ?? '');
-
-        if (!$currentLineLength && '' !== $current && "\n" !== substr($current, -1)) {
-            $text = "\n".$text;
-        }
-
-        $lines = explode("\n", $text);
-        if ($width === $currentLineLength = \strlen(end($lines))) {
-            $currentLineLength = 0;
-        }
-
-        if ($this->isDecorated()) {
+        if ($this->isDecorated() && \strlen($text) > 0) {
+            $lines = explode(PHP_EOL, $text);
             foreach ($lines as $i => $line) {
                 $lines[$i] = $this->styleStack->getCurrent()->apply($line);
             }
+
+            return implode(PHP_EOL, $lines);
         }
 
-        return implode("\n", $lines);
+        return $text;
     }
 }

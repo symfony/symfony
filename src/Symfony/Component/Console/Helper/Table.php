@@ -525,7 +525,7 @@ class Table
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
                 if (isset($this->columnMaxWidths[$column]) && Helper::strlenWithoutDecoration($formatter, $cell) > $this->columnMaxWidths[$column]) {
-                    $cell = $formatter->format(PrettyWordWrapper::wrap(
+                    $cell = $formatter->format($formatter->wordwrap(
                         $cell,
                         $this->columnMaxWidths[$column],
                         $this->columnWordWrapCutOptions[$column]

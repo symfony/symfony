@@ -22,8 +22,7 @@ class AmqpTransportFactoryTest extends TestCase
     public function testSupportsOnlyAmqpTransports()
     {
         $factory = new AmqpTransportFactory(
-            $this->getMockBuilder(SerializerInterface::class)->getMock(),
-            true
+            $this->getMockBuilder(SerializerInterface::class)->getMock()
         );
 
         $this->assertTrue($factory->supports('amqp://localhost', []));
@@ -34,11 +33,10 @@ class AmqpTransportFactoryTest extends TestCase
     public function testItCreatesTheTransport()
     {
         $factory = new AmqpTransportFactory(
-            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock(),
-            true
+            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock()
         );
 
-        $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', ['foo' => 'bar'], true), $serializer);
+        $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', ['foo' => 'bar']), $serializer);
 
         $this->assertEquals($expectedTransport, $factory->createTransport('amqp://localhost', ['foo' => 'bar']));
     }

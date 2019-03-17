@@ -24,17 +24,15 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class AmqpTransportFactory implements TransportFactoryInterface
 {
     private $serializer;
-    private $debug;
 
-    public function __construct(SerializerInterface $serializer = null, bool $debug = false)
+    public function __construct(SerializerInterface $serializer = null)
     {
         $this->serializer = $serializer ?? new PhpSerializer();
-        $this->debug = $debug;
     }
 
     public function createTransport(string $dsn, array $options): TransportInterface
     {
-        return new AmqpTransport(Connection::fromDsn($dsn, $options, $this->debug), $this->serializer);
+        return new AmqpTransport(Connection::fromDsn($dsn, $options), $this->serializer);
     }
 
     public function supports(string $dsn, array $options): bool

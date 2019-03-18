@@ -5,4 +5,3 @@ CHANGELOG
 -----
 
  * added the component
- * added a mock client

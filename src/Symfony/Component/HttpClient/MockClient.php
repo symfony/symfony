@@ -89,7 +89,7 @@ class MockClient implements HttpClientInterface
     }
 
     /**
-     * Clear all predefined responses.
+     * Clears all predefined responses.
      */
     public function clear(): void
     {

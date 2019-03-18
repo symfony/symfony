@@ -82,7 +82,8 @@ class Table
      */
     private $columnWidths = [];
     private $columnMaxWidths = [];
-    private $columnWordWrapCutOptions = [];
+    private $columnWordWrapCutOption = [];
+    private $defaultColumnWordWrapCutOption = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_REPLACE_PHP_EOL;
 
     private static $styles;
 
@@ -229,14 +230,72 @@ class Table
      *
      * @return $this
      */
-    public function setColumnMaxWidth(int $columnIndex, int $width, int $cutOptions = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_REPLACE_PHP_EOL): self
+    public function setColumnMaxWidth(int $columnIndex, int $width, int $cutOption = null): self
     {
         if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
             throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, \get_class($this->output->getFormatter())));
         }
 
         $this->columnMaxWidths[$columnIndex] = $width;
-        $this->columnWordWrapCutOptions[$columnIndex] = $cutOptions;
+        $this->columnWordWrapCutOption[$columnIndex] = $cutOption;
+
+        return $this;
+    }
+
+    /**
+     * Sets the cut options of a column.
+     *
+     * @param int $columnIndex
+     * @param int $cutOptions
+     *
+     * @return $this
+     */
+    public function setColumnWordWrapCutOption(int $columnIndex, int $cutOptions): self
+    {
+        $this->columnWordWrapCutOption[$columnIndex] = $cutOptions;
+
+        return $this;
+    }
+
+    /**
+     * @param int $columnIndex
+     *
+     * @return int
+     */
+    public function getColumnWordWrapCutOption(int $columnIndex): int
+    {
+        if (!array_key_exists($columnIndex, $this->columnWordWrapCutOption)) {
+            return $this->defaultColumnWordWrapCutOption;
+        }
+
+        return $this->columnWordWrapCutOption[$columnIndex];
+    }
+
+    /**
+     * @param int $defaultColumnWordWrapCutOption
+     *
+     * @return $this
+     */
+    public function setDefaultColumnWordWrapCutOption(int $defaultColumnWordWrapCutOption): self
+    {
+        $this->defaultColumnWordWrapCutOption = $defaultColumnWordWrapCutOption;
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param array $columnWordWrapCutOptions
+     *
+     * @return $this
+     */
+    public function setColumnsWordWrapCutOptions(array $columnWordWrapCutOptions): self
+    {
+        $this->columnWordWrapCutOption = [];
+        foreach ($columnWordWrapCutOptions as $columnIndex => $columnOption) {
+            $this->setColumnWordWrapCutOption($columnIndex, $columnOption);
+        }
 
         return $this;
     }
@@ -528,7 +587,7 @@ class Table
                     $cell = $formatter->format($formatter->wordwrap(
                         $cell,
                         $this->columnMaxWidths[$column],
-                        $this->columnWordWrapCutOptions[$column]
+                        $this->getColumnWordWrapCutOption($column)
                     ));
                 }
                 if (!strstr($cell, "\n")) {

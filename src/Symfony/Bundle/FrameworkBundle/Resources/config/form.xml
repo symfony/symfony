@@ -57,6 +57,7 @@
 
         <service id="form.choice_list_factory.cached" class="Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator">
             <argument type="service" id="form.choice_list_factory.property_access"/>
+            <tag name="kernel.reset" method="reset" />
         </service>
 
         <service id="form.choice_list_factory" alias="form.choice_list_factory.cached" />

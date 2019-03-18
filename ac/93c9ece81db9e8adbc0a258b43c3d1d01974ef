@@ -1,0 +1,256 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-25T08:41:31Z
+
+Before reading the code, I was expecting this to be a processor to do a `parse_str()`.
+Now that I read it I see it's for `parse_url()`.
+I think we should ship both in this PR because they are complementary - that will force us to find the least confusing names for each :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-25T08:59:28Z
+
+@jderusse even I appreciate your contribution, I'm going to share an (unpopular?) opinion about this "env processor" trend. I think it's a mistake and makes the YAML config files even harder to understand. I know we need to support something like this ... but I prefer if we focused instead on switching to PHP config by default.
+
+### Before
+
+```yaml
+mongo_db_bundle:
+    clients:
+        default:
+            hosts:
+                - { host: '%env(key:host:url:MONGODB_DSN)%', port: '%env(key:port:url:MONGODB_DSN)%' }
+            username: '%env(key:user:url:MONGODB_DSN)%'
+            password: '%env(key:pass:url:MONGODB_DSN)%'
+    connections:
+        default:
+            database_name: '%env(key:path:url:MONGODB_DSN)%'
+```
+
+### After
+
+```php
+$mongo = parse_url(env('MONGODB_DSN'));
+
+return ['mongo_db_bundle' => [
+    'clients' => [
+        'default' => [
+            'hosts' => [
+                'host' => $mongo['host'], 'port' => $mongo['port'],
+            ],
+            'username' => $mongo['user'] ?? null,
+            'password' => $mongo['pass'] ?? null,
+        ]
+    ],
+    'connections' => [
+        'default' => [
+            'database_name' => $mongo['path'],
+        ]
+    ]
+];
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T09:07:18Z
+
+> parse_url(env('MONGODB_DSN'));
+
+fundamentally the goal of %env()% is to not fetch envs during compile time.
+
+But for PHP config a env builder might be nice:
+
+```php
+'database_name' => env('key:path', 'url', 'MONGODB_DSN'),
+```
+
+to at least make the strings more readable.
+
+---------------------------------------------------------------------------
+
+by andersonamuller at 2018-10-25T09:49:51Z
+
+@javiereguiluz That is a very popular opinion to me :)
+
+@ro0NL Isn't it possible to have something like the code below?
+
+```php
+// services.php
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return function (ContainerConfigurator $configurator) {
+    $parameters = $configurator->parameters();
+
+    $defaultMongoDbUrl = 'mongodb://localhost:27017/symfony?ssl=false';
+
+    $parameters->set(
+        'database_name',
+        env('MONGODB_DSN', $defaultMongoDbUrl)->url()->path()
+    );
+    $parameters->set(
+        'database_secure',
+        env('MONGODB_DSN', $defaultMongoDbUrl)->url()->query('ssl', true /* default */)
+    );
+
+    // other examples
+    $parameters->set(
+        'security_secret',
+        /* without default value, it will throw exception if does not exist at runtime */
+        env('APP_SECRET_FILE')->file()->trim()
+    );
+    $parameters->set('locale', env('APP_LOCALE', 'pt_BR'));
+    /* defaut values are always a string */
+    $parameters->set('account_threshold', env('APP_THRESHOLD', '10')->int());
+};
+```
+also for the other PR #28976
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T09:54:33Z
+
+@andersonamuller sure, whatever API that can build the string for us :)
+
+the question is; how much code do we want to add/maintain only to generate a string.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-10-25T10:17:11Z
+
+@ro0NL I once opened a RFC for this https://github.com/symfony/symfony/issues/28084
+
+@javiereguiluz of course we can do everything with php config file. Does Symfony want to promote use of yaml config file for simple case and php for complex one. This is not my call ;-) But in that case, what is the purpose of envProcessor like 'key', 'json', 'file'?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-10-25T10:28:38Z
+
+@nicolas-grekas done. Took `url` and `query`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-10-25T10:29:55Z
+
+Just to clarify: I think that YAML is fantastic for config files. The problem is when you try to add PHP-like features to YAML. If we continue doing that, it's better to switch to PHP.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-25T10:43:49Z
+
+@javiereguiluz please don't hijack the topic, @ro0NL is right here: your proposal misses a lot of context  to have it work - maybe we can make it work, but that's a huge task, that's what I mean.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:06:08Z
+
+@jderusse your before/after example is perfect for Symfony Docs. Just asking about the missing parts:
+
+* Would this feature require to enable/configure anything when using it in a Symfony full-stack app? (I guess it won't)
+* Would this require some changes when using it as a stand-alone component? I guess it does ... please show some example of how to activate this. Thanks!
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-11-07T15:04:25Z
+
+@javiereguiluz This feature uses exactly the same "workflow" than `key`, `json`, `int`, `bool`, or `file` processor. It don't use new Class or thing to instantiate.
+
+You can use it without the framework like this:
+```php
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+$containerBuilder = new ContainerBuilder();
+$containerBuilder->setParameter('es_url', '%env(url:ES_HOST)%');
+$containerBuilder->compile(true);
+
+var_dump($containerBuilder->getParameter('es_url'));
+```
+
+```bash
+ES_HOST='http://www.google.com' php index.php
+array(8) {
+  ["scheme"]=>
+  string(4) "http"
+  ["host"]=>
+  string(14) "www.google.com"
+  ["port"]=>
+  int(0)
+  ["user"]=>
+  string(0) ""
+  ["pass"]=>
+  string(0) ""
+  ["path"]=>
+  string(0) ""
+  ["query"]=>
+  string(0) ""
+  ["fragment"]=>
+  string(0) ""
+}
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T15:47:52Z
+
+@jderusse thanks for the added examples. That's all we need for the docs. Cheers!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T10:00:37Z
+
+(rebase needed)
+@symfony/deciders OK for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T14:28:38Z
+
+Please rebase.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-13T16:44:00Z
+
+Reading the updated description of this PR, I think this:
+
+```
+charset: '%env(key:charset:query_string:key:query:url:DATABASE_DSN)%'
+```
+
+could be easier to understand as follows:
+
+```
+charset: '%env(key:charset:query_string:DATABASE_DSN)%'
+```
+
+`query_string` would extract the query string from the given URL and explode it into a PHP array.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-13T16:56:13Z
+
+can we try both? query string obtained from URL and provided as-is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-15T13:08:38Z
+
+@javiereguiluz I'm not sure that's possible without restricting possibilities a lot. Power comes from combining single predictable tools, and have each tool do one thing well. Having query_string be a hybrid between `parse_url` and `parse_str` means not being able to use it only as a `parse_str` unit. :-1: to your proposal for this reason on my side.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-15T14:23:26Z
+
+Here's an approach that might work: https://3v4l.org/hLlIg, i like the proposed convenience of `key:charset:query_string:VAR`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-17T17:02:30Z
+
+Thanks @ro0NL
+@jderusse OK to implement this? Works for me (canceling my previous comment)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-03-17T17:14:08Z
+
+Done

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -38,6 +39,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const SKIP_NULL_VALUES = 'skip_null_values';
     const MAX_DEPTH_HANDLER = 'max_depth_handler';
     const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
+    const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
     private $propertyTypeExtractor;
     private $typesCache = [];
@@ -272,6 +274,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 }
 
                 continue;
+            }
+
+            if ($context[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
+                try {
+                    $context[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $context);
+                } catch (NoSuchPropertyException $e) {
+                }
             }
 
             $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context);

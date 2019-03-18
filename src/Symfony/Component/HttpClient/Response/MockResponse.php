@@ -22,7 +22,7 @@ class MockResponse implements ResponseInterface
 {
     use ResponseTrait;
 
-    protected const DEFAULT_INFO = [
+    private const DEFAULT_INFO = [
         'raw_headers' => [],    // An array modelled after the special $http_response_header variable
         'redirect_count' => 0,  // The number of redirects followed while executing the request
         'redirect_url' => null, // The resolved location of redirect responses, null otherwise
@@ -40,7 +40,7 @@ class MockResponse implements ResponseInterface
 
     public function __construct(string $content = '', int $code = 200, array $headers = [], array $info = [], ?callable $initializer = null)
     {
-        $default = static::DEFAULT_INFO;
+        $default = self::DEFAULT_INFO;
         $default['start_time'] = microtime(true);
 
         $this->content = $content;

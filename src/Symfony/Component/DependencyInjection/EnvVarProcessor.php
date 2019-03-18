@@ -41,6 +41,8 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'int' => 'int',
             'json' => 'array',
             'key' => 'bool|int|float|string|array',
+            'url' => 'array',
+            'query_string' => 'array',
             'resolve' => 'string',
             'default' => 'bool|int|float|string|array',
             'string' => 'string',
@@ -181,6 +183,37 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             return $env;
+        }
+
+        if ('url' === $prefix) {
+            $parsedEnv = parse_url($env);
+
+            if (false === $parsedEnv) {
+                throw new RuntimeException(sprintf('Invalid URL in env var "%s"', $name));
+            }
+            if (!isset($parsedEnv['scheme'], $parsedEnv['host'])) {
+                throw new RuntimeException(sprintf('Invalid URL env var "%s": schema and host expected, %s given.', $name, $env));
+            }
+            $parsedEnv += [
+                'port' => null,
+                'user' => null,
+                'pass' => null,
+                'path' => null,
+                'query' => null,
+                'fragment' => null,
+            ];
+
+            // remove the '/' separator
+            $parsedEnv['path'] = '/' === $parsedEnv['path'] ? null : substr($parsedEnv['path'], 1);
+
+            return $parsedEnv;
+        }
+
+        if ('query_string' === $prefix) {
+            $queryString = parse_url($env, PHP_URL_QUERY) ?: $env;
+            parse_str($queryString, $result);
+
+            return $result;
         }
 
         if ('resolve' === $prefix) {

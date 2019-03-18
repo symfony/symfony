@@ -21,6 +21,7 @@ namespace Symfony\Component\Console\Helper;
  *                              response. You can switch this behavior off with this option. The result will be pretty,
  *                              but the URL won't be clickable.
  *      - CUT_FILL_UP_MISSING:  The program will fill up the rows with spaces in order to every row will be same long.
+ *      - CUT_REPLACE_PHP_EOL:  The program will replace the PHP_EOL in the input string to $break.
  *
  * <code>
  *      $message = "<comment>This is a comment message with <info>info</info></comment> ...";
@@ -61,9 +62,9 @@ class PrettyWordWrapper
     /** @var int */
     const DEFAULT_WIDTH = 120;
     /** @var string */
-    const DEFAULT_BREAK = PHP_EOL;
+    const DEFAULT_BREAK = "\n";
     /** @var int */
-    const DEFAULT_CUT = self::CUT_LONG_WORDS;
+    const DEFAULT_CUT = self::CUT_LONG_WORDS | self::CUT_REPLACE_PHP_EOL;
 
     // Cut options
     const CUT_DISABLE = 0;
@@ -72,6 +73,7 @@ class PrettyWordWrapper
     const CUT_URLS = 4;
     const CUT_ALL = 7;
     const CUT_FILL_UP_MISSING = 8;
+    const CUT_REPLACE_PHP_EOL = 16;
 
     /**
      * This is a ZERO_WIDTH_SPACE UTF-8 character. It is used when we try to protect the escaped tags, eg: `\<error>`.
@@ -180,6 +182,9 @@ class PrettyWordWrapper
         }
         // Reset all cache properties.
         $this->reset($width, $cutOptions, $break);
+        if ($this->hasCutOption(self::CUT_REPLACE_PHP_EOL)) {
+            $string = str_replace(PHP_EOL, $break, $string);
+        }
         // Protect the escaped characters and tags.
         $string = $this->escape($string);
         // Slice string by break string

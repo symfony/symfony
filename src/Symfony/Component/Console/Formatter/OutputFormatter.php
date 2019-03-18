@@ -271,12 +271,12 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     private function applyCurrentStyle(string $text): string
     {
         if ($this->isDecorated() && \strlen($text) > 0) {
-            $lines = explode(PHP_EOL, $text);
+            $lines = explode("\n", $text);
             foreach ($lines as $i => $line) {
                 $lines[$i] = $this->styleStack->getCurrent()->apply($line);
             }
 
-            return implode(PHP_EOL, $lines);
+            return implode("\n", $lines);
         }
 
         return $text;

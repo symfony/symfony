@@ -229,7 +229,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnMaxWidth(int $columnIndex, int $width, int $cutOptions = PrettyWordWrapper::CUT_LONG_WORDS): self
+    public function setColumnMaxWidth(int $columnIndex, int $width, int $cutOptions = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_REPLACE_PHP_EOL): self
     {
         if (!$this->output->getFormatter() instanceof WrappableOutputFormatterInterface) {
             throw new \LogicException(sprintf('Setting a maximum column width is only supported when using a "%s" formatter, got "%s".', WrappableOutputFormatterInterface::class, \get_class($this->output->getFormatter())));

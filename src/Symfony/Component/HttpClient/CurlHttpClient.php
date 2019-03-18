@@ -64,8 +64,8 @@ final class CurlHttpClient implements HttpClientInterface
             'dnsCache' => [[], [], []],
         ];
 
-        // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/76675
-        if (\PHP_VERSION_ID < 70215 || \PHP_VERSION_ID === 70300 || \PHP_VERSION_ID === 70301) {
+        // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/bug.php?id=77535
+        if (\PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
             return;
         }
 
@@ -74,8 +74,7 @@ final class CurlHttpClient implements HttpClientInterface
             return;
         }
 
-        // Keep a dummy "onPush" reference to work around a refcount bug in PHP
-        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, $multi->onPush = static function ($parent, $pushed, array $rawHeaders) use ($multi) {
+        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $rawHeaders) use ($multi) {
             return self::handlePush($parent, $pushed, $rawHeaders, $multi);
         });
     }

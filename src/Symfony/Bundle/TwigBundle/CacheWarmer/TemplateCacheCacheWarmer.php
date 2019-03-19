@@ -16,7 +16,6 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinderInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
 use Twig\Error\Error;
 
@@ -69,10 +68,6 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
         }
 
         foreach ($templates as $template) {
-            if ('twig' !== $template->get('engine')) {
-                continue;
-            }
-
             try {
                 $twig->loadTemplate($template);
             } catch (Error $e) {
@@ -107,7 +102,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
      * @param string $namespace The namespace for these templates
      * @param string $dir       The folder where to look for templates
      *
-     * @return array An array of templates of type TemplateReferenceInterface
+     * @return array An array of templates
      */
     private function findTemplatesInFolder($namespace, $dir)
     {
@@ -120,10 +115,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
 
         foreach ($finder->files()->followLinks()->in($dir) as $file) {
             $name = $file->getRelativePathname();
-            $templates[] = new TemplateReference(
-                $namespace ? sprintf('@%s/%s', $namespace, $name) : $name,
-                'twig'
-            );
+            $templates[] = $namespace ? sprintf('@%s/%s', $namespace, $name) : $name;
         }
 
         return $templates;

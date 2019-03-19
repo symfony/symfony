@@ -1,0 +1,296 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-23T16:23:40Z
+
+you also need to deprecate the TwigEngine (in the bridge and the bundle), as they are about integrating Twig in this component.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-23T16:24:15Z
+
+And this requires deprecating the ``AppBundle:foo:bar.html.twig`` syntax too, as it comes from the Templating system (and this one is used)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-23T16:25:12Z
+
+Do we want to deprecate this syntax or not?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-23T16:27:51Z
+
+Well, if we don't want to deprecate it, you need to undeprecate the TemplateNameParser system in your PR.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-12-23T17:59:02Z
+
+The `@AppBundle/foo/bar.html.twig` syntax is recommended since 2.5 or something like that.
+But deprecating the symfony specific syntax might show some resistance :P
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-23T18:46:04Z
+
+So let's deprecate this notation.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-23T19:58:07Z
+
+@dunglas last time we tried to deprecate that syntax (in June 2014) they almost killed us 😁  See https://github.com/symfony/symfony/issues/11051
+
+By the way, in #20130 we discussed about a big inconsistency in the Twig syntax. Maybe we should take care of that too?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-23T20:20:03Z
+
+@javiereguiluz but we have an advantage this time, people already using Twig alone (without the templating bridge) can only use the `@AppBundle` syntax. We're deprecating the Templating component, other syntaxes - not supported by the Twig Bundle - will be deprecated with it. Does it looks reasonable?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-23T20:23:03Z
+
+Indeed, #11051 is very different. Here we are deprecating *everything* related to the Templating component, including the way we reference templates. There is no need to discuss how to reference templates as we are just using "pure" Twig, nothing more.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-23T21:02:15Z
+
+But I think we should indeed look into #20130 and try to find a way to resolve the inconsistency if we force everyone to use the Twig schema to reference templates.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T17:13:05Z
+
+One even more important thing: The native Twig namespace syntax as it is currently integrated in the framework fails on bundle inheritance (see #6919). Please take a look at #19586 which provides a fix.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-13T22:43:28Z
+
+Should the TemplatingPass be deprecated?
+Maybe should it trigger deprecations for each service in the loop too (i.e. tagged `templating.*`)?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-28T17:38:02Z
+
+@chalasr good catch, done.
+
+---------------------------------------------------------------------------
+
+by adrienrn at 2017-02-24T16:11:49Z
+
+One question remains on my end : templating was giving a layer of abstraction to twig and if `@templating` goes away, do we need to inject `@twig` directly or some other component will provide an abstraction ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-03-06T21:45:56Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-03-07T11:14:04Z
+
+As I've expressed on other issues on this matter, I know people that use this component and I am :-1: on moving to a forced-Twig environment (yes, I know people can create services and use them to perform their rendering using alternate templating engines quite easily, but it just seems unnessissary to remove the ability to use your own engine via the core).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T00:22:52Z
+
+One alternative would be to move everything related to the Templating component from FrameworkBundle into a new bundle. Would that work?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-23T00:23:18Z
+
+And move most of the classes back to the Templating component (something we do anyway as much as possible).
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-03-23T12:59:07Z
+
+@fabpot Yeah, that sounds like a great alternative.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T10:56:16Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T15:48:39Z
+
+Moving to 4.1. Rebase on master needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-08T16:29:03Z
+
+Can't we finish this one? IMO it's important to do it now. Doing it in 4.1 won't gain much.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-08T17:11:27Z
+
+If we agree to deprecate this component (IIRC, it wasn't the case), I can finish this soon.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-08T17:12:32Z
+
+I don't think there is a need to deprecate the component.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-09T09:36:24Z
+
+This was about depecating the templating integation in the framework bundle. Not whole component. And I thought that is what was decided
+
+> I'm closing this one as I don't think there is a need to deprecate this component, just the integration with framework bundle, which is done in another PR.
+
+#21036
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-09T09:44:04Z
+
+Good catch, I'll finish this one.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-12T06:54:31Z
+
+Should be ready now.
+
+Status: needs review
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-12T10:24:53Z
+
+LGTM apart from the above comments. We might want to move some of those classes into the templating component directly, e.g. TwigEngine and DelegatingEngine. Otherwise the templating component would only offer php rendering, making it quite limited and defeating the main purpose IMO: Abstracting away rendering with different implementations.
+But we can do that in a separate PR. Or only if people complain they want to keep using templating this way.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-15T12:19:49Z
+
+The AppVeyor failure is unrelated. This PR is be ready to be merged.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-16T22:21:21Z
+
+Remaining comments fixed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-16T22:37:45Z
+
+test are failing. I assume you need to add TwigBundle to require-dev of framework-bundle.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-16T22:39:41Z
+
+@Tobion right I was just pushing the commit
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-16T23:32:14Z
+
+The remaining failure is that TwigBridge >=3.2 is incompatible with TwigBundle < 3.2 since https://github.com/symfony/symfony/commit/812fbb444f1d1e4cafff5876ce7b22d5b8d4adf8 because HttpKernelExtension requires HttpKernelRuntime. This would need a conflict rule in TwigBridge I assume.
+
+The solution here could be to just require TwigBundle ~2.8|~3.2|~4.0
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-17T21:42:45Z
+
+The services are only loaded if templating component is installed (https://github.com/symfony/symfony/blame/master/src/Symfony/Bundle/TwigBundle/DependencyInjection/TwigExtension.php#L50). That would be good enough for Flex but breaks for people using symfony/symfony. It needs to check for the templating services instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-17T21:56:34Z
+
+Changing the check in the bundle extension won't work as it can't know if `templating` exists.
+~~The `twig.loader.filesystem` service ~~should be removed~~ from ExtensionPass where we already remove `templating.engine.twig` https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/ExtensionPass.php#L80.~~ it is already removed.
+Both services need to be marked as deprecated in templating.xml though.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-28T14:31:14Z
+
+`Symfony\Bundle\SecurityBundle\Templating\` NS should be deprecated too right?
+
+Hope to see this happening soon.
+
+Status: needs work (outdated deprecation messages :))
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-01T18:43:55Z
+
+Rebased, message updated.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-31T09:22:25Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-01-30T00:42:04Z
+
+Btw, what this deprecation also means is that PHP templates for the Form component are deprecated as well. The php templating logic for forms is implemented in the framework bundle and the templates are located there as well.
+
+So
+- Symfony\Component\Form\Extension\Templating\TemplatingExtension and Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine should be deprecated as well. Those classes have no value without the stuff in the frameworkbundle.
+-
+ https://github.com/symfony/symfony/blob/7693469bc8634b00aff052467fbc4699ae36885f/src/Symfony/Component/Form/Forms.php#L71-L97 can be removed
+- https://github.com/symfony/symfony/blob/7693469bc8634b00aff052467fbc4699ae36885f/src/Symfony/Component/Form/composer.json#L50 can be removed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-30T06:37:51Z
+
+I would not deprecate templating support but move everything (the integration, not the component) to its own independent bundle (let say PHPTemplatingBundle) like we did for ACLs. The component itself is stable, so I don't see a need to move it out of core.
+
+---------------------------------------------------------------------------
+
+by QuentinCurtet at 2018-02-26T13:28:42Z
+
+I have one question, does the use PHP templates will be deprecated in Symfony 4 ?
+
+Thanks in advance.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-01-02T11:58:32Z
+
+@fabpot launched a poll about this on Twitter: https://twitter.com/fabpot/status/1080403220973924352
+
+---------------------------------------------------------------------------
+
+by kbond at 2019-01-07T14:55:55Z
+
+FWIW, in tests, I wrap `EngineInterface` to track the rendered templates and make assertions about their data.
+
+I am not against deprecating as long as there is a PHPTemplatingBundle to keep this functionality.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-19T15:15:38Z
+
+@dunglas Taking over.

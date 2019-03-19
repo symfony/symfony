@@ -53,7 +53,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
                 $mimeTypeGuesser = MimeTypeGuesser::getInstance();
             }
         } elseif (!$mimeTypeGuesser instanceof MimeTypes) {
-            throw new \InvalidArgumentException(sprintf('Argument 1 passed to "%s()" must be an instance of "%s" or null, %s given.', __METHOD__, MimeTypes::class, \is_object($mimeTypeGuesser) ? \get_class($mimeTypeGuesser) : \gettype($mimeTypeGuesser)));
+            throw new \TypeError(sprintf('Argument 1 passed to "%s()" must be an instance of "%s" or null, %s given.', __METHOD__, MimeTypes::class, \is_object($mimeTypeGuesser) ? \get_class($mimeTypeGuesser) : \gettype($mimeTypeGuesser)));
         }
 
         $this->mimeTypeGuesser = $mimeTypeGuesser;

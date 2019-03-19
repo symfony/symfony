@@ -83,7 +83,7 @@ class Table
     private $columnWidths = [];
     private $columnMaxWidths = [];
     private $columnWordWrapCutOption = [];
-    private $defaultColumnWordWrapCutOption = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_REPLACE_PHP_EOL;
+    private $defaultColumnWordWrapCutOption = PrettyWordWrapperHelper::CUT_LONG_WORDS;
 
     private static $styles;
 
@@ -264,7 +264,9 @@ class Table
      */
     public function getColumnWordWrapCutOption(int $columnIndex): int
     {
-        if (!array_key_exists($columnIndex, $this->columnWordWrapCutOption)) {
+        if (!array_key_exists($columnIndex, $this->columnWordWrapCutOption)
+            || null === $this->columnWordWrapCutOption[$columnIndex]
+        ) {
             return $this->defaultColumnWordWrapCutOption;
         }
 

@@ -29,9 +29,9 @@ interface WrappableOutputFormatterInterface extends OutputFormatterInterface
      *
      * @param string   $message
      * @param int      $width
-     * @param int|null $cutOptions
+     * @param int|null $cutOption
      *
      * @return string
      */
-    public function wordwrap(string $message, int $width, int $cutOptions = null): string;
+    public function wordwrap(string $message, int $width, int $cutOption = null): string;
 }

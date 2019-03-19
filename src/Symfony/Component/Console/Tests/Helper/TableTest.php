@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\PrettyWordWrapper;
+use Symfony\Component\Console\Helper\PrettyWordWrapperHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -1058,7 +1058,7 @@ TABLE
             ->setRows([
                 ['Divine Comedy', 'A Tale of Two Cities', 'The Lord of the Rings', 'And Then There Were None'],
             ])
-            ->setColumnMaxWidth(1, 5, PrettyWordWrapper::CUT_ALL)
+            ->setColumnMaxWidth(1, 5, PrettyWordWrapperHelper::CUT_ALL)
             ->setColumnMaxWidth(2, 10)
             ->setColumnMaxWidth(3, 15);
 

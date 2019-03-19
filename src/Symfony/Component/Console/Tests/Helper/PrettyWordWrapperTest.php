@@ -3,7 +3,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\PrettyWordWrapper;
+use Symfony\Component\Console\Helper\PrettyWordWrapperHelper;
 
 /**
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
@@ -18,9 +18,9 @@ class PrettyWordWrapperTest extends TestCase
      */
     public function testConstructorExceptions($width, $break)
     {
-        $wordWrapper = new PrettyWordWrapper();
+        $wordWrapper = new PrettyWordWrapperHelper();
         $this->expectException(\InvalidArgumentException::class);
-        $wordWrapper->wordwrap('test', $width, PrettyWordWrapper::DEFAULT_CUT, $break);
+        $wordWrapper->wordwrap('test', $width, PrettyWordWrapperHelper::DEFAULT_CUT, $break);
     }
 
     public function dpTestConstructorExceptions()
@@ -44,7 +44,7 @@ class PrettyWordWrapperTest extends TestCase
      */
     public function testWordwrap($input, $width, $cutOptions, $break, $output)
     {
-        $wordWrapper = new PrettyWordWrapper();
+        $wordWrapper = new PrettyWordWrapperHelper();
         $response = $wordWrapper->wordwrap($this->getInputContents($input), $width, $cutOptions, $break);
 
         $this->assertEquals($this->getOutputContents($output), $response);
@@ -63,7 +63,7 @@ class PrettyWordWrapperTest extends TestCase
      */
     public function testStaticWrap($input, $width, $cutOptions, $break, $output)
     {
-        $response = PrettyWordWrapper::wrap($this->getInputContents($input), $width, $cutOptions, $break);
+        $response = PrettyWordWrapperHelper::wrap($this->getInputContents($input), $width, $cutOptions, $break);
 
         $this->assertEquals($this->getOutputContents($output), $response);
     }
@@ -75,29 +75,29 @@ class PrettyWordWrapperTest extends TestCase
 
         return [
             // Check empty
-            ['', 2, PrettyWordWrapper::CUT_ALL, $baseBreak, ''],
-            ['', 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  '],
-            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL, $baseBreak, $baseBreak],
-            [$baseBreak, 2, PrettyWordWrapper::CUT_ALL | PrettyWordWrapper::CUT_FILL_UP_MISSING, $baseBreak, '  '.$baseBreak.'  '],
+            ['', 2, PrettyWordWrapperHelper::CUT_ALL, $baseBreak, ''],
+            ['', 2, PrettyWordWrapperHelper::CUT_ALL | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING, $baseBreak, '  '],
+            [$baseBreak, 2, PrettyWordWrapperHelper::CUT_ALL, $baseBreak, $baseBreak],
+            [$baseBreak, 2, PrettyWordWrapperHelper::CUT_ALL | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING, $baseBreak, '  '.$baseBreak.'  '],
             // Check limit and UTF-8
             [
                 'öüóőúéáű',
                 8,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 $baseBreak,
                 'öüóőúéáű',
             ],
             [
                 'öüóőúéáű',
                 4,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 'öüóő'.$baseBreak.'úéáű',
             ],
             [
                 'öüóőúéáű',
                 6,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 'öüóőúé'.$baseBreak.'áű    ',
             ],
@@ -105,28 +105,28 @@ class PrettyWordWrapperTest extends TestCase
             [
                 '<error>öüóőúéáű</error>',
                 8,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 '<error>öüóőúéáű</error>',
             ],
             [
                 'öüó<error>őú</error>éáű',
                 8,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 'öüó<error>őú</error>éáű',
             ],
             [
                 'foo <error>bar</error> baz',
                 3,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 implode($baseBreak, ['foo', '<error>bar</error>', 'baz']),
             ],
             [
                 'foo <error>bar</error> baz',
                 2,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 implode($baseBreak, ['fo', 'o ', '<error>ba', 'r</error> ', 'ba', 'z ']),
             ],
@@ -134,21 +134,21 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'foo \<error>bar\</error> baz',
                 3,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 implode($baseBreak, ['foo', '\<e', 'rro', 'r>b', 'ar\\', '</e', 'rro', 'r> ', 'baz']),
             ],
             [
                 'foo<error>bar</error>baz foo',
                 3,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 implode($baseBreak, ['foo', '<error>bar</error>', 'baz', 'foo']),
             ],
             [
                 'foo<error>bar</error>baz foo',
                 2,
-                PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING,
                 $baseBreak,
                 implode($baseBreak, ['fo', 'o<error>b', 'ar</error>', 'ba', 'z ', 'fo', 'o ']),
             ],
@@ -156,7 +156,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'lipsum.txt',
                 120,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 $baseBreak,
                 'lipsum.txt',
             ],
@@ -164,7 +164,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'lipsum_with_tags.txt',
                 120,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 $baseBreak,
                 'lipsum_with_tags.txt',
             ],
@@ -172,7 +172,7 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'lipsum_with_tags_and_custom_break.txt',
                 120,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 $customBreak,
                 'lipsum_with_tags_and_custom_break.txt',
             ],
@@ -180,21 +180,21 @@ class PrettyWordWrapperTest extends TestCase
             [
                 'with_long_words.txt',
                 30,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 $baseBreak,
                 'with_long_words_with_default_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
-                PrettyWordWrapper::CUT_DISABLE,
+                PrettyWordWrapperHelper::CUT_DISABLE,
                 $baseBreak,
                 'with_long_words_without_cut.txt',
             ],
             [
                 'with_long_words.txt',
                 30,
-                PrettyWordWrapper::CUT_ALL,
+                PrettyWordWrapperHelper::CUT_ALL,
                 $baseBreak,
                 'with_long_words_with_cut_all.txt',
             ],

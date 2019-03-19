@@ -21,7 +21,7 @@ namespace Symfony\Component\Console\Helper;
  *                              response. You can switch this behavior off with this option. The result will be pretty,
  *                              but the URL won't be clickable.
  *      - CUT_FILL_UP_MISSING:  The program will fill up the rows with spaces in order to every row will be same long.
- *      - CUT_REPLACE_PHP_EOL:  The program will replace the PHP_EOL in the input string to $break.
+ *      - CUT_NO_REPLACE_EOL:   The program will replace the PHP_EOL in the input string to $break.
  *
  * <code>
  *      $message = "<comment>This is a comment message with <info>info</info></comment> ...";
@@ -56,7 +56,7 @@ namespace Symfony\Component\Console\Helper;
  *
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
  */
-class PrettyWordWrapper
+class PrettyWordWrapperHelper extends Helper
 {
     // Defaults
     /** @var int */
@@ -64,7 +64,7 @@ class PrettyWordWrapper
     /** @var string */
     const DEFAULT_BREAK = "\n";
     /** @var int */
-    const DEFAULT_CUT = self::CUT_LONG_WORDS | self::CUT_REPLACE_PHP_EOL;
+    const DEFAULT_CUT = self::CUT_LONG_WORDS;
 
     // Cut options
     const CUT_DISABLE = 0;
@@ -73,7 +73,7 @@ class PrettyWordWrapper
     const CUT_URLS = 4;
     const CUT_ALL = 7;
     const CUT_FILL_UP_MISSING = 8;
-    const CUT_REPLACE_PHP_EOL = 16;
+    const CUT_NO_REPLACE_EOL = 16;
 
     /**
      * This is a ZERO_WIDTH_SPACE UTF-8 character. It is used when we try to protect the escaped tags, eg: `\<error>`.
@@ -100,7 +100,7 @@ class PrettyWordWrapper
      *
      * @var int|null
      */
-    protected $cutOptions;
+    protected $cutOption;
 
     /**
      * "Cache".
@@ -133,7 +133,7 @@ class PrettyWordWrapper
     /**
      * "Singleton.", but it isn't forbidden to create new objects, if you want.
      *
-     * @return PrettyWordWrapper
+     * @return PrettyWordWrapperHelper
      */
     protected static function getInstance(): self
     {
@@ -145,18 +145,28 @@ class PrettyWordWrapper
     }
 
     /**
-     * @param string $string     The text
-     * @param int    $width      Character width of one line
-     * @param int    $cutOptions You can mix your needs with CUT_* constants
-     * @param string $break      The line breaking character(s)
+     * Returns the canonical name of this helper.
+     *
+     * @return string The canonical name
+     */
+    public function getName()
+    {
+        return 'prettywordwrapper';
+    }
+
+    /**
+     * @param string $string    The text
+     * @param int    $width     Character width of one line
+     * @param int    $cutOption You can mix your needs with CUT_* constants
+     * @param string $break     The line breaking character(s)
      *
      * @return string
      */
-    public static function wrap(string $string, int $width = self::DEFAULT_WIDTH, int $cutOptions = self::DEFAULT_CUT, string $break = self::DEFAULT_BREAK): string
+    public static function wrap(string $string, int $width = self::DEFAULT_WIDTH, int $cutOption = self::DEFAULT_CUT, string $break = self::DEFAULT_BREAK): string
     {
         $wrapper = self::getInstance();
 
-        return $wrapper->wordwrap($string, $width, $cutOptions, $break);
+        return $wrapper->wordwrap($string, $width, $cutOption, $break);
     }
 
     /**
@@ -182,8 +192,12 @@ class PrettyWordWrapper
         }
         // Reset all cache properties.
         $this->reset($width, $cutOptions, $break);
-        if ($this->hasCutOption(self::CUT_REPLACE_PHP_EOL)) {
-            $string = str_replace(PHP_EOL, $break, $string);
+        // Unifies the line endings
+        if (!$this->hasCutOption(self::CUT_NO_REPLACE_EOL)) {
+            $string = str_replace(PHP_EOL, "\n", $string);
+            $string = str_replace("\r\n", "\n", $string);
+            $string = str_replace("\n\r", "\n", $string);
+            $string = str_replace("\r", "\n", $string);
         }
         // Protect the escaped characters and tags.
         $string = $this->escape($string);
@@ -197,7 +211,7 @@ class PrettyWordWrapper
                 if ($lineLength + $virtualTokenLength < $width) {
                     $this->addTokenToLine($token, $virtualTokenLength);
                 } else {
-                    $this->handleLineEnding($token, $virtualTokenLength, $width, $cutOptions);
+                    $this->handleLineEnding($token, $virtualTokenLength);
                 }
             }
             $this->closeLine();
@@ -211,10 +225,8 @@ class PrettyWordWrapper
      *
      * @param string $token
      * @param int    $virtualTokenLength
-     * @param int    $width
-     * @param int    $cutOptions
      */
-    protected function handleLineEnding(string $token, int $virtualTokenLength, int $width, int $cutOptions): void
+    protected function handleLineEnding(string $token, int $virtualTokenLength): void
     {
         switch (true) {
             // Token is an URL and we don't want to cut it
@@ -227,7 +239,7 @@ class PrettyWordWrapper
                 $this->sliceToken($token);
                 break;
             // We want to cut the long words
-            case $virtualTokenLength > $width && $this->hasCutOption(self::CUT_LONG_WORDS):
+            case $virtualTokenLength > $this->width && $this->hasCutOption(self::CUT_LONG_WORDS):
                 // A little prettifying, avoid like this:
                 //      Lorem ipsum ve
                 //      rylongtext dol
@@ -236,7 +248,7 @@ class PrettyWordWrapper
                 //      Lorem ipsum
                 //      verylongtext
                 //      dolor sit amet
-                if ($this->getFreeSpace() < 5 && $width > 10) {
+                if ($this->getFreeSpace() < 5 && $this->width > 10) {
                     $this->closeLine();
                 }
                 $this->sliceToken($token);
@@ -352,7 +364,7 @@ class PrettyWordWrapper
 
         // reset "caches"
         $this->width = null;
-        $this->cutOptions = null;
+        $this->cutOption = null;
         $this->break = null;
 
         return $unescaped;
@@ -368,7 +380,7 @@ class PrettyWordWrapper
     protected function reset(int $width, int $cutOptions, string $break): void
     {
         $this->width = $width;
-        $this->cutOptions = $cutOptions;
+        $this->cutOption = $cutOptions;
         $this->break = $break;
         $this->newLineTokens = [];
         $this->newLines = [];
@@ -425,7 +437,7 @@ class PrettyWordWrapper
     /**
      * Slice a long token.
      *
-     * !!! PAY ATTANTION !!! Don't use the mb_* functions with preg_match() position answers. preg_match() gets "bytes",
+     * !!! PAY ATTENTION !!! Don't use the mb_* functions with preg_match() position answers. preg_match() gets "bytes",
      * not characters!
      *
      * @param string $token
@@ -482,13 +494,12 @@ class PrettyWordWrapper
      * It checks the cut option is set. See the CUT_* constants.
      *
      * @param int $option
-     * @param int $cutOptions
      *
      * @return bool
      */
     protected function hasCutOption(int $option): bool
     {
-        return ($this->cutOptions & $option) === $option;
+        return ($this->cutOption & $option) === $option;
     }
 
     /**

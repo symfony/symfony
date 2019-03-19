@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Formatter;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\PrettyWordWrapper;
+use Symfony\Component\Console\Helper\PrettyWordWrapperHelper;
 
 /**
  * Formatter class for console output.
@@ -27,7 +27,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     private $decorated;
     private $styles = [];
     private $styleStack;
-    private $wrapCutOptions = PrettyWordWrapper::CUT_LONG_WORDS | PrettyWordWrapper::CUT_FILL_UP_MISSING;
+    private $defaultWrapCutOption = PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING;
 
     /**
      * Escapes "<" special char in given text.
@@ -133,21 +133,21 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * @return int
      */
-    public function getWrapCutOptions(): int
+    public function getDefaultWrapCutOption(): int
     {
-        return $this->wrapCutOptions;
+        return $this->defaultWrapCutOption;
     }
 
     /**
-     * @param int $wrapCutOptions
+     * @param int $defaultWrapCutOption
      *
      * @return $this
      *
-     * @see PrettyWordWrapper
+     * @see PrettyWordWrapperHelper
      */
-    public function setWrapCutOptions(int $wrapCutOptions)
+    public function setDefaultWrapCutOption(int $defaultWrapCutOption)
     {
-        $this->wrapCutOptions = $wrapCutOptions;
+        $this->defaultWrapCutOption = $defaultWrapCutOption;
 
         return $this;
     }
@@ -212,9 +212,9 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function wordwrap(string $message, int $width, int $cutOptions = null): string
+    public function wordwrap(string $message, int $width, int $cutOption = null): string
     {
-        return PrettyWordWrapper::wrap($message, $width, null === $cutOptions ? $this->wrapCutOptions : $cutOptions);
+        return PrettyWordWrapperHelper::wrap($message, $width, null === $cutOption ? $this->defaultWrapCutOption : $cutOption);
     }
 
     /**

@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Style;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\PrettyWordWrapper;
+use Symfony\Component\Console\Helper\PrettyWordWrapperHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
@@ -407,10 +407,10 @@ class SymfonyStyle extends OutputStyle
                 $message = OutputFormatter::escape($message);
             }
 
-            $lines = array_merge($lines, explode(PHP_EOL, PrettyWordWrapper::wrap(
+            $lines = array_merge($lines, explode(PHP_EOL, PrettyWordWrapperHelper::wrap(
                 $message,
                 $this->lineLength - $prefixLength - $indentLength,
-                PrettyWordWrapper::CUT_LONG_WORDS,
+                PrettyWordWrapperHelper::CUT_LONG_WORDS,
                 PHP_EOL
             )));
 

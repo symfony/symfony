@@ -59,6 +59,10 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of Twig\Environment or Symfony\Component\Templating\EngineInterface');
         }
 
+        if ($templating instanceof EngineInterface) {
+            @trigger_error(sprintf('Using a "%s" instance for "%s" is deprecated since version 4.3; use a \Twig\Environment instance instead.', EngineInterface::class, __CLASS__), E_USER_DEPRECATED);
+        }
+
         $this->templating = $templating;
     }
 

@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Symfony\Component\HttpKernel\UriSigner;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 
 class HIncludeFragmentRendererTest extends TestCase
 {
@@ -74,7 +76,17 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default', 'id' => 'bar', 'attributes' => ['p1' => 'v1', 'p2' => 'v2']])->getContent());
     }
 
-    public function testRenderWithDefaultText()
+    public function testRenderWithTwigAndDefaultText()
+    {
+        $twig = new Environment($loader = new ArrayLoader());
+        $strategy = new HIncludeFragmentRenderer($twig);
+        $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRenderWithDefaultTextLegacy()
     {
         $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
         $engine->expects($this->once())
@@ -85,18 +97,5 @@ class HIncludeFragmentRendererTest extends TestCase
         // only default
         $strategy = new HIncludeFragmentRenderer($engine);
         $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
-    }
-
-    public function testRenderWithEngineAndDefaultText()
-    {
-        $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
-        $engine->expects($this->once())
-            ->method('exists')
-            ->with('loading...')
-            ->willThrowException(new \RuntimeException());
-
-        // only default
-        $strategy = new HIncludeFragmentRenderer($engine);
-        $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
     }
 }

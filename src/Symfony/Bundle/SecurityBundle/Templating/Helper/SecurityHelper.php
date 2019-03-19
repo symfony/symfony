@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
+@trigger_error('The '.SecurityHelper::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Templating\Helper\Helper;
@@ -19,6 +21,8 @@ use Symfony\Component\Templating\Helper\Helper;
  * SecurityHelper provides read-only access to the security checker.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 4.3, to be removed in 5.0; use Twig instead.
  */
 class SecurityHelper extends Helper
 {

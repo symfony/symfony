@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Form\Extension\Templating;
 
+@trigger_error('The '.TemplatingRendererEngine::class.' class is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 4.3, to be removed in 5.0; use Twig instead.
  */
 class TemplatingRendererEngine extends AbstractRendererEngine
 {

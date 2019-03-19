@@ -486,6 +486,7 @@
             <xsd:element name="default-options" type="http_client_options" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="max-host-connections" type="xsd:integer" />
     </xsd:complexType>
 
     <xsd:complexType name="fingerprint">

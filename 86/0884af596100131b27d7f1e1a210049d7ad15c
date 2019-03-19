@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-19T05:18:57Z
+
+Instead of that complex code, what about removing overriding `assertEquals` and create a specialized `assertDatetimeEquals()` method internal to the tests?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-19T07:51:45Z
+
+Makes sense, done!

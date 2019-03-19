@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2018-12-13T22:26:46Z
+
+The last two examples on [this page ](https://github.com/alexislefebvre/SymfonyWorkflowStyleBundle/blob/1bcdf4f22741988b24ac07b2ea0f010273849fe7/README.md#examples) shows the dot format, with `multiple_state`, transitions are displayed as square instead of arrows with texts.
+
+So the option `background_color` is used instead of `arrow_color` because it's meaningless in this context. I still have to find a limited number of parameters that would allow styling states and transitions with state machines and workflows.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2018-12-30T16:34:18Z
+
+Can someone please remove the `Deprecation` tag? I forgot to change the value when creating the PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T11:07:52Z
+
+rebase needed due to short arrays.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2019-02-05T13:57:16Z
+
+Thanks for hint, the PR has been rebased.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T07:31:43Z
+
+@lyrixx I think we need your help to move forward here.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-13T16:37:16Z
+
+Thanks @alexislefebvre . This is very Good. Could you rebase before the merge ? (I think this will conflict with #30468 but I will take care of it).
+
+Could someone review English textes (PHP Doc, Changelog)? :pray: Thanks
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2019-03-13T22:00:22Z
+
+Rebase done. :heavy_check_mark:
+
+Thanks for the follow-up.

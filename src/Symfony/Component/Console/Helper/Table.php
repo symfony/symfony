@@ -264,7 +264,7 @@ class Table
      */
     public function getColumnWordWrapCutOption(int $columnIndex): int
     {
-        if (!array_key_exists($columnIndex, $this->columnWordWrapCutOption)
+        if (!\array_key_exists($columnIndex, $this->columnWordWrapCutOption)
             || null === $this->columnWordWrapCutOption[$columnIndex]
         ) {
             return $this->defaultColumnWordWrapCutOption;
@@ -286,8 +286,6 @@ class Table
     }
 
     /**
-     *
-     *
      * @param array $columnWordWrapCutOptions
      *
      * @return $this

@@ -21,19 +21,14 @@ use Symfony\Contracts\HttpClient\ChunkInterface;
  */
 class ErrorChunk implements ChunkInterface
 {
-    protected $didThrow;
-
+    private $didThrow = false;
     private $offset;
     private $errorMessage;
     private $error;
 
-    /**
-     * @param bool &$didThrow Allows monitoring when the $error has been thrown or not
-     */
-    public function __construct(bool &$didThrow, int $offset, \Throwable $error = null)
+    public function __construct(int $offset, \Throwable $error = null)
     {
         $didThrow = false;
-        $this->didThrow = &$didThrow;
         $this->offset = $offset;
         $this->error = $error;
         $this->errorMessage = null !== $error ? $error->getMessage() : 'Reading from the response stream reached the inactivity timeout.';
@@ -94,6 +89,14 @@ class ErrorChunk implements ChunkInterface
     public function getError(): ?string
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * @return bool Whether the wrapped error has been thrown or not
+     */
+    public function didThrow(): bool
+    {
+        return $this->didThrow;
     }
 
     public function __destruct()

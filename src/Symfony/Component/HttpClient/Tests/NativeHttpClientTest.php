@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 
 class NativeHttpClientTest extends HttpClientTestCase
 {
-    protected function getHttpClient(): HttpClientInterface
+    protected function getHttpClient(string $testCase): HttpClientInterface
     {
         return new NativeHttpClient();
     }

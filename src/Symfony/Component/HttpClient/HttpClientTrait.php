@@ -117,7 +117,7 @@ trait HttpClientTrait
 
         // Finalize normalization of options
         $options['headers'] = $headers;
-        $options['http_version'] = (string) ($options['http_version'] ?? '');
+        $options['http_version'] = (string) ($options['http_version'] ?? '') ?: null;
         $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'));
 
         return [$url, $options];
@@ -128,6 +128,8 @@ trait HttpClientTrait
      */
     private static function mergeDefaultOptions(array $options, array $defaultOptions, bool $allowExtraOptions = false): array
     {
+        unset($options['raw_headers'], $defaultOptions['raw_headers']);
+
         $options['headers'] = self::normalizeHeaders($options['headers'] ?? []);
 
         if ($defaultOptions['headers'] ?? false) {

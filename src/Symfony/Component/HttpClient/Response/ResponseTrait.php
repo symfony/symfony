@@ -259,9 +259,7 @@ trait ResponseTrait
                 foreach ($responses as $j => $response) {
                     $timeoutMax = $timeout ?? max($timeoutMax, $response->timeout);
                     $timeoutMin = min($timeoutMin, $response->timeout, 1);
-                    // ErrorChunk instances will set $didThrow to true when the
-                    // exception they wrap has been thrown after yielding
-                    $chunk = $didThrow = false;
+                    $chunk = false;
 
                     if (isset($multi->handlesActivity[$j])) {
                         // no-op
@@ -269,7 +267,7 @@ trait ResponseTrait
                         unset($responses[$j]);
                         continue;
                     } elseif ($isTimeout) {
-                        $multi->handlesActivity[$j] = [new ErrorChunk($didThrow, $response->offset)];
+                        $multi->handlesActivity[$j] = [new ErrorChunk($response->offset)];
                     } else {
                         continue;
                     }
@@ -293,7 +291,7 @@ trait ResponseTrait
                                     throw $e;
                                 }
 
-                                $chunk = new ErrorChunk($didThrow, $response->offset, $e);
+                                $chunk = new ErrorChunk($response->offset, $e);
                             } else {
                                 $chunk = new LastChunk($response->offset);
                             }
@@ -310,7 +308,7 @@ trait ResponseTrait
                     if ($chunk instanceof FirstChunk && null === $response->initializer) {
                         // Ensure the HTTP status code is always checked
                         $response->getHeaders(true);
-                    } elseif ($chunk instanceof ErrorChunk && !$didThrow) {
+                    } elseif ($chunk instanceof ErrorChunk && !$chunk->didThrow()) {
                         // Ensure transport exceptions are always thrown
                         $chunk->getContent();
                     }

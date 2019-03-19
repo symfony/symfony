@@ -280,6 +280,9 @@ class TwigExtensionTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testRuntimeLoader()
     {
         $container = $this->createContainer();

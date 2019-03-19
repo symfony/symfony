@@ -17,6 +17,9 @@ use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
+/**
+ * @group legacy
+ */
 class AssetsHelperTest extends TestCase
 {
     private $helper;

@@ -533,9 +533,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
     }
 
+    /**
+     * @group legacy
+     */
     public function testTemplating()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('templating');
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
 
@@ -1197,14 +1200,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals($expectedLoaders, $loaders);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAssetHelperWhenAssetsAreEnabled()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('templating');
         $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
 
         $this->assertSame('assets.packages', (string) $packages);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAssetHelperWhenTemplatesAreEnabledAndNoAssetsConfiguration()
     {
         $container = $this->createContainerFromFile('templating_no_assets');
@@ -1213,6 +1222,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('assets.packages', (string) $packages);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
     {
         $container = $this->createContainerFromFile('templating_php_assets_disabled');

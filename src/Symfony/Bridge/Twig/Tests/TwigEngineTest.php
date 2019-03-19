@@ -17,6 +17,9 @@ use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
+/**
+ * @group legacy
+ */
 class TwigEngineTest extends TestCase
 {
     public function testExistsWithTemplateInstances()

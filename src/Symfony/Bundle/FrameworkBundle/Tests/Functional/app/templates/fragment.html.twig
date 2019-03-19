@@ -1,0 +1,7 @@
+{{ render(controller('TestBundle:Fragment:inlined', {'options': {'bar': bar, 'eleven': 11}})) }}
+--
+{{ render(controller('TestBundle:Fragment:customformat', {'_format': 'html'})) }}
+--
+{{ render(controller('TestBundle:Fragment:customlocale', {'_locale': 'es'})) }}
+--
+{{ app.request.setLocale('fr') }}{{ render(controller('TestBundle:Fragment:forwardlocale')) -}}

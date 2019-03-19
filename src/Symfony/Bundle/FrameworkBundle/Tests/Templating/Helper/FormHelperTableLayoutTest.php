@@ -20,6 +20,9 @@ use Symfony\Component\Form\Tests\AbstractTableLayoutTest;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\PhpEngine;
 
+/**
+ * @group legacy
+ */
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 {
     /**

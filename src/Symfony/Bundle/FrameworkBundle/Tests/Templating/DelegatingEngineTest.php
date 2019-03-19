@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group legacy
+ */
 class DelegatingEngineTest extends TestCase
 {
     public function testSupportsRetrievesEngineFromTheContainer()

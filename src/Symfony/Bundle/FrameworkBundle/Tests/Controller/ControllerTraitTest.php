@@ -439,6 +439,9 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertSame(301, $response->getStatusCode());
     }
 
+    /**
+     * @group legacy
+     */
     public function testRenderViewTemplating()
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
@@ -453,6 +456,9 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->renderView('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testRenderTemplating()
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
@@ -467,6 +473,9 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testStreamTemplating()
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();

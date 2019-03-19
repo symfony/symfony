@@ -19,6 +19,9 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * @group legacy
+ */
 class TemplatePathsCacheWarmerTest extends TestCase
 {
     /** @var Filesystem */

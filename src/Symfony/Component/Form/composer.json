@@ -48,8 +48,7 @@
     "suggest": {
         "symfony/validator": "For form validation.",
         "symfony/security-csrf": "For protecting forms against CSRF attacks.",
-        "symfony/twig-bridge": "For templating with Twig.",
-        "symfony/framework-bundle": "For templating with PHP."
+        "symfony/twig-bridge": "For templating with Twig."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Form\\": "" },

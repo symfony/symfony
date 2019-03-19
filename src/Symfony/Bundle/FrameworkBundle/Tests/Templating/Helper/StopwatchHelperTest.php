@@ -14,6 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper;
 
+/**
+ * @group legacy
+ */
 class StopwatchHelperTest extends TestCase
 {
     public function testDevEnvironment()

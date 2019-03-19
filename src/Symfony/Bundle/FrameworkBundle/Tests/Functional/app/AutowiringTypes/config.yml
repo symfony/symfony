@@ -6,6 +6,3 @@ services:
     test.autowiring_types.autowired_services:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes\AutowiredServices
         autowire: true
-framework:
-    templating:
-        engines: ['php']

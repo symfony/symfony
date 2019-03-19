@@ -27,7 +27,7 @@ class GuardEvent extends Event
     /**
      * {@inheritdoc}
      */
-    public function __construct($subject, Marking $marking, Transition $transition, $workflowName = 'unnamed')
+    public function __construct($subject, Marking $marking, Transition $transition, $workflowName = null)
     {
         parent::__construct($subject, $marking, $transition, $workflowName);
 

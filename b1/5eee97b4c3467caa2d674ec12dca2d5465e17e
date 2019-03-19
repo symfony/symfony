@@ -1,0 +1,183 @@
+---------------------------------------------------------------------------
+
+by arnolanglade at 2018-10-30T16:10:38Z
+
+I don't know if I really understand the PR but it is weird to dispatch event in handlers. Normally, you should  dispatch event after committing the main transaction. Then, you can dispatch all events raised by your domain object (entity) and subscribe them.
+
+Example:
+```php
+class User
+{
+    private $messages = [];
+    public function __construct()
+    {
+        $this->messages[] = new UserRegistered(/*...*/);
+    }
+
+    public function messages()
+    {
+        return $this->messages;
+    }
+}
+
+// It should be wrapped into a transaction
+class RegisterUserHandler
+{
+    public function __invoke(RegisterUser $command)
+    {
+        $user = new User(/*...*/);
+
+        // If we use a collection oriented repository, events can be collected in a middleware. In the unit of work, you can find the aggregate User and get all messages.
+        $this->userRespoitory->add($user);
+
+        // If we use a collection oriented repository, you don't have a unit of work so your repository need to collect them.
+        $this->userRespoitory->save($user);
+    }
+}
+
+class DispatchEventMiddleware
+{
+    public function handle(/*...*/)
+    {
+        // Your transaction has been committed then your dispatch your event
+    }
+}
+```
+Perhaps, `$this->messageBus->dispatch(/*...*/)` should not dispatch event/message synchronously?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-29T18:14:29Z
+
+@Nyholm : I gave this a shot in userland. This just needs some tweaks to comply the 4.2 Messenger interfaces (and sharing the same middleware instance across buses (https://github.com/symfony/symfony/pull/28849#discussion_r226863424)), but it works great!
+I'm not sure about the terms used, though. Transaction may be a bit confusing with the doctrine transaction middleware. No strong opinion, maybe I'm just used to the [lock](https://tactician.thephpleague.com/plugins/locking-middleware/) term in use with Tactician.
+
+Tell me if you want some help to take over.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-11-29T18:17:10Z
+
+Thank you for testing this.
+
+Yes, please. This has been on my TODO list for ages now. Please help me.
+I will try to fix this during the holidays but if you (or someone) have time before that, feel free.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-12-12T09:18:48Z
+
+I've pushed new changes and tests, trying to showcase a bit the feature in it.
+I may have a look at the docs, too.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by gubler at 2019-02-09T02:28:54Z
+
+I have tried implementing this in userland with a test app and I can not figure out how to dispatch between buses. I have a command bus that is trying to dispatch to an event bus using the Transaction stamp. In my `messenger.yml` I have the transaction middleware declared for both buses. Is there something else I need to configure? My service for the middleware is declared with `abstract: false` as I saw the comment that otherwise separate middlewares would be generated.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-02-22T13:57:54Z
+
+I've rebased this PR on master.
+Status: Needs Review
+
+@gubler Did you add the `HandleMessageInNewTransactionMiddleware` before the Doctrine transaction middleware?
+
+---------------------------------------------------------------------------
+
+by gubler at 2019-02-23T02:20:16Z
+
+@Nyholm Yes, I did. I have created [a test project here](https://github.com/gubler/messenger-transaction-test/) that you can review and see if I messed anything up.
+
+I'm guessing its more likely I've made an error in the config or usage.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-02-23T08:51:07Z
+
+@gubler : It seems you only declared the `handle_message_in_new_transaction` middleware on command bus: https://github.com/gubler/messenger-transaction-test/blob/54b225f5df9a68a502d8e74d7acbcba2c4da94e5/config/packages/messenger.yaml#L9
+
+Which means the event you dispatch from the command handler to the event bus won't go through the middleware queuing it, so it's dispatched directly.
+
+You must declare it on each bus likely to have messages they handle queued by a transaction. Which means your event bus here.
+
+---------------------------------------------------------------------------
+
+by gubler at 2019-02-23T11:11:48Z
+
+@ogizanagi I added the middleware to the event bus: https://github.com/gubler/messenger-transaction-test/blob/master/config/packages/messenger.yaml
+
+Now the `BookCreatedSubscriber` does not execute at all, whether the `NewBookHandler` succeeds or errors.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-02-24T10:16:46Z
+
+@gubler: 😱 There was indeed an issue! The wrong `$stack` was passed to the next middleware when resuming dispatching the queued items. Which means the handler middleware was not called, as the middleware stack used was empty (because the main dispatch call's stack was used).
+
+Thanks for testing this and for the reproducer btw.
+Could you give a try to the last commit? 🙏
+
+---------------------------------------------------------------------------
+
+by gubler at 2019-02-24T10:30:37Z
+
+Merged your changes into [my test app](https://github.com/gubler/messenger-transaction-test/blob/master/src/Lib/Messenger/Middleware/HandleMessageInNewTransactionMiddleware.php) and it looks like everything works now!
+
+Thank you very much for figuring this out 🎉
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-02-24T10:38:07Z
+
+You guys are the best. Thank you @gubler and @ogizanagi to testing and fixing this PR.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-03-13T18:58:10Z
+
+PR is updated. After some discussions I'm convinced to move this away from "DoctrineTransaction" and let this be a pure "handle this later" middleware named `DispatchAfterCurrentBusMiddleware`.
+
+It will also make the stamp more expressive. (See updated PR description).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T20:24:32Z
+
+To fix the failure, you need to bump messenger to 4.3 in fwb.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-03-17T10:13:14Z
+
+Thank you. I've updated the PR according to @weaverryan's suggestions and I've rebased to avoid the merge conflict.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-18T21:07:43Z
+
+Minor conflict now on `composer.json` file.
+
+Still +1 from me
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-03-18T21:27:01Z
+
+I fixed the conflict
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-18T21:34:51Z
+
+Please squash commits.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-03-19T04:16:45Z
+
+Thank you for the reviews. I've squashed my commits

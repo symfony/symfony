@@ -103,7 +103,7 @@ class Cookie
         // convert expiration time to a Unix timestamp
         if ($expire instanceof \DateTimeInterface) {
             $expire = $expire->format('U');
-        } elseif (!is_numeric($expire)) {
+        } elseif (preg_match('~\D~', $expire)) {
             $expire = strtotime($expire);
 
             if (false === $expire) {

@@ -11,13 +11,16 @@
 
 namespace Symfony\Contracts\HttpClient\Exception;
 
+use Symfony\Contracts\HttpClient\ResponseInterface;
+
 /**
- * When a 4xx response is returned.
+ * Base interface for HTTP-related exceptions.
  *
- * @author Nicolas Grekas <p@tchwork.com>
+ * @author Anton Chernikov <anton_ch1989@mail.ru>
  *
  * @experimental in 1.1
  */
-interface ClientExceptionInterface extends HttpExceptionInterface
+interface HttpExceptionInterface extends ExceptionInterface
 {
+    public function getResponse(): ResponseInterface;
 }

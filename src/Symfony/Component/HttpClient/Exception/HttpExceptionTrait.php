@@ -20,8 +20,11 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 trait HttpExceptionTrait
 {
+    private $response;
+
     public function __construct(ResponseInterface $response)
     {
+        $this->response = $response;
         $code = $response->getInfo('http_code');
         $url = $response->getInfo('url');
         $message = sprintf('HTTP %d returned for URL "%s".', $code, $url);
@@ -34,5 +37,10 @@ trait HttpExceptionTrait
         }
 
         parent::__construct($message, $code);
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
     }
 }

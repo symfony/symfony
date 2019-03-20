@@ -20,9 +20,10 @@
         "symfony/dom-crawler": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/process": "~3.4|~4.0",
         "symfony/css-selector": "~3.4|~4.0",
-        "symfony/mime": "^4.3"
+        "symfony/http-client": "^4.3",
+        "symfony/mime": "^4.3",
+        "symfony/process": "~3.4|~4.0"
     },
     "suggest": {
         "symfony/process": ""

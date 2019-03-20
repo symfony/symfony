@@ -264,7 +264,7 @@ EOF
                     $namespace = '@'.$namespace;
                 }
 
-                $loaderPaths[$namespace] = $paths;
+                $loaderPaths[$namespace] = array_merge($loaderPaths[$namespace] ?? [], $paths);
             }
         }
 

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-10T18:14:39Z
+
+I've just added support for annotations too :). Doc is coming.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-11T06:47:46Z
+
+Why is it useful to expose `compiler_class`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-11T07:05:22Z
+
+Well, I was not sure, I did it by consistency. I felt like it was hidden and deserved to shine too :), but no hard feeling, if there is no real use case for it let's just keep utf8 which should increase DX (see related doc PR).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-11T10:48:54Z
+
+I would remove it, that's an internal settings that does not need to be exposed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-17T17:00:52Z
+
+Done, I exposed the defaults instead, WDYT?
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-20T07:42:28Z
+
+@HeahDude Can you have a look at the broken tests?

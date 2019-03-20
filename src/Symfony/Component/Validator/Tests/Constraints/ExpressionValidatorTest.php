@@ -54,6 +54,32 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testExpressionIsEvaluatedWithArrayValueWithRoot()
+    {
+        $array = ['data' => 2];
+        $constraint = new Expression([
+            'expression' => 'this[\'data\'] > 1',
+            'message' => 'myMessage',
+        ]);
+        $this->setRoot($array);
+        $this->validator->validate($array, $constraint);
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to get an item on a non-array
+     */
+    public function testExpressionIsEvaluatedWithArrayValueWithoutRoot()
+    {
+        $array = ['data' => 2];
+        $constraint = new Expression([
+            'expression' => 'this[\'data\'] > 1',
+            'message' => 'myMessage',
+        ]);
+        $this->validator->validate($array, $constraint);
+    }
+
     public function testSucceedingExpressionAtObjectLevel()
     {
         $constraint = new Expression('this.data == 1');

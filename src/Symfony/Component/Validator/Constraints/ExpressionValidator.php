@@ -43,6 +43,10 @@ class ExpressionValidator extends ConstraintValidator
         $variables['value'] = $value;
         $variables['this'] = $this->context->getObject();
 
+        if (null === $variables['this'] && \is_array($this->context->getRoot()) && $this->isThisUsedAsAnArray($constraint->expression)) {
+            $variables['this'] = $this->context->getRoot();
+        }
+
         if (!$this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING))
@@ -61,5 +65,17 @@ class ExpressionValidator extends ConstraintValidator
         }
 
         return $this->expressionLanguage;
+    }
+
+    // Check if "this" is used as an array instead of Object
+    private function isThisUsedAsAnArray($constraintExpression)
+    {
+        foreach (array_keys($this->context->getRoot()) as $key) {
+            if (false !== strpos($constraintExpression, sprintf('this[\'%s\']', $key))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

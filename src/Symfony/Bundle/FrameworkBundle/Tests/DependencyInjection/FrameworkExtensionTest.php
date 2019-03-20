@@ -1389,15 +1389,17 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
-        $this->assertSame(['foo' => ['bar']], $container->getDefinition('http_client')->getArguments()[0]['headers']);
-        $this->assertSame(['bar' => ['baz'], 'foo' => ['bar']], $container->getDefinition('foo')->getArguments()[0]['headers']);
+        $this->assertSame(['foo' => ['bar']], $container->getDefinition('http_client')->getArgument(0)['headers']);
+        $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
+        $this->assertSame(['bar' => ['baz'], 'foo' => ['bar']], $container->getDefinition('foo')->getArgument(0)['headers']);
+        $this->assertSame(5, $container->getDefinition('foo')->getArgument(1));
     }
 
     public function testHttpClientFullDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_full_default_options');
 
-        $defaultOptions = $container->getDefinition('http_client')->getArguments()[0];
+        $defaultOptions = $container->getDefinition('http_client')->getArgument(0);
 
         $this->assertSame('foo:bar', $defaultOptions['auth_basic']);
         $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], $defaultOptions['query']);

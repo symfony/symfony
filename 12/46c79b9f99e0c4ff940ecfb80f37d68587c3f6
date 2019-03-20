@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by maryo at 2019-03-19T12:39:45Z
+
+I've updated it because it has nothing to do with validation_groups being set as a callback, just a simple empty array is enough to reproduce the bug.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-19T15:31:19Z
+
+Hello @maryo, thank you for opening this issue.
+
+It seems to be a doc issue to me, to disable validation you should define the `validation_groups` option to `false` instead.
+
+---------------------------------------------------------------------------
+
+by maryo at 2019-03-19T19:21:54Z
+
+@HeahDude Yeah. But according to this code
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Validator/Type/BaseValidatorExtension.php#L35
+`false` is just an alias for an empty array but not in case `validation_groups` is a callback. Then it is not normalized. Then it just returns the callable and it is then then resolved inside FormValidator here
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Validator/Constraints/FormValidator.php#L183
+
+If the callback returns `false`, then it actually validates it against group `false`. That's not such a problem but still a bug IMO.
+
+And all the tests inside `FormValidator` also expect an empty array to disable validation. That's probably also because the normalization from `false` to `[]` inside `BaseValidatorExtension` is not triggered by calling `FormValidator->validate(/*...*/)` manually.

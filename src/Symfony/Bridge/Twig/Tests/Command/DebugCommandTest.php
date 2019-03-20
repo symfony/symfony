@@ -16,6 +16,7 @@ use Symfony\Bridge\Twig\Command\DebugCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Twig\Environment;
+use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
 
 class DebugCommandTest extends TestCase
@@ -279,7 +280,16 @@ TXT
         ];
     }
 
-    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, string $rootDir = null): CommandTester
+    public function testDebugTemplateNameWithChainLoader()
+    {
+        $tester = $this->createCommandTester(['templates/' => null], [], null, null, true);
+        $ret = $tester->execute(['name' => 'base.html.twig'], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertContains('[OK]', $tester->getDisplay());
+    }
+
+    private function createCommandTester(array $paths = [], array $bundleMetadata = [], string $defaultPath = null, string $rootDir = null, bool $useChainLoader = false): CommandTester
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);
@@ -289,6 +299,10 @@ TXT
             } else {
                 $loader->addPath($path, $namespace);
             }
+        }
+
+        if ($useChainLoader) {
+            $loader = new ChainLoader([$loader]);
         }
 
         $application = new Application();

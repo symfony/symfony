@@ -133,7 +133,7 @@ trait PhpFilesTrait
      */
     protected function doHave($id)
     {
-        if ($this->appendOnly && $this->values[$id]) {
+        if ($this->appendOnly && isset($this->values[$id])) {
             return true;
         }
 

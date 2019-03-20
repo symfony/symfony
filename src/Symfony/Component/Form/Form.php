@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PostSubmitEvent;
+use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Event\PreSubmitEvent;
+use Symfony\Component\Form\Event\SubmitEvent;
 use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\OutOfBoundsException;
@@ -333,12 +339,12 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         $this->lockSetData = true;
-        $dispatcher = $this->config->getEventDispatcher();
+        $dispatcher = LegacyEventDispatcherProxy::decorate($this->config->getEventDispatcher());
 
         // Hook to change content of the data
         if ($dispatcher->hasListeners(FormEvents::PRE_SET_DATA)) {
-            $event = new FormEvent($this, $modelData);
-            $dispatcher->dispatch(FormEvents::PRE_SET_DATA, $event);
+            $event = new PreSetDataEvent($this, $modelData);
+            $dispatcher->dispatch($event, FormEvents::PRE_SET_DATA);
             $modelData = $event->getData();
         }
 
@@ -380,8 +386,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         }
 
         if ($dispatcher->hasListeners(FormEvents::POST_SET_DATA)) {
-            $event = new FormEvent($this, $modelData);
-            $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+            $event = new PostSetDataEvent($this, $modelData);
+            $dispatcher->dispatch($event, FormEvents::POST_SET_DATA);
         }
 
         return $this;
@@ -542,7 +548,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
         }
 
-        $dispatcher = $this->config->getEventDispatcher();
+        $dispatcher = LegacyEventDispatcherProxy::decorate($this->config->getEventDispatcher());
 
         $modelData = null;
         $normData = null;
@@ -555,8 +561,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
 
             // Hook to change content of the data submitted by the browser
             if ($dispatcher->hasListeners(FormEvents::PRE_SUBMIT)) {
-                $event = new FormEvent($this, $submittedData);
-                $dispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
+                $event = new PreSubmitEvent($this, $submittedData);
+                $dispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
                 $submittedData = $event->getData();
             }
 
@@ -642,8 +648,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 // Hook to change content of the data in the normalized
                 // representation
                 if ($dispatcher->hasListeners(FormEvents::SUBMIT)) {
-                    $event = new FormEvent($this, $normData);
-                    $dispatcher->dispatch(FormEvents::SUBMIT, $event);
+                    $event = new SubmitEvent($this, $normData);
+                    $dispatcher->dispatch($event, FormEvents::SUBMIT);
                     $normData = $event->getData();
                 }
 
@@ -669,8 +675,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
         $this->viewData = $viewData;
 
         if ($dispatcher->hasListeners(FormEvents::POST_SUBMIT)) {
-            $event = new FormEvent($this, $viewData);
-            $dispatcher->dispatch(FormEvents::POST_SUBMIT, $event);
+            $event = new PostSubmitEvent($this, $viewData);
+            $dispatcher->dispatch($event, FormEvents::POST_SUBMIT);
         }
 
         return $this;

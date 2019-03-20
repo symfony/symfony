@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -35,7 +36,10 @@ class FirewallListener extends Firewall
         parent::__construct($map, $dispatcher);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    /**
+     * @internal
+     */
+    public function configureLogoutUrlGenerator(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -44,10 +48,11 @@ class FirewallListener extends Firewall
         if ($this->map instanceof FirewallMap && $config = $this->map->getFirewallConfig($event->getRequest())) {
             $this->logoutUrlGenerator->setCurrentFirewall($config->getName(), $config->getContext());
         }
-
-        parent::onKernelRequest($event);
     }
 
+    /**
+     * @internal since Symfony 4.3
+     */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         if ($event->isMasterRequest()) {
@@ -55,5 +60,19 @@ class FirewallListener extends Firewall
         }
 
         parent::onKernelFinishRequest($event);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            KernelEvents::REQUEST => [
+                ['configureLogoutUrlGenerator', 8],
+                ['onKernelRequest', 8],
+            ],
+            KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+        ];
     }
 }

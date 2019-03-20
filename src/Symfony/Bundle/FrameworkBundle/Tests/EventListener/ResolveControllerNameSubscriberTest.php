@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\EventListener\ResolveControllerNameSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ResolveControllerNameSubscriberTest extends TestCase
@@ -33,7 +33,7 @@ class ResolveControllerNameSubscriberTest extends TestCase
         $request->attributes->set('_controller', 'AppBundle:Starting:format');
 
         $subscriber = new ResolveControllerNameSubscriber($parser);
-        $subscriber->onKernelRequest(new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $subscriber->onKernelRequest(new RequestEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
         $this->assertEquals('App\\Final\\Format::methodName', $request->attributes->get('_controller'));
     }
 
@@ -51,7 +51,7 @@ class ResolveControllerNameSubscriberTest extends TestCase
         $request->attributes->set('_controller', $controller);
 
         $subscriber = new ResolveControllerNameSubscriber($parser);
-        $subscriber->onKernelRequest(new GetResponseEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
+        $subscriber->onKernelRequest(new RequestEvent($httpKernel, $request, HttpKernelInterface::MASTER_REQUEST));
         $this->assertEquals($controller, $request->attributes->get('_controller'));
     }
 

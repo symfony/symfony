@@ -63,7 +63,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
         $submittedData = ['test'];
         $event = new FormEvent($this->getForm(), $submittedData);
 
-        $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
+        $this->dispatcher->dispatch($event, FormEvents::SUBMIT);
 
         $this->assertTrue($this->collection->contains('test'));
         $this->assertSame(1, $this->collection->count());
@@ -74,7 +74,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
         $submittedData = [];
         $event = new FormEvent($this->getForm(), $submittedData);
 
-        $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
+        $this->dispatcher->dispatch($event, FormEvents::SUBMIT);
 
         $this->assertTrue($this->collection->isEmpty());
     }

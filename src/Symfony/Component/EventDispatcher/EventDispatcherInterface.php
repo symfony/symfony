@@ -23,15 +23,13 @@ interface EventDispatcherInterface
     /**
      * Dispatches an event to all registered listeners.
      *
-     * @param string     $eventName The name of the event to dispatch. The name of
-     *                              the event is the name of the method that is
-     *                              invoked on listeners.
-     * @param Event|null $event     The event to pass to the event handlers/listeners
-     *                              If not supplied, an empty Event instance is created
+     * @param Event       $event     The event to pass to the event handlers/listeners
+     * @param string|null $eventName The name of the event to dispatch. If not supplied,
+     *                               the class of $event should be used instead.
      *
      * @return Event
      */
-    public function dispatch($eventName, Event $event = null);
+    public function dispatch($event/*, string $eventName = null*/);
 
     /**
      * Adds an event listener that listens on the specified events.

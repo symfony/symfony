@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * to the client.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class StreamedResponseListener implements EventSubscriberInterface
 {

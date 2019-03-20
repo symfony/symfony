@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * Interface that must be implemented by firewall listeners.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since Symfony 4.3, turn listeners into callables instead
  */
 interface ListenerInterface
 {

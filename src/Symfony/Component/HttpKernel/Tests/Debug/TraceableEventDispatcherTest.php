@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -89,10 +90,10 @@ class TraceableEventDispatcherTest extends TestCase
                 $called2 = true;
             });
         });
-        $dispatcher->dispatch('my-event');
+        $dispatcher->dispatch(new Event(), 'my-event');
         $this->assertTrue($called1);
         $this->assertFalse($called2);
-        $dispatcher->dispatch('my-event');
+        $dispatcher->dispatch(new Event(), 'my-event');
         $this->assertTrue($called2);
     }
 
@@ -104,7 +105,7 @@ class TraceableEventDispatcherTest extends TestCase
         };
         $eventDispatcher->addListener('foo', $listener1);
         $eventDispatcher->addListener('foo', function () {});
-        $eventDispatcher->dispatch('foo');
+        $eventDispatcher->dispatch(new Event(), 'foo');
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }

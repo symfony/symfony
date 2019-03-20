@@ -20,11 +20,11 @@
         "ext-xml": "*",
         "symfony/config": "^4.2",
         "symfony/dependency-injection": "^4.2",
-        "symfony/http-kernel": "^4.1",
+        "symfony/http-kernel": "^4.3",
         "symfony/security-core": "~4.3",
         "symfony/security-csrf": "~4.2",
         "symfony/security-guard": "~4.2",
-        "symfony/security-http": "~4.2"
+        "symfony/security-http": "^4.3"
     },
     "require-dev": {
         "symfony/asset": "~3.4|~4.0",
@@ -32,7 +32,6 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/css-selector": "~3.4|~4.0",
         "symfony/dom-crawler": "~3.4|~4.0",
-        "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/form": "~3.4|~4.0",
         "symfony/framework-bundle": "~4.2",
         "symfony/http-foundation": "~3.4|~4.0",
@@ -51,7 +50,6 @@
         "symfony/browser-kit": "<4.2",
         "symfony/twig-bundle": "<4.2",
         "symfony/var-dumper": "<3.4",
-        "symfony/event-dispatcher": "<3.4",
         "symfony/framework-bundle": "<4.2",
         "symfony/console": "<3.4"
     },

@@ -42,6 +42,11 @@ CHANGELOG
    ```
  * added the `input_format` option to `DateType`, `DateTimeType`, and `TimeType` to specify the input format when setting
    the `input` option to `string`
+ * dispatch `PreSubmitEvent` on `form.pre_submit`
+ * dispatch `SubmitEvent` on `form.submit`
+ * dispatch `PostSubmitEvent` on `form.post_submit`
+ * dispatch `PreSetDataEvent` on `form.pre_set_data`
+ * dispatch `PostSetDataEvent` on `form.post_set_data`
 
 4.2.0
 -----

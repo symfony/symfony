@@ -22,7 +22,6 @@
         "symfony/config": "~4.2",
         "symfony/contracts": "^1.0.2",
         "symfony/dependency-injection": "^4.3",
-        "symfony/event-dispatcher": "^4.1",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3",
         "symfony/polyfill-mbstring": "~1.0",

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
@@ -21,9 +21,13 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * configuration.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class ChannelListener implements ListenerInterface
 {
+    use LegacyListenerTrait;
+
     private $map;
     private $authenticationEntryPoint;
     private $logger;
@@ -38,7 +42,7 @@ class ChannelListener implements ListenerInterface
     /**
      * Handles channel management.
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event)
     {
         $request = $event->getRequest();
 

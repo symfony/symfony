@@ -70,6 +70,7 @@ EventDispatcher
 ---------------
 
  * The `TraceableEventDispatcherInterface` has been removed.
+ * The signature of the `EventDispatcherInterface::dispatch()` method has been updated to `dispatch($event, string $eventName = null)`
 
 Filesystem
 ----------
@@ -206,6 +207,13 @@ HttpKernel
  * Removed the first and second constructor argument of `ConfigDataCollector`
  * Removed `ConfigDataCollector::getApplicationName()`
  * Removed `ConfigDataCollector::getApplicationVersion()`
+ * Removed `FilterControllerArgumentsEvent`, use `ControllerArgumentsEvent` instead
+ * Removed `FilterControllerEvent`, use `ControllerEvent` instead
+ * Removed `FilterResponseEvent`, use `ResponseEvent` instead
+ * Removed `GetResponseEvent`, use `RequestEvent` instead
+ * Removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
+ * Removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
+ * Removed `PostResponseEvent`, use `TerminateEvent` instead
 
 Messenger
 ---------
@@ -262,6 +270,8 @@ Security
  * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
    `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
    `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+ * The `ListenerInterface` has been removed, turn your listeners into callables instead.
+ * The `Firewall::handleRequest()` method has been removed, use `Firewall::callListeners()` instead.
  * `\Serializable` interface has been removed from `AbstractToken` and `AuthenticationException`,
    thus `serialize()` and `unserialize()` aren't available.
    Use `getState()` and `setState()` instead.

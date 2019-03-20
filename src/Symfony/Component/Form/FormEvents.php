@@ -29,7 +29,7 @@ final class FormEvents
      *  - Change data from the request, before submitting the data to the form.
      *  - Add or remove form fields, before submitting the data to the form.
      *
-     * @Event("Symfony\Component\Form\FormEvent")
+     * @Event("Symfony\Component\Form\Event\PreSubmitEvent")
      */
     const PRE_SUBMIT = 'form.pre_submit';
 
@@ -39,7 +39,7 @@ final class FormEvents
      *
      * It can be used to change data from the normalized representation of the data.
      *
-     * @Event("Symfony\Component\Form\FormEvent")
+     * @Event("Symfony\Component\Form\Event\SubmitEvent")
      */
     const SUBMIT = 'form.submit';
 
@@ -49,7 +49,7 @@ final class FormEvents
      *
      * It can be used to fetch data after denormalization.
      *
-     * @Event("Symfony\Component\Form\FormEvent")
+     * @Event("Symfony\Component\Form\Event\PostSubmitEvent")
      */
     const POST_SUBMIT = 'form.post_submit';
 
@@ -60,7 +60,7 @@ final class FormEvents
      *  - Modify the data given during pre-population;
      *  - Modify a form depending on the pre-populated data (adding or removing fields dynamically).
      *
-     * @Event("Symfony\Component\Form\FormEvent")
+     * @Event("Symfony\Component\Form\Event\PreSetDataEvent")
      */
     const PRE_SET_DATA = 'form.pre_set_data';
 
@@ -69,7 +69,7 @@ final class FormEvents
      *
      * This event is mostly here for reading data after having pre-populated the form.
      *
-     * @Event("Symfony\Component\Form\FormEvent")
+     * @Event("Symfony\Component\Form\Event\PostSetDataEvent")
      */
     const POST_SET_DATA = 'form.post_set_data';
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\SaveSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -27,7 +27,7 @@ class SaveSessionListenerTest extends TestCase
     public function testOnlyTriggeredOnMasterRequest()
     {
         $listener = new SaveSessionListener();
-        $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(ResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->expects($this->once())->method('isMasterRequest')->willReturn(false);
         $event->expects($this->never())->method('getRequest');
 
@@ -47,6 +47,6 @@ class SaveSessionListenerTest extends TestCase
         $request = new Request();
         $request->setSession($session);
         $response = new Response();
-        $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
+        $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
     }
 }

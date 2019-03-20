@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * WebProcessor override to read from the HttpFoundation's Request.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * @final since Symfony 4.3
  */
 class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
 {

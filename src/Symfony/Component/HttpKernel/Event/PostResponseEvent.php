@@ -16,12 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * Allows to execute logic after a response was sent.
- *
- * Since it's only triggered on master requests, the `getRequestType()` method
- * will always return the value of `HttpKernelInterface::MASTER_REQUEST`.
- *
- * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @deprecated since Symfony 4.3, use TerminateEvent instead
  */
 class PostResponseEvent extends KernelEvent
 {

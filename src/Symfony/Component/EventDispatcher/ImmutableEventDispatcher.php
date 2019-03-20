@@ -22,15 +22,26 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 
     public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
+        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|null $eventName
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($event/*, string $eventName = null*/)
     {
-        return $this->dispatcher->dispatch($eventName, $event);
+        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
+
+        if (\is_scalar($event)) {
+            // deprecated
+            $swap = $event;
+            $event = $eventName ?? new Event();
+            $eventName = $swap;
+        }
+
+        return $this->dispatcher->dispatch($event, $eventName);
     }
 
     /**

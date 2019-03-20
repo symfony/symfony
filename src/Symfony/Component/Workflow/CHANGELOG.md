@@ -19,6 +19,13 @@ CHANGELOG
     $inMemoryMetadataStore = new InMemoryMetadataStore([], [], $transitionsMetadata);
 
     return new Definition($places, $transitions, null, $inMemoryMetadataStore);
+ * Dispatch `GuardEvent` on `workflow.guard`
+ * Dispatch `LeaveEvent` on `workflow.leave`
+ * Dispatch `TransitionEvent` on `workflow.transition`
+ * Dispatch `EnterEvent` on `workflow.enter`
+ * Dispatch `EnteredEvent` on `workflow.entered`
+ * Dispatch `CompletedEvent` on `workflow.completed`
+ * Dispatch `AnnounceEvent` on `workflow.announce`
 
 4.1.0
 -----

@@ -19,7 +19,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class FirewallMapTest extends TestCase
@@ -66,7 +65,7 @@ class FirewallMapTest extends TestCase
         $firewallConfig = new FirewallConfig('main', 'user_checker');
         $firewallContext->expects($this->once())->method('getConfig')->willReturn($firewallConfig);
 
-        $listener = $this->getMockBuilder(ListenerInterface::class)->getMock();
+        $listener = function () {};
         $firewallContext->expects($this->once())->method('getListeners')->willReturn([$listener]);
 
         $exceptionListener = $this->getMockBuilder(ExceptionListener::class)->disableOriginalConstructor()->getMock();

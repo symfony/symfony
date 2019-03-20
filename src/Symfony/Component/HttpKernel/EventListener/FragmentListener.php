@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\UriSigner;
  * is not signed or if it is not an internal sub-request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.3
  */
 class FragmentListener implements EventSubscriberInterface
 {

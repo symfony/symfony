@@ -24,9 +24,11 @@
         "symfony/http-kernel": ""
     },
     "require-dev": {
-        "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0"
+        "symfony/http-kernel": "^4.3"
+    },
+    "conflict": {
+        "symfony/http-kernel": "<4.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },

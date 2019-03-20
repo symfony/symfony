@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
@@ -33,7 +33,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $subscriber = new AddLinkHeaderListener();
 
-        $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(ResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('isMasterRequest')->willReturn(true);
         $event->method('getRequest')->willReturn($request);
         $event->method('getResponse')->willReturn($response);

@@ -40,10 +40,6 @@ class Address
             self::$validator = new EmailValidator();
         }
 
-        if (null === self::$encoder) {
-            self::$encoder = new IdnAddressEncoder();
-        }
-
         if (!self::$validator->isValid($address, new RFCValidation())) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
@@ -58,6 +54,10 @@ class Address
 
     public function getEncodedAddress(): string
     {
+        if (null === self::$encoder) {
+            self::$encoder = new IdnAddressEncoder();
+        }
+
         return self::$encoder->encodeString($this->address);
     }
 

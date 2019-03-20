@@ -44,7 +44,7 @@ class ExpressionVoter implements VoterInterface
         } elseif (null === $authChecker) {
             @trigger_error(sprintf('Argument 3 passed to "%s()" should be an instance of AuthorizationCheckerInterface, not passing it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
         } elseif (!$authChecker instanceof AuthorizationCheckerInterface) {
-            throw new \InvalidArgumentException(sprintf('Argument 3 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, AuthorizationCheckerInterface::class, \is_object($authChecker) ? \get_class($authChecker) : \gettype($authChecker)));
+            throw new \TypeError(sprintf('Argument 3 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, AuthorizationCheckerInterface::class, \is_object($authChecker) ? \get_class($authChecker) : \gettype($authChecker)));
         }
 
         $this->expressionLanguage = $expressionLanguage;

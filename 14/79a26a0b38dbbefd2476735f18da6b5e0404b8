@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-19T09:00:29Z
+
+I have some questions
+
+1. Why this change ?
+2. if the goal is to simply the event dispatcher usage, why don't you do something like `$eventName = $eventName ?: get_class($event)` ?
+3. What alias are used for ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T12:54:00Z
+
+Thanks for the early reviews. I still have a few edges to fix (as spotted by the CI).
+
+> Why this change ?
+
+two sides: allowing one to subscribe to events using FQCN:
+`return [RequestEvent::class => 'onRequest'];`
+and allowing to trigger your own events by FQCN and thus save ones from having to invent a name:
+`$dispatcher->dispatch(new MyEvent());`
+
+> if the goal is to simply the event dispatcher usage, why don't you do something like $eventName = $eventName ?: get_class($event) ?
+
+that's what happens now :)
+
+> What alias are used for ?
+
+at least for BC, to map `RequestEvent::class` to `kernel.request`. BUT I updated the implementation to have the mapping happen at compile time, so that runtime alias resolution is reverted now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-10-23T12:14:25Z
+
+I prefer this new implementation. This new DX is better.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-10-23T16:53:26Z
+
+The aliases being compile-time only mean that any code meant to work with components only and not FrameworkBundle cannot use them, and that Form aliases are useless (as these are *not* dispatched on the dispatcher configured by FrameworkBundle as each Form instance has its own EventDispatcher)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-28T13:51:44Z
+
+Idea: look at listeners bound to the interfaces of an event.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-11-07T22:49:57Z
+
+I like this step a lot. This was one of my "favorite" drawback of the `EventDispatcher` which I used as one of the arguments to NOT using this component.
+
+I can share some thoughts/ideas of my event handling experience, probably it may help to improve the component. I tried to not discuss it here because you are locked with BC policies. But if you want to change something...
+
+I think you are aware of debates regarding using term "event" for this kind of service. In my opinion, Symfony provides hook dispatcher/manager, not event one. You can say that it's just matter of taste, but it has architecture impacts. You lose ability to make async event handlers without evidence that abstraction is very leaky. It was discussed here, for example: #23441. And regarding naming here, for instance: https://twitter.com/mathiasverraes/status/1013654989682741248. Probably, you will never change it, but it's very noticeable thing that comes in mind when we talk about this component.
+
+This little "terminology disagreement" leads to 2 completely different concepts of EventDispatcher/Bus. "That" event bus:
+1. has immutable events; changed event is just different event; altering event is ability to travel to parallel Universe or just fraud with bank account, it depends on context;
+2. has event handlers in an isolated context: exceptions/errors thrown by them never come to the `EventBus` caller because event handlers are like destructors: execution time is undetermined (right now, 2 seconds later or 1 minute later if queue lags, etc.);
+3. has no priorities on DI-level. This is awesome. You don't need to pick between -32000, 42 or 9223372036854775807 priorities: there is no determined order of event listeners, just chill. It just requires to make explicit chain of event handlers by raising new event from the `A` event handler to the `B`. Or by executing command which leads to the new events. Your processes in the system become more explicit when you see which action depend on which one. `priority: int` is implicit and unreliable way to build a control flow;
+4. doesn't allow to "stop propagation"; event handlers are completely independent from each other; however, hooks probably should be aware of each other and make such decisions; "stop propagation" is incompatible with event handlers completely: probably, I just want to log event, who the heck you think you are to stop me from doing that (_looking at `ExceptionToErrorPageListener`_)?;
+5. has event handlers with no knowledge about sync/async dispatching, because it doesn't matter.
+6. decouples event initiator from the handlers: we don't need to think "should I check returned object or not?"; we just don't care about them, we don't even know whether they exist or not: full agnosticism.
+
+Naming matters.
+
+---
+
+> Idea: look at listeners bound to the interfaces of an event.
+
+I prefer the following logic:
+1. If class has the only listener, we just match by type (`GameWasStarted` for this specific event, `GameEvent` interface for all events of the `Game` aggregate, `Event` for broadcast-listener, etc.);
+2. if class has multiple listeners, we try to allow the only route for any event, i.e. if class has `onStarted(GameWasStarted $event, Context $context)` and `onAny(Event $event)`, `GameWasStarted` will be passed in the first method only to avoid headaches for developer; but it works only if there is explicit inheritance dependency like `final class GameWasStarted implements Event`; if event implements 2 independent interfaces and type hint against them, he makes it on his own risk.
+
+P.S. Avoiding string identifiers for events gives another advantage: developers start to be more reasonable regarding event classes and make them more "fine-grained": not `GameEvent`, but `GameWasStarted`, `PlayerLeftGame`, `GameWasFinishedByTimeOut`, etc. You see the event type directly in the listener, no more YAML DI configs with plain strings. And you need to just add one more method with type hinted event class instead of editing 2 places. Oh, it was so painful. It's like using anemic domain models for complex business logic in 2018, you know. It's unbelievable. It's possible to make people think that it's OK to stab themselves into stomach and they will be happy.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-03-06T10:10:38Z
+
+@unkind I think you confuse two concepts here, the Symfony Event Dispatcher is based on the https://en.wikipedia.org/wiki/Mediator_pattern which allows "events" to be mutable, it's naming is definitely off :) changing this fundamental logic is a major BC break, instead Symfony would have to introduce another component or class that truly implements immutable events.
+
+Async handling requires more work as you need to handle serialization and transportation which the Messenger component already solves nicely. Yes, you don't have priorities, but this feature could be added.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-03-06T10:24:24Z
+
+What @unkind describes here looks like the Messenger component :smile:
+
+---------------------------------------------------------------------------
+
+by unkind at 2019-03-08T15:39:38Z
+
+> I think you confuse two concepts here
+
+I'm not sure about this, I explicitly stated that
+
+> This little "terminology disagreement" leads to 2 completely different concepts of EventDispatcher/Bus.
+
+It was just a little rant about naming in the first place. Naming disregard is a problem.

@@ -58,6 +58,18 @@ trait RouteTrait
     }
 
     /**
+     * Whether paths should accept utf8 encoding.
+     *
+     * @return $this
+     */
+    final public function utf8(bool $utf8 = true)
+    {
+        $this->route->addOptions(['utf8' => $utf8]);
+
+        return $this;
+    }
+
+    /**
      * Sets the condition.
      *
      * @return $this
@@ -121,6 +133,30 @@ trait RouteTrait
     final public function controller($controller)
     {
         $this->route->addDefaults(['_controller' => $controller]);
+
+        return $this;
+    }
+
+    /**
+     * Adds the "_locale" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function locale(string $locale)
+    {
+        $this->route->addDefaults(['_locale' => $locale]);
+
+        return $this;
+    }
+
+    /**
+     * Adds the "_format" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function format(string $format)
+    {
+        $this->route->addDefaults(['_format' => $format]);
 
         return $this;
     }

@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class YamlFileLoaderTest extends TestCase
 {
@@ -220,6 +222,80 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new FileLocatorStub());
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('http://remote.com/here.yml');
+    }
+
+    public function testLoadingRouteWithDefaults()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('defaults.yml');
+
+        $this->assertCount(1, $routes);
+
+        $defaultsRoute = $routes->get('defaults');
+
+        $this->assertSame('/defaults', $defaultsRoute->getPath());
+        $this->assertSame('en', $defaultsRoute->getDefault('_locale'));
+        $this->assertSame('html', $defaultsRoute->getDefault('_format'));
+    }
+
+    public function testLoadingImportedRoutesWithDefaults()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('importer-with-defaults.yml');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('one', $localeRoute = new Route('/defaults/one'));
+        $localeRoute->setDefault('_locale', 'g_locale');
+        $localeRoute->setDefault('_format', 'g_format');
+        $expectedRoutes->add('two', $formatRoute = new Route('/defaults/two'));
+        $formatRoute->setDefault('_locale', 'g_locale');
+        $formatRoute->setDefault('_format', 'g_format');
+        $formatRoute->setDefault('specific', 'imported');
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/imported-with-defaults.yml'));
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/importer-with-defaults.yml'));
+
+        $this->assertEquals($expectedRoutes, $routes);
+    }
+
+    public function testLoadingUtf8Route()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
+        $routes = $loader->load('utf8.yml');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('some_route', new Route('/'));
+
+        $expectedRoutes->add('some_utf8_route', $route = new Route('/utf8'));
+        $route->setOption('utf8', true);
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/utf8.yml'));
+
+        $this->assertEquals($expectedRoutes, $routes);
+    }
+
+    public function testLoadingUtf8ImportedRoutes()
+    {
+        $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
+        $routes = $loader->load('importer-with-utf8.yml');
+
+        $this->assertCount(2, $routes);
+
+        $expectedRoutes = new RouteCollection();
+        $expectedRoutes->add('utf8_one', $one = new Route('/one'));
+        $one->setOption('utf8', true);
+
+        $expectedRoutes->add('utf8_two', $two = new Route('/two'));
+        $two->setOption('utf8', true);
+
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/imported-with-utf8.yml'));
+        $expectedRoutes->addResource(new FileResource(__DIR__.'/../Fixtures/localized/importer-with-utf8.yml'));
+
+        $this->assertEquals($expectedRoutes, $routes);
     }
 
     public function testLoadingLocalizedRoute()

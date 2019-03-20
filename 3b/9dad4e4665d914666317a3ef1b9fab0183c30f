@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-19T07:49:10Z
+
+Shouldn't we tag the corresponding service as `kernel.reset`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-03-19T07:55:57Z
+
+Done too. Thanks!

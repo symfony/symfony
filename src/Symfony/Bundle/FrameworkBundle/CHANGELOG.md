@@ -8,11 +8,18 @@ CHANGELOG
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead
+ * Added the ability to specify a custom `serializer` option for each
+   transport under`framework.messenger.transports`.
  * [BC Break] When using Messenger, the default transport changed from
    using Symfony's serializer service to use `PhpSerializer`, which uses
    PHP's native `serialize()` and `unserialize()` functions. To use the
-   original serialization method, set the `framework.messenger.serializer.id`
-   config option to `messenger.transport.symfony_serializer`.
+   original serialization method, set the `framework.messenger.defaut_serializer`
+   config option to `messenger.transport.symfony_serializer`. Or set the
+   `serializer` option under one specific `transport`.
+ * [BC Break] The `framework.messenger.serializer` config key changed to
+   `framework.messenger.default_serializer`, which holds the string service
+   id and `framework.messenger.symfony_serializer`, which configures the
+   options if you're using Symfony's serializer.
  * Added information about deprecated aliases in `debug:autowiring` 
  * Added php ini session options `sid_length` and `sid_bits_per_character` 
    to the `session` section of the configuration

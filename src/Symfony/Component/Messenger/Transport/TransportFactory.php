@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -30,11 +31,11 @@ class TransportFactory implements TransportFactoryInterface
         $this->factories = $factories;
     }
 
-    public function createTransport(string $dsn, array $options): TransportInterface
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         foreach ($this->factories as $factory) {
             if ($factory->supports($dsn, $options)) {
-                return $factory->createTransport($dsn, $options);
+                return $factory->createTransport($dsn, $options, $serializer);
             }
         }
 

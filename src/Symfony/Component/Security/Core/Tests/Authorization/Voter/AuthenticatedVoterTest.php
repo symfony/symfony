@@ -49,6 +49,15 @@ class AuthenticatedVoterTest extends TestCase
             ['fully', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_GRANTED],
             ['remembered', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
             ['anonymously', ['IS_AUTHENTICATED_FULLY'], VoterInterface::ACCESS_DENIED],
+
+            ['fully', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
+            ['remembered', ['IS_ANONYMOUS'], VoterInterface::ACCESS_DENIED],
+            ['anonymously', ['IS_ANONYMOUS'], VoterInterface::ACCESS_GRANTED],
+
+            ['fully', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
+            ['remembered', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
+            ['anonymously', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_DENIED],
+            ['impersonated', ['IS_IMPERSONATOR'], VoterInterface::ACCESS_GRANTED],
         ];
     }
 
@@ -58,6 +67,8 @@ class AuthenticatedVoterTest extends TestCase
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         } elseif ('remembered' === $authenticated) {
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken')->setMethods(['setPersistent'])->disableOriginalConstructor()->getMock();
+        } elseif ('impersonated' === $authenticated) {
+            return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken')->disableOriginalConstructor()->getMock();
         } else {
             return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken')->setConstructorArgs(['', ''])->getMock();
         }

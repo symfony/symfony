@@ -27,6 +27,7 @@ class MockResponse implements ResponseInterface
     use ResponseTrait;
 
     private $body;
+    private $requestOptions = [];
 
     private static $mainMulti;
     private static $idSequence = 0;
@@ -42,6 +43,28 @@ class MockResponse implements ResponseInterface
     {
         $this->body = \is_iterable($body) ? $body : (string) $body;
         $this->info = $info + $this->info;
+
+        if (!isset($info['raw_headers'])) {
+            return;
+        }
+
+        $rawHeaders = [];
+
+        foreach ($info['raw_headers'] as $k => $v) {
+            foreach ((array) $v as $v) {
+                $rawHeaders[] = (\is_string($k) ? $k.': ' : '').$v;
+            }
+        }
+
+        $info['raw_headers'] = $rawHeaders;
+    }
+
+    /**
+     * Returns the options used when doing the request.
+     */
+    public function getRequestOptions(): array
+    {
+        return $this->requestOptions;
     }
 
     /**
@@ -66,6 +89,7 @@ class MockResponse implements ResponseInterface
     public static function fromRequest(string $method, string $url, array $options, ResponseInterface $mock): self
     {
         $response = new self([]);
+        $response->requestOptions = $options;
         $response->id = ++self::$idSequence;
         $response->content = ($options['buffer'] ?? true) ? fopen('php://temp', 'w+') : null;
         $response->initializer = static function (self $response) {

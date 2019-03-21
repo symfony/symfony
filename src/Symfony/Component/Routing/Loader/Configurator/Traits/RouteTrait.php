@@ -19,7 +19,7 @@ trait RouteTrait
     /**
      * @var RouteCollection|Route
      */
-    private $route;
+    protected $route;
 
     /**
      * Adds defaults.

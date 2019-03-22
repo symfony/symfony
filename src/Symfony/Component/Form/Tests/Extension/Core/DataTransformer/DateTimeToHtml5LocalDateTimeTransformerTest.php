@@ -13,18 +13,11 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
+use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
 
 class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
 {
-    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
-    {
-        if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
-            $expected = $expected->format('c');
-            $actual = $actual->format('c');
-        }
-
-        parent::assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-    }
+    use DateTimeEqualsTrait;
 
     public function transformProvider()
     {
@@ -95,7 +88,7 @@ class DateTimeToHtml5LocalDateTimeTransformerTest extends TestCase
         $transformer = new DateTimeToHtml5LocalDateTimeTransformer($toTz, $fromTz);
 
         if (null !== $to) {
-            $this->assertEquals(new \DateTime($to), $transformer->reverseTransform($from));
+            $this->assertDateTimeEquals(new \DateTime($to), $transformer->reverseTransform($from));
         } else {
             $this->assertNull($transformer->reverseTransform($from));
         }

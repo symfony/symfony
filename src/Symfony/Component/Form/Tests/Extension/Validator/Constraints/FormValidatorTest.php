@@ -220,6 +220,28 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testDontValidateChildConstraintsIfCallableNoValidationGroups()
+    {
+        $formOptions = [
+            'constraints' => [new Valid()],
+            'validation_groups' => [],
+        ];
+        $form = $this->getBuilder('name', null, $formOptions)
+            ->setCompound(true)
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+        $childOptions = ['constraints' => [new NotBlank()]];
+        $child = $this->getCompoundForm(new \stdClass(), $childOptions);
+        $form->add($child);
+        $form->submit([]);
+
+        $this->expectNoValidate();
+
+        $this->validator->validate($form, new Form());
+
+        $this->assertNoViolation();
+    }
+
     public function testDontValidateIfNotSynchronized()
     {
         $object = new \stdClass();

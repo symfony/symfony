@@ -12,7 +12,7 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'initial_place' => 'draft',
+            'initial_places' => ['draft'],
             'places' => [
                 'draft',
                 'wait_for_journalist',
@@ -47,7 +47,7 @@ $container->loadFromExtension('framework', [
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'initial_place' => 'start',
+            'initial_places' => ['start'],
             'metadata' => [
                 'title' => 'workflow title',
             ],

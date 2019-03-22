@@ -127,6 +127,27 @@ Security
    }
    ```
 
+Workflow
+--------
+
+ * `initial_place` is deprecated in favour of `initial_places`.
+
+   Before:
+   ```yaml
+   framework:
+      workflows:
+          article:
+              initial_place: draft
+   ```
+
+   After:
+   ```yaml
+   framework:
+      workflows:
+          article:
+              initial_places: [draft]
+   ```
+
 Yaml
 ----
 

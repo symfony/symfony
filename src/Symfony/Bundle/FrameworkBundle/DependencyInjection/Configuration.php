@@ -231,7 +231,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_place', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_places', 'places', 'transitions']))) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -258,6 +258,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->fixXmlConfig('support')
                                 ->fixXmlConfig('place')
+                                ->fixXmlConfig('initial_place')
                                 ->fixXmlConfig('transition')
                                 ->children()
                                     ->arrayNode('audit_trail')
@@ -312,7 +313,16 @@ class Configuration implements ConfigurationInterface
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->scalarNode('initial_place')
+                                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3, use the "initial_places" configuration key instead.')
                                         ->defaultNull()
+                                    ->end()
+                                    ->arrayNode('initial_places')
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($v) { return !\is_array($v); })
+                                            ->then(function ($v) { return [$v]; })
+                                        ->end()
+                                        ->defaultValue([])
+                                        ->prototype('scalar')->end()
                                     ->end()
                                     ->arrayNode('places')
                                         ->beforeNormalization()

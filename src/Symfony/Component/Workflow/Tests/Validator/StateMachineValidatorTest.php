@@ -109,4 +109,32 @@ class StateMachineValidatorTest extends TestCase
         // | t2 | --> | c  |
         // +----+     +----+
     }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage The state machine "foo" can not store many places. But the definition has 2 initial places. Only one is supported.
+     */
+    public function testWithTooManyInitialPlaces()
+    {
+        $places = range('a', 'c');
+        $transitions = [];
+        $definition = new Definition($places, $transitions, ['a', 'b']);
+
+        (new StateMachineValidator())->validate($definition, 'foo');
+
+        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
+        $this->addToAssertionCount(1);
+
+        // The graph looks like:
+        //
+        // +----+     +----+     +---+
+        // | a  | --> | t1 | --> | b |
+        // +----+     +----+     +---+
+        //   |
+        //   |
+        //   v
+        // +----+     +----+
+        // | t2 | --> | c  |
+        // +----+     +----+
+    }
 }

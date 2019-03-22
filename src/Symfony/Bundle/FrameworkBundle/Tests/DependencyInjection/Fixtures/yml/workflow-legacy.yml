@@ -1,0 +1,14 @@
+framework:
+    workflows:
+        legacy:
+            type: workflow
+            initial_place: draft
+            supports:
+                - stdClass
+            places:
+                - draft
+                - published
+            transitions:
+                publish:
+                    from: draft
+                    to: published

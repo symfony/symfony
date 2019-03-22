@@ -69,7 +69,7 @@ class GraphvizDumper implements DumperInterface
 
         foreach ($definition->getPlaces() as $place) {
             $attributes = [];
-            if ($place === $definition->getInitialPlace()) {
+            if (\in_array($place, $definition->getInitialPlaces(), true)) {
                 $attributes['style'] = 'filled';
             }
             if ($marking && $marking->has($place)) {

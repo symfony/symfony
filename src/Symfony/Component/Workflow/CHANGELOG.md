@@ -26,6 +26,7 @@ CHANGELOG
  * Dispatch `EnteredEvent` on `workflow.entered`
  * Dispatch `CompletedEvent` on `workflow.completed`
  * Dispatch `AnnounceEvent` on `workflow.announce`
+ * Added support for many `initialPlaces`
 
 4.1.0
 -----

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -201,5 +203,25 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $envelope = $middleware->handle($envelope, $this->getStackMock());
 
         $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
+    }
+
+    public function testItDispatchesTheEventOnceTime()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new SendMessageToTransportsEvent($envelope));
+
+        $sender1 = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender2 = $this->getMockBuilder(SenderInterface::class)->getMock();
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender1, $sender2]]), $dispatcher);
+
+        $sender1->expects($this->once())->method('send')->willReturn($envelope);
+        $sender2->expects($this->once())->method('send')->willReturn($envelope);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
     }
 }

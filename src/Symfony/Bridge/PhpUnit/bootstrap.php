@@ -35,6 +35,23 @@ if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && cl
     }
 }
 
+// load an .env.test file for override phpunit.xml(.dist) vars
+$path = dirname(getenv('SYMFONY_PHPUNIT_DIR'), 2);
+if (file_exists($path.'/vendor/autoload.php')) {
+    $loader = clone require $path.'/vendor/autoload.php';
+    if (!class_exists(\Symfony\Component\Dotenv\Dotenv::class)) {
+        throw new \RuntimeException('Please run "composer require symfony/dotenv" to load the ".env" files configuring the application.');
+    }
+
+    $dotenv = new \Symfony\Component\Dotenv\Dotenv();
+    $path .= '/.env.'.(false !== getenv('APP_ENV') ? getenv('APP_ENV') : 'test');
+    if (file_exists($p = $path)) {
+        $dotenv->load($p);
+    }
+
+    $loader->unregister();
+}
+
 if ('disabled' !== getenv('SYMFONY_DEPRECATIONS_HELPER')) {
     DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));
 }

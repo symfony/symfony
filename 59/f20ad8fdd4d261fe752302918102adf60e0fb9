@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-13T19:01:08Z
+
+@nicolas-grekas I don't understand the failure.
+
+```
+
+1) Symfony\Bridge\Twig\Tests\Extension\WorkflowExtensionTest::testCanTransition
+Symfony\Component\Workflow\Exception\LogicException: The method "stdClass::getMarking()" does not exists.
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/workflow/MarkingStore/MethodMarkingStore.php:54
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/workflow/Workflow.php:49
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/workflow/Workflow.php:90
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/Extension/WorkflowExtension.php:55
+/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/Tests/Extension/WorkflowExtensionTest.php:68
+```
+
+I do not use anymore `stdClass` anymore.
+
+Do you have an idea ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T19:07:08Z
+
+The bridge 4.2 is loaded with workflow 4.3 and this fails.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-13T19:46:27Z
+
+Okay. Got it. old components are tested against master (this PR) ([see this ](https://symfony-devs.slack.com/archives/C9F9AMSNP/p1552505326044100))
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-17T14:54:42Z
+
+This PR is now ready

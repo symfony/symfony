@@ -28,11 +28,15 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 {
     private static $typeFixtures = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
 
+    private $extensionConfig = [];
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        $this->extensionConfig = [];
+
         if (!class_exists(BaseNode::class) || !$extensions = $container->getExtensions()) {
             return;
         }
@@ -77,7 +81,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                 }
 
                 try {
-                    $processor->processConfiguration($configuration, $config);
+                    $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
                 } catch (TreeWithoutRootNodeException $e) {
                 }
             }
@@ -86,6 +90,18 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         }
 
         $resolvingBag->clearUnusedEnvPlaceholders();
+    }
+
+    /**
+     * @internal
+     */
+    public function getExtensionConfig(): array
+    {
+        try {
+            return $this->extensionConfig;
+        } finally {
+            $this->extensionConfig = [];
+        }
     }
 
     private static function getType($value): string

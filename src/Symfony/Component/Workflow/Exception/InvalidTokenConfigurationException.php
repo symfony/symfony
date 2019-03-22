@@ -16,6 +16,6 @@ namespace Symfony\Component\Workflow\Exception;
  *
  * @author Matt Johnson <matj1985@gmail.com>
  */
-class InvalidTokenConfigurationException extends LogicException implements ExceptionInterface
+class InvalidTokenConfigurationException extends LogicException
 {
 }

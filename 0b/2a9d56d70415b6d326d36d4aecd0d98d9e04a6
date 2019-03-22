@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by dimabory at 2019-03-07T14:23:04Z
+
+@amaabdou could you please take a look at this https://labs.consol.de/development/git/2017/02/22/gitignore.html and add more test with advanced use cases?
+
+---------------------------------------------------------------------------
+
+by amaabdou at 2019-03-12T00:00:52Z
+
+I added as many cases I could,If I missed anything or more cases need or something is unclear
+Or more reviews needed
+please add a comment
+
+---------------------------------------------------------------------------
+
+by amaabdou at 2019-03-12T00:02:00Z
+
+~~also I could not change PR from Draft to ready to be reviewed, I do not see the "Ready to review" button~~ appeared today not sure how :D
+
+---------------------------------------------------------------------------
+
+by amaabdou at 2019-03-14T21:57:07Z
+
+is there anything I can do to move this forward ?
+
+---------------------------------------------------------------------------
+
+by amaabdou at 2019-03-21T08:55:29Z
+
+is there anything else I can do to move this forward ?
+
+---------------------------------------------------------------------------
+
+by amaabdou at 2019-03-22T07:16:39Z
+
+@fabpot just did , is this one okay ?

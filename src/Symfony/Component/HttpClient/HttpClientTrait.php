@@ -117,7 +117,7 @@ trait HttpClientTrait
 
         // Finalize normalization of options
         $options['headers'] = $headers;
-        $options['http_version'] = (string) ($options['http_version'] ?? '') ?: null;
+        $options['http_version'] = (number_format($options['http_version'], 1) ?? '') ?: null;
         $options['timeout'] = (float) ($options['timeout'] ?? ini_get('default_socket_timeout'));
 
         return [$url, $options];

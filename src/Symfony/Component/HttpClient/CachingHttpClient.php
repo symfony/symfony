@@ -12,9 +12,11 @@
 namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpClientKernel;
@@ -94,10 +96,18 @@ class CachingHttpClient implements HttpClientInterface
             }
         }
 
+        if ((float) $options['http_version'] > 0) {
+            $request->server->set('SERVER_PROTOCOL', sprintf('HTTP/%s', $options['http_version']));
+        }
+
         $response = $this->cache->handle($request);
+
+        $headers = $response->headers->allPreserveCase();
         $response = new MockResponse($response->getContent(), [
             'http_code' => $response->getStatusCode(),
-            'raw_headers' => $response->headers->allPreserveCase(),
+            'http_version' => sprintf('HTTP/%s', $response->getProtocolVersion()),
+            'http_status_text' => Response::$statusTexts[$response->getStatusCode()],
+            'raw_headers' => $headers,
         ]);
 
         return MockResponse::fromRequest($method, $url, $options, $response);

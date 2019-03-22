@@ -45,6 +45,8 @@ trait ResponseTrait
     private $info = [
         'raw_headers' => [],
         'http_code' => 0,
+        'http_version' => '',
+        'http_status_text' => '',
         'error' => null,
     ];
 
@@ -187,12 +189,16 @@ trait ResponseTrait
      */
     abstract protected static function select(\stdClass $multi, float $timeout): int;
 
-    private static function addRawHeaders(array $rawHeaders, array &$info, array &$headers): void
+    private static function addRawHeaders(array $rawHeaders, array &$info, array &$headers = []): void
     {
+        $hasStatusLine = false;
         foreach ($rawHeaders as $h) {
-            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h, $m)) {
+            if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h)) {
+                $hasStatusLine = true;
                 $headers = [];
-                $info['http_code'] = (int) $m[1];
+
+                [$info['http_version'], $info['http_code'], $info['http_status_text']] = explode(' ', $h);
+                $info['http_code'] = (int) $info['http_code'];
             } elseif (2 === \count($m = explode(':', $h, 2))) {
                 $headers[strtolower($m[0])][] = ltrim($m[1]);
             }
@@ -200,8 +206,12 @@ trait ResponseTrait
             $info['raw_headers'][] = $h;
         }
 
-        if (!$info['http_code']) {
+        if (!$info['http_version'] || !$info['http_code'] || !$info['http_status_text']) {
             throw new TransportException('Invalid or missing HTTP status line.');
+        }
+
+        if (!$hasStatusLine) {
+            array_unshift($info['raw_headers'], sprintf('%s %s %s', $info['http_version'], $info['http_code'], $info['http_status_text']));
         }
     }
 

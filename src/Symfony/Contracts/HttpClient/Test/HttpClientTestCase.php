@@ -48,6 +48,7 @@ abstract class HttpClientTestCase extends TestCase
         $info = $response->getInfo();
         $this->assertNull($info['error']);
         $this->assertSame(0, $info['redirect_count']);
+        $this->assertNotEmpty($info['raw_headers']);
         $this->assertSame('HTTP/1.1 200 OK', $info['raw_headers'][0]);
         $this->assertSame('Host: localhost:8057', $info['raw_headers'][1]);
         $this->assertSame('http://localhost:8057/', $info['url']);

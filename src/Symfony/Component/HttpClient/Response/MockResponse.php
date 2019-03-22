@@ -49,14 +49,18 @@ class MockResponse implements ResponseInterface
         }
 
         $rawHeaders = [];
-
-        foreach ($info['raw_headers'] as $k => $v) {
-            foreach ((array) $v as $v) {
-                $rawHeaders[] = (\is_string($k) ? $k.': ' : '').$v;
+        foreach ($this->info['raw_headers'] as $k => $v) {
+            if (\is_array($v)) {
+                $rawHeaders[] = ucwords($k, ' -') . ': ' . implode(', ', $v);
+            } else {
+                foreach ((array) $v as $v) {
+                    $rawHeaders[] = (\is_string($k) ? $k . ': ' : '') . $v;
+                }
             }
         }
+        unset($this->info['raw_headers']);
 
-        $this->info['raw_headers'] = $rawHeaders;
+        self::addRawHeaders($rawHeaders, $this->info);
     }
 
     /**
@@ -103,11 +107,16 @@ class MockResponse implements ResponseInterface
             }
         };
 
+        $response->info += $mock->getInfo();
+        $response->info['error'] = $mock->getInfo('error') ?? null;
+        $response->info['raw_headers'] += $mock->getInfo('raw_headers') ?? [];
         $response->info['redirect_count'] = 0;
         $response->info['redirect_url'] = null;
         $response->info['start_time'] = microtime(true);
         $response->info['http_method'] = $method;
-        $response->info['http_code'] = 0;
+        $response->info['http_code'] = $mock->getInfo('http_code') ?? 0;
+        $response->info['http_version'] = $mock->getInfo('http_version') ?? '';
+        $response->info['http_status_text'] = $mock->getInfo('http_status_text') ?? '';
         $response->info['user_data'] = $options['user_data'] ?? null;
         $response->info['url'] = $url;
 
@@ -238,15 +247,23 @@ class MockResponse implements ResponseInterface
 
         // populate info related to headers
         $info = $mock->getInfo() ?: [];
-        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode(false) ?: 200;
         $response->addRawHeaders($info['raw_headers'] ?? [], $response->info, $response->headers);
+//        $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode(false) ?: 200;
+//        $response->info['http_version'] = ($info['http_version'] ?? '') ?: $mock->getInfo('http_version') ?: 'HTTP/1.1';
+//        $response->info['http_status_text'] = ($info['http_status_text'] ?? '') ?: $mock->getInfo('http_status_text') ?: 'OK';
+//
+//        dump($response->info);
+//        exit;
+
         $dlSize = (int) ($response->headers['content-length'][0] ?? 0);
 
-        $response->info = [
+        $response->info = $response->info + $info + [
             'start_time' => $response->info['start_time'],
             'user_data' => $response->info['user_data'],
             'http_code' => $response->info['http_code'],
-        ] + $info + $response->info;
+            'http_version' => $response->info['http_version'],
+            'http_status_text' => $response->info['http_status_text'],
+        ];
 
         if (isset($response->info['total_time'])) {
             $response->info['total_time'] = microtime(true) - $response->info['start_time'];

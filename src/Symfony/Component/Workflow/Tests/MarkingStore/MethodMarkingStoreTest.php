@@ -5,6 +5,7 @@ namespace Symfony\Component\Workflow\Tests\MarkingStore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\Workflow\Tests\Subject;
 
 class MethodMarkingStoreTest extends TestCase
 {
@@ -50,25 +51,5 @@ class MethodMarkingStoreTest extends TestCase
         $marking2 = $markingStore->getMarking($subject);
 
         $this->assertEquals($marking, $marking2);
-    }
-}
-
-final class Subject
-{
-    private $marking;
-
-    public function __construct($marking = null)
-    {
-        $this->marking = $marking;
-    }
-
-    public function getMarking()
-    {
-        return $this->marking;
-    }
-
-    public function setMarking($marking)
-    {
-        $this->marking = $marking;
     }
 }

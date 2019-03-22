@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
 
+/** @group legacy*/
 class SingleStateMarkingStoreTest extends TestCase
 {
     public function testGetSetMarking()

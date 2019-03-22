@@ -4,7 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
- * Trigger `entered` event for subject entering in the Workflow for the first time
+ * Trigger `entered` event for subject entering in the Workflow for the first time.
  * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
  * Add style to transitions by declaring metadata:
 
@@ -27,6 +27,8 @@ CHANGELOG
  * Dispatch `CompletedEvent` on `workflow.completed`
  * Dispatch `AnnounceEvent` on `workflow.announce`
  * Added support for many `initialPlaces`
+ * Deprecated the `MultipleStateMarkingStore` class, use the `MethodMarkingStore` instead.
+ * Deprecated the `SingleStateMarkingStore` class, use the `MethodMarkingStore` instead.
 
 4.1.0
 -----

@@ -41,12 +41,13 @@
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/web-link": "~3.4|~4.0",
-        "symfony/workflow": "~3.4|~4.0"
+        "symfony/workflow": "~4.3"
     },
     "conflict": {
         "symfony/console": "<3.4",
         "symfony/form": "<4.3",
-        "symfony/translation": "<4.2"
+        "symfony/translation": "<4.2",
+        "symfony/workflow": "<4.3"
     },
     "suggest": {
         "symfony/finder": "",

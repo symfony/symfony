@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\Marking;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class MethodMarkingStore implements MarkingStoreInterface
+final class MethodMarkingStore implements MarkingStoreInterface
 {
     private $singleState;
     private $property;

@@ -44,11 +44,11 @@ if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
 }
 
-$defaultEnvs = [
+$defaultEnvs = array(
     'COMPOSER' => 'composer.json',
     'COMPOSER_VENDOR_DIR' => 'vendor',
     'COMPOSER_BIN_DIR' => 'bin',
-];
+);
 
 foreach ($defaultEnvs as $envName => $envValue) {
     if ($envValue !== getenv($envName)) {

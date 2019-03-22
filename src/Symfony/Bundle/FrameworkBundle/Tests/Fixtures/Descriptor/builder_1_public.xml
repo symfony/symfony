@@ -4,6 +4,7 @@
   <definition id="definition_1" class="Full\Qualified\Class1" public="true" synthetic="false" lazy="true" shared="true" abstract="true" autowired="false" autoconfigured="false" file="">
     <factory class="Full\Qualified\FactoryClass" method="get"/>
   </definition>
+  <definition id="definition_without_class" class="" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>
   <definition id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="">
     <description><![CDATA[ContainerInterface is the interface implemented by service container classes.]]></description>
   </definition>

@@ -23,6 +23,7 @@
       <argument type="service" id=".definition_2"/>
     </argument>
   </definition>
+  <definition id="definition_without_class" class="" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>
   <definition id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="">
     <description><![CDATA[ContainerInterface is the interface implemented by service container classes.]]></description>
   </definition>

@@ -139,6 +139,7 @@ class ObjectsProvider
                 ->addTag('tag2')
                 ->addMethodCall('setMailer', [new Reference('mailer')])
                 ->setFactory([new Reference('factory.service'), 'get']),
+            'definition_without_class' => new Definition(),
         ];
     }
 

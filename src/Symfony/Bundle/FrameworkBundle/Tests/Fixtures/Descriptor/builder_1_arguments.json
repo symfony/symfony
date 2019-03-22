@@ -67,6 +67,19 @@
             "factory_method": "get",
             "tags": []
         },
+        "definition_without_class": {
+            "class": "",
+            "public": false,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "arguments": [],
+            "file": null,
+            "tags": []
+        },
         "service_container": {
             "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
             "public": true,

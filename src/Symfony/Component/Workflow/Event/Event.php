@@ -12,7 +12,6 @@
 namespace Symfony\Component\Workflow\Event;
 
 use Symfony\Component\EventDispatcher\Event as BaseEvent;
-use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -49,7 +48,7 @@ class Event extends BaseEvent
         } elseif ($workflow instanceof WorkflowInterface) {
             $this->workflow = $workflow;
         } else {
-            throw new InvalidArgumentException(sprintf('The 4th parameter of "%s"  should be a "%s" instance instead.', __METHOD__, WorkflowInterface::class));
+            throw new \TypeError(sprintf('The 4th parameter of "%s"  should be a "%s" instance instead.', __METHOD__, WorkflowInterface::class));
         }
     }
 

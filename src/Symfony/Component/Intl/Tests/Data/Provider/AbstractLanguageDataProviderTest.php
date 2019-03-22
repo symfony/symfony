@@ -392,7 +392,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'ms',
         'mt',
         'mua',
-        'mul',
         'mus',
         'mwl',
         'mwr',
@@ -596,7 +595,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'uga',
         'uk',
         'umb',
-        'und',
         'ur',
         'uz',
         'vai',
@@ -641,7 +639,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'zh_Hant',
         'zu',
         'zun',
-        'zxx',
         'zza',
     ];
 

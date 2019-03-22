@@ -45,7 +45,7 @@ class GitRepositoryTest extends TestCase
             $this->setExpectedException(RuntimeException::class);
         }
 
-        @mkdir($this->targetDir, '0777', true);
+        @mkdir($this->targetDir, 0777, true);
 
         new GitRepository($this->targetDir);
     }

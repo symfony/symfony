@@ -44,6 +44,11 @@ class FormValidator extends ConstraintValidator
         if ($form->isSubmitted() && $form->isSynchronized()) {
             // Validate the form data only if transformation succeeded
             $groups = self::getValidationGroups($form);
+
+            if (!$groups) {
+                return;
+            }
+
             $data = $form->getData();
 
             // Validate the data against its own constraints

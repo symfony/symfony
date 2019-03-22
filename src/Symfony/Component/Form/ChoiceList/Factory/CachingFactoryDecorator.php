@@ -14,13 +14,14 @@ namespace Symfony\Component\Form\ChoiceList\Factory;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Caches the choice lists created by the decorated factory.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CachingFactoryDecorator implements ChoiceListFactoryInterface
+class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
     private $decoratedFactory;
 
@@ -133,5 +134,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         }
 
         return $this->views[$hash];
+    }
+
+    public function reset()
+    {
+        $this->lists = [];
+        $this->views = [];
     }
 }

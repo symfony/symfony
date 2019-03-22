@@ -28,8 +28,8 @@ interface ChoiceListFactoryInterface
      * The choices should be passed in the values of the choices array.
      *
      * Optionally, a callable can be passed for generating the choice values.
-     * The callable receives the choice as first and the array key as the second
-     * argument.
+     * The callable receives the choice as only argument.
+     * Null may be passed when the choice list contains the empty value.
      *
      * @param iterable      $choices The choices
      * @param callable|null $value   The callable generating the choice
@@ -43,8 +43,8 @@ interface ChoiceListFactoryInterface
      * Creates a choice list that is loaded with the given loader.
      *
      * Optionally, a callable can be passed for generating the choice values.
-     * The callable receives the choice as first and the array key as the second
-     * argument.
+     * The callable receives the choice as only argument.
+     * Null may be passed when the choice list contains the empty value.
      *
      * @param ChoiceLoaderInterface $loader The choice loader
      * @param callable|null         $value  The callable generating the choice

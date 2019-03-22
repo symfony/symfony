@@ -55,6 +55,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -439,6 +440,11 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(Translator::class)) {
             $container->removeDefinition('form.type_extension.upload.validator');
+        }
+        if (!method_exists(CachingFactoryDecorator::class, 'reset')) {
+            $container->getDefinition('form.choice_list_factory.cached')
+                ->clearTag('kernel.reset')
+            ;
         }
     }
 

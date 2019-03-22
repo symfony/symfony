@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Formatter;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\PrettyWordWrapperHelper;
+use Symfony\Component\Console\Helper\WordWrapperHelper;
 
 /**
  * Formatter class for console output.
@@ -27,7 +27,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     private $decorated;
     private $styles = [];
     private $styleStack;
-    private $defaultWrapCutOption = PrettyWordWrapperHelper::CUT_LONG_WORDS | PrettyWordWrapperHelper::CUT_FILL_UP_MISSING;
+    private $defaultWrapCutOption = WordWrapperHelper::CUT_LONG_WORDS | WordWrapperHelper::CUT_FILL_UP_MISSING;
 
     /**
      * Escapes "<" special char in given text.
@@ -143,7 +143,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      *
      * @return $this
      *
-     * @see PrettyWordWrapperHelper
+     * @see WordWrapperHelper
      */
     public function setDefaultWrapCutOption(int $defaultWrapCutOption)
     {
@@ -214,7 +214,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      */
     public function wordwrap(string $message, int $width, int $cutOption = null): string
     {
-        return PrettyWordWrapperHelper::wrap($message, $width, null === $cutOption ? $this->defaultWrapCutOption : $cutOption);
+        return WordWrapperHelper::wrap($message, $width, null === $cutOption ? $this->defaultWrapCutOption : $cutOption);
     }
 
     /**

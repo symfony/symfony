@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
- * Refactor word wrapping with PrettyWordWrapping
+ * Refactor word wrapping with WordWrapperHelper
 
 4.2.0
 -----

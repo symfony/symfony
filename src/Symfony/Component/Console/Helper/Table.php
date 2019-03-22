@@ -83,7 +83,7 @@ class Table
     private $columnWidths = [];
     private $columnMaxWidths = [];
     private $columnWordWrapCutOption = [];
-    private $defaultColumnWordWrapCutOption = PrettyWordWrapperHelper::CUT_LONG_WORDS;
+    private $defaultColumnWordWrapCutOption = WordWrapperHelper::CUT_LONG_WORDS;
 
     private static $styles;
 

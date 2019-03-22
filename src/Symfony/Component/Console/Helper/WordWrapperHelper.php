@@ -26,19 +26,19 @@ namespace Symfony\Component\Console\Helper;
  * <code>
  *      $message = "<comment>This is a comment message with <info>info</info></comment> ...";
  *      // Default:
- *      $output->writeln(PrettyWordWrapper::wrap($message, 120);
+ *      $output->writeln(WordWrapperHelper::wrap($message, 120);
  *      // Use custom settings:
- *      $output->writeln(PrettyWordWrapper::wrap(
+ *      $output->writeln(WordWrapperHelper::wrap(
  *          $message,
  *          20,
- *          PrettyWordWrapper::CUT_ALL | PrettyWordWrap::CUT_FILL_UP_MISSING,
+ *          WordWrapperHelper::CUT_ALL | WordWrapperHelper::CUT_FILL_UP_MISSING,
  *          PHP_EOL
  *      );
  * </code>
  *
  * Known problems, limitations:
- *      - You can't call PrettyWordWrapper::wrap() inside a "running wrap" because there are "cache" properties and
- *          it causes problems within a Singleton class. Solution: you can create a PrettyWordWrapper object, and
+ *      - You can't call WordWrapperHelper::wrap() inside a "running wrap" because there are "cache" properties and
+ *          it causes problems within a Singleton class. Solution: you can create a WordWrapperHelper object, and
  *          use the $wrapper->wordwrap() non-static method.
  *      - If you use escaped tags AND (the line width is too short OR you use the CUT_WORDS option): `\<error>Message\</error>`,
  *          the wrapper could wrap inside the tag:
@@ -56,7 +56,7 @@ namespace Symfony\Component\Console\Helper;
  *
  * @author Krisztián Ferenczi <ferenczi.krisztian@gmail.com>
  */
-class PrettyWordWrapperHelper extends Helper
+class WordWrapperHelper extends Helper
 {
     // Defaults
     /** @var int */
@@ -133,7 +133,7 @@ class PrettyWordWrapperHelper extends Helper
     /**
      * "Singleton.", but it isn't forbidden to create new objects, if you want.
      *
-     * @return PrettyWordWrapperHelper
+     * @return WordWrapperHelper
      */
     protected static function getInstance(): self
     {
@@ -151,7 +151,7 @@ class PrettyWordWrapperHelper extends Helper
      */
     public function getName()
     {
-        return 'prettywordwrapper';
+        return 'WordWrapperHelper';
     }
 
     /**

@@ -41,6 +41,10 @@
 
         <service id="messenger.middleware.dispatch_after_current_bus" class="Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware" />
 
+        <service id="messenger.middleware.envelope_stamper_middleware" class="Symfony\Component\Messenger\Middleware\EnvelopeStamperMiddleware">
+            <argument type="tagged" tag="messenger.envelope_stamper" />
+        </service>
+
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
         </service>

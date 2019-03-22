@@ -76,6 +76,7 @@ use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Middleware\Stamper\EnvelopeStamperInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -398,6 +399,8 @@ class FrameworkExtension extends Extension
             ->addTag('messenger.message_handler');
         $container->registerForAutoconfiguration(TransportFactoryInterface::class)
             ->addTag('messenger.transport_factory');
+        $container->registerForAutoconfiguration(EnvelopeStamperInterface::class)
+            ->addTag('messenger.envelope_stamper');
         $container->registerForAutoconfiguration(MimeTypeGuesserInterface::class)
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
@@ -1616,8 +1619,14 @@ class FrameworkExtension extends Extension
         }
 
         $defaultMiddleware = [
-            'before' => [['id' => 'dispatch_after_current_bus']],
-            'after' => [['id' => 'send_message'], ['id' => 'handle_message']],
+            'before' => [
+                ['id' => 'envelope_stamper_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+            ],
+            'after' => [
+                ['id' => 'send_message'],
+                ['id' => 'handle_message'],
+            ],
         ];
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];

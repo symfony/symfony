@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-12T13:25:04Z
+
+> Also, is there a reason you don't throw an Exception when we have multiple initial places with `single_state` marking store ?
+
+I will do that once #29457 is merged. It will be much more easier
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-13T15:47:18Z
+
+Here we Go. I updated validators and added test :+1:

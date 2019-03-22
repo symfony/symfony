@@ -22,7 +22,7 @@ class RouteProcessorTest extends TestCase
 {
     private const TEST_CONTROLLER = 'App\Controller\SomeController::someMethod';
     private const TEST_ROUTE = 'someRouteName';
-    private const TEST_PARAMS = array('param1' => 'value1');
+    private const TEST_PARAMS = ['param1' => 'value1'];
 
     public function testProcessor()
     {
@@ -30,12 +30,12 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor();
         $processor->addRouteData($this->mockGetResponseEvent($request));
 
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
-            array('controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE, 'route_params' => self::TEST_PARAMS),
+            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE, 'route_params' => self::TEST_PARAMS],
             $record['extra']['requests'][0]
         );
     }
@@ -46,12 +46,12 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor(false);
         $processor->addRouteData($this->mockGetResponseEvent($request));
 
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
-            array('controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE),
+            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
             $record['extra']['requests'][0]
         );
     }
@@ -66,16 +66,16 @@ class RouteProcessorTest extends TestCase
         $processor->addRouteData($this->mockGetResponseEvent($mainRequest));
         $processor->addRouteData($this->mockGetResponseEvent($subRequest));
 
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(2, $record['extra']['requests']);
         $this->assertEquals(
-            array('controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE),
+            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
             $record['extra']['requests'][0]
         );
         $this->assertEquals(
-            array('controller' => $controllerFromSubRequest, 'route' => self::TEST_ROUTE),
+            ['controller' => $controllerFromSubRequest, 'route' => self::TEST_ROUTE],
             $record['extra']['requests'][1]
         );
     }
@@ -89,17 +89,17 @@ class RouteProcessorTest extends TestCase
         $processor->addRouteData($this->mockGetResponseEvent($mainRequest));
         $processor->addRouteData($this->mockGetResponseEvent($subRequest));
         $processor->removeRouteData($this->mockFinishRequestEvent($subRequest));
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('requests', $record['extra']);
         $this->assertCount(1, $record['extra']['requests']);
         $this->assertEquals(
-            array('controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE),
+            ['controller' => self::TEST_CONTROLLER, 'route' => self::TEST_ROUTE],
             $record['extra']['requests'][0]
         );
 
         $processor->removeRouteData($this->mockFinishRequestEvent($mainRequest));
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayNotHasKey('requests', $record['extra']);
     }
@@ -110,16 +110,16 @@ class RouteProcessorTest extends TestCase
         $processor = new RouteProcessor();
         $processor->addRouteData($this->mockGetResponseEvent($request));
 
-        $record = $processor(array('extra' => array()));
-        $this->assertEquals(array('extra' => array()), $record);
+        $record = $processor(['extra' => []]);
+        $this->assertEquals(['extra' => []], $record);
     }
 
     public function testProcessorDoesNothingWhenNoRequest()
     {
         $processor = new RouteProcessor();
 
-        $record = $processor(array('extra' => array()));
-        $this->assertEquals(array('extra' => array()), $record);
+        $record = $processor(['extra' => []]);
+        $this->assertEquals(['extra' => []], $record);
     }
 
     private function mockGetResponseEvent(Request $request): GetResponseEvent
@@ -140,16 +140,16 @@ class RouteProcessorTest extends TestCase
 
     private function mockEmptyRequest(): Request
     {
-        return $this->mockRequest(array());
+        return $this->mockRequest([]);
     }
 
     private function mockFilledRequest(string $controller = self::TEST_CONTROLLER): Request
     {
-        return $this->mockRequest(array(
+        return $this->mockRequest([
             '_controller' => $controller,
             '_route' => self::TEST_ROUTE,
             '_route_params' => self::TEST_PARAMS,
-        ));
+        ]);
     }
 
     private function mockRequest(array $attributes): Request

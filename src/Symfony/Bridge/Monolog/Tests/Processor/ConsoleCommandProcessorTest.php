@@ -19,8 +19,8 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class ConsoleCommandProcessorTest extends TestCase
 {
-    private const TEST_ARGUMENTS = array('test' => 'argument');
-    private const TEST_OPTIONS = array('test' => 'option');
+    private const TEST_ARGUMENTS = ['test' => 'argument'];
+    private const TEST_OPTIONS = ['test' => 'option'];
     private const TEST_NAME = 'some:test';
 
     public function testProcessor()
@@ -28,11 +28,11 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor();
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
-            array('name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS),
+            ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS],
             $record['extra']['command']
         );
     }
@@ -42,11 +42,11 @@ class ConsoleCommandProcessorTest extends TestCase
         $processor = new ConsoleCommandProcessor(true, true);
         $processor->addCommandData($this->getConsoleEvent());
 
-        $record = $processor(array('extra' => array()));
+        $record = $processor(['extra' => []]);
 
         $this->assertArrayHasKey('command', $record['extra']);
         $this->assertEquals(
-            array('name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS, 'options' => self::TEST_OPTIONS),
+            ['name' => self::TEST_NAME, 'arguments' => self::TEST_ARGUMENTS, 'options' => self::TEST_OPTIONS],
             $record['extra']['command']
         );
     }
@@ -55,8 +55,8 @@ class ConsoleCommandProcessorTest extends TestCase
     {
         $processor = new ConsoleCommandProcessor(true, true);
 
-        $record = $processor(array('extra' => array()));
-        $this->assertEquals(array('extra' => array()), $record);
+        $record = $processor(['extra' => []]);
+        $this->assertEquals(['extra' => []], $record);
     }
 
     private function getConsoleEvent(): ConsoleEvent

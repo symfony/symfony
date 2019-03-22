@@ -42,7 +42,7 @@ class AutowiringTypesTest extends WebTestCase
      */
     public function testTemplatingAutowiring()
     {
-        static::bootKernel(array('root_config' => 'templating.yml', 'environment' => 'templating'));
+        static::bootKernel(['root_config' => 'templating.yml', 'environment' => 'templating']);
 
         $autowiredServices = static::$container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(FrameworkBundleEngineInterface::class, $autowiredServices->getFrameworkBundleEngine());

@@ -49,9 +49,9 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
 
     public function addCommandData(ConsoleEvent $event)
     {
-        $this->commandData = array(
+        $this->commandData = [
             'name' => $event->getCommand()->getName(),
-        );
+        ];
         if ($this->includeArguments) {
             $this->commandData['arguments'] = $event->getInput()->getArguments();
         }
@@ -62,8 +62,8 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
 
     public static function getSubscribedEvents()
     {
-        return array(
-            ConsoleEvents::COMMAND => array('addCommandData', 1),
-        );
+        return [
+            ConsoleEvents::COMMAND => ['addCommandData', 1],
+        ];
     }
 }

@@ -93,7 +93,7 @@ class TextDescriptor extends Descriptor
         ];
 
         if ('' !== $route->getCondition()) {
-            $tableRows[] = array('Condition', $route->getCondition());
+            $tableRows[] = ['Condition', $route->getCondition()];
         }
 
         $table = new Table($this->getOutput());

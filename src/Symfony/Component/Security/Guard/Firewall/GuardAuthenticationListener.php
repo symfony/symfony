@@ -21,8 +21,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
+use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**

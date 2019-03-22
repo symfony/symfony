@@ -44,7 +44,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
 
     public function reset()
     {
-        $this->routeData = array();
+        $this->routeData = [];
     }
 
     public function addRouteData(GetResponseEvent $event)
@@ -58,10 +58,10 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
             return;
         }
 
-        $currentRequestData = array(
+        $currentRequestData = [
             'controller' => $request->attributes->get('_controller'),
             'route' => $request->attributes->get('_route'),
-        );
+        ];
 
         if ($this->includeParams) {
             $currentRequestData['route_params'] = $request->attributes->get('_route_params');
@@ -78,9 +78,9 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array('addRouteData', 1),
-            KernelEvents::FINISH_REQUEST => array('removeRouteData', 1),
-        );
+        return [
+            KernelEvents::REQUEST => ['addRouteData', 1],
+            KernelEvents::FINISH_REQUEST => ['removeRouteData', 1],
+        ];
     }
 }

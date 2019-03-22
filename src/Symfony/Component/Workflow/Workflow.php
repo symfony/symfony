@@ -13,13 +13,12 @@ namespace Symfony\Component\Workflow;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
-use Symfony\Component\Workflow\Event\Event;
-use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Event\AnnounceEvent;
-use Symfony\Component\Workflow\Event\EnterEvent;
-use Symfony\Component\Workflow\Event\EnteredEvent;
-use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Component\Workflow\Event\CompletedEvent;
+use Symfony\Component\Workflow\Event\EnteredEvent;
+use Symfony\Component\Workflow\Event\EnterEvent;
+use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;

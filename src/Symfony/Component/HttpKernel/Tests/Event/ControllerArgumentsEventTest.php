@@ -11,7 +11,7 @@ class ControllerArgumentsEventTest extends TestCase
 {
     public function testControllerArgumentsEvent()
     {
-        $filterController = new ControllerArgumentsEvent(new TestHttpKernel(), function () {}, array('test'), new Request(), 1);
-        $this->assertEquals($filterController->getArguments(), array('test'));
+        $filterController = new ControllerArgumentsEvent(new TestHttpKernel(), function () {}, ['test'], new Request(), 1);
+        $this->assertEquals($filterController->getArguments(), ['test']);
     }
 }

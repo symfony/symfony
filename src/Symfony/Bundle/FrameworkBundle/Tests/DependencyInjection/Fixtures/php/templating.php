@@ -1,14 +1,14 @@
 <?php
 
-$container->loadFromExtension('framework', array(
-    'templating' => array(
+$container->loadFromExtension('framework', [
+    'templating' => [
         'cache' => '/path/to/cache',
-        'engines' => array('php', 'twig'),
-        'loader' => array('loader.foo', 'loader.bar'),
-        'form' => array(
-            'resources' => array('theme1', 'theme2'),
-        ),
+        'engines' => ['php', 'twig'],
+        'loader' => ['loader.foo', 'loader.bar'],
+        'form' => [
+            'resources' => ['theme1', 'theme2'],
+        ],
         'hinclude_default_template' => 'global_hinclude_template',
-    ),
+    ],
     'assets' => null,
-));
+]);

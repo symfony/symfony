@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class RealHttpKernel implements HttpKernelInterface
+final class HttpClientKernel implements HttpKernelInterface
 {
     private $client;
     private $logger;

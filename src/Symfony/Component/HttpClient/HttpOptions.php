@@ -309,4 +309,14 @@ class HttpOptions
 
         return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function setExtra(string $name, $value)
+    {
+        $this->options['extra'][$name] = $value;
+
+        return $this;
+    }
 }

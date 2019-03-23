@@ -147,6 +147,10 @@ trait HttpClientTrait
             $options[$k] = $options[$k] ?? $v;
         }
 
+        if (isset($defaultOptions['extra'])) {
+            $options['extra'] += $defaultOptions['extra'];
+        }
+
         if ($defaultOptions['resolve'] ?? false) {
             $options['resolve'] += array_change_key_case($defaultOptions['resolve']);
         }

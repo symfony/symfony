@@ -62,7 +62,45 @@ TXT;
         $this->assertContains($loaderPaths, trim($tester->getDisplay(true)));
     }
 
-    private function createCommandTester(array $paths = [])
+    public function testWithGlobals()
+    {
+        $message = '<error>foo</error>';
+        $tester = $this->createCommandTester([], ['message' => $message]);
+        $tester->execute([], ['decorated' => true]);
+
+        $display = $tester->getDisplay();
+
+        $this->assertContains(\json_encode($message), $display);
+    }
+
+    public function testWithGlobalsJson()
+    {
+        $globals = ['message' => '<error>foo</error>'];
+
+        $tester = $this->createCommandTester([], $globals);
+        $tester->execute(['--format' => 'json'], ['decorated' => true]);
+
+        $display = $tester->getDisplay();
+        $display = \json_decode($display, true);
+
+        $this->assertSame($globals, $display['globals']);
+    }
+
+    public function testWithFilter()
+    {
+        $tester = $this->createCommandTester([]);
+        $tester->execute(['--format' => 'json'], ['decorated' => false]);
+        $display = $tester->getDisplay();
+        $display1 = \json_decode($display, true);
+
+        $tester->execute(['filter' => 'date', '--format' => 'json'], ['decorated' => false]);
+        $display = $tester->getDisplay();
+        $display2 = \json_decode($display, true);
+
+        $this->assertNotSame($display1, $display2);
+    }
+
+    private function createCommandTester(array $paths = [], array $globals = [])
     {
         $filesystemLoader = new FilesystemLoader([], \dirname(__DIR__).'/Fixtures');
         foreach ($paths as $namespace => $relDirs) {
@@ -70,7 +108,13 @@ TXT;
                 $filesystemLoader->addPath($relDir, $namespace);
             }
         }
-        $command = new DebugCommand(new Environment($filesystemLoader));
+
+        $environment = new Environment($filesystemLoader);
+        foreach ($globals as $name => $value) {
+            $environment->addGlobal($name, $value);
+        }
+
+        $command = new DebugCommand($environment);
 
         $application = new Application();
         $application->add($command);

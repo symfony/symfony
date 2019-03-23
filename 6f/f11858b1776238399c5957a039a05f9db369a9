@@ -1,0 +1,143 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-15T01:42:06Z
+
+I've now incorporated generic retry abilities from #27008. I think more details need to be considered, like #30558 (transport stamp) and how it will affect things.
+
+But, generally speaking, what big issues do people see? I'm pushing much more control into the `Worker`, and making the transport a bit more agnostic to sending/receiving/acking/nacking/retrying.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-18T19:58:33Z
+
+Thank you @sroze  for the review! I was working concurrently with your review, so I pushed a bunch of changes as you were commenting. I would love another look. I've replied to a few of your comments with the changes I've made. Specifically, the `QueuedMetadata` thing is now gone, replaced with a Stamp. Also (and this is important), I've given the `AmqpReceiver` some temporary state. The issue is that the `AMQPEnvelope` is needed to do things like `ack`, `nack`, etc. And because these methods are now called by `Worker`, I previously was passing this "message" back out to the Worker... which was unfortunate, because this is really an internal detail to each transport. I fixed that by tracking the current `AMQPEnvelope` being handled inside `AmqpReceiver`, which allows us to drop passing the `AMQPEnvelope` object around.
+
+I also made the retry stuff configurable on a transport-by-transport basis using a service.
+
+Also, question: should we ever redeliver via `nack()` onto the same queue? Like, if, for some reason, redelivery onto the DLX fails, should we `nack()` retry? Or is that just madness - trying to gracefully fail when something has gone terribly wrong.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-18T20:58:15Z
+
+This is ready for review! This represents a big change in how we handle the transports, so I really appreciate review!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-19T04:36:13Z
+
+One last update: "retrying" is no longer a special situation - we basically just call `SenderInterface::send()` with whatever the delay is, then "ack" the old message. That is *basically* what we were doing before, but the difference is that we're now re-serializing the Envelope on re-send, instead of sending a duplicate of the original message. That allows us to add stamps to the Envelope, which is *really* powerful because we can, for example, manage the `RetryCountStamp` in a way where the transport doesn't need to do *anything* with tracking how many retries have happened.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-19T22:42:16Z
+
+2 big architectural things:
+
+1) the new method on ReceiverInterface is a compromise between adding 3 new methods to that interface that not all need versus giving us the functionality we need. I’d like thoughts on that decision.
+
+2) The senders (check out AmqpSender) currently have some temporary “state” where they keep track of the message being processed so they know which message to acknowledge or reject. An alternative would be for each Sender to attach a stamp to the Envelope that says which message is being processed. The downside is that individual senders would need to catch the MessageDecodingFailedException on their own (it’s actually currently done like this) versus doing that in the Worker, because when deciding fails, there’s no Envelope that is sent to the worker that could then be sent back in reject().
+
+So, the questions are:
+
+1) should we add just one new method to ReceiverInterface (as it’s done now) or is there a better way for a Receiver to support the Worker calling acknowledge/reject/send on it?
+
+2) should the receiver keep track of which message it’s processing internally or push that into a stamp?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-20T15:32:36Z
+
+Probably out of the scope for us ... but for reference purposes, [Spring's Retry project](https://github.com/spring-projects/spring-retry) allows to configure the following retry properties (maybe we want to support defining expressions for example?):
+
+| Type | Property | Description
+| ---- | -------- | -----------
+long | delay | A canonical backoff period.
+String | delayExpression | An expression evaluating to the canonical backoff period.
+long | maxDelay | The maximimum wait (in milliseconds) between retries.
+String | maxDelayExpression | An expression evaluating to the maximimum wait (in milliseconds) between retries.
+double | multiplier |If positive, then used as a multiplier for generating the next delay for backoff.
+String | multiplierExpression | Evaluates to a value used as a multiplier for generating the next delay for backoff.
+boolean | random | In the exponential case (multiplier() > 0) set this to true to have the backoff delays randomized, so that the maximum delay is multiplier times the previous delay and the distribution is uniform between the two values.
+
+See https://docs.spring.io/spring-retry/docs/api/current/org/springframework/retry/annotation/Backoff.html
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-20T18:37:24Z
+
+@javiereguiluz I've just made the retry logic basically identical to that - it's much nicer. Excellent suggestion!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-20T20:04:06Z
+
+Ok, I think we might have it :). PR description & CHANGELOG are both fully updated.
+
+Last critical change was this:
+
+1) The "responder" idea was killed (it was ugly)
+2) `ReceiverInterface` has 2 new methods: `acknowledge(Envelope $envelope)` and `reject(Envelope $envelope)`. This came from talking with @nicolas-grekas - the idea is that any "decent receiver should be able to ack/nack messages. But, of course, if you don't want to or don't have that use-case, leave these message blank, or use them for logging
+3) For retrying, we're now sending the `Envelope` back through the Bus. This was Nicolas' idea, and it solves the big problem that, in `Worker`, we only have access to the Receiver, so it was super awkward to try to find a way to effectively use the Sender from inside of there. No more: we simply clone the Envelope, remove the `ReceivedStamp` and send it to the bus.
+
+The PR now has no pending issues or things I'm unhappy with. Please review so we can move forward with this and the PR's it's blocking :).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-20T20:55:20Z
+
+While testing this PR, I realized that the command to consume messages was a bit "verbose":`messenger:consume-messages`. What about renaming it to just `messenger:consume`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-21T15:45:23Z
+
+Comments addressed & several BC breaks were replaced by deprecations (CHANGELOG is updated).
+
+Last important changes from yesterday are described here: https://github.com/symfony/symfony/pull/30557#issuecomment-475006181
+
+This is ready to go!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-21T18:16:59Z
+
+Rebased, but then added 1 more commit to fix a big. When we retry (and thus, re-send through the entire bus), we need to be smart enough to ONLY send to the transport that the failed message was received from.
+
+For example, if we send a message to `transportA` and `transportB`, if we receive a message from `transportA`, it needs to send back to `transportA` for a retry, but NOT back to `transportB`. If a message is received from an external transport (i.e. it's a message Messenger did not originally send), then it will NOT be retried. Retrying requires us to see a `SentStamp` on the message, which indicates that *we* actually send it originally.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-22T13:50:54Z
+
+Ready to go again!
+
+Last commits guarantee that redeliveries are only sent back to the same transport.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-03-22T14:08:47Z
+
+There are still quite a few mentions of "queue" when we really mean "transport". I think we should try to be more technically correct.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-23T12:57:06Z
+
+Last changes look good to me. Thank you!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-23T13:23:54Z
+
+@weaverryan Can you squash so that I can merge? Thank you.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-23T13:40:29Z
+
+Squashed!

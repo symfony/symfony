@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenMemoryUsageIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenMessageCountIsExceededReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\StopWhenTimeLimitIsReachedReceiver;
@@ -32,21 +33,25 @@ use Symfony\Component\Messenger\Worker;
  */
 class ConsumeMessagesCommand extends Command
 {
-    protected static $defaultName = 'messenger:consume-messages';
+    protected static $defaultName = 'messenger:consume';
 
     private $busLocator;
     private $receiverLocator;
     private $logger;
     private $receiverNames;
     private $busNames;
+    private $retryStrategyLocator;
+    private $eventDispatcher;
 
-    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], array $busNames = [])
+    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], array $busNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
         $this->busLocator = $busLocator;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
         $this->busNames = $busNames;
+        $this->retryStrategyLocator = $retryStrategyLocator;
+        $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
     }
@@ -132,6 +137,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        if (false !== strpos($input->getFirstArgument(), ':consume-')) {
+            $message = 'The use of the "messenger:consume-messages" command is deprecated since version 4.3 and will be removed in 5.0. Use "messenger:consume" instead.';
+            @trigger_error($message, E_USER_DEPRECATED);
+            $output->writeln(sprintf('<comment>%s</comment>', $message));
+        }
+
         if (!$this->receiverLocator->has($receiverName = $input->getArgument('receiver'))) {
             throw new RuntimeException(sprintf('Receiver "%s" does not exist.', $receiverName));
         }
@@ -140,8 +151,13 @@ EOF
             throw new RuntimeException(sprintf('Bus "%s" does not exist.', $busName));
         }
 
+        if (null !== $this->retryStrategyLocator && !$this->retryStrategyLocator->has($receiverName)) {
+            throw new RuntimeException(sprintf('Receiver "%s" does not have a configured retry strategy.', $receiverName));
+        }
+
         $receiver = $this->receiverLocator->get($receiverName);
         $bus = $this->busLocator->get($busName);
+        $retryStrategy = null !== $this->retryStrategyLocator ? $this->retryStrategyLocator->get($receiverName) : null;
 
         $stopsWhen = [];
         if ($limit = $input->getOption('limit')) {
@@ -174,7 +190,7 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
-        $worker = new Worker($receiver, $bus);
+        $worker = new Worker($receiver, $bus, $receiverName, $retryStrategy, $this->eventDispatcher, $this->logger);
         $worker->run();
     }
 

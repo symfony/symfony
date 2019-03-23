@@ -54,6 +54,18 @@ final class Envelope
         return $cloned;
     }
 
+    /**
+     * @return Envelope a new Envelope instance without any stamps of the given class
+     */
+    public function withoutAll(string $stampFqcn): self
+    {
+        $cloned = clone $this;
+
+        unset($cloned->stamps[$stampFqcn]);
+
+        return $cloned;
+    }
+
     public function last(string $stampFqcn): ?StampInterface
     {
         return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;

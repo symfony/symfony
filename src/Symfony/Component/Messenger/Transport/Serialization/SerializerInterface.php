@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -29,6 +30,8 @@ interface SerializerInterface
      * The most common keys are:
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers
+     *
+     * @throws MessageDecodingFailedException
      */
     public function decode(array $encodedEnvelope): Envelope;
 

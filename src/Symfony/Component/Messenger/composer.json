@@ -22,6 +22,7 @@
     "require-dev": {
         "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4.19|^4.1.8",
+        "symfony/event-dispatcher": "~4.3",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "symfony/property-access": "~3.4|~4.0",
@@ -29,6 +30,9 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0"
+    },
+    "conflict": {
+        "symfony/event-dispatcher": "<4.3"
     },
     "suggest": {
         "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."

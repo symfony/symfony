@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
@@ -32,7 +33,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->will($this->returnArgument(0));
 
         $envelope = $middleware->handle($envelope, $this->getStackMock(false));
 
@@ -42,6 +43,69 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertStringMatchesFormat('Mock_SenderInterface_%s', $stamp->getSenderClass());
     }
 
+    public function testItSendsTheMessageToMultipleSenders()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'));
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender2 = $this->getMockBuilder(SenderInterface::class)->getMock();
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([
+            DummyMessage::class => ['foo' => $sender, 'bar' => $sender2],
+        ]));
+
+        $sender->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Envelope $envelope) {
+                /** @var SentStamp|null $lastSentStamp */
+                $lastSentStamp = $envelope->last(SentStamp::class);
+
+                // last SentStamp should be the "foo" alias
+                return null !== $lastSentStamp && 'foo' === $lastSentStamp->getSenderAlias();
+            }))
+            ->will($this->returnArgument(0));
+        $sender2->expects($this->once())
+            ->method('send')
+            ->with($this->callback(function (Envelope $envelope) {
+                /** @var SentStamp|null $lastSentStamp */
+                $lastSentStamp = $envelope->last(SentStamp::class);
+
+                // last SentStamp should be the "bar" alias
+                return null !== $lastSentStamp && 'bar' === $lastSentStamp->getSenderAlias();
+            }))
+            ->will($this->returnArgument(0));
+
+        $envelope = $middleware->handle($envelope, $this->getStackMock(false));
+
+        /** @var SentStamp[] $sentStamps */
+        $sentStamps = $envelope->all(SentStamp::class);
+        $this->assertCount(2, $sentStamps);
+    }
+
+    public function testItSendsToOnlyOneSenderOnRedelivery()
+    {
+        $envelope = new Envelope(new DummyMessage('Hey'), new RedeliveryStamp(5, 'bar'));
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender2 = $this->getMockBuilder(SenderInterface::class)->getMock();
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([
+            DummyMessage::class => ['foo' => $sender, 'bar' => $sender2],
+        ], [
+            // normally, this class sends and handles (but not on retry)
+            DummyMessage::class => true,
+        ]));
+
+        $sender->expects($this->never())
+            ->method('send')
+        ;
+        $sender2->expects($this->once())
+            ->method('send')
+            ->will($this->returnArgument(0));
+
+        $mockStack = $this->getStackMock(false); // false because next should not be called
+        $envelope = $middleware->handle($envelope, $mockStack);
+        $this->assertCount(1, $envelope->all(SentStamp::class));
+    }
+
     public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
     {
         $envelope = new Envelope(new ChildDummyMessage('Hey'));
@@ -49,7 +113,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }
@@ -64,7 +128,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
             DummyMessage::class => true,
         ]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -79,7 +143,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
             DummyMessage::class => true,
         ]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -94,7 +158,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
             DummyMessageInterface::class => true,
         ]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock());
     }
@@ -109,7 +173,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
             '*' => true,
         ]));
 
-        $sender->expects($this->once())->method('send')->with($envelope)->willReturn($envelope);
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender))))->willReturn($envelope);
 
         $middleware->handle($envelope, $this->getStackMock());
     }

@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Transport\AmqpExt\Exception\RejectMessageExceptionInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -42,53 +44,74 @@ class AmqpReceiver implements ReceiverInterface
     public function receive(callable $handler): void
     {
         while (!$this->shouldStop) {
-            $AMQPEnvelope = $this->connection->get();
-            if (null === $AMQPEnvelope) {
+            try {
+                $amqpEnvelope = $this->connection->get();
+            } catch (\AMQPException $exception) {
+                throw new TransportException($exception->getMessage(), 0, $exception);
+            }
+
+            if (null === $amqpEnvelope) {
                 $handler(null);
 
-                usleep($this->connection->getConnectionCredentials()['loop_sleep'] ?? 200000);
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
+                usleep($this->connection->getConnectionConfiguration()['loop_sleep'] ?? 200000);
 
                 continue;
             }
 
             try {
-                $handler($this->serializer->decode([
-                    'body' => $AMQPEnvelope->getBody(),
-                    'headers' => $AMQPEnvelope->getHeaders(),
-                ]));
+                $envelope = $this->serializer->decode([
+                    'body' => $amqpEnvelope->getBody(),
+                    'headers' => $amqpEnvelope->getHeaders(),
+                ]);
+            } catch (MessageDecodingFailedException $exception) {
+                // invalid message of some type
+                $this->rejectAmqpEnvelope($amqpEnvelope);
 
-                $this->connection->ack($AMQPEnvelope);
-            } catch (RejectMessageExceptionInterface $e) {
-                try {
-                    $this->connection->reject($AMQPEnvelope);
-                } catch (\AMQPException $exception) {
-                    throw new TransportException($exception->getMessage(), 0, $exception);
-                }
-
-                throw $e;
-            } catch (\AMQPException $e) {
-                throw new TransportException($e->getMessage(), 0, $e);
-            } catch (\Throwable $e) {
-                try {
-                    $this->connection->nack($AMQPEnvelope, AMQP_REQUEUE);
-                } catch (\AMQPException $exception) {
-                    throw new TransportException($exception->getMessage(), 0, $exception);
-                }
-
-                throw $e;
-            } finally {
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
+                throw $exception;
             }
+
+            $envelope = $envelope->with(new AmqpReceivedStamp($amqpEnvelope));
+            $handler($envelope);
         }
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+        try {
+            $this->connection->ack($this->findAmqpEnvelope($envelope));
+        } catch (\AMQPException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+        $this->rejectAmqpEnvelope($this->findAmqpEnvelope($envelope));
     }
 
     public function stop(): void
     {
         $this->shouldStop = true;
+    }
+
+    private function rejectAmqpEnvelope(\AMQPEnvelope $amqpEnvelope): void
+    {
+        try {
+            $this->connection->nack($amqpEnvelope, AMQP_NOPARAM);
+        } catch (\AMQPException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    private function findAmqpEnvelope(Envelope $envelope): \AMQPEnvelope
+    {
+        /** @var AmqpReceivedStamp|null $amqpReceivedStamp */
+        $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
+
+        if (null === $amqpReceivedStamp) {
+            throw new LogicException('No AmqpReceivedStamp found on the Envelope.');
+        }
+
+        return $amqpReceivedStamp->getAmqpEnvelope();
     }
 }

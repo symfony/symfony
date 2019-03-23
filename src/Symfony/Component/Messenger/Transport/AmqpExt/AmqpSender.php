@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -42,8 +43,15 @@ class AmqpSender implements SenderInterface
     {
         $encodedMessage = $this->serializer->encode($envelope);
 
+        /** @var DelayStamp|null $delayStamp */
+        $delayStamp = $envelope->last(DelayStamp::class);
+        $delay = 0;
+        if (null !== $delayStamp) {
+            $delay = $delayStamp->getDelay();
+        }
+
         try {
-            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'] ?? []);
+            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
         } catch (\AMQPException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

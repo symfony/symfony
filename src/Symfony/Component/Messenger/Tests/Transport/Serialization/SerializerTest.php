@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -93,5 +94,29 @@ class SerializerTest extends TestCase
 
         $this->assertEquals($serializerStamp, $decoded->last(SerializerStamp::class));
         $this->assertEquals($validationStamp, $decoded->last(ValidationStamp::class));
+    }
+
+    public function testDecodingFailsWithBadFormat()
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer = new Serializer();
+
+        $serializer->decode([
+            'body' => '{foo',
+            'headers' => ['type' => 'stdClass'],
+        ]);
+    }
+
+    public function testDecodingFailsWithBadClass()
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+
+        $serializer = new Serializer();
+
+        $serializer->decode([
+            'body' => '{}',
+            'headers' => ['type' => 'NonExistentClass'],
+        ]);
     }
 }

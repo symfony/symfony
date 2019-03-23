@@ -43,8 +43,14 @@ class ConsumeMessagesCommand extends Command
     private $retryStrategyLocator;
     private $eventDispatcher;
 
-    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* ContainerInterface */ $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
+        if (\is_array($retryStrategyLocator)) {
+            @trigger_error(sprintf('The 5th argument of the class "%s" should be a retry-strategy locator, an array of bus names as a value is deprecated since Symfony 4.3.', __CLASS__), E_USER_DEPRECATED);
+
+            $retryStrategyLocator = null;
+        }
+
         $this->busLocator = $busLocator;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;

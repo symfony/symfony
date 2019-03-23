@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
@@ -27,8 +28,8 @@ class RoleHierarchyVoter extends RoleVoter
 
     public function __construct(RoleHierarchyInterface $roleHierarchy, string $prefix = 'ROLE_')
     {
-        if (!$roleHierarchy instanceof RoleHierarchy) {
-            @trigger_error(sprintf('Passing a role hierarchy to "%s" that is not an instance of "%s" is deprecated since Symfony 4.3 and support for it will be dropped in Symfony 5.0 ("%s" given).', __CLASS__, RoleHierarchy::class, \get_class($roleHierarchy)), E_USER_DEPRECATED);
+        if (!method_exists($roleHierarchy, 'getReachableRoleNames')) {
+            @trigger_error(sprintf('Not implementing the getReachableRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($roleHierarchy), RoleHierarchyInterface::class), E_USER_DEPRECATED);
         }
 
         $this->roleHierarchy = $roleHierarchy;
@@ -41,13 +42,13 @@ class RoleHierarchyVoter extends RoleVoter
      */
     protected function extractRoles(TokenInterface $token)
     {
-        if ($this->roleHierarchy instanceof RoleHierarchy) {
+        if (method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
             if (method_exists($token, 'getRoleNames')) {
                 $roles = $token->getRoleNames();
             } else {
                 @trigger_error(sprintf('Not implementing the getRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($token), TokenInterface::class), E_USER_DEPRECATED);
 
-                $roles = $token->getRoles(false);
+                $roles = array_map(function (Role $role) { return $role->getRole(); }, $token->getRoles(false));
             }
 
             return $this->roleHierarchy->getReachableRoleNames($roles);

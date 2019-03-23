@@ -1616,8 +1616,14 @@ class FrameworkExtension extends Extension
         }
 
         $defaultMiddleware = [
-            'before' => [['id' => 'dispatch_after_current_bus']],
-            'after' => [['id' => 'send_message'], ['id' => 'handle_message']],
+            'before' => [
+                ['id' => 'add_bus_name_stamp_middleware'],
+                ['id' => 'dispatch_after_current_bus'],
+            ],
+            'after' => [
+                ['id' => 'send_message'],
+                ['id' => 'handle_message'],
+            ],
         ];
         foreach ($config['buses'] as $busId => $bus) {
             $middleware = $bus['middleware'];
@@ -1628,6 +1634,10 @@ class FrameworkExtension extends Extension
                 } else {
                     unset($defaultMiddleware['after'][1]['arguments']);
                 }
+
+                // argument to add_bus_name_stamp_middleware
+                $defaultMiddleware['before'][0]['arguments'] = [$busId];
+
                 $middleware = array_merge($defaultMiddleware['before'], $middleware, $defaultMiddleware['after']);
             }
 

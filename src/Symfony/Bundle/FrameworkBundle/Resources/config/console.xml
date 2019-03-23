@@ -81,7 +81,6 @@
             <argument type="service" id="messenger.receiver_locator" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="collection" /> <!-- Receiver names -->
-            <argument type="collection" /> <!-- Message bus names -->
             <argument type="service" id="messenger.retry_strategy_locator" />
             <argument type="service" id="event_dispatcher" />
 

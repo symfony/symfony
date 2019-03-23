@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpClientKernel;
@@ -43,7 +42,7 @@ class CachingHttpClient implements HttpClientInterface
     public function __construct(HttpClientInterface $client, StoreInterface $store, array $defaultOptions = [], LoggerInterface $logger = null)
     {
         if (!class_exists(HttpClientKernel::class)) {
-             throw new \LogicException(sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^4.3".', __CLASS__));
+            throw new \LogicException(sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^4.3".', __CLASS__));
         }
 
         $this->client = $client;

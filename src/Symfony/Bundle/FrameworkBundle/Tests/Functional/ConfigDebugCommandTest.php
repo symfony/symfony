@@ -66,6 +66,14 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }
 
+    public function testDumpWithPrefixedEnv()
+    {
+        $tester = $this->createCommandTester();
+        $tester->execute(['name' => 'FrameworkBundle']);
+
+        $this->assertContains("cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'", $tester->getDisplay());
+    }
+
     /**
      * @return CommandTester
      */

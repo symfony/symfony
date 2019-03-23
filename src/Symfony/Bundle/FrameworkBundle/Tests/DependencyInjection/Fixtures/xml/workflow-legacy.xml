@@ -9,8 +9,8 @@
     <framework:config>
         <framework:workflow name="legacy" type="workflow" initial-place="draft">
             <framework:support>stdClass</framework:support>
-            <framework:place name="draft"></framework:place>
-            <framework:place name="published"></framework:place>
+            <framework:place name="draft" />
+            <framework:place name="published" />
             <framework:transition name="publish">
                 <framework:from>draft</framework:from>
                 <framework:to>published</framework:to>

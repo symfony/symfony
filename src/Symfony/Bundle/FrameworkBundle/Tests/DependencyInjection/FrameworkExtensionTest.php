@@ -304,11 +304,22 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "property" and "service" cannot be used together.
+     */
+    public function testWorkflowCannotHaveBothPropertyAndService()
+    {
+        $this->createContainerFromFile('workflow_with_property_and_service');
+    }
+
+    /**
+     * @legacy
+     *
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage "type" and "service" cannot be used together.
      */
     public function testWorkflowCannotHaveBothTypeAndService()
     {
-        $this->createContainerFromFile('workflow_with_type_and_service');
+        $this->createContainerFromFile('workflow_legacy_with_type_and_service');
     }
 
     /**
@@ -335,7 +346,7 @@ abstract class FrameworkExtensionTest extends TestCase
      */
     public function testWorkflowCannotHaveBothArgumentsAndService()
     {
-        $this->createContainerFromFile('workflow_with_arguments_and_service');
+        $this->createContainerFromFile('workflow_legacy_with_arguments_and_service');
     }
 
     public function testWorkflowMultipleTransitionsWithSameName()

@@ -1,10 +1,11 @@
 framework:
     workflows:
         my_workflow:
-            type: workflow
+            marking_store:
+                property: state
+                service: workflow_service
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
-            support_strategy: foobar
             places:
                 - first
                 - last

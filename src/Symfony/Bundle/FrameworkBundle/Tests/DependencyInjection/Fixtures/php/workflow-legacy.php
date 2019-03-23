@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
-
 $container->loadFromExtension('framework', [
     'workflows' => [
         'legacy' => [

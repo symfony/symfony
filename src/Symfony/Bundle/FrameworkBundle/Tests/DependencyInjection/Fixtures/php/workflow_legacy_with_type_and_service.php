@@ -6,7 +6,7 @@ $container->loadFromExtension('framework', [
     'workflows' => [
         'my_workflow' => [
             'marking_store' => [
-                'type' => 'multiple_state',
+                'type' => 'method',
                 'service' => 'workflow_service',
             ],
             'supports' => [

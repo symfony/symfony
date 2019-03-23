@@ -6,10 +6,13 @@ $container->loadFromExtension('framework', [
     'workflows' => [
         'my_workflow' => [
             'type' => 'workflow',
+            'marking_store' => [
+                'property' => 'states',
+                'service' => 'workflow_service',
+            ],
             'supports' => [
                 FrameworkExtensionTest::class,
             ],
-            'support_strategy' => 'foobar',
             'places' => [
                 'first',
                 'last',

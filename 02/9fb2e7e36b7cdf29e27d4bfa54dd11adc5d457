@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-20T22:52:23Z
+
+Before merging: the way tests are written is not compatible with phpunit 4.8.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2019-03-21T07:44:01Z
+
+> Before merging: the way tests are written is not compatible with phpunit 4.8.
+
+@nicolas-grekas because of `$this->createMock(...)`?
+
+I find quite a lot of usages of that in the 3.4 branch.

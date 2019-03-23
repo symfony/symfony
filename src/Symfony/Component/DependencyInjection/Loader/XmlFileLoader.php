@@ -567,20 +567,19 @@ class XmlFileLoader extends FileLoader
                         throw new \InvalidArgumentException('You need to install the YAML component to parse YAML files.');
                     }
 
-                    $filePath = $this->container->getParameterBag()->resolveValue((string) $arg->nodeValue);
-                    $rootDir = \dirname($file);
+                    if (!\is_file($filePath = $this->container->getParameterBag()->resolveValue((string) $arg->nodeValue))) {
+                        $rootDir = \dirname($file);
 
-                    if (!\is_file($filePath)) {
-                        $filePath = "$rootDir/$filePath";
-                    }
-
-                    if (!\is_file($filePath)) {
-                        throw new InvalidArgumentException("Unable to locate file \"{$arg->nodeValue}\". Please provide a path relative to \"$rootDir\" or an absolute path.");
+                        if (!\is_file($filePath = "$rootDir/$filePath")) {
+                            throw new InvalidArgumentException("Unable to locate file \"{$arg->nodeValue}\". Please provide a path relative to \"$rootDir\" or an absolute path.");
+                        }
                     }
 
                     $this->container->addResource(new FileResource($filePath));
 
-                    $arguments[$key] = Yaml::parseFile($filePath, Yaml::PARSE_CONSTANT);
+                    $arguments[$key] = $this->container->getParameterBag()->resolveValue(
+                        Yaml::parseFile($filePath, Yaml::PARSE_CONSTANT)
+                    );
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($arg->nodeValue);

@@ -811,6 +811,7 @@ class YamlFileLoaderTest extends TestCase
         $path = self::$fixturesPath.'/yaml';
         $container = new ContainerBuilder();
         $container->setParameter('fixture_path', "$path/baz");
+        $container->setParameter('meaning_of_life', 42);
 
         $loader = new YamlFileLoader($container, new FileLocator($path));
         $loader->load($resource);

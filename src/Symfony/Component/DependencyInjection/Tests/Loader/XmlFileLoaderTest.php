@@ -902,6 +902,7 @@ class XmlFileLoaderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('fixture_path', realpath(self::$fixturesPath.'/yaml'));
+        $container->setParameter('meaning_of_life', 42);
 
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services_with_yaml_file_argument.xml');

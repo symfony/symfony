@@ -1,3 +1,3 @@
 foo:
   bar: true
-  baz: 42
+  baz: '%meaning_of_life%'

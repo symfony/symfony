@@ -233,7 +233,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_places', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -258,9 +258,17 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('workflows')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
+                                ->beforeNormalization()
+                                    ->always(function ($v) {
+                                        if (isset($v['initial_place'])) {
+                                            $v['initial_marking'] = [$v['initial_place']];
+                                        }
+
+                                        return $v;
+                                    })
+                                ->end()
                                 ->fixXmlConfig('support')
                                 ->fixXmlConfig('place')
-                                ->fixXmlConfig('initial_place')
                                 ->fixXmlConfig('transition')
                                 ->children()
                                     ->arrayNode('audit_trail')
@@ -274,9 +282,11 @@ class Configuration implements ConfigurationInterface
                                         ->fixXmlConfig('argument')
                                         ->children()
                                             ->enumNode('type')
+                                                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3. Use "method" instead as it will be the only option in Symfony 5.0.')
                                                 ->values(['multiple_state', 'single_state', 'method'])
                                             ->end()
                                             ->arrayNode('arguments')
+                                                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3. Use "property" instead.')
                                                 ->beforeNormalization()
                                                     ->ifString()
                                                     ->then(function ($v) { return [$v]; })
@@ -284,6 +294,9 @@ class Configuration implements ConfigurationInterface
                                                 ->requiresAtLeastOneElement()
                                                 ->prototype('scalar')
                                                 ->end()
+                                            ->end()
+                                            ->scalarNode('property')
+                                                ->defaultNull()
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()
@@ -296,6 +309,10 @@ class Configuration implements ConfigurationInterface
                                         ->validate()
                                             ->ifTrue(function ($v) { return !empty($v['arguments']) && isset($v['service']); })
                                             ->thenInvalid('"arguments" and "service" cannot be used together.')
+                                        ->end()
+                                        ->validate()
+                                            ->ifTrue(function ($v) { return !empty($v['property']) && isset($v['service']); })
+                                            ->thenInvalid('"property" and "service" cannot be used together.')
                                         ->end()
                                     ->end()
                                     ->arrayNode('supports')
@@ -315,10 +332,10 @@ class Configuration implements ConfigurationInterface
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->scalarNode('initial_place')
-                                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3, use the "initial_places" configuration key instead.')
+                                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3, use the "initial_marking" configuration key instead.')
                                         ->defaultNull()
                                     ->end()
-                                    ->arrayNode('initial_places')
+                                    ->arrayNode('initial_marking')
                                         ->beforeNormalization()
                                             ->ifTrue(function ($v) { return !\is_array($v); })
                                             ->then(function ($v) { return [$v]; })

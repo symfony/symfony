@@ -1,13 +1,9 @@
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
-
 $container->loadFromExtension('framework', [
     'workflows' => [
         'my_workflow' => [
-            'marking_store' => [
-                'type' => 'multiple_state',
-            ],
+            'type' => 'workflow',
             'places' => [
                 'first',
                 'last',

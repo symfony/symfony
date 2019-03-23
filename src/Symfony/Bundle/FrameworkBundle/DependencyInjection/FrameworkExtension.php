@@ -631,14 +631,14 @@ class FrameworkExtension extends Extension
 
             // Create places
             $places = array_column($workflow['places'], 'name');
-            $initialPlaces = $workflow['initial_places'] ?? $workflow['initial_place'] ?? [];
+            $initialMarking = $workflow['initial_marking'] ?? $workflow['initial_place'] ?? [];
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
             $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
-            $definitionDefinition->addArgument($initialPlaces);
+            $definitionDefinition->addArgument($initialMarking);
             $definitionDefinition->addArgument($metadataStoreDefinition);
 
             // Create MarkingStore
@@ -646,6 +646,12 @@ class FrameworkExtension extends Extension
                 $markingStoreDefinition = new ChildDefinition('workflow.marking_store.'.$workflow['marking_store']['type']);
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
                     $markingStoreDefinition->addArgument($argument);
+                }
+                if ('method' === $workflow['marking_store']['type']) {
+                    $markingStoreDefinition->setArguments([
+                        'state_machine' === $type, //single state
+                        $workflow['marking_store']['property'] ?? 'marking',
+                    ]);
                 }
             } elseif (isset($workflow['marking_store']['service'])) {
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
@@ -686,7 +692,7 @@ class FrameworkExtension extends Extension
                     ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
                         return $container->get((string) $ref);
                     }, $transitions))
-                    ->setInitialPlace($initialPlaces)
+                    ->setInitialPlace($initialMarking)
                     ->build()
                 ;
                 $validator->validate($realDefinition, $name);

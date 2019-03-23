@@ -317,7 +317,7 @@ class Connection
             try {
                 $connection->{$connectMethod}();
             } catch (\AMQPConnectionException $e) {
-                $credentials = $this->connectionCredentials;
+                $credentials = $this->connectionConfiguration;
                 $credentials['password'] = '********';
 
                 throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s)', json_encode($credentials)), 0, $e);

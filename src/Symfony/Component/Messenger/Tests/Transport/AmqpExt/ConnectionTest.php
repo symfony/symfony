@@ -335,6 +335,27 @@ class ConnectionTest extends TestCase
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_120000', AMQP_NOPARAM, ['headers' => []]);
         $connection->publish('{}', [], 120000);
     }
+
+    /**
+     * @expectedException \AMQPException
+     * @expectedExceptionMessage Could not connect to the AMQP server. Please verify the provided DSN. ({"delay":{"routing_key_pattern":"delay_%delay%","exchange_name":"delay","queue_name_pattern":"delay_queue_%delay%"},"host":"localhost","port":5672,"vhost":"\/","login":"user","password":"********"})
+     */
+    public function testObfuscatePasswordInDsn()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpConnection->method('connect')->willThrowException(
+            new \AMQPConnectionException('Oups.')
+        );
+
+        $connection = Connection::fromDsn('amqp://user:secretpassword@localhost/%2f/messages', [], $factory);
+        $connection->channel();
+    }
 }
 
 class TestAmqpFactory extends AmqpFactory

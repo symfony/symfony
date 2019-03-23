@@ -83,6 +83,7 @@ class Request
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
      *
      * @deprecated since version 3.3, to be removed in 4.0
+     * @var array
      */
     protected static $trustedHeaders = [
         self::HEADER_FORWARDED => 'FORWARDED',
@@ -92,6 +93,9 @@ class Request
         self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
     ];
 
+    /**
+    * @var boolean
+    */
     protected static $httpMethodParameterOverride = false;
 
     /**
@@ -218,14 +222,30 @@ class Request
      */
     protected static $formats;
 
+    /**
+    * @var callable|null
+    */
     protected static $requestFactory;
 
+    /**
+    * @var boolean
+    */
     private $isHostValid = true;
+    
+    /**
+    * @var boolean
+    */
     private $isForwardedValid = true;
 
+    /**
+    * @var int
+    */
     private static $trustedHeaderSet = -1;
 
-    /** @deprecated since version 3.3, to be removed in 4.0 */
+    /** 
+    * @deprecated since version 3.3, to be removed in 4.0 
+    * @var array
+    */
     private static $trustedHeaderNames = [
         self::HEADER_FORWARDED => 'FORWARDED',
         self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
@@ -234,6 +254,9 @@ class Request
         self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
     ];
 
+    /**
+    * @var array
+    */
     private static $forwardedParams = [
         self::HEADER_X_FORWARDED_FOR => 'for',
         self::HEADER_X_FORWARDED_HOST => 'host',

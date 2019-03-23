@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-22T14:58:09Z
+
+```
+$ bin/console debug:config SecurityBundle
+
+# before
+
+  Invalid type for path "security.firewalls.api_login.security". Expected boolean, but got string.
+
+# after
+
+Current configuration for "SecurityBundle"
+==========================================
+
+security:
+    firewalls:
+        api_login:
+            security: '%env(bool:FOO)%'
+            anonymous:
+                secret: '%env(int:FOO)%'
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-22T15:33:51Z
+
+deps=high should pass after merge.

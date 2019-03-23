@@ -72,7 +72,7 @@
         "symfony/console": "<3.4",
         "symfony/dotenv": "<4.2",
         "symfony/form": "<4.3",
-        "symfony/messenger": "<4.2",
+        "symfony/messenger": "<4.3",
         "symfony/property-info": "<3.4",
         "symfony/serializer": "<4.2",
         "symfony/stopwatch": "<3.4",

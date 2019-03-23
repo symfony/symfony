@@ -21,7 +21,7 @@ CHANGELOG
  * renamed `GetResponseForControllerResultEvent` to `ViewEvent`
  * renamed `GetResponseForExceptionEvent` to `ExceptionEvent`
  * renamed `PostResponseEvent` to `TerminateEvent`
- * added `RealHttpKernel` for handling requests with an `HttpClientInterface` instance
+ * added `HttpClientKernel` for handling requests with an `HttpClientInterface` instance
 
 4.2.0
 -----

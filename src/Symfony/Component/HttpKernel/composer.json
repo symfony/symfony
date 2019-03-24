@@ -20,7 +20,7 @@
         "symfony/contracts": "^1.1",
         "symfony/event-dispatcher": "^4.3",
         "symfony/http-foundation": "^4.1.1",
-        "symfony/kernel": "^4.3",
+        "instinct/kernel": "dev-symfony-master",
         "symfony/debug": "~3.4|~4.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-php73": "^1.9",

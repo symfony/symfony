@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
+/**
+ * TODO Trigger class deprecation on version 5.1
+ */
 class MergeExtensionConfigurationPassTest extends TestCase
 {
     public function testAutoloadMainExtension()

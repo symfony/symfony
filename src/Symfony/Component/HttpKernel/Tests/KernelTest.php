@@ -28,6 +28,9 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
+/**
+ * TODO Trigger class deprecation on version 5.1
+ */
 class KernelTest extends TestCase
 {
     public static function tearDownAfterClass()

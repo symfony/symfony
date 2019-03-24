@@ -11,31 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass as BaseMergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Kernel\DependencyInjection\MergeExtensionConfigurationPass as BaseMergeExtensionConfigurationPass;
 
 /**
  * Ensures certain extensions are always loaded.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {
-    private $extensions;
-
-    public function __construct(array $extensions)
-    {
-        $this->extensions = $extensions;
-    }
-
-    public function process(ContainerBuilder $container)
-    {
-        foreach ($this->extensions as $extension) {
-            if (!\count($container->getExtensionConfig($extension))) {
-                $container->loadFromExtension($extension, []);
-            }
-        }
-
-        parent::process($container);
-    }
 }

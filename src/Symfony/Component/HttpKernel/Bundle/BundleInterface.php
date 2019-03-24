@@ -11,61 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\Kernel\Bundle\BundleInterface as BaseBundleInterface;
 
 /**
  * BundleInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-interface BundleInterface extends ContainerAwareInterface
+interface BundleInterface extends BaseBundleInterface
 {
-    /**
-     * Boots the Bundle.
-     */
-    public function boot();
-
-    /**
-     * Shutdowns the Bundle.
-     */
-    public function shutdown();
-
-    /**
-     * Builds the bundle.
-     *
-     * It is only ever called once when the cache is empty.
-     */
-    public function build(ContainerBuilder $container);
-
-    /**
-     * Returns the container extension that should be implicitly loaded.
-     *
-     * @return ExtensionInterface|null The default extension or null if there is none
-     */
-    public function getContainerExtension();
-
-    /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
-     */
-    public function getName();
-
-    /**
-     * Gets the Bundle namespace.
-     *
-     * @return string The Bundle namespace
-     */
-    public function getNamespace();
-
-    /**
-     * Gets the Bundle directory path.
-     *
-     * The path should always be returned as a Unix path (with /).
-     *
-     * @return string The Bundle absolute path
-     */
-    public function getPath();
 }

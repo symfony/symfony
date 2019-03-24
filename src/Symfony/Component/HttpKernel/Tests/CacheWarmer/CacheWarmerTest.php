@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class CacheWarmerTest extends TestCase
 {
     protected static $cacheFile;

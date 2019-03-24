@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\CacheWarmer;
 
+use Symfony\Component\Kernel\CacheWarmer\WarmableInterface as BaseWarmableInterface;
+
 /**
  * Interface for classes that support warming their cache.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-interface WarmableInterface
+interface WarmableInterface extends BaseWarmableInterface
 {
-    /**
-     * Warms up the cache.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function warmUp($cacheDir);
 }

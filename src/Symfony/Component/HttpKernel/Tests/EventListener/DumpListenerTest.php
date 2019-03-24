@@ -23,6 +23,8 @@ use Symfony\Component\VarDumper\VarDumper;
  * DumpListenerTest.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
 class DumpListenerTest extends TestCase
 {

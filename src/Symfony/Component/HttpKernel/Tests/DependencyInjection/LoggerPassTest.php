@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Log\Logger;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
 class LoggerPassTest extends TestCase
 {

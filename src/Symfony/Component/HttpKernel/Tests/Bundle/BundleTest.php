@@ -16,6 +16,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class BundleTest extends TestCase
 {
     public function testGetContainerExtension()

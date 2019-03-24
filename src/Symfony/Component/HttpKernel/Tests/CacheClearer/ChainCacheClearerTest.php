@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class ChainCacheClearerTest extends TestCase
 {
     protected static $cacheDir;

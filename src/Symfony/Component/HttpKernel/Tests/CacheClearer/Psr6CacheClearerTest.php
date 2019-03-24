@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class Psr6CacheClearerTest extends TestCase
 {
     public function testClearPoolsInjectedInConstructor()

@@ -11,29 +11,17 @@
 
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
+use Symfony\Component\Kernel\CacheClearer\ChainCacheClearer as BaseChainCacheClearer;
+
 /**
  * ChainCacheClearer.
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  *
  * @final
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-class ChainCacheClearer implements CacheClearerInterface
+class ChainCacheClearer extends BaseChainCacheClearer
 {
-    private $clearers;
-
-    public function __construct(iterable $clearers = [])
-    {
-        $this->clearers = $clearers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clear($cacheDir)
-    {
-        foreach ($this->clearers as $clearer) {
-            $clearer->clear($cacheDir);
-        }
-    }
 }

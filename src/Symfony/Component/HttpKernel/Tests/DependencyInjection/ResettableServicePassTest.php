@@ -12,6 +12,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
+/**
+ * TODO Trigger class deprecation on version 5.1
+ */
 class ResettableServicePassTest extends TestCase
 {
     public function testCompilerPass()

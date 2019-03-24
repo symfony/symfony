@@ -11,145 +11,19 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
-use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Debug\DebugClassLoader;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
-use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
-use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
-use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
+use Symfony\Component\Kernel\Kernel as BaseKernel;
 
 /**
- * The Kernel is the heart of the Symfony system.
+ * The HTTP Kernel is the heart of the Symfony system to handle HTTP request.
  *
- * It manages an environment made of bundles.
- *
- * Environment names must always start with a letter and
- * they must only contain letters and numbers.
+ * It manages an environment made of application kernel and bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Kernel implements KernelInterface, RebootableInterface, TerminableInterface
+abstract class Kernel extends BaseKernel implements KernelInterface, TerminableInterface
 {
-    /**
-     * @var BundleInterface[]
-     */
-    protected $bundles = [];
-
-    protected $container;
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    protected $rootDir;
-    protected $environment;
-    protected $debug;
-    protected $booted = false;
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    protected $name;
-    protected $startTime;
-
-    private $projectDir;
-    private $warmupDir;
-    private $requestStackSize = 0;
-    private $resetServices = false;
-
-    const VERSION = '4.3.0-DEV';
-    const VERSION_ID = 40300;
-    const MAJOR_VERSION = 4;
-    const MINOR_VERSION = 3;
-    const RELEASE_VERSION = 0;
-    const EXTRA_VERSION = 'DEV';
-
-    const END_OF_MAINTENANCE = '01/2020';
-    const END_OF_LIFE = '07/2020';
-
-    public function __construct(string $environment, bool $debug)
-    {
-        $this->environment = $environment;
-        $this->debug = $debug;
-        $this->rootDir = $this->getRootDir(false);
-        $this->name = $this->getName(false);
-    }
-
-    public function __clone()
-    {
-        $this->booted = false;
-        $this->container = null;
-        $this->requestStackSize = 0;
-        $this->resetServices = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function boot()
-    {
-        if (true === $this->booted) {
-            if (!$this->requestStackSize && $this->resetServices) {
-                if ($this->container->has('services_resetter')) {
-                    $this->container->get('services_resetter')->reset();
-                }
-                $this->resetServices = false;
-                if ($this->debug) {
-                    $this->startTime = microtime(true);
-                }
-            }
-
-            return;
-        }
-        if ($this->debug) {
-            $this->startTime = microtime(true);
-        }
-        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
-            putenv('SHELL_VERBOSITY=3');
-            $_ENV['SHELL_VERBOSITY'] = 3;
-            $_SERVER['SHELL_VERBOSITY'] = 3;
-        }
-
-        // init bundles
-        $this->initializeBundles();
-
-        // init container
-        $this->initializeContainer();
-
-        foreach ($this->getBundles() as $bundle) {
-            $bundle->setContainer($this->container);
-            $bundle->boot();
-        }
-
-        $this->booted = true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reboot($warmupDir)
-    {
-        $this->shutdown();
-        $this->warmupDir = $warmupDir;
-        $this->boot();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -167,37 +41,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function shutdown()
-    {
-        if (false === $this->booted) {
-            return;
-        }
-
-        $this->booted = false;
-
-        foreach ($this->getBundles() as $bundle) {
-            $bundle->shutdown();
-            $bundle->setContainer(null);
-        }
-
-        $this->container = null;
-        $this->requestStackSize = 0;
-        $this->resetServices = false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $this->boot();
-        ++$this->requestStackSize;
-        $this->resetServices = true;
+        $this->enterScope();
 
         try {
             return $this->getHttpKernel()->handle($request, $type, $catch);
         } finally {
-            --$this->requestStackSize;
+            $this->leaveScope();
         }
     }
 

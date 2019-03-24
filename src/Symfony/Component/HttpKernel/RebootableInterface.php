@@ -11,20 +11,15 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\Kernel\RebootableInterface as BaseRebootableInterface;
+
 /**
  * Allows the Kernel to be rebooted using a temporary cache directory.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-interface RebootableInterface
+interface RebootableInterface extends BaseRebootableInterface
 {
-    /**
-     * Reboots a kernel.
-     *
-     * The getCacheDir() method of a rebootable kernel should not be called
-     * while building the container. Use the %kernel.cache_dir% parameter instead.
-     *
-     * @param string|null $warmupDir pass null to reboot in the regular cache directory
-     */
-    public function reboot($warmupDir);
 }

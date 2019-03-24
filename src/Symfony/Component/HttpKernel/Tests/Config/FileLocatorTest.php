@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class FileLocatorTest extends TestCase
 {
     public function testLocate()

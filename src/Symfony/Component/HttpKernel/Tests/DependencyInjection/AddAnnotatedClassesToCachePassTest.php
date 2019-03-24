@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCachePass;
 
+/**
+ * TODO Trigger class deprecation on version 5.1.
+ */
 class AddAnnotatedClassesToCachePassTest extends TestCase
 {
     public function testExpandClasses()

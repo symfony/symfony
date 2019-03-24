@@ -11,22 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\CacheWarmer;
 
+use Symfony\Component\Kernel\CacheWarmer\CacheWarmerInterface as BaseCacheWarmerInterface;
+
 /**
  * Interface for classes able to warm up the cache.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-interface CacheWarmerInterface extends WarmableInterface
+interface CacheWarmerInterface extends BaseCacheWarmerInterface
 {
-    /**
-     * Checks whether this warmer is optional or not.
-     *
-     * Optional warmers can be ignored on certain conditions.
-     *
-     * A warmer should return true if the cache can be
-     * generated incrementally and on-demand.
-     *
-     * @return bool true if the warmer is optional, false otherwise
-     */
-    public function isOptional();
 }

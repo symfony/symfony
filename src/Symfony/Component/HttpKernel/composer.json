@@ -20,6 +20,7 @@
         "symfony/contracts": "^1.1",
         "symfony/event-dispatcher": "^4.3",
         "symfony/http-foundation": "^4.1.1",
+        "symfony/kernel": "^4.3",
         "symfony/debug": "~3.4|~4.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-php73": "^1.9",
@@ -41,7 +42,8 @@
         "symfony/translation": "~4.2",
         "symfony/var-dumper": "^4.1.1",
         "psr/cache": "~1.0",
-        "twig/twig": "^1.34|^2.4"
+        "twig/twig": "^1.34|^2.4",
+        "symfony/phpunit-bridge": "^4.1.8"
     },
     "provide": {
         "psr/log-implementation": "1.0"

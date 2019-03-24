@@ -11,17 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
+use Symfony\Component\Kernel\CacheClearer\CacheClearerInterface as BaseCacheClearerInterface;
+
 /**
  * CacheClearerInterface.
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
+ *
+ * TODO Trigger class deprecation on version 5.1
  */
-interface CacheClearerInterface
+interface CacheClearerInterface extends BaseCacheClearerInterface
 {
-    /**
-     * Clears any caches necessary.
-     *
-     * @param string $cacheDir The cache directory
-     */
-    public function clear($cacheDir);
 }

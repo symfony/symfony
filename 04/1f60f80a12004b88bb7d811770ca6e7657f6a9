@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-21T12:03:04Z
+
+@nicolas-grekas I would keep it even for 300 exceptions because Hydra allows to provide better messages even for such status codes, and it doesn't hurt: http://www.hydra-cg.com/spec/latest/core/#description-of-http-status-codes-and-errors

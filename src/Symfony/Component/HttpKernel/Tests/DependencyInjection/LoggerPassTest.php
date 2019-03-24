@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
-use Symfony\Component\HttpKernel\Log\Logger;
+use Symfony\Component\Kernel\Log\Logger;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

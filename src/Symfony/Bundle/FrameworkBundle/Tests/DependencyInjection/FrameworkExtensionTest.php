@@ -35,6 +35,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
@@ -53,7 +54,6 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -1406,25 +1406,34 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('http_client'), '->registerHttpClientConfiguration() loads http_client.xml');
 
         $defaultOptions = [
-            'query' => [],
             'headers' => [],
             'resolve' => [],
         ];
         $this->assertSame([$defaultOptions, 4], $container->getDefinition('http_client')->getArguments());
 
         $this->assertTrue($container->hasDefinition('foo'), 'should have the "foo" service.');
-        $this->assertSame(HttpClientInterface::class, $container->getDefinition('foo')->getClass());
-        $this->assertSame([$defaultOptions, 4], $container->getDefinition('foo')->getArguments());
+        $this->assertSame(ScopingHttpClient::class, $container->getDefinition('foo')->getClass());
     }
 
     public function testHttpClientOverrideDefaultOptions()
     {
         $container = $this->createContainerFromFile('http_client_override_default_options');
 
-        $this->assertSame(['foo' => ['bar']], $container->getDefinition('http_client')->getArgument(0)['headers']);
+        $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
         $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
-        $this->assertSame(['bar' => ['baz'], 'foo' => ['bar']], $container->getDefinition('foo')->getArgument(0)['headers']);
-        $this->assertSame(5, $container->getDefinition('foo')->getArgument(1));
+
+        $expected = [
+            'http\://example\.com/' => [
+                'base_uri' => 'http://example.com',
+                'headers' => [
+                    'bar' => 'baz',
+                ],
+                'query' => [],
+                'resolve' => [],
+            ],
+        ];
+
+        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(1));
     }
 
     public function testHttpClientFullDefaultOptions()
@@ -1433,12 +1442,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $defaultOptions = $container->getDefinition('http_client')->getArgument(0);
 
-        $this->assertSame('foo:bar', $defaultOptions['auth_basic']);
-        $this->assertSame(['foo' => 'bar', 'bar' => 'baz'], $defaultOptions['query']);
-        $this->assertSame(['x-powered' => ['PHP']], $defaultOptions['headers']);
+        $this->assertSame(['X-powered' => 'PHP'], $defaultOptions['headers']);
         $this->assertSame(2, $defaultOptions['max_redirects']);
         $this->assertSame(2.0, (float) $defaultOptions['http_version']);
-        $this->assertSame('http://example.com', $defaultOptions['base_uri']);
         $this->assertSame(['localhost' => '127.0.0.1'], $defaultOptions['resolve']);
         $this->assertSame('proxy.org', $defaultOptions['proxy']);
         $this->assertSame(3.5, $defaultOptions['timeout']);

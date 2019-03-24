@@ -6,12 +6,10 @@ $container->loadFromExtension('framework', [
         'default_options' => [
             'headers' => ['foo' => 'bar'],
         ],
-        'clients' => [
+        'scoped_clients' => [
             'foo' => [
-                'max_host_connections' => 5,
-                'default_options' => [
-                    'headers' => ['bar' => 'baz'],
-                ],
+                'base_uri' => 'http://example.com',
+                'headers' => ['bar' => 'baz'],
             ],
         ],
     ],

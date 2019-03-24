@@ -240,7 +240,7 @@ class MockResponse implements ResponseInterface
         $info = $mock->getInfo() ?: [];
         $response->info['http_code'] = ($info['http_code'] ?? 0) ?: $mock->getStatusCode(false) ?: 200;
         $response->addResponseHeaders($info['response_headers'] ?? [], $response->info, $response->headers);
-        $dlSize = (int) ($response->headers['content-length'][0] ?? 0);
+        $dlSize = isset($response->headers['content-encoding']) ? 0 : (int) ($response->headers['content-length'][0] ?? 0);
 
         $response->info = [
             'start_time' => $response->info['start_time'],
@@ -282,7 +282,7 @@ class MockResponse implements ResponseInterface
         // "notify" completion
         $onProgress($offset, $dlSize, $response->info);
 
-        if (isset($response->headers['content-length']) && $offset !== $dlSize) {
+        if ($dlSize && $offset !== $dlSize) {
             throw new TransportException(sprintf('Transfer closed with %s bytes remaining to read.', $dlSize - $offset));
         }
     }

@@ -8,9 +8,10 @@
     <framework:config>
         <framework:http-client max-host-connections="4">
             <framework:default-options />
-            <framework:client name="foo">
-                <framework:default-options />
-            </framework:client>
+            <framework:scoped-client
+                name="foo"
+                base-uri="http://example.com"
+            />
         </framework:http-client>
     </framework:config>
 </container>

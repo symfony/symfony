@@ -3,12 +3,9 @@
 $container->loadFromExtension('framework', [
     'http_client' => [
         'default_options' => [
-            'auth_basic' => 'foo:bar',
-            'query' => ['foo' => 'bar', 'bar' => 'baz'],
             'headers' => ['X-powered' => 'PHP'],
             'max_redirects' => 2,
             'http_version' => '2.0',
-            'base_uri' => 'http://example.com',
             'resolve' => ['localhost' => '127.0.0.1'],
             'proxy' => 'proxy.org',
             'timeout' => 3.5,

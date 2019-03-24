@@ -27,6 +27,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/lock": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
+        "symfony/var-dumper": "^4.3",
         "psr/log": "~1.0"
     },
     "provide": {

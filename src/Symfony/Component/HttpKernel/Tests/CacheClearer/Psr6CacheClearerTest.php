@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 /**
@@ -47,5 +48,15 @@ class Psr6CacheClearerTest extends TestCase
     public function testClearPoolThrowsExceptionOnUnreferencedPool()
     {
         (new Psr6CacheClearer())->clearPool('unknown');
+    }
+
+    /**
+     * BC layer test to remove on version 6.0.
+     */
+    public function testBCLayer()
+    {
+        $cacheClearer = new Psr6CacheClearer();
+
+        $this->assertInstanceOf(CacheClearerInterface::class, $cacheClearer);
     }
 }

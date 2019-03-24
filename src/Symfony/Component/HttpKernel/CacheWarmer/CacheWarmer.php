@@ -20,6 +20,6 @@ use Symfony\Component\Kernel\CacheWarmer\CacheWarmer as BaseCacheWarmer;
  *
  * TODO Trigger class deprecation on version 5.1
  */
-abstract class CacheWarmer extends BaseCacheWarmer
+abstract class CacheWarmer extends BaseCacheWarmer implements CacheWarmerInterface
 {
 }

@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
 /**
  * TODO Trigger class deprecation on version 5.1.
@@ -47,6 +49,17 @@ class CacheWarmerTest extends TestCase
         $nonWritableFile = '/this/file/is/very/probably/not/writable';
         $warmer = new TestCacheWarmer($nonWritableFile);
         $warmer->warmUp(\dirname($nonWritableFile));
+    }
+
+    /**
+     * BC layer test to remove on version 6.0.
+     */
+    public function testBCLayer()
+    {
+        $warmer = new TestCacheWarmer(self::$cacheFile);
+
+        $this->assertInstanceOf(CacheWarmerInterface::class, $warmer);
+        $this->assertInstanceOf(WarmableInterface::class, $warmer);
     }
 }
 

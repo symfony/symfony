@@ -22,6 +22,6 @@ use Symfony\Component\Kernel\CacheWarmer\CacheWarmerAggregate as BaseCacheWarmer
  *
  * TODO Trigger class deprecation on version 5.1
  */
-class CacheWarmerAggregate extends BaseCacheWarmerAggregate
+class CacheWarmerAggregate extends BaseCacheWarmerAggregate implements CacheWarmerInterface
 {
 }

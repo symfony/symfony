@@ -21,6 +21,6 @@ use Symfony\Component\Kernel\Bundle\Bundle as BaseBundle;
  *
  * TODO Trigger class deprecation on version 5.1
  */
-abstract class Bundle extends BaseBundle
+abstract class Bundle extends BaseBundle implements BundleInterface
 {
 }

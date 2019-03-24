@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
 /**
  * TODO Trigger class deprecation on version 5.1.
@@ -78,5 +80,16 @@ class CacheWarmerAggregateTest extends TestCase
             ->getMock();
 
         return $warmer;
+    }
+
+    /**
+     * BC layer test to remove on version 6.0.
+     */
+    public function testBCLayer()
+    {
+        $aggregate = new CacheWarmerAggregate([]);
+
+        $this->assertInstanceOf(CacheWarmerInterface::class, $aggregate);
+        $this->assertInstanceOf(WarmableInterface::class, $aggregate);
     }
 }

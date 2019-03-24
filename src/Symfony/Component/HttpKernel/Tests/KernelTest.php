@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\RebootableInterface;
 
 /**
  * TODO Trigger class deprecation on version 5.1
@@ -619,6 +621,18 @@ EOF;
         $kernel->reboot(null);
 
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
+    }
+
+    /**
+     * BC layer test to remove on version 6.0
+     */
+    public function testBCLayer()
+    {
+        $kernel = new CustomProjectDirKernel();
+
+        $this->assertInstanceOf(KernelInterface::class, $kernel);
+        $this->assertInstanceOf(HttpKernelInterface::class, $kernel);
+        $this->assertInstanceOf(RebootableInterface::class, $kernel);
     }
 
     /**

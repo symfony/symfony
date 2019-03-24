@@ -18,6 +18,6 @@ use Symfony\Component\Kernel\CacheClearer\Psr6CacheClearer as BasePsr6CacheClear
  *
  * TODO Trigger class deprecation on version 5.1
  */
-class Psr6CacheClearer extends BasePsr6CacheClearer
+class Psr6CacheClearer extends BasePsr6CacheClearer implements CacheClearerInterface
 {
 }

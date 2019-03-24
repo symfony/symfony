@@ -22,6 +22,6 @@ use Symfony\Component\Kernel\CacheClearer\ChainCacheClearer as BaseChainCacheCle
  *
  * TODO Trigger class deprecation on version 5.1
  */
-class ChainCacheClearer extends BaseChainCacheClearer
+class ChainCacheClearer extends BaseChainCacheClearer implements CacheClearerInterface
 {
 }

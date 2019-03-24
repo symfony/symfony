@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionNotValidBundle\ExtensionNotValidBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
@@ -56,6 +57,16 @@ class BundleTest extends TestCase
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
+    }
+
+    /**
+     * BC layer test to remove on version 6.0.
+     */
+    public function testBCLayer()
+    {
+        $bundle = new NamedBundle();
+
+        $this->assertInstanceOf(BundleInterface::class, $bundle);
     }
 }
 

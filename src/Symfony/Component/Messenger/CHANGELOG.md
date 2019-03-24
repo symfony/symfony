@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added optional parameter `prefetch_count` in connection configuration, 
+   to setup channel prefetch count
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`
    and `BusNameStamp` were added, which allow you to add a bus identifier
    to the `Envelope` then find the correct bus when receiving from

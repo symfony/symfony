@@ -84,6 +84,7 @@ class Connection
      *     * exchange_name: Name of the exchange to be used for the retried messages (Default: "retry")
      *   * auto-setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * loop_sleep: Amount of micro-seconds to wait if no message are available (Default: 200000)
+     *   * prefetch_count: set channel prefetch count
      */
     public function __construct(array $connectionConfiguration, array $exchangeConfiguration, array $queueConfiguration, AmqpFactory $amqpFactory = null)
     {
@@ -323,6 +324,10 @@ class Connection
                 throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s)', json_encode($credentials)), 0, $e);
             }
             $this->amqpChannel = $this->amqpFactory->createChannel($connection);
+
+            if (isset($this->connectionConfiguration['prefetch_count'])) {
+                $this->amqpChannel->setPrefetchCount($this->connectionConfiguration['prefetch_count']);
+            }
         }
 
         return $this->amqpChannel;

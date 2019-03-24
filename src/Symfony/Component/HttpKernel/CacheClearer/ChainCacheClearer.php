@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\CacheClearer;
 
-use Symfony\Component\Kernel\CacheClearer\ChainCacheClearer as BaseChainCacheClearer;
+use Symfony\Component\Kernel\CacheClearer\InternalChainCacheClearer;
 
 /**
  * ChainCacheClearer.
@@ -22,6 +22,6 @@ use Symfony\Component\Kernel\CacheClearer\ChainCacheClearer as BaseChainCacheCle
  *
  * TODO Trigger class deprecation on version 5.1
  */
-class ChainCacheClearer extends BaseChainCacheClearer implements CacheClearerInterface
+class ChainCacheClearer extends InternalChainCacheClearer implements CacheClearerInterface
 {
 }

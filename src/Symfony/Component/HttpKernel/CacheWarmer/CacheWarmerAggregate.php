@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\CacheWarmer;
 
-use Symfony\Component\Kernel\CacheWarmer\CacheWarmerAggregate as BaseCacheWarmerAggregate;
+use Symfony\Component\Kernel\CacheWarmer\InternalCacheWarmerAggregate;
 
 /**
  * Aggregates several cache warmers into a single one.
@@ -22,6 +22,6 @@ use Symfony\Component\Kernel\CacheWarmer\CacheWarmerAggregate as BaseCacheWarmer
  *
  * TODO Trigger class deprecation on version 5.1
  */
-class CacheWarmerAggregate extends BaseCacheWarmerAggregate implements CacheWarmerInterface
+class CacheWarmerAggregate extends InternalCacheWarmerAggregate implements CacheWarmerInterface
 {
 }

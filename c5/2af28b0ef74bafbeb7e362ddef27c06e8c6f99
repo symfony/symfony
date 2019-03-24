@@ -1,0 +1,110 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-20T20:55:05Z
+
+for tests i like to embed/wait for #28931, so the fallback would be tested using `@class-not-exists CliDumper`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T06:58:54Z
+
+#28931 was merged a while ago, @ro0NL can we move forward here?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-04T09:33:34Z
+
+I already thought about something like that. IMHO the issue is somewhere else.
+We taught us we should not let some debugging tools (var_dump / dump) in our code and I agree with that.
+
+This PR solves this this issue only in CLI, and only in the main entry point (the Command class).
+Almost all my commands have a very few line of code, because everything live in services. So now, I don't use `Output::writeln` anymore, but instead `Logger::log`. So I will not be able to leverage this new feature.
+
+So here we go: Many other framework / language have a `trace` log level. I know we are a bit limited by PSR, but IMHO the way to go is to add a new log level, where we can `dump` many things
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-04T09:34:58Z
+
+BTW, for now you can aleady achieve this with `$logger->debug('Foo var', ['foo' => $foo'])`.
+See https://github.com/symfony/monolog-bundle/pull/297 for more confiiguration
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-04T10:02:51Z
+
+@lyrixx understood
+
+> Almost all my commands have a very few line of code, because everything live in services.
+
+Also there might be e.g. "debug-commands" with lots of code / output control. My main goal here was to obtain the dump value so i can put it in a console table, and have DX friendly output (#24208, #27684)
+
+> for now you can aleady achieve this with $logger->debug('Foo var', ['foo' => $foo'])
+
+Im not sure using the logger is possible in my case, im looking mostly for  `$pretty = $dumper($value);`.
+
+So maybe get rid of `Dumper::dump + dumpln` at least, to avoid coupling with output control here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-04T10:05:10Z
+
+> This PR solves this this issue only in CLI
+
+True, if we get rid of `dump() / dumpln()` it practically becomes a util to convert arbitrary values into pretty printable ones (with fallback support! that's still the sold feature)
+
+In that case putting it in VarDumper might be a better place :thinking:
+
+edit: no, if we move it to vardumper we dont need fallback support :D the whole idea was to NOT require var-dumper, but use it if available.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-03-04T10:07:47Z
+
+#24208 and #27684 are valid use case for this PR. I'm :+1: with it. Thanks
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-08T11:25:49Z
+
+Cool :) tend to keep `dump()` / `dumpln()` actually, it's tied to console output; but we need that to know about colorization (maybe keep that dependency optional?)
+
+Unless we prefer `$output->writeln($dumper($var))` over `$dumper->dumpln($var)`. Let me know.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-22T07:44:13Z
+
+I think I prefer composition, so `$output->writeln($dumper($var))` would be my personal preference.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-22T10:24:06Z
+
+i dont understand the failures yet, running a single test works as expected (`--filter=testFallbackInvoke`), but running the `DumerTest` fully it breaks the mocking.
+
+In this case `class_exists` behaves very weird :/
+
+```php
+var_dump(
+    class_exists::class,
+    class_exists(CliDumper::class),
+    \Symfony\Component\Console\Helper\class_exists(CliDumper::class),
+    class_exists(CliDumper::class)
+);
+
+// Symfony\Component\Console\Helper\class_exists"
+// bool(true) <-- unexpected
+// bool(false)
+// bool(false)
+```
+
+edit: i've split the tests for now into 2 individual suites, this seems to overcome the state issue.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-22T11:01:37Z
+
+Green&ready :+1:
+
+status: needs review

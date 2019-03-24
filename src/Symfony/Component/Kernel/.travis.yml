@@ -1,0 +1,20 @@
+language: php
+
+dist: trusty
+sudo: false
+
+php:
+    - 7.1
+    - 7.2
+
+git:
+    depth: 2
+
+matrix:
+    fast_finish: true
+
+install:
+    - composer update --no-progress --no-suggest --ansi --prefer-dist
+
+script:
+    - vendor/bin/simple-phpunit

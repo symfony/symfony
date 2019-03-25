@@ -372,7 +372,7 @@ class Email extends Message
     /**
      * @return $this
      */
-    public function attachPart(AbstractPart $part)
+    public function attachPart(DataPart $part)
     {
         $this->attachments[] = ['part' => $part];
 
@@ -380,7 +380,7 @@ class Email extends Message
     }
 
     /**
-     * @return AbstractPart[]
+     * @return DataPart[]
      */
     public function getAttachments(): array
     {

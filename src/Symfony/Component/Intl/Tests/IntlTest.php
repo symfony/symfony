@@ -41,7 +41,7 @@ class IntlTest extends TestCase
 
     public function testGetRegionBundleCreatesTheRegionBundle()
     {
-        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface', Intl::getLocaleBundle());
+        $this->assertInstanceOf('Symfony\Component\Intl\ResourceBundle\RegionBundleInterface', Intl::getRegionBundle());
     }
 
     public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary()

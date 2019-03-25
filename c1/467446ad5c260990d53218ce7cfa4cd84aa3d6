@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-15T21:56:16Z
+
+Please, review feature.
+If realization constraint is ok I will write tests and doc for this feature.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-16T20:00:14Z
+
+Would wait for a symfony team member to confirm, but I think this is pretty straight forward and feature should be accepted.
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T14:50:34Z
+
+@zzenmate please check fabbot's failure
+
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-20T12:41:18Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-22T20:16:51Z
+
+@ostrolucky Thank you for your advice! I have done it.
+status: needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-24T10:48:12Z
+
+oh, please also mention the new constraint in the changelog of the component
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T09:17:15Z
+
+Friendly ping @zzenmate, could you please add an entry in the changelog file of the component?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T09:17:38Z
+
+And create a doc issue/PR also please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T15:48:24Z
+
+Rebased, ready.

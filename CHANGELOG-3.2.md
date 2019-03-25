@@ -102,7 +102,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #22900 [FrameworkBundle][Console] Fix the override of a command registered by the kernel (aaa2000)
  * bug #22910 [Filesystem] improve error handling in lock() (xabbuh)
  * bug #22924 [Cache] Dont use pipelining with RedisCluster (nicolas-grekas)
- * bug #22718 [Console] Fixed different behaviour of key and value user inputs in multiple choice question (borNfreee)
+ * bug #22718 [Console] Fixed different behavior of key and value user inputs in multiple choice question (borNfreee)
  * bug #22829 [Yaml] fix colon without space deprecation (xabbuh)
  * bug #22901 Fix missing abstract key in XmlDumper (weaverryan)
  * bug #22912 [DI] Avoid private call to Container::has() (ro0NL)

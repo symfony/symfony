@@ -91,7 +91,7 @@ class SendMessageMiddleware implements MiddlewareInterface
             }
         } catch (\Throwable $e) {
             $context['exception'] = $e;
-            $this->logger->warning('An exception occurred while handling message "{class}"', $context);
+            $this->logger->warning('An exception occurred while handling message "{class}": '.$e->getMessage(), $context);
 
             throw $e;
         }

@@ -205,7 +205,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
     }
 
-    public function testItDispatchesTheEventOnceTime()
+    public function testItDispatchesTheEventOneTime()
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
@@ -221,6 +221,33 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
         $sender1->expects($this->once())->method('send')->willReturn($envelope);
         $sender2->expects($this->once())->method('send')->willReturn($envelope);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testItDoesNotDispatchWithNoSenders()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->never())->method('dispatch');
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([]), $dispatcher);
+
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testItDoesNotDispatchOnRetry()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+        $envelope = $envelope->with(new RedeliveryStamp(3, 'foo_sender'));
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects($this->never())->method('dispatch');
+
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]), $dispatcher);
 
         $middleware->handle($envelope, $this->getStackMock(false));
     }

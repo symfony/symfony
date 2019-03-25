@@ -20,9 +20,11 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Handle custom callback transformation.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class CallbackTransformer implements TransformerInterface
+final class CallbackTransformer implements TransformerInterface
 {
     private $callbackName;
 

@@ -25,9 +25,11 @@ use Symfony\Component\PropertyInfo\Type;
  * Decorate transformers with condition to handle property with multiples source types
  * It will always use the first target type possible for transformation
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class MultipleTransformer implements TransformerInterface
+final class MultipleTransformer implements TransformerInterface
 {
     private const CONDITION_MAPPING = [
         Type::BUILTIN_TYPE_BOOL => 'is_bool',

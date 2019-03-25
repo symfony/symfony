@@ -18,6 +18,8 @@ use Symfony\Component\AutoMapper\Extractor\SourceTargetMappingExtractor;
 /**
  * Metadata factory, used to autoregistering new mapping without creating them.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class MapperGeneratorMetadataFactory

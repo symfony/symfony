@@ -15,9 +15,11 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class BuiltinTransformerFactory implements TransformerFactoryInterface
+final class BuiltinTransformerFactory implements TransformerFactoryInterface
 {
     private const BUILTIN = [
         Type::BUILTIN_TYPE_BOOL,

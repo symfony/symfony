@@ -16,9 +16,11 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class ObjectTransformerFactory extends AbstractUniqueTypeTransformerFactory
+final class ObjectTransformerFactory extends AbstractUniqueTypeTransformerFactory
 {
     private $autoMapper;
 

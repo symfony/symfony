@@ -17,9 +17,11 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Create a decorated transformer to handle array type.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class ArrayTransformerFactory extends AbstractUniqueTypeTransformerFactory
+final class ArrayTransformerFactory extends AbstractUniqueTypeTransformerFactory
 {
     private $chainTransformerFactory;
 

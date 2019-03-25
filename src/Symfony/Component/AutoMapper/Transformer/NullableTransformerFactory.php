@@ -15,9 +15,11 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class NullableTransformerFactory implements TransformerFactoryInterface
+final class NullableTransformerFactory implements TransformerFactoryInterface
 {
     private $chainTransformerFactory;
 

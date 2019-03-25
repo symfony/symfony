@@ -18,9 +18,11 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Does not do any transformation, output = input.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class CopyTransformer implements TransformerInterface
+final class CopyTransformer implements TransformerInterface
 {
     /**
      * {@inheritdoc}

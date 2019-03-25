@@ -16,6 +16,8 @@ use Symfony\Component\AutoMapper\Transformer\TransformerInterface;
 /**
  * Property mapping.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class PropertyMapping

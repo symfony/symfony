@@ -21,9 +21,11 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Transform a string to a \DateTimeInterface object.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class StringToDateTimeTransformer implements TransformerInterface
+final class StringToDateTimeTransformer implements TransformerInterface
 {
     private $className;
 

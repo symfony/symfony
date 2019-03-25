@@ -30,8 +30,12 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
  * Generate code for a mapping class.
+ *
+ * @expiremental
+ *
+ * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class Generator
+final class Generator
 {
     private $parser;
 

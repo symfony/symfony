@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Bridge for symfony/serializer.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 class AutoMapperNormalizer implements NormalizerInterface, DenormalizerInterface

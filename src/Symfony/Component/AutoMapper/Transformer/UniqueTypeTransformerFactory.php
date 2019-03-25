@@ -18,7 +18,7 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class UniqueTypeTransformerFactory implements TransformerFactoryInterface
+final class UniqueTypeTransformerFactory implements TransformerFactoryInterface
 {
     private $chainTransformerFactory;
 

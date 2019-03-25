@@ -20,9 +20,11 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Tansformer decorator to handle null values.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class NullableTransformer implements TransformerInterface
+final class NullableTransformer implements TransformerInterface
 {
     private $itemTransformer;
     private $isTargetNullable;

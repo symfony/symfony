@@ -21,9 +21,11 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Transform to an object which can be mapped by AutoMapper (sub mapping).
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class ObjectTransformer implements TransformerInterface
+final class ObjectTransformer implements TransformerInterface
 {
     private $sourceType;
 

@@ -22,9 +22,11 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Built in transformer to handle PHP scalar types.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class BuiltinTransformer implements TransformerInterface
+final class BuiltinTransformer implements TransformerInterface
 {
     private const CAST_MAPPING = [
         Type::BUILTIN_TYPE_BOOL => [

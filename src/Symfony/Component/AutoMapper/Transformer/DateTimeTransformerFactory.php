@@ -15,9 +15,11 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class DateTimeTransformerFactory extends AbstractUniqueTypeTransformerFactory
+final class DateTimeTransformerFactory extends AbstractUniqueTypeTransformerFactory
 {
     /**
      * {@inheritdoc}

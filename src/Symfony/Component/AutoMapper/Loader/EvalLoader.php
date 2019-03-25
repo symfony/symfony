@@ -1,9 +1,12 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: joelwurtz
- * Date: 2/14/19
- * Time: 2:07 PM.
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Symfony\Component\AutoMapper\Loader;
@@ -13,9 +16,13 @@ use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
- * Uses a generator and eval to requiring mapping of a class.
+ * Use eval to load mappers
+ *
+ * @expiremental
+ *
+ * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class EvalLoader implements ClassLoaderInterface
+final class EvalLoader implements ClassLoaderInterface
 {
     private $generator;
 

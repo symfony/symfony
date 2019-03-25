@@ -14,9 +14,11 @@ namespace Symfony\Component\AutoMapper\Transformer;
 use Symfony\Component\AutoMapper\MapperMetadataInterface;
 
 /**
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class MultipleTransformerFactory implements TransformerFactoryInterface
+final class MultipleTransformerFactory implements TransformerFactoryInterface
 {
     private $chainTransformerFactory;
 

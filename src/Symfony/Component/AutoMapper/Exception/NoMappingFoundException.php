@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\AutoMapper\Exception;
 
+/**
+ * @expiremental
+ *
+ * @author Joel Wurtz <jwurtz@jolicode.com>
+ */
 class NoMappingFoundException extends \RuntimeException
 {
 }

@@ -20,6 +20,8 @@ use Symfony\Component\AutoMapper\Transformer\MapperDependency;
 /**
  * Mapper metadata.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 class MapperMetadata implements MapperGeneratorMetadataInterface

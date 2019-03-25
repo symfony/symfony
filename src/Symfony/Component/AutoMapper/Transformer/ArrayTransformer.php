@@ -19,9 +19,11 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Transformer array decorator.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class ArrayTransformer implements TransformerInterface
+final class ArrayTransformer implements TransformerInterface
 {
     private $itemTransformer;
 

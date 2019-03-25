@@ -15,7 +15,14 @@ use PhpParser\PrettyPrinter\Standard;
 use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
-class FileLoader implements ClassLoaderInterface
+/**
+ * Use file system to load mapper, and persist them using a registry
+ *
+ * @expiremental
+ *
+ * @author Joel Wurtz <jwurtz@jolicode.com>
+ */
+final class FileLoader implements ClassLoaderInterface
 {
     private $generator;
 

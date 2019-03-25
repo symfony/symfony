@@ -24,6 +24,8 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
  *
  * Can use a NameConverter to use specific properties name in the source
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class FromTargetMappingExtractor extends MappingExtractor

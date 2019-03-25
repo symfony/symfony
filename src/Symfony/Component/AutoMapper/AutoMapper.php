@@ -40,6 +40,8 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 /**
  * Maps a source data structure (object or array) to a target one.
  *
+ * @expiremental
+ *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
 final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, MapperGeneratorMetadataRegistryInterface

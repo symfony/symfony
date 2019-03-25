@@ -27,5 +27,5 @@ class Unique extends Constraint
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
 
-    public $message = 'This collection should contain only unique elements';
+    public $message = 'This collection should contain only unique elements.';
 }

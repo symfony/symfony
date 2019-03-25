@@ -57,7 +57,7 @@ CHANGELOG
 
  * [DEPRECATION] The `ApacheMatcherDumper` and `ApacheUrlMatcher` were deprecated and
    will be removed in Symfony 3.0, since the performance gains were minimal and
-   it's hard to replicate the behaviour of PHP implementation.
+   it's hard to replicate the behavior of PHP implementation.
 
 2.3.0
 -----

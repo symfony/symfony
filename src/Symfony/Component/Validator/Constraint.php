@@ -256,7 +256,7 @@ abstract class Constraint
      *
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
-     * behaviour.
+     * behavior.
      *
      * @return string
      */

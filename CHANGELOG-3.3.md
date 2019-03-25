@@ -425,7 +425,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #22928 [WebProfilerBundle] Fixed options stub values display in form profiler (HeahDude)
  * feature #22838 Make the simple exception pages match the new style (javiereguiluz)
  * bug #22925 [PhpUnitBridge] Adjust PHPUnit class_alias check to also check for namespaced class (GawainLynch)
- * bug #22718 [Console] Fixed different behaviour of key and value user inputs in multiple choice question (borNfreee)
+ * bug #22718 [Console] Fixed different behavior of key and value user inputs in multiple choice question (borNfreee)
  * bug #22921 [FrameworkBundle] Only override getProjectDir if it exists in the kernel (aschempp)
  * feature #22905 [FrameworkBundle][Validator] Move the PSR-11 factory to the component (ogizanagi)
  * bug #22728 [HttpKernel] Fix kernel.project_dir extensibility (chalasr)

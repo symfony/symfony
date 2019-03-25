@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Form\Console\Descriptor;
 
+use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\VarDumper\Caster\Caster;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -97,7 +95,7 @@ class TextDescriptor extends Descriptor
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 
-        $dump = $this->getDumpFunction();
+        $dump = new Dumper($this->output);
         $map = [];
         if ($definition['deprecated']) {
             $map = [
@@ -179,24 +177,5 @@ class TextDescriptor extends Descriptor
         }
 
         return $options;
-    }
-
-    private function getDumpFunction()
-    {
-        $cloner = new VarCloner();
-        $cloner->addCasters(['Closure' => function ($c, $a) {
-            $prefix = Caster::PREFIX_VIRTUAL;
-
-            return [
-                $prefix.'file' => $a[$prefix.'file'],
-                $prefix.'line' => $a[$prefix.'line'],
-            ];
-        }]);
-        $dumper = new CliDumper(null, null, CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR);
-        $dumper->setColors($this->output->isDecorated());
-
-        return function ($value) use ($dumper, $cloner) {
-            return rtrim($dumper->dump($cloner->cloneVar($value)->withRefHandles(false), true));
-        };
     }
 }

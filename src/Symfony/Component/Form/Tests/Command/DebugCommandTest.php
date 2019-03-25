@@ -153,6 +153,43 @@ TXT
         $this->createCommandTester()->execute(['class' => 'test']);
     }
 
+    public function testDebugCustomFormTypeOption()
+    {
+        $tester = $this->createCommandTester([], [FooType::class]);
+        $ret = $tester->execute(['class' => FooType::class, 'option' => 'foo'], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringMatchesFormat(<<<'TXT'
+
+Symfony\Component\Form\Tests\Command\FooType (foo)
+==================================================
+
+ ---------------- ---------------------------------------------------------------------------%s
+  Required         true                                                                      %w
+ ---------------- ---------------------------------------------------------------------------%s
+  Default          -                                                                         %w
+ ---------------- ---------------------------------------------------------------------------%s
+  Allowed types    [                                                                         %w
+                     "string"                                                                %w
+                   ]                                                                         %w
+ ---------------- ---------------------------------------------------------------------------%s
+  Allowed values   [                                                                         %w
+                     "bar",                                                                  %w
+                     "baz"                                                                   %w
+                   ]                                                                         %w
+ ---------------- ---------------------------------------------------------------------------%s
+  Normalizer       Closure(Options $options, $value) {                                       %w
+                     class: "Symfony\Component\Form\Tests\Command\FooType"                   %w
+                     this: Symfony\Component\Form\Tests\Command\FooType { …}                 %w
+                     file: "%s"%w
+                     line: "%d to %d"%w
+                   }                                                                         %w
+ ---------------- ---------------------------------------------------------------------------%s
+
+TXT
+            , $tester->getDisplay(true));
+    }
+
     private function createCommandTester(array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [])
     {
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());

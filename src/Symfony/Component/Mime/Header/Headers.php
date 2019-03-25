@@ -168,7 +168,7 @@ final class Headers
     public function get(string $name): ?HeaderInterface
     {
         $name = strtolower($name);
-        if (!isset($this->headers[strtolower($name)])) {
+        if (!isset($this->headers[$name])) {
             return null;
         }
 

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-03-25T13:52:38Z
+
+I am not really sure what causes the difference here though. /cc @ro0NL
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-25T14:05:47Z
+
+the `%s/%w` trick is for linux vs windows (the file path exceeded the table length on windows).
+
+i missed the failing test from the original PR: https://travis-ci.org/symfony/symfony/jobs/510860372#L5020 ..., not sure what happened.
+
+It passed before, maybe related to the last minute changes: https://github.com/symfony/symfony/pull/30666/files#diff-4d7446f0cdc9d06df82e038e443e1dbcL184 (removing VarDumper fallback in the component and bumping the deps)

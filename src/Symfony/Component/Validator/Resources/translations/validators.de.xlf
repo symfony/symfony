@@ -330,6 +330,14 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Diese internationale Bankleitzahl (BIC) ist nicht mit der IBAN {{ iban }} assoziiert.</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Dieser Wert sollte gültiges JSON sein.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Diese Sammlung darf keine doppelten Elemente enthalten.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

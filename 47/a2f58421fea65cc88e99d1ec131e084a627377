@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-06-23T11:04:23Z
+
+screenshot updated and JSON version included. I think the data set is pretty nice, and leaves us figuring out how to display processors/processed value in the text table without cluttering output too much. Still need to extract the actual prefixes though :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-06-25T17:27:35Z
+
+text version conceptually ready :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-10T15:54:24Z
+
+> Actually, do we need the json/xml descriptors?
+
+not really, do you suggest to throw from any format other then text?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T16:49:30Z
+
+Throwing an exception sounds good to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-25T18:26:11Z
+
+aiming for
+
+- `debug:container --env-vars` (shows name, default- and real value horizontally)
+- `debug:container --env-vars APP_` (shows matching envs with prefix and processed value vertically)
+- throw in markdown/xml, support text/json (having at least 1 machine format sounds reasonable and it's already there :))
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-27T07:17:22Z
+
+@fabpot for 4.2? Do you suggest to keep the VarDumper dependency for now.. Form component already does it. Otherwise we need to squeeze #28898 as well
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-27T07:51:45Z
+
+screenshots updated
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-27T08:29:18Z
+
+i dropped JSON support as well, no real need for a machine format to inspect/debug envs. They are bound to the current environment/runtime anyway.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-03-08T10:49:42Z
+
+@ro0NL Any chance to finish this one for 4.3? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-24T19:43:20Z
+
+@ro0NL What needs to be done before merging?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-24T19:53:44Z
+
+@fabpot ready. Failures unrelated.

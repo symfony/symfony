@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * HttpKernel notifies events to convert a Request object to a Response one.

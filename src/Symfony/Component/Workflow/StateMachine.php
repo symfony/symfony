@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Workflow;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

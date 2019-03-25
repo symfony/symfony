@@ -38,6 +38,8 @@ class Firewall implements EventSubscriberInterface
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
+        // the type-hint will be updated to the "EventDispatcherInterface" from symfony/contracts in 5.0
+
         $this->map = $map;
         $this->dispatcher = $dispatcher;
         $this->exceptionListeners = new \SplObjectStorage();

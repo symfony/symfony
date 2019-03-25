@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +19,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpCache\SubRequestHandler;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Implements the inline rendering strategy where the Request is rendered by the current HTTP kernel.

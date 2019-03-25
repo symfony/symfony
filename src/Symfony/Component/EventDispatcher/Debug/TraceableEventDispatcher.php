@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -133,7 +134,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
         $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
 
-        if ($event instanceof Event) {
+        if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);
         } else {
             @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
@@ -146,13 +147,13 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             }
         }
 
-        if (null !== $this->logger && $event->isPropagationStopped()) {
+        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 
         $this->preProcess($eventName);
         try {
-            $this->preDispatch($eventName, $event);
+            $this->beforeDispatch($eventName, $event);
             try {
                 $e = $this->stopwatch->start($eventName, 'section');
                 try {
@@ -163,7 +164,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                     }
                 }
             } finally {
-                $this->postDispatch($eventName, $event);
+                $this->afterDispatch($eventName, $event);
             }
         } finally {
             $this->postProcess($eventName);
@@ -262,18 +263,32 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * Called before dispatching the event.
      *
-     * @param string $eventName The event name
-     * @param Event  $event     The event
+     * @param object $event
+     */
+    protected function beforeDispatch(string $eventName, $event)
+    {
+        $this->preDispatch($eventName, $event);
+    }
+
+    /**
+     * Called after dispatching the event.
+     *
+     * @param object $event
+     */
+    protected function afterDispatch(string $eventName, $event)
+    {
+        $this->postDispatch($eventName, $event);
+    }
+
+    /**
+     * @deprecated since Symfony 4.3, will be removed in 5.0, use beforeDispatch instead
      */
     protected function preDispatch($eventName, Event $event)
     {
     }
 
     /**
-     * Called after dispatching the event.
-     *
-     * @param string $eventName The event name
-     * @param Event  $event     The event
+     * @deprecated since Symfony 4.3, will be removed in 5.0, use afterDispatch instead
      */
     protected function postDispatch($eventName, Event $event)
     {

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Messenger\Envelope;
 
 /**
@@ -23,7 +22,7 @@ use Symfony\Component\Messenger\Envelope;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-class SendMessageToTransportsEvent extends Event
+class SendMessageToTransportsEvent
 {
     private $envelope;
 

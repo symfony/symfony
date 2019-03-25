@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Auto
 
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class AutowiredServices
 {

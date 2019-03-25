@@ -17,7 +17,6 @@ use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -34,6 +33,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SecurityDataCollectorTest extends TestCase
 {

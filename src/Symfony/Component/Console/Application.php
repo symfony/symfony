@@ -91,6 +91,9 @@ class Application
         $this->defaultCommand = 'list';
     }
 
+    /**
+     * @final since Symfony 4.3, the type-hint will be updated to the interface from symfony/contracts in 5.0
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);

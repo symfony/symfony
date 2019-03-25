@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +29,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SwitchUserListener allows a user to impersonate another one temporarily

@@ -14,11 +14,15 @@ namespace Symfony\Component\Security\Guard\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class GuardAuthenticatorHandlerTest extends TestCase
 {
@@ -158,11 +162,11 @@ class GuardAuthenticatorHandlerTest extends TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $this->token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $this->request = new Request([], [], [], [], [], []);
-        $this->sessionStrategy = $this->getMockBuilder('Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock();
+        $this->sessionStrategy = $this->getMockBuilder(SessionAuthenticationStrategyInterface::class)->getMock();
         $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
     }
 

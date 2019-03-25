@@ -13,13 +13,13 @@ namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>

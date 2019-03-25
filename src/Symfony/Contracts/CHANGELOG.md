@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `HttpClient` namespace with contracts for implementing flexible HTTP clients
+ * added `EventDispatcher\EventDispatcherInterface`
 
 1.0.0
 -----

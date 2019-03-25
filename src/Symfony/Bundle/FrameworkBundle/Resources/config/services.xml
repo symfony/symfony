@@ -49,6 +49,7 @@
             <tag name="container.hot_path" />
         </service>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
+        <service id="Symfony\Contracts\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel" public="true">
             <argument type="service" id="event_dispatcher" />

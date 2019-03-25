@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\StoppableEventInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 /**
  * An helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
  *
@@ -51,7 +54,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
     {
         $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
 
-        if ($event instanceof Event) {
+        if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);
         } else {
             @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
@@ -65,9 +68,10 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
         }
 
         $listeners = $this->getListeners($eventName);
+        $stoppable = $event instanceof Event || $event instanceof StoppableEventInterface;
 
         foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
+            if ($stoppable && $event->isPropagationStopped()) {
                 break;
             }
             $listener($event, $eventName, $this);

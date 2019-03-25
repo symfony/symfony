@@ -86,11 +86,7 @@ abstract class MappingExtractor implements MappingExtractorInterface
             return null;
         }
 
-        if (null === $this->classMetadataFactory) {
-            return null;
-        }
-
-        if (!$this->classMetadataFactory->getMetadataFor($class)) {
+        if (null === $this->classMetadataFactory || !$this->classMetadataFactory->getMetadataFor($class)) {
             return null;
         }
 
@@ -99,12 +95,14 @@ abstract class MappingExtractor implements MappingExtractorInterface
         $groups = [];
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if ($serializerAttributeMetadata->getGroups()) {
+            $groupsFound = $serializerAttributeMetadata->getGroups();
+
+            if ($groupsFound) {
                 $anyGroupFound = true;
             }
 
             if ($serializerAttributeMetadata->getName() === $property) {
-                $groups = $serializerAttributeMetadata->getGroups();
+                $groups = $groupsFound;
             }
         }
 

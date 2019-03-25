@@ -28,25 +28,19 @@ final class MapperGeneratorMetadataFactory
     private $fromSourcePropertiesMappingExtractor;
     private $fromTargetPropertiesMappingExtractor;
     private $classPrefix;
-    private $attributeChecking = true;
+    private $attributeChecking;
 
     public function __construct(
         SourceTargetMappingExtractor $sourceTargetPropertiesMappingExtractor,
         FromSourceMappingExtractor $fromSourcePropertiesMappingExtractor,
         FromTargetMappingExtractor $fromTargetPropertiesMappingExtractor,
-        string $classPrefix = 'Mapper_'
+        string $classPrefix = 'Mapper_',
+        bool $attributeChecking = true
     ) {
         $this->sourceTargetPropertiesMappingExtractor = $sourceTargetPropertiesMappingExtractor;
         $this->fromSourcePropertiesMappingExtractor = $fromSourcePropertiesMappingExtractor;
         $this->fromTargetPropertiesMappingExtractor = $fromTargetPropertiesMappingExtractor;
         $this->classPrefix = $classPrefix;
-    }
-
-    /**
-     * Whether or not attribute checking code should be generated.
-     */
-    public function setAttributeChecking(bool $attributeChecking): void
-    {
         $this->attributeChecking = $attributeChecking;
     }
 

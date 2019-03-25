@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 
 /**
- * Generate code for a mapping class.
+ * Generates code for a mapping class.
  *
  * @expiremental
  *
@@ -121,7 +121,7 @@ final class Generator
             }
         }
 
-        if (\count($addedDependencies) > 0) {
+        if ($addedDependencies) {
             if ($canHaveCircularDependency) {
                 $statements[] = new Stmt\Expression(new Expr\Assign(
                     $contextVariable,
@@ -232,10 +232,10 @@ final class Generator
                 );
             }
 
-            if (\count($conditions) > 0) {
+            if ($conditions) {
                 $condition = array_shift($conditions);
 
-                while (\count($conditions) > 0) {
+                while ($conditions) {
                     $condition = new Expr\BinaryOp\BooleanAnd($condition, array_shift($conditions));
                 }
 
@@ -244,10 +244,9 @@ final class Generator
                 ])];
             }
 
-            $statements = array_merge(
-                $statements,
-                $propStatements
-            );
+            foreach ($propStatements as $propStatement) {
+                $statements[] = $propStatement;
+            }
         }
 
         $statements[] = new Stmt\Return_($result);

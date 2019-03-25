@@ -46,7 +46,7 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
  */
 final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, MapperGeneratorMetadataRegistryInterface
 {
-    private $metadatas = [];
+    private $metadata = [];
 
     /** @var GeneratedMapper[] */
     private $mapperRegistry = [];
@@ -66,11 +66,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
      */
     public function register(MapperGeneratorMetadataInterface $metadata): void
     {
-        if (!\array_key_exists($metadata->getSource(), $this->metadatas)) {
-            $this->metadatas[$metadata->getSource()] = [];
-        }
-
-        $this->metadatas[$metadata->getSource()][$metadata->getTarget()] = $metadata;
+        $this->metadata[$metadata->getSource()][$metadata->getTarget()] = $metadata;
     }
 
     /**
@@ -170,7 +166,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
      */
     public function getMetadata(string $source, string $target): ?MapperGeneratorMetadataInterface
     {
-        if (!isset($this->metadatas[$source][$target])) {
+        if (!isset($this->metadata[$source][$target])) {
             if (null === $this->mapperConfigurationFactory) {
                 return null;
             }
@@ -178,13 +174,11 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             $this->register($this->mapperConfigurationFactory->create($this, $source, $target));
         }
 
-        return $this->metadatas[$source][$target];
+        return $this->metadata[$source][$target];
     }
 
     /**
-     * Use this for test, benchmark and fast prototyping.
-     *
-     * @internal
+     * Create a default automapper
      */
     public static function create(
         bool $private = true,
@@ -193,8 +187,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
         string $classPrefix = 'Mapper_',
         bool $attributeChecking = true,
         bool $autoRegister = true
-    ): self
-    {
+    ): self {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
 
         if (null === $loader) {
@@ -204,11 +197,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             ));
         }
 
-        if ($private) {
-            $reflectionExtractor = new PrivateReflectionExtractor();
-        } else {
-            $reflectionExtractor = new ReflectionExtractor();
-        }
+        $reflectionExtractor = $private ? new PrivateReflectionExtractor() : new ReflectionExtractor();
 
         $phpDocExtractor = new PhpDocExtractor();
         $propertyInfoExtractor = new PropertyInfoExtractor(
@@ -247,20 +236,16 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             $sourceTargetMappingExtractor,
             $fromSourceMappingExtractor,
             $fromTargetMappingExtractor,
-            $classPrefix
+            $classPrefix,
+            $attributeChecking
         );
-        $factory->setAttributeChecking($attributeChecking);
 
-        if ($autoRegister) {
-            $autoMapper = new self($loader, new MapperGeneratorMetadataFactory(
-                $sourceTargetMappingExtractor,
-                $fromSourceMappingExtractor,
-                $fromTargetMappingExtractor,
-                $classPrefix
-            ));
-        } else {
-            $autoMapper = new self($loader);
-        }
+        $autoMapper = $autoRegister ? new self($loader, new MapperGeneratorMetadataFactory(
+            $sourceTargetMappingExtractor,
+            $fromSourceMappingExtractor,
+            $fromTargetMappingExtractor,
+            $classPrefix
+        )) : new self($loader);
 
         $transformerFactory->addTransformerFactory(new MultipleTransformerFactory($transformerFactory));
         $transformerFactory->addTransformerFactory(new NullableTransformerFactory($transformerFactory));

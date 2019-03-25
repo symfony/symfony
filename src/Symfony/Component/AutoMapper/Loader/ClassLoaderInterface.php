@@ -14,7 +14,7 @@ namespace Symfony\Component\AutoMapper\Loader;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
- * Load (require) a mapping given metadata.
+ * Loads (require) a mapping given metadata.
  */
 interface ClassLoaderInterface
 {

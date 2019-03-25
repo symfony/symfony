@@ -38,11 +38,11 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
- * An auto mapper has the role of mapping a source to a target.
+ * Maps a source data structure (object or array) to a target one.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, MapperGeneratorMetadataRegistryInterface
+final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, MapperGeneratorMetadataRegistryInterface
 {
     private $metadatas = [];
 
@@ -168,7 +168,7 @@ class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, Ma
      */
     public function getMetadata(string $source, string $target): ?MapperGeneratorMetadataInterface
     {
-        if (!\array_key_exists($source, $this->metadatas) || !\array_key_exists($target, $this->metadatas[$source])) {
+        if (!isset($this->metadatas[$source][$target])) {
             if (null === $this->mapperConfigurationFactory) {
                 return null;
             }

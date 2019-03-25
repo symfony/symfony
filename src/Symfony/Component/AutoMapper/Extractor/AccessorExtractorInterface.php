@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper\Extractor;
 
 /**
- * Extract accessor and mutator.
+ * Extracts accessor and mutator.
  *
  * @internal
  *

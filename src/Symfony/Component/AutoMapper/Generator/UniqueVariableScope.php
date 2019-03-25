@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper\Generator;
 
 /**
- * Allow to get a unique variable name for a scope (like a method).
+ * Allows to get a unique variable name for a scope (like a method).
  *
  * @internal
  *

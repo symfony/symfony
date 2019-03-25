@@ -13,7 +13,7 @@ use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
- * Use a generator and eval to requiring mapping of a class.
+ * Uses a generator and eval to requiring mapping of a class.
  */
 class EvalLoader implements ClassLoaderInterface
 {

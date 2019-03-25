@@ -99,7 +99,7 @@ abstract class MappingExtractor implements MappingExtractorInterface
         $groups = [];
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if (\count($serializerAttributeMetadata->getGroups()) > 0) {
+            if ($serializerAttributeMetadata->getGroups()) {
                 $anyGroupFound = true;
             }
 

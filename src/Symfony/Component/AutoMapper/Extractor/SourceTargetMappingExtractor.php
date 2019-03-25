@@ -14,7 +14,7 @@ namespace Symfony\Component\AutoMapper\Extractor;
 use Symfony\Component\AutoMapper\MapperMetadataInterface;
 
 /**
- * Extract mapping between two objects, only give properties that have the same name.
+ * Extracts mapping between two objects, only gives properties that have the same name.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

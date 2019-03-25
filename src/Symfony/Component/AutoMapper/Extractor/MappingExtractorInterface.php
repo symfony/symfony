@@ -14,7 +14,7 @@ namespace Symfony\Component\AutoMapper\Extractor;
 use Symfony\Component\AutoMapper\MapperMetadataInterface;
 
 /**
- * Extract mapping.
+ * Extracts mapping.
  *
  * @internal
  *
@@ -23,19 +23,19 @@ use Symfony\Component\AutoMapper\MapperMetadataInterface;
 interface MappingExtractorInterface
 {
     /**
-     * Extract properties mapped for a given source and target.
+     * Extracts properties mapped for a given source and target.
      *
      * @return PropertyMapping[]
      */
     public function getPropertiesMapping(MapperMetadataInterface $mapperMetadata): array;
 
     /**
-     * Extract read accessor for a given source, target and property.
+     * Extracts read accessor for a given source, target and property.
      */
     public function getReadAccessor(string $source, string $target, string $property): ?ReadAccessor;
 
     /**
-     * Extract write mutator for a given source, target and property.
+     * Extracts write mutator for a given source, target and property.
      */
     public function getWriteMutator(string $source, string $target, string $property): ?WriteMutator;
 }

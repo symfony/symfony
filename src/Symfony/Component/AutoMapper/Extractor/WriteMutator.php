@@ -20,7 +20,7 @@ use PhpParser\Node\Stmt;
 use Symfony\Component\AutoMapper\Exception\CompileException;
 
 /**
- * Write mutator tell how to write to a property.
+ * Writes mutator tell how to write to a property.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

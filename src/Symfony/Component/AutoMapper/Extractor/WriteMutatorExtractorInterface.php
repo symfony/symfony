@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper\Extractor;
 
 /**
- * Extract write mutator for property of a class.
+ * Extracts write mutator for property of a class.
  *
  * @internal
  *
@@ -20,5 +20,5 @@ namespace Symfony\Component\AutoMapper\Extractor;
  */
 interface WriteMutatorExtractorInterface
 {
-    public function getWriteMutator(string $class, string $property, bool $allowConstruct = true): ?WriteMutator;
+    public function getWriteMutator(string $class, string $property, bool $allowConstructor = true): ?WriteMutator;
 }

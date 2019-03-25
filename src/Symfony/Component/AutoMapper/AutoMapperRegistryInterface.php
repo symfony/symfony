@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper;
 
 /**
- * Allow to retrieve mapper.
+ * Allows to retrieve a mapper.
  *
  * @internal
  *
@@ -21,7 +21,7 @@ namespace Symfony\Component\AutoMapper;
 interface AutoMapperRegistryInterface
 {
     /**
-     * Get a specific mapper for a source type and a target type.
+     * Gets a specific mapper for a source type and a target type.
      *
      * @param string $source Source type
      * @param string $target Target type

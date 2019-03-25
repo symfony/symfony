@@ -19,7 +19,7 @@ namespace Symfony\Component\AutoMapper;
 interface AutoMapperInterface
 {
     /**
-     * Map data from a source to a target.
+     * Maps data from a source to a target.
      *
      * @param array|object        $source  Any data object, which may be an object or an array
      * @param string|array|object $target  To which type of data, or data, the source should be mapped

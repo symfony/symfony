@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper\Extractor;
 
 /**
- * Extract accessor and mutator from reflection.
+ * Extracts accessor and mutator from reflection.
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

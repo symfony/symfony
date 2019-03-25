@@ -16,7 +16,7 @@ use Symfony\Component\AutoMapper\Exception\CircularReferenceException;
 /**
  * Context for mapping.
  *
- * Allow to customize how is done the mapping
+ * Allows to customize how is done the mapping
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

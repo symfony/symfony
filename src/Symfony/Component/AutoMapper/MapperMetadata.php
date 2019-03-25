@@ -111,7 +111,7 @@ class MapperMetadata implements MapperGeneratorMetadataInterface
             }
         }
 
-        if (0 === \count($mandatoryParameters)) {
+        if (!$mandatoryParameters) {
             return true;
         }
 

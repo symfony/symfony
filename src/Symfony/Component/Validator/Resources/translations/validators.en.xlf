@@ -334,6 +334,10 @@
                 <source>This value should be valid JSON.</source>
                 <target>This value should be valid JSON.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>This collection should contain only unique elements.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -288,33 +288,36 @@ final class Generator
 
     private function getCreateObjectStatements(MapperGeneratorMetadataInterface $mapperMetadata, Expr\Variable $result, Expr\Variable $contextVariable, Expr\Variable $sourceInput, UniqueVariableScope $uniqueVariableScope): array
     {
-        if ('array' === $mapperMetadata->getTarget()) {
+        $target = $mapperMetadata->getTarget();
+        $source = $mapperMetadata->getSource();
+
+        if ('array' === $target) {
             return [[new Stmt\Expression(new Expr\Assign($result, new Expr\Array_()))], [], [], []];
         }
 
-        if (\stdClass::class === $mapperMetadata->getTarget()) {
+        if (\stdClass::class === $target) {
             return [[new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name(\stdClass::class))))], [], [], []];
         }
 
-        $reflectionClass = new \ReflectionClass($mapperMetadata->getTarget());
+        $reflectionClass = new \ReflectionClass($target);
         $targetConstructor = $reflectionClass->getConstructor();
         $createObjectStatements = [];
         $inConstructor = [];
         $constructStatements = [];
         $injectMapperStatements = [];
         /** @var ClassDiscriminatorMapping $classDiscriminatorMapping */
-        $classDiscriminatorMapping = 'array' !== $mapperMetadata->getTarget() && null !== $this->classDiscriminator ? $this->classDiscriminator->getMappingForClass($mapperMetadata->getTarget()) : null;
+        $classDiscriminatorMapping = 'array' !== $target && null !== $this->classDiscriminator ? $this->classDiscriminator->getMappingForClass($target) : null;
 
         if (null !== $classDiscriminatorMapping && null !== ($propertyMapping = $mapperMetadata->getPropertyMapping($classDiscriminatorMapping->getTypeProperty()))) {
             [$output, $createObjectStatements] = $propertyMapping->getTransformer()->transform($propertyMapping->getReadAccessor()->getExpression($sourceInput), $propertyMapping, $uniqueVariableScope);
 
             foreach ($classDiscriminatorMapping->getTypesMapping() as $typeValue => $typeTarget) {
-                $mapperName = 'Discriminator_Mapper_'.$mapperMetadata->getSource().'_'.$typeTarget;
+                $mapperName = 'Discriminator_Mapper_'.$source.'_'.$typeTarget;
 
                 $injectMapperStatements[] = new Stmt\Expression(new Expr\Assign(
                     new Expr\ArrayDimFetch(new Expr\PropertyFetch(new Expr\Variable('this'), 'mappers'), new Scalar\String_($mapperName)),
                     new Expr\MethodCall(new Expr\Variable('autoMapperRegistry'), 'getMapper', [
-                        new Arg(new Scalar\String_($mapperMetadata->getSource())),
+                        new Arg(new Scalar\String_($source)),
                         new Arg(new Scalar\String_($typeTarget)),
                     ])
                 ));
@@ -353,12 +356,12 @@ final class Generator
 
                 $propStatements[] = new Stmt\Expression(new Expr\Assign($constructVar, $output));
                 $createObjectStatements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, 'hasConstructorArgument', [
-                    new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                    new Arg(new Scalar\String_($target)),
                     new Arg(new Scalar\String_($propertyMapping->getProperty())),
                 ]), [
                     'stmts' => [
                         new Stmt\Expression(new Expr\Assign($constructVar, new Expr\MethodCall($contextVariable, 'getConstructorArgument', [
-                            new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                            new Arg(new Scalar\String_($target)),
                             new Arg(new Scalar\String_($propertyMapping->getProperty())),
                         ]))),
                     ],
@@ -373,12 +376,12 @@ final class Generator
                     $constructVar = new Expr\Variable($uniqueVariableScope->getUniqueName('constructArg'));
 
                     $createObjectStatements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, 'hasConstructorArgument', [
-                        new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                        new Arg(new Scalar\String_($target)),
                         new Arg(new Scalar\String_($constructorParameter->getName())),
                     ]), [
                         'stmts' => [
                             new Stmt\Expression(new Expr\Assign($constructVar, new Expr\MethodCall($contextVariable, 'getConstructorArgument', [
-                                new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                                new Arg(new Scalar\String_($target)),
                                 new Arg(new Scalar\String_($constructorParameter->getName())),
                             ]))),
                         ],
@@ -393,12 +396,12 @@ final class Generator
 
             ksort($constructArguments);
 
-            $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name\FullyQualified($mapperMetadata->getTarget()), $constructArguments)));
+            $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name\FullyQualified($target), $constructArguments)));
         } elseif (null !== $targetConstructor && $mapperMetadata->isTargetCloneable()) {
             $constructStatements[] = new Stmt\Expression(new Expr\Assign(
                 new Expr\PropertyFetch(new Expr\Variable('this'), 'cachedTarget'),
                 new Expr\MethodCall(new Expr\New_(new Name\FullyQualified(\ReflectionClass::class), [
-                    new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                    new Arg(new Scalar\String_($target)),
                 ]), 'newInstanceWithoutConstructor')
             ));
             $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\Clone_(new Expr\PropertyFetch(new Expr\Variable('this'), 'cachedTarget'))));
@@ -406,7 +409,7 @@ final class Generator
             $constructStatements[] = new Stmt\Expression(new Expr\Assign(
                 new Expr\PropertyFetch(new Expr\Variable('this'), 'cachedTarget'),
                 new Expr\New_(new Name\FullyQualified(\ReflectionClass::class), [
-                    new Arg(new Scalar\String_($mapperMetadata->getTarget())),
+                    new Arg(new Scalar\String_($target)),
                 ])
             ));
             $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\MethodCall(
@@ -414,7 +417,7 @@ final class Generator
                 'newInstanceWithoutConstructor'
             )));
         } else {
-            $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name\FullyQualified($mapperMetadata->getTarget()))));
+            $createObjectStatements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\New_(new Name\FullyQualified($target))));
         }
 
         return [$createObjectStatements, $inConstructor, $constructStatements, $injectMapperStatements];

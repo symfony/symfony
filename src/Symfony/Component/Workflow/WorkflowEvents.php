@@ -12,7 +12,7 @@
 namespace Symfony\Component\Workflow;
 
 /**
- * To learn more about how form events work check the documentation
+ * To learn more about how workflow events work check the documentation
  * entry at {@link https://symfony.com/doc/current/workflow/usage.html#using-events}.
  */
 final class WorkflowEvents

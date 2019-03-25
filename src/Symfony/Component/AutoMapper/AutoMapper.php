@@ -46,6 +46,7 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
  */
 final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterface, MapperGeneratorMetadataRegistryInterface
 {
+    /** @var MapperGeneratorMetadataInterface[] */
     private $metadata = [];
 
     /** @var GeneratedMapper[] */
@@ -55,7 +56,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
 
     private $mapperConfigurationFactory;
 
-    public function __construct(ClassLoaderInterface $classLoader, MapperGeneratorMetadataFactory $mapperConfigurationFactory = null)
+    public function __construct(ClassLoaderInterface $classLoader, MapperGeneratorMetadataFactoryInterface $mapperConfigurationFactory = null)
     {
         $this->classLoader = $classLoader;
         $this->mapperConfigurationFactory = $mapperConfigurationFactory;
@@ -178,7 +179,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
     }
 
     /**
-     * Create a default automapper
+     * Create an automapper.
      */
     public static function create(
         bool $private = true,
@@ -232,19 +233,12 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             $nameConverter
         );
 
-        $factory = new MapperGeneratorMetadataFactory(
+        $autoMapper = $autoRegister ? new self($loader, new MapperGeneratorMetadataFactory(
             $sourceTargetMappingExtractor,
             $fromSourceMappingExtractor,
             $fromTargetMappingExtractor,
             $classPrefix,
             $attributeChecking
-        );
-
-        $autoMapper = $autoRegister ? new self($loader, new MapperGeneratorMetadataFactory(
-            $sourceTargetMappingExtractor,
-            $fromSourceMappingExtractor,
-            $fromTargetMappingExtractor,
-            $classPrefix
         )) : new self($loader);
 
         $transformerFactory->addTransformerFactory(new MultipleTransformerFactory($transformerFactory));

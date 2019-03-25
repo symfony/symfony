@@ -22,7 +22,7 @@ use Symfony\Component\AutoMapper\Extractor\SourceTargetMappingExtractor;
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */
-final class MapperGeneratorMetadataFactory
+final class MapperGeneratorMetadataFactory implements MapperGeneratorMetadataFactoryInterface
 {
     private $sourceTargetPropertiesMappingExtractor;
     private $fromSourcePropertiesMappingExtractor;
@@ -47,7 +47,7 @@ final class MapperGeneratorMetadataFactory
     /**
      * Create metadata for a source and target.
      */
-    public function create(MapperGeneratorMetadataRegistryInterface $autoMapperRegister, string $source, string $target): MapperMetadata
+    public function create(MapperGeneratorMetadataRegistryInterface $autoMapperRegister, string $source, string $target): MapperGeneratorMetadataInterface
     {
         $extractor = $this->sourceTargetPropertiesMappingExtractor;
 

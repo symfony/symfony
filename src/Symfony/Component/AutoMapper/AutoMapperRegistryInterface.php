@@ -35,8 +35,6 @@ interface AutoMapperRegistryInterface
      *
      * @param string $source Source type
      * @param string $target Target type
-     *
-     * @return bool
      */
     public function hasMapper(string $source, string $target): bool;
 }

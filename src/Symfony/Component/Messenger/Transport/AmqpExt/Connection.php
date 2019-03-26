@@ -343,7 +343,12 @@ class Connection
         return $this->amqpQueue;
     }
 
-    public function exchange(): \AMQPExchange
+    public function getConnectionConfiguration(): array
+    {
+        return $this->connectionConfiguration;
+    }
+
+    private function exchange(): \AMQPExchange
     {
         if (null === $this->amqpExchange) {
             $this->amqpExchange = $this->amqpFactory->createExchange($this->channel());
@@ -357,11 +362,6 @@ class Connection
         }
 
         return $this->amqpExchange;
-    }
-
-    public function getConnectionConfiguration(): array
-    {
-        return $this->connectionConfiguration;
     }
 
     private function clear(): void

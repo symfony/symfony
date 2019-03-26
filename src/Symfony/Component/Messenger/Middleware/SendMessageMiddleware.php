@@ -62,18 +62,19 @@ class SendMessageMiddleware implements MiddlewareInterface
                 /** @var RedeliveryStamp|null $redeliveryStamp */
                 $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-                $senders = \iterator_to_array($this->sendersLocator->getSenders($envelope, $handle));
-
-                if (null !== $this->eventDispatcher && \count($senders) > 0) {
-                    $event = new SendMessageToTransportsEvent($envelope);
-                    $this->eventDispatcher->dispatch($event);
-                    $envelope = $event->getEnvelope();
-                }
-
-                foreach ($senders as $alias => $sender) {
+                // dispatch event unless this is a redelivery
+                $shouldDispatchEvent = null === $redeliveryStamp;
+                foreach ($this->sendersLocator->getSenders($envelope, $handle) as $alias => $sender) {
                     // on redelivery, only deliver to the given sender
                     if (null !== $redeliveryStamp && !$redeliveryStamp->shouldRedeliverToSender(\get_class($sender), $alias)) {
                         continue;
+                    }
+
+                    if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
+                        $event = new SendMessageToTransportsEvent($envelope);
+                        $this->eventDispatcher->dispatch($event);
+                        $envelope = $event->getEnvelope();
+                        $shouldDispatchEvent = false;
                     }
 
                     $this->logger->info('Sending message "{class}" with "{sender}"', $context + ['sender' => \get_class($sender)]);

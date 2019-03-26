@@ -53,7 +53,7 @@ class Bic extends Constraint
         }
 
         if (isset($options['iban']) && isset($options['ibanPropertyPath'])) {
-            throw new ConstraintDefinitionException(sprintf('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time.', self::class));
+            throw new ConstraintDefinitionException('The "iban" and "ibanPropertyPath" options of the Iban constraint cannot be used at the same time.');
         }
 
         if (isset($options['ibanPropertyPath']) && !class_exists(PropertyAccess::class)) {

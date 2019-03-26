@@ -32,6 +32,8 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     private $discriminatorCache = [];
 
+    private $objectClassResolver;
+
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         if (!\class_exists(PropertyAccess::class)) {
@@ -41,6 +43,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->objectClassResolver = $objectClassResolver;
     }
 
     /**
@@ -60,7 +63,9 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $attributes = [];
 
         // methods
-        $reflClass = new \ReflectionClass($object);
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $reflClass = new \ReflectionClass($class);
+
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             if (
                 0 !== $reflMethod->getNumberOfRequiredParameters() ||

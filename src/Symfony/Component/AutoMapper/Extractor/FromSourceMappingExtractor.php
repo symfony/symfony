@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
  *
  * Can use a NameConverter to use specific properties name in the target
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

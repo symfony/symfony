@@ -21,7 +21,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Transform a string to a \DateTimeInterface object.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

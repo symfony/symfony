@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 /**
  * Generates code for a mapping class.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

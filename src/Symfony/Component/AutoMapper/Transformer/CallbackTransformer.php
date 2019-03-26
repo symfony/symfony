@@ -20,7 +20,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Handle custom callback transformation.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

@@ -40,7 +40,7 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 /**
  * Maps a source data structure (object or array) to a target one.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

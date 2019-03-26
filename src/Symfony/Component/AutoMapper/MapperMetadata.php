@@ -20,7 +20,7 @@ use Symfony\Component\AutoMapper\Transformer\MapperDependency;
 /**
  * Mapper metadata.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

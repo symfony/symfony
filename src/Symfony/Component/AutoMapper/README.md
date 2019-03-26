@@ -3,6 +3,11 @@ AutoMapper Component
 
 The AutoMapper component maps data between different domains.
 
+**This Component is experimental**.
+[Experimental features](https://symfony.com/doc/current/contributing/code/experimental.html)
+are not covered by Symfony's
+[Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
+
 Resources
 ---------
 

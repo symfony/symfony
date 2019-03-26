@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
  * Decorate transformers with condition to handle property with multiples source types
  * It will always use the first target type possible for transformation
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

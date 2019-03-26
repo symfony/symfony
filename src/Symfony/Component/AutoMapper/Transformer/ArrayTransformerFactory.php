@@ -17,7 +17,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Create a decorated transformer to handle array type.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

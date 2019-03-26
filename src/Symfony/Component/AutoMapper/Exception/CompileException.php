@@ -12,7 +12,7 @@
 namespace Symfony\Component\AutoMapper\Exception;
 
 /**
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

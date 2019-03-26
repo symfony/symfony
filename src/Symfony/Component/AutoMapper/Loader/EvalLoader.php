@@ -18,7 +18,7 @@ use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 /**
  * Use eval to load mappers.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

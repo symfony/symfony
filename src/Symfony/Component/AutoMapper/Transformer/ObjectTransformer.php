@@ -23,7 +23,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Transform to an object which can be mapped by AutoMapper (sub mapping).
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

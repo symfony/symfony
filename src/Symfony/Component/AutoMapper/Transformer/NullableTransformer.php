@@ -20,7 +20,7 @@ use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
 /**
  * Tansformer decorator to handle null values.
  *
- * @expiremental
+ * @expiremental in 4.3
  *
  * @author Joel Wurtz <jwurtz@jolicode.com>
  */

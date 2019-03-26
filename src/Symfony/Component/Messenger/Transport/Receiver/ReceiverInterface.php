@@ -34,7 +34,7 @@ interface ReceiverInterface
      *
      * @throws TransportException If there is an issue communicating with the transport
      */
-    public function receive(callable $handler): void;
+    public function receive(callable $handler, array $queues = []): void;
 
     /**
      * Stop receiving some messages.

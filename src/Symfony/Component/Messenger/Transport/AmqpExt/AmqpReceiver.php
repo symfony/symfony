@@ -41,11 +41,22 @@ class AmqpReceiver implements ReceiverInterface
     /**
      * {@inheritdoc}
      */
-    public function receive(callable $handler): void
+    public function receive(callable $handler, array $queues = []): void
     {
+        if (0 === \count($queues)) {
+            $queues[] = null;
+        }
+
         while (!$this->shouldStop) {
             try {
-                $amqpEnvelope = $this->connection->get();
+                foreach ($queues as $queue) {
+                    $amqpEnvelope = $this->connection->get($queue);
+
+                    // stop when you find one
+                    if (null !== $amqpEnvelope) {
+                        break;
+                    }
+                }
             } catch (\AMQPException $exception) {
                 throw new TransportException($exception->getMessage(), 0, $exception);
             }

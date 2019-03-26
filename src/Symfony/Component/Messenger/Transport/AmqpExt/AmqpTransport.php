@@ -37,9 +37,9 @@ class AmqpTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function receive(callable $handler): void
+    public function receive(callable $handler, array $queues = null): void
     {
-        ($this->receiver ?? $this->getReceiver())->receive($handler);
+        ($this->receiver ?? $this->getReceiver())->receive($handler, $queues);
     }
 
     /**

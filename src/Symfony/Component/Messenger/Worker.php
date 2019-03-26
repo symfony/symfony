@@ -37,15 +37,17 @@ class Worker
 {
     private $receiver;
     private $bus;
+    private $queues;
     private $receiverName;
     private $retryStrategy;
     private $eventDispatcher;
     private $logger;
 
-    public function __construct(ReceiverInterface $receiver, MessageBusInterface $bus, string $receiverName = null, RetryStrategyInterface $retryStrategy = null, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    public function __construct(ReceiverInterface $receiver, MessageBusInterface $bus, array $queues, string $receiverName = null, RetryStrategyInterface $retryStrategy = null, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
     {
         $this->receiver = $receiver;
         $this->bus = $bus;
+        $this->queues = $queues;
         if (null === $receiverName) {
             @trigger_error(sprintf('Instantiating the "%s" class without passing a third argument is deprecated since Symfony 4.3.', __CLASS__), E_USER_DEPRECATED);
 
@@ -138,7 +140,7 @@ class Worker
             if (\function_exists('pcntl_signal_dispatch')) {
                 pcntl_signal_dispatch();
             }
-        });
+        }, $this->queues);
     }
 
     private function dispatchEvent(Event $event)

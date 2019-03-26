@@ -75,6 +75,7 @@ class ConsumeMessagesCommand extends Command
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
                 new InputOption('time-limit', 't', InputOption::VALUE_REQUIRED, 'The time limit in seconds the worker can run'),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically.'),
+                new InputOption('queues', null, InputOption::VALUE_REQUIRED, 'comma-separated list of queue names in order of priority'),
             ])
             ->setDescription('Consumes messages')
             ->setHelp(<<<'EOF'
@@ -183,7 +184,15 @@ EOF
             $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
-        $worker = new Worker($receiver, $bus, $receiverName, $retryStrategy, $this->eventDispatcher, $this->logger);
+        // TODO - make "default" equal to null?
+        $queues = [];
+        if (null !== $input->getOption('queues')) {
+            $queues = array_map(function ($queue) {
+                return trim($queue);
+            }, explode(',', $input->getOption('queues')));
+        }
+
+        $worker = new Worker($receiver, $bus, $queues, $receiverName, $retryStrategy, $this->eventDispatcher, $this->logger);
         $worker->run();
     }
 

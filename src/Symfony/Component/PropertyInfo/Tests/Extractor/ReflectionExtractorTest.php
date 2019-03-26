@@ -13,11 +13,14 @@ namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Type;
@@ -272,7 +275,7 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertSame(
             $expected,
-            $this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, [])
+            $this->extractor->isWritable(Dummy::class, $property, [])
         );
     }
 
@@ -367,6 +370,19 @@ class ReflectionExtractorTest extends TestCase
         ];
     }
 
+    public function testNullOnPrivateProtectedAccessor()
+    {
+        $barAcessor = $this->extractor->getReadInfo(Dummy::class, 'bar');
+        $barMutator = $this->extractor->getWriteInfo(Dummy::class, 'bar');
+        $bazAcessor = $this->extractor->getReadInfo(Dummy::class, 'baz');
+        $bazMutator = $this->extractor->getWriteInfo(Dummy::class, 'baz');
+
+        $this->assertNull($barAcessor);
+        $this->assertNull($barMutator);
+        $this->assertNull($bazAcessor);
+        $this->assertNull($bazMutator);
+    }
+
     /**
      * @requires PHP 7.4
      */
@@ -374,5 +390,108 @@ class ReflectionExtractorTest extends TestCase
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)], $this->extractor->getTypes(Php74Dummy::class, 'dummy'));
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL, true)], $this->extractor->getTypes(Php74Dummy::class, 'nullableBoolProp'));
+    }
+
+    /**
+     * @dataProvider readAccessorProvider
+     */
+    public function testGetReadAccessor($class, $property, $found, $type, $name, $visibility, $static)
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $readAcessor = $extractor->getReadInfo($class, $property);
+
+        if (!$found) {
+            $this->assertNull($readAcessor);
+
+            return;
+        }
+
+        $this->assertNotNull($readAcessor);
+        $this->assertSame($type, $readAcessor->getType());
+        $this->assertSame($name, $readAcessor->getName());
+        $this->assertSame($visibility, $readAcessor->getVisibility());
+        $this->assertSame($static, $readAcessor->isStatic());
+    }
+
+    public function readAccessorProvider(): array
+    {
+        return [
+            [Dummy::class, 'bar', true, PropertyReadInfo::TYPE_PROPERTY, 'bar', PropertyReadInfo::VISIBILITY_PRIVATE, false],
+            [Dummy::class, 'baz', true, PropertyReadInfo::TYPE_PROPERTY, 'baz', PropertyReadInfo::VISIBILITY_PROTECTED, false],
+            [Dummy::class, 'bal', true, PropertyReadInfo::TYPE_PROPERTY, 'bal', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Dummy::class, 'parent', true, PropertyReadInfo::TYPE_PROPERTY, 'parent', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Dummy::class, 'static', true, PropertyReadInfo::TYPE_METHOD, 'getStatic', PropertyReadInfo::VISIBILITY_PUBLIC, true],
+            [Dummy::class, 'foo', true, PropertyReadInfo::TYPE_PROPERTY, 'foo', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'foo', true, PropertyReadInfo::TYPE_METHOD, 'getFoo', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'buz', true, PropertyReadInfo::TYPE_METHOD, 'getBuz', PropertyReadInfo::VISIBILITY_PUBLIC, false],
+        ];
+    }
+
+    /**
+     * @dataProvider writeMutatorProvider
+     */
+    public function testGetWriteMutator($class, $property, $allowConstruct, $found, $type, $name, $addName, $removeName, $visibility, $static)
+    {
+        $extractor = new ReflectionExtractor(null, null, null, true, ReflectionExtractor::ALLOW_PUBLIC | ReflectionExtractor::ALLOW_PROTECTED | ReflectionExtractor::ALLOW_PRIVATE);
+        $writeMutator = $extractor->getWriteInfo($class, $property, [
+            'enable_constructor_extraction' => $allowConstruct,
+            'enable_getter_setter_extraction' => true,
+        ]);
+
+        if (!$found) {
+            $this->assertNull($writeMutator);
+
+            return;
+        }
+
+        $this->assertNotNull($writeMutator);
+        $this->assertSame($type, $writeMutator->getType());
+
+        if (PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $writeMutator->getType()) {
+            $this->assertNotNull($writeMutator->getAdderInfo());
+            $this->assertSame($addName, $writeMutator->getAdderInfo()->getName());
+            $this->assertNotNull($writeMutator->getRemoverInfo());
+            $this->assertSame($removeName, $writeMutator->getRemoverInfo()->getName());
+        }
+
+        if (PropertyWriteInfo::TYPE_CONSTRUCTOR === $writeMutator->getType()) {
+            $this->assertSame($name, $writeMutator->getName());
+        }
+
+        if (PropertyWriteInfo::TYPE_PROPERTY === $writeMutator->getType()) {
+            $this->assertSame($name, $writeMutator->getName());
+            $this->assertSame($visibility, $writeMutator->getVisibility());
+            $this->assertSame($static, $writeMutator->isStatic());
+        }
+
+        if (PropertyWriteInfo::TYPE_METHOD === $writeMutator->getType()) {
+            $this->assertSame($name, $writeMutator->getName());
+            $this->assertSame($visibility, $writeMutator->getVisibility());
+            $this->assertSame($static, $writeMutator->isStatic());
+        }
+    }
+
+    public function writeMutatorProvider(): array
+    {
+        return [
+            [Dummy::class, 'bar', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'bar', null, null, PropertyWriteInfo::VISIBILITY_PRIVATE, false],
+            [Dummy::class, 'baz', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'baz', null, null, PropertyWriteInfo::VISIBILITY_PROTECTED, false],
+            [Dummy::class, 'bal', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'bal', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Dummy::class, 'parent', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'parent', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Dummy::class, 'staticSetter', false, true, PropertyWriteInfo::TYPE_METHOD, 'staticSetter', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, true],
+            [Dummy::class, 'foo', false, true, PropertyWriteInfo::TYPE_PROPERTY, 'foo', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'bar', false, true, PropertyWriteInfo::TYPE_METHOD, 'setBar', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'string', false, false, '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'string', true, true,  PropertyWriteInfo::TYPE_CONSTRUCTOR, 'string', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71Dummy::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended::class, 'bar', false, true, PropertyWriteInfo::TYPE_METHOD, 'setBar', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended::class, 'string', false, false, -1, '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended::class, 'string', true, true, PropertyWriteInfo::TYPE_CONSTRUCTOR, 'string', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended2::class, 'bar', false, true, PropertyWriteInfo::TYPE_METHOD, 'setBar', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended2::class, 'string', false, false, '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended2::class, 'string', true, false,  '', '', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+            [Php71DummyExtended2::class, 'baz', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addBaz', 'removeBaz', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
+        ];
     }
 }

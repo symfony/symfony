@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "symfony/inflector": "^4.4|^5.0"
+        "symfony/inflector": "^4.4|^5.0",
+        "symfony/property-info": "^4.4|^5.0"
     },
     "require-dev": {
         "symfony/cache": "^4.4|^5.0"

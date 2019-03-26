@@ -15,7 +15,11 @@ use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyReadInfo;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -25,7 +29,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface
 {
     /**
      * @internal
@@ -56,7 +60,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $accessorPrefixes;
     private $arrayMutatorPrefixes;
     private $enableConstructorExtraction;
-    private $accessFlags;
+    private $methodReflectionFlags;
+    private $propertyReflectionFlags;
 
     /**
      * @param string[]|null $mutatorPrefixes
@@ -69,7 +74,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
         $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
         $this->enableConstructorExtraction = $enableConstructorExtraction;
-        $this->accessFlags = $accessFlags;
+        $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
+        $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
     }
 
     /**
@@ -83,34 +89,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
-        $propertyFlags = 0;
-        $methodFlags = 0;
-
-        if ($this->accessFlags & self::ALLOW_PUBLIC) {
-            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PUBLIC;
-            $methodFlags = $methodFlags | \ReflectionMethod::IS_PUBLIC;
-        }
-
-        if ($this->accessFlags & self::ALLOW_PRIVATE) {
-            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PRIVATE;
-            $methodFlags = $methodFlags | \ReflectionMethod::IS_PRIVATE;
-        }
-
-        if ($this->accessFlags & self::ALLOW_PROTECTED) {
-            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PROTECTED;
-            $methodFlags = $methodFlags | \ReflectionMethod::IS_PROTECTED;
-        }
-
         $reflectionProperties = $reflectionClass->getProperties();
 
         $properties = [];
         foreach ($reflectionProperties as $reflectionProperty) {
-            if ($reflectionProperty->getModifiers() & $propertyFlags) {
+            if ($reflectionProperty->getModifiers() & $this->propertyReflectionFlags) {
                 $properties[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
 
-        foreach ($reflectionClass->getMethods($methodFlags) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods($this->methodReflectionFlags) as $reflectionMethod) {
             if ($reflectionMethod->isStatic()) {
                 continue;
             }
@@ -176,9 +164,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return true;
         }
 
-        list($reflectionMethod) = $this->getAccessorMethod($class, $property);
-
-        return null !== $reflectionMethod;
+        return null !== $this->getReadInfo($class, $property, $context);
     }
 
     /**
@@ -221,6 +207,135 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReadInfo(string $class, string $property, array $context = []): ?PropertyReadInfo
+    {
+        try {
+            $reflClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
+        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+
+        $hasProperty = $reflClass->hasProperty($property);
+        $camelProp = $this->camelize($property);
+        $getsetter = lcfirst($camelProp); // jQuery style, e.g. read: last(), write: last($item)
+
+        foreach ($this->accessorPrefixes as $prefix) {
+            $methodName = $prefix.$camelProp;
+
+            if ($reflClass->hasMethod($methodName) && ($reflClass->getMethod($methodName)->getModifiers() & $this->methodReflectionFlags)) {
+                $method = $reflClass->getMethod($methodName);
+
+                return PropertyReadInfo::forMethod($methodName, $this->getReadVisiblityForMethod($method), $method->isStatic());
+            }
+        }
+
+        if ($allowGetterSetter && $reflClass->hasMethod($getsetter) && ($reflClass->getMethod($getsetter)->getModifiers() & $this->methodReflectionFlags)) {
+            $method = $reflClass->getMethod($getsetter);
+
+            return PropertyReadInfo::forMethod($getsetter, $this->getReadVisiblityForMethod($method), $method->isStatic());
+        }
+
+        if ($hasProperty && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
+            $reflProperty = $reflClass->getProperty($property);
+
+            return PropertyReadInfo::forProperty($property, $this->getReadVisiblityForProperty($reflProperty), $reflProperty->isStatic(), true);
+        }
+
+        if ($reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
+            return PropertyReadInfo::forProperty($property, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
+        }
+
+        if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
+            return PropertyReadInfo::forMethod('get'.$camelProp, PropertyReadInfo::VISIBILITY_PUBLIC, false);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
+    {
+        try {
+            $reflClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
+        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        $allowConstruct = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
+        $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
+
+        $camelized = $this->camelize($property);
+        $constructor = $reflClass->getConstructor();
+
+        if (null !== $constructor && $allowConstruct) {
+            foreach ($constructor->getParameters() as $parameter) {
+                if ($parameter->getName() === $property) {
+                    return PropertyWriteInfo::forConstructor($property);
+                }
+            }
+        }
+
+        if ($allowAdderRemover && null !== $methods = $this->findAdderAndRemover($reflClass, (array) Inflector::singularize($camelized))) {
+            [$adderAccessName, $removerAccessName] = $methods;
+
+            $adderMethod = $reflClass->getMethod($adderAccessName);
+            $removerMethod = $reflClass->getMethod($removerAccessName);
+
+            return PropertyWriteInfo::forAdderAndRemover(
+                PropertyWriteInfo::forMethod($adderAccessName, $this->getWriteVisiblityForMethod($adderMethod), $adderMethod->isStatic()),
+                PropertyWriteInfo::forMethod($removerAccessName, $this->getWriteVisiblityForMethod($removerMethod), $removerMethod->isStatic())
+            );
+        }
+
+        foreach ($this->mutatorPrefixes as $mutatorPrefix) {
+            $methodName = $mutatorPrefix.$camelized;
+
+            if (!$this->isMethodAccessible($reflClass, $methodName, 1)) {
+                continue;
+            }
+
+            $method = $reflClass->getMethod($methodName);
+
+            if (!\in_array($mutatorPrefix, $this->arrayMutatorPrefixes, true)) {
+                return PropertyWriteInfo::forMethod($methodName, $this->getWriteVisiblityForMethod($method), $method->isStatic());
+            }
+        }
+
+        $getsetter = lcfirst($camelized);
+
+        if ($allowGetterSetter && $this->isMethodAccessible($reflClass, $getsetter, 1)) {
+            $method = $reflClass->getMethod($getsetter);
+
+            return PropertyWriteInfo::forMethod($getsetter, $this->getWriteVisiblityForMethod($method), $method->isStatic());
+        }
+
+        if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
+            $reflProperty = $reflClass->getProperty($property);
+
+            return PropertyWriteInfo::forProperty($property, $this->getWriteVisiblityForProperty($reflProperty), $reflProperty->isStatic());
+        }
+
+        if ($this->isMethodAccessible($reflClass, '__set', 2)) {
+            return PropertyWriteInfo::forProperty($property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+        }
+
+        if ($allowMagicCall && $this->isMethodAccessible($reflClass, '__call', 2)) {
+            return PropertyWriteInfo::forMethod('set'.$camelized, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+        }
+
+        return null;
     }
 
     /**
@@ -360,19 +475,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
-            if ($this->accessFlags & self::ALLOW_PUBLIC && $reflectionProperty->isPublic()) {
-                return true;
-            }
-
-            if ($this->accessFlags & self::ALLOW_PROTECTED && $reflectionProperty->isProtected()) {
-                return true;
-            }
-
-            if ($this->accessFlags & self::ALLOW_PRIVATE && $reflectionProperty->isPrivate()) {
-                return true;
-            }
-
-            return false;
+            return $reflectionProperty->getModifiers() & $this->propertyReflectionFlags;
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }
@@ -464,5 +567,156 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return null;
+    }
+
+    /**
+     * Searches for add and remove methods.
+     *
+     * @param \ReflectionClass $reflClass The reflection class for the given object
+     * @param array            $singulars The singular form of the property name or null
+     *
+     * @return array|null An array containing the adder and remover when found, null otherwise
+     */
+    private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
+    {
+        if (!\is_array($this->arrayMutatorPrefixes) && 2 !== \count($this->arrayMutatorPrefixes)) {
+            return null;
+        }
+
+        [$addPrefix, $removePrefix] = $this->arrayMutatorPrefixes;
+
+        foreach ($singulars as $singular) {
+            $addMethod = $addPrefix.$singular;
+            $removeMethod = $removePrefix.$singular;
+
+            $addMethodFound = $this->isMethodAccessible($reflClass, $addMethod, 1);
+            $removeMethodFound = $this->isMethodAccessible($reflClass, $removeMethod, 1);
+
+            if ($addMethodFound && $removeMethodFound) {
+                return [$addMethod, $removeMethod];
+            }
+        }
+    }
+
+    /**
+     * Returns whether a method is public and has the number of required parameters.
+     */
+    private function isMethodAccessible(\ReflectionClass $class, string $methodName, int $parameters): bool
+    {
+        if ($class->hasMethod($methodName)) {
+            $method = $class->getMethod($methodName);
+
+            if (($method->getModifiers() & $this->methodReflectionFlags)
+                && $method->getNumberOfRequiredParameters() <= $parameters
+                && $method->getNumberOfParameters() >= $parameters) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Camelizes a given string.
+     */
+    private function camelize(string $string): string
+    {
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
+    }
+
+    /**
+     * Return allowed reflection method flags.
+     */
+    private function getMethodsFlags(int $accessFlags): int
+    {
+        $methodFlags = 0;
+
+        if ($accessFlags & self::ALLOW_PUBLIC) {
+            $methodFlags |= \ReflectionMethod::IS_PUBLIC;
+        }
+
+        if ($accessFlags & self::ALLOW_PRIVATE) {
+            $methodFlags |= \ReflectionMethod::IS_PRIVATE;
+        }
+
+        if ($accessFlags & self::ALLOW_PROTECTED) {
+            $methodFlags |= \ReflectionMethod::IS_PROTECTED;
+        }
+
+        return $methodFlags;
+    }
+
+    /**
+     * Return allowed reflection property flags.
+     */
+    private function getPropertyFlags(int $accessFlags): int
+    {
+        $propertyFlags = 0;
+
+        if ($accessFlags & self::ALLOW_PUBLIC) {
+            $propertyFlags |= \ReflectionProperty::IS_PUBLIC;
+        }
+
+        if ($accessFlags & self::ALLOW_PRIVATE) {
+            $propertyFlags |= \ReflectionProperty::IS_PRIVATE;
+        }
+
+        if ($accessFlags & self::ALLOW_PROTECTED) {
+            $propertyFlags |= \ReflectionProperty::IS_PROTECTED;
+        }
+
+        return $propertyFlags;
+    }
+
+    private function getReadVisiblityForProperty(\ReflectionProperty $reflectionProperty): string
+    {
+        if ($reflectionProperty->isPrivate()) {
+            return PropertyReadInfo::VISIBILITY_PRIVATE;
+        }
+
+        if ($reflectionProperty->isProtected()) {
+            return PropertyReadInfo::VISIBILITY_PROTECTED;
+        }
+
+        return PropertyReadInfo::VISIBILITY_PUBLIC;
+    }
+
+    private function getReadVisiblityForMethod(\ReflectionMethod $reflectionMethod): string
+    {
+        if ($reflectionMethod->isPrivate()) {
+            return PropertyReadInfo::VISIBILITY_PRIVATE;
+        }
+
+        if ($reflectionMethod->isProtected()) {
+            return PropertyReadInfo::VISIBILITY_PROTECTED;
+        }
+
+        return PropertyReadInfo::VISIBILITY_PUBLIC;
+    }
+
+    private function getWriteVisiblityForProperty(\ReflectionProperty $reflectionProperty): string
+    {
+        if ($reflectionProperty->isPrivate()) {
+            return PropertyWriteInfo::VISIBILITY_PRIVATE;
+        }
+
+        if ($reflectionProperty->isProtected()) {
+            return PropertyWriteInfo::VISIBILITY_PROTECTED;
+        }
+
+        return PropertyWriteInfo::VISIBILITY_PUBLIC;
+    }
+
+    private function getWriteVisiblityForMethod(\ReflectionMethod $reflectionMethod): string
+    {
+        if ($reflectionMethod->isPrivate()) {
+            return PropertyWriteInfo::VISIBILITY_PRIVATE;
+        }
+
+        if ($reflectionMethod->isProtected()) {
+            return PropertyWriteInfo::VISIBILITY_PROTECTED;
+        }
+
+        return PropertyWriteInfo::VISIBILITY_PUBLIC;
     }
 }

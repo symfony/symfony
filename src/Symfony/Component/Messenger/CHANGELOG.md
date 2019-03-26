@@ -4,6 +4,12 @@ CHANGELOG
 4.3.0
 -----
 
+ * [BC BREAK] The `Envelope::__construct()` signature changed:
+   you can no longer pass an unlimited number of stamps as the second,
+   third, fourth, arguments etc: stamps are now an array passed to the
+   second argument.
+ * [BC BREAK] The `MessageBusInterface::dispatch()` signature changed:
+   a second argument `array $stamps = []` was added.
  * [BC BREAK] The `TransportFactoryInterface::createTransport()` signature
    changed: a required 3rd `SerializerInterface` argument was added.
  * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to

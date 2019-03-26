@@ -43,8 +43,8 @@ class WorkerTest extends TestCase
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with($envelope = new Envelope($apiMessage, new ReceivedStamp()))->willReturn($envelope);
-        $bus->expects($this->at(1))->method('dispatch')->with($envelope = new Envelope($ipaMessage, new ReceivedStamp()))->willReturn($envelope);
+        $bus->expects($this->at(0))->method('dispatch')->with($envelope = new Envelope($apiMessage, [new ReceivedStamp()]))->willReturn($envelope);
+        $bus->expects($this->at(1))->method('dispatch')->with($envelope = new Envelope($ipaMessage, [new ReceivedStamp()]))->willReturn($envelope);
 
         $worker = new Worker([$receiver], $bus);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
@@ -78,7 +78,7 @@ class WorkerTest extends TestCase
     public function testDispatchCausesRetry()
     {
         $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'), new SentStamp('Some\Sender', 'sender_alias'))],
+            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'sender_alias')])],
         ]);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
@@ -117,7 +117,7 @@ class WorkerTest extends TestCase
     public function testDispatchCausesRejectWhenNoRetry()
     {
         $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'), new SentStamp('Some\Sender', 'sender_alias'))],
+            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'sender_alias')])],
         ]);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();

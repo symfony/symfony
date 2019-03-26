@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
@@ -21,7 +23,8 @@ interface MessageBusInterface
     /**
      * Dispatches the given message.
      *
-     * @param object|Envelope $message The message or the message pre-wrapped in an envelope
+     * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
+     * @param StampInterface[] $stamps
      */
-    public function dispatch($message): Envelope;
+    public function dispatch($message, array $stamps = []): Envelope;
 }

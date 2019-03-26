@@ -83,7 +83,7 @@ class Serializer implements SerializerInterface
             throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
         }
 
-        return new Envelope($message, ...$stamps);
+        return new Envelope($message, $stamps);
     }
 
     /**

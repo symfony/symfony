@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\Config\FileLocator as BaseFileLocator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class FileLocator extends BaseFileLocator
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\Bundle\BundleInterface as BaseBundleInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 interface BundleInterface extends BaseBundleInterface
 {

@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\DependencyInjection\MergeExtensionConfigurationPass
  *
  * @author Kris Wallsmith <kris@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {

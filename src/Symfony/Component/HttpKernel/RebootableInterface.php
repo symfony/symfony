@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\RebootableInterface as BaseRebootableInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 interface RebootableInterface extends BaseRebootableInterface
 {

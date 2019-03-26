@@ -21,7 +21,7 @@ use Symfony\Component\Kernel\DependencyInjection\ServicesResetter as BaseService
  *
  * @internal
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class ServicesResetter extends BaseServicesResetter
 {

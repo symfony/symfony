@@ -25,7 +25,7 @@ use Symfony\Component\Kernel\DependencyInjection\ConfigurableExtension as BaseCo
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 abstract class ConfigurableExtension extends BaseConfigurableExtension
 {

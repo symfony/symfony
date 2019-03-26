@@ -16,7 +16,7 @@ use Symfony\Component\Kernel\CacheClearer\Psr6CacheClearer as BasePsr6CacheClear
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class Psr6CacheClearer extends BasePsr6CacheClearer implements CacheClearerInterface
 {

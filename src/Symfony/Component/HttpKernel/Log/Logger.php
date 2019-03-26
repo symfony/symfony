@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\Log\Logger as BaseLogger;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class Logger extends BaseLogger
 {

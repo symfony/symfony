@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 /**
- * TODO Trigger class deprecation on version 5.1
+ * TODO To delete on version 6.0, while now it ensures the BC layer.
  */
 class ResettableServicePassTest extends TestCase
 {

@@ -19,7 +19,7 @@ use Symfony\Component\Kernel\Bundle\Bundle as BaseBundle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 abstract class Bundle extends BaseBundle implements BundleInterface
 {

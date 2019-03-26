@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 /**
- * TODO Trigger class deprecation on version 5.1.
+ * TODO To delete on version 6.0, while now it ensures the BC layer.
  */
 class Psr6CacheClearerTest extends TestCase
 {

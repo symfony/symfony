@@ -16,7 +16,7 @@ use Symfony\Component\Kernel\DependencyInjection\ResettableServicePass as BaseRe
 /**
  * @author Alexander M. Turek <me@derrabus.de>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class ResettableServicePass extends BaseResettableServicePass
 {

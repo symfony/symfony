@@ -20,7 +20,7 @@ use Symfony\Component\Kernel\CacheWarmer\InternalCacheWarmerAggregate;
  *
  * @final
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class CacheWarmerAggregate extends InternalCacheWarmerAggregate implements CacheWarmerInterface
 {

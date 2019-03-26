@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\DependencyInjection\Extension as BaseExtension;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 abstract class Extension extends BaseExtension
 {

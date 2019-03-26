@@ -20,7 +20,7 @@ use Symfony\Component\Kernel\CacheClearer\InternalChainCacheClearer;
  *
  * @final
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 class ChainCacheClearer extends InternalChainCacheClearer implements CacheClearerInterface
 {

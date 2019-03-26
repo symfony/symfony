@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\CacheWarmer\WarmableInterface as BaseWarmableInterf
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 interface WarmableInterface extends BaseWarmableInterface
 {

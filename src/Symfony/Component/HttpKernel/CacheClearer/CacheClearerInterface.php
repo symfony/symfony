@@ -18,7 +18,7 @@ use Symfony\Component\Kernel\CacheClearer\CacheClearerInterface as BaseCacheClea
  *
  * @author Dustin Dobervich <ddobervich@gmail.com>
  *
- * TODO Trigger class deprecation on version 5.1
+ * TODO Trigger class deprecation on version 5.1.
  */
 interface CacheClearerInterface extends BaseCacheClearerInterface
 {

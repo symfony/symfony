@@ -82,7 +82,7 @@ class Connection
      *     * routing_key_pattern: The pattern of the routing key (Default: "delay_%delay%")
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_queue_%delay%")
      *     * exchange_name: Name of the exchange to be used for the retried messages (Default: "retry")
-     *   * auto-setup: Enable or not the auto-setup of queues and exchanges (Default: true)
+     *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * loop_sleep: Amount of micro-seconds to wait if no message are available (Default: 200000)
      */
     public function __construct(array $connectionConfiguration, array $exchangeConfiguration, array $queueConfiguration, AmqpFactory $amqpFactory = null)
@@ -373,11 +373,11 @@ class Connection
 
     private function shouldSetup(): bool
     {
-        if (!\array_key_exists('auto-setup', $this->connectionConfiguration)) {
+        if (!\array_key_exists('auto_setup', $this->connectionConfiguration)) {
             return true;
         }
 
-        if (\in_array($this->connectionConfiguration['auto-setup'], [false, 'false'], true)) {
+        if (\in_array($this->connectionConfiguration['auto_setup'], [false, 'false'], true)) {
             return false;
         }
 

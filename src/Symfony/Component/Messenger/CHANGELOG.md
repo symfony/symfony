@@ -49,7 +49,7 @@ CHANGELOG
    both no longer have `$isDebug` arguments.
  * [BC BREAK] The Amqp Transport now automatically sets up the exchanges
    and queues by default. Previously, this was done when in "debug" mode
-   only. Pass the `auto-setup` connection option to control this.
+   only. Pass the `auto_setup` connection option to control this.
 
 4.2.0
 -----

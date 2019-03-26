@@ -86,7 +86,7 @@ interface ResponseInterface
      *  - http_method - the HTTP verb of the last request
      *  - http_code - the last response code or 0 when it is not known yet
      *  - error - the error message when the transfer was aborted, null otherwise
-     *  - data - the value of the "data" request option, null if not set
+     *  - user_data - the value of the "user_data" request option, null if not set
      *  - url - the last effective URL of the request
      *
      * When the "capture_peer_cert_chain" option is true, the "peer_certificate_chain"

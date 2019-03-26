@@ -39,7 +39,7 @@ interface HttpClientInterface
                                 //   the JSON-encoded value and set the "content-type" headers to a JSON-compatible
                                 //   value it is they are not defined - typically "application/json"
         'user_data' => null,    // mixed - any extra data to attach to the request (scalar, callable, object...) that
-                                //   MUST be available via $response->getInfo('data') - not used internally
+                                //   MUST be available via $response->getInfo('user_data') - not used internally
         'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower or equal to 0 means
                                 //   redirects should not be followed; "Authorization" and "Cookie" headers MUST
                                 //   NOT follow except for the initial host name

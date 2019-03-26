@@ -14,7 +14,6 @@ namespace Symfony\Component\AutoMapper;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ZendTest\Code\Scanner\TestAsset\MapperExample\Mapper;
 
 /**
  * Bridge for symfony/serializer.

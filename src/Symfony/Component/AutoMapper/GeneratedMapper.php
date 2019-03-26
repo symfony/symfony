@@ -42,8 +42,6 @@ abstract class GeneratedMapper implements MapperInterface
         $this->callbacks[$name] = $callback;
     }
 
-    abstract public function &map($value, Context $context);
-
     /**
      * Inject sub mappers.
      */

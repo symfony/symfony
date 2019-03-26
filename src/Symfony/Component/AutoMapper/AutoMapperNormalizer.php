@@ -64,7 +64,7 @@ class AutoMapperNormalizer implements NormalizerInterface, DenormalizerInterface
         return true;
     }
 
-    private function createAutoMapperContext(array $serializerContext = []): Context
+    private function createAutoMapperContext(array $serializerContext = []): MapperContext
     {
         $circularReferenceLimit = 1;
 
@@ -72,7 +72,7 @@ class AutoMapperNormalizer implements NormalizerInterface, DenormalizerInterface
             $circularReferenceLimit = $serializerContext[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT];
         }
 
-        $context = new Context(
+        $context = new MapperContext(
             $serializerContext[AbstractNormalizer::GROUPS] ?? null,
             $serializerContext[AbstractNormalizer::ATTRIBUTES] ?? null,
             $serializerContextContext[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? null

@@ -24,9 +24,9 @@ interface MapperInterface
 {
     /**
      * @param mixed   $value   Value to map
-     * @param Context $context Options mapper have access to
+     * @param array   $context Options mapper have access to
      *
      * @return mixed The mapped value
      */
-    public function &map($value, Context $context);
+    public function &map($value, array $context = []);
 }

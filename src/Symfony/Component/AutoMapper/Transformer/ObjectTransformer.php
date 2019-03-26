@@ -13,9 +13,11 @@ namespace Symfony\Component\AutoMapper\Transformer;
 
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Name;
 use PhpParser\Node\Scalar;
 use Symfony\Component\AutoMapper\Extractor\PropertyMapping;
 use Symfony\Component\AutoMapper\Generator\UniqueVariableScope;
+use Symfony\Component\AutoMapper\MapperContext;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -49,7 +51,8 @@ final class ObjectTransformer implements TransformerInterface
             new Scalar\String_($mapperName)
             ), 'map', [
                 new Arg($input),
-                new Arg(new Expr\MethodCall(new Expr\Variable('context'), 'withNewContext', [
+                new Arg(new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'withNewContext', [
+                    new Arg(new Expr\Variable('context')),
                     new Arg(new Scalar\String_($propertyMapping->getProperty())),
                 ])),
         ]), []];

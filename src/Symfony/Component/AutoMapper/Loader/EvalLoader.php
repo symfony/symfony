@@ -16,7 +16,7 @@ use Symfony\Component\AutoMapper\Generator\Generator;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 
 /**
- * Use eval to load mappers
+ * Use eval to load mappers.
  *
  * @expiremental
  *

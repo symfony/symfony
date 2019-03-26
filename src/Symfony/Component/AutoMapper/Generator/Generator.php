@@ -20,10 +20,10 @@ use PhpParser\Node\Stmt;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 use Symfony\Component\AutoMapper\AutoMapperRegistryInterface;
-use Symfony\Component\AutoMapper\Context;
 use Symfony\Component\AutoMapper\Exception\CompileException;
 use Symfony\Component\AutoMapper\Extractor\PropertyMapping;
 use Symfony\Component\AutoMapper\GeneratedMapper;
+use Symfony\Component\AutoMapper\MapperContext;
 use Symfony\Component\AutoMapper\MapperGeneratorMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -77,12 +77,14 @@ final class Generator
             ]),
                 new Scalar\String_($mapperGeneratorMetadata->getTarget())
             )));
-            $statements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, new Name('shouldHandleCircularReference'), [
+            $statements[] = new Stmt\If_(new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), new Name('shouldHandleCircularReference'), [
+                new Arg($contextVariable),
                 new Arg($hashVariable),
                 new Arg(new Expr\PropertyFetch(new Expr\Variable('this'), 'circularReferenceLimit')),
             ]), [
                 'stmts' => [
-                    new Stmt\Return_(new Expr\MethodCall($contextVariable, 'handleCircularReference', [
+                    new Stmt\Return_(new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'handleCircularReference', [
+                        new Arg($contextVariable),
                         new Arg($hashVariable),
                         new Arg($sourceInput),
                         new Arg(new Expr\PropertyFetch(new Expr\Variable('this'), 'circularReferenceLimit')),
@@ -95,7 +97,10 @@ final class Generator
         [$createObjectStmts, $inConstructor, $constructStatementsForCreateObjects, $injectMapperStatements] = $this->getCreateObjectStatements($mapperGeneratorMetadata, $result, $contextVariable, $sourceInput, $uniqueVariableScope);
         $constructStatements = array_merge($constructStatements, $constructStatementsForCreateObjects);
 
-        $statements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\MethodCall($contextVariable, 'getObjectToPopulate')));
+        $statements[] = new Stmt\Expression(new Expr\Assign($result, new Expr\BinaryOp\Coalesce(
+            new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::TARGET_TO_POPULATE)),
+            new Expr\ConstFetch(new Name('null'))
+        )));
         $statements[] = new Stmt\If_(new Expr\BinaryOp\Identical(new Expr\ConstFetch(new Name('null')), $result), [
             'stmts' => $createObjectStmts,
         ]);
@@ -125,7 +130,8 @@ final class Generator
             if ($canHaveCircularDependency) {
                 $statements[] = new Stmt\Expression(new Expr\Assign(
                     $contextVariable,
-                    new Expr\MethodCall($contextVariable, 'withReference', [
+                    new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'withReference', [
+                        new Arg($contextVariable),
                         new Arg($hashVariable),
                         new Arg($result),
                     ])
@@ -134,7 +140,9 @@ final class Generator
 
             $statements[] = new Stmt\Expression(new Expr\Assign(
                 $contextVariable,
-                new Expr\MethodCall($contextVariable, 'withIncrementedDepth')
+                new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'withIncrementedDepth', [
+                    new Arg($contextVariable),
+                ])
             ));
         }
 
@@ -190,7 +198,8 @@ final class Generator
             }
 
             if ($mapperGeneratorMetadata->shouldCheckAttributes()) {
-                $conditions[] = new Expr\MethodCall($contextVariable, 'isAllowedAttribute', [
+                $conditions[] = new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'isAllowedAttribute', [
+                    new Arg($contextVariable),
                     new Arg(new Scalar\String_($propertyMapping->getProperty())),
                 ]);
             }
@@ -199,10 +208,16 @@ final class Generator
                 $conditions[] = new Expr\BinaryOp\BooleanAnd(
                     new Expr\BinaryOp\NotIdentical(
                         new Expr\ConstFetch(new Name('null')),
-                        new Expr\MethodCall(new Expr\Variable('context'), 'getGroups')
+                        new Expr\BinaryOp\Coalesce(
+                            new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::GROUPS)),
+                            new Expr\Array_()
+                        )
                     ),
                     new Expr\FuncCall(new Name('array_intersect'), [
-                        new Arg(new Expr\MethodCall(new Expr\Variable('context'), 'getGroups')),
+                        new Arg(new Expr\BinaryOp\Coalesce(
+                            new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::GROUPS)),
+                            new Expr\Array_()
+                        )),
                         new Arg(new Expr\Array_(array_map(function (string $group) {
                             return new Expr\ArrayItem(new Scalar\String_($group));
                         }, $propertyMapping->getSourceGroups()))),
@@ -214,10 +229,16 @@ final class Generator
                 $conditions[] = new Expr\BinaryOp\BooleanAnd(
                     new Expr\BinaryOp\NotIdentical(
                         new Expr\ConstFetch(new Name('null')),
-                        new Expr\MethodCall(new Expr\Variable('context'), 'getGroups')
+                        new Expr\BinaryOp\Coalesce(
+                            new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::GROUPS)),
+                            new Expr\Array_()
+                        )
                     ),
                     new Expr\FuncCall(new Name('array_intersect'), [
-                        new Arg(new Expr\MethodCall(new Expr\Variable('context'), 'getGroups')),
+                        new Arg(new Expr\BinaryOp\Coalesce(
+                            new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::GROUPS)),
+                            new Expr\Array_()
+                        )),
                         new Arg(new Expr\Array_(array_map(function (string $group) {
                             return new Expr\ArrayItem(new Scalar\String_($group));
                         }, $propertyMapping->getTargetGroups()))),
@@ -227,7 +248,10 @@ final class Generator
 
             if (null !== $propertyMapping->getMaxDepth()) {
                 $conditions[] = new Expr\BinaryOp\SmallerOrEqual(
-                    new Expr\MethodCall($contextVariable, 'getDepth'),
+                    new Expr\BinaryOp\Coalesce(
+                        new Expr\ArrayDimFetch($contextVariable, new Scalar\String_(MapperContext::DEPTH)),
+                        new Expr\ConstFetch(new Name('0'))
+                    ),
                     new Scalar\LNumber($propertyMapping->getMaxDepth())
                 );
             }
@@ -255,7 +279,7 @@ final class Generator
             'flags' => Stmt\Class_::MODIFIER_PUBLIC,
             'params' => [
                 new Param(new Expr\Variable($sourceInput->name)),
-                new Param(new Expr\Variable('context'), null, new Name\FullyQualified(Context::class)),
+                new Param(new Expr\Variable('context'), new Expr\Array_(), 'array'),
             ],
             'byRef' => true,
             'stmts' => $statements,
@@ -355,12 +379,14 @@ final class Generator
                 $constructArguments[$parameter->getPosition()] = new Arg($constructVar);
 
                 $propStatements[] = new Stmt\Expression(new Expr\Assign($constructVar, $output));
-                $createObjectStatements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, 'hasConstructorArgument', [
+                $createObjectStatements[] = new Stmt\If_(new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'hasConstructorArgument', [
+                    new Arg($contextVariable),
                     new Arg(new Scalar\String_($target)),
                     new Arg(new Scalar\String_($propertyMapping->getProperty())),
                 ]), [
                     'stmts' => [
-                        new Stmt\Expression(new Expr\Assign($constructVar, new Expr\MethodCall($contextVariable, 'getConstructorArgument', [
+                        new Stmt\Expression(new Expr\Assign($constructVar, new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'getConstructorArgument', [
+                            new Arg($contextVariable),
                             new Arg(new Scalar\String_($target)),
                             new Arg(new Scalar\String_($propertyMapping->getProperty())),
                         ]))),
@@ -375,12 +401,14 @@ final class Generator
                 if (!\array_key_exists($constructorParameter->getPosition(), $constructArguments) && $constructorParameter->isDefaultValueAvailable()) {
                     $constructVar = new Expr\Variable($uniqueVariableScope->getUniqueName('constructArg'));
 
-                    $createObjectStatements[] = new Stmt\If_(new Expr\MethodCall($contextVariable, 'hasConstructorArgument', [
+                    $createObjectStatements[] = new Stmt\If_(new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'hasConstructorArgument', [
+                        new Arg($contextVariable),
                         new Arg(new Scalar\String_($target)),
                         new Arg(new Scalar\String_($constructorParameter->getName())),
                     ]), [
                         'stmts' => [
-                            new Stmt\Expression(new Expr\Assign($constructVar, new Expr\MethodCall($contextVariable, 'getConstructorArgument', [
+                            new Stmt\Expression(new Expr\Assign($constructVar, new Expr\StaticCall(new Name\FullyQualified(MapperContext::class), 'getConstructorArgument', [
+                                new Arg($contextVariable),
                                 new Arg(new Scalar\String_($target)),
                                 new Arg(new Scalar\String_($constructorParameter->getName())),
                             ]))),

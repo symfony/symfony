@@ -112,7 +112,7 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
     /**
      * {@inheritdoc}
      */
-    public function map($sourceData, $targetData, Context $context = null)
+    public function map($sourceData, $targetData, array $context = [])
     {
         $source = null;
         $target = null;
@@ -133,18 +133,14 @@ final class AutoMapper implements AutoMapperInterface, AutoMapperRegistryInterfa
             throw new NoMappingFoundException('Cannot map this value, source is neither an object or an array.');
         }
 
-        if (null === $context) {
-            $context = new Context();
-        }
-
         if (\is_object($targetData)) {
             $target = \get_class($targetData);
-            $context->setObjectToPopulate($targetData);
+            $context[MapperContext::TARGET_TO_POPULATE] = $targetData;
         }
 
         if (\is_array($targetData)) {
             $target = 'array';
-            $context->setObjectToPopulate($targetData);
+            $context[MapperContext::TARGET_TO_POPULATE] = $targetData;
         }
 
         if (\is_string($targetData)) {

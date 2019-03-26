@@ -42,6 +42,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public static $defaultArrayMutatorPrefixes = ['add', 'remove'];
 
+    public const ALLOW_PRIVATE = 1;
+    public const ALLOW_PROTECTED = 2;
+    public const ALLOW_PUBLIC = 4;
+
     private const MAP_TYPES = [
         'integer' => Type::BUILTIN_TYPE_INT,
         'boolean' => Type::BUILTIN_TYPE_BOOL,
@@ -52,18 +56,20 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $accessorPrefixes;
     private $arrayMutatorPrefixes;
     private $enableConstructorExtraction;
+    private $accessFlags;
 
     /**
      * @param string[]|null $mutatorPrefixes
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true)
+    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC)
     {
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
         $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
         $this->enableConstructorExtraction = $enableConstructorExtraction;
+        $this->accessFlags = $accessFlags;
     }
 
     /**
@@ -77,16 +83,34 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return;
         }
 
+        $propertyFlags = 0;
+        $methodFlags = 0;
+
+        if ($this->accessFlags & self::ALLOW_PUBLIC) {
+            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PUBLIC;
+            $methodFlags = $methodFlags | \ReflectionMethod::IS_PUBLIC;
+        }
+
+        if ($this->accessFlags & self::ALLOW_PRIVATE) {
+            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PRIVATE;
+            $methodFlags = $methodFlags | \ReflectionMethod::IS_PRIVATE;
+        }
+
+        if ($this->accessFlags & self::ALLOW_PROTECTED) {
+            $propertyFlags = $propertyFlags | \ReflectionProperty::IS_PROTECTED;
+            $methodFlags = $methodFlags | \ReflectionMethod::IS_PROTECTED;
+        }
+
         $reflectionProperties = $reflectionClass->getProperties();
 
         $properties = [];
         foreach ($reflectionProperties as $reflectionProperty) {
-            if ($reflectionProperty->isPublic()) {
+            if ($reflectionProperty->getModifiers() & $propertyFlags) {
                 $properties[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
 
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods($methodFlags) as $reflectionMethod) {
             if ($reflectionMethod->isStatic()) {
                 continue;
             }
@@ -134,7 +158,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function isReadable($class, $property, array $context = [])
     {
-        if ($this->isPublicProperty($class, $property)) {
+        if ($this->isAllowedProperty($class, $property)) {
             return true;
         }
 
@@ -148,7 +172,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function isWritable($class, $property, array $context = [])
     {
-        if ($this->isPublicProperty($class, $property)) {
+        if ($this->isAllowedProperty($class, $property)) {
             return true;
         }
 
@@ -317,12 +341,24 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $name;
     }
 
-    private function isPublicProperty(string $class, string $property): bool
+    private function isAllowedProperty(string $class, string $property): bool
     {
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
-            return $reflectionProperty->isPublic();
+            if ($this->accessFlags & self::ALLOW_PUBLIC && $reflectionProperty->isPublic()) {
+                return true;
+            }
+
+            if ($this->accessFlags & self::ALLOW_PROTECTED && $reflectionProperty->isProtected()) {
+                return true;
+            }
+
+            if ($this->accessFlags & self::ALLOW_PRIVATE && $reflectionProperty->isPrivate()) {
+                return true;
+            }
+
+            return false;
         } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }

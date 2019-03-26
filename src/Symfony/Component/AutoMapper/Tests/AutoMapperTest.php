@@ -13,7 +13,7 @@ namespace Symfony\Component\AutoMapper\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use PhpParser\ParserFactory;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\AutoMapper\AutoMapper;
 use Symfony\Component\AutoMapper\MapperContext;
 use Symfony\Component\AutoMapper\Exception\CircularReferenceException;

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class SymfonyAskQuestion extends AskQuestion
+class SymfonyQuestionPrompt extends QuestionPrompt
 {
     /**
      * {@inheritdoc}

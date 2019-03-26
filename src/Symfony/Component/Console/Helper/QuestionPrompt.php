@@ -27,7 +27,7 @@ use Symfony\Component\Console\Question\Question;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AskQuestion
+class QuestionPrompt
 {
     protected $input;
     protected $output;

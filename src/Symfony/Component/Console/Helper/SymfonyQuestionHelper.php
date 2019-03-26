@@ -22,6 +22,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Symfony Style Guide compliant question helper.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @deprecated since Symfony 4.3, use SymfonyQuestionPrompt instead.
  */
 class SymfonyQuestionHelper extends QuestionHelper
 {

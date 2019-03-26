@@ -26,6 +26,8 @@ use Symfony\Component\Console\Question\Question;
  * The QuestionHelper class provides helpers to interact with the user.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.3, use QuestionPrompt instead.
  */
 class QuestionHelper extends Helper
 {

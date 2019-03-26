@@ -51,6 +51,13 @@ Dotenv
  * First parameter of `Dotenv::__construct()` will be changed from `true` to `false` in Symfony 5.0. A deprecation warning
    is triggered if no parameter is provided. Use `$usePutenv = true` to upgrade without breaking changes.
 
+Console
+------
+
+ * Deprecated `QuestionHelper`, use `QuestionPrompt` instead.
+ * Deprecated `SymfonyQuestionHelper`, use `SymfonyQuestionPrompt` instead.
+ * Deprecated `FormatterHelper`, use `Symfony\Component\Console\Helper\Formatter` instead.
+
 EventDispatcher
 ---------------
 

@@ -17,6 +17,8 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  * The Formatter class provides helpers to format messages.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.3, use Formatter instead.
  */
 class FormatterHelper extends Helper
 {

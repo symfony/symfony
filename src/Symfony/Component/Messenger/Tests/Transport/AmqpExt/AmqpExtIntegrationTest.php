@@ -57,16 +57,20 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($first = new Envelope(new DummyMessage('First')));
         $sender->send($second = new Envelope(new DummyMessage('Second')));
 
-        $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages, $first, $second) {
-            $expectedEnvelope = 0 === $receivedMessages ? $first : $second;
-            $this->assertEquals($expectedEnvelope->getMessage(), $envelope->getMessage());
-            $this->assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($first->getMessage(), $envelope->getMessage());
+        $this->assertInstanceOf(AmqpReceivedStamp::class, $envelope->last(AmqpReceivedStamp::class));
 
-            if (2 === ++$receivedMessages) {
-                $receiver->stop();
-            }
-        });
+        $envelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $this->assertEquals($second->getMessage(), $envelope->getMessage());
+
+        $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
     public function testRetryAndDelay()
@@ -82,50 +86,38 @@ class AmqpExtIntegrationTest extends TestCase
 
         $sender->send($first = new Envelope(new DummyMessage('First')));
 
-        $receivedMessages = 0;
+        $envelopes = iterator_to_array($receiver->get());
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
+        $newEnvelope = $envelope
+            ->with(new DelayStamp(2000))
+            ->with(new RedeliveryStamp(1, 'not_important'));
+        $sender->send($newEnvelope);
+        $receiver->ack($envelope);
+
+        $envelopes = [];
         $startTime = time();
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, $sender, &$receivedMessages, $startTime) {
-            if (null === $envelope) {
-                // if we have been processing for 4 seconds + have received 2 messages
-                // then it's safe to say no other messages will be received
-                if (time() > $startTime + 4 && 2 === $receivedMessages) {
-                    $receiver->stop();
-                }
+        // wait for next message, but only for max 3 seconds
+        while (0 === \count($envelopes) && $startTime + 3 > time()) {
+            $envelopes = iterator_to_array($receiver->get());
+        }
 
-                return;
-            }
+        $this->assertCount(1, $envelopes);
+        /** @var Envelope $envelope */
+        $envelope = $envelopes[0];
 
-            ++$receivedMessages;
+        // should have a 2 second delay
+        $this->assertGreaterThanOrEqual($startTime + 2, time());
+        // but only a 2 second delay
+        $this->assertLessThan($startTime + 4, time());
 
-            // retry the first time
-            if (1 === $receivedMessages) {
-                // imitate what Worker does
-                $envelope = $envelope
-                    ->with(new DelayStamp(2000))
-                    ->with(new RedeliveryStamp(1, 'not_important'));
-                $sender->send($envelope);
-                $receiver->ack($envelope);
+        /** @var RedeliveryStamp|null $retryStamp */
+        // verify the stamp still exists from the last send
+        $retryStamp = $envelope->last(RedeliveryStamp::class);
+        $this->assertNotNull($retryStamp);
+        $this->assertSame(1, $retryStamp->getRetryCount());
 
-                return;
-            }
-
-            if (2 === $receivedMessages) {
-                // should have a 2 second delay
-                $this->assertGreaterThanOrEqual($startTime + 2, time());
-                // but only a 2 second delay
-                $this->assertLessThan($startTime + 4, time());
-
-                /** @var RedeliveryStamp|null $retryStamp */
-                // verify the stamp still exists from the last send
-                $retryStamp = $envelope->last(RedeliveryStamp::class);
-                $this->assertNotNull($retryStamp);
-                $this->assertSame(1, $retryStamp->getRetryCount());
-
-                $receiver->ack($envelope);
-
-                return;
-            }
-        });
+        $receiver->ack($envelope);
     }
 
     public function testItReceivesSignals()
@@ -173,29 +165,6 @@ Done.
 
 TXT
             , $process->getOutput());
-    }
-
-    /**
-     * @runInSeparateProcess
-     */
-    public function testItSupportsTimeoutAndTicksNullMessagesToTheHandler()
-    {
-        $serializer = $this->createSerializer();
-
-        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), ['read_timeout' => '1']);
-        $connection->setup();
-        $connection->queue()->purge();
-
-        $receiver = new AmqpReceiver($connection, $serializer);
-
-        $receivedMessages = 0;
-        $receiver->receive(function (?Envelope $envelope) use ($receiver, &$receivedMessages) {
-            $this->assertNull($envelope);
-
-            if (2 === ++$receivedMessages) {
-                $receiver->stop();
-            }
-        });
     }
 
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)

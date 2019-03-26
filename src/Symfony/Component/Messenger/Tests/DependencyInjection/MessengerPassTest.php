@@ -612,11 +612,9 @@ class DummyHandler
 
 class DummyReceiver implements ReceiverInterface
 {
-    public function receive(callable $handler): void
+    public function get(): iterable
     {
-        for ($i = 0; $i < 3; ++$i) {
-            $handler(new Envelope(new DummyMessage("Dummy $i")));
-        }
+        yield new Envelope(new DummyMessage('Dummy'));
     }
 
     public function stop(): void

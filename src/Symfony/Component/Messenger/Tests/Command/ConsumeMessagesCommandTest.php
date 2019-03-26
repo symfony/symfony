@@ -20,16 +20,8 @@ class ConsumeMessagesCommandTest extends TestCase
     public function testConfigurationWithDefaultReceiver()
     {
         $command = new ConsumeMessagesCommand($this->createMock(ServiceLocator::class), $this->createMock(ServiceLocator::class), null, ['amqp']);
-        $inputArgument = $command->getDefinition()->getArgument('receiver');
+        $inputArgument = $command->getDefinition()->getArgument('receivers');
         $this->assertFalse($inputArgument->isRequired());
-        $this->assertSame('amqp', $inputArgument->getDefault());
-    }
-
-    public function testConfigurationWithoutDefaultReceiver()
-    {
-        $command = new ConsumeMessagesCommand($this->createMock(ServiceLocator::class), $this->createMock(ServiceLocator::class), null, ['amqp', 'dummy']);
-        $inputArgument = $command->getDefinition()->getArgument('receiver');
-        $this->assertTrue($inputArgument->isRequired());
-        $this->assertNull($inputArgument->getDefault());
+        $this->assertSame(['amqp'], $inputArgument->getDefault());
     }
 }

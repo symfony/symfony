@@ -11,8 +11,9 @@ CHANGELOG
    to the `Envelope` then find the correct bus when receiving from
    the transport. See `ConsumeMessagesCommand`.
  * The optional `$busNames` constructor argument of the class `ConsumeMessagesCommand` was removed.
- * [BC BREAK] 2 new methods were added to `ReceiverInterface`:
-   `ack()` and `reject()`.
+ * [BC BREAK] 3 new methods were added to `ReceiverInterface`:
+   `ack()`, `reject()` and `get()`. The methods `receive()`
+   and `stop()` were removed.
  * [BC BREAK] Error handling was moved from the receivers into
    `Worker`. Implementations of `ReceiverInterface::handle()`
    should now allow all exceptions to be thrown, except for transport
@@ -24,7 +25,9 @@ CHANGELOG
  * The default command name for `ConsumeMessagesCommand` was
    changed from `messenger:consume-messages` to `messenger:consume`
  * `ConsumeMessagesCommand` has two new optional constructor arguments
- * `Worker` has 4 new option constructor arguments.
+ * [BC BREAK] The first argument to Worker changed from a single
+   `ReceiverInterface` to an array of `ReceiverInterface`.
+ * `Worker` has 3 new optional constructor arguments.
  * The `Worker` class now handles calling `pcntl_signal_dispatch()` the
    receiver no longer needs to call this.
  * The `AmqpSender` will now retry messages using a dead-letter exchange

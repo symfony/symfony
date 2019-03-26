@@ -30,7 +30,6 @@ class AmqpReceiver implements ReceiverInterface
 {
     private $serializer;
     private $connection;
-    private $shouldStop;
 
     public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
@@ -41,38 +40,31 @@ class AmqpReceiver implements ReceiverInterface
     /**
      * {@inheritdoc}
      */
-    public function receive(callable $handler): void
+    public function get(): iterable
     {
-        while (!$this->shouldStop) {
-            try {
-                $amqpEnvelope = $this->connection->get();
-            } catch (\AMQPException $exception) {
-                throw new TransportException($exception->getMessage(), 0, $exception);
-            }
-
-            if (null === $amqpEnvelope) {
-                $handler(null);
-
-                usleep($this->connection->getConnectionConfiguration()['loop_sleep'] ?? 200000);
-
-                continue;
-            }
-
-            try {
-                $envelope = $this->serializer->decode([
-                    'body' => $amqpEnvelope->getBody(),
-                    'headers' => $amqpEnvelope->getHeaders(),
-                ]);
-            } catch (MessageDecodingFailedException $exception) {
-                // invalid message of some type
-                $this->rejectAmqpEnvelope($amqpEnvelope);
-
-                throw $exception;
-            }
-
-            $envelope = $envelope->with(new AmqpReceivedStamp($amqpEnvelope));
-            $handler($envelope);
+        try {
+            $amqpEnvelope = $this->connection->get();
+        } catch (\AMQPException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
         }
+
+        if (null === $amqpEnvelope) {
+            return [];
+        }
+
+        try {
+            $envelope = $this->serializer->decode([
+                'body' => $amqpEnvelope->getBody(),
+                'headers' => $amqpEnvelope->getHeaders(),
+            ]);
+        } catch (MessageDecodingFailedException $exception) {
+            // invalid message of some type
+            $this->rejectAmqpEnvelope($amqpEnvelope);
+
+            throw $exception;
+        }
+
+        yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope));
     }
 
     public function ack(Envelope $envelope): void
@@ -87,11 +79,6 @@ class AmqpReceiver implements ReceiverInterface
     public function reject(Envelope $envelope): void
     {
         $this->rejectAmqpEnvelope($this->findAmqpEnvelope($envelope));
-    }
-
-    public function stop(): void
-    {
-        $this->shouldStop = true;
     }
 
     private function rejectAmqpEnvelope(\AMQPEnvelope $amqpEnvelope): void

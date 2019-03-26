@@ -47,11 +47,8 @@ class AmqpTransportTest extends TestCase
         $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('get')->willReturn($amqpEnvelope);
 
-        $transport->receive(function (Envelope $envelope) use ($transport, $decodedMessage) {
-            $this->assertSame($decodedMessage, $envelope->getMessage());
-
-            $transport->stop();
-        });
+        $envelopes = iterator_to_array($transport->get());
+        $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)

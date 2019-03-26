@@ -32,7 +32,7 @@ $connection = Connection::fromDsn(getenv('DSN'));
 $receiver = new AmqpReceiver($connection, $serializer);
 $retryStrategy = new MultiplierRetryStrategy(3, 0);
 
-$worker = new Worker($receiver, new class() implements MessageBusInterface {
+$worker = new Worker(['the_receiver' => $receiver], new class() implements MessageBusInterface {
     public function dispatch($envelope): Envelope
     {
         echo 'Get envelope with message: '.\get_class($envelope->getMessage())."\n";
@@ -43,7 +43,7 @@ $worker = new Worker($receiver, new class() implements MessageBusInterface {
 
         return $envelope;
     }
-}, 'the_receiver', $retryStrategy);
+});
 
 echo "Receiving messages...\n";
 $worker->run();

@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Mime;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Mime\Renderer;
+use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
@@ -157,7 +157,7 @@ EOF
             'document.txt' => 'Some text document...',
             'image.jpg' => 'Some image data',
         ]));
-        $renderer = new Renderer($twig);
+        $renderer = new BodyRenderer($twig);
         $email = (new TemplatedEmail())->to('fabien@symfony.com')->from('helene@symfony.com');
         if (null !== $full) {
             $email->template('full');
@@ -168,7 +168,8 @@ EOF
         if (null !== $html) {
             $email->htmlTemplate('html');
         }
+        $renderer->render($email);
 
-        return $renderer->render($email);
+        return $email;
     }
 }

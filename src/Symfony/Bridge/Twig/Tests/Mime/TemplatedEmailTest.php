@@ -22,4 +22,18 @@ class TemplatedEmailTest extends TestCase
         $email->htmlTemplate($template = 'html');
         $this->assertEquals($template, $email->getHtmlTemplate());
     }
+
+    public function testSerialize()
+    {
+        $email = (new TemplatedEmail())
+            ->textTemplate('text.txt.twig')
+            ->htmlTemplate('text.html.twig')
+            ->context($context = ['a' => 'b'])
+        ;
+
+        $email = unserialize(serialize($email));
+        $this->assertEquals('text.txt.twig', $email->getTextTemplate());
+        $this->assertEquals('text.html.twig', $email->getHtmlTemplate());
+        $this->assertEquals($context, $email->getContext());
+    }
 }

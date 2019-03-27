@@ -543,20 +543,11 @@ class Email extends Message
         return $this;
     }
 
-    public function __sleep()
+    /**
+     * @internal
+     */
+    public function __serialize(): array
     {
-        $this->_headers = $this->getHeaders();
-        $this->_raw = false;
-
-        if (null !== $body = parent::getBody()) {
-            $r = new \ReflectionProperty(Message::class, 'body');
-            $r->setAccessible(true);
-            $this->_body = $r->getValue($this);
-            $this->_raw = true;
-
-            return ['_raw', '_headers', '_body'];
-        }
-
         if (\is_resource($this->text)) {
             if (stream_get_meta_data($this->text)['seekable'] ?? false) {
                 rewind($this->text);
@@ -583,22 +574,16 @@ class Email extends Message
             }
         }
 
-        return ['_raw', '_headers', 'text', 'textCharset', 'html', 'htmlCharset', 'attachments'];
+        return [$this->text, $this->textCharset, $this->html, $this->htmlCharset, $this->attachments, parent::__serialize()];
     }
 
-    public function __wakeup()
+    /**
+     * @internal
+     */
+    public function __unserialize(array $data): void
     {
-        $r = new \ReflectionProperty(Message::class, 'headers');
-        $r->setAccessible(true);
-        $r->setValue($this, $this->_headers);
-        unset($this->_headers);
+        [$this->text, $this->textCharset, $this->html, $this->htmlCharset, $this->attachments, $parentData] = $data;
 
-        if ($this->_raw) {
-            $r = new \ReflectionProperty(Message::class, 'body');
-            $r->setAccessible(true);
-            $r->setValue($this, $this->_body);
-            unset($this->_body);
-        }
-        unset($this->_raw);
+        parent::__unserialize($parentData);
     }
 }

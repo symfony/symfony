@@ -118,12 +118,18 @@ class FormValidator extends ConstraintValidator
                     ? (string) $form->getViewData()
                     : \gettype($form->getViewData());
 
+                $failure = $form->getTransformationFailure();
+
                 $this->context->setConstraint($formConstraint);
-                $this->context->buildViolation($config->getOption('invalid_message'))
-                    ->setParameters(array_replace(['{{ value }}' => $clientDataAsString], $config->getOption('invalid_message_parameters')))
+                $this->context->buildViolation($failure->getInvalidMessage() ?? $config->getOption('invalid_message'))
+                    ->setParameters(array_replace(
+                        ['{{ value }}' => $clientDataAsString],
+                        $config->getOption('invalid_message_parameters'),
+                        $failure->getInvalidMessageParameters()
+                    ))
                     ->setInvalidValue($form->getViewData())
                     ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-                    ->setCause($form->getTransformationFailure())
+                    ->setCause($failure)
                     ->addViolation();
             }
         }

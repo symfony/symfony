@@ -72,6 +72,23 @@ EventDispatcher
  * The `TraceableEventDispatcherInterface` has been removed.
  * The signature of the `EventDispatcherInterface::dispatch()` method has been updated to `dispatch($event, string $eventName = null)`
 
+DependencyInjection
+-------------------
+
+ * Removed support for non-string default env() parameters
+
+   Before:
+   ```yaml
+   parameters:
+       env(NAME): 1.5
+   ```
+
+   After:
+   ```yaml
+   parameters:
+          env(NAME): '1.5'
+   ```
+
 Filesystem
 ----------
 

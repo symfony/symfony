@@ -21,6 +21,23 @@ Config
 
  * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
 
+DependencyInjection
+-------------------
+
+ * Deprecated support for non-string default env() parameters
+
+   Before:
+   ```yaml
+   parameters:
+       env(NAME): 1.5
+   ```
+
+   After:
+   ```yaml
+   parameters:
+          env(NAME): '1.5'
+   ```
+
 EventDispatcher
 ---------------
 

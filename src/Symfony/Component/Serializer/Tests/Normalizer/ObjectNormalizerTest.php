@@ -1003,6 +1003,34 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(null, $nameConverter);
         $this->assertArrayHasKey('foo-Symfony\Component\Serializer\Tests\Normalizer\ObjectDummy-json-bar', $normalizer->normalize(new ObjectDummy(), 'json', ['foo' => 'bar']));
     }
+
+    public function testObjectClassResolver()
+    {
+        $classResolver = function ($object) {
+            return ObjectDummy::class;
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, $classResolver);
+
+        $obj = new ProxyObjectDummy();
+        $obj->setFoo('foo');
+        $obj->bar = 'bar';
+        $obj->setBaz(true);
+        $obj->setCamelCase('camelcase');
+        $obj->unwantedProperty = 'notwanted';
+
+        $this->assertEquals(
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'baz' => true,
+                'fooBar' => 'foobar',
+                'camelCase' => 'camelcase',
+                'object' => null,
+            ],
+            $normalizer->normalize($obj, 'any')
+        );
+    }
 }
 
 class ObjectDummy
@@ -1062,6 +1090,11 @@ class ObjectDummy
     {
         return $this->object;
     }
+}
+
+class ProxyObjectDummy extends ObjectDummy
+{
+    public $unwantedProperty;
 }
 
 class ObjectConstructorDummy

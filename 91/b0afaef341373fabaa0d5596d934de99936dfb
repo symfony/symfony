@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T13:13:39Z
+
+I don't get what this would allow. What does it mean to "setup a transport"?
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-01-28T21:12:08Z
+
+@nicolas-grekas In that case "setup a transport" means to declare the queue on AMQP. Actually it is done only if we use debug : https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Transport/AmqpExt/Connection.php#L132
+
+The goal of having this is to be able to easily configure the AMQP broker (RabbitMQ) without to switch environment.
+
+I encounter this problem when we added a new routing configuration to dispatch a new message on a production environment. The queue wasn't declared and the message was not routed to the Broker (I don't remember if the message was lost or an error was raised :thinking: ). To fix this we had to create a command that we use during the deployment.
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-19T13:04:27Z
+
+@sroze I've made the requested changes, rebased and squashed to have one commit
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-21T18:58:22Z
+
+@weaverryan @sroze I've just push to fix tests and rebase. Also made the requested changes :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-27T11:24:31Z
+
+> Shouldn't really be used for AMQP - we need auto-setup for retry or delay
+
+For AMQP, it would actually be useful for the following issue: https://github.com/symfony/symfony/issues/30218. 👍

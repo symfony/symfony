@@ -21,8 +21,7 @@
         "symfony/http-foundation": "^2.3.42 || ^3.4 || ^4.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^3.4 || ^4.0",
-        "nyholm/psr7": "^1.1"
+        "symfony/phpunit-bridge": "^3.4 || ^4.0"
     },
     "suggest": {
         "nyholm/psr7": "For a super lightweight PSR-7/17 implementation"

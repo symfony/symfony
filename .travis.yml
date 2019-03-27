@@ -9,13 +9,13 @@ env:
     global:
         - PHPUNIT_FLAGS="-v"
         - SYMFONY_PHPUNIT_DIR="$HOME/symfony-bridge/.phpunit"
-        - DEPENDENCIES="zendframework/zend-diactoros:^1.4.1 http-interop/http-factory-diactoros:^1.0"
+        - DEPENDENCIES="nyholm/psr7:^1.1"
 
 matrix:
     fast_finish: true
     include:
           # Minimum supported dependencies with the latest and oldest PHP version
-        - php: 7.2
+        - php: 7.3
           env: COMPOSER_FLAGS="--prefer-stable --prefer-lowest" SYMFONY_DEPRECATIONS_HELPER="weak_vendors"
         - php: 5.3
           dist: 'precise'
@@ -24,7 +24,7 @@ matrix:
           # Test the latest stable release
         - php: 5.3
           dist: 'precise'
-          env: DEPENDENCIES=""
+          env: DEPENDENCIES="symfony/phpunit-bridge:>=3.4,<3.4.22||>=4.0,<4.1.11||>=4.2,<4.2.3"
         - php: 5.4
           env: DEPENDENCIES="zendframework/zend-diactoros:^1.4.1"
         - php: 5.5
@@ -32,19 +32,21 @@ matrix:
         - php: 5.6
           env: DEPENDENCIES="zendframework/zend-diactoros:^1.4.1"
         - php: 7.0
+          env: DEPENDENCIES="zendframework/zend-diactoros:^1.4.1 http-interop/http-factory-diactoros:^1.0"
         - php: 7.1
         - php: 7.2
+        - php: 7.3
           env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-text"
 
           # Test LTS versions. This makes sure we do not use Symfony packages with version greater
           # than 2 or 3 respectively.
-        - php: 7.2
+        - php: 7.3
           env: DEPENDENCIES="$DEPENDENCIES symfony/lts:^2 symfony/force-lowest:~2.8.0"
-        - php: 7.2
+        - php: 7.3
           env: DEPENDENCIES="$DEPENDENCIES symfony/lts:^3 symfony/force-lowest:~3.4.0"
 
           # Latest commit to master
-        - php: 7.2
+        - php: 7.3
           env: STABILITY="dev"
 
     allow_failures:

@@ -76,7 +76,9 @@ class Message implements MessageInterface
 
     public function withoutHeader($name)
     {
-        throw new \BadMethodCallException('Not implemented.');
+        unset($this->headers[$name]);
+
+        return $this;
     }
 
     public function getBody()

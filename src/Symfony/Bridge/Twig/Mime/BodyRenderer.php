@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\Mime;
 
 use League\HTMLToMarkdown\HtmlConverter;
+use Symfony\Component\Mime\BodyRendererInterface;
+use Symfony\Component\Mime\Message;
 use Twig\Environment;
 
 /**
@@ -19,7 +21,7 @@ use Twig\Environment;
  *
  * @experimental in 4.3
  */
-final class Renderer
+final class BodyRenderer implements BodyRendererInterface
 {
     private $twig;
     private $context;
@@ -38,48 +40,48 @@ final class Renderer
         }
     }
 
-    public function render(TemplatedEmail $email): TemplatedEmail
+    public function render(Message $message): void
     {
-        $email = clone $email;
+        if (!$message instanceof TemplatedEmail) {
+            return;
+        }
 
-        $vars = array_merge($this->context, $email->getContext(), [
-            'email' => new WrappedTemplatedEmail($this->twig, $email),
+        $vars = array_merge($this->context, $message->getContext(), [
+            'email' => new WrappedTemplatedEmail($this->twig, $message),
         ]);
 
-        if ($template = $email->getTemplate()) {
-            $this->renderFull($email, $template, $vars);
+        if ($template = $message->getTemplate()) {
+            $this->renderFull($message, $template, $vars);
         }
 
-        if ($template = $email->getTextTemplate()) {
-            $email->text($this->twig->render($template, $vars));
+        if ($template = $message->getTextTemplate()) {
+            $message->text($this->twig->render($template, $vars));
         }
 
-        if ($template = $email->getHtmlTemplate()) {
-            $email->html($this->twig->render($template, $vars));
+        if ($template = $message->getHtmlTemplate()) {
+            $message->html($this->twig->render($template, $vars));
         }
 
         // if text body is empty, compute one from the HTML body
-        if (!$email->getTextBody() && null !== $html = $email->getHtmlBody()) {
-            $email->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
+        if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
+            $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
         }
-
-        return $email;
     }
 
-    private function renderFull(TemplatedEmail $email, string $template, array $vars): void
+    private function renderFull(TemplatedEmail $message, string $template, array $vars): void
     {
         $template = $this->twig->load($template);
 
         if ($template->hasBlock('subject', $vars)) {
-            $email->subject($template->renderBlock('subject', $vars));
+            $message->subject($template->renderBlock('subject', $vars));
         }
 
         if ($template->hasBlock('text', $vars)) {
-            $email->text($template->renderBlock('text', $vars));
+            $message->text($template->renderBlock('text', $vars));
         }
 
         if ($template->hasBlock('html', $vars)) {
-            $email->html($template->renderBlock('html', $vars));
+            $message->html($template->renderBlock('html', $vars));
         }
 
         if ($template->hasBlock('config', $vars)) {

@@ -84,4 +84,22 @@ class TemplatedEmail extends Email
     {
         return $this->context;
     }
+
+    /**
+     * @internal
+     */
+    public function __serialize(): array
+    {
+        return [$this->template, $this->htmlTemplate, $this->textTemplate, $this->context, parent::__serialize()];
+    }
+
+    /**
+     * @internal
+     */
+    public function __unserialize(array $data): void
+    {
+        [$this->template, $this->htmlTemplate, $this->textTemplate, $this->context, $parentData] = $data;
+
+        parent::__unserialize($parentData);
+    }
 }

@@ -16,7 +16,7 @@ namespace Symfony\Component\Mime;
  *
  * @experimental in 4.3
  */
-class RawMessage
+class RawMessage implements \Serializable
 {
     private $message;
 
@@ -51,5 +51,37 @@ class RawMessage
             yield $chunk;
         }
         $this->message = $message;
+    }
+
+    /**
+     * @internal
+     */
+    final public function serialize()
+    {
+        return serialize($this->__serialize());
+    }
+
+    /**
+     * @internal
+     */
+    final public function unserialize($serialized)
+    {
+        $this->__unserialize(unserialize($serialized));
+    }
+
+    /**
+     * @internal
+     */
+    public function __serialize(): array
+    {
+        return [$this->message];
+    }
+
+    /**
+     * @internal
+     */
+    public function __unserialize(array $data): void
+    {
+        [$this->message] = $data;
     }
 }

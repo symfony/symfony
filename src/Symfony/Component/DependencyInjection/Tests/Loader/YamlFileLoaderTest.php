@@ -770,4 +770,15 @@ class YamlFileLoaderTest extends TestCase
         $definition = $container->getDefinition('foo');
         $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
+
+    public function testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('service_instanceof_factory.yml');
+        $container->compile();
+
+        $tagged = $container->findTaggedServiceIds('bar');
+        $this->assertCount(1, $tagged);
+    }
 }

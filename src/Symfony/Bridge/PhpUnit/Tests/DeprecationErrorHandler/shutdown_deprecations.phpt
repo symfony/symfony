@@ -25,7 +25,7 @@ class Test
 {
     public static function getGroups()
     {
-        return [];
+        return array();
     }
 }
 EOPHP
@@ -35,7 +35,7 @@ class PHPUnit_Util_Test
 {
     public static function getGroups()
     {
-        return [];
+        return array();
     }
 }
 

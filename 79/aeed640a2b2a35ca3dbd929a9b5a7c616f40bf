@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-07-06T11:24:52Z
+
+@HeahDude : Is it worth working again on this PR or should I wait your propositions about https://github.com/symfony/symfony/pull/20978#discussion_r92943106 ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-07-06T11:27:10Z
+
+Yes, I suggest to wait :).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T15:46:25Z
+
+Moving to 4.1. Rebase on master needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-31T05:47:59Z
+
+@HeahDude Any ways we can unblock this PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-15T10:04:35Z
+
+What about allowing the option to be a closure that would get passed the transformation failure exception and would return the error message to use?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-09-15T14:38:43Z
+
+@xabbuh : Would you remove the safe message in favor of more specific `TransformationFailedException` instances then? I'm fine with both solutions, but I thing the safe message approach is more convenient than creating a dedicated exception and treat it in each form type `invalid_message` option when relevant.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-09T17:02:08Z
+
+After thinking about it again I think having a message key in the exception isn't such a bad idea. It's also consistent with what we support in the Security component.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-05T23:25:45Z
+
+Woops. I've closed this one by mistake.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-08T22:08:26Z
+
+rebase needed. for which branch is this PR?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-09T09:41:33Z
+
+Rebased on master
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-24T19:32:33Z
+
+@ogizanagi @HeahDude I think we need to take a decision here. Finish/merge or close?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-03-26T21:44:07Z
+
+(PR rebased)

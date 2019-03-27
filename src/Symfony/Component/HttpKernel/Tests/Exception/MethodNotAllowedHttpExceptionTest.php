@@ -34,4 +34,9 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
         $exception->setHeaders($headers);
         $this->assertSame($headers, $exception->getHeaders());
     }
+
+    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    {
+        return new MethodNotAllowedHttpException(['get'], $message, $previous, $code, $headers);
+    }
 }

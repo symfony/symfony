@@ -46,8 +46,16 @@ class HttpExceptionTest extends TestCase
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    protected function createException()
+    public function testThrowableIsAllowedForPrevious()
     {
-        return new HttpException(200);
+        $previous = new class('Error of PHP 7+') extends \Error {
+        };
+        $exception = $this->createException(null, $previous);
+        $this->assertSame($previous, $exception->getPrevious());
+    }
+
+    protected function createException(string $message = null, \Throwable $previous = null, ?int $code = 0, array $headers = [])
+    {
+        return new HttpException(200, $message, $previous, $headers, $code);
     }
 }

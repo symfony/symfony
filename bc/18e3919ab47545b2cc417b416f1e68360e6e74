@@ -1,0 +1,164 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-02T18:48:44Z
+
+Didn't open the patch yet, still have a comment :)
+We should make it possible to define
+`env(json:FOO): [...]`
+Basically we should use processors type to validate.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-02T19:25:15Z
+
+Isnt that over-complicated? IMHO there's only one real env, and thus only 1 default for it as well.
+
+Following your logic we could do:
+
+```
+env(json:FOO): [1, 2, 3]
+env(float:FOO): 1.5
+env(FOO): "arbitrary"
+```
+
+And use `ref: %env(my:truth:here:float:FOO)%` on reference somewhere / anywhere.
+
+Im not sure that makes sense... or at least is extremely hard to reason about.
+
+> Basically we should use processors type to validate.
+
+Which we do already, the processors defined on the reference-side (e.g. for `my:truth:here:float` we receive types from `my` - a custom one in this case).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-02T19:35:35Z
+
+Ok. Deja vu: https://github.com/symfony/symfony/pull/23901#discussion_r135021395
+
+Indeed, we kept this opportunity open.. but the current implem doesnt handle this at all
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-03T15:39:52Z
+
+Let's say today I rely on having e.g.:
+`env(json:SECRETS): { API_KEY: default-api-key, OTHER_KEY: other-token }`
+this PR will break my config but won't provide any alternative, isn't it?
+It should be fine to me instead...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-03T16:20:23Z
+
+> Let's say today I rely on having e.g.:
+> env(json:SECRETS): { API_KEY: default-api-key, OTHER_KEY: other-token }
+
+You can't ... :)
+
+```
+The default value of an env() parameter must be scalar or null, but "array" given to "env(json:FOO)".
+```
+
+Ok, let's use `env(float:FOO): 1.5` (conceptually the same thing - a prefixed default env), using it will throw:
+
+```
+Environment variable not found: "FOO".
+```
+
+I.e. the prefixed default is not used, which is the same behavior during config validation:
+
+https://github.com/symfony/symfony/blob/f27c3a85843f7bfbd08ebb6793b207a4f28c33f1/src/Symfony/Component/DependencyInjection/Compiler/ValidateEnvPlaceholdersPass.php#L50-L51
+
+> this PR will break my config but won't provide any alternative
+
+No. It will only trigger a deprecation declaring default env as non-string.
+
+And given any prefixed default env is not used today, i think we should deprecate that as well :) and open-up whenever it's actually supported (of which i'm not sure we should do it).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-04T07:36:50Z
+
+> Environment variable not found: "FOO".
+
+Oh, great then I forgot that, so all good, let's make tests pass :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-04T08:54:22Z
+
+I need an extra hint :) do you suggest to make the test pass by preserving the assertion `float(3.5)` on `$foo->default`?
+
+Or this PR; asserting `string("3.5")` along with a deprecation for declaring it as `float(3.5)`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-07-13T16:21:48Z
+
+@nicolas-grekas any thoughts already?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-09-04T08:49:11Z
+
+/cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-23T09:18:47Z
+
+@ro0NL would you mind rebasing please? I'd like to see tests green :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-10T10:41:12Z
+
+I'm afraid tests are not green yet :(
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-11T06:36:35Z
+
+Correct, it's still a failing test only :) to move forward the open questions are
+
+- do we want to deprecate non-string default envs?
+
+  ```yaml
+  parameters:
+    env(SOME): 1.5 # before
+    env(SOME): '1.5' # after
+  ```
+
+  currently it's implicitly cast to string during runtime, but not during compile time (config validation) as it broke BC, but this inconsistency is weird.
+
+- somewhat related, but different PR: do we want to deprecate default prefixed envs?
+
+  ```yaml
+  parameters:
+    env(foo:SOME): 'val' # before
+    env(SOME): 'val' # after
+  ```
+
+  a prefixed default env is not detected as such (i.e. above `foo:SOME` wouldnt override `SOME`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-10-11T08:07:05Z
+
+> do we want to deprecate non-string default envs?
+
+👍 for me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-24T19:45:11Z
+
+"do we want to deprecate non-string default envs?" 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-26T17:22:34Z
+
+@fabpot @nicolas-grekas this should do
+
+status: needs review

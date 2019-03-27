@@ -31,4 +31,11 @@ class RedeliveryStampTest extends TestCase
         $this->assertTrue($stampToRedeliverToSender1->shouldRedeliverToSender('App\Sender1', null));
         $this->assertFalse($stampToRedeliverToSender1->shouldRedeliverToSender('App\Sender2', null));
     }
+
+    public function testGetters()
+    {
+        $stamp = new RedeliveryStamp(10, 'sender_alias');
+        $this->assertSame(10, $stamp->getRetryCount());
+        $this->assertSame('sender_alias', $stamp->getSenderClassOrAlias());
+    }
 }

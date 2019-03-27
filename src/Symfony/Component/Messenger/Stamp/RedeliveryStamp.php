@@ -40,9 +40,9 @@ class RedeliveryStamp implements StampInterface
      *
      * @internal
      */
-    public function getSenderClassOrAlias(): int
+    public function getSenderClassOrAlias(): string
     {
-        return $this->retryCount;
+        return $this->senderClassOrAlias;
     }
 
     public function shouldRedeliverToSender(string $senderClass, ?string $senderAlias): bool

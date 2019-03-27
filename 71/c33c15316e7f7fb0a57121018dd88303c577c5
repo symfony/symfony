@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-03-19T16:51:30Z
+
+The name `allowExtraChars` does not seem clear to me if it is actually about allowing brackets. When seeing it, I would have no idea what the extra chars are.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T07:23:46Z
+
+@eborges78 Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by eborges78 at 2019-03-27T07:48:19Z
+
+> @eborges78 Can you rebase to get rid of the merge commit?
+
+Fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T08:40:40Z
+
+Do we really need an option for that? Why would you not allow it?
+
+---------------------------------------------------------------------------
+
+by eborges78 at 2019-03-27T08:49:09Z
+
+> Do we really need an option for that? Why would you not allow it?
+
+I did not want to alter the existing behavior of the UrlValidator.
+Do you think this option can be removed?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T08:53:11Z
+
+I would vote for having this by default with no options. WDYT @symfony/deciders?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-27T09:00:57Z
+
+I agree with Fabien. According to [RFC 3986](https://tools.ietf.org/html/rfc3986) the following line is the regular expression for breaking-down a well-formed URI reference into its components:
+
+```
+^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+```
+
+This is the query string part -> `(\?([^#]*))?`  So nothing prevents using `[` and `]` and, therefore, we shouldn't treat them as a special thing.
+
+---------------------------------------------------------------------------
+
+by eborges78 at 2019-03-27T10:31:57Z
+
+@fabpot @javiereguiluz Thank you for your feedback. so I removed the option and allowed brackets by default

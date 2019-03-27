@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class InlineFragmentRendererTest extends TestCase
 {
@@ -73,7 +74,7 @@ class InlineFragmentRendererTest extends TestCase
      */
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
 
         $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
@@ -87,7 +88,7 @@ class InlineFragmentRendererTest extends TestCase
         $kernel = $this->getKernel($this->throwException($exception));
         $request = Request::create('/');
         $expectedEvent = new ExceptionEvent($kernel, $request, $kernel::SUB_REQUEST, $exception);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher->expects($this->once())->method('dispatch')->with($expectedEvent, KernelEvents::EXCEPTION);
 
         $strategy = new InlineFragmentRenderer($kernel, $dispatcher);

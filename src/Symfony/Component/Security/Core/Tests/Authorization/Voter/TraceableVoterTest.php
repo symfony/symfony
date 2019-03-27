@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Event\VoteEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TraceableVoterTest extends TestCase
 {
@@ -44,7 +44,7 @@ class TraceableVoterTest extends TestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with('debug.security.authorization.vote', new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED));
+            ->with(new VoteEvent($voter, 'anysubject', ['attr1'], VoterInterface::ACCESS_DENIED), 'debug.security.authorization.vote');
 
         $sut = new TraceableVoter($voter, $eventDispatcher);
         $result = $sut->vote($token, 'anysubject', ['attr1']);

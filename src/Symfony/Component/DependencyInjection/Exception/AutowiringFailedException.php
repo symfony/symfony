@@ -23,6 +23,10 @@ class AutowiringFailedException extends RuntimeException
     {
         $this->serviceId = $serviceId;
 
+        if ($message instanceof \Closure && \function_exists('xdebug_is_enabled') && xdebug_is_enabled()) {
+            $message = $message();
+        }
+
         if (!$message instanceof \Closure) {
             parent::__construct($message, $code, $previous);
 

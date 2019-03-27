@@ -12,8 +12,6 @@
 namespace Symfony\Component\Messenger;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
@@ -25,6 +23,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -141,7 +140,7 @@ class Worker
         });
     }
 
-    private function dispatchEvent(Event $event)
+    private function dispatchEvent($event)
     {
         if (null === $this->eventDispatcher) {
             return;

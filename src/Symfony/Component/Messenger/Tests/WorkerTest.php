@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -26,6 +25,7 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\CallbackReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Worker;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class WorkerTest extends TestCase
 {

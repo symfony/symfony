@@ -30,6 +30,8 @@ class FirewallListener extends Firewall
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher, LogoutUrlGenerator $logoutUrlGenerator)
     {
+        // the type-hint will be updated to the "EventDispatcherInterface" from symfony/contracts in 5.0
+
         $this->map = $map;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
 

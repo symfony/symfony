@@ -27,6 +27,7 @@
         "psr/cache": "When using the Cache contracts",
         "psr/container": "When using the Service contracts",
         "symfony/cache-contracts-implementation": "",
+        "symfony/event-dispatcher-implementation": "",
         "symfony/http-client-contracts-implementation": "",
         "symfony/service-contracts-implementation": "",
         "symfony/translation-contracts-implementation": ""

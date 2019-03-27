@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Psr\EventDispatcher\StoppableEventInterface;
+
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
  *
@@ -48,7 +50,7 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
 
-        if ($event instanceof Event) {
+        if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);
         } else {
             @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
@@ -223,12 +225,22 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @param callable[] $listeners The event listeners
      * @param string     $eventName The name of the event to dispatch
-     * @param Event      $event     The event object to pass to the event handlers/listeners
+     * @param object     $event     The event object to pass to the event handlers/listeners
+     */
+    protected function callListeners(iterable $listeners, string $eventName, $event)
+    {
+        $this->doDispatch($listeners, $eventName, $event);
+    }
+
+    /**
+     * @deprecated since Symfony 4.3, use callListeners() instead
      */
     protected function doDispatch($listeners, $eventName, Event $event)
     {
+        $stoppable = $event instanceof Event || $event instanceof StoppableEventInterface;
+
         foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
+            if ($stoppable && $event->isPropagationStopped()) {
                 break;
             }
             $listener($event, $eventName, $this);

@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SwitchUserListenerTest extends TestCase
 {
@@ -138,7 +139,7 @@ class SwitchUserListenerTest extends TestCase
         $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', [new SwitchUserRole('ROLE_PREVIOUS', $originalToken, false)], $originalToken));
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
@@ -165,7 +166,7 @@ class SwitchUserListenerTest extends TestCase
         $this->tokenStorage->setToken(new SwitchUserToken('username', '', 'key', [new SwitchUserRole('ROLE_PREVIOUS', $originalToken, false)], $originalToken));
         $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
 
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher
             ->expects($this->never())
             ->method('dispatch')
@@ -267,7 +268,7 @@ class SwitchUserListenerTest extends TestCase
             ->method('loadUserByUsername')->with('kuba')
             ->will($this->returnValue($user));
 
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by deguif at 2019-03-22T14:02:11Z
+
+Nice, I already needed this in the past.
+The main advantage for me would be that it triggers error during container compilation when package doesn't exist (instead of detecting it at runtime).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-25T08:01:32Z
+
+@gpenverne Can you submit a PR on the docs?

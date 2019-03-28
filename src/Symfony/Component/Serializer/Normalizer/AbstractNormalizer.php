@@ -333,6 +333,10 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
+            if (true !== $constructor->isPublic()) {
+                return $reflectionClass->newInstanceWithoutConstructor();
+            }
+
             $constructorParameters = $constructor->getParameters();
 
             $params = [];

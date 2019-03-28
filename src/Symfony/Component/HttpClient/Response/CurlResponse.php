@@ -231,7 +231,7 @@ final class CurlResponse implements ResponseInterface
 
             while ($info = curl_multi_info_read($multi->handle)) {
                 $multi->handlesActivity[(int) $info['handle']][] = null;
-                $multi->handlesActivity[(int) $info['handle']][] = \in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) ? null : new TransportException(curl_error($info['handle']));
+                $multi->handlesActivity[(int) $info['handle']][] = \in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || (\CURLE_WRITE_ERROR === $info['result'] && 'destruct' === @curl_getinfo($info['handle'], CURLINFO_PRIVATE)) ? null : new TransportException(curl_error($info['handle']));
             }
         } finally {
             self::$performing = false;

@@ -28,7 +28,6 @@ class ErrorChunk implements ChunkInterface
 
     public function __construct(int $offset, \Throwable $error = null)
     {
-        $didThrow = false;
         $this->offset = $offset;
         $this->error = $error;
         $this->errorMessage = null !== $error ? $error->getMessage() : 'Reading from the response stream reached the inactivity timeout.';

@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @experimental in 4.2
  */
-class AmqpReceiver implements ReceiverInterface
+class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
     private $serializer;
     private $connection;
@@ -85,6 +86,14 @@ class AmqpReceiver implements ReceiverInterface
     public function reject(Envelope $envelope): void
     {
         $this->rejectAmqpEnvelope($this->findAmqpEnvelope($envelope));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageCount(): int
+    {
+        return $this->connection->countMessagesInQueue();
     }
 
     private function rejectAmqpEnvelope(\AMQPEnvelope $amqpEnvelope): void

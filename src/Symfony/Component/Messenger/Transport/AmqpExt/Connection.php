@@ -185,6 +185,14 @@ class Connection
     }
 
     /**
+     * Returns an approximate count of the messages in a queue.
+     */
+    public function countMessagesInQueue(): int
+    {
+        return $this->queue()->declareQueue();
+    }
+
+    /**
      * @throws \AMQPException
      */
     private function publishWithDelay(string $body, array $headers = [], int $delay)

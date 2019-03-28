@@ -37,6 +37,9 @@ class ConnectionTest extends TestCase
         $queryBuilder
             ->method('getSQL')
             ->willReturn('');
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
         $driverConnection
             ->method('prepare')
             ->willReturn($stmt);
@@ -54,6 +57,9 @@ class ConnectionTest extends TestCase
         $driverConnection = $this->getDBALConnectionMock();
         $stmt = $this->getStatementMock(false);
 
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
         $driverConnection->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
@@ -119,6 +125,7 @@ class ConnectionTest extends TestCase
         $queryBuilder->method('orderBy')->willReturn($queryBuilder);
         $queryBuilder->method('setMaxResults')->willReturn($queryBuilder);
         $queryBuilder->method('setParameter')->willReturn($queryBuilder);
+        $queryBuilder->method('setParameters')->willReturn($queryBuilder);
 
         return $queryBuilder;
     }

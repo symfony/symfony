@@ -14,10 +14,12 @@ namespace Symfony\Component\EventDispatcher\DependencyInjection;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventListenerInterface;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
@@ -63,22 +65,41 @@ class RegisterListenersPass implements CompilerPassInterface
         $definition = $container->findDefinition($this->dispatcherService);
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
+            $reflection = null;
             foreach ($events as $event) {
                 $priority = isset($event['priority']) ? $event['priority'] : 0;
 
                 if (!isset($event['event'])) {
-                    throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+                    if (null === $reflection) {
+                        $class = $container->getDefinition($id)->getClass();
+                        if (!$reflection = $container->getReflectionClass($class)) {
+                            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                        }
+                    }
+                    if (!$reflection->implementsInterface(EventListenerInterface::class)) {
+                        throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags or implements the "%s" interface.', $id, $this->listenerTag, EventListenerInterface::class));
+                    }
+
+                    $event['event'] = $this->guessListenedClass($reflection, $id);
+                    $event['method'] = '__invoke';
+                } else {
+                    $event['event'] = $aliases[$event['event']] ?? $event['event'];
                 }
-                $event['event'] = $aliases[$event['event']] ?? $event['event'];
 
                 if (!isset($event['method'])) {
                     $event['method'] = 'on'.preg_replace_callback([
                         '/(?<=\b)[a-z]/i',
                         '/[^a-z0-9]/i',
-                    ], function ($matches) { return strtoupper($matches[0]); }, $event['event']);
+                    ], function ($matches) { return strtoupper($matches[0]); }, (false === $p = strrpos($event['event'], '\\')) ? $event['event'] : substr($event['event'], $p + 1));
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
 
-                    if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method']) && $r->hasMethod('__invoke')) {
+                    if (null === $reflection) {
+                        $class = $container->getDefinition($id)->getClass();
+                        if (!$reflection = $container->getReflectionClass($class)) {
+                            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                        }
+                    }
+                    if (!$reflection->hasMethod($event['method']) && $reflection->hasMethod('__invoke')) {
                         $event['method'] = '__invoke';
                     }
                 }
@@ -120,6 +141,40 @@ class RegisterListenersPass implements CompilerPassInterface
             }
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];
+        }
+    }
+
+    private function guessListenedClass(\ReflectionClass $handlerClass, string $serviceId): string
+    {
+        try {
+            $method = $handlerClass->getMethod('__invoke');
+        } catch (\ReflectionException $e) {
+            throw new \InvalidArgumentException(sprintf('Invalid EventListener "%s": class "%s" must have an "__invoke()" method.', $serviceId, $handlerClass->getName()));
+        }
+
+        $parameters = $method->getParameters();
+        if (1 > \count($parameters)) {
+            throw new \InvalidArgumentException(sprintf('Invalid EventListener "%s": method "%s::__invoke()" must have, at least, one argument corresponding to the event it handles.', $serviceId, $handlerClass->getName()));
+        }
+
+        if (!$type = $parameters[0]->getType()) {
+            throw new \InvalidArgumentException(sprintf('Invalid EventListener "%s": argument "$%s" of method "%s::__invoke()" must have a type-hint corresponding to the event class it handles.', $serviceId, $parameters[0]->getName(), $handlerClass->getName()));
+        }
+
+        if ($type->isBuiltin()) {
+            throw new \InvalidArgumentException(sprintf('Invalid EventListener "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class, "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $type));
+        }
+
+        return $parameters[0]->getType();
+    }
+
+    private function registerListenerCall(ContainerBuilder $container, Definition $definition, string $listerId, string $eventName, string $method, int $priority)
+    {
+        $callable = [new ServiceClosureArgument(new Reference($listerId)), $method];
+        $definition->addMethodCall('addListener', [$eventName, $callable, $priority]);
+
+        if (isset($this->hotPathEvents[$eventName])) {
+            $container->getDefinition($listerId)->addTag($this->hotPathTagName);
         }
     }
 }

@@ -116,6 +116,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\EventDispatcher\EventListenerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -368,6 +369,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.cache_clearer');
         $container->registerForAutoconfiguration(CacheWarmerInterface::class)
             ->addTag('kernel.cache_warmer');
+        $container->registerForAutoconfiguration(EventListenerInterface::class)
+            ->addTag('kernel.event_listener');
         $container->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResetInterface::class)

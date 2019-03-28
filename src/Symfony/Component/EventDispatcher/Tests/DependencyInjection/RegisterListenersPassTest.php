@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Contracts\EventDispatcher\EventListenerInterface;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -148,6 +150,9 @@ class RegisterListenersPassTest extends TestCase
         $container->register('foo', \stdClass::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('bar', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo.bar']);
         $container->register('baz', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
+        $container->register('fqdn', InvokableListenerService::class)->addTag('kernel.event_listener', ['event' => KernelEvent::class]);
+        $container->register('autoconfigured', AutoconfiguredListenerService::class)->addTag('kernel.event_listener');
+        $container->register('hybride', AutoconfiguredListenerService::class)->addTag('kernel.event_listener', ['event' => 'foo'])->addTag('kernel.event_listener');
         $container->register('event_dispatcher', \stdClass::class);
 
         $registerListenersPass = new RegisterListenersPass();
@@ -179,6 +184,38 @@ class RegisterListenersPassTest extends TestCase
                     0,
                 ],
             ],
+            [
+                'addListener',
+                [
+                    'Symfony\Component\HttpKernel\Event\KernelEvent',
+                    [new ServiceClosureArgument(new Reference('fqdn')), 'onKernelEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'Symfony\Component\EventDispatcher\Tests\DependencyInjection\FooEvent',
+                    [new ServiceClosureArgument(new Reference('autoconfigured')), '__invoke'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'foo',
+                    [new ServiceClosureArgument(new Reference('hybride')), 'onFoo'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    'Symfony\Component\EventDispatcher\Tests\DependencyInjection\FooEvent',
+                    [new ServiceClosureArgument(new Reference('hybride')), '__invoke'],
+                    0,
+                ],
+            ],
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
@@ -203,4 +240,23 @@ class InvokableListenerService
     public function onEvent()
     {
     }
+
+    public function onKernelEvent()
+    {
+    }
+}
+
+class AutoconfiguredListenerService implements EventListenerInterface
+{
+    public function __invoke(FooEvent $e)
+    {
+    }
+
+    public function onFoo(FooEvent $e)
+    {
+    }
+}
+
+class FooEvent
+{
 }

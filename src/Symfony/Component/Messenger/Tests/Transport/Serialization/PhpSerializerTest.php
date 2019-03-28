@@ -28,6 +28,16 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
     }
 
+    public function testDecodingFailsWithMissingBodyKey()
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage('Encoded envelope should have at least a "body".');
+
+        $serializer = new PhpSerializer();
+
+        $serializer->decode([]);
+    }
+
     public function testDecodingFailsWithBadFormat()
     {
         $this->expectException(MessageDecodingFailedException::class);

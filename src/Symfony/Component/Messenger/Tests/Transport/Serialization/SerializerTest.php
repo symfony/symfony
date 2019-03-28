@@ -108,6 +108,37 @@ class SerializerTest extends TestCase
         ]);
     }
 
+    /**
+     * @dataProvider getMissingKeyTests
+     */
+    public function testDecodingFailsWithMissingKeys(array $data, string $expectedMessage)
+    {
+        $this->expectException(MessageDecodingFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $serializer = new Serializer();
+
+        $serializer->decode($data);
+    }
+
+    public function getMissingKeyTests()
+    {
+        yield 'no_body' => [
+            ['headers' => ['type' => 'bar']],
+            'Encoded envelope should have at least a "body" and some "headers".',
+        ];
+
+        yield 'no_headers' => [
+            ['body' => '{}'],
+            'Encoded envelope should have at least a "body" and some "headers".',
+        ];
+
+        yield 'no_headers_type' => [
+            ['body' => '{}', 'headers' => ['foo' => 'bar']],
+            'Encoded envelope does not have a "type" header.',
+        ];
+    }
+
     public function testDecodingFailsWithBadClass()
     {
         $this->expectException(MessageDecodingFailedException::class);

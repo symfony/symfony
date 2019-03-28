@@ -1,0 +1,141 @@
+---------------------------------------------------------------------------
+
+by kejwmen at 2018-01-07T03:19:30Z
+
+labels are wrong, my fault.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-01-07T10:10:04Z
+
+What's the point of the interface?
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2018-01-07T17:44:28Z
+
+@unkind let you verify if `ServiceLocator` can provide services for class implementing `ServiceSubscriberInterface`.
+
+And can be used for debugging.
+
+probably @nicolas-grekas will bring more specific examples.
+
+Thank for review, missed that it's supplementary for `PsrContainerInterface`.
+
+---------------------------------------------------------------------------
+
+by unkind at 2018-01-07T18:33:06Z
+
+> let you verify if ServiceLocator can provide services for class implementing ServiceSubscriberInterface.
+
+I mean not method by itself, but separated interface. I see the only implementation — `ServiceLocator`. Do you mind to provide example when type hinting against `ServiceLocator` is not possible/enough if you want to execute `getProvidedServices()`? Any other implementations?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T19:14:19Z
+
+@unkind what I described in th linked PR: to provide reflection on the inner of the locator.
+This concern is legitimate for any PSR-11 container - ServiceLocator, but could also be implemented on our `Container`, etc.
+It could help e.g generating useful message, allow iterating over services, etc. (any use case that reflection provides really.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T19:48:05Z
+
+@mnapoli @moufmouf @crell FYI here is an implementation of what we talked about recently in Paris :)
+
+---------------------------------------------------------------------------
+
+by moufmouf at 2018-01-09T09:28:50Z
+
+@nicolas-grekas Cool! I know I promised to write an article on this idea and I haven't had time to do it yet... this is still on my TODO list though!
+
+I know the Symfony container is mostly used to store objects (which is not the case of all PSR-11 containers). Yet, some factories might return arrays of objects, or scalars. Do you think it might be worthwhile to add those cases to `getProvidedServices()` return types?
+
+For instance: "string" maps to a string, "LoggerInterface[]" maps to an array of LoggerInterface...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-09T13:10:58Z
+
+> "string" maps to a string
+
+that's already the case here
+
+> "LoggerInterface[]" maps to an array of LoggerInterface
+
+that'd need more information than we rely on in this implementation, but otherwise, yes (the current implementation is already compatible with it, it just won't ever return that :).)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-23T06:17:23Z
+
+I think this would be a good addition to PSR-11. I would even go as far as saying that we should not implement this before being part of an extension of PSR-11. So, Fig first, then add it to Symfony. But right now, I would no deviate from PSR-11 as we spent a lot of time being sure that our code is PSR-11 compliant.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-23T07:02:58Z
+
+Looks good to me, let's put this on hold, waiting for the FIG.
+@moufmouf @mnapoli @Crell needing you at this stage :)
+
+---------------------------------------------------------------------------
+
+by moufmouf at 2018-03-01T17:25:32Z
+
+Hey!
+
+As promised, I just wrote a [lengthy article](https://thecodingmachine.io/psr-11-scope-of-universal-service-providers) presenting your solution and comparing it to [container-interop/service-provider](https://github.com/container-interop/service-provider/).
+
+I'm trying to highlight the strength of both solutions. I have a feeling there must be a way to gather the best of both worlds.
+
+I opened the discussion on the PHP-FIG mailing list here: https://groups.google.com/forum/#!topic/php-fig/Up0JATOb0-w
+
+Feel free to join the discussion!
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2018-03-04T20:06:12Z
+
+Hey! Nice summary @moufmouf! Lately I've been completely swamped and I'm afraid I cannot do much to help except sending +1's on trying out that idea :/ It does sound good, especially if it fits Symfony's need (we were originally worried about performances and compilation).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-05T09:43:39Z
+
+@kejwmen would you be up to resume this PR? I'd suggest to rebase on top of master, and move the new interface in the `Symfony\Contracts\Service` namespace. WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-09-05T15:03:12Z
+
+@nicolas-grekas https://github.com/symfony/symfony/tree/master/src/Symfony/Contracts#design-principles is saying:
+
+> all contracts must have a proven implementation to enter this repository;
+
+Doesn't this means that this *cannot* go directly in contracts ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-05T15:04:57Z
+
+@stof correct, but we can still get closer to the point where this might be merged :)
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2018-09-06T05:43:08Z
+
+@nicolas-grekas sure :)
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2018-09-07T21:07:09Z
+
+@nicolas-grekas done.
+What should I do about this failing test? Should I submit a separate PR with contracts or can we just ignore it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-20T15:14:37Z
+
+@symfony/deciders I'm going to merge this PR soon: the feature it provides (reflecting what a container provides) is going to play nice with #30348.

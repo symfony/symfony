@@ -36,6 +36,10 @@
             <tag name="cache.pool" />
         </service>
 
+        <service id="cache.messenger.restart_workers_signal" parent="cache.app" public="false">
+            <tag name="cache.pool" />
+        </service>
+
         <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
             <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
             <tag name="cache.pool" clearer="cache.system_clearer" />

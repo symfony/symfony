@@ -256,6 +256,25 @@ class ConnectionTest extends TestCase
         $connection->publish('body', $headers);
     }
 
+    public function testSetChannelPrefetchWhenSetup()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        // makes sure the channel looks connected, so it's not re-created
+        $amqpChannel->expects($this->exactly(2))->method('isConnected')->willReturn(true);
+
+        $amqpChannel->expects($this->exactly(2))->method('setPrefetchCount')->with(2);
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages?prefetch_count=2', [], $factory);
+        $connection->setup();
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', ['prefetch_count' => 2], $factory);
+        $connection->setup();
+    }
+
     public function testItDelaysTheMessage()
     {
         $amqpConnection = $this->getMockBuilder(\AMQPConnection::class)->disableOriginalConstructor()->getMock();

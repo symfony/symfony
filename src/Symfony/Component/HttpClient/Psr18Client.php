@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
@@ -20,6 +21,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+if (!interface_exists(ClientInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-client" package is not installed. Try running "composer require psr/http-client".');
+}
 
 /**
  * An adapter to turn a Symfony HttpClientInterface into a PSR-18 ClientInterface.
@@ -38,11 +43,23 @@ final class Psr18Client implements ClientInterface
     private $responseFactory;
     private $streamFactory;
 
-    public function __construct(HttpClientInterface $client, ResponseFactoryInterface $responseFactory, StreamFactoryInterface $streamFactory)
+    public function __construct(HttpClientInterface $client = null, ResponseFactoryInterface $responseFactory = null, StreamFactoryInterface $streamFactory = null)
     {
-        $this->client = $client;
+        $this->client = $client ?? HttpClient::create();
         $this->responseFactory = $responseFactory;
-        $this->streamFactory = $streamFactory;
+        $this->streamFactory = $streamFactory ?? ($responseFactory instanceof StreamFactoryInterface ? $responseFactory : null);
+
+        if (null !== $this->responseFactory && null !== $this->streamFactory) {
+            return;
+        }
+
+        if (!class_exists(Psr17Factory::class)) {
+            throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as no PSR-17 factories have been provided. Try running "composer require nyholm/psr7".');
+        }
+
+        $psr17Factory = new Psr17Factory();
+        $this->responseFactory = $this->responseFactory ?? $psr17Factory;
+        $this->streamFactory = $this->streamFactory ?? $psr17Factory;
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface

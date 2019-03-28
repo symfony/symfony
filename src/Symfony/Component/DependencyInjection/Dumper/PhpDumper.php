@@ -1546,6 +1546,7 @@ EOF;
 
                 if ($value instanceof ServiceLocatorArgument) {
                     $serviceMap = '';
+                    $serviceTypes = '';
                     foreach ($value->getValues() as $k => $v) {
                         if (!$v) {
                             continue;
@@ -1559,11 +1560,12 @@ EOF;
                             $this->export(ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $v->getInvalidBehavior() && !\is_string($load) ? $this->generateMethodName($id).($load ? '.php' : '') : null),
                             $this->export($load)
                         );
+                        $serviceTypes .= sprintf("\n            %s => %s,", $this->export($k), $this->export($v instanceof TypedReference ? $v->getType() : '?'));
                         $this->locatedIds[$id] = true;
                     }
                     $this->addGetService = true;
 
-                    return sprintf('new \%s($this->getService, [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '');
+                    return sprintf('new \%s($this->getService, [%s%s], [%s%s])', ServiceLocator::class, $serviceMap, $serviceMap ? "\n        " : '', $serviceTypes, $serviceTypes ? "\n        " : '');
                 }
             } finally {
                 list($this->definitionVariables, $this->referenceVariables) = $scope;

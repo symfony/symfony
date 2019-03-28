@@ -86,6 +86,21 @@ class ServiceLocatorTest extends BaseServiceLocatorTest
         $this->assertSame('baz', $locator('bar'));
         $this->assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
     }
+
+    public function testProvidesServicesInformation()
+    {
+        $locator = new ServiceLocator([
+            'foo' => function () { return 'bar'; },
+            'bar' => function (): string { return 'baz'; },
+            'baz' => function (): ?string { return 'zaz'; },
+        ]);
+
+        $this->assertSame($locator->getProvidedServices(), [
+            'foo' => '?',
+            'bar' => 'string',
+            'baz' => '?string',
+        ]);
+    }
 }
 
 class SomeServiceSubscriber implements ServiceSubscriberInterface

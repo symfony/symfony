@@ -13,6 +13,7 @@ namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
@@ -585,7 +586,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      *
-     * @throws \InvalidArgumentException if one of the directories does not exist
+     * @throws DirectoryNotFoundException if one of the directories does not exist
      */
     public function in($dirs)
     {
@@ -597,7 +598,7 @@ class Finder implements \IteratorAggregate, \Countable
             } elseif ($glob = glob($dir, (\defined('GLOB_BRACE') ? GLOB_BRACE : 0) | GLOB_ONLYDIR)) {
                 $resolvedDirs = array_merge($resolvedDirs, array_map([$this, 'normalizeDir'], $glob));
             } else {
-                throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
+                throw new DirectoryNotFoundException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 

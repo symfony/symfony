@@ -450,6 +450,7 @@ class PropertyAccessorTest extends TestCase
             [new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'],
             [new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'],
             [new TestClass('Bernhard'), 'publicGetSetter', 'Bernhard'],
+            [new TestClass('Bernhard'), 'publicCanAccessor', 'Bernhard'],
 
             // Methods are camelized
             [new TestClass('Bernhard'), 'public_accessor', 'Bernhard'],

@@ -42,6 +42,7 @@ EventDispatcher
 ---------------
 
  * The signature of the `EventDispatcherInterface::dispatch()` method should be updated to `dispatch($event, string $eventName = null)`, not doing so is deprecated
+ * The `Event` class has been deprecated, use `Symfony\Contracts\EventDispatcher\Event` instead
 
 Form
 ----

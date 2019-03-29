@@ -71,6 +71,7 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
  * The signature of the `EventDispatcherInterface::dispatch()` method has been updated to `dispatch($event, string $eventName = null)`
+ * The `Event` class has been removed, use `Symfony\Contracts\EventDispatcher\Event` instead
 
 DependencyInjection
 -------------------

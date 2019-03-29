@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
+use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -68,7 +69,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
         }
 
         $listeners = $this->getListeners($eventName);
-        $stoppable = $event instanceof Event || $event instanceof StoppableEventInterface;
+        $stoppable = $event instanceof Event || $event instanceof ContractsEvent || $event instanceof StoppableEventInterface;
 
         foreach ($listeners as $listener) {
             if ($stoppable && $event->isPropagationStopped()) {

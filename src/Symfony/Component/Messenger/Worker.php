@@ -99,7 +99,7 @@ class Worker
 
                     $retryCount = $this->getRetryCount($envelope) + 1;
                     if (null !== $this->logger) {
-                        $this->logger->info('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
+                        $this->logger->error('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
                     }
 
                     // add the delay and retry stamp info + remove ReceivedStamp
@@ -113,7 +113,7 @@ class Worker
                     $this->receiver->ack($envelope);
                 } else {
                     if (null !== $this->logger) {
-                        $this->logger->info('Rejecting {class} (removing from transport).', $context + ['error' => $throwable]);
+                        $this->logger->critical('Rejecting {class} (removing from transport).', $context + ['error' => $throwable]);
                     }
 
                     $this->receiver->reject($envelope);

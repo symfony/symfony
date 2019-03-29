@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by kralos at 2018-06-25T03:50:58Z
+
+Removed composer `require-dev` `mongodb/mongodb` from `Component\Lock` in case someone requires it and doesn't want to use MongoDbStore.
+Renamed `MongoDbClientTest` to `MongoDbStoreTest`
+Squashed commits
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-06-25T06:16:44Z
+
+`require-dev` are only installed when you run `composer install` on the component (every project that define the "lock component" as a dependency won't get packages defined in this section). This is the right place to add dependencies for developement or testing of the component.
+
+By removing the dependency all the tests are flagged `skipped`
+
+---------------------------------------------------------------------------
+
+by kralos at 2018-06-25T06:32:45Z
+
+Ah ok, i've reinstated `require-dev` `mongodb/mongodb` in `Symfony\Component\Lock`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-25T08:52:34Z
+
+Personally, when this is contributed like here, I'm OK with adding this to the component directly, provided the implementation is top quality (double care for reviewers + author).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-09-10T07:35:23Z
+
+Could you please rebase? We prefer not merging PRs when they contain merge commits.
+
+---------------------------------------------------------------------------
+
+by kralos at 2018-10-05T06:33:06Z
+
+@GaneshChandrasekaran I've responded to all of your comments, can you please resolve every discussion you are happy with?
+
+---------------------------------------------------------------------------
+
+by GaneshChandrasekaran at 2018-10-05T11:25:01Z
+
+Thanks for your patience and answering all my questions @kralos
+
+The only concern that I have left is, this implementation leaves with a possibility of leaving behind stale locks in the DB if an application encounters a crash or some other failure or if the version of mongodb is older than `2.2`. This can be bad if you have a high throughput application that requires a lock only once to avoid duplicate processing or something.
+
+I am thinking maybe it should also do something similar to `PDOStore` which seems to clean up stale locks at random intervals
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Lock/Store/PdoStore.php#L143
+
+---------------------------------------------------------------------------
+
+by kralos at 2018-10-08T22:50:37Z
+
+> Thanks for your patience and answering all my questions @kralos
+>
+> The only concern that I have left is, this implementation leaves with a possibility of leaving behind stale locks in the DB if an application encounters a crash or some other failure or if the version of mongodb is older than `2.2`. This can be bad if you have a high throughput application that requires a lock only once to avoid duplicate processing or something.
+>
+> I am thinking maybe it should also do something similar to `PDOStore` which seems to clean up stale locks at random intervals
+> https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Lock/Store/PdoStore.php#L143
+
+I've had a look at `PdoStore`'s implementation and I have some concerns with it:
+
+1. The expiry time is using the DBMS's clock for cleanup, what if the DBMS clock differs from the application server? It would be possible to use a timestamp generated from PHP for the `WHERE` clause. Shouldn't we avoid this where possible?
+2. What about clock drift? If there are multiple servers spanning geographic regions should the developer be allowed to specify an acceptable drift (seconds) allowing cleanup to happen slightly after expiry? e.g. `MongoDbStore::createTtlIndex(int $expireAfterSeconds = 0)` The `$expireAfterSeconds` allows the developer / sysadmin to specify acceptable delay between the expiry and deletion.
+
+I did also have a concern about people who run servers on different timezones however I'm not sure if we care about these people... :-p
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-24T19:42:23Z
+
+@jderusse How can we move this one forward?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-29T12:16:58Z
+
+Tests are broken.
+
+---------------------------------------------------------------------------
+
+by kralos at 2019-03-29T13:55:14Z
+
+@fabpot `composer update` is intermittently breaking AppVeyor
+
+```
+php composer.phar update --no-progress --no-suggest --ansi
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Restricting packages listed in "symfony/symfony" to ">=4.2"
+Failed to decode response: Failed to decode zlib stream
+Retrying with degraded mode, check https://getcomposer.org/doc/articles/troubleshooting.md#degraded-mode for more info
+```
+```
+Command exited with code -1073741819
+```

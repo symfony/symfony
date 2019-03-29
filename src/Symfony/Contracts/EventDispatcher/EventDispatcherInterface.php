@@ -13,7 +13,7 @@ namespace Symfony\Contracts\EventDispatcher;
 
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 
-if (interface_exists(PsrEventDispatcherInterface::class)) {
+if (\interface_exists(PsrEventDispatcherInterface::class)) {
     /**
      * Allows providing hooks on domain-specific lifecycles by dispatching events.
      */

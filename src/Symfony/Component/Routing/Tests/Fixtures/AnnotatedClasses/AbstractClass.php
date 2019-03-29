@@ -13,4 +13,9 @@ namespace Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses;
 
 abstract class AbstractClass
 {
+    abstract public function abstractRouteAction();
+
+    public function routeAction($arg1, $arg2 = 'defaultValue2', $arg3 = 'defaultValue3')
+    {
+    }
 }

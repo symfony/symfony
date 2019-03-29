@@ -4,6 +4,9 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added `AmqpRoutingKeyStamp` allowing to provide a routing key on message publishing.
+ * Removed publishing with a `routing_key` option from queue configuration, for
+   AMQP. Use exchange `default_publish_routing_key` or `AmqpRoutingKeyStamp` instead.
  * Added optional parameter `prefetch_count` in connection configuration, 
    to setup channel prefetch count
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`
@@ -53,8 +56,6 @@ CHANGELOG
    and queues by default. Previously, this was done when in "debug" mode
    only. Pass the `auto_setup` connection option to control this.
  * Added a `SetupTransportsCommand` command to setup the transports
- * Added `AmqpRoutingKeyStamp` allowing to provide a routing key on message publishing.
- * Deprecated publishing with a routing key from queue configuration, use exchange configuration instead.
 
 4.2.0
 -----

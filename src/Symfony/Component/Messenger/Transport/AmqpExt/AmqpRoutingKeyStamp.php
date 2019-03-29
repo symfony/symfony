@@ -20,9 +20,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  */
 final class AmqpRoutingKeyStamp implements StampInterface
 {
-    /**
-     * @var string
-     */
     private $routingKey;
 
     public function __construct(string $routingKey)

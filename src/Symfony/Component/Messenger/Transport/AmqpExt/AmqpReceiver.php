@@ -45,7 +45,15 @@ class AmqpReceiver implements ReceiverInterface
     {
         while (!$this->shouldStop) {
             try {
-                $amqpEnvelope = $this->connection->get();
+                // TODO - update this after #30708 is merged
+                $amqpEnvelope = null;
+                foreach ($this->getAllQueueNames() as $queueName) {
+                    $amqpEnvelope = $this->connection->get($queueName);
+
+                    if (null !== $amqpEnvelope) {
+                        break;
+                    }
+                }
             } catch (\AMQPException $exception) {
                 throw new TransportException($exception->getMessage(), 0, $exception);
             }

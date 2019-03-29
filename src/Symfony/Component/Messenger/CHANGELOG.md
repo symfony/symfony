@@ -52,8 +52,9 @@ CHANGELOG
  * [BC BREAK] The Amqp Transport now automatically sets up the exchanges
    and queues by default. Previously, this was done when in "debug" mode
    only. Pass the `auto_setup` connection option to control this.
-
  * Added a `SetupTransportsCommand` command to setup the transports
+ * Added `AmqpRoutingKeyStamp` allowing to provide a routing key on message publishing.
+ * Deprecated publishing with a routing key from queue configuration, use exchange configuration instead.
 
 4.2.0
 -----

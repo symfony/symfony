@@ -213,7 +213,7 @@ trait HttpClientTrait
      *
      * @throws InvalidArgumentException When an invalid body is passed
      */
-    private static function normalizeBody($body)
+    private static function normalizeBody($body): ?string
     {
         if (\is_array($body)) {
             return http_build_query($body, '', '&', PHP_QUERY_RFC1738);

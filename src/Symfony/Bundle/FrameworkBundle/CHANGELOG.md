@@ -28,6 +28,7 @@ CHANGELOG
  * Added support for PHP files with translations in translation commands.
  * Added support for boolean container parameters within routes.
  * Added the `messenger:setup-transports` command to setup messenger transports
+ * Added `ProxyController` to fetch content from a remote URL
 
 4.2.0
 -----

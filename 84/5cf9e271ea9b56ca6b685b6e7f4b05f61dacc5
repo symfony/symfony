@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-29T14:27:09Z
+
+In case you missed it, "AMP for mail" is now a reality. I'm not asking to add support for AMP ... but we should review that the current architecture doesn't prevent from adding AMP support in the future (in core or via extensions).
+
+Specifically:
+
+> Important things to note:
+>
+> The text/x-amp-html part must be nested under a multipart/alternative node, it will not be recognized by the email client otherwise.
+>
+> Some email clients will only render the last MIME part, so we recommend placing the text/x-amp-html MIME part before the text/html MIME part.
+
+Read this for all the tech details: https://www.ampproject.org/docs/interaction_dynamic/amp-email-format
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-03-29T14:55:43Z
+
+@fabpot
+
+What is our plan when a provider deprecate an usage / remove it or change a default configuration ? Shouldn't there be a version system somewhere in the provider bridges ?
+
+Also, what is the criteria for a provider to be in SF core ? I think it should be clear.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-29T15:29:50Z
+
+@javiereguiluz I've just read the AMP for email page and the good news is that we are compatible. One needs to add the AMP part "manually", but that's a great use case for using the low-level interface of the component. I don't think that AMP should be a first-class citizen of the component though.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-29T16:22:58Z
+
+Tests are green now.

@@ -21,7 +21,7 @@ namespace Symfony\Component\Messenger;
 interface WorkerInterface
 {
     /**
-     * Receive the messages and dispatch them to the bus.
+     * Receives the messages and dispatch them to the bus.
      *
      * The $onHandledCallback will be passed the Envelope that was just
      * handled or null if nothing was handled.
@@ -31,7 +31,7 @@ interface WorkerInterface
     public function run(array $options = [], callable $onHandledCallback = null): void;
 
     /**
-     * Stop receiving messages.
+     * Stops receiving messages.
      */
     public function stop(): void;
 }

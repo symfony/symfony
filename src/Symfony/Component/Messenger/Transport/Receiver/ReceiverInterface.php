@@ -23,14 +23,14 @@ use Symfony\Component\Messenger\Exception\TransportException;
 interface ReceiverInterface
 {
     /**
-     * Receive some messages to the given handler.
+     * Receives some messages to the given handler.
      *
      * While this method could return an unlimited number of messages,
      * the intention is that it returns only one, or a "small number"
      * of messages each time. This gives the user more flexibility:
      * they can finish processing the one (or "small number") of messages
      * from this receiver and move on to check other receivers for messages.
-     * If a this method returns too many messages, it could cause a
+     * If this method returns too many messages, it could cause a
      * blocking effect where handling the messages received from one
      * call to get() takes a long time, blocking other receivers from
      * being called.
@@ -46,7 +46,7 @@ interface ReceiverInterface
     public function get(): iterable;
 
     /**
-     * Acknowledge that the passed message was handled.
+     * Acknowledges that the passed message was handled.
      *
      * @throws TransportException If there is an issue communicating with the transport
      */

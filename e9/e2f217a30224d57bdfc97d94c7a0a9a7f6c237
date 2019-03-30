@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-27T22:42:54Z
+
+Thanks, LGTM. Should target master as it's a new feature.
+
+---------------------------------------------------------------------------
+
+by sGy1980de at 2019-03-28T10:46:59Z
+
+@nicolas-grekas
+Could you please explain a little, why you consider this a new feature? To me it is a bug or at least unintended behaviour. Furthermore this won't change any existing application out there, so i really don't get the point here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-28T11:10:29Z
+
+This never worked as you said, so it wasn't supported. Adding support for something that wasn't possible before is almost the definition of a new feature to me.
+
+---------------------------------------------------------------------------
+
+by sGy1980de at 2019-03-28T12:24:37Z
+
+So what's next?
+@javiereguiluz marked the corresponding issue as bug. Shall i raise it with target `master` again or let it like that?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-03-28T12:35:57Z
+
+@sGy1980de I marked it as a bug because the issue description looked as a bug. But I could be wrong, so please don't think that it's definitive.
+
+---------------------------------------------------------------------------
+
+by sGy1980de at 2019-03-29T14:14:59Z
+
+Hey guys - what about the bug vs. feature discussion on this? Is it discussed internally or are all following @nicolas-grekas opinion and i should raise this with target master again?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-29T15:32:02Z
+
+I tend to agree with @nicolas-grekas here.

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.49.2",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazia",
@@ -67,6 +67,7 @@
         "byv": "Medumba",
         "ca": "Catalonia",
         "cay": "Cayuga",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Chiga",

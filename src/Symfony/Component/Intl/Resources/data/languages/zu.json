@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.65",
+    "Version": "2.1.48.17",
     "Names": {
         "aa": "isi-Afar",
         "ab": "isi-Abkhazian",
@@ -48,6 +48,7 @@
         "bug": "isi-Buginese",
         "byn": "isi-Blin",
         "ca": "isi-Catalan",
+        "ccp": "i-Chakma",
         "ce": "isi-Chechen",
         "ceb": "isi-Cebuano",
         "cgg": "isi-Chiga",

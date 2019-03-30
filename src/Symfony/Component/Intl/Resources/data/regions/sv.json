@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.94",
+    "Version": "2.1.48.90",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -146,7 +146,7 @@
         "MF": "Saint-Martin",
         "MG": "Madagaskar",
         "MH": "Marshallöarna",
-        "MK": "Makedonien",
+        "MK": "Nordmakedonien",
         "ML": "Mali",
         "MM": "Myanmar (Burma)",
         "MN": "Mongoliet",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis- och Futunaöarna",
         "WS": "Samoa",
+        "XA": "fejkade accenter (för test)",
+        "XB": "fejkad bidi (för test)",
         "XK": "Kosovo",
         "YE": "Jemen",
         "YT": "Mayotte",

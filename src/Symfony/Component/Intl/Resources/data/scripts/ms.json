@@ -1,14 +1,11 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.49.2",
     "Names": {
         "Arab": "Arab",
         "Armn": "Armenia",
-        "Bali": "Bali",
-        "Bamu": "Bamu",
         "Beng": "Benggala",
         "Bopo": "Bopomofo",
         "Brai": "Braille",
-        "Cans": "Cans",
         "Cyrl": "Cyril",
         "Deva": "Devanagari",
         "Ethi": "Ethiopia",

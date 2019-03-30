@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.43",
     "Names": {
         "Arab": "arabe",
         "Armi": "araméen impérial",
@@ -29,6 +29,7 @@
         "Egyd": "démotique égyptien",
         "Egyh": "hiératique égyptien",
         "Egyp": "hiéroglyphes égyptiens",
+        "Elym": "élymaïque",
         "Ethi": "éthiopique",
         "Geok": "géorgien khoutsouri",
         "Geor": "géorgien",
@@ -46,6 +47,7 @@
         "Hebr": "hébreu",
         "Hira": "hiragana",
         "Hmng": "pahawh hmong",
+        "Hmnp": "nyiakeng puachue hmong",
         "Hrkt": "katakana ou hiragana",
         "Hung": "ancien hongrois",
         "Inds": "indus",
@@ -80,6 +82,7 @@
         "Moon": "moon",
         "Mtei": "meitei mayek",
         "Mymr": "birman",
+        "Nand": "nandinagari",
         "Nkoo": "n’ko",
         "Ogam": "ogam",
         "Olck": "ol tchiki",
@@ -124,6 +127,7 @@
         "Ugar": "ougaritique",
         "Vaii": "vaï",
         "Visp": "parole visible",
+        "Wcho": "wantcho",
         "Xpeo": "cunéiforme persépolitain",
         "Xsux": "cunéiforme suméro-akkadien",
         "Yiii": "yi",

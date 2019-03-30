@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.17",
     "Names": {
         "AC": "Oileán na Deascabhála",
         "AD": "Andóra",
@@ -248,6 +248,8 @@
         "VU": "Vanuatú",
         "WF": "Vailís agus Futúna",
         "WS": "Samó",
+        "XA": "XA",
+        "XB": "XB",
         "XK": "an Chosaiv",
         "YE": "Éimin",
         "YT": "Mayotte",

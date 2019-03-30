@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.50",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Wyspa Wniebowstąpienia",
         "AD": "Andora",
@@ -146,7 +146,7 @@
         "MF": "Saint-Martin",
         "MG": "Madagaskar",
         "MH": "Wyspy Marshalla",
-        "MK": "Macedonia",
+        "MK": "Macedonia Północna",
         "ML": "Mali",
         "MM": "Mjanma (Birma)",
         "MN": "Mongolia",
@@ -215,7 +215,7 @@
         "SV": "Salwador",
         "SX": "Sint Maarten",
         "SY": "Syria",
-        "SZ": "Suazi",
+        "SZ": "Eswatini",
         "TA": "Tristan da Cunha",
         "TC": "Turks i Caicos",
         "TD": "Czad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis i Futuna",
         "WS": "Samoa",
+        "XA": "Pseudoakcenty",
+        "XB": "Pseudodwukierunkowe",
         "XK": "Kosowo",
         "YE": "Jemen",
         "YT": "Majotta",

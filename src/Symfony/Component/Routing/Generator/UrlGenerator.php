@@ -52,6 +52,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // some webservers don't allow the slash in encoded form in the path for security reasons anyway
         // see http://stackoverflow.com/questions/4069002/http-400-if-2f-part-of-get-url-in-jboss
         '%2F' => '/',
+        // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
+        // so we need to encode them as they are not used for this purpose here
+        // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
+        '%2F..%2F' => '/%2E%2E/',
+        '%2F.%2F' => '/%2E/',
         // the following chars are general delimiters in the URI specification but have only special meaning in the authority component
         // so they can safely be used in the path in unencoded form
         '%40' => '@',
@@ -191,10 +196,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
         $url = strtr(rawurlencode($url), $this->decodedChars);
 
-        // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
-        // so we need to encode them as they are not used for this purpose here
-        // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
-        $url = strtr($url, ['/../' => '/%2E%2E/', '/./' => '/%2E/']);
         if ('/..' === substr($url, -3)) {
             $url = substr($url, 0, -2).'%2E%2E';
         } elseif ('/.' === substr($url, -2)) {

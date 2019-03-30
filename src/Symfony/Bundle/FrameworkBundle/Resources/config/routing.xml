@@ -111,10 +111,6 @@
             <argument>%request_listener.https_port%</argument>
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Controller\ProxyController" public="true">
-            <argument type="service" id="http_client" />
-        </service>
-
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
             <argument type="service" id="twig" on-invalid="ignore" />
             <argument type="service" id="templating" on-invalid="ignore" />

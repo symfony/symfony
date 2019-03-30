@@ -16,5 +16,9 @@
             <argument type="service" id="http_client" />
         </service>
         <service id="Psr\Http\Client\ClientInterface" alias="psr18.http_client" />
+
+        <service id="Symfony\Bundle\FrameworkBundle\Controller\ProxyController" public="true">
+            <argument type="service" id="http_client" />
+        </service>
     </services>
 </container>

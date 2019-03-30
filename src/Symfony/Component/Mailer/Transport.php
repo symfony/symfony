@@ -87,7 +87,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'gmail':
                 if (!class_exists(Google\Smtp\GmailTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Gmail as the Google bridge is not installed. Try running "composer require symfony/google-bridge".');
+                    throw new \LogicException('Unable to send emails via Gmail as the Google bridge is not installed. Try running "composer require symfony/google-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
@@ -97,7 +97,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'mailgun':
                 if (!class_exists(Mailgun\Smtp\MailgunTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Mailgun as the bridge is not installed. Try running "composer require symfony/mailgun-bridge".');
+                    throw new \LogicException('Unable to send emails via Mailgun as the bridge is not installed. Try running "composer require symfony/mailgun-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
@@ -113,7 +113,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'postmark':
                 if (!class_exists(Postmark\Smtp\PostmarkTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Postmark as the bridge is not installed. Try running "composer require symfony/postmark-bridge".');
+                    throw new \LogicException('Unable to send emails via Postmark as the bridge is not installed. Try running "composer require symfony/postmark-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
@@ -126,7 +126,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'sendgrid':
                 if (!class_exists(Sendgrid\Smtp\SendgridTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Sendgrid as the bridge is not installed. Try running "composer require symfony/sendgrid-bridge".');
+                    throw new \LogicException('Unable to send emails via Sendgrid as the bridge is not installed. Try running "composer require symfony/sendgrid-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
@@ -139,7 +139,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'ses':
                 if (!class_exists(Amazon\Smtp\SesTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Amazon SES as the bridge is not installed. Try running "composer require symfony/amazon-bridge".');
+                    throw new \LogicException('Unable to send emails via Amazon SES as the bridge is not installed. Try running "composer require symfony/amazon-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
@@ -155,7 +155,7 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             case 'mandrill':
                 if (!class_exists(Mailchimp\Smtp\MandrillTransport::class)) {
-                    throw new \LogicException('Unable to send emails via Mandrill as the bridge is not installed. Try running "composer require symfony/mailchimp-bridge".');
+                    throw new \LogicException('Unable to send emails via Mandrill as the bridge is not installed. Try running "composer require symfony/mailchimp-mailer".');
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {

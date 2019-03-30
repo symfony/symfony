@@ -32,112 +32,144 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final
  */
-class Worker
+class Worker implements WorkerInterface
 {
-    private $receiver;
+    private $receivers;
     private $bus;
-    private $receiverName;
-    private $retryStrategy;
+    private $retryStrategies;
     private $eventDispatcher;
     private $logger;
+    private $shouldStop = false;
 
-    public function __construct(ReceiverInterface $receiver, MessageBusInterface $bus, string $receiverName = null, RetryStrategyInterface $retryStrategy = null, EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    /**
+     * @param ReceiverInterface[]      $receivers       Where the key will be used as the string "identifier"
+     * @param RetryStrategyInterface[] $retryStrategies Retry strategies for each receiver (array keys must match)
+     */
+    public function __construct(array $receivers, MessageBusInterface $bus, $retryStrategies = [], EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
     {
-        $this->receiver = $receiver;
+        $this->receivers = $receivers;
         $this->bus = $bus;
-        if (null === $receiverName) {
-            @trigger_error(sprintf('Instantiating the "%s" class without passing a third argument is deprecated since Symfony 4.3.', __CLASS__), E_USER_DEPRECATED);
-
-            $receiverName = 'unknown';
-        }
-        $this->receiverName = $receiverName;
-        $this->retryStrategy = $retryStrategy;
+        $this->retryStrategies = $retryStrategies;
         $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
     }
 
     /**
      * Receive the messages and dispatch them to the bus.
+     *
+     * Valid options are:
+     *  * sleep (default: 1000000): Time in microseconds to sleep after no messages are found
      */
-    public function run()
+    public function run(array $options = [], callable $onHandledCallback = null): void
     {
+        $options = array_merge([
+            'sleep' => 1000000,
+        ], $options);
+
         if (\function_exists('pcntl_signal')) {
             pcntl_signal(SIGTERM, function () {
-                $this->receiver->stop();
+                $this->stop();
             });
         }
 
-        $this->receiver->receive(function (?Envelope $envelope) {
-            if (null === $envelope) {
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
-
-                return;
-            }
-
-            $this->dispatchEvent(new WorkerMessageReceivedEvent($envelope, $this->receiverName));
-
-            $message = $envelope->getMessage();
-            $context = [
-                'message' => $message,
-                'class' => \get_class($message),
-            ];
-
-            try {
-                $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp()));
-            } catch (\Throwable $throwable) {
-                $shouldRetry = $this->shouldRetry($throwable, $envelope);
-
-                $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $this->receiverName, $throwable, $shouldRetry));
-
-                if ($shouldRetry) {
-                    if (null === $this->retryStrategy) {
-                        // not logically allowed, but check just in case
-                        throw new LogicException('Retrying is not supported without a retry strategy.');
-                    }
-
-                    $retryCount = $this->getRetryCount($envelope) + 1;
-                    if (null !== $this->logger) {
-                        $this->logger->error('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
-                    }
-
-                    // add the delay and retry stamp info + remove ReceivedStamp
-                    $retryEnvelope = $envelope->with(new DelayStamp($this->retryStrategy->getWaitingTime($envelope)))
-                        ->with(new RedeliveryStamp($retryCount, $this->getSenderAlias($envelope)))
-                        ->withoutAll(ReceivedStamp::class);
-
-                    // re-send the message
-                    $this->bus->dispatch($retryEnvelope);
-                    // acknowledge the previous message has received
-                    $this->receiver->ack($envelope);
-                } else {
-                    if (null !== $this->logger) {
-                        $this->logger->critical('Rejecting {class} (removing from transport).', $context + ['error' => $throwable]);
-                    }
-
-                    $this->receiver->reject($envelope);
-                }
-
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
-
-                return;
-            }
-
-            $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $this->receiverName));
-
-            if (null !== $this->logger) {
-                $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
-            }
-
-            $this->receiver->ack($envelope);
-
+        $onHandled = function (?Envelope $envelope) use ($onHandledCallback) {
             if (\function_exists('pcntl_signal_dispatch')) {
                 pcntl_signal_dispatch();
             }
-        });
+
+            if (null !== $onHandledCallback) {
+                $onHandledCallback($envelope);
+            }
+        };
+
+        while (false === $this->shouldStop) {
+            $envelopeHandled = false;
+            foreach ($this->receivers as $receiverName => $receiver) {
+                $envelopes = $receiver->get();
+
+                foreach ($envelopes as $envelope) {
+                    $envelopeHandled = true;
+
+                    $this->handleMessage($envelope, $receiver, $receiverName, $this->retryStrategies[$receiverName] ?? null);
+                    $onHandled($envelope);
+                }
+
+                // after handling a single receiver, quit and start the loop again
+                // this should prevent multiple lower priority receivers from
+                // blocking too long before the higher priority are checked
+                if ($envelopeHandled) {
+                    break;
+                }
+            }
+
+            if (false === $envelopeHandled) {
+                $onHandled(null);
+
+                usleep($options['sleep']);
+            }
+        }
+    }
+
+    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $receiverName, ?RetryStrategyInterface $retryStrategy)
+    {
+        $this->dispatchEvent(new WorkerMessageReceivedEvent($envelope, $receiverName));
+
+        $message = $envelope->getMessage();
+        $context = [
+            'message' => $message,
+            'class' => \get_class($message),
+        ];
+
+        try {
+            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp()));
+        } catch (\Throwable $throwable) {
+            $shouldRetry = $this->shouldRetry($throwable, $envelope, $retryStrategy);
+
+            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $receiverName, $throwable, $shouldRetry));
+
+            if ($shouldRetry) {
+                if (null === $retryStrategy) {
+                    // not logically allowed, but check just in case
+                    throw new LogicException('Retrying is not supported without a retry strategy.');
+                }
+
+                $retryCount = $this->getRetryCount($envelope) + 1;
+                if (null !== $this->logger) {
+                    $this->logger->error('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
+                }
+
+                // add the delay and retry stamp info + remove ReceivedStamp
+                $retryEnvelope = $envelope->with(new DelayStamp($retryStrategy->getWaitingTime($envelope)))
+                    ->with(new RedeliveryStamp($retryCount, $this->getSenderAlias($envelope)))
+                    ->withoutAll(ReceivedStamp::class);
+
+                // re-send the message
+                $this->bus->dispatch($retryEnvelope);
+                // acknowledge the previous message has received
+                $receiver->ack($envelope);
+            } else {
+                if (null !== $this->logger) {
+                    $this->logger->critical('Rejecting {class} (removing from transport).', $context + ['error' => $throwable]);
+                }
+
+                $receiver->reject($envelope);
+            }
+
+            return;
+        }
+
+        $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $receiverName));
+
+        if (null !== $this->logger) {
+            $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);
+        }
+
+        $receiver->ack($envelope);
+    }
+
+    public function stop(): void
+    {
+        $this->shouldStop = true;
     }
 
     private function dispatchEvent($event)
@@ -149,17 +181,17 @@ class Worker
         $this->eventDispatcher->dispatch($event);
     }
 
-    private function shouldRetry(\Throwable $e, Envelope $envelope): bool
+    private function shouldRetry(\Throwable $e, Envelope $envelope, ?RetryStrategyInterface $retryStrategy): bool
     {
         if ($e instanceof UnrecoverableMessageHandlingException) {
             return false;
         }
 
-        if (null === $this->retryStrategy) {
+        if (null === $retryStrategy) {
             return false;
         }
 
-        return $this->retryStrategy->isRetryable($envelope);
+        return $retryStrategy->isRetryable($envelope);
     }
 
     private function getRetryCount(Envelope $envelope): int

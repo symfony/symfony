@@ -38,17 +38,9 @@ class AmqpTransport implements TransportInterface, SetupableTransportInterface
     /**
      * {@inheritdoc}
      */
-    public function receive(callable $handler): void
+    public function get(): iterable
     {
-        ($this->receiver ?? $this->getReceiver())->receive($handler);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function stop(): void
-    {
-        ($this->receiver ?? $this->getReceiver())->stop();
+        return ($this->receiver ?? $this->getReceiver())->get();
     }
 
     /**

@@ -21,6 +21,8 @@ use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
+ * @author Kevin Verschaeve
+ *
  * @experimental in 4.3
  */
 class SendgridTransport extends AbstractApiTransport

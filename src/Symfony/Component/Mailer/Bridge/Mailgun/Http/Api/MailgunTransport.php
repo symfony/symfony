@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kevin Verschaeve
  *
  * @experimental in 4.3
  */

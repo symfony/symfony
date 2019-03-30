@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to
-   explicitly handle messages asynchronously.
+   explicitly handle messages synchronously.
  * Added optional parameter `prefetch_count` in connection configuration, 
    to setup channel prefetch count
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`

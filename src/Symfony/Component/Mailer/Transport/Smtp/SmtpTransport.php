@@ -111,7 +111,13 @@ class SmtpTransport extends AbstractTransport
             $this->start();
         }
 
-        $message = parent::send($message, $envelope);
+        try {
+            $message = parent::send($message, $envelope);
+        } catch (TransportExceptionInterface $e) {
+            $this->executeCommand("RSET\r\n", [250]);
+
+            throw $e;
+        }
 
         $this->checkRestartThreshold();
 

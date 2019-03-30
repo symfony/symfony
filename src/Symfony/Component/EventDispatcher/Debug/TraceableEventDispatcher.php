@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 
 /**
  * Collects some data about event listeners.
@@ -147,7 +148,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             }
         }
 
-        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if (null !== $this->logger && ($event instanceof Event || $event instanceof ContractsEvent || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 

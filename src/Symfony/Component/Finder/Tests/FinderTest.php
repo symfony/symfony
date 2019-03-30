@@ -888,9 +888,18 @@ class FinderTest extends Iterator\RealIteratorTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Finder\Exception\DirectoryNotFoundException
      */
     public function testInWithNonExistentDirectory()
+    {
+        $finder = new Finder();
+        $finder->in('foobar');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInWithNonExistentDirectoryLegacyException()
     {
         $finder = new Finder();
         $finder->in('foobar');

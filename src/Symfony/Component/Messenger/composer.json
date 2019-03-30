@@ -20,8 +20,10 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "~2.4",
         "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4.19|^4.1.8",
+        "symfony/doctrine-bridge": "~3.4|~4.0",
         "symfony/event-dispatcher": "~4.3",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",

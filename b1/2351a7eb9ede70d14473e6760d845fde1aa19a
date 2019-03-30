@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-27T03:26:53Z
+
+This is ready!
+
+tl;dr In recent changes, the `ReceiverInterface` is not really the layer that's handling the "looping and waiting for messages" layer -  the `Worker` is doing that. This completes that transformation. It will also allow us to create a `Worker` that listens to multiple queues at once, in a priority order (#30699).
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-27T12:35:04Z
+
+The reasoning of having `handle($handler)` was for the transports to be able to catch the exceptions from the handlers and deal with the errors (i.e. ack, nack, etc...). Since we moved this to the worker, I'm happy to move back to get one message. Though, why wouldn't we return an `iterable` instead to match the behaviour of prefetching (i.e. some transports would have loaded X messages, not just one)?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-28T03:57:14Z
+
+This is ready for review! Description updated.
+
+Better viewed (especially the `Worker` with `?w=1`). The 3 `StopWhen***` classes are not new - but were moved & changed enough (they decorate `WorkerInterface` instead of `ReceiverInerface` so they look new.

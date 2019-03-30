@@ -49,7 +49,13 @@ class QuestionHelper extends Helper
         if (!$input->isInteractive()) {
             $default = $question->getDefault();
 
-            if (null !== $default && $question instanceof ChoiceQuestion) {
+            if (null === $default) {
+                return $default;
+            }
+
+            if ($validator = $question->getValidator()) {
+                return \call_user_func($question->getValidator(), $default);
+            } elseif ($question instanceof ChoiceQuestion) {
                 $choices = $question->getChoices();
 
                 if (!$question->isMultiselect()) {

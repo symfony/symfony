@@ -16,6 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 /**
+ * @author Kevin Verschaeve
+ *
  * @experimental in 4.3
  */
 class MandrillTransport extends EsmtpTransport

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\RuntimeException;
+use Symfony\Component\Translation\MessageCatalogue;
 
 /**
  * XliffFileLoader loads translations from XLIFF files.
@@ -57,7 +58,11 @@ class XliffFileLoader implements LoaderInterface
         }
 
         $xliffVersion = $this->getVersionNumber($dom);
-        $this->validateSchema($xliffVersion, $dom, $this->getSchema($xliffVersion));
+        try {
+            $this->validateSchema($dom, $this->getSchema($xliffVersion));
+        } catch (RuntimeException $e) {
+            throw new InvalidResourceException(sprintf('Invalid resource provided "%s": %s', $resource, $e->getMessage()), $e->getCode(), $e);
+        }
 
         if ('1.2' === $xliffVersion) {
             $this->extractXliff1($dom, $catalogue, $domain);
@@ -182,13 +187,12 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Validates and parses the given file into a DOMDocument.
      *
-     * @param string       $file
      * @param \DOMDocument $dom
      * @param string       $schema source of the schema
      *
      * @throws InvalidResourceException
      */
-    private function validateSchema($file, \DOMDocument $dom, $schema)
+    private function validateSchema(\DOMDocument $dom, $schema)
     {
         $internalErrors = libxml_use_internal_errors(true);
 
@@ -197,7 +201,7 @@ class XliffFileLoader implements LoaderInterface
         if (!@$dom->schemaValidateSource($schema)) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: %s', $file, implode("\n", $this->getXmlErrors($internalErrors))));
+            throw new RuntimeException(sprintf('Schema validation failed; Errors: %s', implode("\n", $this->getXmlErrors($internalErrors))));
         }
 
         libxml_disable_entity_loader($disableEntities);

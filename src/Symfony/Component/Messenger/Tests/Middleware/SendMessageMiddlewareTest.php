@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
+use Symfony\Component\Messenger\Stamp\ForceCallHandlersStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -86,6 +87,8 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     public function testItSendsToOnlyOneSenderOnRedelivery()
     {
         $envelope = new Envelope(new DummyMessage('Hey'), new RedeliveryStamp(5, 'bar'));
+        // even with a ForceCallHandlersStamp, the next middleware won't be called
+        $envelope = $envelope->with(new ForceCallHandlersStamp());
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $sender2 = $this->getMockBuilder(SenderInterface::class)->getMock();
 
@@ -237,7 +240,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testItDoesNotDispatchOnRetry()
+    public function testItDoesNotDispatchOnRedeliver()
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
         $envelope = $envelope->with(new RedeliveryStamp(3, 'foo_sender'));
@@ -250,5 +253,19 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]), $dispatcher);
 
         $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testItHandlesWithForceCallHandlersStamp()
+    {
+        $envelope = new Envelope(new DummyMessage('original envelope'));
+        $envelope = $envelope->with(new ForceCallHandlersStamp());
+
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $sender->expects($this->once())->method('send')->willReturn($envelope);
+
+        $middleware = new SendMessageMiddleware(new SendersLocator([DummyMessage::class => [$sender]]));
+
+        // next handler *should* be called
+        $middleware->handle($envelope, $this->getStackMock(true));
     }
 }

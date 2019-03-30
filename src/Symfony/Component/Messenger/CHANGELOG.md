@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to
+   explicitly handle messages asynchronously.
  * Added optional parameter `prefetch_count` in connection configuration, 
    to setup channel prefetch count
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`

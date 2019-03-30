@@ -15,6 +15,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
+use Symfony\Component\Messenger\Stamp\ForceCallHandlersStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -81,7 +82,13 @@ class SendMessageMiddleware implements MiddlewareInterface
                     $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
                 }
 
-                // on a redelivery, never call local handlers
+                // if the message was marked (usually by SyncTransport) that it handlers
+                // MUST be called, mark them to be handled.
+                if (null !== $envelope->last(ForceCallHandlersStamp::class)) {
+                    $handle = true;
+                }
+
+                // on a redelivery, only send back to queue: never call local handlers
                 if (null !== $redeliveryStamp) {
                     $handle = false;
                 }

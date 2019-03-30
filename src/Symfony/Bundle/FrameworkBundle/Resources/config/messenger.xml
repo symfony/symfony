@@ -67,6 +67,10 @@
             <argument type="service" id="messenger.transport.serializer" />
         </service>
 
+        <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">
+            <tag name="messenger.transport_factory" />
+        </service>
+
         <!-- retry -->
         <service id="messenger.retry_strategy_locator">
             <tag name="container.service_locator" />

@@ -56,6 +56,11 @@ class AnnotationFileLoader extends FileLoader
 
         $collection = new RouteCollection();
         if ($class = $this->findClass($path)) {
+            $refl = new \ReflectionClass($class);
+            if ($refl->isAbstract()) {
+                return;
+            }
+
             $collection->addResource(new FileResource($path));
             $collection->addCollection($this->loader->load($class, $type));
         }

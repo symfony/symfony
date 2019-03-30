@@ -22,8 +22,8 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 /**
  * Class with the default authentication failure handling logic.
  *
- * Can be optionally be extended from by the developer to alter the behaviour
- * while keeping the default behaviour.
+ * Can be optionally be extended from by the developer to alter the behavior
+ * while keeping the default behavior.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

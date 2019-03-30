@@ -219,10 +219,7 @@ class SmtpTransport extends AbstractTransport
         try {
             $this->executeCommand("NOOP\r\n", [250]);
         } catch (TransportExceptionInterface $e) {
-            try {
-                $this->stop();
-            } catch (TransportExceptionInterface $e) {
-            }
+            $this->stop();
         }
     }
 

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-30T07:27:47Z
+
+I'm not sure: the bug report explains how memory management works in php7, thus why this code is needed as of it, to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-30T07:29:45Z
+
+Then, we need to remove the reference to the bug.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-30T07:30:45Z
+
+Correct!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-30T07:32:50Z
+
+Done

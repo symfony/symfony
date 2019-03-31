@@ -8,13 +8,9 @@ CHANGELOG
  * added UATP cards support to `CardSchemeValidator`
  * added option `allowNull` to NotBlank constraint
  * added `Json` constraint
-<<<<<<< HEAD
  * added `Unique` constraint
- 
-=======
  * added a new `normalizer` option to the string constraints and to the `NotBlank` constraint
 
->>>>>>> pull/26484
 4.2.0
 -----
 

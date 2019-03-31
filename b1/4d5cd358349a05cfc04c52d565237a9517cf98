@@ -1,0 +1,199 @@
+---------------------------------------------------------------------------
+
+by Destroy666x at 2018-03-13T09:25:33Z
+
+Looks good now, thanks. Some more edge cases (e.g. regular whitespaces) could be added for tests, but not sure how strict are they here yet
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-03-13T23:44:53Z
+
+Thanks for the review @Destroy666x.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-04-01T19:11:55Z
+
+Would it make sense to update other constraint validators too?
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-04-06T13:49:12Z
+
+Hey guys, how do you like this PR right now?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-19T12:43:40Z
+
+@renan-taranto For consistency, I would add this option to the [other string constraints](http://symfony.com/doc/current/reference/constraints.html#string-constraints) too.
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-06-19T21:48:37Z
+
+@xabbuh Done it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-06-29T07:00:36Z
+
+I wonder if two options are that handy when you want to trim on both sides which I could imagine happens more often than only trimming on one end. In Twig, the `trim` filter allows to pass a kind of "strategy". Would that be an option here too? Or does it make sense to add a third `trim` option which would enable`ltrim` and `rtrim`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-07T15:36:05Z
+
+Following @xabbuh's comment, what about having a single "trim" option, which would accept `true` to trim both sides, and `left` or `right` for one-side trims?
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-07-08T02:16:13Z
+
+Yes, a single trim option with 3 modes would be better for sure.
+These constraints constructors will need to validate the `trim` parameter value and since the allowed values are the same for all, we would end up with a small duplication. Should we avoid that somehow? With a trait maybe?
+
+```php
+trait TrimModesTrait
+{
+    public static $disabledMode = false;
+    public static $lTrimMode = 'left';
+    public static $rTrimMode = 'right';
+    public static $trimMode = true;
+
+    public static function allowedTrimModes()
+    {
+        return array(
+            self::$disabledMode,
+            self::$lTrimMode,
+            self::$rTrimMode,
+            self::$trimMode
+        );
+    }
+
+    private function throwExceptionIfTrimModeIsInvalid($options = null)
+    {
+        if (is_array($options) && array_key_exists('trim', $options) && !in_array($options['trim'], $this->allowedTrimModes(), true)) {
+            throw new \InvalidArgumentException('The "trim" parameter value is not valid.');
+        }
+    }
+}
+```
+And while validating
+```php
+$value = $constraint->trim === Length::$lTrimMode ? ltrim($value) : $value;
+```
+What do you think?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-07-08T11:14:59Z
+
+How about `$normalizationCallable`<sup>*</sup> option instead. Implementation is really simple
+```php
+if (null !== $constraint->normalizationCallable) {
+  $value = call_user_func($constraint->normalizationCallable, $value);
+}
+```
+
+and usage as well
+
+```php
+$this->validator->validate($email, new Email(['normalizationCallable' => 'ltrim']));
+```
+
+- much more versatile
+- simpler code
+- less maintainance requirements (since it's more versatile, it's much less probable current code will need to be extended later, unlike the current proposal)
+- simpler usage
+- easier to document
+- more SOLID (action is injected by user, instead of hardcoded)
+
+<sub>* proposed name is subject to change</sub>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-07-08T18:52:01Z
+
+> Length::$lTrimMode
+
+honestly, I find this ugly :) The duplication is not an issue to me. We could throw an exception if a not supported value is passed.
+
+@ostrolucky's idea is also interesting, although very different than the current one. WDYT?
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-07-08T19:34:01Z
+
+@nicolas-grekas I also prefer the small duplication, it would be cleaner.
+@ostrolucky's idea is really nice and the advantages were already stated by him. Someone could argue that it is less intuitive for the user and less beginner friendly.
+I vote for the `$normalizationCallable`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-07-08T20:44:58Z
+
+I vote for @ostrolucky 's idea too. While it may be considered less intuitive, this main use-case could be highlighted in documentation.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-09T08:15:25Z
+
+I very much like this proposal. We would just need to find a good name for the option. `normalizationCallable` does describe what's happening, but it seems a bit verbose. What about just `normalizer`?
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-07-09T23:50:51Z
+
+`normalizer` sounds good, its intuitive. Will we allow any other callables besides trim methods to be passed as parameter?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-07-10T07:39:55Z
+
+I think what callable to pass is up to the user as long as it receives the string to be validated as the input and returns the normalised string. But the trim examples is a good one to explain the usage of this option in the docs.
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-07-11T18:35:11Z
+
+Hey guys, the patch is updated with the `normalizer` option.
+One of the Travis-ci builds broke while running the `Symfony\Component\Process\Tests\ProcessTest::testMustRun` test, not sure why.
+
+---------------------------------------------------------------------------
+
+by Destroy666x at 2018-08-16T13:53:29Z
+
+I was so busy that I forgot about this - callable is the perfect idea, thanks for suggesting it @ostrolucky
+
+---------------------------------------------------------------------------
+
+by gmponos at 2018-10-09T21:06:54Z
+
+Hello,
+
+for me as a developer using symfony the `normalizer` option is a little bit confusing. I am referring to the naming of it. Maybe it's because in the syfmony world when I hear `normalizer` my mind goes to the `Serializer` component. So in the end when I saw the title of this PR I was expecting to see about an option that will be able to convert objects into strings and remove this code:
+
+``` php
+       if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+```
+
+I am not sure if the same confusion will be caused later for whatever reason. Therefore my suggestion would be `formatter`. Or simple `trim` and allowing this option to be either true or callable and if it is true just use plain trim. It's just a suggestion your call :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-10-09T21:28:39Z
+
+You can pass even callable which makes input pass the above check, it's your choice. Hence formatter is not good name.
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2018-10-09T23:33:28Z
+
+PR updated. AppVeyor broke due to the unrelated `Symfony\Component\Process\Tests\ProcessTest`.
+
+---------------------------------------------------------------------------
+
+by renan-taranto at 2019-02-17T21:37:04Z
+
+Hi @nicolas-grekas, is there anything else I can do for this PR?

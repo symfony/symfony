@@ -1,0 +1,212 @@
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-10-30T11:47:34Z
+
+All green. Working on docs PR
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-10-30T12:24:47Z
+
+~~@Taluu As explained the dsn will not contains database credentials. But I can still change the message to the following :~~
+
+Edit : changes made
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-30T14:39:26Z
+
+For reference (I don't have more info):
+https://twitter.com/maksim_ka2/status/1057239933600129025
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-10-30T17:43:03Z
+
+@nicolas-grekas Hum I can understand that he is "scared" that people will use this instead of the enqueue project. But for me this won't replace enqueue at all.
+
+This is a very simple implementation that people can use for fast prototyping for example. When using a transport like AMQP you need to have a server running RabbitMQ (or other implementation of AMQP).
+
+Personnally for big projects that will run on production I will always use a RabbitMQ so the AMQPTransport or enqueue if I need Kafka, SQS, ... But for small projects or prototyping I think it's "too big".
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-10-31T19:37:12Z
+
+Is there a problem with the Process component on AppVeyor ? The build faild since yesterday and I don't know why 🤔
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-10-31T20:23:23Z
+
+@vincenttouzet that's a random failure which has been fixed recently (#29015), rebasing your branch should avoid the failure on next pushes if any. I restarted your build, now green
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-10-31T21:55:12Z
+
+@chalasr ok that what I thought. Thank you for relaunch (I don't know if I can relaunch by myself)
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-11-01T10:38:46Z
+
+@Taluu @ostrolucky Is it good for you now ?
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-11-11T17:30:33Z
+
+I've added a `requeueMessages` method on the `Connection` to requeue message that are in `delivered` status for a long time. (The timeout is configurable under the `redeliver_timeout` option)
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2018-11-20T21:46:43Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by planeth44 at 2019-03-08T21:32:59Z
+
+@vincenttouzet can you give a complete example to use this transport in a symfony project?
+I'm testing the doctrine transport and get this message: "No transport supports the given DSN "doctrine://
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-03-09T15:40:58Z
+
+@planeth44 Make sure you use both the fork branch of this pr *and* the fork branch of the DoctrineBundle, otherwise this will not work. Don't have more information how to do this completely atm.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-13T15:14:20Z
+
+Hey!
+
+I'd like to push this forward. Can you rebase? Also, at some point, we lost the service id for the transport factory - here's an old commit with what we lost: https://github.com/symfony/symfony/commit/4fae182c06613d0f840204661dfefd1e2d58b2b5#diff-9750ede1399d486ef37da057a9d613e1
+
+It currently doesn't work, which is why people are having problems testing it.
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-14T18:11:03Z
+
+>
+> Also, at some point, we lost the service id for the transport factory - here's an old commit with what we lost: [4fae182#diff-9750ede1399d486ef37da057a9d613e1](https://github.com/symfony/symfony/commit/4fae182c06613d0f840204661dfefd1e2d58b2b5#diff-9750ede1399d486ef37da057a9d613e1)
+>
+
+@weaverryan  In an outdated diff someone told me to move this to the DoctrineBundle. PR is available here : https://github.com/doctrine/DoctrineBundle/pull/868
+
+I start rebasing.
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-15T21:13:33Z
+
+As advised by @weaverryan I remove the `status` column in favor of a `available_at` column. For now the date is set to now. I think that if we want to be able to set a due date when dispatching a message this must be done globally. And all transport must then handle the functionnality.
+
+Or if this is just for doctrine I can add an option to the transport that define the delay per queue :thinking:
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-18T21:02:06Z
+
+@planeth44 I've just updated the code after testing on a real project. If you want to test it you have to also to declare the `messenger.transport.doctrine.factory` service like below
+
+```xml
+        <!-- https://github.com/doctrine/DoctrineBundle/pull/868/files -->
+        <service id="messenger.transport.doctrine.factory" class="Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="messenger.transport.serializer" on-invalid="ignore" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="messenger.transport_factory" />
+        </service>
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-19T12:57:27Z
+
+~~There's a tricky thing with "setting up" Doctrine transports. In #29476, you're adding the command to set up your queues. But for a Doctrine transport, it would be really best to have this in a migration. For example, imagine you have an automated deploy, and you want to use the Doctrine queue... would you call the `messenger:setup-transports` command on *every* deploy? Ideally, you'd put that into a migration when you enable the queue feature, and deploy that like normal.~~
+
+~~What do you think about hooking into this event: https://github.com/doctrine/orm/blob/04036f22446b7df7cca6c57ba16d01c65b8099bf/lib/Doctrine/ORM/Tools/SchemaTool.php#L350-L353 - and automatically adding the transport's schema? I believe this would give us this flow:~~
+
+~~1) You enable a doctrine transport~~
+~~2) You run `doctrine:migrations:diff` and it generates the migration for the new table.~~
+
+Update: After talking to Nicolas about this, we should (if auto-setup is on) take inspiration from the PdoAdapter in cache:
+
+* https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Cache/Adapter/PdoAdapter.php
+* https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Cache/Traits/PdoTrait.php
+
+Check this line specifically: https://github.com/symfony/symfony/blob/bff9e68bb448ca7f7da5365b4d733acfedba87dd/src/Symfony/Component/Cache/Traits/PdoTrait.php#L314-L317
+
+So, we actually *try* to talk to the connection, and if it fails with a `TableNotFoundException`, THEN we create the table automatically. It has no runtime overhead, and really great DX. Of course, the user could still choose to turn `auto-setup` to false and then use the new command if they want.
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-21T20:54:29Z
+
+@weaverryan I've implemented the solution you proposed to setup the table when a `TableNotFoundException` is thrown. I really like this approch ^^. Can you give me your feedback ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-23T14:14:58Z
+
+@vincenttouzet we just merged #30557, which clarifies how the transports need to work. Could you update your PR? I'll definitely check it after that thoroughly :)
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-23T15:51:49Z
+
+@weaverryan I rebased and pushed new commits :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-28T00:19:29Z
+
+Can you rebase & squash?
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-30T13:31:57Z
+
+@sroze @weaverryan I've added an option to set the id column configurable.
+
+Default is "auto_increment". I use this to generate the uuid :
+
+`$this->driverConnection->getDatabasePlatform()->getGuidExpression();`
+
+Unfortunately this is marked as deprecated :disappointed:
+See:
+https://github.com/doctrine/dbal/issues/3167
+
+The only workaround is to use the `ramsey/uuid` library. Maybe we can only require as a dev dependency and throw an exception if the UUID strategy is used and the `ramsey/uuid` library is not installed
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T12:45:36Z
+
+@vincenttouzet mind the conflict with `master`. Once you've removed the `id_strategy`, can you squash and rebase as well?
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-31T13:18:11Z
+
+@sroze I've rebase and squash my commits :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T13:19:51Z
+
+@vincenttouzet but you kept the `id_strategy` 😉
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-31T13:22:24Z
+
+That was just the doc in the configuration (part of another commit).

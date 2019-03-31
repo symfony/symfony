@@ -289,7 +289,6 @@ class FlattenException
             if (++$count > 1e4) {
                 return ['array', '*SKIPPED over 10000 entries*'];
             }
-            
             if (!isset($value)) {
                 $result[$key] = ['null', 'NOT ISSET'];
             } elseif ($value instanceof \__PHP_Incomplete_Class) {

@@ -26,10 +26,8 @@ class OutOfMemoryFatalErrorHandler implements FatalErrorHandlerInterface
      */
     public function handleError(array $error, FatalErrorException $exception)
     {
-        if (false !== strpos($error['message'], 'memory')) {
-            $message = 'I didn\'t get enough memory for execution :\/';
-
-            return new OutOfMemoryException($message, $exception);
+        if (false !== strpos($error['message'], 'Out of memory')) {
+            return new OutOfMemoryException('Allowed memory size exhausted', $exception);
         }
     }
 }

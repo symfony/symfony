@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-04-12T13:07:51Z
+
+Have you read readme of this component?
+> This component is currently marked as internal. Do not use it in your own code.
+
+I don't see this patch utilized in other components, so why adding unused feature into internal component?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2018-04-12T13:12:41Z
+
+In combination with https://github.com/symfony/symfony/issues/26903 this allows us in Joomla to drop our inflector (which is in essence stable but unmaintained because we just don't have the resources to keep up with it) for something which is better maintained.

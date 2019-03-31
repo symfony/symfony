@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-03-28T16:32:37Z
+
+Recently `messenger:consume` command was renamed/shortened, so I wonder if this one could be named `messenger:stop` instead?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-30T08:10:37Z
+
+#30708 has been merged now, so this one can be rebased.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T15:39:31Z
+
+I've kept the longer command name here, because you won't type it often (it's a command to run at deploy mostly) and I think the longer name makes it a bit more descriptive.
+
+This is ready for review! It does actually work locally ;)

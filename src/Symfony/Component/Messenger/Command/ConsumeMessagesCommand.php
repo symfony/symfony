@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -25,6 +26,7 @@ use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Messenger\Worker\StopWhenMemoryUsageIsExceededWorker;
 use Symfony\Component\Messenger\Worker\StopWhenMessageCountIsExceededWorker;
+use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
 use Symfony\Component\Messenger\Worker\StopWhenTimeLimitIsReachedWorker;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -43,6 +45,8 @@ class ConsumeMessagesCommand extends Command
     private $receiverNames;
     private $retryStrategyLocator;
     private $eventDispatcher;
+    /** @var CacheItemPoolInterface|null */
+    private $restartSignalCachePool;
 
     public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* ContainerInterface */ $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
@@ -60,6 +64,11 @@ class ConsumeMessagesCommand extends Command
         $this->eventDispatcher = $eventDispatcher;
 
         parent::__construct();
+    }
+
+    public function setCachePoolForRestartSignal(CacheItemPoolInterface $restartSignalCachePool)
+    {
+        $this->restartSignalCachePool = $restartSignalCachePool;
     }
 
     /**
@@ -188,6 +197,11 @@ EOF
         if ($timeLimit = $input->getOption('time-limit')) {
             $stopsWhen[] = "been running for {$timeLimit}s";
             $worker = new StopWhenTimeLimitIsReachedWorker($worker, $timeLimit, $this->logger);
+        }
+
+        if (null !== $this->restartSignalCachePool) {
+            $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
+            $worker = new StopWhenRestartSignalIsReceived($worker, $this->restartSignalCachePool, $this->logger);
         }
 
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);

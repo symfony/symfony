@@ -10,6 +10,8 @@ CHANGELOG
    second argument.
  * [BC BREAK] The `MessageBusInterface::dispatch()` signature changed:
    a second argument `array $stamps = []` was added.
+ * Added new `messenger:stop-workers` command that sends a signal
+   to stop all `messenger:consume` workers.
  * [BC BREAK] The `TransportFactoryInterface::createTransport()` signature
    changed: a required 3rd `SerializerInterface` argument was added.
  * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to

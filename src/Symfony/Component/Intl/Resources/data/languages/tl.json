@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.20",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhazian",
@@ -48,6 +48,7 @@
         "bug": "Buginese",
         "byn": "Blin",
         "ca": "Catalan",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Chiga",

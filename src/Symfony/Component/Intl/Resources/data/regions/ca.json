@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.65",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Illa de l’Ascensió",
         "AD": "Andorra",
@@ -146,7 +146,7 @@
         "MF": "Saint Martin",
         "MG": "Madagascar",
         "MH": "Illes Marshall",
-        "MK": "Macedònia",
+        "MK": "Macedònia del Nord",
         "ML": "Mali",
         "MM": "Myanmar (Birmània)",
         "MN": "Mongòlia",
@@ -215,7 +215,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Síria",
-        "SZ": "Swazilàndia",
+        "SZ": "eSwatini",
         "TA": "Tristão da Cunha",
         "TC": "Illes Turks i Caicos",
         "TD": "Txad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis i Futuna",
         "WS": "Samoa",
+        "XA": "Pseudo-Accents",
+        "XB": "Pseudo-Bidi",
         "XK": "Kosovo",
         "YE": "Iemen",
         "YT": "Mayotte",

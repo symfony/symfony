@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.65",
+    "Version": "2.1.48.86",
     "Names": {
         "aa": "afar dili",
         "ab": "abhaz dili",
@@ -46,6 +46,7 @@
         "bug": "bugiý dili",
         "byn": "blin dili",
         "ca": "katalan dili",
+        "ccp": "çakma dili",
         "ce": "çeçen dili",
         "ceb": "sebuan dili",
         "cgg": "kiga",
@@ -237,6 +238,7 @@
         "naq": "nama dili",
         "nb": "norwegiýa bukmol dili",
         "nd": "demirgazyk ndebele dili",
+        "nds": "aşaky nemes dili",
         "ne": "nepal dili",
         "new": "newari dili",
         "ng": "ndonga dili",

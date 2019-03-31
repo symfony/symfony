@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.43",
     "Names": {
         "aa": "afar",
         "ab": "abkhaze",
@@ -88,6 +88,7 @@
         "car": "caribe",
         "cay": "cayuga",
         "cch": "atsam",
+        "ccp": "changma kodha",
         "ce": "tchétchène",
         "ceb": "cebuano",
         "cgg": "kiga",

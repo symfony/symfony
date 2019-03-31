@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.65",
     "Names": {
         "Adlm": "Adlam",
         "Afak": "Afaka",
@@ -39,6 +39,7 @@
         "Egyh": "Egyptian hieratic",
         "Egyp": "Egyptian hieroglyphs",
         "Elba": "Elbasan",
+        "Elym": "Elymaic",
         "Ethi": "Ethiopic",
         "Geok": "Georgian Khutsuri",
         "Geor": "Georgian",
@@ -61,6 +62,7 @@
         "Hira": "Hiragana",
         "Hluw": "Anatolian Hieroglyphs",
         "Hmng": "Pahawh Hmong",
+        "Hmnp": "Nyiakeng Puachue Hmong",
         "Hrkt": "Japanese syllabaries",
         "Hung": "Old Hungarian",
         "Inds": "Indus",
@@ -109,6 +111,7 @@
         "Mtei": "Meitei Mayek",
         "Mult": "Multani",
         "Mymr": "Myanmar",
+        "Nand": "Nandinagari",
         "Narb": "Old North Arabian",
         "Nbat": "Nabataean",
         "Newa": "Newa",
@@ -174,6 +177,7 @@
         "Vaii": "Vai",
         "Visp": "Visible Speech",
         "Wara": "Varang Kshiti",
+        "Wcho": "Wancho",
         "Wole": "Woleai",
         "Xpeo": "Old Persian",
         "Xsux": "Sumero-Akkadian Cuneiform",

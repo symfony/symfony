@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.50",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Ishulli Asenshion",
         "AD": "Andorrë",
@@ -146,7 +146,7 @@
         "MF": "Sen-Marten",
         "MG": "Madagaskar",
         "MH": "Ishujt Marshall",
-        "MK": "Maqedoni",
+        "MK": "Maqedonia e Veriut",
         "ML": "Mali",
         "MM": "Mianmar (Burmë)",
         "MN": "Mongoli",
@@ -215,7 +215,7 @@
         "SV": "Salvador",
         "SX": "Sint-Marten",
         "SY": "Siri",
-        "SZ": "Suazilend",
+        "SZ": "Esvatini",
         "TA": "Tristan-da-Kuna",
         "TC": "Ishujt Turks dhe Kaikos",
         "TD": "Çad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Uollis e Futuna",
         "WS": "Samoa",
+        "XA": "Pseudo-thekse",
+        "XB": "Pseudo-bidi",
         "XK": "Kosovë",
         "YE": "Jemen",
         "YT": "Majotë",

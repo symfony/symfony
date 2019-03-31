@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.17",
     "Names": {
         "ADP": [
             "ADP",
@@ -53,10 +53,6 @@
             "ARA",
             "Austral Airgintíneach"
         ],
-        "ARL": [
-            "ARL",
-            "ARL"
-        ],
         "ARM": [
             "ARM",
             "Peso na hAirgintíne (1881–1970)"
@@ -96,10 +92,6 @@
         "BAM": [
             "BAM",
             "Marg Inmhalartaithe na Boisnia-Heirseagaivéine"
-        ],
-        "BAN": [
-            "BAN",
-            "BAN"
         ],
         "BBD": [
             "BBD",
@@ -152,10 +144,6 @@
         "BOB": [
             "BOB",
             "Boliviano"
-        ],
-        "BOL": [
-            "BOL",
-            "BOL"
         ],
         "BOP": [
             "BOP",
@@ -261,10 +249,6 @@
             "COP",
             "Peso na Colóime"
         ],
-        "COU": [
-            "COU",
-            "COU"
-        ],
         "CRC": [
             "CRC",
             "Colón Chósta Ríce"
@@ -340,14 +324,6 @@
         "ERN": [
             "ERN",
             "Nakfa na hEiritré"
-        ],
-        "ESA": [
-            "ESA",
-            "ESA"
-        ],
-        "ESB": [
-            "ESB",
-            "ESB"
         ],
         "ESP": [
             "ESP",
@@ -529,14 +505,6 @@
             "KPW",
             "Won na Cóiré Thuaidh"
         ],
-        "KRH": [
-            "KRH",
-            "KRH"
-        ],
-        "KRO": [
-            "KRO",
-            "KRO"
-        ],
         "KRW": [
             "₩",
             "Won na Cóiré Theas"
@@ -624,10 +592,6 @@
         "MKD": [
             "MKD",
             "Denar na Macadóine"
-        ],
-        "MKN": [
-            "MKN",
-            "MKN"
         ],
         "MLF": [
             "MLF",
@@ -1049,10 +1013,6 @@
             "CFPF",
             "Franc CFP"
         ],
-        "XRE": [
-            "XRE",
-            "XRE"
-        ],
         "YDD": [
             "YDD",
             "Dínear Éimin"
@@ -1072,10 +1032,6 @@
         "YUN": [
             "YUN",
             "YUN"
-        ],
-        "YUR": [
-            "YUR",
-            "YUR"
         ],
         "ZAL": [
             "ZAL",

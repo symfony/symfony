@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.45.14",
+    "Version": "2.1.48.86",
     "Names": {
         "aa": "Afar",
         "ab": "Abchazisch",
@@ -87,6 +87,7 @@
         "car": "Caribisch",
         "cay": "Cayuga",
         "cch": "Atsam",
+        "ccp": "Chakma",
         "ce": "Tsjetsjeens",
         "ceb": "Cebuano",
         "cgg": "Chiga",

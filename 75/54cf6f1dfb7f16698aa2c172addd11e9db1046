@@ -1,0 +1,549 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-26T17:20:49Z
+
+Truly black magic. :crystal_ball:
+
+It should at least be possible to opt-in or out for each class via annotation.
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-26T18:22:46Z
+
+I don't really like this to be honest, but primarily because I don't like RAD or entity validation. In my opinion entities should never even reach an invalid state. While I do agree that for RAD purposes this might be nice, I don't know if this should be available in the core.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-26T18:57:15Z
+
+This is not just for entities. There are multiple different loaders. Those who like DTOs benefit from this too.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-26T19:41:37Z
+
+> Truly black magic. 🔮
+
+Why? It's not magic at all (and definitely not more than an annotation that can automatically create the underlying database table 😄).
+
+> It should at least be possible to opt-in or out for each class via annotation.
+
+👍, it can be a new dummy constraint, `@NoAutoValid`, so it works using annotations, XML and YAML, and is similar to the existing `@All` and `@Valid` special constraints.
+
+> While I do agree that for RAD purposes this might be nice, I don't know if this should be available in the core.
+
+It's 100% opt-in, and in sync with what Symfony already allows/encourages for RAD (`@UniqueEntity` for instance). It doesn't force to use entity validation, it's up to the developper, but for typical CRUD/RAD/small apps, it allows to improve the UX/security by default, and to save some precious time.
+
+I recently stumbled upon this quote (in another context, Kubernetes deployment):
+
+> For applications that are brand new, their biggest risk is that they don’t find product/market fit. That is, they get deployed and never used. It’s code that ends up getting thrown away because it was something built that no one actually wanted. This represents the vast majority of application code that gets written. It’s certainly where I’ve spent a good deal of my career, iterating on code and features in a search for the right set. Once you find that application and feature set, you can then scale it out. But to do so before that point is a premature optimization.
+
+https://www.influxdata.com/blog/will-kubernetes-collapse-under-the-weight-of-its-complexity/
+
+It's exactly my feeling about RAD: iterate quickly, get the shit done as fast as possible, test, fail, try again. And when the app is proved to be useful, stop using RAD tools and move to a more heavy and time-resistant design.
+
+If it is useful for RAD, it should be in core. Symfony 4 is all about allowing to develop faster (while still allowing to handle more complex needs, of course). And we had a bad experience with less visible external bundles that are abandoned after some time...
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-06-26T20:10:06Z
+
+Could it be opt-in per class, not opt-out per class?
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-26T20:13:36Z
+
+> And when the app is proved to be useful, stop using RAD tools and move to a more heavy and time-resistant design.
+
+Except that this part usually doesn't happen. Developers see "Symfony does this, so it must be good", they are still binding entities to forms for example, causing overly complex situations with big forms that simply would require a DTO and take only a fraction of the time to write. Stack-overflow, IRC (previously) and Slack are full of those related questions. It's probably one of the top 3 issues arising via support channels.
+
+I'm not going to say "don't add this to Symfony!", because for that specific use-case, it can be nice for new-comers to see it work. However, I'm also of opinion that it's wrong of the docs to show those "bad practices" as the primary examples and advocate it as easy. Yes it's RAD, yes it's easy to setup and yes, there are some advantages when you look at it from a short-term perspective. But honestly, writing a DTO takes 2 minutes and would make forms so much more simple as there is no complex binding, no changes between data types, no guessing for the entity type, no repository magic via callable form options, no form events that need to be listened to etc.
+
+I understand _exactly_ what problem you're trying to solve, but what about this?
+ - Document DTOs instead of entities for forms and the validator
+ - Use the awesome new maker bundle to generate DTOs + FormTypes + the validation, based on an entity and a (subset) of its fields
+ - Find a way to easily heave those values into entities via tools such as [AutoMapper+](https://github.com/mark-gerarts/automapper-plus)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-26T20:17:27Z
+
+@dkarlovi opt-in per class breaks the overall experience don't you think? It will already be opt-in globally. Opt-in globally + opt-out per-class with an annotation as suggested by @teohhanhui looks like a better compromise to me.
+
+@iltar I personally don't use the Form component anymore for a while (not because of the docs, but because I use JS + AJAX for my forms). Honestly I mostly have API Platform in mind here, even if it will probably help for forms too.
+
+Regarding docs and forms suggestion, can they be discussed in another issue? I don't think it's related.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-26T20:23:54Z
+
+When something has side effects without being asked for, it's magic. Having annotations to provide mapping information for the ORM is **not** comparable to having validation rules automagically added based on the ORM mapping. It's also not the same as convention where it simply removes the need for explicit configuration by following some obvious and well-defined rules.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-26T20:25:23Z
+
+@teohhanhui it's opt-in, and it also works for DTOs (may be less "magic"). I've updated the main description to show an example.
+
+Btw, Doctrine 1 used to have exactly this behavior 😄 http://doctrine1.readthedocs.io/en/latest/en/manual/data-validation.html. Back in the old days. (full disclosure: I'm still a Symfony 1 fan)
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-06-26T20:39:56Z
+
+@dunglas TBH I'd rather see per-class opt-in, not too keen on global opt-in at all, it seems "far away". Maybe local and global opt-in as a compromise?
+
+Since this already seems like magic, it would make it less so it was localized together where you'd expect to see validation rules either way.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-26T20:46:01Z
+
+@dkarlovi if an user don't want to use this convention, he will just not enable this feature. Requiring to add an annotation on every class you create breaks the "add a class, map it and you're done" experience and make the feature less useful. I prefer to keep it as is, with - why not - the opt-out extra annotation. With this feature feature, to get a 100% valid API you'll just have to create this class:
+
+```php
+/** @Entity @ApiResource */
+class Book
+{
+    /** @Id @Column */
+    public $id;
+    /** @Column */
+    public $name;
+    /** @Column(type="int") */
+    public $price;
+}
+```
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-06-26T20:54:40Z
+
+Having this feature globally opt-in will break third party bundles both both when they expect this feature to be enabled when it isn't and when they don't use it and it's enabled. So a bit :-1: for having this globally configured, if it's configured on a per-class basis I'm ok with it.
+
+Maybe a solution would be to add the "auto" constraints in a separate validation group, that would make it easy to decide if you want to use them or not.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-26T21:25:54Z
+
+We discussed it with @nicolas-grekas, and the config can look like this:
+
+```yaml
+validation:
+    autovalidate:
+        'App\': ~ # enable all built-in loaders
+        'App\Foo': ['My\Loader', 'SF\Validator\Loader\PropertyInfo', 'DoctrineBundle\ValidatorLoader'] # enable only some specific services
+```
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-06-26T21:49:40Z
+
+BTW, I don't think "auto[matic] validation" is the right name for this feature, it make me thinks data will automatically be validated without having to call the ``validate`` method.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-26T21:52:44Z
+
+`auto_mapping`, perhaps?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-27T06:27:31Z
+
+I had this in mind since months for DTOs, so big 👍 from me.
+I also think this should be opt-in only, an opt-out annotation would be really weird and likely to cause issues with third parties and WTF moments. But the `autovalidate` configuration looks good (regarding the name, I'd rather like `auto_mapping` too).
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-27T07:14:01Z
+
+Perhaps adding a new annotation would help to enable this feature? `@Assert\BasedOnEntity`?
+
+@dunglas conceptually seen, forms are almost the same as what API platform achieves. You have request data, which gets transformed into an object (unserialized) and this is being validated. I understand your focus on api platform (great project btw!), but to me, it's the same as forms on a conceptual level, hence I feel like DTOs are also a better option for APIs.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-27T08:32:04Z
+
+`enable_implicit_constraints`?
+
+I don't want having to enable this per-class, it defeats its purpose.
+
+This is not a place for discussion about Forms and DTOs. Please, don't drag it here and go discuss it somewhere else. But like I said, this is useful even for DTOs.
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-27T09:16:35Z
+
+@ostrolucky this feature seems to aim specifically at doctrine annotations, thus it's tightly coupled with doctrine (and thus not re-usable for DTOs): https://github.com/symfony/symfony/pull/27735/files#diff-b24d5fab7288b31bac42d19f60ab9f49R71
+
+I highly disagree with your comment about Forms and DTOs as well. Forms are a form (no pun intended) of (un)serializing a request. While this particular PR is broader than just forms, one of the most used components where _this_ new feature would hit, would be forms. Due to this PR aiming to solve automatic validation based on Doctrine mapping on Entities, and forms being the biggest component to be impacted by _this_ feature, I think it most certainly is important to discuss this. If you use DTOs and not entities as subject (regardless of forms or API), this feature would not be necessary. In combination of exposing entity state via (un)serialization, with the whole "use entities in forms" culture in the Symfony documentation, is what leads to features like this. Solve the core problem (entities being misused), don't patch a symptom.
+
+The design of Symfony will always allow RAD and entities being used as such. There's nothing wrong with a developer picking this path. But making a bad practice easier to be used, rather than the good practice, seems like a step backwards to me.
+
+Related discussion in the docs: https://github.com/symfony/symfony-docs/issues/8893
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-06-27T09:27:04Z
+
+Why are you still ignoring that this is useful for DTOs too? Even if you use DTO, you will make a mistake and forget to add Type/NotBlank constraints and this will help with that. This feature isn't about necessity, but about safer and easier validation. It happened to me so many times we did forget about such constraints and user gets error 500, then having to come back and add those constraints manually.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-06-27T09:39:01Z
+
+What's the configuration you are thinking to enable/disable this feature?
+
+An annotation for each entity?
+
+```php
+/**
+ * @ORM\Entity
+ * @Autovalidation
+ */
+class Dummy
+{
+    // ...
+}
+```
+
+A global `framework.autovalidation` option? Both? Something different? Thanks!
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-27T09:46:17Z
+
+@ostrolucky if you check what I've linked and read the PR, you'll see that this particular feature is to read doctrine mappings on an object and translate that to the corresponding symfony validation constraints. DTOs don't have doctrine mappings, only entities do, thus this won't ever work for DTOs.
+
+@javiereguiluz an annotation like that is what I was thinking of, it's completely opt-in at that point. It's just really hard to figure out _what_ it will validate, especially considering fields are never nullable by default, but relations are _always_ nullable by default. So if you wonder why it's never validated if a relation is created, you might not figure it out any time soon.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-27T09:52:02Z
+
+@iltar
+
+> @ostrolucky this feature seems to aim specifically at doctrine annotations, thus it's tightly coupled with doctrine (and thus not re-usable for DTOs): https://github.com/symfony/symfony/pull/27735/files#diff-b24d5fab7288b31bac42d19f60ab9f49R71
+
+There actually 3 parts in this PR:
+
+* A new mechanism to allow registering custom loaders (generic)
+* A loader using PropertyInfo (generic, already support getter/setters, PHPDoc and Doctrine metadata)
+* A loader for Doctrine metadata (`length` and `unique`, specific)
+
+The 2 first are useful for DTOs too, I updated the PR description yesterday to highlight this use case.
+
+@javiereguiluz regarding config, WDYT about this proposal? https://github.com/symfony/symfony/pull/27735#issuecomment-400467749
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-27T09:55:34Z
+
+> hence I feel like DTOs are also a better option for APIs.
+
+It's where API Platform differs from Forms. Class marked with `@ApiResource` are essentially DTO, that can also and optionally be entities for RAD: https://github.com/api-platform/core/issues/1747#issuecomment-391308202
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-27T10:04:05Z
+
+> The 2 first are useful for DTOs too
+
+@dunglas can you illustrate an example for this? I'm not seeing how this is possible in the current context. How do you define a max length via validation rules based on nothing? Am I mistaken that the "nothing" isn't there? Then where is this rule coming from?
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-06-27T10:44:49Z
+
+Length is Doctrine specific, type isn't?
+
+---------------------------------------------------------------------------
+
+by JarJak at 2018-06-29T16:44:32Z
+
+@dunglas
+>It's exactly my feeling about RAD: iterate quickly, get the shit done as fast as possible, test, fail, try again. And when the app is proved to be useful, stop using RAD tools and move to a more heavy and time-resistant design.
+
+It sounds great for a developer, but like a nightmare for business :D
+Tell them that what you have written is ugly and shitty, but works, so now they have to pay you again to make code look better, but without any business benefit. :P
+
+BTW I love API Platform, it makes creating Backend For Frontend apps really Rapid :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-30T00:02:22Z
+
+> It sounds great for a developer, but like a nightmare for business :D
+
+I would say the opposite. It will be boring for the developper, but the business will earn money fast(er). Scalability/maintainance/performance issues are rich problems, and money can easily solve them.
+
+Some facts: 32% of the Quantcast Top 10K are powered by Wordpress, Facebook has been designed in weeks by a junior PHP dev, Twitter had major scalability issues because of how they used Rails, but at this time they had already rised the money to fix this, and most of their competitors were out of business, GitHub was a weekend project...
+
+What matters is creating tools that allow to develop fast, then let smoothly move to advanced architectural patterns needed for scalability/speed/evolvability depending of the business. Optimizing too early will most likely be damageable for the project, at least in of time to market.
+
+Regarding this feature, I’m pretty sure it will directly improve the security and quality of Symfony websites (because, from my audit experience, it will prevent a lot of 500 errors related to missing validation constraints). And it doesn’t prevent at all to use other patterns (like separating validation and the ORM mapping).
+
+And Thanks for API Platform :)
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-30T10:18:00Z
+
+> I like the idea as well. I'm 👍 as long as we can opt-out. (I'd argue this could be opt-in for 4.x because of BC, opt-out for 5.x)
+
+Can we please leave this opt-in? People with big applications (100+ entities) while not using entities this way, will probably have a performance decrease unless they know about this specific feature. I don't like having this on by default.
+
+> > It sounds great for a developer, but like a nightmare for business :D
+>
+> I would say the opposite. It will be boring for the developper, but the business will earn money fast(er). Scalability/maintainance/performance issues are rich problems, and money can easily solve them.
+
+Just started working at a company that always developed RAD style, it literally prevented them from growing properly because of the poor decisions made in the past about RAD and the technical debt it brought along. So I highly disagree with it being "rich problems". It actually costs money that is unnecessary to be spent, if you do it right from the beginning.
+
+I've not been able to spot how this would work for DTOs, anybody got an explanation for that?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-30T10:26:33Z
+
+> I've not been able to spot how this would work for DTOs, anybody got an explanation for that?
+
+I've added an example in the PR description some times ago.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-30T10:26:51Z
+
+@iltar The `PropertyInfoLoader` is handling `NotNull` and `Type` constraints. No need for doctrine for this, just the `PropertyInfo` component. So works for DTOs.
+
+---------------------------------------------------------------------------
+
+by slaci at 2018-06-30T10:35:56Z
+
+For DTO-s and other plain objects the docblock autoconfigurator, or property type hint reader (after [released ](https://wiki.php.net/rfc/property_type_hints) ofc) would help a lot, because this feels very redundant:
+```php
+class MyObj
+{
+    /**
+     * @Type("int")
+     * @var int
+     */
+     private $number;
+
+     /**
+      * @Type("string")
+      */
+     private string $name;
+}
+```
+With this PR I wouldn't have to add the `Type` annotation if I understand correctly. Currently if I don't add the validator manually, then I get fatal error instead of validator error when type error happens. This is similar to typehint vs `@var` annotation, I don't want to duplicate type info anywhere.
+
+About forms, my opinion:
+This is very similar to form type guessers, so it would be more consistent if you called them validator guessers instead of loaders I think. When you work with forms, you expect that you just have to create the ORM mappings for your entity and everything is good, but after some weird 500 errors you may realize you miss the things that this PR adds automatically. The main problem is: this part is not really documented. At least there is no best practice which mentions you should add `Type` validators manually because they are not guessed and I rarely see them in tutorials either... and people may say "the form can guess everything, im sure it guesses the type too, its in my docblock and my column is int anyway", and im not sure many people are aware about this is nothing to do with forms in the first place so its not happening and type errors will be uncaught exceptions instead of red texts under the field.
+
+In short I really like this PR!
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-30T10:36:56Z
+
+@ogizanagi I'm missing the configuration part for this, I see the loader, but I can't see how they are loaded. It receives a metadata object, but I don't know those are determined. DTOs can be scattered around an application, so it will be hard to guess them. I must've read over this part?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-06-30T10:48:32Z
+
+@iltar : It works the same way as for any constraint on a DTO: the loader is called the first time we call validate on the object, so metadata object is fulfilled by loaders to be cached and reused later.
+See [`\Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory` description](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Mapping/Factory/LazyLoadingMetadataFactory.php#L19-L39).
+However, I agree with you, this should be opt-in in some way and this is currently missing from the PR implementation. The suggested config in https://github.com/symfony/symfony/pull/27735#issuecomment-400467749 would be a solution.
+A dedicated annotation also, and I don't think it would defeat the purpose of the feature as stated above, but I understand some of the arguments.
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-30T10:59:26Z
+
+Got it! 👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-02T13:47:52Z
+
+I added the configuration part. The following options are supported:
+
+```yaml
+validation:
+    auto_mapping: ['App\Entity\'] # Add the auto-mapping for this namespace, all services tagged with validator.auto_mapping are used
+
+validation:
+    auto_mapping:
+        - 'App\Entity\': ['foo.bar'] # only the service foo.bar is used
+```
+
+Technically, basic matching is used, it means that any FQCN starting with the given string in the config will match:
+
+```yaml
+validation:
+    auto_mapping:
+        - 'App\Entity\MyClass' # App\Entity\MyClass but not App\Entity\MyClass10
+```
+
+```yaml
+validation:
+    auto_mapping:
+        - 'App\Entity\MyClas*' # Both App\Entity\MyClass and App\Entity\MyClass10 will match
+```
+
+~~I considered using regex or glob matching instead, but it looks a bit too heavy.~~ Glob are now supported.
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-07-02T13:50:35Z
+
+@dunglas what about the resource loader for services? That seems ideal for this scenario
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-07-02T13:51:45Z
+
+> App\Entity\MyClass as well as App\Entity\MyClass10 will match
+
+This would be a WTF moment for me.
+
+> I considered using regex or glob matching instead, but it looks a bit too heavy.
+
+But this would only be heavy at compile time, correct?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-02T14:29:48Z
+
+@iltar unfortunately it's executed at runtime (it's mandatory regarding the current design of the validator)
+@dkarlovi I just updated the code to support globs (@nicolas-grekas pointed me to a cheap way to do it). This isn't an issue anymore.
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2018-07-03T09:29:46Z
+
+This looks cool but how would you change the validation group of a generated constraint?
+
+If it is a *global* opt-in or opt-out, generated constraints should be changeable in some way.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-03T10:15:29Z
+
+> This looks cool but how would you change the validation group of a generated constraint?
+
+Such features are out of scope. Add the constraint directly to do so.
+
+> If it is a global opt-in or opt-out, generated constraints should be changeable in some way.
+
+The added constraints don't override the existing ones (if any). It's opt-in, and not global (see the config): you can enable it for the whole app, some namespaces, or just some classes using the glob syntax.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-03T10:17:44Z
+
+This PR is ready for a new review.
+
+* The configuration is finished (opt-in, using a glob syntax)
+* Tests have been added and are green
+* The Doctrine specific config and DI have been moved to Doctrine Bundle: doctrine/DoctrineBundle#831
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-13T15:29:45Z
+
+Support for class-based and collections type checking added (ping @ogizanagi)
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2018-09-15T12:11:48Z
+
+@dunglas I understand your point with your PR. At AssoConnect, we have developed a bundle as described in https://medium.com/@syl.fabre/validating-doctrine-entities-with-only-the-orm-column-annotation-2040a8f6c677 as we think that an entity should be valid as a last-check feature but the code should validate data before hydrating entities as per this comment https://github.com/symfony/symfony/pull/27735#issuecomment-400414750
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-02T14:33:05Z
+
+https://github.com/symfony/symfony/pull/27917 is a must-have before this IMHO, especially regarding the `@All` + `@Type` constraints which is a bit flawed currently (see https://github.com/symfony/symfony/pull/26477).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-02T14:40:46Z
+
+@ogizanagi #27917 is a good one, and I hope it will be merged soon, but I fail to understand the direct relation between both PRs. `@All` + `@Type` is just a small part of this PR, and will be "fixed" automatically when #27917 will be merged, or am I missing something?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-10-02T14:46:09Z
+
+You're right. But if this one is merged but not #27917 (in the same minor release), it means we can get 500 errors instead of proper validation errors due to flawed constraints automapped by this feature. I just wanted to point that.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-02T14:47:32Z
+
+Got it.
+
+Anyway this PR is ready (App Veyor failed not related). And  #27917 has 2 approvals, so can be merged (after a rebase).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-10-02T16:00:11Z
+
+Also missing: the DoctrineBundle PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-20T19:49:40Z
+
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-31T08:46:56Z
+
+(moved to "next" milestone - ie 4.3)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-01T09:12:02Z
+
+(rebase needed - would be great to have one more vote @symfony/deciders ;) )
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-12-08T11:23:47Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-01-02T09:43:19Z
+
+I think that this is the kind of PR that needs some docs before we can merge it. Would you agree to write a short doc as a PR on symfony-docs @dunglas?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-11T12:05:14Z
+
+@fabpot @symfony/deciders [docs added](https://github.com/symfony/symfony-docs/pull/11132) and PR rebased.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-15T13:09:55Z
+
+Small rebase needed.
+@weaverryan I'd love your +1 here :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-21T12:06:17Z
+
+Rebased

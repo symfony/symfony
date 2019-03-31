@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-09-30T06:33:37Z
+
+What about null values?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2018-09-30T07:13:01Z
+
+@ostrolucky I think it should do nothing for null values. I will add a condition and a test.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-30T17:58:55Z
+
+I think we could save plenty of code here if the constraints were just specialised versions of the already existing `Range` constraint. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-09-30T18:43:57Z
+
+like `Positive extends Range`?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-30T19:02:16Z
+
+yes
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-09-30T19:04:15Z
+
+Better fit is GreaterThan*/LessThan*. No new validators would be required then
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-09-30T19:05:53Z
+
+indeed, those fit better than `Range`
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2018-10-05T08:38:51Z
+
+@ostrolucky Do you mean we don't need the new `Positive*/Negative*` validators at all and users should use the already existing `GreaterThan*/LessThan*` validators?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2018-10-05T08:42:33Z
+
+@xabbuh @ro0NL I changed the `PositiveValidator` which is now extending the `GreaterThanValidator`. Is this what you had in mind?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-05T09:22:20Z
+
+@jschaedl actually i expected it like:
+
+```
+class Postive extends GreaterThan {
+   public function __construct() {
+       parent::__construct(array('min' => 1));
+   }
+}
+```
+
+then `Postive` is validated by `GreaterThanValidator` as regular.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-10-05T14:10:17Z
+
+Yep, like @ro0NL says. Well, not exactly (validatedBy needs to be specified and minimum value maybe tweaked) but mostly just that.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-16T13:31:21Z
+
+IMHO it should, so we get the expected exception here https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Constraint.php#L136
+
+Also we could make `message` the default option for these :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-16T14:26:08Z
+
+These constraints are designed in a way they will never pass `null` to parent.
+
+It would make some sense in case message is default property, but I don't think somebody would approve such change.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-03-31T13:46:04Z
+
+@jschaedl could you please send a Docs PR for this new feature?
+Thank you
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-03-31T17:06:52Z
+
+@OskarStark I am already working on it. :-)

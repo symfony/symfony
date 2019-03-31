@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\WrappedEvent;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
@@ -111,6 +112,10 @@ class WrappedListener
 
     public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)
     {
+        if ($event instanceof WrappedEvent) {
+            $event = $event->getWrappedEvent();
+        }
+
         $dispatcher = $this->dispatcher ?: $dispatcher;
 
         $this->called = true;

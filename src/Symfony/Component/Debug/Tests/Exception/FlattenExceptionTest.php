@@ -283,7 +283,7 @@ class FlattenExceptionTest extends TestCase
 
         $this->assertSame(['array', [['integer', 1], ['integer', 2]]], $array[$i++]);
         $this->assertSame(['array', ['foo' => ['integer', 123]]], $array[$i++]);
-        $this->assertSame(['null', null], $array[$i++]);
+        $this->assertSame(['null', 'NOT ISSET'], $array[$i++]);
         $this->assertSame(['boolean', true], $array[$i++]);
         $this->assertSame(['boolean', false], $array[$i++]);
         $this->assertSame(['integer', 0], $array[$i++]);

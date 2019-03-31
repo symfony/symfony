@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -60,6 +61,13 @@ class QuestionHelper extends Helper
                 foreach ($default as $k => $v) {
                     $v = trim($v);
                     $default[$k] = isset($choices[$v]) ? $choices[$v] : $v;
+                }
+            }
+
+            if ($question instanceof ConfirmationQuestion) {
+                $value = trim(fgets(STDIN));
+                if ($value === 'y') {
+                    return true;
                 }
             }
 

@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SyncTransport implements TransportInterface
 {
-    public function receive(callable $handler): void
+    public function get(): iterable
     {
         throw new InvalidArgumentException('You cannot receive messages from the SyncTransport.');
     }

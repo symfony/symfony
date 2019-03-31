@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Transport\Sync;
 
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class SyncTransportFactory implements TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options): TransportInterface
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         return new SyncTransport();
     }

@@ -50,6 +50,8 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
+use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -1055,6 +1057,23 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertContains('foo.yml', $calls[4][1][0][0]);
         $this->assertContains('validation.yml', $calls[4][1][0][1]);
         $this->assertContains('validation.yaml', $calls[4][1][0][2]);
+    }
+
+    public function testValidationAutoMapping()
+    {
+        if (!class_exists(PropertyInfoLoader::class)) {
+            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
+        }
+
+        $container = $this->createContainerFromFile('validation_auto_mapping');
+        $parameter = [
+            'App\\' => ['services' => ['foo', 'bar']],
+            'Symfony\\' => ['services' => ['a', 'b']],
+            'Foo\\' => ['services' => []],
+        ];
+
+        $this->assertSame($parameter, $container->getParameter('validator.auto_mapping'));
+        $this->assertTrue($container->hasDefinition('validator.property_info_loader'));
     }
 
     public function testFormsCanBeEnabledWithoutCsrfProtection()

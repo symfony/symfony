@@ -71,7 +71,7 @@ class FlattenException
         return $e;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $exceptions = [];
         foreach (array_merge([$this], $this->getAllPrevious()) as $exception) {
@@ -85,7 +85,7 @@ class FlattenException
         return $exceptions;
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -93,14 +93,14 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setStatusCode($code)
+    public function setStatusCode($code): self
     {
         $this->statusCode = $code;
 
         return $this;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -108,7 +108,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): self
     {
         $this->headers = $headers;
 
@@ -123,14 +123,14 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setClass($class)
+    public function setClass($class): self
     {
         $this->class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
 
         return $this;
     }
 
-    public function getFile()
+    public function getFile(): string
     {
         return $this->file;
     }
@@ -138,14 +138,14 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setFile($file)
+    public function setFile($file): self
     {
         $this->file = $file;
 
         return $this;
     }
 
-    public function getLine()
+    public function getLine(): int
     {
         return $this->line;
     }
@@ -153,14 +153,14 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setLine($line)
+    public function setLine($line): self
     {
         $this->line = $line;
 
         return $this;
     }
 
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -168,7 +168,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setMessage($message)
+    public function setMessage($message): self
     {
         if (false !== strpos($message, "class@anonymous\0")) {
             $message = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
@@ -181,7 +181,7 @@ class FlattenException
         return $this;
     }
 
-    public function getCode()
+    public function getCode(): int
     {
         return $this->code;
     }
@@ -189,7 +189,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setCode($code)
+    public function setCode($code): self
     {
         $this->code = $code;
 
@@ -204,14 +204,14 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setPrevious(self $previous)
+    public function setPrevious(self $previous): self
     {
         $this->previous = $previous;
 
         return $this;
     }
 
-    public function getAllPrevious()
+    public function getAllPrevious(): array
     {
         $exceptions = [];
         $e = $this;
@@ -237,7 +237,7 @@ class FlattenException
         $this->setTraceFromThrowable($exception);
     }
 
-    public function setTraceFromThrowable(\Throwable $throwable)
+    public function setTraceFromThrowable(\Throwable $throwable): self
     {
         return $this->setTrace($throwable->getTrace(), $throwable->getFile(), $throwable->getLine());
     }
@@ -245,7 +245,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setTrace($trace, $file, $line)
+    public function setTrace($trace, $file, $line): self
     {
         $this->trace = [];
         $this->trace[] = [
@@ -282,14 +282,17 @@ class FlattenException
         return $this;
     }
 
-    private function flattenArgs($args, $level = 0, &$count = 0)
+    private function flattenArgs($args, $level = 0, &$count = 0): array
     {
         $result = [];
         foreach ($args as $key => $value) {
             if (++$count > 1e4) {
                 return ['array', '*SKIPPED over 10000 entries*'];
             }
-            if ($value instanceof \__PHP_Incomplete_Class) {
+            
+            if (!isset($value)) {
+                $result[$key] = ['null', 'NOT ISSET'];
+            } elseif ($value instanceof \__PHP_Incomplete_Class) {
                 // is_object() returns false on PHP<=7.1
                 $result[$key] = ['incomplete-object', $this->getClassNameFromIncomplete($value)];
             } elseif (\is_object($value)) {

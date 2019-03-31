@@ -1554,6 +1554,63 @@ class OptionsResolverTest extends TestCase
         $this->assertEmpty($this->resolver->resolve());
     }
 
+    public function testAddNormalizerReturnsThis()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+
+        $this->assertSame($this->resolver, $this->resolver->addNormalizer('foo', function () {}));
+    }
+
+    public function testAddNormalizerClosure()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
+            return '1st-normalized-'.$value;
+        });
+        // defined by subclass
+        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
+            return '2nd-normalized-'.$value;
+        });
+
+        $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
+    }
+
+    public function testForcePrependNormalizerClosure()
+    {
+        // defined by superclass
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setNormalizer('foo', function (Options $options, $value) {
+            return '2nd-normalized-'.$value;
+        });
+        // defined by subclass
+        $this->resolver->addNormalizer('foo', function (Options $options, $value) {
+            return '1st-normalized-'.$value;
+        }, true);
+
+        $this->assertEquals(['foo' => '2nd-normalized-1st-normalized-bar'], $this->resolver->resolve());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     */
+    public function testAddNormalizerFailsIfUnknownOption()
+    {
+        $this->resolver->addNormalizer('foo', function () {});
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function testFailIfAddNormalizerFromLazyOption()
+    {
+        $this->resolver->setDefault('foo', function (Options $options) {
+            $options->addNormalizer('foo', function () {});
+        });
+
+        $this->resolver->resolve();
+    }
+
     public function testSetDefaultsReturnsThis()
     {
         $this->assertSame($this->resolver, $this->resolver->setDefaults(['foo', 'bar']));

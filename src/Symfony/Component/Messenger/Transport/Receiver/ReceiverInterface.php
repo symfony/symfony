@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 interface ReceiverInterface
 {
     /**
-     * Receives some messages to the given handler.
+     * Receives some messages.
      *
      * While this method could return an unlimited number of messages,
      * the intention is that it returns only one, or a "small number"

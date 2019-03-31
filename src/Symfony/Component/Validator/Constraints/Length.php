@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
@@ -39,6 +40,7 @@ class Length extends Constraint
     public $max;
     public $min;
     public $charset = 'UTF-8';
+    public $normalizer;
 
     public function __construct($options = null)
     {
@@ -53,6 +55,10 @@ class Length extends Constraint
 
         if (null === $this->min && null === $this->max) {
             throw new MissingOptionsException(sprintf('Either option "min" or "max" must be given for constraint %s', __CLASS__), ['min', 'max']);
+        }
+
+        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
         }
     }
 }

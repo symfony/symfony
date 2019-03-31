@@ -124,4 +124,34 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->setCode(NotBlank::IS_BLANK_ERROR)
             ->assertRaised();
     }
+
+    /**
+     * @dataProvider getWhitespaces
+     */
+    public function testNormalizedStringIsInvalid($value)
+    {
+        $constraint = new NotBlank([
+            'message' => 'myMessage',
+            'normalizer' => 'trim',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '""')
+            ->setCode(NotBlank::IS_BLANK_ERROR)
+            ->assertRaised();
+    }
+
+    public function getWhitespaces()
+    {
+        return [
+            ["\x20"],
+            ["\x09\x09"],
+            ["\x0A"],
+            ["\x0D\x0D"],
+            ["\x00"],
+            ["\x0B\x0B"],
+        ];
+    }
 }

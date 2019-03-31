@@ -95,6 +95,28 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getValidEmailsWithWhitespaces
+     */
+    public function testValidNormalizedEmails($email)
+    {
+        $this->validator->validate($email, new Email(['normalizer' => 'trim']));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidEmailsWithWhitespaces()
+    {
+        return [
+            ["\x20example@example.co.uk\x20"],
+            ["\x09\x09example@example.co..uk\x09\x09"],
+            ["\x0A{}~!@!@£$%%^&*().!@£$%^&*()\x0A"],
+            ["\x0D\x0Dexample@example.co..uk\x0D\x0D"],
+            ["\x00example@-example.com"],
+            ["example@example.com\x0B\x0B"],
+        ];
+    }
+
+    /**
      * @dataProvider getValidEmailsHtml5
      */
     public function testValidEmailsHtml5($email)

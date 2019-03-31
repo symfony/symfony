@@ -81,6 +81,10 @@ class UuidValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
+        }
+
         if ($constraint->strict) {
             $this->validateStrict($value, $constraint);
 

@@ -43,6 +43,10 @@ class IpValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
+        }
+
         switch ($constraint->version) {
             case Ip::V4:
                $flag = FILTER_FLAG_IPV4;

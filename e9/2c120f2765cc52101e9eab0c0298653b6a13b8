@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-13T12:23:45Z
+
+Add handle for relative paths.
+
+CI build fails not related
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-14T09:35:35Z
+
+Added a bypass for symlink mirror tests on windows
+
+CI build fails not related
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-24T17:18:59Z
+
+I think this PR does not qualify for being a bug fix but rather as a new feature.
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-26T09:51:43Z
+
+Hi @fabpot , did you really think this PR should be qualify as a new feature ?
+
+Since the behavior of `mirror` doesn't match what should be done at the origin (ie not to copy the target directory to the inside of itself).
+
+Indeed, adding absolute path management to `mirror` might justify qualifying this PR as a new feature, but I think it was just a foregone departure.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T06:50:48Z
+
+I still think this is a new feature as the use case itself was not supported at all.
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-27T09:34:09Z
+
+Ok So I'll rebase this branch on master and change de PR.
+
+---------------------------------------------------------------------------
+
+by XuruDragon at 2019-03-27T10:05:01Z
+
+@fabpot as you asked for, I've rebase this PR on master and qualify it as a new feature.

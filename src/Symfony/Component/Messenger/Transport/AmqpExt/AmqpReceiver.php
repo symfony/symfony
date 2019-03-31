@@ -67,6 +67,9 @@ class AmqpReceiver implements ReceiverInterface
         yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function ack(Envelope $envelope): void
     {
         try {
@@ -76,6 +79,9 @@ class AmqpReceiver implements ReceiverInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function reject(Envelope $envelope): void
     {
         $this->rejectAmqpEnvelope($this->findAmqpEnvelope($envelope));

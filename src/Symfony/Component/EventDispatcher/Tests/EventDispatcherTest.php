@@ -132,7 +132,7 @@ class EventDispatcherTest extends TestCase
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
         $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
-        $this->dispatcher->dispatch(new ContractsEvent(), self::preFoo);
+        $this->dispatcher->dispatch(new Event(), self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
         $this->assertInstanceOf('Symfony\Component\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), 'noevent'));
@@ -146,7 +146,7 @@ class EventDispatcherTest extends TestCase
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
         $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
-        $this->dispatcher->dispatch(new Event(), self::preFoo);
+        $this->dispatcher->dispatch(new ContractsEvent(), self::preFoo);
         $this->assertTrue($this->listener->preFooInvoked);
         $this->assertFalse($this->listener->postFooInvoked);
         $this->assertInstanceOf('Symfony\Component\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), 'noevent'));

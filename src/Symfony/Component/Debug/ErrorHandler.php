@@ -20,6 +20,7 @@ use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
+use Symfony\Component\Debug\FatalErrorHandler\OutOfMemoryFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedMethodFatalErrorHandler;
 
@@ -676,6 +677,7 @@ class ErrorHandler
             new UndefinedFunctionFatalErrorHandler(),
             new UndefinedMethodFatalErrorHandler(),
             new ClassNotFoundFatalErrorHandler(),
+            new OutOfMemoryFatalErrorHandler(),
         ];
     }
 

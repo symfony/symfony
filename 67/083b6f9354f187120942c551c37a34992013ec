@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-15T15:11:41Z
+
+Thanks for the PR.
+I think this has been rejected in the past (I'm not 100% sure though).
+This can leak sensitive info to me, in case the cast is not planned.
+Looks risky IMHO
+
+---------------------------------------------------------------------------
+
+by Deltachaos at 2018-10-15T15:18:41Z
+
+@nicolas-grekas For the `__toString()` method i at least can think of situations where it can be executed accidentally when converting something to string (which is the same for other objects). But for the `getTraceAsString` method it is not providing any other data that can be fetched by calling other methods of the class as well.
+
+So i don't really see cases where this can leak sensitive data?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-10-17T06:47:33Z
+
+Fine for getTraceAsString. Do you have a use case where this would help?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-10-17T07:30:33Z
+
+`As the FlattenException class should behave as much as possible like a php \Exception object` Actually, that's never been a goal.
+
+---------------------------------------------------------------------------
+
+by Deltachaos at 2018-10-17T09:16:12Z
+
+@fabpot if this is not the goal then at least the return type declaration of [`Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector::getException`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/DataCollector/ExceptionDataCollector.php#L60) is not correct, as this indicates to return a `\Exception` but at least when using this method from a `WebTestCase` it returns a `Symfony\Component\Debug\Exception\FlattenException`.
+
+It the behaivor wanted is that `Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector::getException` should return either `\Exception` or `Symfony\Component\Debug\Exception\FlattenException` then both should implement the same interface. The commit 02088004592d4704141f38257657755bf3a5b9f6 has changed the original behaivor.
+
+@nicolas-grekas The use case i have mentioned is to access the exception of a failed request in a `WebTestCase`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-21T09:59:32Z
+
+Any news here?
+
+---------------------------------------------------------------------------
+
+by Deltachaos at 2019-02-21T13:17:00Z
+
+@fabpot have changed the method name to what @nicolas-grekas suggested. Tests have run through.

@@ -65,7 +65,7 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         $cacheItem = $this->restartSignalCachePool->getItem(StopWhenRestartSignalIsReceived::RESTART_REQUESTED_TIMESTAMP_KEY);
-        $cacheItem->set(time());
+        $cacheItem->set(microtime(true));
         $this->restartSignalCachePool->save($cacheItem);
 
         $io->success('Signal successfully sent to stop any running workers.');

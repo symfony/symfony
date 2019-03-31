@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -29,10 +28,10 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     private $receiver;
     private $sender;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer = null)
+    public function __construct(Connection $connection, SerializerInterface $serializer)
     {
         $this->connection = $connection;
-        $this->serializer = $serializer ?? new PhpSerializer();
+        $this->serializer = $serializer;
     }
 
     /**

@@ -16,15 +16,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineTransportFactoryTest extends TestCase
 {
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->getMockBuilder(RegistryInterface::class)->getMock(),
-            null,
-            false
+            $this->getMockBuilder(RegistryInterface::class)->getMock()
         );
 
         $this->assertTrue($factory->supports('doctrine://default', []));
@@ -41,14 +40,12 @@ class DoctrineTransportFactoryTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        $factory = new DoctrineTransportFactory(
-            $registry,
-            null
-        );
+        $factory = new DoctrineTransportFactory($registry);
+        $serializer = $this->createMock(SerializerInterface::class);
 
         $this->assertEquals(
-            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $connection), null),
-            $factory->createTransport('doctrine://default', [])
+            new DoctrineTransport(new Connection(Connection::buildConfiguration('doctrine://default'), $connection), $serializer),
+            $factory->createTransport('doctrine://default', [], $serializer)
         );
     }
 
@@ -65,11 +62,7 @@ class DoctrineTransportFactoryTest extends TestCase
                 throw new \InvalidArgumentException();
             }));
 
-        $factory = new DoctrineTransportFactory(
-            $registry,
-            null
-        );
-
-        $factory->createTransport('doctrine://default', []);
+        $factory = new DoctrineTransportFactory($registry);
+        $factory->createTransport('doctrine://default', [], $this->createMock(SerializerInterface::class));
     }
 }

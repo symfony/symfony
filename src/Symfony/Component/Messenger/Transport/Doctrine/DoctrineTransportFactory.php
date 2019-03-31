@@ -13,7 +13,6 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -26,15 +25,13 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class DoctrineTransportFactory implements TransportFactoryInterface
 {
     private $registry;
-    private $serializer;
 
-    public function __construct(RegistryInterface $registry, SerializerInterface $serializer = null)
+    public function __construct(RegistryInterface $registry)
     {
         $this->registry = $registry;
-        $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    public function createTransport(string $dsn, array $options): TransportInterface
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $configuration = Connection::buildConfiguration($dsn, $options);
 
@@ -46,7 +43,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 
         $connection = new Connection($configuration, $driverConnection);
 
-        return new DoctrineTransport($connection, $this->serializer);
+        return new DoctrineTransport($connection, $serializer);
     }
 
     public function supports(string $dsn, array $options): bool

@@ -29,7 +29,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
  */
 class Connection
 {
-    const DEFAULT_OPTIONS = [
+    private const DEFAULT_OPTIONS = [
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,

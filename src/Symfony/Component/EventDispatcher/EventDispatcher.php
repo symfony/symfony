@@ -71,7 +71,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         if ($listeners) {
-            $this->doDispatch($listeners, $eventName, $event);
+            $this->callListeners($listeners, $eventName, $event);
         }
 
         return $event;
@@ -242,7 +242,7 @@ class EventDispatcher implements EventDispatcherInterface
             if ($stoppable && $event->isPropagationStopped()) {
                 break;
             }
-            $listener($event, $eventName, $this);
+            $listener($event instanceof Event ? $event : new WrappedEvent($event), $eventName, $this);
         }
     }
 

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 
 class EventDispatcherTest extends TestCase
 {
@@ -128,6 +129,20 @@ class EventDispatcherTest extends TestCase
     }
 
     public function testDispatch()
+    {
+        $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
+        $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
+        $this->dispatcher->dispatch(new ContractsEvent(), self::preFoo);
+        $this->assertTrue($this->listener->preFooInvoked);
+        $this->assertFalse($this->listener->postFooInvoked);
+        $this->assertInstanceOf('Symfony\Component\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), 'noevent'));
+        $this->assertInstanceOf('Symfony\Component\EventDispatcher\Event', $this->dispatcher->dispatch(new Event(), self::preFoo));
+        $event = new Event();
+        $return = $this->dispatcher->dispatch($event, self::preFoo);
+        $this->assertSame($event, $return);
+    }
+
+    public function testDispatchContractsEvent()
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
         $this->dispatcher->addListener('post.foo', [$this->listener, 'postFoo']);
@@ -413,12 +428,12 @@ class TestEventListener
 
     /* Listener methods */
 
-    public function preFoo(Event $e)
+    public function preFoo($e)
     {
         $this->preFooInvoked = true;
     }
 
-    public function postFoo(Event $e)
+    public function postFoo($e)
     {
         $this->postFooInvoked = true;
 
@@ -433,7 +448,7 @@ class TestWithDispatcher
     public $name;
     public $dispatcher;
 
-    public function foo(Event $e, $name, $dispatcher)
+    public function foo($e, $name, $dispatcher)
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;

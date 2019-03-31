@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
@@ -63,11 +62,11 @@ class Serializer implements SerializerInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            throw new InvalidArgumentException('Encoded envelope should have at least a "body" and some "headers".');
+            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers".');
         }
 
         if (empty($encodedEnvelope['headers']['type'])) {
-            throw new InvalidArgumentException('Encoded envelope does not have a "type" header.');
+            throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);

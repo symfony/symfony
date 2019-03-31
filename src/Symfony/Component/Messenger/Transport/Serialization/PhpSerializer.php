@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
 /**
@@ -28,7 +27,7 @@ class PhpSerializer implements SerializerInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
-            throw new InvalidArgumentException('Encoded envelope should have at least a "body".');
+            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
         }
 
         return $this->safelyUnserialize($encodedEnvelope['body']);

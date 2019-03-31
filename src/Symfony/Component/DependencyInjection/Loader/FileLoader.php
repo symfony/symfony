@@ -45,7 +45,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string               $resource  The directory to look for classes, glob-patterns allowed
      * @param string|string[]|null $exclude   A globbed path of files to exclude or an array of globbed paths of files to exclude
      */
-    public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null)
+    public function registerClasses(Definition $prototype, $namespace, $resource, $exclude = null): void
     {
         if ('\\' !== substr($namespace, -1)) {
             throw new InvalidArgumentException(sprintf('Namespace prefix must end with a "\\": %s.', $namespace));
@@ -89,7 +89,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string     $id
      * @param Definition $definition
      */
-    protected function setDefinition($id, Definition $definition)
+    protected function setDefinition($id, Definition $definition): void
     {
         if ($this->isLoadingInstanceof) {
             if (!$definition instanceof ChildDefinition) {
@@ -101,7 +101,7 @@ abstract class FileLoader extends BaseFileLoader
         }
     }
 
-    private function findClasses($namespace, $pattern, array $excludePatterns)
+    private function findClasses($namespace, $pattern, array $excludePatterns): array
     {
         $parameterBag = $this->container->getParameterBag();
 

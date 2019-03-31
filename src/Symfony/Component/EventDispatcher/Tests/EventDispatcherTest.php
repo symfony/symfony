@@ -243,6 +243,49 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals('preFoo2', $listeners[0][1]);
     }
 
+    public function testAddSubscriberWithoutEventName()
+    {
+        $eventSubscriber = new TestEventSubscriberWithoutEventName();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->assertCount(2, $this->dispatcher->getListeners(MockEvent::class));
+    }
+
+    public function testImplicitSubscriberWithMissingMethod()
+    {
+        $eventSubscriber = new TestEventSubscriberWithMissingEventMethod();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Cannot infer event name for missing method "Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithMissingEventMethod::invalidMethod".'
+        );
+
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
+    public function testImplicitSubscriberWithMissingParameter()
+    {
+        $eventSubscriber = new TestEventSubscriberWithMissingParameter();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Cannot infer event name for method "Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithMissingParameter::invalidMethod". Please add a type-hint for the event calls to the first parameter of the method or configure the event name explicitly.'
+        );
+
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
+    public function testImplicitSubscriberWithInvalidParameter()
+    {
+        $eventSubscriber = new TestEventSubscriberWithInvalidParameter();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Cannot infer event name for method "Symfony\Component\EventDispatcher\Tests\TestEventSubscriberWithInvalidParameter::invalidMethod". Please add a type-hint for the event calls to the first parameter of the method or configure the event name explicitly.'
+        );
+
+        $this->dispatcher->addSubscriber($eventSubscriber);
+    }
+
     public function testRemoveSubscriber()
     {
         $eventSubscriber = new TestEventSubscriber();
@@ -271,6 +314,14 @@ class EventDispatcherTest extends TestCase
         $this->assertCount(2, $this->dispatcher->getListeners(self::preFoo));
         $this->dispatcher->removeSubscriber($eventSubscriber);
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
+    }
+
+    public function testRemoveSubscriberWithoutEventName()
+    {
+        $eventSubscriber = new TestEventSubscriberWithoutEventName();
+        $this->dispatcher->addSubscriber($eventSubscriber);
+        $this->dispatcher->removeSubscriber($eventSubscriber);
+        $this->assertFalse($this->dispatcher->hasListeners(MockEvent::class));
     }
 
     public function testEventReceivesTheDispatcherInstanceAsArgument()
@@ -483,4 +534,59 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
             ['preFoo2', 10],
         ]];
     }
+}
+
+class TestEventSubscriberWithoutEventName implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            'onMockEvent',
+            ['onEarlyMockEvent', 255],
+        ];
+    }
+
+    public function onEarlyMockEvent(MockEvent $event): void
+    {
+    }
+
+    public function onMockEvent(MockEvent $event): void
+    {
+    }
+}
+
+class TestEventSubscriberWithMissingEventMethod implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return ['invalidMethod'];
+    }
+}
+
+class TestEventSubscriberWithMissingParameter implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return ['invalidMethod'];
+    }
+
+    public function invalidMethod(): void
+    {
+    }
+}
+
+class TestEventSubscriberWithInvalidParameter implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return ['invalidMethod'];
+    }
+
+    public function invalidMethod(string $event): void
+    {
+    }
+}
+
+class MockEvent extends Event
+{
 }

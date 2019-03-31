@@ -149,4 +149,9 @@ class ExtractingEventDispatcher extends EventDispatcher implements EventSubscrib
 
         return $events;
     }
+
+    protected function inferEventName($subscriber, $params): string
+    {
+        return parent::inferEventName($subscriber instanceof self ? self::$subscriber : $subscriber, $params);
+    }
 }

@@ -190,6 +190,9 @@ class EventDispatcher implements EventDispatcherInterface
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
+            if (\is_int($eventName)) {
+                $eventName = $this->inferEventName($subscriber, $params);
+            }
             if (\is_string($params)) {
                 $this->addListener($eventName, [$subscriber, $params]);
             } elseif (\is_string($params[0])) {
@@ -208,6 +211,9 @@ class EventDispatcher implements EventDispatcherInterface
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
+            if (\is_int($eventName)) {
+                $eventName = $this->inferEventName($subscriber, $params);
+            }
             if (\is_array($params) && \is_array($params[0])) {
                 foreach ($params as $listener) {
                     $this->removeListener($eventName, [$subscriber, $listener[0]]);
@@ -257,6 +263,41 @@ class EventDispatcher implements EventDispatcherInterface
             }
             $listener($event, $eventName, $this);
         }
+    }
+
+    /**
+     * @param string|object $subscriber
+     * @param string|array  $params
+     *
+     * @return string
+     */
+    protected function inferEventName($subscriber, $params): string
+    {
+        $methodName = \is_array($params) ? $params[0] : $params;
+
+        try {
+            $parameters = (new \ReflectionMethod($subscriber, $methodName))->getParameters();
+        } catch (\ReflectionException $e) {
+            throw new \UnexpectedValueException(sprintf(
+                'Cannot infer event name for missing method "%s::%s".',
+                \is_object($subscriber) ? \get_class($subscriber) : $subscriber,
+                $methodName
+            ), 0, $e);
+        }
+
+        if (
+            empty($parameters)
+            || null === ($type = $parameters[0]->getType())
+            || $type->isBuiltin()
+        ) {
+            throw new \UnexpectedValueException(sprintf(
+                'Cannot infer event name for method "%s::%s". Please add a type-hint for the event calls to the first parameter of the method or configure the event name explicitly.',
+                \is_object($subscriber) ? \get_class($subscriber) : $subscriber,
+                $methodName
+            ));
+        }
+
+        return $type->getName();
     }
 
     /**

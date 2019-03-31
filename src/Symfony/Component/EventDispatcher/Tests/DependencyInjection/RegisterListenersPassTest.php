@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class RegisterListenersPassTest extends TestCase
 {
@@ -57,6 +59,30 @@ class RegisterListenersPassTest extends TestCase
                     'event',
                     [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onEvent'],
                     0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onExplicitlyConfiguredEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onMockEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onEarlyMockEvent'],
+                    255,
                 ],
             ],
         ];
@@ -110,6 +136,30 @@ class RegisterListenersPassTest extends TestCase
                     'event',
                     [new ServiceClosureArgument(new Reference('foo')), 'onEvent'],
                     0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onExplicitlyConfiguredEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onMockEvent'],
+                    0,
+                ],
+            ],
+            [
+                'addListener',
+                [
+                    MockEvent::class,
+                    [new ServiceClosureArgument(new Reference('foo')), 'onEarlyMockEvent'],
+                    255,
                 ],
             ],
         ];
@@ -184,14 +234,29 @@ class RegisterListenersPassTest extends TestCase
     }
 }
 
-class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+class SubscriberService implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
         return [
             'event' => 'onEvent',
+            MockEvent::class => 'onExplicitlyConfiguredEvent',
+            'onMockEvent',
+            ['onEarlyMockEvent', 255],
         ];
     }
+
+    public function onEarlyMockEvent(MockEvent $event): void
+    {
+    }
+
+    public function onMockEvent(MockEvent $event): void
+    {
+    }
+}
+
+class MockEvent extends Event
+{
 }
 
 class InvokableListenerService

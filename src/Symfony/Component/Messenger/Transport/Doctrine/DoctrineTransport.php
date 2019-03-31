@@ -39,7 +39,7 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
      */
     public function get(): iterable
     {
-        ($this->receiver ?? $this->getReceiver())->get();
+        return ($this->receiver ?? $this->getReceiver())->get();
     }
 
     /**

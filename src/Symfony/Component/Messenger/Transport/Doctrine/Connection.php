@@ -231,7 +231,7 @@ class Connection
             ->setNotnull(true);
         $table->addColumn('body', Type::TEXT)
             ->setNotnull(true);
-        $table->addColumn('headers', Type::STRING)
+        $table->addColumn('headers', Type::TEXT)
             ->setNotnull(true);
         $table->addColumn('queue_name', Type::STRING)
             ->setNotnull(true);

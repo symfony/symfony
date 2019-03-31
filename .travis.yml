@@ -62,6 +62,9 @@ before_install:
       set -e
       stty cols 120
       mkdir /tmp/slapd
+      if [ ! -e /tmp/slapd-modules ]; then
+          [ -d /usr/lib/openldap ] && ln -s /usr/lib/openldap /tmp/slapd-modules || ln -s /usr/lib/ldap /tmp/slapd-modules
+      fi
       slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
       [ -d ~/.composer ] || mkdir ~/.composer
       cp .composer/* ~/.composer/

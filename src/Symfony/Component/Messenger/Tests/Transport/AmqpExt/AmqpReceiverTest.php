@@ -56,7 +56,7 @@ class AmqpReceiverTest extends TestCase
         $connection->method('ack')->with($amqpEnvelope)->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
-        $receiver->ack(new Envelope(new \stdClass(), new AmqpReceivedStamp($amqpEnvelope)));
+        $receiver->ack(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope)]));
     }
 
     /**
@@ -71,7 +71,7 @@ class AmqpReceiverTest extends TestCase
         $connection->method('nack')->with($amqpEnvelope, AMQP_NOPARAM)->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
-        $receiver->reject(new Envelope(new \stdClass(), new AmqpReceivedStamp($amqpEnvelope)));
+        $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope)]));
     }
 
     private function createAMQPEnvelope()

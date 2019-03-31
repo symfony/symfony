@@ -86,7 +86,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testItSendsToOnlyOneSenderOnRedelivery()
     {
-        $envelope = new Envelope(new DummyMessage('Hey'), new RedeliveryStamp(5, 'bar'));
+        $envelope = new Envelope(new DummyMessage('Hey'), [new RedeliveryStamp(5, 'bar')]);
         // even with a ForceCallHandlersStamp, the next middleware won't be called
         $envelope = $envelope->with(new ForceCallHandlersStamp());
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();

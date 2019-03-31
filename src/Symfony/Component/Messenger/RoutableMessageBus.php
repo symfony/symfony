@@ -37,7 +37,7 @@ class RoutableMessageBus implements MessageBusInterface
         $this->busLocator = $busLocator;
     }
 
-    public function dispatch($envelope): Envelope
+    public function dispatch($envelope, array $stamps = []): Envelope
     {
         if (!$envelope instanceof Envelope) {
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
@@ -53,6 +53,6 @@ class RoutableMessageBus implements MessageBusInterface
             throw new InvalidArgumentException(sprintf('Invalid bus name "%s" on BusNameStamp.', $busNameStamp->getBusName()));
         }
 
-        return $this->busLocator->get($busNameStamp->getBusName())->dispatch($envelope);
+        return $this->busLocator->get($busNameStamp->getBusName())->dispatch($envelope, $stamps);
     }
 }

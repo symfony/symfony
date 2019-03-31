@@ -12,13 +12,10 @@ if (!file_exists($autoload)) {
 
 require_once $autoload;
 
-use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
-use Symfony\Component\Messenger\Worker;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -33,7 +30,7 @@ $receiver = new AmqpReceiver($connection, $serializer);
 $retryStrategy = new MultiplierRetryStrategy(3, 0);
 
 $worker = new Worker(['the_receiver' => $receiver], new class() implements MessageBusInterface {
-    public function dispatch($envelope): Envelope
+    public function dispatch($envelope, array $stamps = []): Envelope
     {
         echo 'Get envelope with message: '.\get_class($envelope->getMessage())."\n";
         echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));

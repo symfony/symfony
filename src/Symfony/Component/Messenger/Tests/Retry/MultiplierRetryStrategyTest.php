@@ -21,7 +21,7 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testIsRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);
-        $envelope = new Envelope(new \stdClass(), new RedeliveryStamp(0, 'sender_alias'));
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
 
         $this->assertTrue($strategy->isRetryable($envelope));
     }
@@ -29,7 +29,7 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testIsNotRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);
-        $envelope = new Envelope(new \stdClass(), new RedeliveryStamp(3, 'sender_alias'));
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3, 'sender_alias')]);
 
         $this->assertFalse($strategy->isRetryable($envelope));
     }
@@ -48,7 +48,7 @@ class MultiplierRetryStrategyTest extends TestCase
     public function testGetWaitTime(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay);
-        $envelope = new Envelope(new \stdClass(), new RedeliveryStamp($previousRetries, 'sender_alias'));
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries, 'sender_alias')]);
 
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }

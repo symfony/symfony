@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\AnEnvelopeStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -69,7 +71,7 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanAddSomeStampsToTheEnvelope()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, new ReceivedStamp());
+        $envelope = new Envelope($message, [new ReceivedStamp()]);
         $envelopeWithAnotherStamp = $envelope->with(new AnEnvelopeStamp());
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
@@ -107,10 +109,10 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeStamps()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, ...$stamps = [new ReceivedStamp()]);
+        $envelope = new Envelope($message, $stamps = [new ReceivedStamp()]);
 
         $changedMessage = new DummyMessage('Changed');
-        $expectedEnvelope = new Envelope($changedMessage, ...$stamps);
+        $expectedEnvelope = new Envelope($changedMessage, $stamps);
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $firstMiddleware->expects($this->once())
@@ -133,5 +135,17 @@ class MessageBusTest extends TestCase
         ]);
 
         $bus->dispatch($envelope);
+    }
+
+    public function testItAddsTheStamps()
+    {
+        $finalEnvelope = (new MessageBus())->dispatch(new \stdClass(), [new DelayStamp(5), new BusNameStamp('bar')]);
+        $this->assertCount(2, $finalEnvelope->all());
+    }
+
+    public function testItAddsTheStampsToEnvelope()
+    {
+        $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new BusNameStamp('bar')]);
+        $this->assertCount(2, $finalEnvelope->all());
     }
 }

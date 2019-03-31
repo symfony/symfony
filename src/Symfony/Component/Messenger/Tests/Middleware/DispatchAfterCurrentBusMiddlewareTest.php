@@ -44,8 +44,8 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus = new MessageBus([
             $middleware,
             new DispatchingMiddleware($eventBus, [
-                new Envelope($firstEvent, new DispatchAfterCurrentBusStamp()),
-                new Envelope($secondEvent, new DispatchAfterCurrentBusStamp()),
+                new Envelope($firstEvent, [new DispatchAfterCurrentBusStamp()]),
+                new Envelope($secondEvent, [new DispatchAfterCurrentBusStamp()]),
                 $thirdEvent, // Not in a new transaction
             ]),
             $handlingMiddleware,
@@ -80,8 +80,8 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus = new MessageBus([
             $middleware,
             new DispatchingMiddleware($eventBus, [
-                new Envelope($firstEvent, new DispatchAfterCurrentBusStamp()),
-                new Envelope($secondEvent, new DispatchAfterCurrentBusStamp()),
+                new Envelope($firstEvent, [new DispatchAfterCurrentBusStamp()]),
+                new Envelope($secondEvent, [new DispatchAfterCurrentBusStamp()]),
             ]),
             $handlingMiddleware,
         ]);

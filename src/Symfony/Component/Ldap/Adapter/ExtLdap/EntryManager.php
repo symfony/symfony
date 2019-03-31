@@ -114,7 +114,7 @@ class EntryManager implements EntryManagerInterface
      * Moves an entry on the Ldap server.
      *
      * @throws NotBoundException if the connection has not been previously bound.
-     * @throws LdapException if an error is thrown during the rename operation.
+     * @throws LdapException     if an error is thrown during the rename operation.
      */
     public function move(Entry $entry, string $newParent)
     {
@@ -156,10 +156,10 @@ class EntryManager implements EntryManagerInterface
         }
     }
 
-   private function parseRdnFromEntry(Entry $entry)
+    private function parseRdnFromEntry(Entry $entry)
     {
         if (!preg_match('/^([^,]+),/', $entry->getDn(), $matches)) {
-            throw new LdapException(sprintf('Entry "%s" malformed, could not parse RDN', $entry->getDn()));
+            throw new LdapException(sprintf('Entry "%s" malformed, could not parse RDN.', $entry->getDn()));
         }
 
         return $matches[1];

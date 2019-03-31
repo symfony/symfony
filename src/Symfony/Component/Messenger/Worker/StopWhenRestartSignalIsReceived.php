@@ -38,14 +38,14 @@ class StopWhenRestartSignalIsReceived implements WorkerInterface
 
     public function run(array $options = [], callable $onHandledCallback = null): void
     {
-        $workerStartedTimestamp = time();
+        $workerStartedAt = microtime(true);
 
-        $this->decoratedWorker->run($options, function (?Envelope $envelope) use ($onHandledCallback, $workerStartedTimestamp) {
+        $this->decoratedWorker->run($options, function (?Envelope $envelope) use ($onHandledCallback, $workerStartedAt) {
             if (null !== $onHandledCallback) {
                 $onHandledCallback($envelope);
             }
 
-            if ($this->shouldRestart($workerStartedTimestamp)) {
+            if ($this->shouldRestart($workerStartedAt)) {
                 $this->stop();
                 if (null !== $this->logger) {
                     $this->logger->info('Worker stopped because a restart was requested.');
@@ -59,9 +59,10 @@ class StopWhenRestartSignalIsReceived implements WorkerInterface
         $this->decoratedWorker->stop();
     }
 
-    private function shouldRestart(int $workerStartedAt)
+    private function shouldRestart(float $workerStartedAt)
     {
         $cacheItem = $this->cachePool->getItem(self::RESTART_REQUESTED_TIMESTAMP_KEY);
+
         if (!$cacheItem->isHit()) {
             // no restart has ever been scheduled
             return false;

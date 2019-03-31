@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-27T11:54:39Z
+
+I find it confusing: my original assumption would have been that the other arguments are other messages, in case I want to dispatch multiple of them at the same time. I know it's been done this way on `Envelope::__constructor` but looking back, I'm not convinced.
+
+This is much more explicit:
+```php
+$bus->dispatch(
+   new Envelope(new SendSmsNotification('Hi!'))
+       ->with(new DelayStamp(10), new QueueNameStamp('low'))
+);
+```
+
+Or if it's *really* important, let's make it an array so we identify easily that it should not be other messages?
+```php
+$bus->dispatch(
+   new SendSmsNotification('Hi!'),
+   [ new DelayStamp(10), new QueueNameStamp('low') ]
+);
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-27T12:05:25Z
+
+Hmm, fair point. Wrapping it in an array still looks great to me, and indeed, a bit more clear. I can change to use that if others agree.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-27T12:49:49Z
+
+I agree that using an array. looks a bit better.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-27T14:07:24Z
+
+I suggest we change the `Envelope::__construct` 2nd argument as well.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-28T00:52:34Z
+
+This is ready to go:
+
+* 2nd arg added to MessageBusInterface: `array $stamps = []`
+* "2nd" arg on `Envelope` changed from `StampInterface ...$stamps` to `array $stamps = []`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-28T12:17:32Z
+
+Good catches - comments addressed!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T16:06:18Z
+
+Rebased & ready again

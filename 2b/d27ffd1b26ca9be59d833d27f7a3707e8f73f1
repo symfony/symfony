@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by kevans91 at 2018-12-06T23:00:31Z
+
+Note that I'm not 100% confident in my assessment of the hack; it works in our environment, though, where we're frequently querying for 6000+ objects against a server that has a 1000-object limit. I will consult with php-ldap folk on that, though, because the advised 'reset' is clearly not enough.
+
+---------------------------------------------------------------------------
+
+by kevans91 at 2018-12-07T05:58:10Z
+
+Sorry for the churn- spent some extra time today and got a local test setup going.
+
+The backend in the test configuration must be switched to one that actually supports pagination. I've modified the tests to just skip if we get a failure while querying in these tests, though, in case one needs to run them in an environment that doesn't support pagination.
+
+PHP 7.1 apparently still has issues with resetting the page bits, even with the hack, according to Travis. I'm not sure how to rectify at this point- PHP 7.1 isn't actively supported as of this month, so trying to get it fixed there simply will not be feasible.  I could hide those parts behind PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 1 and we live with the fact that it simply won't work and likely no one will notice... I'm unsure of the best approach to take.
+
+---------------------------------------------------------------------------
+
+by kevans91 at 2018-12-07T22:59:12Z
+
+I've created php/php-src#3703 to track my progress in addressing the php-ldap bug.
+
+---------------------------------------------------------------------------
+
+by kevans91 at 2018-12-08T06:01:26Z
+
+After closer assessment of extldap in PHP-7.1, there is no way that we can properly reset state there enough to make non-paged queries work following paged queries on the same connection for all servers for a kind of silly reason: LDAP_OPT_SERVER_CONTROLS in ldap_get_option is unimplemented, so we can't filter the paged result OID out of the current set of server controls. To add to the hilarity, ldap_set_option won't accept an empty array for LDAP_OPT_SERVER_CONTROLS, so even if we could filter it from the current set- we can't set the option if there are no other server controls left. This will be the case nearly 100% of the time anyways, because ldap_control_paged_result clobbers the server controlset when it's called to only the paged control OID.
+
+A fix for this could be adding a fake OID/value/iscritical set. This is an even nastier workaround than I've already implemented, and I'd really prefer to just indicate to users that they should upgrade to a later PHP version if they want to use non-paged queries following paged queries.
+
+---------------------------------------------------------------------------
+
+by kevans91 at 2018-12-29T14:40:36Z
+
+Upstream isn't receptive to fixing the broken abstraction, so this possibly will see a small rewrite in the Thursday/Friday timeline to use ldap_search_ext and friends where possible, depending on what's available in PHP 7.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-25T13:14:52Z
+
+rebase needed please
+
+---------------------------------------------------------------------------
+
+by kevans91 at 2019-01-25T16:31:38Z
+
+Rebased and fixed new style issues; the small rewrite mentioned before won't happen until 7.1 becomes de-supported.

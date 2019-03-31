@@ -341,4 +341,22 @@ class LdapManagerTest extends LdapTestCase
 
         $entryManager->applyOperations($entry->getDn(), $duplicateIterator);
     }
+
+    /**
+     * @group functional
+     */
+    public function testLdapMove()
+    {
+        $result = $this->executeSearchQuery(1);
+
+        $entry = $result[0];
+        $this->assertNotContains('ou=Ldap', $entry->getDn());
+
+        $entryManager = $this->adapter->getEntryManager();
+        $entryManager->move($entry, 'ou=Ldap,ou=Components,dc=symfony,dc=com');
+
+        $result = $this->executeSearchQuery(1);
+        $movedEntry = $result[0];
+        $this->assertContains('ou=Ldap', $movedEntry->getDn());
+    }
 }

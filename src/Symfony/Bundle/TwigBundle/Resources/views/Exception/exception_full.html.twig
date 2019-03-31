@@ -134,7 +134,7 @@
 {% endblock %}
 
 {% block title %}
-    {{ exception.message }} ({{ status_code }} {{ status_text }})
+    {{ exception.message }} (HTTP status code: {{ status_code }} - {{ status_text }})
 {% endblock %}
 
 {% block body %}

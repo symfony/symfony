@@ -1332,44 +1332,34 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileNotExists($targetPath.'target');
     }
 
-    public function testMirrorWithCustomIterator()
+    public function testMirrorAvoidCopyingTargetDirectoryIfInSourceDirectory()
     {
         $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+        $directory = $sourcePath.'directory'.\DIRECTORY_SEPARATOR;
+        $file1 = $directory.'file1';
+        $file2 = $sourcePath.'file2';
+
         mkdir($sourcePath);
+        mkdir($directory);
+        file_put_contents($file1, 'FILE1');
+        file_put_contents($file2, 'FILE2');
 
-        $file = $sourcePath.\DIRECTORY_SEPARATOR.'file';
-        file_put_contents($file, 'FILE');
+        $targetPath = $sourcePath.'target'.\DIRECTORY_SEPARATOR;
 
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->filesystem->symlink($targetPath, $sourcePath.'target_simlink');
+        }
 
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['delete' => true]);
 
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
+        $this->assertTrue($this->filesystem->exists($targetPath));
+        $this->assertTrue($this->filesystem->exists($targetPath.'directory'));
 
-        $this->assertTrue(is_dir($targetPath));
-        $this->assertFileEquals($file, $targetPath.\DIRECTORY_SEPARATOR.'file');
-    }
+        $this->assertFileEquals($file1, $targetPath.'directory'.\DIRECTORY_SEPARATOR.'file1');
+        $this->assertFileEquals($file2, $targetPath.'file2');
 
-    /**
-     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
-     * @expectedExceptionMessageRegExp /Unable to mirror "(.*)" directory/
-     */
-    public function testMirrorWithCustomIteratorWithRelativePath()
-    {
-        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        $realSourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
-        mkdir($realSourcePath);
-
-        $file = $realSourcePath.'file';
-        file_put_contents($file, 'FILE');
-
-        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
-
-        $splFile = new \SplFileInfo($file);
-        $iterator = new \ArrayObject([$splFile]);
-
-        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
+        $this->assertFalse($this->filesystem->exists($targetPath.'target_simlink'));
+        $this->assertFalse($this->filesystem->exists($targetPath.'target'));
     }
 
     /**

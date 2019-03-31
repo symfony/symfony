@@ -44,7 +44,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
         }
 
         $initialPlaces = $definition->getInitialPlaces();
-        if (2 <= count($initialPlaces)) {
+        if (2 <= \count($initialPlaces)) {
             throw new InvalidDefinitionException(sprintf('The state machine "%s" can not store many places. But the definition has %s initial places. Only one is supported.', $name, \count($initialPlaces)));
         }
     }

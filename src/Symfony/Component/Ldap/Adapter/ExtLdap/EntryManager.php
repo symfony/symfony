@@ -113,8 +113,8 @@ class EntryManager implements EntryManagerInterface
     /**
      * Moves an entry on the Ldap server.
      *
-     * @throws NotBoundException if the connection has not been previously bound.
-     * @throws LdapException     if an error is thrown during the rename operation.
+     * @throws NotBoundException if the connection has not been previously bound
+     * @throws LdapException     if an error is thrown during the rename operation
      */
     public function move(Entry $entry, string $newParent)
     {

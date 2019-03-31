@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-31T12:03:05Z
+
+This means doDidpatch() won't be called if we merge this patch, leading to a BC break.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-03-31T12:22:10Z
+
+Indeed. The only way to keep calling `doDispatch()` in every case would be to make the deprecated `Event` class extend the one from contracts, which seems impossible due to the signature incompatibility; any suggestion welcome.
+Also is it expected that all core events still extend the deprecated class?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-03-31T12:23:50Z
+
+Patch updated to keep calling `doDispatch()` in case `$event instanceof (deprecated) Event`. Not sure it's enough though, let me know
+
+(edit) should be ok as `doDispatch()` and `Event` will be gone in 5.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-31T14:23:15Z
+
+We could check using reflection in the constructor if doDispatch exists in the child while callListeners doesn't?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T16:35:36Z
+
+Thank you @chalasr.

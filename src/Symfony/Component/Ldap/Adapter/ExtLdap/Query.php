@@ -176,8 +176,6 @@ class Query extends AbstractQuery
 
     /**
      * Resets pagination on the current connection.
-     *
-     * @internal
      */
     private function resetPagination()
     {

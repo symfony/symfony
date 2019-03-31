@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-24T20:25:49Z
+
+Better diff for reviewers https://github.com/symfony/symfony/pull/30371/files?utf8=%E2%9C%93&diff=unified&w=1
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-02-27T15:45:18Z
+
+It seems that our friend @carsonbot was not working 3 days ago :)
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-03-07T12:38:42Z
+
+@nicolas-grekas comments addressed, thanks!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-03-07T20:17:29Z
+
+Adding doc PR reference https://github.com/symfony/symfony-docs/pull/11103
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-03-27T15:29:23Z
+
+BTW missing `OptionsResolver` label :)

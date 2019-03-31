@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-31T17:15:46Z
+
+It it really a mandatory requirement? Or just something you need if you use the related features?
+2nd choice means there is not need to do this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T17:18:20Z
+
+@nicolas-grekas is right.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T17:19:03Z
+
+@nicolas-grekas the way we merged #30754 means that it's a technical requirement but it's a good shot actually.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-31T17:21:52Z
+
+Not unless you use `StopWorkersCommand`, which you don't have to.
+For require-dev if we have tests.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T17:23:42Z
+
+Moved to `require-dev`, thanks!

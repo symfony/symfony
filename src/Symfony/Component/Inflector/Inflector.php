@@ -298,7 +298,7 @@ final class Inflector
     );
 
     /**
-     * A list of words which should not be inflected
+     * A list of words which should not be inflected.
      *
      * @var array
      */

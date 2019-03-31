@@ -661,15 +661,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('messenger.transport.default'));
         $this->assertTrue($container->getDefinition('messenger.transport.default')->hasTag('messenger.receiver'));
         $this->assertEquals([['alias' => 'default']], $container->getDefinition('messenger.transport.default')->getTag('messenger.receiver'));
+        $transportArguments = $container->getDefinition('messenger.transport.default')->getArguments();
+        $this->assertEquals(new Reference('messenger.default_serializer'), $transportArguments[2]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.customised'));
         $transportFactory = $container->getDefinition('messenger.transport.customised')->getFactory();
         $transportArguments = $container->getDefinition('messenger.transport.customised')->getArguments();
 
         $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
-        $this->assertCount(2, $transportArguments);
+        $this->assertCount(3, $transportArguments);
         $this->assertSame('amqp://localhost/%2f/messages?exchange_name=exchange_name', $transportArguments[0]);
-        $this->assertSame(['queue' => ['name' => 'Queue']], $transportArguments[1]);
+        $this->assertEquals(['queue' => ['name' => 'Queue']], $transportArguments[1]);
+        $this->assertEquals(new Reference('messenger.transport.native_php_serializer'), $transportArguments[2]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.amqp.factory'));
     }
@@ -693,29 +696,11 @@ abstract class FrameworkExtensionTest extends TestCase
         ], $sendersMapping[DummyMessage::class]->getValues());
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".
-     */
-    public function testMessengerTransportConfigurationWithoutSerializer()
-    {
-        $this->createContainerFromFile('messenger_transport_no_serializer');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".
-     */
-    public function testMessengerAMQPTransportConfigurationWithoutSerializer()
-    {
-        $this->createContainerFromFile('messenger_amqp_transport_no_serializer');
-    }
-
     public function testMessengerTransportConfiguration()
     {
         $container = $this->createContainerFromFile('messenger_transport');
 
-        $this->assertSame('messenger.transport.symfony_serializer', (string) $container->getAlias('messenger.transport.serializer'));
+        $this->assertSame('messenger.transport.symfony_serializer', (string) $container->getAlias('messenger.default_serializer'));
 
         $serializerTransportDefinition = $container->getDefinition('messenger.transport.symfony_serializer');
         $this->assertSame('csv', $serializerTransportDefinition->getArgument(1));

@@ -26,7 +26,7 @@
             <argument /> <!-- Format -->
             <argument type="collection" /> <!-- Context -->
         </service>
-        <service id="Symfony\Component\Messenger\Transport\Serialization\SerializerInterface" alias="messenger.transport.serializer" />
+        <service id="Symfony\Component\Messenger\Transport\Serialization\SerializerInterface" alias="messenger.default_serializer" />
 
         <service id="messenger.transport.native_php_serializer" class="Symfony\Component\Messenger\Transport\Serialization\PhpSerializer" />
 
@@ -64,7 +64,6 @@
 
         <service id="messenger.transport.amqp.factory" class="Symfony\Component\Messenger\Transport\AmqpExt\AmqpTransportFactory">
             <tag name="messenger.transport_factory" />
-            <argument type="service" id="messenger.transport.serializer" />
         </service>
 
         <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">

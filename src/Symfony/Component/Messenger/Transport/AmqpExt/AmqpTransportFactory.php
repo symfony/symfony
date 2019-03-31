@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -23,16 +22,9 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  */
 class AmqpTransportFactory implements TransportFactoryInterface
 {
-    private $serializer;
-
-    public function __construct(SerializerInterface $serializer = null)
+    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        $this->serializer = $serializer ?? new PhpSerializer();
-    }
-
-    public function createTransport(string $dsn, array $options): TransportInterface
-    {
-        return new AmqpTransport(Connection::fromDsn($dsn, $options), $this->serializer);
+        return new AmqpTransport(Connection::fromDsn($dsn, $options), $serializer);
     }
 
     public function supports(string $dsn, array $options): bool

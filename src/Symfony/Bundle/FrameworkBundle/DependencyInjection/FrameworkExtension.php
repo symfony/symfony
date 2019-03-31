@@ -78,7 +78,6 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
@@ -1604,28 +1603,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('messenger.xml');
 
-        if (empty($config['transports'])) {
-            $container->removeDefinition('messenger.transport.symfony_serializer');
-            $container->removeDefinition('messenger.transport.amqp.factory');
-        } else {
-            if ('messenger.transport.symfony_serializer' === $config['serializer']['id']) {
-                if (!$this->isConfigEnabled($container, $serializerConfig)) {
-                    throw new LogicException('The Messenger serializer cannot be enabled as the Serializer support is not available. Try enabling it or running "composer require symfony/serializer-pack".');
-                }
-
-                $container->getDefinition('messenger.transport.symfony_serializer')
-                    ->replaceArgument(1, $config['serializer']['format'])
-                    ->replaceArgument(2, $config['serializer']['context']);
-            }
-
-            if ($config['serializer']['id']) {
-                $container->setAlias('messenger.transport.serializer', $config['serializer']['id']);
-            } else {
-                $container->removeDefinition('messenger.transport.amqp.factory');
-                $container->removeDefinition(SerializerInterface::class);
-            }
-        }
-
         if (null === $config['default_bus'] && 1 === \count($config['buses'])) {
             $config['default_bus'] = key($config['buses']);
         }
@@ -1677,16 +1654,24 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if (empty($config['transports'])) {
+            $container->removeDefinition('messenger.transport.symfony_serializer');
+            $container->removeDefinition('messenger.transport.amqp.factory');
+        } else {
+            $container->getDefinition('messenger.transport.symfony_serializer')
+                ->replaceArgument(1, $config['symfony_serializer']['format'])
+                ->replaceArgument(2, $config['symfony_serializer']['context']);
+            $container->setAlias('messenger.default_serializer', $config['default_serializer']);
+        }
+
         $senderAliases = [];
         $transportRetryReferences = [];
         foreach ($config['transports'] as $name => $transport) {
-            if (0 === strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
-                throw new LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
-            }
+            $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
 
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
-                ->setArguments([$transport['dsn'], $transport['options']])
+                ->setArguments([$transport['dsn'], $transport['options'], new Reference($serializerId)])
                 ->addTag('messenger.receiver', ['alias' => $name])
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);

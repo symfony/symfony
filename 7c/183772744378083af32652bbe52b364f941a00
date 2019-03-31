@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2019-03-31T09:35:56Z
+
+Tests on travis are failing for several reasons:
+1. vardumper tests seem to be broken
+2. deps=high tests for the form component install dev-master of intl
+3. deps=low tests for the form component install 2.8 version of intl
+
+1 is unrelated and needs to be looked into in separation.
+2 will be resolved once this PR is merged to 3.4 and master, but I guess for 3 I need to make the test less reliant on specific data as we won't make it work with 2.8.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-31T09:39:17Z
+
+> 3. deps=low
+
+can't we bump some lowest dep in a composer.json?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2019-03-31T11:50:17Z
+
+> can't we bump some lowest dep in a composer.json?
+
+We could, but it's not necessary as the failing test just relies on data too much.
+
+I just pushed a change that's hopefully gonna fix it.

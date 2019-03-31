@@ -34,17 +34,19 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
     private $resolverServiceId;
     private $controllerTag;
     private $controllerLocator;
+    private $notTaggedControllerResolverServiceId;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator')
+    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator', string $notTaggedControllerResolverServiceId = 'argument_resolver.not_tagged_controller')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->controllerTag = $controllerTag;
         $this->controllerLocator = $controllerLocator;
+        $this->notTaggedControllerResolverServiceId = $notTaggedControllerResolverServiceId;
     }
 
     public function process(ContainerBuilder $container)
     {
-        if (false === $container->hasDefinition($this->resolverServiceId)) {
+        if (false === $container->hasDefinition($this->resolverServiceId) && false === $container->hasDefinition($this->notTaggedControllerResolverServiceId)) {
             return;
         }
 
@@ -181,8 +183,17 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition($this->resolverServiceId)
-            ->replaceArgument(0, $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers));
+        $controllerLocatorRef = ServiceLocatorTagPass::register($container, $controllers);
+
+        if ($container->hasDefinition($this->resolverServiceId)) {
+            $container->getDefinition($this->resolverServiceId)
+                ->replaceArgument(0, $controllerLocatorRef);
+        }
+
+        if ($container->hasDefinition($this->notTaggedControllerResolverServiceId)) {
+            $container->getDefinition($this->notTaggedControllerResolverServiceId)
+                ->replaceArgument(0, $controllerLocatorRef);
+        }
 
         $container->setAlias($this->controllerLocator, (string) $controllerLocatorRef);
     }

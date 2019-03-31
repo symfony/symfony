@@ -376,6 +376,19 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(ServiceClosureArgument::class, $locator['someArg']);
         $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }
+
+    public function testNotTaggedControllerServiceReceivesLocatorArgument()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locatorArgument = $container->getDefinition('argument_resolver.not_tagged_controller')->getArgument(0);
+
+        $this->assertInstanceOf(Reference::class, $locatorArgument);
+    }
 }
 
 class RegisterTestController

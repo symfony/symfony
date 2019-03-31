@@ -23,5 +23,10 @@
             <argument type="service" id="debug.argument_resolver.inner" />
             <argument type="service" id="debug.stopwatch" />
         </service>
+
+        <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
+            <tag name="controller.argument_value_resolver" priority="-200" />
+            <argument />
+        </service>
     </services>
 </container>

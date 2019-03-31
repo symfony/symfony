@@ -33,7 +33,6 @@ class Connection
         'table_name' => 'messenger_messages',
         'queue_name' => 'default',
         'redeliver_timeout' => 3600,
-        'loop_sleep' => 200000,
         'auto_setup' => true,
     ];
 
@@ -46,7 +45,6 @@ class Connection
      * * connection: name of the Doctrine's entity manager
      * * queue_name: name of the queue
      * * redeliver_timeout: Timeout before redeliver messages still in handling state (i.e: delivered_at is not null and message is still in table). Default 3600
-     * * loop_sleep: Number of micro seconds to wait for a next message to handle
      * * auto_setup: Whether the table should be created automatically during send / get. Default : true
      */
     private $configuration = [];
@@ -80,7 +78,6 @@ class Connection
             'table_name' => $options['table_name'] ?? ($query['table_name'] ?? self::DEFAULT_OPTIONS['table_name']),
             'queue_name' => $options['queue_name'] ?? ($query['queue_name'] ?? self::DEFAULT_OPTIONS['queue_name']),
             'redeliver_timeout' => $options['redeliver_timeout'] ?? ($query['redeliver_timeout'] ?? self::DEFAULT_OPTIONS['redeliver_timeout']),
-            'loop_sleep' => $options['loop_sleep'] ?? ($query['loop_sleep'] ?? self::DEFAULT_OPTIONS['loop_sleep']),
             'auto_setup' => $options['auto_setup'] ?? ($query['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup']),
         ];
 

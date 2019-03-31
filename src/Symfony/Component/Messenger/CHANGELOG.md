@@ -60,7 +60,7 @@ CHANGELOG
    and queues by default. Previously, this was done when in "debug" mode
    only. Pass the `auto_setup` connection option to control this.
  * Added a `SetupTransportsCommand` command to setup the transports
- * Added a Doctrine transport. For example, the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
+ * Added a Doctrine transport. For example, use the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
 
 4.2.0
 -----

@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -99,7 +100,6 @@ class GetSetMethodNormalizerTest extends TestCase
     public function testIgnoredAttributesInContext()
     {
         $ignoredAttributes = ['foo', 'bar', 'baz', 'object'];
-        $this->normalizer->setIgnoredAttributes($ignoredAttributes);
         $obj = new GetSetDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
@@ -109,7 +109,7 @@ class GetSetMethodNormalizerTest extends TestCase
                 'fooBar' => 'foobar',
                 'camelCase' => true,
             ],
-            $this->normalizer->normalize($obj, 'any')
+            $this->normalizer->normalize($obj, 'any', [AbstractNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes])
         );
     }
 

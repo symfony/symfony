@@ -58,7 +58,7 @@ class PhpSerializerTest extends TestCase
         $serializer = new PhpSerializer();
 
         $serializer->decode([
-            'body' => 'O:13:"ReceivedSt0mp":0:{}',
+            'body' => base64_encode('O:13:"ReceivedSt0mp":0:{}'),
         ]);
     }
 }

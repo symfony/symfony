@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
@@ -38,8 +39,9 @@ class DebugCommand extends Command
     private $twigDefaultPath;
     private $rootDir;
     private $filesystemLoaders;
+    private $fileLinkFormatter;
 
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, string $rootDir = null)
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, string $rootDir = null, FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -48,6 +50,7 @@ class DebugCommand extends Command
         $this->bundlesMetadata = $bundlesMetadata;
         $this->twigDefaultPath = $twigDefaultPath;
         $this->rootDir = $rootDir;
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     protected function configure()
@@ -105,16 +108,28 @@ EOF
 
     private function displayPathsText(SymfonyStyle $io, string $name)
     {
-        $files = $this->findTemplateFiles($name);
+        $file = new \ArrayIterator($this->findTemplateFiles($name));
         $paths = $this->getLoaderPaths($name);
 
         $io->section('Matched File');
-        if ($files) {
-            $io->success(array_shift($files));
+        if ($file->valid()) {
+            if ($fileLink = $this->getFileLink($file->key())) {
+                $io->block($file->current(), 'OK', sprintf('fg=black;bg=green;href=%s', $fileLink), ' ', true);
+            } else {
+                $io->success($file->current());
+            }
+            $file->next();
 
-            if ($files) {
+            if ($file->valid()) {
                 $io->section('Overridden Files');
-                $io->listing($files);
+                do {
+                    if ($fileLink = $this->getFileLink($file->key())) {
+                        $io->text(sprintf('* <href=%s>%s</>', $fileLink, $file->current()));
+                    } else {
+                        $io->text(sprintf('* %s', $file->current()));
+                    }
+                    $file->next();
+                } while ($file->valid());
             }
         } else {
             $alternatives = [];
@@ -453,9 +468,9 @@ EOF
 
                 if (is_file($filename)) {
                     if (false !== $realpath = realpath($filename)) {
-                        $files[] = $this->getRelativePath($realpath);
+                        $files[$realpath] = $this->getRelativePath($realpath);
                     } else {
-                        $files[] = $this->getRelativePath($filename);
+                        $files[$filename] = $this->getRelativePath($filename);
                     }
                 }
             }
@@ -562,5 +577,14 @@ EOF
         }
 
         return $this->filesystemLoaders;
+    }
+
+    private function getFileLink(string $absolutePath): string
+    {
+        if (null === $this->fileLinkFormatter) {
+            return '';
+        }
+
+        return (string) $this->fileLinkFormatter->format($absolutePath, 1);
     }
 }

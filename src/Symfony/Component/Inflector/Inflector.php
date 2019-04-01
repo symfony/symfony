@@ -15,15 +15,11 @@ namespace Symfony\Component\Inflector;
  * Converts words between singular and plural forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @internal
  */
 final class Inflector
 {
     /**
      * Map English plural to singular suffixes.
-     *
-     * @var array
      *
      * @see http://english-zone.com/spelling/plurals.html
      */
@@ -142,11 +138,9 @@ final class Inflector
     /**
      * Map English singular to plural suffixes.
      *
-     * @var array
-     *
      * @see http://english-zone.com/spelling/plurals.html
      */
-    private static $singularMap = array(
+    private static $singularMap = [
         // First entry: singular suffix, reversed
         // Second entry: length of singular suffix
         // Third entry: Whether the suffix may succeed a vocal
@@ -154,163 +148,168 @@ final class Inflector
         // Fifth entry: plural suffix, normal
 
         // criterion (criteria)
-        array('airetirc', 8, false, false, 'criterion'),
+        ['airetirc', 8, false, false, 'criterion'],
 
         // nebulae (nebula)
-        array('aluben', 6, false, false, 'nebulae'),
+        ['aluben', 6, false, false, 'nebulae'],
 
         // children (child)
-        array('dlihc', 5, true, true, 'children'),
+        ['dlihc', 5, true, true, 'children'],
 
         // prices (price)
-        array('eci', 3, false, true, 'ices'),
+        ['eci', 3, false, true, 'ices'],
 
         // services (service)
-        array('ecivres', 7, true, true, 'services'),
+        ['ecivres', 7, true, true, 'services'],
 
         // lives (life), wives (wife)
-        array('efi', 3, false, true, 'ives'),
+        ['efi', 3, false, true, 'ives'],
 
         // selfies (selfie)
-        array('eifles', 6, true, true, 'selfies'),
+        ['eifles', 6, true, true, 'selfies'],
 
         // movies (movie)
-        array('eivom', 5, true, true, 'movies'),
+        ['eivom', 5, true, true, 'movies'],
 
         // lice (louse)
-        array('esuol', 5, false, true, 'lice'),
+        ['esuol', 5, false, true, 'lice'],
 
         // mice (mouse)
-        array('esuom', 5, false, true, 'mice'),
+        ['esuom', 5, false, true, 'mice'],
 
         // geese (goose)
-        array('esoo', 4, false, true, 'eese'),
+        ['esoo', 4, false, true, 'eese'],
 
         // houses (house), bases (base)
-        array('es', 2, true, true, 'ses'),
+        ['es', 2, true, true, 'ses'],
 
         // geese (goose)
-        array('esoog', 5, true, true, 'geese'),
+        ['esoog', 5, true, true, 'geese'],
 
         // caves (cave)
-        array('ev', 2, true, true, 'ves'),
+        ['ev', 2, true, true, 'ves'],
 
         // drives (drive)
-        array('evird', 5, false, true, 'drives'),
+        ['evird', 5, false, true, 'drives'],
 
         // objectives (objective), alternative (alternatives)
-        array('evit', 4, true, true, 'tives'),
+        ['evit', 4, true, true, 'tives'],
 
         // moves (move)
-        array('evom', 4, true, true, 'moves'),
+        ['evom', 4, true, true, 'moves'],
 
         // staves (staff)
-        array('ffats', 5, true, true, 'staves'),
+        ['ffats', 5, true, true, 'staves'],
 
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
-        array('ff', 2, true, true, 'ffs'),
+        ['ff', 2, true, true, 'ffs'],
 
         // hooves (hoof), dwarves (dwarf), elves (elf), leaves (leaf)
-        array('f', 1, true, true, array('fs', 'ves')),
+        ['f', 1, true, true, ['fs', 'ves']],
 
         // arches (arch)
-        array('hc', 2, true, true, 'ches'),
+        ['hc', 2, true, true, 'ches'],
 
         // bushes (bush)
-        array('hs', 2, true, true, 'shes'),
+        ['hs', 2, true, true, 'shes'],
 
         // teeth (tooth)
-        array('htoot', 5, true, true, 'teeth'),
+        ['htoot', 5, true, true, 'teeth'],
 
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        array('mu', 2, true, true, 'a'),
-
-        // echoes (echo)
-        array('ohce', 4, true, true, 'echoes'),
+        ['mu', 2, true, true, 'a'],
 
         // men (man), women (woman)
-        array('nam', 3, true, true, 'men'),
+        ['nam', 3, true, true, 'men'],
 
         // people (person)
-        array('nosrep', 6, true, true, array('persons', 'people')),
+        ['nosrep', 6, true, true, ['persons', 'people']],
 
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        array('noi', 3, true, true, 'ions'),
+        ['noi', 3, true, true, 'ions'],
 
         // bacteria (bacterium), criteria (criterion), phenomena (phenomenon)
-        array('no', 2, true, true, 'a'),
+        ['no', 2, true, true, 'a'],
+
+        // echoes (echo)
+        ['ohce', 4, true, true, 'echoes'],
+
+        // heroes (hero)
+        ['oreh', 4, true, true, 'heroes'],
 
         // atlases (atlas)
-        array('salta', 5, true, true, 'atlases'),
+        ['salta', 5, true, true, 'atlases'],
 
         // irises (iris)
-        array('siri', 4, true, true, 'irises'),
+        ['siri', 4, true, true, 'irises'],
 
         // analyses (analysis), ellipses (ellipsis), neuroses (neurosis)
         // theses (thesis), emphases (emphasis), oases (oasis),
         // crises (crisis)
-        array('sis', 3, true, true, 'ses'),
+        ['sis', 3, true, true, 'ses'],
 
         // accesses (access), addresses (address), kisses (kiss)
-        array('ss', 2, true, false, 'sses'),
+        ['ss', 2, true, false, 'sses'],
 
         // syllabi (syllabus)
-        array('suballys', 8, true, true, 'syllabi'),
+        ['suballys', 8, true, true, 'syllabi'],
 
         // buses (bus)
-        array('sub', 3, true, true, 'buses'),
+        ['sub', 3, true, true, 'buses'],
+
+        // circuses (circus)
+        ['suc', 3, true, true, 'cuses'],
 
         // fungi (fungus), alumni (alumnus), syllabi (syllabus), radii (radius)
-        array('su', 2, true, true, 'i'),
+        ['su', 2, true, true, 'i'],
 
         // news (news)
-        array('swen', 4, true, true, 'news'),
+        ['swen', 4, true, true, 'news'],
 
         // feet (foot)
-        array('toof', 4, true, true, 'feet'),
+        ['toof', 4, true, true, 'feet'],
 
         // chateaux (chateau), bureaus (bureau)
-        array('uae', 3, false, true, array('eaus', 'eaux')),
+        ['uae', 3, false, true, ['eaus', 'eaux']],
 
         // oxen (ox)
-        array('xo', 2, false, false, 'oxen'),
+        ['xo', 2, false, false, 'oxen'],
 
         // hoaxes (hoax)
-        array('xaoh', 4, true, false, 'hoaxes'),
+        ['xaoh', 4, true, false, 'hoaxes'],
 
         // indices (index)
-        array('xedni', 5, false, true, array('indicies', 'indexes')),
+        ['xedni', 5, false, true, ['indicies', 'indexes']],
 
         // indexes (index), matrixes (matrix)
-        array('x', 1, true, false, array('cies', 'xes')),
+        ['x', 1, true, false, ['cies', 'xes']],
 
         // appendices (appendix)
-        array('xi', 2, false, true, 'ices'),
+        ['xi', 2, false, true, 'ices'],
 
         // babies (baby)
-        array('y', 1, false, true, 'ies'),
+        ['y', 1, false, true, 'ies'],
 
         // quizzes (quiz)
-        array('ziuq', 4, true, false, 'quizzes'),
+        ['ziuq', 4, true, false, 'quizzes'],
 
         // waltzes (waltz)
-        array('z', 1, true, false, 'zes'),
-    );
+        ['z', 1, true, true, 'zes'],
+    ];
 
     /**
-     * A list of words which should not be inflected.
-     *
-     * @var array
+     * A list of words which should not be inflected, reversed.
      */
-    private static $uninflected = array(
-        'data',
-        'deer',
-        'feedback',
-        'fish',
-        'moose',
-        'series',
-        'sheep',
-    );
+    private static $uninflected = [
+        'atad',
+        'reed',
+        'kcabdeef',
+        'hsif',
+        'ofni',
+        'esoom',
+        'seires',
+        'peehs',
+    ];
 
     /**
      * This class should not be instantiated.
@@ -327,10 +326,7 @@ final class Inflector
      *
      * @param string $plural A word in plural form
      *
-     * @return string|array The singular form or an array of possible singular
-     *                      forms
-     *
-     * @internal
+     * @return string|array The singular form or an array of possible singular forms
      */
     public static function singularize(string $plural)
     {
@@ -339,7 +335,7 @@ final class Inflector
         $pluralLength = \strlen($lowerPluralRev);
 
         // Check if the word is one which is not inflected, return early if so
-        if (in_array(strtolower($plural), self::$uninflected, true)) {
+        if (\in_array($lowerPluralRev, self::$uninflected, true)) {
             return $plural;
         }
 
@@ -416,19 +412,16 @@ final class Inflector
      *
      * @param string $singular A word in plural form
      *
-     * @return string|array The plural form or an array of possible plural
-     *                      forms
-     *
-     * @internal
+     * @return string|array The plural form or an array of possible plural forms
      */
     public static function pluralize(string $singular)
     {
         $singularRev = strrev($singular);
         $lowerSingularRev = strtolower($singularRev);
-        $singularLength = strlen($lowerSingularRev);
+        $singularLength = \strlen($lowerSingularRev);
 
         // Check if the word is one which is not inflected, return early if so
-        if (in_array(strtolower($singular), self::$uninflected, true)) {
+        if (\in_array($lowerSingularRev, self::$uninflected, true)) {
             return $singular;
         }
 
@@ -474,8 +467,8 @@ final class Inflector
                     // the singular suffix too
                     $firstUpper = ctype_upper($singularRev[$j - 1]);
 
-                    if (is_array($newSuffix)) {
-                        $plurals = array();
+                    if (\is_array($newSuffix)) {
+                        $plurals = [];
 
                         foreach ($newSuffix as $newSuffixEntry) {
                             $plurals[] = $newBase.($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);

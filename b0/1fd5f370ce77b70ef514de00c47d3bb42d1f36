@@ -1,0 +1,206 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-06-27T10:10:25Z
+
+This constraint already exist as a third-party one here: https://github.com/rollerworks/PasswordStrengthValidator/blob/v1.1.3/src/Validator/Constraints/P0wnedPassword.php
+
+I'm wondering whether we need to have it in core.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-27T10:12:25Z
+
+I wasn't aware of this bundle! Thanks @stof for pointing it out.
+IMO it's a good reason to move this kind of very important features in core :)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-27T10:14:34Z
+
+the threshold is not yet implemented there (it is always the equivalent of your `maxCount=1`), but there is a issue about it already: https://github.com/rollerworks/PasswordStrengthValidator/issues/22
+
+---------------------------------------------------------------------------
+
+by stloyd at 2018-06-27T10:22:50Z
+
+I was thinking about similar thing to add to Symfony, but after re-thinking the idea to have it core I decided to abandon it & probably propose it as documentation tutorial or something like that. Mostly cause it depends on external implementation.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by linaori at 2018-06-27T13:35:14Z
+
+Great idea! I'm pretty sure that despite depending on a vendor, this would be a nice addition to the core.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-27T13:38:27Z
+
+> I was thinking about similar thing to add to Symfony, but after re-thinking the idea to have it core I decided to abandon it & probably propose it as documentation tutorial or something like that. Mostly cause it depends on external implementation.
+
+I had the same feelings, but if it's good enough to be included in Firefox, with its huge user base. I guess it's good for us too. It's also [used by 1password](https://blog.agilebits.com/2018/02/22/finding-pwned-passwords-with-1password/).
+
+---------------------------------------------------------------------------
+
+by ChangePlaces at 2018-06-27T15:40:46Z
+
+Please don't turn symfony into laravel. The owners of this site could easily 'omit' certain passwords and will know what sites have such passwords.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-27T15:58:38Z
+
+> Also hardcoding HTTP requests to some URL sounds like a really bad idea (should the service be compromised, all users are doomed and you are in serious security trouble).
+
+I don't understand what you mean here. If you don't call the URL, you cannot use the service at all.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-27T16:00:43Z
+
+@Majkl578 the paragraph you pasted is titled `License — breach & paste APIs`. This validator is not using any of these 2 apis, but the "Pwned Passwords" one
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-27T16:34:01Z
+
+> Please don't turn symfony into laravel.
+
+This kind of comments aren't constructive and create a bad atmosphere. That being said, and even if I personally think that we've a lot to learn from Laravel, I don't get what the relation between this PR and Laravel is. AFAIK, they don't provide an integration with HaveIBeenPwned (yet).
+If "turning Symfony into Laravel" helps making the web a safer place, I'm 100% for.
+
+> The owners of this site could easily 'omit' certain passwords and will know what sites have such passwords.
+
+The password hash isn't sent to the API (only the first 5 chars are). So the API cannot know the password used. You can refer to the Cloudflare paper about k-anonymity I linked in the PR description.
+
+Anyway, this site is run by a well known security expert from Microsoft, and trusted by internet backbones such as Firefox and CloudFlare. This feature is 100% optin, if you don't trust this service, don't use it.
+
+@Majkl578 In addition to what @stof said, I sent a mail to Troy Hunt to be sure we're in the path from a legal PoV. I think that it's the website that will use this validator that need to comply with ToS, not Symfony. We'll make that bold in the documentation.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-27T20:22:59Z
+
+Licensing is not an issue: https://twitter.com/troyhunt/status/1012066309251592192
+
+---------------------------------------------------------------------------
+
+by goetas at 2018-06-27T22:04:22Z
+
+Not really happy to see third party api landing into the symfony core (that's becoming bigger and bigger recently)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-28T06:00:21Z
+
+maxCount should be minCount, i.e. it's considered as pwned if it's present for a minimum number of times.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2018-06-28T06:04:19Z
+
+IMO we could add an optional dependency on a third-party HTTP client. Since there's no PSR, the closest thing is https://github.com/php-http/httplug
+
+Edit: There's a draft PSR-18: https://github.com/php-fig/fig-standards/blob/master/proposed/http-client/http-client.md
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-28T09:11:00Z
+
+@teohhanhui I think it's safer to wait for PSR-18 and use something lightweight like the current signature for now. It will be easy to switch when PSR-18 will be stable.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-28T09:12:10Z
+
+@teohhanhui I planned to switch to `threshold` as suggested by @stof. wdyt?
+
+---------------------------------------------------------------------------
+
+by ChangePlaces at 2018-06-28T10:08:38Z
+
+Also wanted to point out, the twitter stream of the guy responsible for this service has many messages of him talking about how much it's costing to host the service. Never a good sign.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-06-28T10:20:32Z
+
+Are you speaking about https://twitter.com/troyhunt/status/1011871609039171587?
+
+It looks like an ad for Azure and CloudFlare (it costs "only" $32 per month for such a huge service).
+
+According to https://haveibeenpwned.com/Donate, Donations are mostly to cover the time spent running the service, not the hosting:
+
+> Many people love this service and have asked to donate. In all good conscience, I can't write about how awesome and cost-effective Azure is then ask for donations to fund it. Instead, it's enormously time consuming to run this service and the sacrifices required to do so are where the real cost is. If you want to kick in to help me cover those costs, that would be awesome!
+
+Regarding good signs: [Have I Been Pwned' Integrates With Firefox and 1Password to Tell You When You've Been Pwned (Gizmodo)](https://gizmodo.com/have-i-been-pwned-integrates-with-firefox-and-1password-1827143323)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-06-28T10:51:38Z
+
+> Also wanted to point out, the twitter stream of the guy responsible for this service has many messages of him talking about how much it's costing to host the service. Never a good sign.
+
+these tweets are about how *not much* it costs actually.
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-06-29T19:13:49Z
+
+Great feature, very nice
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-07-03T14:11:41Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-09-11T14:50:37Z
+
+Rebased.
+Btw, GitHub itself integrated HaveIBeenPwned during the summer: https://blog.github.com/2018-07-31-new-improvements-and-best-practices-for-account-security-and-recoverability/
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-12-18T10:09:46Z
+
+Can this one be merged? Do we want to use PSR-18 here?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-12-18T10:58:15Z
+
+https://github.com/symfony/symfony/pull/27738#discussion_r221470310 is a blocker to me
+
+---------------------------------------------------------------------------
+
+by sstok at 2018-12-30T18:07:38Z
+
+If this is merged would it make sense to move the Rollerworks Password Strength validators to the Validator component itself?
+
+Although I properly would favor an validator for https://github.com/mkopinsky/zxcvbn-php (see https://github.com/bjeavons/zxcvbn-php/issues/15 for the discussion about this fork) with proper translations.
+
+---------------------------------------------------------------------------
+
+by andreybolonin at 2019-01-06T22:21:33Z
+
+IMO, very useful feature for make safer password generation.
+I think, we should add this into symfony core. thx to @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-03-21T12:24:15Z
+
+* Added a new option to not throw in case of error
+* Fixed issues raised in comments
+
+Should be ready to be merged
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T17:44:35Z
+
+This one should be in 4.3 :) Let's talk on Slack about the best way to finish it.

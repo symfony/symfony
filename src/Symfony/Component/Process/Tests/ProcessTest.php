@@ -49,7 +49,8 @@ class ProcessTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The provided cwd does not exist.
+     * @expectedExceptionMessage The provided cwd "
+     * @expectedExceptionMessage "does not exist.
      */
     public function testInvalidCwd()
     {

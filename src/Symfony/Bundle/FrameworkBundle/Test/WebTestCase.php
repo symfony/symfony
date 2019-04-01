@@ -23,12 +23,14 @@ abstract class WebTestCase extends KernelTestCase
 {
     use WebTestAssertions;
 
+    /** @var Client|null */
+    protected static $client;
+
     protected function doTearDown(): void
     {
         parent::doTearDown();
-        if (static::$client) {
-            static::$client = null;
-        }
+
+        static::$client = null;
     }
 
     /**

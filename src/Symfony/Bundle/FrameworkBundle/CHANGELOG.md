@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * added `WebTestAssertions` trait (included by default in `WebTestCase`)
  * renamed `Client` to `KernelBrowser`
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.

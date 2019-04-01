@@ -45,11 +45,17 @@ if ((new \ReflectionMethod(TestCase::class, 'tearDown'))->hasReturnType()) {
      */
     trait TestCaseSetUpTearDownTrait
     {
-        private function doSetUp(): void
+        /**
+         * @return void
+         */
+        private function doSetUp()
         {
         }
 
-        private function doTearDown(): void
+        /**
+         * @return void
+         */
+        private function doTearDown()
         {
         }
 

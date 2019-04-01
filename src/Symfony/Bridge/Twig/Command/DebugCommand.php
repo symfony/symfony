@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -188,12 +189,13 @@ EOF
 
     private function displayGeneralText(SymfonyStyle $io, string $filter = null)
     {
+        $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
         foreach ($types as $index => $type) {
             $items = [];
             foreach ($this->twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
-                    $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
+                    $items[$name] = $name.$this->getPrettyMetadata($type, $entity, $decorated);
                 }
             }
 
@@ -221,6 +223,7 @@ EOF
 
     private function displayGeneralJson(SymfonyStyle $io, $filter)
     {
+        $decorated = $io->isDecorated();
         $types = ['functions', 'filters', 'tests', 'globals'];
         $data = [];
         foreach ($types as $type) {
@@ -238,11 +241,12 @@ EOF
             $data['loader_paths'] = $paths;
         }
 
-        if ($wronBundles = $this->findWrongBundleOverrides()) {
-            $data['warnings'] = $this->buildWarningMessages($wronBundles);
+        if ($wrongBundles = $this->findWrongBundleOverrides()) {
+            $data['warnings'] = $this->buildWarningMessages($wrongBundles);
         }
 
-        $io->writeln(json_encode($data));
+        $data = json_encode($data, JSON_PRETTY_PRINT);
+        $io->writeln($decorated ? OutputFormatter::escape($data) : $data);
     }
 
     private function getLoaderPaths(string $name = null): array
@@ -327,7 +331,7 @@ EOF
         }
     }
 
-    private function getPrettyMetadata($type, $entity)
+    private function getPrettyMetadata($type, $entity, $decorated)
     {
         if ('tests' === $type) {
             return '';
@@ -339,7 +343,7 @@ EOF
                 return '(unknown?)';
             }
         } catch (\UnexpectedValueException $e) {
-            return ' <error>'.$e->getMessage().'</error>';
+            return sprintf(' <error>%s</error>', $decorated ? OutputFormatter::escape($e->getMessage()) : $e->getMessage());
         }
 
         if ('globals' === $type) {
@@ -347,7 +351,9 @@ EOF
                 return ' = object('.\get_class($meta).')';
             }
 
-            return ' = '.substr(@json_encode($meta), 0, 50);
+            $description = substr(@json_encode($meta), 0, 50);
+
+            return sprintf(' = %s', $decorated ? OutputFormatter::escape($description) : $description);
         }
 
         if ('functions' === $type) {

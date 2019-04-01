@@ -88,6 +88,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
             'parameter_bag' => '?'.ContainerBagInterface::class,
             'message_bus' => '?'.MessageBusInterface::class,
+            'messenger.default_bus' => '?'.MessageBusInterface::class,
         ];
     }
 }

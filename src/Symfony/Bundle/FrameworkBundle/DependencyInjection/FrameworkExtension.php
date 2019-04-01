@@ -1647,7 +1647,8 @@ class FrameworkExtension extends Extension
             $container->register($busId, MessageBus::class)->addArgument([])->addTag('messenger.bus');
 
             if ($busId === $config['default_bus']) {
-                $container->setAlias('message_bus', $busId)->setPublic(true);
+                $container->setAlias('message_bus', $busId)->setPublic(true)->setDeprecated(true, 'The "%alias_id%" service is deprecated, use the "messenger.default_bus" service instead.');
+                $container->setAlias('messenger.default_bus', $busId)->setPublic(true);
                 $container->setAlias(MessageBusInterface::class, $busId);
             } else {
                 $container->registerAliasForArgument($busId, MessageBusInterface::class);

@@ -43,6 +43,7 @@ class AbstractControllerTest extends ControllerTraitTest
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',
             'parameter_bag' => '?Symfony\\Component\\DependencyInjection\\ParameterBag\\ContainerBagInterface',
             'message_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
+            'messenger.default_bus' => '?Symfony\\Component\\Messenger\\MessageBusInterface',
             'security.token_storage' => '?Symfony\\Component\\Security\\Core\\Authentication\\Token\\Storage\\TokenStorageInterface',
             'security.csrf.token_manager' => '?Symfony\\Component\\Security\\Csrf\\CsrfTokenManagerInterface',
         ];

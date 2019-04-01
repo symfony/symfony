@@ -650,6 +650,8 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger');
         $this->assertTrue($container->hasAlias('message_bus'));
         $this->assertTrue($container->getAlias('message_bus')->isPublic());
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
         $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
@@ -737,6 +739,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasAlias('message_bus'));
         $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));
+        $this->assertTrue($container->hasAlias('messenger.default_bus'));
+        $this->assertSame('messenger.bus.commands', (string) $container->getAlias('messenger.default_bus'));
     }
 
     /**

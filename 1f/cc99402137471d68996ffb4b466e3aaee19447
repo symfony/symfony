@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-26T12:43:28Z
+
+We don't need it due to the experimental, but do we want a BC layer here?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-03-26T13:26:28Z
+
+👍 for adding BC layer
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-26T13:28:41Z
+
+We don't need a BC layer, but we definitely need some documentation in the CHANGELOG to help people migrate their code.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-27T11:31:17Z
+
+Why not `messenger.default_bus`? So it's explicit that it's the default one.
+
+We already have:
+- `translator.default`
+- `router.default`
+- `cache.default_*`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-28T00:54:13Z
+
+Personally, I do like `messenger.default_bus`
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-28T01:33:38Z
+
+I'd add a BC layer as well, especially given the fact we have all these one-word services in Symfony (`router`, `translation`, etc...)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-28T06:41:09Z
+
+The bc layer is a one liner: a deprecated alias should do it.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-28T11:50:54Z
+
+@ktherage can you do these two changes (BC layer + `messenger.default_bus`)?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-04-01T08:58:09Z
+
+@sroze i made the wanted changes but i'm not really sure that changes about the BC layer are those you wanted. Feel free to tell me what's wrong (on Slack i am more reactive because i get noticed as soon as i got a message).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-01T12:15:13Z
+
+@ktherage check the tests - one is failing now :)
+
+---------------------------------------------------------------------------
+
+by ktherage at 2019-04-01T12:30:09Z
+
+@weaverryan yes sorry :sweat_smile:. i'll fix it.

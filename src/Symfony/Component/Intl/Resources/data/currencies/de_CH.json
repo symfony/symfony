@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.50",
+    "Version": "2.1.47.86",
     "Names": {
         "BYN": [
             "BYN",
@@ -8,6 +8,10 @@
         "BYR": [
             "BYR",
             "Weissrussischer Rubel (2000–2016)"
+        ],
+        "CHF": [
+            "CHF",
+            "Schweizer Franken"
         ],
         "EUR": [
             "EUR",

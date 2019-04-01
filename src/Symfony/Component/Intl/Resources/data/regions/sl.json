@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Otok Ascension",
         "AD": "Andora",
@@ -146,7 +146,7 @@
         "MF": "Saint Martin",
         "MG": "Madagaskar",
         "MH": "Marshallovi otoki",
-        "MK": "Makedonija",
+        "MK": "Severna Makedonija",
         "ML": "Mali",
         "MM": "Mjanmar (Burma)",
         "MN": "Mongolija",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis in Futuna",
         "WS": "Samoa",
+        "XA": "psevdonaglasi",
+        "XB": "psevdobidi",
         "XK": "Kosovo",
         "YE": "Jemen",
         "YT": "Mayotte",

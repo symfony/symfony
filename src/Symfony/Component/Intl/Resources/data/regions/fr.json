@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.43",
     "Names": {
         "AC": "Île de l’Ascension",
         "AD": "Andorre",
@@ -215,7 +215,7 @@
         "SV": "Salvador",
         "SX": "Saint-Martin (partie néerlandaise)",
         "SY": "Syrie",
-        "SZ": "Swaziland",
+        "SZ": "Eswatini",
         "TA": "Tristan da Cunha",
         "TC": "Îles Turques-et-Caïques",
         "TD": "Tchad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis-et-Futuna",
         "WS": "Samoa",
+        "XA": "pseudo-accents",
+        "XB": "pseudo-bidi",
         "XK": "Kosovo",
         "YE": "Yémen",
         "YT": "Mayotte",

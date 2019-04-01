@@ -1,0 +1,241 @@
+{
+    "Version": "2.1.48.77",
+    "Names": {
+        "AED": [
+            "AED",
+            "Kuɗin Haɗaɗɗiyar Daular Larabawa"
+        ],
+        "AOA": [
+            "AOA",
+            "Kuɗin Angola"
+        ],
+        "AUD": [
+            "A$",
+            "Dalar Ostareliya"
+        ],
+        "BHD": [
+            "BHD",
+            "Kuɗin Baharan"
+        ],
+        "BIF": [
+            "BIF",
+            "Kuɗin Burundi"
+        ],
+        "BRL": [
+            "R$",
+            "Ril Kudin Birazil"
+        ],
+        "BWP": [
+            "BWP",
+            "Kuɗin Baswana"
+        ],
+        "CAD": [
+            "CA$",
+            "Dalar Kanada"
+        ],
+        "CDF": [
+            "CDF",
+            "Kuɗin Kongo"
+        ],
+        "CHF": [
+            "CHF",
+            "Kuɗin Suwizalan"
+        ],
+        "CNY": [
+            "CN¥",
+            "Yuwan kasar Sin"
+        ],
+        "CVE": [
+            "CVE",
+            "Kuɗin Tsibiran Kap Barde"
+        ],
+        "DJF": [
+            "DJF",
+            "Kuɗin Jibuti"
+        ],
+        "DZD": [
+            "DZD",
+            "Kuɗin Aljeriya"
+        ],
+        "EGP": [
+            "EGP",
+            "Fam kin Masar"
+        ],
+        "ERN": [
+            "ERN",
+            "Kuɗin Eritireya"
+        ],
+        "ETB": [
+            "ETB",
+            "Kuɗin Habasha"
+        ],
+        "EUR": [
+            "€",
+            "Yuro"
+        ],
+        "GBP": [
+            "£",
+            "Fam na Ingila"
+        ],
+        "GHC": [
+            "GHC",
+            "Cedi"
+        ],
+        "GMD": [
+            "GMD",
+            "Kuɗin Gambiya"
+        ],
+        "GNS": [
+            "GNS",
+            "Kuɗin Gini"
+        ],
+        "INR": [
+            "₹",
+            "Kuɗin Indiya"
+        ],
+        "JPY": [
+            "¥",
+            "Yen kasar Japan"
+        ],
+        "KES": [
+            "KES",
+            "Sulen Kenya"
+        ],
+        "KMF": [
+            "KMF",
+            "Kuɗin Kwamoras"
+        ],
+        "LRD": [
+            "LRD",
+            "Dalar Laberiya"
+        ],
+        "LSL": [
+            "LSL",
+            "Kuɗin Lesoto"
+        ],
+        "LYD": [
+            "LYD",
+            "Kuɗin Libiya"
+        ],
+        "MAD": [
+            "MAD",
+            "Kuɗin Maroko"
+        ],
+        "MGA": [
+            "MGA",
+            "Kuɗin Madagaskar"
+        ],
+        "MRO": [
+            "MRO",
+            "Kuɗin Moritaniya (1973–2017)"
+        ],
+        "MRU": [
+            "MRU",
+            "Kuɗin Moritaniya"
+        ],
+        "MUR": [
+            "MUR",
+            "Kuɗin Moritus"
+        ],
+        "MWK": [
+            "MWK",
+            "Kuɗin Malawi"
+        ],
+        "MZM": [
+            "MZM",
+            "Kuɗin Mozambik"
+        ],
+        "NAD": [
+            "NAD",
+            "Dalar Namibiya"
+        ],
+        "NGN": [
+            "₦",
+            "Naira"
+        ],
+        "RUB": [
+            "RUB",
+            "Ruble kasar Rasha"
+        ],
+        "RWF": [
+            "RWF",
+            "Kuɗin Ruwanda"
+        ],
+        "SAR": [
+            "SAR",
+            "Riyal"
+        ],
+        "SCR": [
+            "SCR",
+            "Kuɗin Saishal"
+        ],
+        "SDG": [
+            "SDG",
+            "Fam kin Sudan"
+        ],
+        "SHP": [
+            "SHP",
+            "Fam kin San Helena"
+        ],
+        "SLL": [
+            "SLL",
+            "Kuɗin Salewo"
+        ],
+        "SOS": [
+            "SOS",
+            "Sulen Somaliya"
+        ],
+        "STD": [
+            "STD",
+            "Kuɗin Sawo Tome da Paransip (1977–2017)"
+        ],
+        "STN": [
+            "STN",
+            "Kuɗin Sawo Tome da Paransip"
+        ],
+        "SZL": [
+            "SZL",
+            "Kuɗin Lilangeni"
+        ],
+        "TND": [
+            "TND",
+            "Kuɗin Tunisiya"
+        ],
+        "TZS": [
+            "TZS",
+            "Sulen Tanzaniya"
+        ],
+        "UGX": [
+            "UGX",
+            "Sule Yuganda"
+        ],
+        "USD": [
+            "$",
+            "Dalar Amirka"
+        ],
+        "XAF": [
+            "FCFA",
+            "Kuɗin Sefa na Afirka Ta Tsakiya"
+        ],
+        "XOF": [
+            "CFA",
+            "Kuɗin Sefa na Afirka Ta Yamma"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Kuɗin Afirka Ta Kudu"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Kuɗin Zambiya (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Kuɗin Zambiya"
+        ],
+        "ZWD": [
+            "ZWD",
+            "Dalar zimbabuwe"
+        ]
+    }
+}

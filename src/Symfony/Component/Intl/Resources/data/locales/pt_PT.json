@@ -31,13 +31,13 @@
         "en_KN": "inglês (São Cristóvão e Neves)",
         "en_KY": "inglês (Ilhas Caimão)",
         "en_MG": "inglês (Madagáscar)",
-        "en_MO": "inglês (Macau, RAE da China)",
         "en_MS": "inglês (Monserrate)",
         "en_MU": "inglês (Maurícia)",
         "en_MW": "inglês (Maláui)",
         "en_NU": "inglês (Niuê)",
         "en_SI": "inglês (Eslovénia)",
         "en_SX": "inglês (São Martinho (Sint Maarten))",
+        "en_SZ": "inglês (Essuatíni)",
         "en_TK": "inglês (Toquelau)",
         "en_TT": "inglês (Trindade e Tobago)",
         "en_UM": "inglês (Ilhas Menores Afastadas dos EUA)",
@@ -108,7 +108,7 @@
         "pl_PL": "polaco (Polónia)",
         "ps": "pastó",
         "ps_AF": "pastó (Afeganistão)",
-        "pt_MO": "português (Macau, RAE da China)",
+        "ps_PK": "pastó (Paquistão)",
         "ro_MD": "romeno (Moldávia)",
         "ro_RO": "romeno (Roménia)",
         "ru_MD": "russo (Moldávia)",
@@ -153,9 +153,6 @@
         "xh_ZA": "xosa (África do Sul)",
         "yo": "ioruba",
         "yo_BJ": "ioruba (Benim)",
-        "yo_NG": "ioruba (Nigéria)",
-        "zh_Hans_MO": "chinês (simplificado, Macau, RAE da China)",
-        "zh_Hant_MO": "chinês (tradicional, Macau, RAE da China)",
-        "zh_MO": "chinês (Macau, RAE da China)"
+        "yo_NG": "ioruba (Nigéria)"
     }
 }

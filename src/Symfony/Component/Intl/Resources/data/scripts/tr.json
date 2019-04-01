@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.42",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kafkas Albanyası",
@@ -21,7 +21,6 @@
         "Cakm": "Chakma",
         "Cans": "UCAS",
         "Cari": "Karya",
-        "Cham": "Cham",
         "Cher": "Çeroki",
         "Cirt": "Cirth",
         "Copt": "Kıpti",
@@ -86,13 +85,11 @@
         "Lydi": "Lidya",
         "Mahj": "Mahajani",
         "Mand": "Manden",
-        "Mani": "Mani",
         "Maya": "Maya Hiyeroglifleri",
         "Mend": "Mende",
         "Merc": "Meroitik El Yazısı",
         "Mero": "Meroitik",
         "Mlym": "Malayalam",
-        "Modi": "Modi",
         "Mong": "Moğol",
         "Moon": "Moon",
         "Mroo": "Mro",

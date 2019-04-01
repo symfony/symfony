@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.50",
+    "Version": "2.1.48.42",
     "Names": {
         "ADP": [
             "ADP",
@@ -192,10 +192,6 @@
         "BRR": [
             "BRR",
             "brazilski cruzeiro"
-        ],
-        "BRZ": [
-            "BRZ",
-            "BRZ"
         ],
         "BSD": [
             "BSD",
@@ -636,10 +632,6 @@
         "MAF": [
             "MAF",
             "marokanski franak"
-        ],
-        "MCF": [
-            "MCF",
-            "MCF"
         ],
         "MDC": [
             "MDC",

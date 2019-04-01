@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.42",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kaukasisch-Albanisch",
@@ -21,7 +21,6 @@
         "Cakm": "Chakma",
         "Cans": "UCAS",
         "Cari": "Karisch",
-        "Cham": "Cham",
         "Cher": "Cherokee",
         "Cirt": "Cirth",
         "Copt": "Koptisch",
@@ -92,7 +91,6 @@
         "Merc": "Meroitisch kursiv",
         "Mero": "Meroitisch",
         "Mlym": "Malayalam",
-        "Modi": "Modi",
         "Mong": "Mongolisch",
         "Moon": "Moon",
         "Mroo": "Mro",

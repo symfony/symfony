@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.48.17",
     "Names": {
         "AC": "Ynys Ascension",
         "AD": "Andorra",
@@ -215,7 +215,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Syria",
-        "SZ": "Gwlad Swazi",
+        "SZ": "Eswatini",
         "TA": "Tristan da Cunha",
         "TC": "Ynysoedd Turks a Caicos",
         "TD": "Tchad",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis a Futuna",
         "WS": "Samoa",
+        "XA": "Acenion Ffug",
+        "XB": "Bidi Ffug",
         "XK": "Kosovo",
         "YE": "Yemen",
         "YT": "Mayotte",

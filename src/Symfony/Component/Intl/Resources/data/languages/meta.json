@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.91",
+    "Version": "2.1.47.82",
     "Languages": [
         "aa",
         "ab",
@@ -623,6 +623,7 @@
     "Alpha2ToAlpha3": {
         "aa": "aar",
         "ab": "abk",
+        "dz": "dzo",
         "af": "afr",
         "ak": "aka",
         "sq": "sqi",
@@ -660,8 +661,8 @@
         "da": "dan",
         "de": "deu",
         "dv": "div",
+        "mn": "mon",
         "nl": "nld",
-        "dz": "dzo",
         "et": "est",
         "el": "ell",
         "en": "eng",
@@ -707,7 +708,6 @@
         "ks": "kas",
         "kr": "kau",
         "kk": "kaz",
-        "mn": "mon",
         "km": "khm",
         "ki": "kik",
         "rw": "kin",
@@ -734,6 +734,7 @@
         "ms": "msa",
         "mg": "mlg",
         "mt": "mlt",
+        "ro": "ron",
         "na": "nau",
         "nv": "nav",
         "nr": "nbl",
@@ -754,7 +755,6 @@
         "pt": "por",
         "qu": "que",
         "rm": "roh",
-        "ro": "ron",
         "rn": "run",
         "ru": "rus",
         "sg": "sag",

@@ -105,7 +105,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                 if (method_exists($kernel = $event->getKernel(), 'terminateWithException')) {
                     $request = $event->getRequest();
                     $hasRun = &$this->hasTerminatedWithException;
-                    $this->exceptionHandler = function (\Exception $e) use ($kernel, $request, &$hasRun) {
+                    $this->exceptionHandler = static function (\Exception $e) use ($kernel, $request, &$hasRun) {
                         if ($hasRun) {
                             throw $e;
                         }

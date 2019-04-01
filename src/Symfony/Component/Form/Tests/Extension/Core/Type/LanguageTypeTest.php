@@ -51,7 +51,6 @@ class LanguageTypeTest extends BaseTypeTest
 
         // Don't check objects for identity
         $this->assertContains(new ChoiceView('en', 'en', 'англійська'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'British English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_US', 'en_US', 'англійська (США)'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('fr', 'fr', 'французька'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('my', 'my', 'бірманська'), $choices, '', false, false);

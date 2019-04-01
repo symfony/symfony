@@ -125,6 +125,20 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
+    public function testGetArray()
+    {
+        $bag = new ParameterBag(
+            [
+                'foo' => ['foo', 'bar'],
+                'bar' => 'hello',
+            ]
+        );
+
+        $this->assertEquals(['foo', 'bar'], $bag->getArray('foo'), '->getArray() gets a value of parameter as an array');
+        $this->assertEquals(['hello'], $bag->getArray('bar'), '->getArray() gets a value of parameter as an array');
+        $this->assertEquals([], $bag->getArray('unknown'), '->getArray() returns empty array if a parameter is not defined');
+    }
+
     public function testFilter()
     {
         $bag = new ParameterBag([

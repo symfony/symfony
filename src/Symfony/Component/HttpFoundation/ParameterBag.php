@@ -171,6 +171,19 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Returns the parameter value converted to array.
+     *
+     * @param string $key     The parameter key
+     * @param array  $default The default value if the parameter key does not exist
+     *
+     * @return array The filtered value
+     */
+    public function getArray($key, $default = [])
+    {
+        return (array) $this->get($key, $default);
+    }
+
+    /**
      * Returns the parameter value converted to boolean.
      *
      * @param string $key     The parameter key

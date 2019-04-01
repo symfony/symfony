@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-03-31T18:52:36Z
+
+@weaverryan if you have an idea for the PhpSerializer bug :thinking:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T20:04:25Z
+
+@vincenttouzet This is because the string contains `\0` characters.

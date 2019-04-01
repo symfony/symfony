@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-01T15:00:12Z
+
+Green and ready!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-01T15:21:47Z
+
+Minor comment: checking PHPUnit's assertions (https://phpunit.de/manual/6.5/en/appendixes.assertions.html) I saw that they don't define "negative asserts" (NotHas..., NotContains..., etc.) but here we're defining asserts in symmetric pairs: (assertResponseHasCookie() + assertResponseNotHasCookie(), assertInputValueSame() + assertInputValueNotSame(), etc.) Just in case you want to double check if we really want this. Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-01T16:28:25Z
+
+@javiereguiluz If you have a closer look, you will see that PHPUnit defines a Not alternative for **almost all** their assertions.

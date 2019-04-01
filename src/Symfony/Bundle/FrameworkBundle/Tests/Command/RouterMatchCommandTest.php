@@ -96,11 +96,7 @@ class RouterMatchCommandTest extends TestCase
             ->expects($this->atLeastOnce())
             ->method('has')
             ->will($this->returnCallback(function ($id) {
-                if ('console.command_loader' === $id) {
-                    return false;
-                }
-
-                return true;
+                return 'console.command_loader' !== $id;
             }))
         ;
         $container

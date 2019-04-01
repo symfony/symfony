@@ -33,7 +33,6 @@ final class Dotenv
     private $lineno;
     private $data;
     private $end;
-    private $state;
     private $values;
 
     /**
@@ -111,27 +110,27 @@ final class Dotenv
         $this->lineno = 1;
         $this->cursor = 0;
         $this->end = \strlen($this->data);
-        $this->state = self::STATE_VARNAME;
+        $state = self::STATE_VARNAME;
         $this->values = [];
         $name = '';
 
         $this->skipEmptyLines();
 
         while ($this->cursor < $this->end) {
-            switch ($this->state) {
+            switch ($state) {
                 case self::STATE_VARNAME:
                     $name = $this->lexVarname();
-                    $this->state = self::STATE_VALUE;
+                    $state = self::STATE_VALUE;
                     break;
 
                 case self::STATE_VALUE:
                     $this->values[$name] = $this->lexValue();
-                    $this->state = self::STATE_VARNAME;
+                    $state = self::STATE_VARNAME;
                     break;
             }
         }
 
-        if (self::STATE_VALUE === $this->state) {
+        if (self::STATE_VALUE === $state) {
             $this->values[$name] = '';
         }
 

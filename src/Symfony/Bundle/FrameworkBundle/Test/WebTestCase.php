@@ -21,6 +21,18 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 abstract class WebTestCase extends KernelTestCase
 {
+    use WebTestAssertions;
+
+    /** @var Client|null */
+    protected static $client;
+
+    protected function doTearDown(): void
+    {
+        parent::doTearDown();
+
+        static::$client = null;
+    }
+
     /**
      * Creates a KernelBrowser.
      *
@@ -44,6 +56,6 @@ abstract class WebTestCase extends KernelTestCase
 
         $client->setServerParameters($server);
 
-        return $client;
+        return static::$client = $client;
     }
 }

@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * added PHPUnit constraints: `RequestAttributeValueSame`, `ResponseCookieValueSame`, `ResponseHasCookie`,
+   `ResponseHasHeader`, `ResponseHeaderSame`, `ResponseIsRedirected`, `ResponseIsSuccessful`, and `ResponseStatusCodeSame`
  * deprecated `MimeTypeGuesserInterface` and `ExtensionGuesserInterface` in favor of `Symfony\Component\Mime\MimeTypesInterface`.
  * deprecated `MimeType` and `MimeTypeExtensionGuesser` in favor of `Symfony\Component\Mime\MimeTypes`.
  * deprecated `FileBinaryMimeTypeGuesser` in favor of `Symfony\Component\Mime\FileBinaryMimeTypeGuesser`.

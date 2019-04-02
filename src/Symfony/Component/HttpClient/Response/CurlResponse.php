@@ -48,7 +48,7 @@ final class CurlResponse implements ResponseInterface
         $info = &$this->info;
         $headers = &$this->headers;
 
-        if (!$info['raw_headers']) {
+        if (!$info['response_headers']) {
             // Used to keep track of what we're waiting for
             curl_setopt($ch, CURLOPT_PRIVATE, 'headers');
         }
@@ -257,7 +257,7 @@ final class CurlResponse implements ResponseInterface
 
         if ("\r\n" !== $data) {
             // Regular header line: add it to the list
-            self::addRawHeaders([substr($data, 0, -2)], $info, $headers);
+            self::addResponseHeaders([substr($data, 0, -2)], $info, $headers);
 
             if (0 === strpos($data, 'HTTP') && 300 <= $info['http_code'] && $info['http_code'] < 400) {
                 if (curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {

@@ -97,7 +97,7 @@ class CachingHttpClient implements HttpClientInterface
         $response = $this->cache->handle($request);
         $response = new MockResponse($response->getContent(), [
             'http_code' => $response->getStatusCode(),
-            'raw_headers' => $response->headers->allPreserveCase(),
+            'response_headers' => $response->headers->allPreserveCase(),
         ]);
 
         return MockResponse::fromRequest($method, $url, $options, $response);

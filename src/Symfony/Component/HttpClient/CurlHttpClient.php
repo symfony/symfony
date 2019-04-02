@@ -74,8 +74,8 @@ final class CurlHttpClient implements HttpClientInterface
             return;
         }
 
-        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $rawHeaders) use ($multi) {
-            return self::handlePush($parent, $pushed, $rawHeaders, $multi);
+        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi) {
+            return self::handlePush($parent, $pushed, $requestHeaders, $multi);
         });
     }
 
@@ -191,7 +191,7 @@ final class CurlHttpClient implements HttpClientInterface
             $curlopts[CURLOPT_ENCODING] = ''; // Enable HTTP compression
         }
 
-        foreach ($options['raw_headers'] as $header) {
+        foreach ($options['request_headers'] as $header) {
             if (':' === $header[-2] && \strlen($header) - 2 === strpos($header, ': ')) {
                 // curl requires a special syntax to send empty headers
                 $curlopts[CURLOPT_HTTPHEADER][] = substr_replace($header, ';', -2);
@@ -282,11 +282,11 @@ final class CurlHttpClient implements HttpClientInterface
         }
     }
 
-    private static function handlePush($parent, $pushed, array $rawHeaders, \stdClass $multi): int
+    private static function handlePush($parent, $pushed, array $requestHeaders, \stdClass $multi): int
     {
         $headers = [];
 
-        foreach ($rawHeaders as $h) {
+        foreach ($requestHeaders as $h) {
             if (false !== $i = strpos($h, ':', 1)) {
                 $headers[substr($h, 0, $i)] = substr($h, 1 + $i);
             }
@@ -348,12 +348,12 @@ final class CurlHttpClient implements HttpClientInterface
         $redirectHeaders = [];
         if (0 < $options['max_redirects']) {
             $redirectHeaders['host'] = $host;
-            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['raw_headers'], static function ($h) {
+            $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['request_headers'], static function ($h) {
                 return 0 !== stripos($h, 'Host:');
             });
 
             if (isset($options['headers']['authorization']) || isset($options['headers']['cookie'])) {
-                $redirectHeaders['no_auth'] = array_filter($options['raw_headers'], static function ($h) {
+                $redirectHeaders['no_auth'] = array_filter($options['request_headers'], static function ($h) {
                     return 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
                 });
             }
@@ -361,8 +361,8 @@ final class CurlHttpClient implements HttpClientInterface
 
         return static function ($ch, string $location) use ($redirectHeaders) {
             if ($redirectHeaders && $host = parse_url($location, PHP_URL_HOST)) {
-                $rawHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $rawHeaders);
+                $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
             }
 
             $url = self::parseUrl(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL));

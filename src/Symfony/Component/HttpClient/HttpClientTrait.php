@@ -53,12 +53,12 @@ trait HttpClientTrait
             $options['peer_fingerprint'] = self::normalizePeerFingerprint($options['peer_fingerprint']);
         }
 
-        // Compute raw headers
-        $rawHeaders = $headers = [];
+        // Compute request headers
+        $requestHeaders = $headers = [];
 
         foreach ($options['headers'] as $name => $values) {
             foreach ($values as $value) {
-                $rawHeaders[] = $name.': '.$headers[$name][] = $value = (string) $value;
+                $requestHeaders[] = $name.': '.$headers[$name][] = $value = (string) $value;
 
                 if (\strlen($value) !== strcspn($value, "\r\n\0")) {
                     throw new InvalidArgumentException(sprintf('Invalid header value: CR/LF/NUL found in "%s".', $value));
@@ -95,14 +95,14 @@ trait HttpClientTrait
         if (null !== $url) {
             // Merge auth with headers
             if (($options['auth_basic'] ?? false) && !($headers['authorization'] ?? false)) {
-                $rawHeaders[] = 'authorization: '.$headers['authorization'][] = 'Basic '.base64_encode($options['auth_basic']);
+                $requestHeaders[] = 'authorization: '.$headers['authorization'][] = 'Basic '.base64_encode($options['auth_basic']);
             }
             // Merge bearer with headers
             if (($options['auth_bearer'] ?? false) && !($headers['authorization'] ?? false)) {
-                $rawHeaders[] = 'authorization: '.$headers['authorization'][] = 'Bearer '.$options['auth_bearer'];
+                $requestHeaders[] = 'authorization: '.$headers['authorization'][] = 'Bearer '.$options['auth_bearer'];
             }
 
-            $options['raw_headers'] = $rawHeaders;
+            $options['request_headers'] = $requestHeaders;
             unset($options['auth_basic'], $options['auth_bearer']);
 
             // Parse base URI
@@ -128,7 +128,7 @@ trait HttpClientTrait
      */
     private static function mergeDefaultOptions(array $options, array $defaultOptions, bool $allowExtraOptions = false): array
     {
-        unset($options['raw_headers'], $defaultOptions['raw_headers']);
+        unset($options['request_headers'], $defaultOptions['request_headers']);
 
         $options['headers'] = self::normalizeHeaders($options['headers'] ?? []);
 

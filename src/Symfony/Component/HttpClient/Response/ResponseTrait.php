@@ -43,7 +43,7 @@ trait ResponseTrait
     private $content;
 
     private $info = [
-        'raw_headers' => [],
+        'response_headers' => [],
         'http_code' => 0,
         'error' => null,
     ];
@@ -187,9 +187,9 @@ trait ResponseTrait
      */
     abstract protected static function select(\stdClass $multi, float $timeout): int;
 
-    private static function addRawHeaders(array $rawHeaders, array &$info, array &$headers): void
+    private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers): void
     {
-        foreach ($rawHeaders as $h) {
+        foreach ($responseHeaders as $h) {
             if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h, $m)) {
                 $headers = [];
                 $info['http_code'] = (int) $m[1];
@@ -197,7 +197,7 @@ trait ResponseTrait
                 $headers[strtolower($m[0])][] = ltrim($m[1]);
             }
 
-            $info['raw_headers'][] = $h;
+            $info['response_headers'][] = $h;
         }
 
         if (!$info['http_code']) {

@@ -38,7 +38,7 @@ class HttpExceptionTraitTest extends TestCase
             ->will($this->returnValueMap([
                 ['http_code', 400],
                 ['url', 'http://example.com'],
-                ['raw_headers', [
+                ['response_headers', [
                     'HTTP/1.1 400 Bad Request',
                     'Content-Type: '.$mimeType,
                 ]],

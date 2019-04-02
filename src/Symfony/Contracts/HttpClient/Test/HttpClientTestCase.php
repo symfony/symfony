@@ -41,15 +41,15 @@ abstract class HttpClientTestCase extends TestCase
             'user_data' => $data = new \stdClass(),
         ]);
 
-        $this->assertSame([], $response->getInfo('raw_headers'));
+        $this->assertSame([], $response->getInfo('response_headers'));
         $this->assertSame($data, $response->getInfo()['user_data']);
         $this->assertSame(200, $response->getStatusCode());
 
         $info = $response->getInfo();
         $this->assertNull($info['error']);
         $this->assertSame(0, $info['redirect_count']);
-        $this->assertSame('HTTP/1.1 200 OK', $info['raw_headers'][0]);
-        $this->assertSame('Host: localhost:8057', $info['raw_headers'][1]);
+        $this->assertSame('HTTP/1.1 200 OK', $info['response_headers'][0]);
+        $this->assertSame('Host: localhost:8057', $info['response_headers'][1]);
         $this->assertSame('http://localhost:8057/', $info['url']);
 
         $headers = $response->getHeaders();
@@ -105,7 +105,7 @@ abstract class HttpClientTestCase extends TestCase
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('HTTP/1.0 200 OK', $response->getInfo('raw_headers')[0]);
+        $this->assertSame('HTTP/1.0 200 OK', $response->getInfo('response_headers')[0]);
 
         $body = $response->toArray();
 
@@ -252,7 +252,7 @@ abstract class HttpClientTestCase extends TestCase
             'Content-Type: application/json',
         ];
 
-        $filteredHeaders = array_values(array_filter($response->getInfo('raw_headers'), function ($h) {
+        $filteredHeaders = array_values(array_filter($response->getInfo('response_headers'), function ($h) {
             return \in_array(substr($h, 0, 4), ['HTTP', 'Loca', 'Cont'], true) && 'Content-Encoding: gzip' !== $h;
         }));
 
@@ -326,7 +326,7 @@ abstract class HttpClientTestCase extends TestCase
             'Content-Type: application/json',
         ];
 
-        $filteredHeaders = array_values(array_filter($response->getInfo('raw_headers'), function ($h) {
+        $filteredHeaders = array_values(array_filter($response->getInfo('response_headers'), function ($h) {
             return \in_array(substr($h, 0, 4), ['HTTP', 'Loca', 'Cont'], true);
         }));
 

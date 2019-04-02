@@ -64,6 +64,16 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         return $this->cacheDir;
     }
 
+    public function __sleep()
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
     public function __destruct()
     {
         $fs = new Filesystem();

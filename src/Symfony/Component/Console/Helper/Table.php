@@ -522,16 +522,18 @@ class Table
 
             // Remove any new line breaks and replace it with a new line
             foreach ($rows[$rowKey] as $column => $cell) {
+                $colspan = $cell instanceof TableCell ? $cell->getColspan() : 1;
+
                 if (isset($this->columnMaxWidths[$column]) && Helper::strlenWithoutDecoration($formatter, $cell) > $this->columnMaxWidths[$column]) {
-                    $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column]);
+                    $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column] * $colspan);
                 }
                 if (!strstr($cell, "\n")) {
                     continue;
                 }
                 $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                 foreach ($lines as $lineKey => $line) {
-                    if ($cell instanceof TableCell) {
-                        $line = new TableCell($line, ['colspan' => $cell->getColspan()]);
+                    if ($colspan > 1) {
+                        $line = new TableCell($line, ['colspan' => $colspan]);
                     }
                     if (0 === $lineKey) {
                         $rows[$rowKey][$column] = $line;

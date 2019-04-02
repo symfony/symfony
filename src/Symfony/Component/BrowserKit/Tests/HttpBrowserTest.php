@@ -36,7 +36,7 @@ class TestHttpClient extends HttpBrowser
 
             return new MockResponse($this->nextResponse->getContent(), [
                 'http_code' => $this->nextResponse->getStatusCode(),
-                'raw_headers' => $this->nextResponse->getHeaders(),
+                'response_headers' => $this->nextResponse->getHeaders(),
             ]);
         });
         parent::__construct($client);

@@ -79,7 +79,7 @@ interface ResponseInterface
      * another, as the request/response progresses.
      *
      * The following info MUST be returned:
-     *  - raw_headers - an array modelled after the special $http_response_header variable
+     *  - response_headers - an array modelled after the special $http_response_header variable
      *  - redirect_count - the number of redirects followed while executing the request
      *  - redirect_url - the resolved location of redirect responses, null otherwise
      *  - start_time - the time when the request was sent or 0.0 when it's pending

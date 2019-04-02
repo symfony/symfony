@@ -73,7 +73,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testGetRequest':
                 array_unshift($headers, 'HTTP/1.1 200 OK');
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
 
                 $headers = [
                   'Host: localhost:8057',
@@ -81,7 +81,7 @@ class MockHttpClientTest extends HttpClientTestCase
                   'Content-Type: application/json',
                 ];
 
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
             case 'testDnsError':
@@ -100,7 +100,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testBadRequestBody':
             case 'testOnProgressCancel':
             case 'testOnProgressError':
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
 
             case 'testTimeoutOnAccess':
@@ -113,15 +113,15 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testResolve':
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 $responses[] = $client->request('GET', 'http://symfony.com:8057/');
                 break;
 
             case 'testTimeoutOnStream':
             case 'testUncheckedTimeoutThrows':
                 $body = ['<1>', '', '<2>'];
-                $responses[] = new MockResponse($body, ['raw_headers' => $headers]);
+                $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 break;
         }
 

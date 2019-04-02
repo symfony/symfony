@@ -7,6 +7,34 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.24 (2019-04-02)
+
+ * bug #30660 [Bridge][Twig] DebugCommand - fix escaping and filter (SpacePossum)
+ * bug #30720 Fix getSetMethodNormalizer to correctly ignore the attributes specified in "ignored_attributes" (Emmanuel BORGES)
+ * bug #30749 [Serializer] Added check of constuctor modifiers to AbstractNormalizer (NekaKawaii)
+ * bug #30776 [Routing] Fix routes annotation loading with glob pattern (snoob)
+ * bug #30773 [DependencyInjection] Fix hardcoded hotPathTagName (jderusse)
+ * bug #30737 [Validator] Improve constraint default option check (vudaltsov)
+ * bug #30736 [Validator] Fix annotation default for @Count and @Length (vudaltsov)
+ * bug #30620 [FrameworkBundle][HttpFoundation] make session service resettable (dmaicher)
+ * bug #30640 [Phpunit] fixed support for PHP 5.3 (fabpot)
+ * bug #30595 Do not validate child constraints if form has no validation groups (maryo)
+ * bug #30479 Check if Client exists when test.client does not exist, to provide clearer exception message (SerkanYildiz)
+ * feature #30584 [Intl] Add compile binary (ro0NL)
+ * bug #30487 Fix Cache error while using anonymous class (Emmanuel BORGES)
+ * bug #30548 Correct language code for ukrainian language (stanleyk)
+ * bug #30518 [Cache] Fix perf when using RedisCluster by reducing roundtrips to the servers (nicolas-grekas)
+ * bug #30515 [Cache] Only delete one key at a time when on Predis + Cluster (andrerom)
+ * bug #30507 [Routing] Fixed XML options resolution (Jules Pietri)
+ * bug #30506 [TwigBridge] remove deprecation triggered when using Twig 2.7 (nicolas-grekas)
+ * bug #30496 [PHPUnit-Bridge] override some Composer environment variables (nicoweb)
+ * bug #30505 [TwigBridge] Remove usages of the spaceless tag (nicolas-grekas)
+ * bug #30474 compatibility with phpunit8 (garak)
+ * bug #30497 [HttpKernel] Change default log level for output streams (yceruto)
+ * bug #30498 [translation] Update defaut format from yml to yaml (GaryPEGEOT)
+ * bug #30437 [Debug] detect annotations before blank docblock lines (xabbuh)
+ * bug #30392 [PropertyAccess] Fixed PropertyPathBuilder remove that fails to reset internal indexes (GregOriol)
+
 * 3.4.23 (2019-03-03)
 
  * bug #26532 [HttpKernel] Correctly merging cache directives in HttpCache/ResponseCacheStrategy (aschempp)

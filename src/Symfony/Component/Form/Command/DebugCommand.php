@@ -22,6 +22,7 @@ use Symfony\Component\Form\Console\Helper\DescriptorHelper;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\FormTypeInterface;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
  * A console command for retrieving information about form types.
@@ -37,8 +38,9 @@ class DebugCommand extends Command
     private $types;
     private $extensions;
     private $guessers;
+    private $fileLinkFormatter;
 
-    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [])
+    public function __construct(FormRegistryInterface $formRegistry, array $namespaces = ['Symfony\Component\Form\Extension\Core\Type'], array $types = [], array $extensions = [], array $guessers = [], FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
@@ -47,6 +49,7 @@ class DebugCommand extends Command
         $this->types = $types;
         $this->extensions = $extensions;
         $this->guessers = $guessers;
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     /**
@@ -145,7 +148,7 @@ EOF
             }
         }
 
-        $helper = new DescriptorHelper();
+        $helper = new DescriptorHelper($this->fileLinkFormatter);
         $options['format'] = $input->getOption('format');
         $options['show_deprecated'] = $input->getOption('show-deprecated');
         $helper->describe($io, $object, $options);

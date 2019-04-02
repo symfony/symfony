@@ -45,18 +45,17 @@ class ProxyController
      *
      * @throws HttpException In case the route name is empty
      */
-    public function proxyAction(Request $request, string $url, string $method = 'GET', $options = [], $responseHeaders = []): Response
+    public function __invoke(Request $request, string $url, string $method = 'GET', $options = [], $responseHeaders = []): Response
     {
         try {
-            $httpResponse = $this->httpClient->request($method, $url, $options);
+            $remoteResponse = $this->httpClient->request($method, $url, $options);
         } catch (InvalidArgumentException $e) {
             throw new \InvalidArgumentException(sprintf('Invalid proxy configuration for route "%s"', $request->attributes->get('_route')), 0, $e);
         }
-        // @todo How to handle runtime errors ?
 
         $response = new Response();
-        $response->setContent($httpResponse->getContent());
-        $response->setStatusCode($httpResponse->getStatusCode());
+        $response->setContent($remoteResponse->getContent());
+        $response->setStatusCode($remoteResponse->getStatusCode());
         $response->headers->add($responseHeaders);
 
         return $response;

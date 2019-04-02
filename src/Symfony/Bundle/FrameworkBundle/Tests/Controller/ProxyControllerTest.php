@@ -39,7 +39,7 @@ class ProxyControllerTest extends TestCase
         });
         $controller = new ProxyController($httpClient);
 
-        $response = $controller->proxyAction($request, $expectedUrl, 'GET', ['timeout' => 10], ['custom-header' => 'myheadervalue']);
+        $response = $controller($request, $expectedUrl, 'GET', ['timeout' => 10], ['custom-header' => 'myheadervalue']);
 
         $this->assertEquals($expectedBody, $response->getContent());
         $this->assertEquals('myheadervalue', $response->headers->get('custom-header'));
@@ -64,6 +64,6 @@ class ProxyControllerTest extends TestCase
         });
         $controller = new ProxyController($httpClient);
 
-        $controller->proxyAction($request, '');
+        $controller($request, '');
     }
 }

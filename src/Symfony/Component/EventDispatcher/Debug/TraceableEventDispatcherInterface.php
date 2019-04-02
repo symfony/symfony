@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Debug;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -24,14 +25,18 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface, Re
     /**
      * Gets the called listeners.
      *
+     * @param Request|null $request The request to get listeners for
+     *
      * @return array An array of called listeners
      */
-    public function getCalledListeners();
+    public function getCalledListeners(/* Request $request = null */);
 
     /**
      * Gets the not called listeners.
      *
+     * @param Request|null $request The request to get listeners for
+     *
      * @return array An array of not called listeners
      */
-    public function getNotCalledListeners();
+    public function getNotCalledListeners(/* Request $request = null */);
 }

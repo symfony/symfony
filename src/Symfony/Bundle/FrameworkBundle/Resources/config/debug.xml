@@ -12,6 +12,7 @@
             <argument type="service" id="debug.event_dispatcher.inner" />
             <argument type="service" id="debug.stopwatch" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="request_stack" on-invalid="null" />
         </service>
 
         <service id="debug.controller_resolver" decorates="controller_resolver" class="Symfony\Component\HttpKernel\Controller\TraceableControllerResolver">

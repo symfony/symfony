@@ -30,13 +30,16 @@ class PhpSerializer implements SerializerInterface
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body".');
         }
 
-        $serializeEnvelope = base64_decode($encodedEnvelope['body']);
-
-        if (false === $serializeEnvelope) {
-            throw new MessageDecodingFailedException('The "body" key could not be base64 decoded.');
+        $decodedData = \json_decode($encodedEnvelope['body'], true);
+        if (false === $decodedData) {
+            throw new MessageDecodingFailedException('The "body" key could not be JSON decoded.');
         }
 
-        return $this->safelyUnserialize($serializeEnvelope);
+        if (!isset($decodedData['data'])) {
+            throw new MessageDecodingFailedException('Missing the "data" key on the JSON decoded data..');
+        }
+
+        return $this->safelyUnserialize($decodedData['data']);
     }
 
     /**
@@ -45,7 +48,7 @@ class PhpSerializer implements SerializerInterface
     public function encode(Envelope $envelope): array
     {
         return [
-            'body' => base64_encode(serialize($envelope)),
+            'body' => json_encode(['data' => serialize($envelope)]),
         ];
     }
 

@@ -46,7 +46,7 @@ class PhpSerializerTest extends TestCase
         $serializer = new PhpSerializer();
 
         $serializer->decode([
-            'body' => '{"message": "bar"}',
+            'body' => '{"data": "not-serialized"}',
         ]);
     }
 
@@ -58,7 +58,7 @@ class PhpSerializerTest extends TestCase
         $serializer = new PhpSerializer();
 
         $serializer->decode([
-            'body' => base64_encode('O:13:"ReceivedSt0mp":0:{}'),
+            'body' => json_encode(['data' => 'O:13:"ReceivedSt0mp":0:{}']),
         ]);
     }
 }

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-25T11:25:33Z
+
+Last but not least, i think we should append each _wrapped_ listener to the call stack during **pre** process and lazy verify if it was called yes/no.
+
+Currently it's added to the call stack during post-process which affects the order. I.e. the main kernel.exception is called before the sub kernel.reques, but we only collect that after the sub request finished.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-11-25T13:09:51Z
+
+Ive updated above screenshots after https://github.com/symfony/symfony/pull/29312/commits/c737944e0c4d5d3c2fcd88db6cec107ed7e257fc
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T08:23:36Z
+
+@ro0NL Do you think you can finish this one for 4.3?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-02T09:11:40Z
+
+@fabpot done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-02T09:34:36Z
+
+@ro0NL Apparently, tests do not pass. Can you have a look please?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-02T09:51:21Z
+
+Let's see now :) i think it's a shortcoming of sf/debug not accounting for `@inheritdoc` :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-02T09:54:35Z
+
+> I think it's a shortcoming of sf/debug not accounting for @inheritdoc :/
+
+It's not a bug it's a feature. You must have to change your code when a lower layer decides to deprecate something. This is how.

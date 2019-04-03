@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint as ResponseConstraint;
  *
  * @see https://laravel.com/docs/5.7/dusk#available-assertions
  */
-trait WebTestAssertions
+trait WebTestAssertionsTrait
 {
     public static function assertResponseIsSuccessful(string $message = ''): void
     {

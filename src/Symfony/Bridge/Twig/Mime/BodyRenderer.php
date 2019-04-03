@@ -50,10 +50,6 @@ final class BodyRenderer implements BodyRendererInterface
             'email' => new WrappedTemplatedEmail($this->twig, $message),
         ]);
 
-        if ($template = $message->getTemplate()) {
-            $this->renderFull($message, $template, $vars);
-        }
-
         if ($template = $message->getTextTemplate()) {
             $message->text($this->twig->render($template, $vars));
         }
@@ -65,29 +61,6 @@ final class BodyRenderer implements BodyRendererInterface
         // if text body is empty, compute one from the HTML body
         if (!$message->getTextBody() && null !== $html = $message->getHtmlBody()) {
             $message->text($this->convertHtmlToText(\is_resource($html) ? stream_get_contents($html) : $html));
-        }
-    }
-
-    private function renderFull(TemplatedEmail $message, string $template, array $vars): void
-    {
-        $template = $this->twig->load($template);
-
-        if ($template->hasBlock('subject', $vars)) {
-            $message->subject($template->renderBlock('subject', $vars));
-        }
-
-        if ($template->hasBlock('text', $vars)) {
-            $message->text($template->renderBlock('text', $vars));
-        }
-
-        if ($template->hasBlock('html', $vars)) {
-            $message->html($template->renderBlock('html', $vars));
-        }
-
-        if ($template->hasBlock('config', $vars)) {
-            // we discard the output as we're only interested
-            // in the side effect of calling email methods
-            $template->renderBlock('config', $vars);
         }
     }
 

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-26T13:07:31Z
+
+What do you think about using the same concept as the `RequestMatcher` (like a ClientRequestMatcher) for tiggering this ?
+
+So someone could match on headers (like content-type / accept and even if the header is already present) or even body response ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-26T18:32:40Z
+
+> So someone could match on headers (like content-type / accept and even if the header is already present) or even body response ?
+
+I suppose you mean body request?
+Anyway, why not, but I don't know how precisely, and I would wait for someone to have a use case first (and contribute the code ;) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-29T19:36:52Z
+
+Status: needs review
+Green :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-02T16:57:54Z
+
+(failure is unrelated: some old commit for contracts us checked out)
+Votes pending
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-03T08:49:42Z
+
+I removed the `scoping_http_client` service and related autowiring aliases. It can be reintroduced later if needed.

@@ -15,6 +15,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
@@ -25,6 +26,7 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
+        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getStatementMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
@@ -44,7 +46,7 @@ class ConnectionTest extends TestCase
             ->method('prepare')
             ->willReturn($stmt);
 
-        $connection = new Connection([], $driverConnection);
+        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
         $doctrineEnvelope = $connection->get();
         $this->assertEquals(1, $doctrineEnvelope['id']);
         $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
@@ -55,6 +57,7 @@ class ConnectionTest extends TestCase
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnectionMock();
+        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
         $stmt = $this->getStatementMock(false);
 
         $queryBuilder
@@ -68,7 +71,7 @@ class ConnectionTest extends TestCase
         $driverConnection->expects($this->never())
             ->method('update');
 
-        $connection = new Connection([], $driverConnection);
+        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
         $doctrineEnvelope = $connection->get();
         $this->assertNull($doctrineEnvelope);
     }
@@ -140,6 +143,12 @@ class ConnectionTest extends TestCase
             ->willReturn($expectedResult);
 
         return $stmt;
+    }
+
+    private function getSchemaSynchronizerMock()
+    {
+        return $this->getMockBuilder(SchemaSynchronizer::class)
+            ->getMock();
     }
 
     /**

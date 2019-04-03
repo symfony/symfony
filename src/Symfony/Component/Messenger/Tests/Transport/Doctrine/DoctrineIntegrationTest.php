@@ -164,4 +164,17 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals('{"message": "Hi requeued"}', $next['body']);
         $this->connection->reject($next['id']);
     }
+
+    public function testTheTransportIsSetupOnGet()
+    {
+        // If the table does not exist and we call the get (i.e run messenger:consume) the table must be setup
+        // so first delete the tables
+        $this->driverConnection->exec('DROP TABLE messenger_messages');
+
+        $this->assertNull($this->connection->get());
+
+        $this->connection->send('the body', ['my' => 'header']);
+        $envelope = $this->connection->get();
+        $this->assertEquals('the body', $envelope['body']);
+    }
 }

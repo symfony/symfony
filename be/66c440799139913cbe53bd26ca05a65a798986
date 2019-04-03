@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-11-24T17:46:30Z
+
+As the native implementation uses `validateOnParse`, I think your alternative implementation needs to check `$html5->hasErrors()` and throw based on `$html5->getErrors()` too. Otherwise, parse errors might go unnoticed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-02-21T09:50:41Z
+
+@tgalopin  What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-02-21T09:53:22Z
+
+Waiting for https://github.com/Masterminds/html5-php/pull/163 to be merged to pass tests here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T07:36:32Z
+
+@tgalopin  Upstream PR merged :)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-03-28T17:32:40Z
+
+Due to https://github.com/Masterminds/html5-php/issues/139, shouldn't we use the `saveHTML` of the HTML5 library instead of the native one when use use the HTML5 parser to parse the DOM (meaning we need to also remember whether the DOM was created by the HTML5 parser)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T08:22:48Z
+
+@tgalopin  friendly ping
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-03T10:51:16Z
+
+Tests are failing for an unrelated reason. I think this is ready to review.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-03T12:48:48Z
+
+Updated

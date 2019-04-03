@@ -100,6 +100,46 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
     }
 
+    public function testItCountMessages()
+    {
+        // insert messages
+        // one currently handled
+        $this->driverConnection->insert('messenger_messages', [
+            'body' => '{"message": "Hi handled"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+            'queue_name' => 'default',
+            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
+            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
+            'delivered_at' => Connection::formatDateTime(\DateTime::createFromFormat('U.u', microtime(true))),
+        ]);
+        // one available later
+        $this->driverConnection->insert('messenger_messages', [
+            'body' => '{"message": "Hi delayed"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+            'queue_name' => 'default',
+            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
+            'available_at' => Connection::formatDateTime((new \DateTime())->modify('+1 minute')),
+        ]);
+        // one available
+        $this->driverConnection->insert('messenger_messages', [
+            'body' => '{"message": "Hi available"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+            'queue_name' => 'default',
+            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
+            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+        ]);
+        // another available
+        $this->driverConnection->insert('messenger_messages', [
+            'body' => '{"message": "Hi available"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+            'queue_name' => 'default',
+            'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
+            'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:30:00')),
+        ]);
+
+        $this->assertSame(2, $this->connection->getMessageCount());
+    }
+
     public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout()
     {
         $twoHoursAgo = new \DateTime('now');

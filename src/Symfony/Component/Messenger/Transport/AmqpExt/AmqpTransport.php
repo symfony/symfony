@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  *
  * @experimental in 4.2
  */
-class AmqpTransport implements TransportInterface, SetupableTransportInterface
+class AmqpTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface
 {
     private $serializer;
     private $connection;
@@ -73,6 +74,14 @@ class AmqpTransport implements TransportInterface, SetupableTransportInterface
     public function setup(): void
     {
         $this->connection->setup();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageCount(): int
+    {
+        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
     }
 
     private function getReceiver()

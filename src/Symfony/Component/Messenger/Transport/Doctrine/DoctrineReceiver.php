@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @experimental in 4.3
  */
-class DoctrineReceiver implements ReceiverInterface
+class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
 {
     private $connection;
     private $serializer;
@@ -79,6 +80,14 @@ class DoctrineReceiver implements ReceiverInterface
     public function reject(Envelope $envelope): void
     {
         $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageCount(): int
+    {
+        return $this->connection->getMessageCount();
     }
 
     private function findDoctrineReceivedStamp(Envelope $envelope): DoctrineReceivedStamp

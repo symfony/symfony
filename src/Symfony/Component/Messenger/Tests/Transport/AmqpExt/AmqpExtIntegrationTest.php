@@ -167,6 +167,24 @@ TXT
             , $process->getOutput());
     }
 
+    public function testItCountsMessagesInQueue()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
+        $connection->setup();
+        $connection->queue()->purge();
+
+        $sender = new AmqpSender($connection, $serializer);
+
+        $sender->send($first = new Envelope(new DummyMessage('First')));
+        $sender->send($second = new Envelope(new DummyMessage('Second')));
+        $sender->send($second = new Envelope(new DummyMessage('Third')));
+
+        sleep(1); // give amqp a moment to have the messages ready
+        $this->assertSame(3, $connection->countMessagesInQueue());
+    }
+
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)
     {
         $timedOutTime = time() + $timeoutInSeconds;

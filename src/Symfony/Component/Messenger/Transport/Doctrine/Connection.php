@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Doctrine;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Type;
@@ -128,25 +129,14 @@ class Connection
     {
         $this->driverConnection->beginTransaction();
         try {
-            $query = $this->driverConnection->createQueryBuilder()
-                ->select('m.*')
-                ->from($this->configuration['table_name'], 'm')
-                ->where('m.delivered_at is null OR m.delivered_at < :redeliver_limit')
-                ->andWhere('m.available_at <= :now')
-                ->andWhere('m.queue_name = :queue_name')
+            $query = $this->createAvailableMessagesQueryBuilder()
                 ->orderBy('available_at', 'ASC')
                 ->setMaxResults(1);
 
-            $now = \DateTime::createFromFormat('U.u', microtime(true));
-            $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
             // use SELECT ... FOR UPDATE to lock table
             $doctrineEnvelope = $this->executeQuery(
                 $query->getSQL().' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL(),
-                [
-                    ':now' => self::formatDateTime($now),
-                    ':queue_name' => $this->configuration['queue_name'],
-                    ':redeliver_limit' => self::formatDateTime($redeliverLimit),
-                ]
+                $query->getParameters()
             )->fetch();
 
             if (false === $doctrineEnvelope) {
@@ -161,6 +151,7 @@ class Connection
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', ':delivered_at')
                 ->where('id = :id');
+            $now = \DateTime::createFromFormat('U.u', microtime(true));
             $this->executeQuery($queryBuilder->getSQL(), [
                 ':id' => $doctrineEnvelope['id'],
                 ':delivered_at' => self::formatDateTime($now),
@@ -198,6 +189,33 @@ class Connection
     {
         $synchronizer = new SingleDatabaseSynchronizer($this->driverConnection);
         $synchronizer->updateSchema($this->getSchema(), true);
+    }
+
+    public function getMessageCount(): int
+    {
+        $queryBuilder = $this->createAvailableMessagesQueryBuilder()
+            ->select('COUNT(m.id) as message_count')
+            ->setMaxResults(1);
+
+        return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchColumn();
+    }
+
+    private function createAvailableMessagesQueryBuilder(): QueryBuilder
+    {
+        $now = \DateTime::createFromFormat('U.u', microtime(true));
+        $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
+
+        return $this->driverConnection->createQueryBuilder()
+            ->select('m.*')
+            ->from($this->configuration['table_name'], 'm')
+            ->where('m.delivered_at is null OR m.delivered_at < :redeliver_limit')
+            ->andWhere('m.available_at <= :now')
+            ->andWhere('m.queue_name = :queue_name')
+            ->setParameters([
+                ':now' => self::formatDateTime($now),
+                ':queue_name' => $this->configuration['queue_name'],
+                ':redeliver_limit' => self::formatDateTime($redeliverLimit),
+            ]);
     }
 
     private function executeQuery(string $sql, array $parameters = [])

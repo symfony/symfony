@@ -17,22 +17,31 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 
 /**
- * @requires pdo_mysql
+ * @requires extension pdo_sqlite
  */
 class DoctrineIntegrationTest extends TestCase
 {
     private $driverConnection;
     private $connection;
 
-    protected function setUp()
+    /**
+     * @after
+     */
+    public function cleanup()
     {
-        parent::setUp();
+        @unlink(sys_get_temp_dir().'/symfony.messenger.sqlite');
+    }
 
-        if (!getenv('MESSENGER_DOCTRINE_DSN')) {
-            $this->markTestSkipped('The "MESSENGER_DOCTRINE_DSN" environment variable is required.');
+    /**
+     * @before
+     */
+    public function createConnection()
+    {
+        if ($dsn = getenv('MESSENGER_DOCTRINE_DSN')) {
+            $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
+        } else {
+            $this->driverConnection = DriverManager::getConnection(['pdo' => new \PDO('sqlite:'.sys_get_temp_dir().'/symfony.messenger.sqlite')]);
         }
-        $dsn = getenv('MESSENGER_DOCTRINE_DSN');
-        $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
         $this->connection = new Connection([], $this->driverConnection);
         // call send to auto-setup the table
         $this->connection->setup();
@@ -62,7 +71,7 @@ class DoctrineIntegrationTest extends TestCase
 
         $available_at = new \DateTime($available_at);
 
-        $now = \DateTime::createFromFormat('U.u', microtime(true));
+        $now = new \DateTime();
         $now->modify('+60 seconds');
         $this->assertGreaterThan($now, $available_at);
     }
@@ -77,7 +86,7 @@ class DoctrineIntegrationTest extends TestCase
             'queue_name' => 'default',
             'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
             'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'delivered_at' => Connection::formatDateTime(\DateTime::createFromFormat('U.u', microtime(true))),
+            'delivered_at' => Connection::formatDateTime(new \DateTime()),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [
@@ -110,7 +119,7 @@ class DoctrineIntegrationTest extends TestCase
             'queue_name' => 'default',
             'created_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
             'available_at' => Connection::formatDateTime(new \DateTime('2019-03-15 12:00:00')),
-            'delivered_at' => Connection::formatDateTime(\DateTime::createFromFormat('U.u', microtime(true))),
+            'delivered_at' => Connection::formatDateTime(new \DateTime()),
         ]);
         // one available later
         $this->driverConnection->insert('messenger_messages', [

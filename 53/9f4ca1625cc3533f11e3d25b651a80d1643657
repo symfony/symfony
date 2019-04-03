@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by rvanlaak at 2019-02-12T20:28:29Z
+
+The third parameter does not feel as explicit as it should.
+
+On the other hand is the following format a bit overkill:
+
+```yml
+services:
+    MyService:
+        with:
+            - [withLogger, '@logger']
+```
+
+Did you think about some other formats as well?
+
+---------------------------------------------------------------------------
+
+by tsantos84 at 2019-02-12T22:41:34Z
+
+Its ok to access private members as public ones? Sounds weird to me. Its ok this approach in this context?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-12T22:49:15Z
+
+> Did you think about some other formats as well?
+
+None that clicked - that's the most simple I could think of - like for you, "with" doesn't click. I'm good with the 3rd arg - withers already start with "with" and that's enough maybe.
+
+> Its ok to access private members as public ones? Sounds weird to me. Its ok this approach in this context?
+
+of course it is, that's pretty common for this and similar cases.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-02-13T01:43:01Z
+
+```yaml
+services:
+    MyService:
+        calls:
+            - [withLogger, '@logger', true]
+```
+
+It does not look like this works. The second array element needs to be an array of arguments (`['@logger']`).  Ref. #25663
+And the third element was not implemented in YamlFileLoader as far as I see (which is good IMO).
+
+So it needs to be written in the following way which is also alot more readable:
+
+```yaml
+services:
+    MyService:
+        calls:
+            -
+                method: withLogger
+                arguments: ['@logger']
+                use_result: true
+```
+
+I would go so far that we should think about deprecating the yaml syntax with array list in favour of named properties (#13892)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-13T08:17:22Z
+
+Thanks @Tobion and everyone, comments addressed, PR ready.
+
+> I would go so far that we should think about deprecating the yaml syntax with array list in favour of named properties
+
+that's too far for me :) but that can be discussed in a RFC if you want to.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-02-13T08:28:38Z
+
+Shouldn't there be a check that the "wither" method actually returns an instance of the same class ? What prevents people from returning something else ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-13T08:34:49Z
+
+That's not the job of a DI container, eg we don't check you won't inject a logger where an event dispatcher is expected. That's a job for the language runtime, or a separate compiler pass / inspection process.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-02-20T12:08:44Z
+
+> On the other hand is the following format a bit overkill:
+>
+> ```yaml
+> services:
+>     MyService:
+>         with:
+>             - [withLogger, '@logger']
+> ```
+>
+> Did you think about some other formats as well?
+
+@rvanlaak Registering withers separately from other calls would have a big drawback: if you have both `with` and `calls`, what is their order ? Do we call methods on the initial object or on the final one ?
+Marking calls themselves as wither allows to support any order (even having withers in the middle of non-wither calls) as the order is explicit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-12T11:09:31Z
+
+@stof thanks for the review, issue addressed.
+
+Statuts: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-26T18:52:14Z
+
+friendly ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-03T09:00:02Z
+
+use-result? use-returned-value? use-returned?
+is-wither-factory? is-wither?
+as-factory? is-factory?
+is-wither-factory?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-03T09:15:16Z
+
+PR and description updated to use `returns-clone`, as discussed on Slack.

@@ -60,7 +60,6 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -1796,10 +1795,6 @@ class FrameworkExtension extends Extension
 
     private function registerHttpClientConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!class_exists(HttpClient::class)) {
-            throw new LogicException('HttpClient support cannot be enabled as the component is not installed. Try running "composer require symfony/http-client".');
-        }
-
         $loader->load('http_client.xml');
 
         $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);

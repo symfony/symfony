@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-28T18:00:52Z
+
+curious.. what about using the existing `LocaleListener` for this? Then we can use `tagged` again maybe?
+
+cc @stof
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T12:23:08Z
+
+@neghmurken this is an interesting proposal! Thanks for contributing it.
+
+If this is decided to be merged, we'd need some examples of how can we use this new feature in practice (inside a Symfony app and/or as a stand-alone component). If this feature improves an existing feature, please show a before/after example. Thanks a lot!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-13T14:14:11Z
+
+I completely swapped my mind here and actually, we merged `LocaleAwareInterface` in Contracts v1.0.2 as a bug fix, see https://github.com/symfony/symfony/pull/29461
+
+Would you mind rebasing, please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-26T21:49:02Z
+
+Small rebase needed + lowest version of httpkernel should be bumped in framework bundle to make tests pass.
+Good to me after that!

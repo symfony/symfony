@@ -136,9 +136,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testDefaultValuesForMethods()
     {
         $routes = $this->loader->load(DefaultValueController::class);
-        $this->assertCount(1, $routes);
+        $this->assertCount(3, $routes);
         $this->assertEquals('/{default}/path', $routes->get('action')->getPath());
         $this->assertEquals('value', $routes->get('action')->getDefault('default'));
+        $this->assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
+        $this->assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
     }
 
     public function testMethodActionControllers()

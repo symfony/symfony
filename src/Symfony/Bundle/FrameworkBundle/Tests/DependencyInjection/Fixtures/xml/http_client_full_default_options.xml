@@ -12,10 +12,8 @@
                     bindto="127.0.0.1"
                     timeout="3.5"
                     verify-peer="true"
-                    auth-basic="foo:bar"
                     max-redirects="2"
                     http-version="2.0"
-                    base-uri="http://example.com"
                     verify-host="true"
                     cafile="/etc/ssl/cafile"
                     capath="/etc/ssl"
@@ -24,8 +22,6 @@
                     passphrase="password123456"
                     ciphers="RC4-SHA:TLS13-AES-128-GCM-SHA256"
             >
-                <framework:query key="foo">bar</framework:query>
-                <framework:query key="bar">baz</framework:query>
                 <framework:header name="X-powered">PHP</framework:header>
                 <framework:resolve host="localhost">127.0.0.1</framework:resolve>
                 <framework:peer-fingerprint>

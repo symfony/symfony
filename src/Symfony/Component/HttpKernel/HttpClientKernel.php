@@ -16,6 +16,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -60,7 +61,16 @@ final class HttpClientKernel implements HttpKernelInterface
 
         $this->logger->debug(sprintf('Response: %s %s', $response->getStatusCode(), $request->getUri()));
 
-        return new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
+        $response = new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
+
+        $response->headers = new class($response->headers->all()) extends ResponseHeaderBag {
+            protected function computeCacheControlValue()
+            {
+                return $this->getCacheControlHeader(); // preserve the original value
+            }
+        };
+
+        return $response;
     }
 
     private function getBody(Request $request): ?AbstractPart

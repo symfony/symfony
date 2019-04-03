@@ -61,8 +61,8 @@ use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\Psr18Client;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -117,7 +117,6 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -1803,42 +1802,23 @@ class FrameworkExtension extends Extension
 
         $loader->load('http_client.xml');
 
-        $merger = new class() {
-            use HttpClientTrait;
-
-            public function merge(array $options, array $defaultOptions)
-            {
-                try {
-                    [, $mergedOptions] = $this->prepareRequest(null, null, $options, $defaultOptions);
-
-                    foreach ($mergedOptions as $k => $v) {
-                        if (!isset($options[$k]) && !isset($defaultOptions[$k])) {
-                            // Remove options added by prepareRequest()
-                            unset($mergedOptions[$k]);
-                        }
-                    }
-
-                    return $mergedOptions;
-                } catch (TransportExceptionInterface $e) {
-                    throw new InvalidArgumentException($e->getMessage(), 0, $e);
-                }
-            }
-        };
-
-        $defaultOptions = $merger->merge($config['default_options'] ?? [], []);
-        $container->getDefinition('http_client')->setArguments([$defaultOptions, $config['max_host_connections'] ?? 6]);
+        $container->getDefinition('http_client')->setArguments([$config['default_options'] ?? [], $config['max_host_connections'] ?? 6]);
 
         if (!$hasPsr18 = interface_exists(ClientInterface::class)) {
             $container->removeDefinition('psr18.http_client');
             $container->removeAlias(ClientInterface::class);
         }
 
-        foreach ($config['clients'] as $name => $clientConfig) {
-            $options = $merger->merge($clientConfig['default_options'] ?? [], $defaultOptions);
+        foreach ($config['scoped_clients'] as $name => $scopeConfig) {
+            if ('http_client' === $name) {
+                throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
+            }
 
-            $container->register($name, HttpClientInterface::class)
-                ->setFactory([HttpClient::class, 'create'])
-                ->setArguments([$options, $clientConfig['max_host_connections'] ?? $config['max_host_connections'] ?? 6]);
+            $scope = $scopeConfig['scope'];
+            unset($scopeConfig['scope']);
+
+            $container->register($name, ScopingHttpClient::class)
+                ->setArguments([new Reference('http_client'), [$scope => $scopeConfig], $scope]);
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
 

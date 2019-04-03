@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -34,12 +35,14 @@ class RouterDebugCommand extends Command
 {
     protected static $defaultName = 'debug:router';
     private $router;
+    private $fileLinkFormatter;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, FileLinkFormatter $fileLinkFormatter = null)
     {
         parent::__construct();
 
         $this->router = $router;
+        $this->fileLinkFormatter = $fileLinkFormatter;
     }
 
     /**
@@ -74,7 +77,7 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
-        $helper = new DescriptorHelper();
+        $helper = new DescriptorHelper($this->fileLinkFormatter);
         $routes = $this->router->getRouteCollection();
 
         if ($name) {

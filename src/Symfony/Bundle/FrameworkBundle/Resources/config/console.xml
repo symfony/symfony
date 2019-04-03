@@ -111,6 +111,7 @@
 
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
+            <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:router" />
         </service>
 

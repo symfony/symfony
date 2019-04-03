@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -34,6 +35,13 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class TextDescriptor extends Descriptor
 {
+    private $fileLinkFormatter;
+
+    public function __construct(FileLinkFormatter $fileLinkFormatter = null)
+    {
+        $this->fileLinkFormatter = $fileLinkFormatter;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,17 +56,18 @@ class TextDescriptor extends Descriptor
 
         $tableRows = [];
         foreach ($routes->all() as $name => $route) {
+            $controller = $route->getDefault('_controller');
+
             $row = [
                 $name,
                 $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
                 '' !== $route->getHost() ? $route->getHost() : 'ANY',
-                $route->getPath(),
+                $this->formatControllerLink($controller, $route->getPath()),
             ];
 
             if ($showControllers) {
-                $controller = $route->getDefault('_controller');
-                $row[] = $controller ? $this->formatCallable($controller) : '';
+                $row[] = $controller ? $this->formatControllerLink($controller, $this->formatCallable($controller)) : '';
             }
 
             $tableRows[] = $row;
@@ -512,6 +521,35 @@ class TextDescriptor extends Descriptor
         }
 
         return trim($configAsString);
+    }
+
+    private function formatControllerLink($controller, string $anchorText): string
+    {
+        if (null === $this->fileLinkFormatter) {
+            return $anchorText;
+        }
+
+        try {
+            if (\is_array($controller)) {
+                $r = new \ReflectionMethod($controller);
+            } elseif ($controller instanceof \Closure) {
+                $r = new \ReflectionFunction($controller);
+            } elseif (method_exists($controller, '__invoke')) {
+                $r = new \ReflectionMethod($controller, '__invoke');
+            } elseif (!\is_string($controller)) {
+                return $anchorText;
+            } elseif (false !== strpos($controller, '::')) {
+                $r = new \ReflectionMethod($controller);
+            } else {
+                $r = new \ReflectionFunction($controller);
+            }
+        } catch (\ReflectionException $e) {
+            return $anchorText;
+        }
+
+        $fileLink = $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
+
+        return sprintf('<href=%s>%s</>', $fileLink, $anchorText);
     }
 
     private function formatCallable($callable): string

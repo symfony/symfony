@@ -43,8 +43,6 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  */
 class Configuration implements ConfigurationInterface
 {
-    use HttpClientTrait;
-
     private $debug;
 
     /**
@@ -1332,10 +1330,21 @@ class Configuration implements ConfigurationInterface
                                 ->beforeNormalization()
                                     ->always()
                                     ->then(function ($config) {
+                                        if (!trait_exists(HttpClientTrait::class)) {
+                                            throw new LogicException('HttpClient support cannot be enabled as the component is not installed. Try running "composer require symfony/http-client".');
+                                        }
+
                                         $config = \is_array($config) ? $config : ['base_uri' => $config];
 
                                         if (!isset($config['scope']) && isset($config['base_uri'])) {
-                                            $config['scope'] = preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($config['base_uri']))));
+                                            $urlResolver = new class() {
+                                                use HttpClientTrait {
+                                                    resolveUrl as public;
+                                                    parseUrl as public;
+                                                }
+                                            };
+
+                                            $config['scope'] = preg_quote(implode('', $urlResolver->resolveUrl($urlResolver->parseUrl('.'), $urlResolver->parseUrl($config['base_uri']))));
                                         }
 
                                         return $config;

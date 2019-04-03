@@ -232,6 +232,7 @@ HttpKernel
  * Removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
  * Removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
+ * Removed `TranslatorListener` in favor of `LocaleAwareListener`
 
 Messenger
 ---------

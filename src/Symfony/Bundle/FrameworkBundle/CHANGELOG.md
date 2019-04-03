@@ -4,13 +4,14 @@ CHANGELOG
 4.3.0
 -----
 
- * added `WebTestAssertions` trait (included by default in `WebTestCase`)
- * renamed `Client` to `KernelBrowser`
+ * Added `WebTestAssertionsTrait` (included by default in `WebTestCase`)
+ * Renamed `Client` to `KernelBrowser`
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead
  * Added the ability to specify a custom `serializer` option for each
    transport under`framework.messenger.transports`.
+ * Added the `RegisterLocaleAwareServicesPass` and configured the `LocaleAwareListener`
  * [BC Break] When using Messenger, the default transport changed from
    using Symfony's serializer service to use `PhpSerializer`, which uses
    PHP's native `serialize()` and `unserialize()` functions. To use the

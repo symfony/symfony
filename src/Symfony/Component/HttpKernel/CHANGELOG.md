@@ -8,7 +8,9 @@ CHANGELOG
  * `KernelInterface` doesn't extend `Serializable` anymore
  * deprecated the `Kernel::serialize()` and `unserialize()` methods
  * increased the priority of `Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener`
- * made `Symfony\Component\HttpKernel\EventListenerLocaleListener` set the default locale early
+ * made `Symfony\Component\HttpKernel\EventListener\LocaleListener` set the default locale early
+ * deprecated `TranslatorListener` in favor of `LocaleAwareListener`
+ * added the registration of all `LocaleAwareInterface` implementations into the `LocaleAwareListener`
  * made `FileLinkFormatter` final and not implement `Serializable` anymore
  * the base `DataCollector` doesn't implement `Serializable` anymore, you should
    store all the serialized state in the data property instead

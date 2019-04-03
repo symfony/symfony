@@ -40,6 +40,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'kernel.event_listener',
         'kernel.event_subscriber',
         'kernel.fragment_renderer',
+        'kernel.locale_aware',
         'messenger.bus',
         'messenger.receiver',
         'messenger.message_handler',

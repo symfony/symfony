@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.3 and will be removed in 5.0, use LocaleAwareListener instead.', TranslatorListener::class), E_USER_DEPRECATED);
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,7 +27,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @deprecated since Symfony 4.3, use LocaleAwareListener instead
  */
 class TranslatorListener implements EventSubscriberInterface
 {

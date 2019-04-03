@@ -41,6 +41,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueReso
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServicesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -121,6 +122,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $container->addCompilerPass(new WorkflowGuardListenerPass());
         $container->addCompilerPass(new ResettableServicePass());
+        $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
         $this->addCompilerPassIfExists($container, AddMimeTypeGuesserPass::class);

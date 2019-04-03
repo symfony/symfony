@@ -1140,7 +1140,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Convert charset to HTML-entities to ensure valid parsing.
+     * Converts charset to HTML-entities to ensure valid parsing.
      */
     private function convertToHtmlEntities(string $htmlContent, string $charset = 'UTF-8'): string
     {

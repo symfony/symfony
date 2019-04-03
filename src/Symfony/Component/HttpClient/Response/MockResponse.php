@@ -111,6 +111,10 @@ class MockResponse implements ResponseInterface
         $response->info['user_data'] = $options['user_data'] ?? null;
         $response->info['url'] = $url;
 
+        if ($mock instanceof self) {
+            $mock->requestOptions = $response->requestOptions;
+        }
+
         self::writeRequest($response, $options, $mock);
         $response->body[] = [$options, $mock];
 

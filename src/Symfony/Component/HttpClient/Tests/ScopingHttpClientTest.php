@@ -14,14 +14,13 @@ namespace Symfony\Component\HttpClient\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\MockHttpClient;
-use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 
 class ScopingHttpClientTest extends TestCase
 {
     public function testRelativeUrl()
     {
-        $mockClient = new MockHttpClient([]);
+        $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, []);
 
         $this->expectException(InvalidArgumentException::class);
@@ -30,7 +29,7 @@ class ScopingHttpClientTest extends TestCase
 
     public function testRelativeUrlWithDefaultRegexp()
     {
-        $mockClient = new MockHttpClient(new MockResponse());
+        $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com']], '.*');
 
         $this->assertSame('http://example.com/foo', $client->request('GET', '/foo')->getInfo('url'));
@@ -41,7 +40,7 @@ class ScopingHttpClientTest extends TestCase
      */
     public function testMatchingUrls(string $regexp, string $url, array $options)
     {
-        $mockClient = new MockHttpClient(new MockResponse());
+        $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, $options);
 
         $response = $client->request('GET', $url);
@@ -69,13 +68,7 @@ class ScopingHttpClientTest extends TestCase
             '.*' => ['headers' => ['content-type' => 'text/html']],
         ];
 
-        $mockResponses = [
-            new MockResponse(),
-            new MockResponse(),
-            new MockResponse(),
-        ];
-
-        $mockClient = new MockHttpClient($mockResponses);
+        $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, $defaultOptions);
 
         $response = $client->request('GET', 'http://example.com/foo-bar', ['json' => ['url' => 'http://example.com']]);
@@ -92,5 +85,17 @@ class ScopingHttpClientTest extends TestCase
         $requestOptions = $response->getRequestOptions();
         $this->assertEquals($requestOptions['headers']['x-app'][0], 'unit-test');
         $this->assertEquals($requestOptions['headers']['content-type'][0], 'text/html');
+    }
+
+    public function testForBaseUri()
+    {
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(), 'http://example.com/foo');
+
+        $response = $client->request('GET', '/bar');
+        $this->assertSame('http://example.com/foo', implode('', $response->getRequestOptions()['base_uri']));
+        $this->assertSame('http://example.com/bar', $response->getInfo('url'));
+
+        $response = $client->request('GET', 'http://foo.bar/');
+        $this->assertNull($response->getRequestOptions()['base_uri']);
     }
 }

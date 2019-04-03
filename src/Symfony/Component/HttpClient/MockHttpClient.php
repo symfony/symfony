@@ -31,16 +31,16 @@ class MockHttpClient implements HttpClientInterface
     private $baseUri;
 
     /**
-     * @param callable|ResponseInterface|ResponseInterface[]|iterable $responseFactory
+     * @param callable|ResponseInterface|ResponseInterface[]|iterable|null $responseFactory
      */
-    public function __construct($responseFactory, string $baseUri = null)
+    public function __construct($responseFactory = null, string $baseUri = null)
     {
         if ($responseFactory instanceof ResponseInterface) {
             $responseFactory = [$responseFactory];
         }
 
-        if (!\is_callable($responseFactory) && !$responseFactory instanceof \Iterator) {
-            $responseFactory = (function () use ($responseFactory) {
+        if (null !== $responseFactory && !\is_callable($responseFactory) && !$responseFactory instanceof \Iterator) {
+            $responseFactory = (static function () use ($responseFactory) {
                 yield from $responseFactory;
             })();
         }
@@ -57,7 +57,9 @@ class MockHttpClient implements HttpClientInterface
         [$url, $options] = $this->prepareRequest($method, $url, $options, ['base_uri' => $this->baseUri], true);
         $url = implode('', $url);
 
-        if (\is_callable($this->responseFactory)) {
+        if (null === $this->responseFactory) {
+            $response = new MockResponse();
+        } elseif (\is_callable($this->responseFactory)) {
             $response = ($this->responseFactory)($method, $url, $options);
         } elseif (!$this->responseFactory->valid()) {
             throw new TransportException('The response factory iterator passed to MockHttpClient is empty.');

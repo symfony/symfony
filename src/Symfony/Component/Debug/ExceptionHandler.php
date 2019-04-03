@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug;
 
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
@@ -187,6 +188,160 @@ class ExceptionHandler
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
+    }
+
+    /**
+     * Gets the content associated with the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     * @param string                      $format    The request format (html, json, xml, txt)
+     *
+     * @return string The formatted content as a string
+     */
+    public function getFormattedContent($exception, string $format): string
+    {
+        switch ($format) {
+            case 'json':
+                return $this->getJson($exception);
+            case 'xml':
+            case 'rdf':
+                return $this->getXml($exception);
+            case 'txt':
+                return $this->getTxt($exception);
+            default:
+                return $this->getHtml($exception);
+        }
+    }
+
+    /**
+     * Gets the JSON content associated with the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The JSON content as a string
+     */
+    public function getJson($exception): string
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        if (404 === $statusCode = $exception->getStatusCode()) {
+            $title = 'Not Found';
+        } elseif (class_exists(Response::class) && isset(Response::$statusTexts[$statusCode])) {
+            $title = Response::$statusTexts[$statusCode];
+        } else {
+            $title = 'Internal Server Error';
+        }
+
+        $content = [
+            'title' => $title,
+            'status' => $statusCode,
+            'detail' => $this->escapeHtml($exception->getMessage()),
+        ];
+
+        if ($this->debug) {
+            $content['exceptions'] = $exception->toArray();
+        }
+
+        return (string) json_encode($content);
+    }
+
+    /**
+     * Gets the XML content associated with the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The XML content as a string
+     */
+    public function getXml($exception): string
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        if (404 === $statusCode = $exception->getStatusCode()) {
+            $title = 'Not Found';
+        } elseif (class_exists(Response::class) && isset(Response::$statusTexts[$statusCode])) {
+            $title = Response::$statusTexts[$statusCode];
+        } else {
+            $title = 'Internal Server Error';
+        }
+        $message = $this->escapeHtml($exception->getMessage());
+
+        $exceptions = '';
+        if ($this->debug) {
+            $exceptions .= '<exceptions>';
+            foreach ($exception->toArray() as $e) {
+                $exceptions .= sprintf('<exception class="%s" message="%s"><traces>', $e['class'], $this->escapeHtml($e['message']));
+                foreach ($e['trace'] as $trace) {
+                    $exceptions .= '<trace>';
+                    if ($trace['function']) {
+                        $exceptions .= sprintf('at %s%s%s(%s) ', $trace['class'], $trace['type'], $trace['function'], strip_tags($this->formatArgs($trace['args'])));
+                    }
+                    if (isset($trace['file'], $trace['line'])) {
+                        $exceptions .= strip_tags($this->formatPath($trace['file'], $trace['line']));
+                    }
+                    $exceptions .= '</trace>';
+                }
+                $exceptions .= '</traces></exception>';
+            }
+            $exceptions .= '</exceptions>';
+        }
+
+        return <<<EOF
+<?xml version="1.0" encoding="{$this->charset}" ?>
+<problem xmlns="urn:ietf:rfc:7807">
+    <title>{$title}</title>
+    <status>{$statusCode}</status>
+    <detail>{$message}</detail>
+    {$exceptions}
+</problem>
+EOF;
+    }
+
+    /**
+     * Gets the TXT content associated with the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The TXT content as a string
+     */
+    public function getTxt($exception): string
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        if (404 === $statusCode = $exception->getStatusCode()) {
+            $title = 'Not Found';
+        } elseif (class_exists(Response::class) && isset(Response::$statusTexts[$statusCode])) {
+            $title = Response::$statusTexts[$statusCode];
+        } else {
+            $title = 'Internal Server Error';
+        }
+
+        $content = sprintf("[title] %s\n", $title);
+        $content .= sprintf("[status] %s\n", $statusCode);
+        $content .= sprintf("[detail] %s\n", $exception->getMessage());
+
+        if ($this->debug) {
+            foreach ($exception->toArray() as $i => $e) {
+                $content .= sprintf("[%d] %s: %s\n", $i + 1, $e['class'], $e['message']);
+
+                foreach ($e['trace'] as $trace) {
+                    if ($trace['function']) {
+                        $content .= sprintf('at %s%s%s(%s) ', $trace['class'], $trace['type'], $trace['function'], strip_tags($this->formatArgs($trace['args'])));
+                    }
+                    if (isset($trace['file'], $trace['line'])) {
+                        $content .= strip_tags($this->formatPath($trace['file'], $trace['line']));
+                    }
+                    $content .= "\n";
+                }
+            }
+        }
+
+        return $content;
     }
 
     /**

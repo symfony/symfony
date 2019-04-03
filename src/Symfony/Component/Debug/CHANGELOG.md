@@ -8,6 +8,8 @@ CHANGELOG
 * added `Exception\FlattenException::getAsString` and
 `Exception\FlattenException::getTraceAsString` to increase compatibility to php
 exception objects
+* added `ExceptionHandler::getFormattedContent()` to get the exception content 
+according to given format (html, json, xml, txt)
 
 4.0.0
 -----

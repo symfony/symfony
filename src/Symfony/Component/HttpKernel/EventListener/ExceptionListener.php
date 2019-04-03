@@ -151,10 +151,10 @@ class ExceptionListener implements EventSubscriberInterface
     {
         $attributes = [
             'exception' => $exception = FlattenException::create($exception),
-            '_controller' => $this->controller ?: function () use ($exception) {
+            '_controller' => $this->controller ?: function () use ($exception, $request) {
                 $handler = new ExceptionHandler($this->debug, $this->charset, $this->fileLinkFormat);
 
-                return new Response($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders());
+                return new Response($handler->getFormattedContent($exception, $request->getRequestFormat()), $exception->getStatusCode(), $exception->getHeaders());
             },
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         ];

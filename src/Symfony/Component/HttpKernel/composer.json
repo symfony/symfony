@@ -48,6 +48,7 @@
     "conflict": {
         "symfony/browser-kit": "<4.3",
         "symfony/config": "<3.4",
+        "symfony/debug": "<4.3",
         "symfony/dependency-injection": "<4.2",
         "symfony/translation": "<4.2",
         "symfony/var-dumper": "<4.1.1",

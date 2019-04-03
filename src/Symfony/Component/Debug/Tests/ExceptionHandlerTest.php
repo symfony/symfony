@@ -139,4 +139,28 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
 
         $handler->handle($exception);
     }
+
+    public function testJsonExceptionContent()
+    {
+        $handler = new ExceptionHandler(true);
+        $content = $handler->getJson(new \RuntimeException('Foo'));
+
+        $this->assertStringMatchesFormat('{"title":"Internal Server Error","status":500,"detail":"Foo","exceptions":[{"message":"Foo","class":"RuntimeException"%S}]}', $content);
+    }
+
+    public function testXmlExceptionContent()
+    {
+        $handler = new ExceptionHandler(true);
+        $content = $handler->getXml(new \RuntimeException('Foo'));
+
+        $this->assertStringMatchesFormat('<?xml version="1.0" encoding="UTF-8" ?>%A<problem xmlns="urn:ietf:rfc:7807">%A<title>Internal Server Error</title>%A<status>500</status>%A<detail>Foo</detail>%A<exceptions><exception class="RuntimeException" message="Foo"><traces><trace>%A', $content);
+    }
+
+    public function testTxtExceptionContent()
+    {
+        $handler = new ExceptionHandler(true);
+        $content = $handler->getTxt(new \RuntimeException('Foo'));
+
+        $this->assertStringMatchesFormat("[title] Internal Server Error\n[status] 500\n[detail] Foo\n[1] RuntimeException: Foo\nin ExceptionHandlerTest.php line %A", $content);
+    }
 }

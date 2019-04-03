@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Test;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertions;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\CookieJar;
@@ -275,7 +275,7 @@ class WebTestCaseTest extends TestCase
     private function getTester(KernelBrowser $client): WebTestCase
     {
         return new class($client) extends WebTestCase {
-            use WebTestAssertions;
+            use WebTestAssertionsTrait;
 
             protected static $client;
 

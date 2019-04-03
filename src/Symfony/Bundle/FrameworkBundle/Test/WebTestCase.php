@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 abstract class WebTestCase extends KernelTestCase
 {
-    use WebTestAssertions;
+    use WebTestAssertionsTrait;
 
     /** @var Client|null */
     protected static $client;

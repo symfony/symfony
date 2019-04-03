@@ -243,6 +243,7 @@
       <xsd:element name="argument" type="argument" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="returns-clone" type="boolean" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">

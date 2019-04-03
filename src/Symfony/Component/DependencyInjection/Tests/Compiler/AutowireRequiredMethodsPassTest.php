@@ -77,4 +77,26 @@ class AutowireRequiredMethodsPassTest extends TestCase
         );
         $this->assertEquals([], $methodCalls[0][1]);
     }
+
+    public function testWitherInjection()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('wither', Wither::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $methodCalls = $container->getDefinition('wither')->getMethodCalls();
+
+        $expected = [
+            ['withFoo1', [], true],
+            ['withFoo2', [], true],
+            ['setFoo', []],
+        ];
+        $this->assertSame($expected, $methodCalls);
+    }
 }

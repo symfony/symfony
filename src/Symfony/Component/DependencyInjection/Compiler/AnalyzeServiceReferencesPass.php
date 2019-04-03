@@ -140,11 +140,41 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->byConstructor = true;
         $this->processValue($value->getFactory());
         $this->processValue($value->getArguments());
+
+        $properties = $value->getProperties();
+        $setters = $value->getMethodCalls();
+
+        // Any references before a "wither" are part of the constructor-instantiation graph
+        $lastWitherIndex = null;
+        foreach ($setters as $k => $call) {
+            if ($call[2] ?? false) {
+                $lastWitherIndex = $k;
+            }
+        }
+
+        if (null !== $lastWitherIndex) {
+            $this->processValue($properties);
+            $setters = $properties = [];
+
+            foreach ($value->getMethodCalls() as $k => $call) {
+                if (null === $lastWitherIndex) {
+                    $setters[] = $call;
+                    continue;
+                }
+
+                if ($lastWitherIndex === $k) {
+                    $lastWitherIndex = null;
+                }
+
+                $this->processValue($call);
+            }
+        }
+
         $this->byConstructor = $byConstructor;
 
         if (!$this->onlyConstructorArguments) {
-            $this->processValue($value->getProperties());
-            $this->processValue($value->getMethodCalls());
+            $this->processValue($properties);
+            $this->processValue($setters);
             $this->processValue($value->getConfigurator());
         }
         $this->lazy = $lazy;

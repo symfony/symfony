@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-16T17:32:18Z
+
+Looks like there are no reasons not to do it to me.
+Some notes to help:
+- should target master
+- the implementation should be quite different: there should be no need for anything special in `AbstractRecursivePass`. Instead, we should make `ContainerBuilder` and `PhpDumper` handle when `Definition::getFactory()` returns a reference. That should be enough.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-02-18T14:25:51Z
+
+- Now targetting `master`
+- `AbstractRecursivePass` was expecting an array, now handles a `Reference` object.
+- Now sure how to move that logic out into `ContainerBuilder` and `PhpDumper` unfortunately :slightly_frowning_face:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-18T14:31:15Z
+
+> `AbstractRecursivePass` was expecting an array, now handles a `Reference` object.
+
+actually, maybe this should be handled 100% at the loader level? If service reference then method defaults to `__invoke`?
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-02-19T11:29:16Z
+
+Undrafting PR because I'm getting `Class 'PHPUnit_Framework_TestCase' not found` errors locally.
+
+---------------------------------------------------------------------------
+
+by zanbaldwin at 2019-02-25T11:00:53Z
+
+Done, and rebased latest `master`.

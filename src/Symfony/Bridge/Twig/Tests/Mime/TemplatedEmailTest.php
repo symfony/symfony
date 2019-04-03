@@ -13,9 +13,6 @@ class TemplatedEmailTest extends TestCase
         $email->context($context = ['product' => 'Symfony']);
         $this->assertEquals($context, $email->getContext());
 
-        $email->template($template = 'full');
-        $this->assertEquals($template, $email->getTemplate());
-
         $email->textTemplate($template = 'text');
         $this->assertEquals($template, $email->getTextTemplate());
 

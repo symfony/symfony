@@ -38,6 +38,17 @@ class ScopingHttpClient implements HttpClientInterface
         $this->defaultRegexp = $defaultRegexp;
     }
 
+    public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], $regexp = null): self
+    {
+        if (null === $regexp) {
+            $regexp = preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri))));
+        }
+
+        $defaultOptions['base_uri'] = $baseUri;
+
+        return new self($client, [$regexp => $defaultOptions], $regexp);
+    }
+
     /**
      * {@inheritdoc}
      */

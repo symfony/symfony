@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-04-03T16:55:42Z
+
+:+1: for me.
+
+My current system in the Incenteev codebase looks like this `template` way (minus the `config` block), and usage makes me wish to rewrite that to use separate templates (except I won't do it until I can migrate to symfony/mailer instead, as doing the rewrite now would be a waste of time).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-03T17:19:31Z
+
+(but see fabbot ;) )

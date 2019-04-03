@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T09:41:49Z
+
+I don't think we should add it to the core without knowing the actually use-case tbh.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T16:27:49Z
+
+> I don't think we should add it to the core without knowing the actually use-case tbh.
+
+Very fair. So, let me try to be more specific... even though I admit, I'm "planning ahead" a bit here. One easy thing to look at is Larave's Horizon, which takes advantage of the "size" of a queue for (A) displaying a health dashboard and (B) for automatically spinning up/down more/less workers for each transport, based on the size. Without this feature (which is pretty simple), creating something like that as a 3rd party bundle, for example, will not be possible.
+
+Rebased and comments addressed!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T17:36:06Z
+
+@vincenttouzet could you check the Doctrine part of this PR out? There is an integration test, but would love your +1 technically for it.

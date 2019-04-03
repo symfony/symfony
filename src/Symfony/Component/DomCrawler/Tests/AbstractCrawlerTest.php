@@ -14,41 +14,50 @@ namespace Symfony\Component\DomCrawler\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CrawlerTest extends TestCase
+abstract class AbstractCrawlerTest extends TestCase
 {
+    /**
+     * @param mixed       $node
+     * @param string|null $uri
+     * @param string|null $baseHref
+     *
+     * @return Crawler
+     */
+    abstract public function createCrawler($node = null, string $uri = null, string $baseHref = null);
+
     public function testConstructor()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
 
         $doc = new \DOMDocument();
         $node = $doc->createElement('test');
 
-        $crawler = new Crawler($node);
+        $crawler = $this->createCrawler($node);
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
     public function testGetUri()
     {
         $uri = 'http://symfony.com';
-        $crawler = new Crawler(null, $uri);
+        $crawler = $this->createCrawler(null, $uri);
         $this->assertEquals($uri, $crawler->getUri());
     }
 
     public function testGetBaseHref()
     {
         $baseHref = 'http://symfony.com';
-        $crawler = new Crawler(null, null, $baseHref);
+        $crawler = $this->createCrawler(null, null, $baseHref);
         $this->assertEquals($baseHref, $crawler->getBaseHref());
     }
 
     public function testAdd()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add($this->createDomDocument());
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMDocument');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add($this->createNodeList());
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
@@ -56,15 +65,15 @@ class CrawlerTest extends TestCase
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add($list);
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an array of nodes');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add($this->createNodeList()->item(0));
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNode');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add('<html><body>Foo</body></html>');
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
@@ -74,7 +83,7 @@ class CrawlerTest extends TestCase
      */
     public function testAddInvalidType()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->add(1);
     }
 
@@ -90,7 +99,7 @@ class CrawlerTest extends TestCase
 
     public function testAddHtmlContent()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addHtmlContent('<html><div class="foo"></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
@@ -98,7 +107,7 @@ class CrawlerTest extends TestCase
 
     public function testAddHtmlContentWithBaseTag()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
 
         $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
 
@@ -111,7 +120,7 @@ class CrawlerTest extends TestCase
      */
     public function testAddHtmlContentCharset()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addHtmlContent('<html><div class="foo">Tiếng Việt</html>', 'UTF-8');
 
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
@@ -119,19 +128,10 @@ class CrawlerTest extends TestCase
 
     public function testAddHtmlContentInvalidBaseTag()
     {
-        $crawler = new Crawler(null, 'http://symfony.com');
-
+        $crawler = $this->createCrawler(null, 'http://symfony.com');
         $crawler->addHtmlContent('<html><head><base target="_top"></head><a href="/contact"></a></html>', 'UTF-8');
 
         $this->assertEquals('http://symfony.com/contact', current($crawler->filterXPath('//a')->links())->getUri(), '->addHtmlContent() correctly handles a non-existent base tag href attribute');
-    }
-
-    public function testAddHtmlContentUnsupportedCharset()
-    {
-        $crawler = new Crawler();
-        $crawler->addHtmlContent(file_get_contents(__DIR__.'/Fixtures/windows-1250.html'), 'Windows-1250');
-
-        $this->assertEquals('Žťčýů', $crawler->filterXPath('//p')->text());
     }
 
     /**
@@ -139,41 +139,16 @@ class CrawlerTest extends TestCase
      */
     public function testAddHtmlContentCharsetGbk()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         //gbk encode of <html><p>中文</p></html>
         $crawler->addHtmlContent(base64_decode('PGh0bWw+PHA+1tDOxDwvcD48L2h0bWw+'), 'gbk');
 
         $this->assertEquals('中文', $crawler->filterXPath('//p')->text());
     }
 
-    public function testAddHtmlContentWithErrors()
-    {
-        $internalErrors = libxml_use_internal_errors(true);
-
-        $crawler = new Crawler();
-        $crawler->addHtmlContent(<<<'EOF'
-<!DOCTYPE html>
-<html>
-    <head>
-    </head>
-    <body>
-        <nav><a href="#"><a href="#"></nav>
-    </body>
-</html>
-EOF
-        , 'UTF-8');
-
-        $errors = libxml_get_errors();
-        $this->assertCount(1, $errors);
-        $this->assertEquals("Tag nav invalid\n", $errors[0]->message);
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-    }
-
     public function testAddXmlContent()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addXmlContent('<html><div class="foo"></div></html>', 'UTF-8');
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
@@ -181,62 +156,39 @@ EOF
 
     public function testAddXmlContentCharset()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addXmlContent('<html><div class="foo">Tiếng Việt</div></html>', 'UTF-8');
 
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
-    public function testAddXmlContentWithErrors()
-    {
-        $internalErrors = libxml_use_internal_errors(true);
-
-        $crawler = new Crawler();
-        $crawler->addXmlContent(<<<'EOF'
-<!DOCTYPE html>
-<html>
-    <head>
-    </head>
-    <body>
-        <nav><a href="#"><a href="#"></nav>
-    </body>
-</html>
-EOF
-        , 'UTF-8');
-
-        $this->assertGreaterThan(1, libxml_get_errors());
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-    }
-
     public function testAddContent()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an HTML string');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div class="foo"></html>', 'text/html; charset=UTF-8; dir=RTL');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an HTML string with extended content type');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div class="foo"></html>');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() uses text/html as the default type');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml; charset=UTF-8');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an XML string');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div class="foo"></div></html>', 'text/xml');
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addContent() adds nodes from an XML string');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('foo bar', 'text/plain');
         $this->assertCount(0, $crawler, '->addContent() does nothing if the type is not (x|ht)ml');
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><span>中文</span></html>');
         $this->assertEquals('中文', $crawler->filterXPath('//span')->text(), '->addContent() guess wrong charset');
     }
@@ -246,14 +198,14 @@ EOF
      */
     public function testAddContentNonUtf8()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent(iconv('UTF-8', 'SJIS', '<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
     }
 
     public function testAddDocument()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addDocument($this->createDomDocument());
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
@@ -261,7 +213,7 @@ EOF
 
     public function testAddNodeList()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addNodeList($this->createNodeList());
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
@@ -274,7 +226,7 @@ EOF
             $list[] = $node;
         }
 
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addNodes($list);
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodes() adds nodes from an array of nodes');
@@ -282,7 +234,7 @@ EOF
 
     public function testAddNode()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
@@ -293,7 +245,7 @@ EOF
         $doc = new \DOMDocument();
         $node = $doc->createElement('test');
 
-        $crawler = new Crawler($node);
+        $crawler = $this->createCrawler($node);
         $crawler->clear();
         $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
     }
@@ -361,7 +313,7 @@ EOF
 
     public function testMissingAttrValueIsNull()
     {
-        $crawler = new Crawler();
+        $crawler = $this->createCrawler();
         $crawler->addContent('<html><div non-empty-attr="sample value" empty-attr=""></div></html>', 'text/html; charset=UTF-8');
         $div = $crawler->filterXPath('//div');
 
@@ -647,7 +599,7 @@ EOF
 
     public function testFilterWithDefaultNamespaceOnly()
     {
-        $crawler = new Crawler('<?xml version="1.0" encoding="UTF-8"?>
+        $crawler = $this->createCrawler('<?xml version="1.0" encoding="UTF-8"?>
             <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
                 <url>
                     <loc>http://localhost/foo</loc>
@@ -731,7 +683,7 @@ EOF
 </html>
 HTML;
 
-        $crawler = new Crawler($html);
+        $crawler = $this->createCrawler($html);
 
         $this->assertCount(1, $crawler->selectButton('Click \'Here\''));
     }
@@ -752,7 +704,7 @@ HTML;
 </html>
 HTML;
 
-        $crawler = new Crawler($html);
+        $crawler = $this->createCrawler($html);
 
         $this->assertCount(1, $crawler->selectButton('Click "Here"'));
     }
@@ -824,7 +776,7 @@ HTML;
 </html>
 HTML;
 
-        $crawler = new Crawler($html);
+        $crawler = $this->createCrawler($html);
         $filtered = $crawler->filterXPath("descendant-or-self::*[@id = 'login-form']");
 
         $this->assertCount(0, $filtered->selectLink('Login'));
@@ -841,7 +793,7 @@ HTML;
 
     public function testChaining()
     {
-        $crawler = new Crawler('<div name="a"><div name="b"><div name="c"></div></div></div>');
+        $crawler = $this->createCrawler('<div name="a"><div name="b"><div name="c"></div></div></div>');
 
         $this->assertEquals('a', $crawler->filterXPath('//div')->filterXPath('div')->filterXPath('div')->attr('name'));
     }
@@ -1000,7 +952,7 @@ HTML;
         }
 
         try {
-            $crawler = new Crawler('<p></p>');
+            $crawler = $this->createCrawler('<p></p>');
             $crawler->filter('p')->children();
             $this->assertTrue(true, '->children() does not trigger a notice if the node has no children');
         } catch (\PHPUnit\Framework\Error\Notice $e) {
@@ -1029,7 +981,7 @@ HTML;
 </html>
 HTML;
 
-        $crawler = new Crawler($html);
+        $crawler = $this->createCrawler($html);
         $foo = $crawler->filter('#foo');
 
         $this->assertEquals(3, $foo->children()->count());
@@ -1066,7 +1018,7 @@ HTML;
      */
     public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = '')
     {
-        $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $crawler = $this->createCrawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
     }
 
@@ -1086,7 +1038,7 @@ HTML;
      */
     public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
+        $crawler = $this->createCrawler('<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
     }
 
@@ -1104,7 +1056,7 @@ HTML;
 
     public function testCountOfNestedElements()
     {
-        $crawler = new Crawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
+        $crawler = $this->createCrawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
 
         $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
     }
@@ -1151,7 +1103,7 @@ HTML;
      */
     public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty()
     {
-        (new Crawler())->evaluate('//form/input[1]');
+        $this->createCrawler()->evaluate('//form/input[1]');
     }
 
     /**
@@ -1210,6 +1162,14 @@ HTML;
         $crawlerChild->children();
     }
 
+    public function testAddHtmlContentUnsupportedCharset()
+    {
+        $crawler = $this->createCrawler();
+        $crawler->addHtmlContent(file_get_contents(__DIR__.'/Fixtures/windows-1250.html'), 'Windows-1250');
+
+        $this->assertEquals('Žťčýů', $crawler->filterXPath('//p')->text());
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();
@@ -1259,7 +1219,7 @@ HTML;
             </html>
         ');
 
-        return new Crawler($dom, $uri);
+        return $this->createCrawler($dom, $uri);
     }
 
     protected function createTestXmlCrawler($uri = null)
@@ -1276,7 +1236,7 @@ HTML;
                 <media:category label="Music" scheme="http://gdata.youtube.com/schemas/2007/categories.cat">Music</media:category>
             </entry>';
 
-        return new Crawler($xml, $uri);
+        return $this->createCrawler($xml, $uri);
     }
 
     protected function createDomDocument()

@@ -8,6 +8,8 @@ CHANGELOG
   and `CrawlerSelectorTextSame`
 * Added return of element name (`_name`) in `extract()` method.
 * Added ability to return a default value in `text()` and `html()` instead of throwing an exception when node is empty.
+* When available, the [html5-php library](https://github.com/Masterminds/html5-php) is used to
+  parse HTML added to a Crawler for better support of HTML5 tags.
 
 4.2.0
 -----

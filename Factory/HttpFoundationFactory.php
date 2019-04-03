@@ -141,7 +141,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     public function createResponse(ResponseInterface $psrResponse)
     {
         $cookies = $psrResponse->getHeader('Set-Cookie');
-        $psrResponse = $psrResponse->withHeader('Set-Cookie', array());
+        $psrResponse = $psrResponse->withoutHeader('Set-Cookie');
 
         $response = new Response(
             $psrResponse->getBody()->__toString(),

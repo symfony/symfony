@@ -317,7 +317,7 @@ class XmlFileLoader extends FileLoader
                     $class = $factory->hasAttribute('class') ? $factory->getAttribute('class') : null;
                 }
 
-                $definition->setFactory([$class, $factory->getAttribute('method')]);
+                $definition->setFactory([$class, $factory->getAttribute('method') ?: '__invoke']);
             }
         }
 
@@ -332,7 +332,7 @@ class XmlFileLoader extends FileLoader
                     $class = $configurator->getAttribute('class');
                 }
 
-                $definition->setConfigurator([$class, $configurator->getAttribute('method')]);
+                $definition->setConfigurator([$class, $configurator->getAttribute('method') ?: '__invoke']);
             }
         }
 

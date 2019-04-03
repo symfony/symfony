@@ -573,12 +573,15 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When errors occur
      *
-     * @return string|array A parsed callable
+     * @return string|array|Reference A parsed callable
      */
     private function parseCallable($callable, $parameter, $id, $file)
     {
         if (\is_string($callable)) {
             if ('' !== $callable && '@' === $callable[0]) {
+                if (false === strpos($callable, ':')) {
+                    return [$this->resolveServices($callable, $file), '__invoke'];
+                }
                 throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $parameter, $id, $callable, substr($callable, 1)));
             }
 

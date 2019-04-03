@@ -95,7 +95,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
+     * @param string|array|Reference $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -105,6 +105,8 @@ class Definition
 
         if (\is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
+        } elseif ($factory instanceof Reference) {
+            $factory = [$factory, '__invoke'];
         }
 
         $this->factory = $factory;
@@ -783,7 +785,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array $configurator A PHP callable
+     * @param string|array|Reference $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -793,6 +795,8 @@ class Definition
 
         if (\is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
+        } elseif ($configurator instanceof Reference) {
+            $configurator = [$configurator, '__invoke'];
         }
 
         $this->configurator = $configurator;

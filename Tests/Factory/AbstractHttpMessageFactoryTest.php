@@ -149,7 +149,7 @@ abstract class AbstractHttpMessageFactoryTest extends TestCase
             202,
             array('X-Symfony' => array('3.4'))
         );
-        $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, ''));
+        $response->headers->setCookie(new Cookie('city', 'Lille', new \DateTime('Wed, 13 Jan 2021 22:23:01 GMT'), '/', null, false, true, false, 'lax'));
 
         $psrResponse = $this->factory->createResponse($response);
         $this->assertEquals('Response content.', $psrResponse->getBody()->__toString());

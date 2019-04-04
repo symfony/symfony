@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -35,12 +36,13 @@ final class NativeResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(\stdClass $multi, $context, string $url, $options, bool $gzipEnabled, array &$info, callable $resolveRedirect, ?callable $onProgress)
+    public function __construct(\stdClass $multi, $context, string $url, $options, bool $gzipEnabled, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
     {
         $this->multi = $multi;
         $this->id = (int) $context;
         $this->context = $context;
         $this->url = $url;
+        $this->logger = $logger;
         $this->timeout = $options['timeout'];
         $this->info = &$info;
         $this->resolveRedirect = $resolveRedirect;
@@ -107,13 +109,19 @@ final class NativeResponse implements ResponseInterface
             $this->info['start_time'] = microtime(true);
             $url = $this->url;
 
-            do {
+            while (true) {
                 // Send request and follow redirects when needed
                 $this->info['fopen_time'] = microtime(true);
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
                 self::addResponseHeaders($http_response_header, $this->info, $this->headers);
                 $url = ($this->resolveRedirect)($this->multi, $this->headers['location'][0] ?? null, $this->context);
-            } while (null !== $url);
+
+                if (null === $url) {
+                    break;
+                }
+
+                $this->logger && $this->logger->info(sprintf('Redirecting: %s %s', $this->info['http_code'], $url ?? $this->url));
+            }
         } catch (\Throwable $e) {
             $this->close();
             $this->multi->handlesActivity[$this->id][] = null;

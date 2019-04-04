@@ -30,6 +30,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
  */
 trait ResponseTrait
 {
+    private $logger;
     private $headers = [];
 
     /**
@@ -299,6 +300,9 @@ trait ResponseTrait
                         } elseif ($chunk instanceof ErrorChunk) {
                             unset($responses[$j]);
                             $isTimeout = true;
+                        } elseif ($chunk instanceof FirstChunk && $response->logger) {
+                            $info = $response->getInfo();
+                            $response->logger->info(sprintf('Response: %s %s', $info['http_code'], $info['url']));
                         }
 
                         yield $response => $chunk;

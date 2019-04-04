@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\NativeResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -30,13 +30,13 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  *
  * @experimental in 4.3
  */
-final class NativeHttpClient implements HttpClientInterface
+final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterface
 {
     use HttpClientTrait;
+    use LoggerAwareTrait;
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
     private $multi;
-    private $logger;
 
     /**
      * @param array $defaultOptions     Default requests' options
@@ -44,10 +44,8 @@ final class NativeHttpClient implements HttpClientInterface
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], LoggerInterface $logger = null, int $maxHostConnections = 6)
+    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6)
     {
-        $this->logger = $logger ?? new NullLogger();
-
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
@@ -73,7 +71,6 @@ final class NativeHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $this->logger->notice('Making a request', ['url' => $url, 'method' => $method, 'client' => static::class]);
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
         if ($options['bindto'] && file_exists($options['bindto'])) {
@@ -211,7 +208,10 @@ final class NativeHttpClient implements HttpClientInterface
         $context = stream_context_create($context, ['notification' => $notification]);
         self::configureHeadersAndProxy($context, $host, $options['request_headers'], $proxy, $noProxy);
 
-        return new NativeResponse($this->multi, $context, implode('', $url), $options, $gzipEnabled, $info, $resolveRedirect, $onProgress);
+        $url = implode('', $url);
+        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, $url));
+
+        return new NativeResponse($this->multi, $context, $url, $options, $gzipEnabled, $info, $resolveRedirect, $onProgress, $this->logger);
     }
 
     /**

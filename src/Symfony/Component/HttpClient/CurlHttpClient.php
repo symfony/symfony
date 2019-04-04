@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\CurlResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -30,24 +31,23 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  *
  * @experimental in 4.3
  */
-final class CurlHttpClient implements HttpClientInterface
+final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
 {
     use HttpClientTrait;
+    use LoggerAwareTrait;
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
     private $multi;
-    private $logger;
 
     /**
      * @param array $defaultOptions     Default requests' options
      * @param int   $maxHostConnections The maximum number of connections to a single host
+     * @param int   $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public function __construct(array $defaultOptions = [], LoggerInterface $logger = null, int $maxHostConnections = 6)
+    public function __construct(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
-        $this->logger = $logger ?? new NullLogger();
-
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
@@ -70,7 +70,7 @@ final class CurlHttpClient implements HttpClientInterface
         ];
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/bug.php?id=77535
-        if (\PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
+        if (0 >= $maxPendingPushes || \PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
             return;
         }
 
@@ -79,8 +79,10 @@ final class CurlHttpClient implements HttpClientInterface
             return;
         }
 
-        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi) {
-            return self::handlePush($parent, $pushed, $requestHeaders, $multi);
+        $logger = &$this->logger;
+
+        curl_multi_setopt($mh, CURLMOPT_PUSHFUNCTION, static function ($parent, $pushed, array $requestHeaders) use ($multi, $maxPendingPushes, &$logger) {
+            return self::handlePush($parent, $pushed, $requestHeaders, $multi, $maxPendingPushes, $logger);
         });
     }
 
@@ -91,7 +93,6 @@ final class CurlHttpClient implements HttpClientInterface
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $this->logger->notice('Making a request', ['url' => $url, 'method' => $method, 'client' => static::class]);
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $scheme = $url['scheme'];
         $authority = $url['authority'];
@@ -109,13 +110,18 @@ final class CurlHttpClient implements HttpClientInterface
             ];
 
             if ('GET' === $method && !$options['body'] && $expectedHeaders === $pushedHeaders) {
-                $this->logger->debug('Creating pushed response');
+                $this->logger && $this->logger->info(sprintf('Connecting request to pushed response: %s %s', $method, $url));
+
                 // Reinitialize the pushed response with request's options
-                $pushedResponse->__construct($this->multi, $url, $options);
+                $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
 
                 return $pushedResponse;
             }
+
+            $this->logger && $this->logger->info(sprintf('Rejecting pushed response for "%s": authorization headers don\'t match the request', $url));
         }
+
+        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, $url));
 
         $curlopts = [
             CURLOPT_URL => $url,
@@ -163,7 +169,7 @@ final class CurlHttpClient implements HttpClientInterface
                 // DNS cache removals require curl 7.42 or higher
                 // On lower versions, we have to create a new multi handle
                 curl_multi_close($this->multi->handle);
-                $this->multi->handle = (new self([], $this->logger))->multi->handle;
+                $this->multi->handle = (new self())->multi->handle;
             }
 
             foreach ($options['resolve'] as $host => $ip) {
@@ -262,7 +268,7 @@ final class CurlHttpClient implements HttpClientInterface
             }
         }
 
-        return new CurlResponse($this->multi, $ch, $options, $method, self::createRedirectResolver($options, $host));
+        return new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $host));
     }
 
     /**
@@ -289,9 +295,10 @@ final class CurlHttpClient implements HttpClientInterface
         }
     }
 
-    private static function handlePush($parent, $pushed, array $requestHeaders, \stdClass $multi): int
+    private static function handlePush($parent, $pushed, array $requestHeaders, \stdClass $multi, int $maxPendingPushes, ?LoggerInterface $logger): int
     {
         $headers = [];
+        $origin = curl_getinfo($parent, CURLINFO_EFFECTIVE_URL);
 
         foreach ($requestHeaders as $h) {
             if (false !== $i = strpos($h, ':', 1)) {
@@ -299,20 +306,33 @@ final class CurlHttpClient implements HttpClientInterface
             }
         }
 
-        if ('GET' !== $headers[':method'] || isset($headers['range'])) {
+        if (!isset($headers[':method']) || !isset($headers[':scheme']) || !isset($headers[':authority']) || !isset($headers[':path']) || 'GET' !== $headers[':method'] || isset($headers['range'])) {
+            $logger && $logger->info(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
+
             return CURL_PUSH_DENY;
         }
 
         $url = $headers[':scheme'].'://'.$headers[':authority'];
 
-        // curl before 7.65 doesn't validate the pushed ":authority" header,
-        // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
-        // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
-        if (0 !== strpos(curl_getinfo($parent, CURLINFO_EFFECTIVE_URL), $url.'/')) {
+        if ($maxPendingPushes <= \count($multi->pushedResponses)) {
+            $logger && $logger->info(sprintf('Rejecting pushed response from "%s" for "%s": the queue is full', $origin, $url));
+
             return CURL_PUSH_DENY;
         }
 
-        $multi->pushedResponses[$url.$headers[':path']] = [
+        // curl before 7.65 doesn't validate the pushed ":authority" header,
+        // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
+        // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
+        if (0 !== strpos($origin, $url.'/')) {
+            $logger && $logger->info(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
+
+            return CURL_PUSH_DENY;
+        }
+
+        $url .= $headers[':path'];
+        $logger && $logger->info(sprintf('Queueing pushed response: %s', $url));
+
+        $multi->pushedResponses[$url] = [
             new CurlResponse($multi, $pushed),
             [
                 $headers['authorization'] ?? null,

@@ -33,15 +33,17 @@ class ProxyControllerTest extends TestCase
             $this->assertEquals('GET', $method);
             $this->assertEquals($expectedUrl, $url);
 
-            return new MockResponse($expectedBody, [
-                'http_code' => 200,
-            ]);
+            return new MockResponse($expectedBody);
         });
         $controller = new ProxyController($httpClient);
 
         $response = $controller($request, $expectedUrl, 'GET', ['timeout' => 10], ['custom-header' => 'myheadervalue']);
 
-        $this->assertEquals($expectedBody, $response->getContent());
+        ob_start();
+        $response->sendContent();
+        $body = ob_get_clean();
+
+        $this->assertEquals($expectedBody, $body);
         $this->assertEquals('myheadervalue', $response->headers->get('custom-header'));
     }
 
@@ -58,9 +60,7 @@ class ProxyControllerTest extends TestCase
         $httpClient = new MockHttpClient(function ($method, $url, $options) use ($expectedBody) {
             $this->assertEquals('GET', $method);
 
-            return new MockResponse($expectedBody, [
-                'http_code' => 200,
-            ]);
+            return new MockResponse($expectedBody);
         });
         $controller = new ProxyController($httpClient);
 

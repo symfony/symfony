@@ -33,34 +33,53 @@ class ProxyControllerTest extends TestCase
             $this->assertEquals('GET', $method);
             $this->assertEquals($expectedUrl, $url);
 
-            return new MockResponse($expectedBody);
+            return new MockResponse($expectedBody, [
+                'response_headers' => [
+                    'Content-Type: application/json',
+                    'Cache-Control: max-age: 60, public',
+                    'Content-Encoding: gzip',
+                    'Content-Transfer-Encoding: BASE64',
+                ],
+            ]);
         });
         $controller = new ProxyController($httpClient);
 
-        $response = $controller($request, $expectedUrl, 'GET', ['timeout' => 10], ['custom-header' => 'myheadervalue']);
+        $response = $controller(
+            $request,
+            $expectedUrl,
+            'GET',
+            [
+                'timeout' => 10,
+            ],
+            [
+                'CACHE_CONTROL' => 'private',
+                'custom-header' => 'myheadervalue',
+            ]
+        );
 
         ob_start();
         $response->sendContent();
         $body = ob_get_clean();
 
         $this->assertEquals($expectedBody, $body);
-        $this->assertEquals('myheadervalue', $response->headers->get('custom-header'));
+        $this->assertEquals('application/json', $response->headers->get('content-type'), 'Remote response headers are passed');
+        $this->assertNull($response->headers->get('content-encoding'), 'Header Content-Encoding is removed, the HTTP client decodes responses');
+        $this->assertNull($response->headers->get('content-transfer-encoding'), 'Header Content-Transfer-Encoding is removed, the HTTP client decodes responses');
+        $this->assertEquals('private', $response->headers->get('cache-control'), 'Extra headers replace remote headers');
+        $this->assertEquals('myheadervalue', $response->headers->get('custom-header'), 'Custom header added');
+        $this->assertCount(4, $response->headers, 'No other header added');
     }
 
     public function testInvalidRoute()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid proxy configuration for route "myproxy"');
+        $this->expectExceptionMessage('Invalid proxy configuration for route "myproxy": Invalid URL');
 
         $request = new Request();
         $request->attributes->set('_route', 'myproxy');
 
-        $expectedBody = '<html><body>Page body</body></html>';
-
-        $httpClient = new MockHttpClient(function ($method, $url, $options) use ($expectedBody) {
-            $this->assertEquals('GET', $method);
-
-            return new MockResponse($expectedBody);
+        $httpClient = new MockHttpClient(function ($method, $url, $options) {
+            return new MockResponse('');
         });
         $controller = new ProxyController($httpClient);
 

@@ -45,7 +45,7 @@ class ProxyController
      *
      * @throws \InvalidArgumentException In case of invalid HTTP client options
      */
-    public function __invoke(Request $request, string $url, string $method = 'GET', $options = [], $responseHeaders = []): Response
+    public function __invoke(Request $request, string $url, string $method = 'GET', $options = [], $extraResponseHeaders = []): Response
     {
         $options = array_replace([
             'buffer' => false,
@@ -63,7 +63,13 @@ class ProxyController
             }
         });
         $response->setStatusCode($remoteResponse->getStatusCode());
+
+        $responseHeaders = $remoteResponse->getHeaders();
+        unset($responseHeaders['content-encoding']);
+        unset($responseHeaders['content-transfer-encoding']);
         $response->headers->add($responseHeaders);
+
+        $response->headers->add($extraResponseHeaders);
 
         return $response;
     }

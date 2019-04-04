@@ -16,6 +16,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Synchronizer\SingleDatabaseSynchronizer;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
@@ -50,11 +51,13 @@ class Connection
      */
     private $configuration = [];
     private $driverConnection;
+    private $schemaSynchronizer;
 
-    public function __construct(array $configuration, DBALConnection $driverConnection)
+    public function __construct(array $configuration, DBALConnection $driverConnection, SchemaSynchronizer $schemaSynchronizer = null)
     {
         $this->configuration = array_replace_recursive(self::DEFAULT_OPTIONS, $configuration);
         $this->driverConnection = $driverConnection;
+        $this->schemaSynchronizer = $schemaSynchronizer ?? new SingleDatabaseSynchronizer($this->driverConnection);
     }
 
     public function getConfiguration(): array
@@ -127,6 +130,9 @@ class Connection
 
     public function get(): ?array
     {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
         $this->driverConnection->beginTransaction();
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
@@ -187,8 +193,7 @@ class Connection
 
     public function setup(): void
     {
-        $synchronizer = new SingleDatabaseSynchronizer($this->driverConnection);
-        $synchronizer->updateSchema($this->getSchema(), true);
+        $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
     }
 
     public function getMessageCount(): int

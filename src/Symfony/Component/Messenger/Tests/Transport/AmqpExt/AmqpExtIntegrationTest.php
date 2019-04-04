@@ -177,9 +177,9 @@ TXT
 
         $sender = new AmqpSender($connection, $serializer);
 
-        $sender->send($first = new Envelope(new DummyMessage('First')));
-        $sender->send($second = new Envelope(new DummyMessage('Second')));
-        $sender->send($second = new Envelope(new DummyMessage('Third')));
+        $sender->send(new Envelope(new DummyMessage('First')));
+        $sender->send(new Envelope(new DummyMessage('Second')));
+        $sender->send(new Envelope(new DummyMessage('Third')));
 
         sleep(1); // give amqp a moment to have the messages ready
         $this->assertSame(3, $connection->countMessagesInQueue());

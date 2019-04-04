@@ -25,11 +25,20 @@
     --metric-unit-color: #999;
     --metric-label-background: #e0e0e0;
     --metric-label-color: inherit;
+    --trace-selected-background: #F7E5A1;
     --table-border: #e0e0e0;
     --table-background: #fff;
     --table-header: #e0e0e0;
+    --info-background: #ddf;
+    --tree-active-background: #F7E5A1;
+    --exception-title-color: var(--base-2);
     --shadow: 0px 0px 1px rgba(128, 128, 128, .2);
     --border: 1px solid #e0e0e0;
+    --background-error: var(--color-error);
+    --highlight-comment: #969896;
+    --highlight-default: #222222;
+    --highlight-keyword: #a71d5d;
+    --highlight-string: #183691;
     --base-0: #fff;
     --base-1: #f5f5f5;
     --base-2: #e0e0e0;
@@ -43,6 +52,7 @@
     --page-background: #36393e;
     --color-text: #e0e0e0;
     --color-muted: #777;
+    --color-error: #d43934;
     --tab-background: #555;
     --tab-color: #ccc;
     --tab-active-background: #888;
@@ -54,11 +64,20 @@
     --metric-unit-color: #999;
     --metric-label-background: #777;
     --metric-label-color: #e0e0e0;
+    --trace-selected-background: #71663a;
     --table-border: #444;
     --table-background: #333;
     --table-header: #555;
+    --info-background: rgba(79, 148, 195, 0.5);
+    --tree-active-background: var(--metric-label-background);
+    --exception-title-color: var(--base-2);
     --shadow: 0px 0px 1px rgba(32, 32, 32, .2);
     --border: 1px solid #666;
+    --background-error: #b0413e;
+    --highlight-comment: #dedede;
+    --highlight-default: var(--base-6);
+    --highlight-keyword: #ff413c;
+    --highlight-string: #70a6fd;
     --base-0: #2e3136;
     --base-1: #444;
     --base-2: #666;
@@ -325,7 +344,7 @@ table tbody td.num-col {
 }
 .label.status-success { background: var(--color-success); color: #FFF; }
 .label.status-warning { background: var(--color-warning); color: #FFF; }
-.label.status-error   { background: var(--color-error); color: #FFF; }
+.label.status-error   { background: var(--background-error); color: #FFF; }
 
 {# Metrics
    ------------------------------------------------------------------------- #}
@@ -458,9 +477,9 @@ tr.status-warning td {
 }
 
 .highlight .keyword   { color: #8959A8; font-weight: bold; }
-.highlight .word      { color: #222222; }
+.highlight .word      { color: var(--color-text); }
 .highlight .variable  { color: #916319; }
-.highlight .symbol    { color: #222222; }
+.highlight .symbol    { color: var(--color-text); }
 .highlight .comment   { color: #999999; }
 .highlight .backtick  { color: #718C00; }
 .highlight .string    { color: #718C00; }
@@ -601,7 +620,7 @@ tr.status-warning td {
 
 #summary .status-success { background: var(--color-success); }
 #summary .status-warning { background: var(--color-warning); }
-#summary .status-error   { background: var(--color-error);   }
+#summary .status-error   { background: var(--background-error);   }
 
 #summary .status-success h2,
 #summary .status-success a,
@@ -702,7 +721,7 @@ tr.status-warning td {
 }
 #sidebar-search .form-group input {
     background: #ccc;
-    border: 1px solid #999;
+    border: 1px solid var(--color-muted);
     color: #222;
     width: 120px;
 }
@@ -815,7 +834,7 @@ tr.status-warning td {
     background: var(--color-warning);
 }
 #menu-profiler .label-status-error .count {
-    background: var(--color-error);
+    background: var(--background-error);
 }
 
 {# Timeline panel
@@ -905,7 +924,7 @@ tr.status-warning td {
     margin-top: 0;
 }
 .tab-navigation li .badge.status-warning { background: var(--color-warning); color: #FFF; }
-.tab-navigation li .badge.status-error { background: var(--color-error); color: #FFF; }
+.tab-navigation li .badge.status-error { background: var(--background-error); color: #FFF; }
 
 .sf-tabs .tab:not(:first-child) { display: none; }
 
@@ -964,8 +983,8 @@ tr.status-warning td {
 #twig-dump pre {
     font-size: 12px;
     line-height: 1.7;
-    background-color: #fff;
-    border: 1px solid #E0E0E0;
+    background-color: var(--base-0);
+    border: var(--border);
     padding: 15px;
     box-shadow: 0 0 1px rgba(128, 128, 128, .2);
 }
@@ -973,9 +992,10 @@ tr.status-warning td {
     border-radius: 2px;
     padding: 1px 2px;
 }
-#twig-dump .status-error   { background: transparent; color: #B0413E; }
+#twig-dump .status-error   { background: transparent; color: var(--color-error); }
 #twig-dump .status-warning { background: rgba(240, 181, 24, 0.3);     }
 #twig-dump .status-success { background: rgba(100, 189, 99, 0.2);     }
+#twig-dump .status-info    { background: var(--info-background);      }
 
 #twig-table tbody td {
     vertical-align: middle;
@@ -1060,8 +1080,8 @@ table.logs .metadata {
 
 #collector-content .sf-validator .sf-validator-context,
 #collector-content .sf-validator .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: var(--border);
+    background: var(--base-0);
     padding: 10px;
     margin: 0.5em 0;
     overflow: auto;
@@ -1118,7 +1138,7 @@ pre.sf-dump, pre.sf-dump .sf-dump-default {
 }
 #collector-content .sf-dump pre.sf-dump,
 #collector-content .sf-dump .trace {
-    border: 1px solid #DDD;
+    border: var(--border);
     padding: 10px;
     margin: 0.5em 0;
     overflow: auto;

@@ -180,7 +180,7 @@ final class CurlResponse implements ResponseInterface
             if (!$this->multi->openHandles) {
                 if ($this->logger) {
                     foreach ($this->multi->pushedResponses as $url => $response) {
-                        $this->logger->info(sprintf('Unused pushed response: %s', $url));
+                        $this->logger->debug(sprintf('Unused pushed response: "%s"', $url));
                     }
                 }
 
@@ -319,7 +319,7 @@ final class CurlResponse implements ResponseInterface
 
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');
         } elseif (null !== $info['redirect_url'] && $logger) {
-            $logger->info(sprintf('Redirecting: %s %s', $info['http_code'], $info['redirect_url']));
+            $logger->info(sprintf('Redirecting: "%s %s"', $info['http_code'], $info['redirect_url']));
         }
 
         return \strlen($data);

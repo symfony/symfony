@@ -110,7 +110,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             ];
 
             if ('GET' === $method && !$options['body'] && $expectedHeaders === $pushedHeaders) {
-                $this->logger && $this->logger->info(sprintf('Connecting request to pushed response: %s %s', $method, $url));
+                $this->logger && $this->logger->debug(sprintf('Connecting request to pushed response: "%s %s"', $method, $url));
 
                 // Reinitialize the pushed response with request's options
                 $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
@@ -118,10 +118,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
                 return $pushedResponse;
             }
 
-            $this->logger && $this->logger->info(sprintf('Rejecting pushed response for "%s": authorization headers don\'t match the request', $url));
+            $this->logger && $this->logger->debug(sprintf('Rejecting pushed response for "%s": authorization headers don\'t match the request', $url));
         }
 
-        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, $url));
+        $this->logger && $this->logger->info(sprintf('Request: "%s %s"', $method, $url));
 
         $curlopts = [
             CURLOPT_URL => $url,
@@ -307,7 +307,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         }
 
         if (!isset($headers[':method']) || !isset($headers[':scheme']) || !isset($headers[':authority']) || !isset($headers[':path']) || 'GET' !== $headers[':method'] || isset($headers['range'])) {
-            $logger && $logger->info(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
+            $logger && $logger->debug(sprintf('Rejecting pushed response from "%s": pushed headers are invalid', $origin));
 
             return CURL_PUSH_DENY;
         }
@@ -315,7 +315,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         $url = $headers[':scheme'].'://'.$headers[':authority'];
 
         if ($maxPendingPushes <= \count($multi->pushedResponses)) {
-            $logger && $logger->info(sprintf('Rejecting pushed response from "%s" for "%s": the queue is full', $origin, $url));
+            $logger && $logger->debug(sprintf('Rejecting pushed response from "%s" for "%s": the queue is full', $origin, $url));
 
             return CURL_PUSH_DENY;
         }
@@ -324,13 +324,13 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         // but this is a MUST in the HTTP/2 RFC; let's restrict pushes to the original host,
         // ignoring domains mentioned as alt-name in the certificate for now (same as curl).
         if (0 !== strpos($origin, $url.'/')) {
-            $logger && $logger->info(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
+            $logger && $logger->debug(sprintf('Rejecting pushed response from "%s": server is not authoritative for "%s"', $origin, $url));
 
             return CURL_PUSH_DENY;
         }
 
         $url .= $headers[':path'];
-        $logger && $logger->info(sprintf('Queueing pushed response: %s', $url));
+        $logger && $logger->debug(sprintf('Queueing pushed response: "%s"', $url));
 
         $multi->pushedResponses[$url] = [
             new CurlResponse($multi, $pushed),

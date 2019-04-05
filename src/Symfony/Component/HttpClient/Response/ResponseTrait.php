@@ -302,7 +302,7 @@ trait ResponseTrait
                             $isTimeout = true;
                         } elseif ($chunk instanceof FirstChunk && $response->logger) {
                             $info = $response->getInfo();
-                            $response->logger->info(sprintf('Response: %s %s', $info['http_code'], $info['url']));
+                            $response->logger->info(sprintf('Response: "%s %s"', $info['http_code'], $info['url']));
                         }
 
                         yield $response => $chunk;

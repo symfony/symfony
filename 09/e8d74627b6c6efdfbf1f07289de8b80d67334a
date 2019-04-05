@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-14T12:39:56Z
+
+Not really a fan of having a logger inside the client implementation when it could use decoration, but really depends if you want to log what the implementation does.
+
+If it's only logging request / response transmission it should use a decoration system (or at least a trait but not a fan of this either). Using decorations would allow:
+
+ * other implementation to not care about it (less code = happier maintainers)
+ * also this allow to log at a specific time if you have other decorators (you can log before and after something has change the request to debug what's changed between the original request and the one received by the client)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-14T13:04:30Z
+
+@joelwurtz same as #30539: logging in a cross-cutting concern, it's a bad fit for a middleware. I'd like implementation to log what they do internally also, e.g. dealing with redirections, or with server pushes for the `CurlHttpClient`. Exposing these steps for the purpose of logging means adding a lot of complexity, not worth it.

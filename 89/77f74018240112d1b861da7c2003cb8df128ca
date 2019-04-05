@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-05T13:13:17Z
+
+What about adding url / method / and other variables as attributes in the log message ? would be useful for some systems parsing logs so we could filters logs.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-05T13:19:40Z
+
+> What about adding url / method / and other variables as attributes in the log message ? would be useful for some systems parsing logs as we could some of this attributes to filters logs.
+
+I already make app that heavily use an http client with a nice log platform, and I never add such need. So you really think it common to search by verb or URL ?
+(Adding things to the context come with the a price: CPU (processing) / network / Storage. This is why I'm a bit reluctant to add it
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-05T13:35:51Z
+
+@nicolas-grekas About warning vs debug:
+
+Warning do not spam the logs.
+
+I suppose you are referring to the FingerCrossHandler. But the threshold is `error`.
+debug < info < notice < warning < error < critical < alert < emerg
+[Ref](https://github.com/Seldaek/monolog/blob/master/doc/01-usage.md#log-levels)
+
+More over:
+> WARNING (300): Exceptional occurrences that are not errors. Examples: Use of deprecated APIs, poor use of an API, undesirable things that are not necessarily wrong.
+
+So, maybe some warning should goes to debug. But I'm not sure it's the case for all of them.
+For exemple the following case if legit to me
+```php
+$this->logger && $this->logger->info(sprintf('Rejecting pushed response for "%s": authorization headers don\'t match the request', $url));
+```
+
+Could you re-review this PR with theses new considerations? Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-05T13:38:23Z
+
+@lyrixx the HTTP/2 spec lists that clients should be defensive against servers that send too many pushes or other frames. That means this is not rare, when it's spamming.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-05T13:42:33Z
+
+@nicolas-grekas Ok. I changed all warning to debug, and updated all `"%s" "%s"` to `"%s %s"`

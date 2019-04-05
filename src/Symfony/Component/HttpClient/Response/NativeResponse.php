@@ -120,7 +120,7 @@ final class NativeResponse implements ResponseInterface
                     break;
                 }
 
-                $this->logger && $this->logger->info(sprintf('Redirecting: %s %s', $this->info['http_code'], $url ?? $this->url));
+                $this->logger && $this->logger->info(sprintf('Redirecting: "%s %s"', $this->info['http_code'], $url ?? $this->url));
             }
         } catch (\Throwable $e) {
             $this->close();

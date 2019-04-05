@@ -34,8 +34,13 @@ trait HttpClientTrait
      */
     private static function prepareRequest(?string $method, ?string $url, array $options, array $defaultOptions = [], bool $allowExtraOptions = false): array
     {
-        if (null !== $method && \strlen($method) !== strspn($method, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) {
-            throw new InvalidArgumentException(sprintf('Invalid HTTP method "%s", only uppercase letters are accepted.', $method));
+        if (null !== $method) {
+            if (\strlen($method) !== strspn($method, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) {
+                throw new InvalidArgumentException(sprintf('Invalid HTTP method "%s", only uppercase letters are accepted.', $method));
+            }
+            if (!$method) {
+                throw new InvalidArgumentException('The HTTP method can not be empty.');
+            }
         }
 
         $options = self::mergeDefaultOptions($options, $defaultOptions, $allowExtraOptions);

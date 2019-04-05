@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Response;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -29,7 +30,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * @internal
      */
-    public function __construct(\stdClass $multi, $ch, array $options = null, string $method = 'GET', callable $resolveRedirect = null)
+    public function __construct(\stdClass $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null)
     {
         $this->multi = $multi;
 
@@ -41,6 +42,7 @@ final class CurlResponse implements ResponseInterface
         }
 
         $this->id = $id = (int) $ch;
+        $this->logger = $logger;
         $this->timeout = $options['timeout'] ?? null;
         $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
@@ -64,8 +66,8 @@ final class CurlResponse implements ResponseInterface
             $content = ($options['buffer'] ?? true) ? $content : null;
         }
 
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect): int {
-            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
+            return self::parseHeaderLine($ch, $data, $info, $headers, $options, $multi, $id, $location, $resolveRedirect, $logger);
         });
 
         if (null === $options) {
@@ -103,7 +105,9 @@ final class CurlResponse implements ResponseInterface
                 throw new TransportException($response->info['error']);
             }
 
-            if (\in_array(curl_getinfo($ch = $response->handle, CURLINFO_PRIVATE), ['headers', 'destruct'], true)) {
+            $waitFor = curl_getinfo($ch = $response->handle, CURLINFO_PRIVATE);
+
+            if (\in_array($waitFor, ['headers', 'destruct'], true)) {
                 try {
                     if (\defined('CURLOPT_STREAM_WEIGHT')) {
                         curl_setopt($ch, CURLOPT_STREAM_WEIGHT, 32);
@@ -115,6 +119,8 @@ final class CurlResponse implements ResponseInterface
                     $response->close();
                     throw $e;
                 }
+            } elseif ('content' === $waitFor && ($response->multi->handlesActivity[$response->id][0] ?? null) instanceof FirstChunk) {
+                self::stream([$response])->current();
             }
 
             curl_setopt($ch, CURLOPT_HEADERFUNCTION, null);
@@ -156,8 +162,8 @@ final class CurlResponse implements ResponseInterface
     public function __destruct()
     {
         try {
-            if (null === $this->timeout || isset($this->info['url'])) {
-                return; // pushed response
+            if (null === $this->timeout) {
+                return; // Unused pushed response
             }
 
             if ('content' === $waitFor = curl_getinfo($this->handle, CURLINFO_PRIVATE)) {
@@ -171,7 +177,13 @@ final class CurlResponse implements ResponseInterface
             $this->close();
 
             // Clear local caches when the only remaining handles are about pushed responses
-            if (\count($this->multi->openHandles) === \count($this->multi->pushedResponses)) {
+            if (!$this->multi->openHandles) {
+                if ($this->logger) {
+                    foreach ($this->multi->pushedResponses as $url => $response) {
+                        $this->logger->info(sprintf('Unused pushed response: %s', $url));
+                    }
+                }
+
                 $this->multi->pushedResponses = [];
                 // Schedule DNS cache eviction for the next request
                 $this->multi->dnsCache[2] = $this->multi->dnsCache[2] ?: $this->multi->dnsCache[1];
@@ -249,7 +261,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * Parses header lines as curl yields them to us.
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, \stdClass $multi, int $id, ?string &$location, ?callable $resolveRedirect): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, \stdClass $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
     {
         if (!\in_array($waitFor = @curl_getinfo($ch, CURLINFO_PRIVATE), ['headers', 'destruct'], true)) {
             return \strlen($data); // Ignore HTTP trailers
@@ -306,6 +318,8 @@ final class CurlResponse implements ResponseInterface
             }
 
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');
+        } elseif (null !== $info['redirect_url'] && $logger) {
+            $logger->info(sprintf('Redirecting: %s %s', $info['http_code'], $info['redirect_url']));
         }
 
         return \strlen($data);

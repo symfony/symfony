@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\NativeResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -28,9 +30,10 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  *
  * @experimental in 4.3
  */
-final class NativeHttpClient implements HttpClientInterface
+final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterface
 {
     use HttpClientTrait;
+    use LoggerAwareTrait;
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
     private $multi;
@@ -205,7 +208,10 @@ final class NativeHttpClient implements HttpClientInterface
         $context = stream_context_create($context, ['notification' => $notification]);
         self::configureHeadersAndProxy($context, $host, $options['request_headers'], $proxy, $noProxy);
 
-        return new NativeResponse($this->multi, $context, implode('', $url), $options, $gzipEnabled, $info, $resolveRedirect, $onProgress);
+        $url = implode('', $url);
+        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, $url));
+
+        return new NativeResponse($this->multi, $context, $url, $options, $gzipEnabled, $info, $resolveRedirect, $onProgress, $this->logger);
     }
 
     /**

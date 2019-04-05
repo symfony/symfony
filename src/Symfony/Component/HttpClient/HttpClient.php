@@ -25,13 +25,14 @@ final class HttpClient
     /**
      * @param array $defaultOptions     Default requests' options
      * @param int   $maxHostConnections The maximum number of connections to a single host
+     * @param int   $maxPendingPushes   The maximum number of pushed responses to accept in the queue
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
      */
-    public static function create(array $defaultOptions = [], int $maxHostConnections = 6): HttpClientInterface
+    public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
         if (\extension_loaded('curl')) {
-            return new CurlHttpClient($defaultOptions, $maxHostConnections);
+            return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
         }
 
         return new NativeHttpClient($defaultOptions, $maxHostConnections);

@@ -293,7 +293,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
             if (
                 (false === $groups || array_intersect($attributeMetadata->getGroups(), $groups)) &&
-                $this->isAllowedAttribute($classOrObject, $name, null, $context)
+                $this->isAllowedAttribute($classOrObject, $name, null, $context) &&
+                $this->attributeAllowedInVersion($context, $attributeMetadata)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
@@ -492,4 +493,23 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
         return $parentContext;
     }
+
+    /**
+     * @param array                      $context
+     * @param AttributeMetadataInterface $attributeMetadata
+     *
+     * @return bool
+     */
+    protected function attributeAllowedInVersion(array $context, AttributeMetadataInterface $attributeMetadata): bool
+    {
+        $sinceVersion = $attributeMetadata->getSince();
+        $untilVersion = $attributeMetadata->getUntil();
+        if ((null !== $sinceVersion || null !== $untilVersion) && isset($context['version'])) {
+
+            return (null !== $sinceVersion && version_compare($context['version'], $sinceVersion, '>')) &&
+                (null !== $untilVersion && version_compare($context['version'], $untilVersion, '<'));
+        }
+
+        return true;
+}
 }

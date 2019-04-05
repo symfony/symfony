@@ -71,4 +71,24 @@ interface AttributeMetadataInterface
      * Merges an {@see AttributeMetadataInterface} with in the current one.
      */
     public function merge(self $attributeMetadata);
+
+    /**
+     * Sets the version number from which the attribute must be serialized.
+     */
+    public function setSince(string $version);
+
+    /**
+     * Gets the version number from which the attribute must be serialized.
+     */
+    public function getSince(): ?string;
+
+    /**
+     * Sets the version number after which the attribute must not be serialized
+     */
+    public function setUntil(string $version);
+
+    /**
+     * Gets the version number after which the attribute must not be serialized
+     */
+    public function getUntil(): ?string ;
 }

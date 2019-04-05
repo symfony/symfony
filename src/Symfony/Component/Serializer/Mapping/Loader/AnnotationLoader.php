@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\Since;
+use Symfony\Component\Serializer\Annotation\Until;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -71,6 +73,10 @@ class AnnotationLoader implements LoaderInterface
                         $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
                     } elseif ($annotation instanceof SerializedName) {
                         $attributesMetadata[$property->name]->setSerializedName($annotation->getSerializedName());
+                    } elseif ($annotation instanceof Since) {
+                        $attributesMetadata[$property->name]->setSince($annotation->getVersion());
+                    } elseif ($annotation instanceof Until) {
+                        $attributesMetadata[$property->name]->setUntil($annotation->getVersion());
                     }
 
                     $loaded = true;
@@ -116,6 +122,10 @@ class AnnotationLoader implements LoaderInterface
                     }
 
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());
+                } elseif ($annotation instanceof Since) {
+                    $attributesMetadata[$method->name]->setSince($annotation->getVersion());
+                } elseif ($annotation instanceof Until) {
+                    $attributesMetadata[$method->name]->setUntil($annotation->getVersion());
                 }
 
                 $loaded = true;

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-06T14:11:28Z
+
+@tgalopin will you add a config option in FrameworkBundle to enable/disable the HTML5 parser? Thanks.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T14:20:03Z
+
+@javiereguiluz the usage of the HTML5 parser is when 1/ the library is available 2/ the doctype is HTML5. I think it's better than having a configuration option (and was recommended by Nicolas)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T14:53:09Z
+
+Updated

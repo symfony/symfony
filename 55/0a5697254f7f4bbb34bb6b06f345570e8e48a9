@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-04-04T21:04:58Z
+
+Thx for the help @nicolas-grekas . ~~Do you know how can I run test with deps=low locally ? I tried `composer update --prefer-lowest --prefer-stable` but I got errors and no tests are runned :(~~
+
+Nervermind juste run `composer up --prefer-lowest --prefer-stable` then `SYMFONY_PHPUNIT_VERSION=6.5.13 php phpunit src/Symfony/Component/Messenger/` and its fine :)
+
+EDIT: Well ... this install `doctrine/dbal` `v2.6.0` locally but it fails on travis with `v2.4.0`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-05T13:27:11Z
+
+```
+cd src/Symfony/Component/Messenger/
+composer up --prefer-lowest --prefer-stable
+../../../../phpunit
+```

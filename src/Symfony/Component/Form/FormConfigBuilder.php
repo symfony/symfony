@@ -47,44 +47,19 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         'PATCH',
     ];
 
-    /**
-     * @var bool
-     */
     protected $locked = false;
 
-    /**
-     * @var EventDispatcherInterface
-     */
     private $dispatcher;
-
-    /**
-     * @var string
-     */
     private $name;
 
     /**
-     * @var PropertyPathInterface
+     * @var PropertyPathInterface|string|null
      */
     private $propertyPath;
 
-    /**
-     * @var bool
-     */
     private $mapped = true;
-
-    /**
-     * @var bool
-     */
     private $byReference = true;
-
-    /**
-     * @var bool
-     */
     private $inheritData = false;
-
-    /**
-     * @var bool
-     */
     private $compound = false;
 
     /**
@@ -92,34 +67,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private $type;
 
-    /**
-     * @var array
-     */
     private $viewTransformers = [];
-
-    /**
-     * @var array
-     */
     private $modelTransformers = [];
 
     /**
-     * @var DataMapperInterface
+     * @var DataMapperInterface|null
      */
     private $dataMapper;
 
-    /**
-     * @var bool
-     */
     private $required = true;
-
-    /**
-     * @var bool
-     */
     private $disabled = false;
-
-    /**
-     * @var bool
-     */
     private $errorBubbling = false;
 
     /**
@@ -127,9 +84,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private $emptyData;
 
-    /**
-     * @var array
-     */
     private $attributes = [];
 
     /**
@@ -142,39 +96,26 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private $dataClass;
 
-    /**
-     * @var bool
-     */
-    private $dataLocked;
+    private $dataLocked = false;
 
     /**
-     * @var FormFactoryInterface
+     * @var FormFactoryInterface|null
      */
     private $formFactory;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $action;
 
-    /**
-     * @var string
-     */
     private $method = 'POST';
 
     /**
-     * @var RequestHandlerInterface
+     * @var RequestHandlerInterface|null
      */
     private $requestHandler;
 
-    /**
-     * @var bool
-     */
     private $autoInitialize = false;
-
-    /**
-     * @var array
-     */
     private $options;
 
     /**
@@ -616,7 +557,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->errorBubbling = null === $errorBubbling ? null : (bool) $errorBubbling;
+        $this->errorBubbling = (bool) $errorBubbling;
 
         return $this;
     }
@@ -662,7 +603,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->mapped = $mapped;
+        $this->mapped = (bool) $mapped;
 
         return $this;
     }
@@ -676,7 +617,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->byReference = $byReference;
+        $this->byReference = (bool) $byReference;
 
         return $this;
     }
@@ -690,7 +631,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->inheritData = $inheritData;
+        $this->inheritData = (bool) $inheritData;
 
         return $this;
     }
@@ -704,7 +645,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->compound = $compound;
+        $this->compound = (bool) $compound;
 
         return $this;
     }
@@ -746,7 +687,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->dataLocked = $locked;
+        $this->dataLocked = (bool) $locked;
 
         return $this;
     }
@@ -774,7 +715,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('The config builder cannot be modified anymore.');
         }
 
-        $this->action = $action;
+        $this->action = (string) $action;
 
         return $this;
     }
@@ -790,7 +731,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         $upperCaseMethod = strtoupper($method);
 
-        if (!\in_array($upperCaseMethod, self::$allowedMethods)) {
+        if (!\in_array($upperCaseMethod, self::$allowedMethods, true)) {
             throw new InvalidArgumentException(sprintf('The form method is "%s", but should be one of "%s".', $method, implode('", "', self::$allowedMethods)));
         }
 
@@ -846,7 +787,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|int $name The tested form name
+     * @param string|int|null $name The tested form name
      *
      * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
@@ -872,7 +813,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
      *
-     * @param string $name The tested form name
+     * @param string|null $name The tested form name
      *
      * @return bool Whether the name is valid
      */

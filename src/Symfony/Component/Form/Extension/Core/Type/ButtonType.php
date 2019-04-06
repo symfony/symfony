@@ -43,8 +43,6 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     {
         parent::configureOptions($resolver);
 
-        $resolver->setDefaults([
-            'auto_initialize' => false,
-        ]);
+        $resolver->setDefault('auto_initialize', false);
     }
 }

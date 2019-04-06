@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
- * @internal
- *
  * @author Gary PEGEOT <garypegeot@gmail.com>
  */
 class InMemoryTransportFactoryTest extends TestCase

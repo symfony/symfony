@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 
 /**
- * @internal
- *
  * @author Gary PEGEOT <garypegeot@gmail.com>
  */
 class InMemoryTransportTest extends TestCase

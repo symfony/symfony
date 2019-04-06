@@ -30,7 +30,7 @@ class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterfac
     /**
      * {@inheritdoc}
      */
-    public function getProperties($object, array $context = [])
+    public function getProperties($object, array $context = []): ?array
     {
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 

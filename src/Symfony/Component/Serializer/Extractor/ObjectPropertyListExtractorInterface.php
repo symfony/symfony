@@ -20,9 +20,8 @@ interface ObjectPropertyListExtractorInterface
      * Gets the list of properties available for the given object.
      *
      * @param object $object
-     * @param array  $context
      *
      * @return string[]|null
      */
-    public function getProperties($object, array $context = []);
+    public function getProperties($object, array $context = []): ?array;
 }

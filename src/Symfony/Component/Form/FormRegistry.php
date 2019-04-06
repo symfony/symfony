@@ -26,7 +26,7 @@ class FormRegistry implements FormRegistryInterface
     /**
      * Extensions.
      *
-     * @var FormExtensionInterface[] An array of FormExtensionInterface
+     * @var FormExtensionInterface[]
      */
     private $extensions = [];
 

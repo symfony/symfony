@@ -232,12 +232,13 @@ abstract class Constraint
      *
      * Override this method to define a default option.
      *
-     * @return string
+     * @return string|null
      *
      * @see __construct()
      */
     public function getDefaultOption()
     {
+        return null;
     }
 
     /**

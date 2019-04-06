@@ -49,7 +49,7 @@ class FormError implements \Serializable
      */
     public function __construct(?string $message, string $messageTemplate = null, array $messageParameters = [], int $messagePluralization = null, $cause = null)
     {
-        $this->message = $message;
+        $this->message = (string) $message;
         $this->messageTemplate = $messageTemplate ?: $message;
         $this->messageParameters = $messageParameters;
         $this->messagePluralization = $messagePluralization;

@@ -20,6 +20,7 @@ use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\TransitionBlockerList;
 use Symfony\Component\Workflow\Workflow;
 
 class WorkflowExtensionTest extends TestCase
@@ -109,6 +110,18 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame('t1 title', $this->extension->getMetadata($subject, 'title', $this->t1));
         $this->assertNull($this->extension->getMetadata($subject, 'not found'));
         $this->assertNull($this->extension->getMetadata($subject, 'not found', $this->t1));
+    }
+
+    public function testbuildTransitionBlockerList()
+    {
+        if (!class_exists(TransitionBlockerList::class)) {
+            $this->markTestSkipped('This test requires symfony/workflow:4.1.');
+        }
+        $subject = new Subject();
+
+        $list = $this->extension->buildTransitionBlockerList($subject, 't1');
+        $this->assertInstanceOf(TransitionBlockerList::class, $list);
+        $this->assertTrue($list->isEmpty());
     }
 }
 

@@ -12,16 +12,34 @@
 namespace Symfony\Component\Messenger\Transport;
 
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class InMemoryTransportFactory implements TransportFactoryInterface
+/**
+ * @author Gary PEGEOT <garypegeot@gmail.com>
+ *
+ * @experimental in 4.3
+ */
+class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
 {
+    /**
+     * @var InMemoryTransport[]
+     */
+    private $createdTransports = [];
+
     public function createTransport(string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
-        return new InMemoryTransport();
+        return $this->createdTransports[] = new InMemoryTransport();
     }
 
     public function supports(string $dsn, array $options): bool
     {
         return 0 === strpos($dsn, 'in-memory://');
+    }
+
+    public function reset()
+    {
+        foreach ($this->createdTransports as $transport) {
+            $transport->reset();
+        }
     }
 }

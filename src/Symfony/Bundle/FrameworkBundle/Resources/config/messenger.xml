@@ -72,6 +72,7 @@
 
         <service id="messenger.transport.in_memory.factory" class="Symfony\Component\Messenger\Transport\InMemoryTransportFactory">
             <tag name="messenger.transport_factory" />
+            <tag name="kernel.reset" method="reset" />
         </service>
 
         <!-- retry -->

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\InMemoryTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -50,6 +52,16 @@ class InMemoryTransportFactoryTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
 
         $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
+    }
+
+    public function testResetCreatedTransports()
+    {
+        $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
+        $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
+
+        $this->assertCount(1, $transport->get());
+        $this->factory->reset();
+        $this->assertCount(0, $transport->get());
     }
 
     public function provideDSN(): array

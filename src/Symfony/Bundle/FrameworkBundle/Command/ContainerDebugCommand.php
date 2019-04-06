@@ -224,14 +224,11 @@ EOF
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
             $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
+            $container->compile();
         } else {
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
-            $container->setParameter('container.build_hash', $hash = ContainerBuilder::hash(__METHOD__));
-            $container->setParameter('container.build_id', hash('crc32', $hash.time()));
         }
-
-        $container->getCompilerPassConfig()->setRemovingPasses([]);
-        $container->compile();
 
         return $this->containerBuilder = $container;
     }

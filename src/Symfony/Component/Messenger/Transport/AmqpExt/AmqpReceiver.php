@@ -81,10 +81,11 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
     public function ack(Envelope $envelope): void
     {
         try {
-            /* @var AmqpReceivedStamp $amqpReceivedStamp */
+            $stamp = $this->findAmqpStamp($envelope);
+
             $this->connection->ack(
-                $this->findAmqpEnvelope($envelope, $amqpReceivedStamp),
-                $amqpReceivedStamp->getQueueName()
+                $stamp->getAmqpEnvelope(),
+                $stamp->getQueueName()
             );
         } catch (\AMQPException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -96,10 +97,11 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function reject(Envelope $envelope): void
     {
-        /* @var AmqpReceivedStamp $amqpReceivedStamp */
+        $stamp = $this->findAmqpStamp($envelope);
+
         $this->rejectAmqpEnvelope(
-            $this->findAmqpEnvelope($envelope, $amqpReceivedStamp),
-            $amqpReceivedStamp->getQueueName()
+            $stamp->getAmqpEnvelope(),
+            $stamp->getQueueName()
         );
     }
 
@@ -120,14 +122,13 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
     }
 
-    private function findAmqpEnvelope(Envelope $envelope, AmqpReceivedStamp &$amqpReceivedStamp = null): \AMQPEnvelope
+    private function findAmqpStamp(Envelope $envelope): AmqpReceivedStamp
     {
         $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
-
         if (null === $amqpReceivedStamp) {
-            throw new LogicException('No AmqpReceivedStamp found on the Envelope.');
+            throw new LogicException('No "AmqpReceivedStamp" stamp found on the Envelope.');
         }
 
-        return $amqpReceivedStamp->getAmqpEnvelope();
+        return $amqpReceivedStamp;
     }
 }

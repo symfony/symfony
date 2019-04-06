@@ -108,10 +108,10 @@
 
 {% block form_row -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
-        {{- form_label(form) -}}
-        {{- form_widget(form) -}}
-        {{- form_errors(form) -}}
-    </div>
+        {{- form_label(form) }} {# -#}
+        {{ form_widget(form) }} {# -#}
+        {{ form_errors(form) }} {# -#}
+    </div> {# -#}
 {%- endblock form_row %}
 
 {% block button_row -%}

@@ -1077,6 +1077,26 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testColumnMaxWidthsWithTrailingBackslash()
+    {
+        (new Table($output = $this->getOutputStream()))
+            ->setColumnMaxWidth(0, 5)
+            ->setRows([['1234\6']])
+            ->render()
+        ;
+
+        $expected =
+            <<<'TABLE'
++-------+
+| 1234\ |
+| 6     |
++-------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     public function testBoxedStyleWithColspan()
     {
         $boxed = new TableStyle();

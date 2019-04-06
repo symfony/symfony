@@ -74,8 +74,8 @@ trait BlockingStoreTestTrait
             // Block SIGHUP signal
             pcntl_sigprocmask(SIG_BLOCK, [SIGHUP]);
 
-            $store = $this->getStore();
             try {
+                $store = $this->getStore();
                 $store->save($key);
                 // send the ready signal to the parent
                 posix_kill($parentPID, SIGHUP);
@@ -87,7 +87,8 @@ trait BlockingStoreTestTrait
                 usleep($clockDelay);
                 $store->delete($key);
                 exit(0);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                posix_kill($parentPID, SIGHUP);
                 exit(1);
             }
         }

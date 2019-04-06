@@ -115,8 +115,27 @@ class Configuration implements ConfigurationInterface
         $this->addRobotsIndexSection($rootNode);
         $this->addHttpClientSection($rootNode);
         $this->addMailerSection($rootNode);
+        $this->addSecretsSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addSecretsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('secrets')
+                    ->canBeEnabled()
+                    ->children()
+                        ->scalarNode('encrypted_secrets_dir')->end()
+                        ->scalarNode('encryption_key')->end()
+                        //->scalarNode('public_key')->end()
+                        //->scalarNode('private_key')->end()
+                        ->scalarNode('decrypted_secrets_cache')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addCsrfSection(ArrayNodeDefinition $rootNode)

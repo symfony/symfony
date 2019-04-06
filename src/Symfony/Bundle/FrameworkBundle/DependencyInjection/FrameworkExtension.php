@@ -334,6 +334,7 @@ class FrameworkExtension extends Extension
         $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        $this->registerSecretsConfiguration($config['secrets'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             if (!class_exists('Symfony\Component\Serializer\Serializer')) {
@@ -1439,6 +1440,20 @@ class FrameworkExtension extends Extension
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
             ->replaceArgument(3, $config['throw_exception_on_invalid_property_path'])
         ;
+    }
+
+    private function registerSecretsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            $container->removeDefinition('console.command.secrets_add');
+
+            return;
+        }
+
+        $loader->load('secrets.xml');
+
+        $container->getDefinition('secrets.storage.files')->replaceArgument(0, $config['encrypted_secrets_dir']);
+        $container->getDefinition('secrets.storage.files')->replaceArgument(1, $config['encryption_key']);
     }
 
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)

@@ -200,5 +200,19 @@
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
             <tag name="console.command" command="debug:error-renderer" />
         </service>
+
+        <service id="console.command.secrets_add" class="Symfony\Bundle\FrameworkBundle\Command\SecretsAddCommand">
+            <argument type="service" id="secrets.storage.cache" />
+            <tag name="console.command" command="secrets:add" />
+        </service>
+
+        <service id="console.command.secrets_generate_key" class="Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeyCommand">
+            <tag name="console.command" command="secrets:generate-key" />
+        </service>
+
+        <service id="console.command.secrets_list" class="Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand">
+            <argument type="service" id="secrets.storage.cache" />
+            <tag name="console.command" command="secrets:list" />
+        </service>
     </services>
 </container>

@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -221,6 +223,29 @@ class TranslatorTest extends TestCase
             [false, true],
             [true, true],
         ];
+    }
+
+    public function testCatalogResourcesAreAddedForScannedDirectories()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = [
+            'fr' => [
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ],
+        ];
+
+        /** @var Translator $translator */
+        $translator = $this->getTranslator($loader, [
+            'resource_files' => $resourceFiles,
+            'scanned_directories' => [__DIR__, '/tmp/I/sure/hope/this/does/not/exist'],
+        ], 'yml');
+
+        $catalogue = $translator->getCatalogue('fr');
+
+        $resources = $catalogue->getResources();
+
+        $this->assertEquals(new DirectoryResource(__DIR__), $resources[1]);
+        $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
     }
 
     protected function getCatalogue($locale, $messages, $resources = [])

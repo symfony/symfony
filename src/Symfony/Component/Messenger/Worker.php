@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -123,6 +124,10 @@ class Worker implements WorkerInterface
         try {
             $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp()));
         } catch (\Throwable $throwable) {
+            if ($throwable instanceof HandlerFailedException) {
+                $envelope = $throwable->getEnvelope();
+            }
+
             $shouldRetry = $this->shouldRetry($throwable, $envelope, $retryStrategy);
 
             $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $receiverName, $throwable, $shouldRetry));

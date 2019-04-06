@@ -79,6 +79,7 @@ CHANGELOG
  * Added a `SetupTransportsCommand` command to setup the transports
  * Added a Doctrine transport. For example, use the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
  * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed. 
+ * [BC BREAK] A `HandlerFailedException` exception will be thrown if one or more handler fails.
 
 4.2.0
 -----

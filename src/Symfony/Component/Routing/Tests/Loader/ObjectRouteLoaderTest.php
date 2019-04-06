@@ -70,7 +70,7 @@ class ObjectRouteLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider getBadResourceStrings
      */
-    public function testExceptionWithoutSyntax($resourceString)
+    public function testExceptionWithoutSyntax(string $resourceString): void
     {
         $loader = new ObjectRouteLoaderForTest();
         $loader->load($resourceString);
@@ -79,8 +79,12 @@ class ObjectRouteLoaderTest extends TestCase
     public function getBadResourceStrings()
     {
         return [
-            ['Foo'],
             ['Foo:Bar:baz'],
+            ['Foo::Bar::baz'],
+            ['Foo:'],
+            ['Foo::'],
+            [':Foo'],
+            ['::Foo'],
         ];
     }
 

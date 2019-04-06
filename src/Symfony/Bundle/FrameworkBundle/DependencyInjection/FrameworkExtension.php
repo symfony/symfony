@@ -1229,6 +1229,11 @@ class FrameworkExtension extends Extension
         if (!$propertyInfoEnabled || !$config['auto_mapping'] || !class_exists(PropertyInfoLoader::class)) {
             $container->removeDefinition('validator.property_info_loader');
         }
+
+        $container
+            ->getDefinition('validator.not_compromised_password')
+            ->setArgument(2, $config['disable_not_compromised_password'])
+        ;
     }
 
     private function registerValidatorMapping(ContainerBuilder $container, array $config, array &$files)

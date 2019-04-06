@@ -60,6 +60,17 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testInvalidPasswordButDisabled()
+    {
+        $r = new \ReflectionProperty($this->validator, 'disabled');
+        $r->setAccessible(true);
+        $r->setValue($this->validator, true);
+
+        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
     public function testInvalidPassword()
     {
         $constraint = new NotCompromisedPassword();

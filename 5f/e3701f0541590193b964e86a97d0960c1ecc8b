@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-23T10:59:45Z
+
+We need to wait for #30557 to be merged to go forward with this one because we need to make sure the `HandledStamp`s are kept when retrying then.
+
+But either way, wouldn't it make more sense to retry all the listeners by default? It might cause even more inconsistency if we only call the "remaining listeners" isn't it? (only if they are related to each other I guess)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-23T15:01:18Z
+
+#30557 is merged now :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-24T00:46:24Z
+
+@keulinho can you rebase now that #30557 is merged? This is a missing piece to handling failures correctly. It could be a bit more complex, but I'm wondering if we should add an integration test involving `Worker` with a fake "receiver" and a bus with all the default middleware. That would allow us to test this complex behavior: e.g. use `Worker` to "receive" a message that has 2 handlers where 1 fails the first time. Then see that there was a retry, but each handler was ultimately only called 1 time. The whole "flow" really involves `Worker` and several middleware working together properly.
+
+> But either way, wouldn't it make more sense to retry all the listeners by default? It might cause even more inconsistency if we only call the "remaining listeners" isn't it? (only if they are related to each other I guess)
+
+Hmm, I don't think I agree with this. It seems like more risk to knowingly execute a handler two times.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T16:16:06Z
+
+@keulinho could you please rebase again? And mark the previous comments as "Resolved" if you've handled them. A lot of things are being merged to messenger currently - so sorry for the repeated rebasing!
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-06T10:42:20Z
+
+I've changed the exception name to `HandlerFailedException` and added a note in the CHANGELOG.

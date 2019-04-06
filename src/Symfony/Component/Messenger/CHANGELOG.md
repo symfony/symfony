@@ -18,9 +18,9 @@ CHANGELOG
    changed: a required 3rd `SerializerInterface` argument was added.
  * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to
    explicitly handle messages synchronously.
- * Added `AmqpRoutingKeyStamp` allowing to provide a routing key on message publishing.
+ * Added `AmqpStamp` allowing to provide a routing key, flags and attributes on message publishing.
  * [BC BREAK] Removed publishing with a `routing_key` option from queue configuration, for
-   AMQP. Use exchange `default_publish_routing_key` or `AmqpRoutingKeyStamp` instead.
+   AMQP. Use exchange `default_publish_routing_key` or `AmqpStamp` instead.
  * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can 
    therefore name the queue but also configure `binding_keys`, `flags` and `arguments`.
  * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection` 

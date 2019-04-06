@@ -51,11 +51,12 @@ class AmqpSender implements SenderInterface
         }
 
         try {
-            /** @var $routingKeyStamp AmqpRoutingKeyStamp */
-            $routingKeyStamp = $envelope->last(AmqpRoutingKeyStamp::class);
-            $routingKey = $routingKeyStamp ? $routingKeyStamp->getRoutingKey() : null;
-
-            $this->connection->publish($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay, $routingKey);
+            $this->connection->publish(
+                $encodedMessage['body'],
+                $encodedMessage['headers'] ?? [],
+                $delay,
+                $envelope->last(AmqpStamp::class)
+            );
         } catch (\AMQPException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

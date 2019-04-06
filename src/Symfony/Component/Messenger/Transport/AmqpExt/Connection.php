@@ -171,10 +171,10 @@ class Connection
      *
      * @throws \AMQPException
      */
-    public function publish(string $body, array $headers = [], int $delay = 0, string $routingKey = null): void
+    public function publish(string $body, array $headers = [], int $delay = 0, AmqpStamp $amqpStamp = null): void
     {
         if (0 !== $delay) {
-            $this->publishWithDelay($body, $headers, $delay, $routingKey);
+            $this->publishWithDelay($body, $headers, $delay, $amqpStamp);
 
             return;
         }
@@ -183,13 +183,14 @@ class Connection
             $this->setup();
         }
 
-        $this->exchange()->publish(
+        $this->publishOnExchange(
+            $this->exchange(),
             $body,
-            $routingKey ?? $this->getDefaultPublishRoutingKey(),
-            AMQP_NOPARAM,
+            (null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null) ?? $this->getDefaultPublishRoutingKey(),
             [
                 'headers' => $headers,
-            ]
+            ],
+            $amqpStamp
         );
     }
 
@@ -206,19 +207,30 @@ class Connection
     /**
      * @throws \AMQPException
      */
-    private function publishWithDelay(string $body, array $headers, int $delay, ?string $exchangeRoutingKey)
+    private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
     {
         if ($this->shouldSetup()) {
-            $this->setupDelay($delay, $exchangeRoutingKey);
+            $this->setupDelay($delay, null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null);
         }
 
-        $this->getDelayExchange()->publish(
+        $this->publishOnExchange(
+            $this->getDelayExchange(),
             $body,
             $this->getRoutingKeyForDelay($delay),
-            AMQP_NOPARAM,
             [
                 'headers' => $headers,
-            ]
+            ],
+            $amqpStamp
+        );
+    }
+
+    private function publishOnExchange(\AMQPExchange $exchange, string $body, string $routingKey = null, array $attributes = [], AmqpStamp $amqpStamp = null)
+    {
+        $exchange->publish(
+            $body,
+            $routingKey,
+            $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM,
+            array_merge($amqpStamp ? $amqpStamp->getAttributes() : [], $attributes)
         );
     }
 

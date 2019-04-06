@@ -13,7 +13,9 @@ namespace Symfony\Component\Messenger\Tests\Transport\AmqpExt;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpFactory;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
 
 /**
@@ -430,7 +432,7 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key');
 
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages?exchange[default_publish_routing_key]=default_routing_key', [], $factory);
-        $connection->publish('body', [], 0, 'routing_key');
+        $connection->publish('body', [], 0, new AmqpStamp('routing_key'));
     }
 
     public function testItDelaysTheMessageWithTheInitialSuppliedRoutingKeyAsArgument()
@@ -477,7 +479,27 @@ class ConnectionTest extends TestCase
         $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_120000');
 
         $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_120000', AMQP_NOPARAM, ['headers' => []]);
-        $connection->publish('{}', [], 120000, 'routing_key');
+        $connection->publish('{}', [], 120000, new AmqpStamp('routing_key'));
+    }
+
+    public function testItCanPublishWithCustomFlagsAndAttributes()
+    {
+        $factory = new TestAmqpFactory(
+            $amqpConnection = $this->createMock(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $amqpQueue = $this->createMock(\AMQPQueue::class),
+            $amqpExchange = $this->createMock(\AMQPExchange::class)
+        );
+
+        $amqpExchange->expects($this->once())->method('publish')->with(
+            'body',
+            'routing_key',
+            AMQP_IMMEDIATE,
+            ['delivery_mode' => 2, 'headers' => ['type' => DummyMessage::class]]
+        );
+
+        $connection = Connection::fromDsn('amqp://localhost/%2f/messages', [], $factory);
+        $connection->publish('body', ['type' => DummyMessage::class], 0, new AmqpStamp('routing_key', AMQP_IMMEDIATE, ['delivery_mode' => 2]));
     }
 }
 

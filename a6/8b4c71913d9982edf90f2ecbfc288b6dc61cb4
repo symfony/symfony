@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by rpkamp at 2018-12-16T13:12:42Z
+
+Rebased and force pushed to fix merge conflict.
+
+Could I get a review here please? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-01-22T08:43:10Z
+
+Rebased again.
+
+Could you have a look please @nicolas-grekas? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-03-22T21:58:23Z
+
+@nicolas-grekas I've rebased onto master and stopped using `ContainerBuilder::fileExists()` for translation resources altogether since the container no longer needs to track any changes in translation files - catalogues are fully handling that now.
+
+This prevents a full container rebuild if any of the translation directories it was tracking but did not exist is created - it will only rebuild the Catalogue in that case, which is much faster.
+
+I've also added some tests.
+
+Could you check again please? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-03-26T08:21:50Z
+
+Failing tests are unrelated (I think).
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2019-03-29T19:05:28Z
+
+Hi @rpkamp, I have a similar issue that your PR could solve.  [Here](https://github.com/php-translation/symfony-bundle/issues/198) the use case and the steps to reproduce it. I'll try your PR with my scenario to test if it solves the problem.
+
+Do you have a scenario to be reproduced?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-03-29T19:21:34Z
+
+This PR makes sure that catalogues also track directories that were found empty when scanning for translation files, where they didn't before.
+
+So yes, if I understand correctly this PR is also a fix for your problem, @welcoMattic :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-03-30T08:36:03Z
+
+Rebased on master again. This time the failed build on Travis is definitely unrelated :slightly_smiling_face:
+
+Ping @nicolas-grekas, could you review again please?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-01T13:30:08Z
+
+The list of files being loaded is still built by the container. So AFAICT, this change does not allow removing the resources at the container-level (we would still need to build the new list).
+The only benefit of that change would be that the translator cache would be invalidated when adding new files too, solving #27600 (which is already a good move).
+Some attempt was done in the past to include a hash of the list of resource files in the cache key, but this was reverted due to bad effects.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-04-01T15:17:43Z
+
+> So AFAICT, this change does not allow removing the resources at the container-level (we would still need to build the new list).
+
+This change is already removing the resources from the container, and everything works fine without the container knowing where translations files reside. Why would it need to know about those?
+
+The only reason I can think of is if I add another translations path to the framework, but then the resource where I define that is not fresh anymore, so the container would be rebuilt, and the change would cascade to the catalogues.
+
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-04-03T20:51:36Z
+
+Comments processed @fabpot. Could you check again please?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-06T18:30:53Z
+
+Think it's right now but @fabpot should have a quick look still.

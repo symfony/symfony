@@ -31,14 +31,16 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
     private const RANGE_API = 'https://api.pwnedpasswords.com/range/%s';
 
     private $httpClient;
+    private $charset;
 
-    public function __construct(HttpClientInterface $httpClient = null)
+    public function __construct(HttpClientInterface $httpClient = null, string $charset = 'UTF-8')
     {
         if (null === $httpClient && !class_exists(HttpClient::class)) {
             throw new \LogicException(sprintf('The "%s" class requires the "HttpClient" component. Try running "composer require symfony/http-client".', self::class));
         }
 
         $this->httpClient = $httpClient ?? HttpClient::create();
+        $this->charset = $charset;
     }
 
     /**
@@ -59,6 +61,10 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
         $value = (string) $value;
         if ('' === $value) {
             return;
+        }
+
+        if ('UTF-8' !== $this->charset) {
+            $value = mb_convert_encoding($value, 'UTF-8', $this->charset);
         }
 
         $hash = strtoupper(sha1($value));

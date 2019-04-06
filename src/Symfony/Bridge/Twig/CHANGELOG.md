@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the `form_parent()` function that allows to reliably retrieve the parent form in Twig templates
+ * added the `workflow_transition_blockers()` function
 
 4.2.0
 -----

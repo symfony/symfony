@@ -1,7 +1,11 @@
 framework:
     workflows:
         legacy:
-            type: workflow
+            type: state_machine
+            marking_store:
+                type: single_state
+                arguments:
+                    - state
             initial_place: draft
             supports:
                 - stdClass

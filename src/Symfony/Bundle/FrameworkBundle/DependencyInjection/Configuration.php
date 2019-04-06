@@ -282,8 +282,15 @@ class Configuration implements ConfigurationInterface
                                         ->fixXmlConfig('argument')
                                         ->children()
                                             ->enumNode('type')
-                                                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3. Use "method" instead as it will be the only option in Symfony 5.0.')
                                                 ->values(['multiple_state', 'single_state', 'method'])
+                                                ->validate()
+                                                    ->ifTrue(function ($v) { return 'method' !== $v; })
+                                                    ->then(function ($v) {
+                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', E_USER_DEPRECATED);
+
+                                                        return $v;
+                                                    })
+                                                ->end()
                                             ->end()
                                             ->arrayNode('arguments')
                                                 ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3. Use "property" instead.')
@@ -296,7 +303,7 @@ class Configuration implements ConfigurationInterface
                                                 ->end()
                                             ->end()
                                             ->scalarNode('property')
-                                                ->defaultNull()
+                                                ->defaultValue('marking')
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()
@@ -309,10 +316,6 @@ class Configuration implements ConfigurationInterface
                                         ->validate()
                                             ->ifTrue(function ($v) { return !empty($v['arguments']) && isset($v['service']); })
                                             ->thenInvalid('"arguments" and "service" cannot be used together.')
-                                        ->end()
-                                        ->validate()
-                                            ->ifTrue(function ($v) { return !empty($v['property']) && isset($v['service']); })
-                                            ->thenInvalid('"property" and "service" cannot be used together.')
                                         ->end()
                                     ->end()
                                     ->arrayNode('supports')

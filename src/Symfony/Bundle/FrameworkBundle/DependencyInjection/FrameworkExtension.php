@@ -644,14 +644,15 @@ class FrameworkExtension extends Extension
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new ChildDefinition('workflow.marking_store.'.$workflow['marking_store']['type']);
-                foreach ($workflow['marking_store']['arguments'] as $argument) {
-                    $markingStoreDefinition->addArgument($argument);
-                }
                 if ('method' === $workflow['marking_store']['type']) {
                     $markingStoreDefinition->setArguments([
                         'state_machine' === $type, //single state
-                        $workflow['marking_store']['property'] ?? 'marking',
+                        $workflow['marking_store']['property'],
                     ]);
+                } else {
+                    foreach ($workflow['marking_store']['arguments'] as $argument) {
+                        $markingStoreDefinition->addArgument($argument);
+                    }
                 }
             } elseif (isset($workflow['marking_store']['service'])) {
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
@@ -676,10 +677,6 @@ class FrameworkExtension extends Extension
                 case 'state_machine' === $workflow['type']:
                     $validator = new Workflow\Validator\StateMachineValidator();
                     break;
-                case 'method' === ($workflow['marking_store']['type'] ?? null):
-                    $singlePlace = $workflow['marking_store']['arguments'][0] ?? false;
-                    $validator = new Workflow\Validator\WorkflowValidator($singlePlace);
-                    break;
                 case 'single_state' === ($workflow['marking_store']['type'] ?? null):
                     $validator = new Workflow\Validator\WorkflowValidator(true);
                     break;
@@ -687,6 +684,7 @@ class FrameworkExtension extends Extension
                     $validator = new Workflow\Validator\WorkflowValidator(false);
                     break;
             }
+
             if ($validator) {
                 $realDefinition = (new Workflow\DefinitionBuilder($places))
                     ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {

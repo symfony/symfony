@@ -9,10 +9,6 @@
     <framework:config>
         <framework:workflow name="article" type="workflow">
             <framework:initial-marking>draft</framework:initial-marking>
-            <framework:marking-store>
-                <framework:argument>a</framework:argument>
-                <framework:argument>a</framework:argument>
-            </framework:marking-store>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place>draft</framework:place>
             <framework:place>wait_for_journalist</framework:place>

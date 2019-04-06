@@ -64,6 +64,7 @@
         <service id="validator.not_compromised_password" class="Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator">
             <argument type="service" id="http_client" on-invalid="null" />
             <argument>%kernel.charset%</argument>
+            <argument type="constant">false</argument>
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator" />
         </service>
 

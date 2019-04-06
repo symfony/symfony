@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-04-06T14:21:53Z
+
+FrameworkBundle should define a service for that constraint validator, passing `%kernel.charset%` for this argument. Otherwise, customizing this charset will be a pain in a fullstack project.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T14:33:37Z
+
+@stof that's the aim, but it can be the subject of another PR IMO.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T15:32:05Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T16:34:51Z
+
+Based on https://github.com/symfony/symfony/pull/30889, otherwise ready to review.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-06T16:38:23Z
+
+@tgalopin Can you  rebase?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T16:44:22Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-04-06T17:09:34Z
+
+Updated

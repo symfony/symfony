@@ -28,40 +28,22 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     private const PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL = 'https://api.pwnedpasswords.com/range/3EF27'; // https://api.pwnedpasswords.com/range/3EF27 is the range for the value "apiError"
     private const PASSWORD_LEAKED = 'maman';
     private const PASSWORD_NOT_LEAKED = ']<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy';
+    private const PASSWORD_NON_UTF8_LEAKED = 'мама';
+    private const PASSWORD_NON_UTF8_NOT_LEAKED = 'м<в0dp3r4\45b28Hy';
 
     private const RETURN = [
         '35E033023A46402F94CFB4F654C5BFE44A1:1',
         '35F079CECCC31812288257CD770AA7968D7:53',
-        '36039744C253F9B2A4E90CBEDB02EBFB82D:5', // this is the matching line, password: maman
+        '36039744C253F9B2A4E90CBEDB02EBFB82D:5', // UTF-8 leaked password: maman
+        '273CA8A2A78C9B2D724144F4FAF4D221C86:6', // ISO-8859-5 leaked password: мама
         '3686792BBC66A72D40D928ED15621124CFE:7',
         '36EEC709091B810AA240179A44317ED415C:2',
     ];
 
     protected function createValidator()
     {
-        $httpClientStub = $this->createMock(HttpClientInterface::class);
-        $httpClientStub->method('request')->will(
-            $this->returnCallback(function (string $method, string $url): ResponseInterface {
-                if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
-                    throw new class('Problem contacting the Have I been Pwned API.') extends \Exception implements ServerExceptionInterface {
-                        public function getResponse(): ResponseInterface
-                        {
-                            throw new \RuntimeException('Not implemented');
-                        }
-                    };
-                }
-
-                $responseStub = $this->createMock(ResponseInterface::class);
-                $responseStub
-                    ->method('getContent')
-                    ->willReturn(implode("\r\n", self::RETURN));
-
-                return $responseStub;
-            })
-        );
-
-        // Pass HttpClient::create() instead of this mock to run the tests against the real API
-        return new NotCompromisedPasswordValidator($httpClientStub);
+        // Pass HttpClient::create() instead of the mock to run the tests against the real API
+        return new NotCompromisedPasswordValidator($this->createHttpClientStub());
     }
 
     public function testNullIsValid()
@@ -112,6 +94,29 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testNonUtf8CharsetValid()
+    {
+        $validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
+        $validator->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_NOT_LEAKED, 'ISO-8859-5', 'UTF-8'), new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testNonUtf8CharsetInvalid()
+    {
+        $constraint = new NotCompromisedPassword();
+
+        $this->context = $this->createContext();
+
+        $validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
+        $validator->initialize($this->context);
+        $validator->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_LEAKED, 'ISO-8859-5', 'UTF-8'), $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -141,5 +146,31 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
         $this->assertTrue(true); // No exception have been thrown
+    }
+
+    private function createHttpClientStub(): HttpClientInterface
+    {
+        $httpClientStub = $this->createMock(HttpClientInterface::class);
+        $httpClientStub->method('request')->will(
+            $this->returnCallback(function (string $method, string $url): ResponseInterface {
+                if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
+                    throw new class('Problem contacting the Have I been Pwned API.') extends \Exception implements ServerExceptionInterface {
+                        public function getResponse(): ResponseInterface
+                        {
+                            throw new \RuntimeException('Not implemented');
+                        }
+                    };
+                }
+
+                $responseStub = $this->createMock(ResponseInterface::class);
+                $responseStub
+                    ->method('getContent')
+                    ->willReturn(implode("\r\n", self::RETURN));
+
+                return $responseStub;
+            })
+        );
+
+        return $httpClientStub;
     }
 }

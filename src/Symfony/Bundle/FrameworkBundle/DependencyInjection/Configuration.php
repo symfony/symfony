@@ -233,7 +233,7 @@ class Configuration implements ConfigurationInterface
                                     $workflows = [];
                                 }
 
-                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_places', 'places', 'transitions']))) {
+                                if (1 === \count($workflows) && isset($workflows['workflows']) && array_keys($workflows['workflows']) !== range(0, \count($workflows) - 1) && !empty(array_diff(array_keys($workflows['workflows']), ['audit_trail', 'type', 'marking_store', 'supports', 'support_strategy', 'initial_marking', 'places', 'transitions']))) {
                                     $workflows = $workflows['workflows'];
                                 }
 
@@ -258,9 +258,17 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('workflows')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
+                                ->beforeNormalization()
+                                    ->always(function ($v) {
+                                        if (isset($v['initial_place'])) {
+                                            $v['initial_marking'] = [$v['initial_place']];
+                                        }
+
+                                        return $v;
+                                    })
+                                ->end()
                                 ->fixXmlConfig('support')
                                 ->fixXmlConfig('place')
-                                ->fixXmlConfig('initial_place')
                                 ->fixXmlConfig('transition')
                                 ->children()
                                     ->arrayNode('audit_trail')
@@ -275,8 +283,17 @@ class Configuration implements ConfigurationInterface
                                         ->children()
                                             ->enumNode('type')
                                                 ->values(['multiple_state', 'single_state', 'method'])
+                                                ->validate()
+                                                    ->ifTrue(function ($v) { return 'method' !== $v; })
+                                                    ->then(function ($v) {
+                                                        @trigger_error('Passing something else than "method" has been deprecated in Symfony 4.3.', E_USER_DEPRECATED);
+
+                                                        return $v;
+                                                    })
+                                                ->end()
                                             ->end()
                                             ->arrayNode('arguments')
+                                                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3. Use "property" instead.')
                                                 ->beforeNormalization()
                                                     ->ifString()
                                                     ->then(function ($v) { return [$v]; })
@@ -284,6 +301,9 @@ class Configuration implements ConfigurationInterface
                                                 ->requiresAtLeastOneElement()
                                                 ->prototype('scalar')
                                                 ->end()
+                                            ->end()
+                                            ->scalarNode('property')
+                                                ->defaultValue('marking')
                                             ->end()
                                             ->scalarNode('service')
                                                 ->cannotBeEmpty()
@@ -315,10 +335,10 @@ class Configuration implements ConfigurationInterface
                                         ->cannotBeEmpty()
                                     ->end()
                                     ->scalarNode('initial_place')
-                                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3, use the "initial_places" configuration key instead.')
+                                        ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.3, use the "initial_marking" configuration key instead.')
                                         ->defaultNull()
                                     ->end()
-                                    ->arrayNode('initial_places')
+                                    ->arrayNode('initial_marking')
                                         ->beforeNormalization()
                                             ->ifTrue(function ($v) { return !\is_array($v); })
                                             ->then(function ($v) { return [$v]; })
@@ -453,6 +473,16 @@ class Configuration implements ConfigurationInterface
                                         return !$v['supports'] && !isset($v['support_strategy']);
                                     })
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return 'workflow' === $v['type'] && 'single_state' === ($v['marking_store']['type'] ?? false);
+                                    })
+                                    ->then(function ($v) {
+                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', E_USER_DEPRECATED);
+
+                                        return $v;
+                                    })
                                 ->end()
                             ->end()
                         ->end()

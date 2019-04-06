@@ -8,11 +8,7 @@
 
     <framework:config>
         <framework:workflow name="article" type="workflow">
-            <framework:initial-place>draft</framework:initial-place>
-            <framework:marking-store type="multiple_state">
-                <framework:argument>a</framework:argument>
-                <framework:argument>a</framework:argument>
-            </framework:marking-store>
+            <framework:initial-marking>draft</framework:initial-marking>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place name="draft" />
             <framework:place name="wait_for_journalist" />

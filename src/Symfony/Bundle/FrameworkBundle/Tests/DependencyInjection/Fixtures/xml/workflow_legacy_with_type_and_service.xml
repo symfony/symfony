@@ -8,7 +8,7 @@
 
     <framework:config>
         <framework:workflow name="my_workflow">
-            <framework:marking-store type="multiple_state" service="workflow_service" />
+            <framework:marking-store type="method" service="workflow_service" />
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place name="first" />
             <framework:place name="last" />

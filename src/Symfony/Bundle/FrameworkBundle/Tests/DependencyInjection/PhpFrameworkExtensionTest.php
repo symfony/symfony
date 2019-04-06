@@ -89,10 +89,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * @expectedExceptionMessage The marking store of workflow "article" can not store many places. But the transition "a_to_b" has too many output (2). Only one is accepted.
+     * @group legacy
+     * @expectedDeprecation Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.
      */
-    public function testWorkflowValidationMethodSingle()
+    public function testWorkflowDeprecateWorkflowSingleState()
     {
         $this->createContainerFromClosure(function ($container) {
             $container->loadFromExtension('framework', [
@@ -100,10 +100,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
                     'article' => [
                         'type' => 'workflow',
                         'marking_store' => [
-                            'type' => 'method',
-                            'arguments' => [
-                                true,
-                            ],
+                            'type' => 'single_state',
                         ],
                         'supports' => [
                             __CLASS__,
@@ -116,7 +113,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
                         'transitions' => [
                             'a_to_b' => [
                                 'from' => ['a'],
-                                'to' => ['b', 'c'],
+                                'to' => ['b'],
                             ],
                         ],
                     ],
@@ -125,42 +122,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         });
     }
 
-    public function testWorkflowValidationMethodNotSingle()
-    {
-        $this->createContainerFromClosure(function ($container) {
-            $container->loadFromExtension('framework', [
-                'workflows' => [
-                    'article' => [
-                        'type' => 'workflow',
-                        'marking_store' => [
-                            'type' => 'method',
-                            'arguments' => [
-                                false,
-                            ],
-                        ],
-                        'supports' => [
-                            __CLASS__,
-                        ],
-                        'places' => [
-                            'a',
-                            'b',
-                            'c',
-                        ],
-                        'transitions' => [
-                            'a_to_b' => [
-                                'from' => ['a'],
-                                'to' => ['b', 'c'],
-                            ],
-                        ],
-                    ],
-                ],
-            ]);
-        });
-
-        // the test ensures that the validation does not fail (i.e. it does not throw any exceptions)
-        $this->addToAssertionCount(1);
-    }
-
+    /**
+     * @group legacy
+     */
     public function testWorkflowValidationMultipleState()
     {
         $this->createContainerFromClosure(function ($container) {
@@ -197,6 +161,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage The marking store of workflow "article" can not store many places. But the transition "a_to_b" has too many output (2). Only one is accepted.
+     * @group legacy
      */
     public function testWorkflowValidationSingleState()
     {

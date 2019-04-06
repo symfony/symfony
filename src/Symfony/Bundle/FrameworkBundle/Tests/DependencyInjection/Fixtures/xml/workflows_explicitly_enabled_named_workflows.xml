@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:workflow enabled="true" name="workflows" type="workflow">
-            <framework:initial-place>bar</framework:initial-place>
+            <framework:initial-marking>bar</framework:initial-marking>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place>bar</framework:place>
             <framework:place>baz</framework:place>

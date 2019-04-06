@@ -1,11 +1,15 @@
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest;
-
 $container->loadFromExtension('framework', [
     'workflows' => [
         'legacy' => [
-            'type' => 'workflow',
+            'type' => 'state_machine',
+            'marking_store' => [
+                'type' => 'single_state',
+                'arguments' => [
+                    'state',
+                ],
+            ],
             'supports' => [
                 stdClass::class,
             ],

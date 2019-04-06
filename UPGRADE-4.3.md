@@ -166,11 +166,6 @@ Workflow
               initial_places: [draft]
    ```
 
-Yaml
-----
-
- * Using a mapping inside a multi-line string is deprecated and will throw a `ParseException` in 5.0.
-
 Workflow
 --------
 
@@ -202,19 +197,22 @@ Workflow
    ```yaml
    framework:
        workflows:
+           type: workflow
            article:
                marking_store:
                    type: multiple
+                   arguments: states
    ```
 
    After:
    ```yaml
    framework:
        workflows:
+           type: workflow
            article:
                marking_store:
                    type: method
-
+                   property: states
    ```
 
  * `SingleStateMarkingStore` is deprecated. Use `MethodMarkingStore` instead.
@@ -225,7 +223,30 @@ Workflow
        workflows:
            article:
                marking_store:
-                   type: single
+                   arguments: state
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           type: state_machine
+           article:
+               marking_store:
+                   type: method
+                   property: state
+   ```
+
+ * Using a workflow with a single state marking is deprecated. Use a state machine instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: workflow
+               marking_store:
+                   type: single_state
    ```
 
    After:
@@ -233,8 +254,13 @@ Workflow
    framework:
        workflows:
            article:
+               type: state_machine
                marking_store:
+                   # type: single_state # Since the single_state marking store is deprecated, use method instead
                    type: method
-                   arguments:
-                       - true
    ```
+
+Yaml
+----
+
+ * Using a mapping inside a multi-line string is deprecated and will throw a `ParseException` in 5.0.

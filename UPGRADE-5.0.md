@@ -388,8 +388,68 @@ Workflow
  * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.
  * `MarkingStoreInterface::setMarking()` has a third argument: `array $context = []`.
  * Removed support of `initial_place`. Use `initial_places` instead.
- * `MultipleStateMarkingStore` has been removed.
- * `SingleStateMarkingStore` has been removed.
+ * `MultipleStateMarkingStore` has been removed. Use `MethodMarkingStore` instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           type: workflow
+           article:
+               marking_store:
+                   type: multiple
+                   arguments: states
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           type: workflow
+           article:
+               marking_store:
+                   property: states
+   ```
+ * `SingleStateMarkingStore` has been removed. Use `MethodMarkingStore` instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               marking_store:
+                   arguments: state
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               marking_store:
+                   property: state
+   ```
+
+
+ * Support for using a workflow with a single state marking is dropped. Use a state machine instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: workflow
+               marking_store:
+                   type: single_state
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: state_machine
+   ```
 
 Yaml
 ----

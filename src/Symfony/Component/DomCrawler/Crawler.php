@@ -61,23 +61,14 @@ class Crawler implements \Countable, \IteratorAggregate
     private $html5Parser;
 
     /**
-     * @param mixed     $node           A Node to use as the base for the crawling
-     * @param string    $uri            The current URI
-     * @param string    $baseHref       The base href value
-     * @param bool|null $useHtml5Parser Whether the Crawler should use the HTML5 parser or the native DOM parser
+     * @param mixed  $node     A Node to use as the base for the crawling
+     * @param string $uri      The current URI
+     * @param string $baseHref The base href value
      */
-    public function __construct($node = null, string $uri = null, string $baseHref = null, bool $useHtml5Parser = null)
+    public function __construct($node = null, string $uri = null, string $baseHref = null)
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
-
-        if ($useHtml5Parser && !class_exists(HTML5::class)) {
-            throw new \LogicException('Using the DomCrawler HTML5 parser requires the html5-php library. Try running "composer require masterminds/html5".');
-        }
-
-        if ($useHtml5Parser ?? class_exists(HTML5::class)) {
-            $this->html5Parser = new HTML5(['disable_html_ns' => true]);
-        }
 
         $this->add($node);
     }
@@ -198,6 +189,13 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
+        // Use HTML5 parser if the content is HTML5 and the library is available
+        if (!$this->html5Parser
+            && class_exists(HTML5::class)
+            && '<!doctype html>' === strtolower(substr(ltrim($content), 0, 15))) {
+            $this->html5Parser = new HTML5(['disable_html_ns' => true]);
+        }
+
         $dom = null !== $this->html5Parser ? $this->parseHtml5($content, $charset) : $this->parseXhtml($content, $charset);
         $this->addDocument($dom);
 
@@ -1219,6 +1217,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $crawler->isHtml = $this->isHtml;
         $crawler->document = $this->document;
         $crawler->namespaces = $this->namespaces;
+        $crawler->html5Parser = $this->html5Parser;
 
         return $crawler;
     }

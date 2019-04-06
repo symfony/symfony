@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Transport that stay in memory. Useful for testing purpose.
+ * Transport that stays in memory. Useful for testing purpose.
  *
  * @author Gary PEGEOT <garypegeot@gmail.com>
  *

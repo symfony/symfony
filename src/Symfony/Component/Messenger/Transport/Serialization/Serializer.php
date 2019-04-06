@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -70,10 +71,11 @@ class Serializer implements SerializerInterface
         }
 
         $stamps = $this->decodeStamps($encodedEnvelope);
+        $serializerStamp = $this->findFirstSerializerStamp($stamps);
 
         $context = $this->context;
-        if (isset($stamps[SerializerStamp::class])) {
-            $context = end($stamps[SerializerStamp::class])->getContext() + $context;
+        if (null !== $serializerStamp) {
+            $context = $serializerStamp->getContext() + $context;
         }
 
         try {
@@ -137,5 +139,19 @@ class Serializer implements SerializerInterface
         }
 
         return $headers;
+    }
+
+    /**
+     * @param StampInterface[] $stamps
+     */
+    private function findFirstSerializerStamp(array $stamps): ?SerializerStamp
+    {
+        foreach ($stamps as $stamp) {
+            if ($stamp instanceof SerializerStamp) {
+                return $stamp;
+            }
+        }
+
+        return null;
     }
 }

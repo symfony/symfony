@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
 
 class SerializerTest extends TestCase
 {
@@ -75,11 +76,23 @@ class SerializerTest extends TestCase
 
     public function testEncodedWithSymfonySerializerForStamps()
     {
-        $serializer = new Serializer();
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class)
+        );
 
-        $envelope = (new Envelope(new DummyMessage('Hello')))
+        $envelope = (new Envelope($message = new DummyMessage('test')))
             ->with($serializerStamp = new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
-            ->with($validationStamp = new ValidationStamp(['foo', 'bar']))
+            ->with($validationStamp = new ValidationStamp(['foo', 'bar']));
+
+        $symfonySerializer
+            ->expects($this->at(2))
+            ->method('serialize')->with(
+                $message,
+                'json',
+                [
+                    ObjectNormalizer::GROUPS => ['foo'],
+                ]
+            )
         ;
 
         $encoded = $serializer->encode($envelope);
@@ -89,11 +102,41 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('type', $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.SerializerStamp::class, $encoded['headers']);
         $this->assertArrayHasKey('X-Message-Stamp-'.ValidationStamp::class, $encoded['headers']);
+    }
 
-        $decoded = $serializer->decode($encoded);
+    public function testDecodeWithSymfonySerializerStamp()
+    {
+        $serializer = new Serializer(
+            $symfonySerializer = $this->createMock(SerializerComponentInterface::class)
+        );
 
-        $this->assertEquals($serializerStamp, $decoded->last(SerializerStamp::class));
-        $this->assertEquals($validationStamp, $decoded->last(ValidationStamp::class));
+        $symfonySerializer
+            ->expects($this->at(0))
+            ->method('deserialize')
+            ->with('[{"context":{"groups":["foo"]}}]', SerializerStamp::class.'[]', 'json', [])
+            ->willReturn([new SerializerStamp(['groups' => ['foo']])])
+        ;
+
+        $symfonySerializer
+            ->expects($this->at(1))
+            ->method('deserialize')->with(
+                '{}',
+                DummyMessage::class,
+                'json',
+                [
+                    ObjectNormalizer::GROUPS => ['foo'],
+                ]
+            )
+            ->willReturn(new DummyMessage('test'))
+        ;
+
+        $serializer->decode([
+            'body' => '{}',
+            'headers' => [
+                'type' => DummyMessage::class,
+                'X-Message-Stamp-'.SerializerStamp::class => '[{"context":{"groups":["foo"]}}]',
+            ],
+        ]);
     }
 
     public function testDecodingFailsWithBadFormat()

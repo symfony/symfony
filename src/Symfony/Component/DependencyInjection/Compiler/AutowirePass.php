@@ -158,7 +158,15 @@ class AutowirePass extends AbstractRecursivePass
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
             } else {
-                $reflectionMethod = $this->getReflectionMethod(new Definition($reflectionClass->name), $method);
+                $definition = new Definition($reflectionClass->name);
+                try {
+                    $reflectionMethod = $this->getReflectionMethod($definition, $method);
+                } catch (RuntimeException $e) {
+                    if ($definition->getFactory()) {
+                        continue;
+                    }
+                    throw $e;
+                }
             }
 
             $arguments = $this->autowireMethod($reflectionMethod, $arguments);

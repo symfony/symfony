@@ -16,11 +16,14 @@ use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -110,6 +113,23 @@ class ResolveBindingsPassTest extends TestCase
         (new ResolveBindingsPass())->process($container);
 
         $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
+    }
+
+    public function testWithNonExistingSetterAndBinding()
+    {
+        $container = new ContainerBuilder();
+
+        $bindings = [
+            '$c' => (new Definition('logger'))->setFactory('logger'),
+        ];
+
+        $definition = $container->register(HttpKernelInterface::class, HttpKernelInterface::class);
+        $definition->addMethodCall('setLogger');
+        $definition->setBindings($bindings);
+        $this->expectException(RuntimeException::class);
+
+        $pass = new ResolveBindingsPass();
+        $pass->process($container);
     }
 
     public function testTupleBinding()

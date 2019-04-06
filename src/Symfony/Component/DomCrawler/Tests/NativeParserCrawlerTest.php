@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
-use Symfony\Component\DomCrawler\Crawler;
-
 class NativeParserCrawlerTest extends AbstractCrawlerTest
 {
-    public function createCrawler($node = null, string $uri = null, string $baseHref = null)
+    public function getDoctype(): string
     {
-        return new Crawler($node, $uri, $baseHref, false);
+        return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
     }
 
     public function testAddHtmlContentWithErrors()
@@ -26,7 +24,7 @@ class NativeParserCrawlerTest extends AbstractCrawlerTest
 
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent(<<<'EOF'
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
     <head>
     </head>
@@ -51,7 +49,7 @@ EOF
 
         $crawler = $this->createCrawler();
         $crawler->addXmlContent(<<<'EOF'
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
     <head>
     </head>

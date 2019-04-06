@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
-use Symfony\Component\DependencyInjection\Tests\Dumper\YamlDumperTest;
 use Symfony\Component\Yaml\Yaml;
 
 class EnvVarProcessorTest extends TestCase

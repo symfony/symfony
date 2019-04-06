@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by BentCoder at 2019-02-04T19:27:50Z
+
+Please correct me if I am wrong. As far as I can see, this PR addresses **only** the second section of the [referencing issue](https://github.com/symfony/symfony/issues/29950) which is "MessageBus::dispatch" where `RoutingKeyStamp` feature was suggested. If so, is there a plan to address the first section "AMQP configuration" where we can define multiple routing keys for given queue? There is [an example](https://github.com/symfony/symfony/pull/28772#issuecomment-455875152) what example I mean by that if you wonder.
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-29T15:44:02Z
+
+Thanks for the PR! Let's chat about this :).
+
+This is related to @BentCoder's comment here: https://github.com/symfony/symfony/pull/28772#issuecomment-455875152
+
+We can (or will soon) have the ability for `messenger:consume` to consume multiple transports at one time, in order of priority. So, I thought we could possibly solve this problem not by using a single transport with multiple queues, but by creating multiple transports, each with 1 queue. But, it's awkward, and a bit confusing as it sort of "works against" the nature of AMQP.
+
+So, yea, I think we still *do* need another PR that allows people to create multiple queues per AMQP transport, each with one or more routing keys.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-29T17:12:48Z
+
+I've added the second half of this (many queues per transport) on #30770.
+
+@G15N Your work is included over on my PR. However, I did NOT intend to "hijack" your PR. In fact, I'm super busy and *nothing* would make me happier than for you to pull my 1 new commit back into your branch, and for you to be able to finish everything right here. I realize that this is now bigger than you initially may have thought, but if you are interested in finishing this, please let me know and please do! You can always ping me directly on the Symfony Slack if you have any questions.
+
+@BentCoder Can you check out #30770 to make sure it accomplishes what you need and makes sense?
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by BentCoder at 2019-03-29T19:30:17Z
+
+> @BentCoder Can you check out #30770 to make sure it accomplishes what you need and makes sense?
+>
+> Cheers!
+
+@weaverryan I left a small confirmation question there if you kindly check. Thanks
+
+---------------------------------------------------------------------------
+
+by G15N at 2019-03-29T19:35:16Z
+
+> if you are interested in finishing this, please let me know and please do!
+
+Yup, I am. I'll grab your last commit and work on top of it from now.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-30T14:04:14Z
+
+Thank you @G15N! There is one comment on my PR about changing “routing_keys” to “binds” (or something like that), which is probably a good idea.
+
+---------------------------------------------------------------------------
+
+by BentCoder at 2019-03-30T19:08:22Z
+
+@weaverryan I can confirm that it does what I asked for. Thank you guys.
+
+---------------------------------------------------------------------------
+
+by G15N at 2019-03-31T12:43:25Z
+
+I renamed the key used to bind the queue to the exchange as `binding_key`. The one used by the exchange to route the message is still named `routing_key`.
+
+---
+
+What about the [`ReceiverInterface`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Messenger/Transport/Receiver/ReceiverInterface.php) ?
+
+Actually, `ack` and `reject` methods don't accept the queue name as an argument. But, `AmqpReceiver` implementation now need it: https://github.com/symfony/symfony/pull/30008/commits/b357f5f668a7435d48725b242d4e221b7b603c81#diff-7ebc83440dab2caf52e1aa32dcae92a9R302.
+
+Should I use the `AmqpReceivedStamp` stamp to map the queue from which the message is coming from ?
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T12:53:49Z
+
+> Should I use the AmqpReceivedStamp stamp to map the queue from which the message is coming from ?
+
+Yep, you can do that 👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-01T15:34:43Z
+
+@G15N Can you check the test failures?
+
+I have one outstanding question to @sroze
+
+---------------------------------------------------------------------------
+
+by G15N at 2019-04-02T19:33:13Z
+
+@sroze Should be OK now, I missed this one, ty.
+
+Do you guys mind telling me the way I can inject settings from the configuration file associated to this component in a symfony project ? I'm talking about `config/packages/messenger.yml`. Do I have to do it here ? Did I miss a README somewhere ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-03T15:51:02Z
+
+@G15N Sorry, can you rebase 1 more time? There are still a lot of things being merged into the component :).
+
+> Do you guys mind telling me the way I can inject settings from the configuration file associated to this component in a symfony project ? I'm talking about config/packages/messenger.yml. Do I have to do it here ? Did I miss a README somewhere ?
+
+Can you explain more what you're trying to accomplish? I don't quite understand :).
+
+---------------------------------------------------------------------------
+
+by bigfoot90 at 2019-04-03T21:57:16Z
+
+I think @G15N was talking abount recipes configuration https://github.com/symfony/recipes/blob/master/symfony/messenger/4.1/
+
+---------------------------------------------------------------------------
+
+by G15N at 2019-04-04T06:30:08Z
+
+> I think @G15N was talking abount recipes configuration https://github.com/symfony/recipes/blob/master/symfony/messenger/4.1/
+
+Ya, thanks
+
+---------------------------------------------------------------------------
+
+by G15N at 2019-04-04T09:18:38Z
+
+@sroze Done ^^
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-06T10:15:19Z
+
+@Nyholm great points. I've kept `channel`, `queue` and `exchange` public (because it's a legit extension point) and added a mention of the BC break on the `Connection` 👍

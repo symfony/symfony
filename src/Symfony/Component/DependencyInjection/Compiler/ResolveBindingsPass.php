@@ -115,7 +115,14 @@ class ResolveBindingsPass extends AbstractRecursivePass
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
             } else {
-                $reflectionMethod = $this->getReflectionMethod($value, $method);
+                try {
+                    $reflectionMethod = $this->getReflectionMethod($value, $method);
+                } catch (RuntimeException $e) {
+                    if ($value->getFactory()) {
+                        continue;
+                    }
+                    throw $e;
+                }
             }
 
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {

@@ -40,9 +40,14 @@
             <argument type="service" id="file_locator" />
         </service>
 
+        <service id="routing.loader.service.container" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoaderContainer">
+            <argument type="service" id="service_container" />
+            <argument type="tagged_locator" tag="routing.router_loader" index-by="service_id" />
+        </service>
+
         <service id="routing.loader.service" class="Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader">
             <tag name="routing.loader" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="routing.loader.service.container" />
         </service>
 
         <service id="routing.loader" class="Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader" public="true">

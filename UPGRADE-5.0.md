@@ -284,6 +284,7 @@ Routing
    options have been removed.
  * `Route` and `CompiledRoute` don't implement `Serializable` anymore; if you serialize them, please
    ensure your unserialization logic can recover from a failure related to an updated serialization format
+ * The router loader services must be tagged with `routing.router_loader`.
 
 Security
 --------

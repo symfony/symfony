@@ -92,6 +92,7 @@ use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoaderInterface;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Security\Core\Security;
@@ -428,6 +429,9 @@ class FrameworkExtension extends Extension
         if (!$config['disallow_search_engine_index'] ?? false) {
             $container->removeDefinition('disallow_search_engine_index_response_listener');
         }
+
+        $container->registerForAutoconfiguration(ServiceRouterLoaderInterface::class)
+            ->addTag('routing.router_loader');
     }
 
     /**

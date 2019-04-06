@@ -334,6 +334,10 @@
                 <source>This value should be valid JSON.</source>
                 <target>Ez az érték érvényes JSON kell, hogy legyen.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ez a gyűjtemény csak egyedi elemeket tartalmazhat.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -97,10 +97,10 @@ class GuardListener
         }
 
         if (null !== $this->roleHierarchy && method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
-            $roleNames = $this->roleHierarchy->getReachableRoleNames($roles);
+            $roleNames = $this->roleHierarchy->getReachableRoleNames($roleNames);
             $roles = array_map(function (string $role) { return new Role($role, false); }, $roleNames);
         } elseif (null !== $this->roleHierarchy) {
-            $roles = $this->roleHierarchy->getReachableRoles($token->getRoles(false));
+            $roles = $this->roleHierarchy->getReachableRoles($roles);
             $roleNames = array_map(function (Role $role) { return $role->getRole(); }, $roles);
         }
 

@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -114,5 +115,17 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     public function isFileUpload($data)
     {
         return $data instanceof File;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getUploadFileError($data)
+    {
+        if (!$data instanceof UploadedFile || $data->isValid()) {
+            return null;
+        }
+
+        return $data->getError();
     }
 }

@@ -136,6 +136,30 @@ class NativeRequestHandler implements RequestHandlerInterface
     }
 
     /**
+     * @return int|null
+     */
+    public function getUploadFileError($data)
+    {
+        if (!\is_array($data)) {
+            return null;
+        }
+
+        if (!isset($data['error'])) {
+            return null;
+        }
+
+        if (!\is_int($data['error'])) {
+            return null;
+        }
+
+        if (UPLOAD_ERR_OK === $data['error']) {
+            return null;
+        }
+
+        return $data['error'];
+    }
+
+    /**
      * Returns the method used to submit the request to the server.
      *
      * @return string The request method

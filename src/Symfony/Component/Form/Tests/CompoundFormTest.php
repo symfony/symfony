@@ -450,6 +450,31 @@ class CompoundFormTest extends AbstractFormTest
         $form->setData('foo');
     }
 
+    public function testSetDataDoesNotMapViewDataToChildrenWithLockedSetData()
+    {
+        $mapper = new PropertyPathMapper();
+        $viewData = [
+            'firstName' => 'Fabien',
+            'lastName' => 'Pot',
+        ];
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->addViewTransformer(new FixedDataTransformer([
+                '' => '',
+                'foo' => $viewData,
+            ]))
+            ->getForm();
+
+        $form->add($child1 = $this->getBuilder('firstName')->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->setData('Potencier')->setDataLocked(true)->getForm());
+
+        $form->setData('foo');
+
+        $this->assertSame('Fabien', $form->get('firstName')->getData());
+        $this->assertSame('Potencier', $form->get('lastName')->getData());
+    }
+
     public function testSubmitSupportsDynamicAdditionAndRemovalOfChildren()
     {
         $form = $this->form;

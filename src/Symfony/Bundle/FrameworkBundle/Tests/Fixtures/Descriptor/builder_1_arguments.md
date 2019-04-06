@@ -18,6 +18,18 @@ Definitions
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 
+### definition_without_class
+
+- Class: ``
+- Public: no
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- Arguments: no
+
 ### service_container
 
 - Description: `ContainerInterface is the interface implemented by service container classes.`

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.43.65",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Đảo Ascension",
         "AD": "Andorra",
@@ -146,7 +146,7 @@
         "MF": "St. Martin",
         "MG": "Madagascar",
         "MH": "Quần đảo Marshall",
-        "MK": "Macedonia",
+        "MK": "Bắc Macedonia",
         "ML": "Mali",
         "MM": "Myanmar (Miến Điện)",
         "MN": "Mông Cổ",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Wallis và Futuna",
         "WS": "Samoa",
+        "XA": "XA",
+        "XB": "XB",
         "XK": "Kosovo",
         "YE": "Yemen",
         "YT": "Mayotte",

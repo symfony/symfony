@@ -1,9 +1,6 @@
 {
-    "Version": "2.1.44.88",
+    "Version": "2.1.48.89",
     "Names": {
-        "af": "isiBhulu",
-        "en": "isiNgesi",
-        "xh": "isiXhosa",
-        "zu": "isiZulu"
+        "xh": "isiXhosa"
     }
 }

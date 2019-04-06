@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.50",
+    "Version": "2.1.48.77",
     "Names": {
         "AC": "Ostrvo Asension",
         "AD": "Andora",
@@ -146,7 +146,7 @@
         "MF": "Sveti Martin (Francuska)",
         "MG": "Madagaskar",
         "MH": "Maršalska Ostrva",
-        "MK": "Makedonija",
+        "MK": "Severna Makedonija",
         "ML": "Mali",
         "MM": "Mijanmar (Burma)",
         "MN": "Mongolija",
@@ -248,6 +248,8 @@
         "VU": "Vanuatu",
         "WF": "Valis i Futuna",
         "WS": "Samoa",
+        "XA": "XA",
+        "XB": "XB",
         "XK": "Kosovo",
         "YE": "Jemen",
         "YT": "Majot",

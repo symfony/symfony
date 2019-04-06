@@ -188,7 +188,7 @@ class MarkdownDescriptor extends Descriptor
     {
         $output = '';
 
-        if ('' !== $classDescription = $this->getClassDescription($definition->getClass())) {
+        if ('' !== $classDescription = $this->getClassDescription((string) $definition->getClass())) {
             $output .= '- Description: `'.$classDescription.'`'."\n";
         }
 

@@ -300,9 +300,7 @@ class PdoStore implements StoreInterface
     {
         $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
 
-        $stmt = $this->getConnection()->prepare($sql);
-
-        $stmt->execute();
+        $this->getConnection()->exec($sql);
     }
 
     private function getDriver(): string

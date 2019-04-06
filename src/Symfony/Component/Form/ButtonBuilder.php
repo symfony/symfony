@@ -22,9 +22,6 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 {
-    /**
-     * @var bool
-     */
     protected $locked = false;
 
     /**
@@ -530,6 +527,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getEventDispatcher()
     {
+        return null;
     }
 
     /**
@@ -545,6 +543,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getPropertyPath()
     {
+        return null;
     }
 
     /**
@@ -612,6 +611,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getDataMapper()
     {
+        return null;
     }
 
     /**
@@ -649,6 +649,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getEmptyData()
     {
+        return null;
     }
 
     /**
@@ -691,6 +692,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getData()
     {
+        return null;
     }
 
     /**
@@ -698,6 +700,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getDataClass()
     {
+        return null;
     }
 
     /**
@@ -715,6 +718,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getFormFactory()
     {
+        throw new BadMethodCallException('Buttons do not support adding children.');
     }
 
     /**
@@ -722,6 +726,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getAction()
     {
+        return null;
     }
 
     /**
@@ -729,6 +734,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getMethod()
     {
+        return null;
     }
 
     /**
@@ -736,6 +742,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function getRequestHandler()
     {
+        return null;
     }
 
     /**

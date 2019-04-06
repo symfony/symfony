@@ -36,7 +36,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * The type guesser provided by this extension.
      *
-     * @var FormTypeGuesserInterface
+     * @var FormTypeGuesserInterface|null
      */
     private $typeGuesser;
 
@@ -136,7 +136,7 @@ abstract class AbstractExtension implements FormExtensionInterface
     /**
      * Registers the type guesser.
      *
-     * @return FormTypeGuesserInterface|null A type guesser
+     * @return FormTypeGuesserInterface|null
      */
     protected function loadTypeGuesser()
     {

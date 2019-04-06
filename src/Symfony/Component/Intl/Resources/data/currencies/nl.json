@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.45.14",
+    "Version": "2.1.48.86",
     "Names": {
         "ADP": [
             "ADP",
@@ -1032,6 +1032,10 @@
         "UYU": [
             "UYU",
             "Uruguayaanse peso"
+        ],
+        "UYW": [
+            "UYW",
+            "Uruguayaanse nominale salarisindexeenheid"
         ],
         "UZS": [
             "UZS",

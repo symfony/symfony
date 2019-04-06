@@ -350,6 +350,10 @@
                 <source>This value should be either negative or zero.</source>
                 <target>This value should be either negative or zero.</target>
             </trans-unit>
+            <trans-unit id="91">
+                <source>This collection should contain only unique elements.</source>
+                <target>This collection should contain only unique elements.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

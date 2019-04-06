@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.20",
+    "Version": "2.1.48.42",
     "Names": {
         "aa": "Afar",
         "ab": "Abkhaz",
@@ -81,6 +81,7 @@
         "car": "Karib",
         "cay": "Cayuga",
         "cch": "Atsam",
+        "ccp": "Chakma",
         "ce": "Chechen",
         "ceb": "Cebuano",
         "cgg": "Kiga",
@@ -151,6 +152,8 @@
         "fo": "Faroe",
         "fon": "Fon",
         "fr": "Prancis",
+        "fr_CA": "Perancis (Kanada)",
+        "fr_CH": "Perancis (Swiss)",
         "frc": "Prancis Cajun",
         "frm": "Prancis Abad Pertengahan",
         "fro": "Prancis Kuno",

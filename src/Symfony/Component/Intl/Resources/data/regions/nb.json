@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.44.2",
+    "Version": "2.1.48.42",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -146,7 +146,7 @@
         "MF": "Saint-Martin",
         "MG": "Madagaskar",
         "MH": "Marshalløyene",
-        "MK": "Makedonia",
+        "MK": "Nord-Makedonia",
         "ML": "Mali",
         "MM": "Myanmar (Burma)",
         "MN": "Mongolia",
@@ -215,7 +215,7 @@
         "SV": "El Salvador",
         "SX": "Sint Maarten",
         "SY": "Syria",
-        "SZ": "Swaziland",
+        "SZ": "Eswatini",
         "TA": "Tristan da Cunha",
         "TC": "Turks- og Caicosøyene",
         "TD": "Tsjad",

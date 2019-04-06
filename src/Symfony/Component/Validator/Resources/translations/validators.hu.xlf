@@ -330,6 +330,10 @@
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
                 <target>Ez a Bankazonosító kód (BIC) nem kapcsolódik az IBAN kódhoz ({{ iban }}).</target>
             </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Ez az érték érvényes JSON kell, hogy legyen.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

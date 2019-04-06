@@ -72,10 +72,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
         // Add to "children" to maintain order
         $this->children[$child] = null;
-        $this->unresolvedChildren[$child] = [
-            'type' => $type,
-            'options' => $options,
-        ];
+        $this->unresolvedChildren[$child] = [$type, $options];
 
         return $this;
     }
@@ -143,15 +140,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        if (isset($this->unresolvedChildren[$name])) {
-            return true;
-        }
-
-        if (isset($this->children[$name])) {
-            return true;
-        }
-
-        return false;
+        return isset($this->unresolvedChildren[$name]) || isset($this->children[$name]);
     }
 
     /**
@@ -223,7 +212,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * {@inheritdoc}
      *
-     * @return FormBuilderInterface[]
+     * @return FormBuilderInterface[]|\Traversable
      */
     public function getIterator()
     {
@@ -239,12 +228,11 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     private function resolveChild(string $name): FormBuilderInterface
     {
-        $info = $this->unresolvedChildren[$name];
-        $child = $this->create($name, $info['type'], $info['options']);
-        $this->children[$name] = $child;
+        list($type, $options) = $this->unresolvedChildren[$name];
+
         unset($this->unresolvedChildren[$name]);
 
-        return $child;
+        return $this->children[$name] = $this->create($name, $type, $options);
     }
 
     /**
@@ -253,7 +241,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     private function resolveChildren()
     {
         foreach ($this->unresolvedChildren as $name => $info) {
-            $this->children[$name] = $this->create($name, $info['type'], $info['options']);
+            $this->children[$name] = $this->create($name, $info[0], $info[1]);
         }
 
         $this->unresolvedChildren = [];

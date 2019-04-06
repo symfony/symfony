@@ -131,8 +131,11 @@
         .tree .tree-inner:hover {
             background: #dfdfdf;
         }
+        .tree .tree-inner:hover span:not(.has-error) {
+            color: var(--base-0);
+        }
         .tree .tree-inner.active, .tree .tree-inner.active:hover {
-            background: #E0E0E0;
+            background: var(--tree-active-background);
             font-weight: bold;
         }
         .tree .tree-inner.active .toggle-icon, .tree .tree-inner:hover .toggle-icon, .tree .tree-inner.active:hover .toggle-icon {
@@ -153,7 +156,7 @@
         }
         .badge-error {
             float: right;
-            background: #B0413E;
+            background: var(--background-error);
             color: #FFF;
             padding: 1px 4px;
             font-size: 10px;
@@ -161,17 +164,17 @@
             vertical-align: middle;
         }
         .has-error {
-            color: #B0413E;
+            color: var(--color-error);
         }
         .errors h3 {
-            color: #B0413E;
+            color: var(--color-error);
         }
         .errors th {
-            background: #B0413E;
+            background: var(--background-error);
             color: #FFF;
         }
         .errors .toggle-icon {
-            background-color: #B0413E;
+            background-color: var(--background-error);
         }
         h3 a, h3 a:hover, h3 a:focus {
             color: inherit;
@@ -182,6 +185,20 @@
         }
         h3.form-data-type + h3 {
             margin-top: 1em;
+        }
+        .theme-dark .toggle-icon {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAVUExURUdwTH+Ag0lNUZiYmGRmbP///zU5P2n9VV4AAAAFdFJOUwCv+yror0g1sQAAAE1JREFUGNNjSFM0YGBgEEpjSGEAAzcGBQiDiUEAwmBkMIAwmBmwgVAgQGWgA7h2uIFwK+CWwp1BpHtYA6DuATEYkBlY3IOmBq6dCPcAAKMtEEs3tfChAAAAAElFTkSuQmCC');
+        }
+        .theme-dark .toggle-icon.empty {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAASUExURUdwTDI3OzQ5PS4uLjU3PzU5P4keoyIAAAAFdFJOUwBApgtzrnKGEwAAADJJREFUCNdjCFU0YGBgEAplCGEAA1cGBQiDiUEAwmBkMIAwmBnIA3DtcAPhVsAthTkDACsZBBmrTTSxAAAAAElFTkSuQmCC');
+        }
+        .theme-dark .tree .tree-inner.active .toggle-icon, .theme-dark .tree .tree-inner:hover .toggle-icon, .theme-dark  .tree .tree-inner.active:hover .toggle-icon {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgBAMAAADpp+X/AAAAD1BMVEVHcEx/gIOYmJiZmZn///+IJ2wIAAAAA3RSTlMAryoIUq0uAAAAUElEQVQY02NgYFQ2NjYWYGBgMAYDBgZmCMOAQRjCMGRQhjCMoEqAipAYLkCAykBXA9cONxBuBdxShDOIc4+JM9Q9IIYxMgOLe9DUwLUT4R4AznguG0qfEa0AAAAASUVORK5CYII=');
+            background-color: transparent;
+        }
+        .theme-dark .tree .tree-inner.active .toggle-icon.empty, .theme-dark .tree .tree-inner:hover .toggle-icon.empty, .theme-dark  .tree .tree-inner.active:hover .toggle-icon.empty {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEVHcEwyNzuqqqrd9nIgAAAAAnRSTlMAQABPjKgAAAArSURBVAjXY2BctcqBgWvVqgUMWqtWrWDIWrVqJcMqICCGACsGawMbADIKANflJYEoGMqtAAAAAElFTkSuQmCC');
+            background-color: transparent;
         }
     </style>
 {% endblock %}

@@ -6,6 +6,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Tests\Dumper\YamlDumperTest;
+use Symfony\Component\Yaml\Yaml;
 
 class EnvVarProcessorTest extends TestCase
 {
@@ -289,7 +291,7 @@ class EnvVarProcessorTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Invalid JSON env var
-     * @dataProvider otherJsonValues
+     * @dataProvider nonArrayOrNullValues
      */
     public function testGetEnvJsonOther($value)
     {
@@ -302,7 +304,7 @@ class EnvVarProcessorTest extends TestCase
         });
     }
 
-    public function otherJsonValues()
+    public function nonArrayOrNullValues()
     {
         return [
             [1],
@@ -311,6 +313,75 @@ class EnvVarProcessorTest extends TestCase
             [false],
             ['foo'],
         ];
+    }
+
+    /**
+     * @dataProvider validYaml
+     */
+    public function testGetEnvYaml($value, $processed)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('yaml', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return $value;
+        });
+
+        $this->assertSame($processed, $result);
+    }
+
+    public function validYaml()
+    {
+        return [
+            ["key:\n    subkey: value", ['key' => ['subkey' => 'value']]],
+        ];
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid YAML
+     */
+    public function testGetEnvInvalidYaml()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('yaml', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return 'this ain\'t yaml';
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to parse YAML
+     */
+    public function testGetEnvUnparseableYaml()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('yaml', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return 'data: !!binary "SGVsbG8d29ybGQ="'; // length is not a multiple of four
+        });
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Invalid YAML env var
+     * @dataProvider nonArrayOrNullValues
+     */
+    public function testGetEnvYamlOther($value)
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('yaml', 'foo', function ($name) use ($value) {
+            $this->assertSame('foo', $name);
+
+            return Yaml::dump($value);
+        });
     }
 
     /**

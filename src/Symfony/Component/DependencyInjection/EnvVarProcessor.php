@@ -13,6 +13,8 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -180,6 +182,20 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
             if (null !== $env && !\is_array($env)) {
                 throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, %s given.', $name, \gettype($env)));
+            }
+
+            return $env;
+        }
+
+        if ('yaml' === $prefix) {
+            try {
+                $env = Yaml::parse($env);
+            } catch (ParseException $exception) {
+                throw new RuntimeException(sprintf('Unable to parse YAML in env var "%s": '.$exception->getMessage(), $name), 0, $exception);
+            }
+
+            if (null !== $env && !\is_array($env)) {
+                throw new RuntimeException(sprintf('Invalid YAML env var "%s": array or null expected, %s given.', $name, \gettype($env)));
             }
 
             return $env;

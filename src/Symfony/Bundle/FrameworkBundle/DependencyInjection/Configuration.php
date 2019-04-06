@@ -474,6 +474,16 @@ class Configuration implements ConfigurationInterface
                                     })
                                     ->thenInvalid('"supports" or "support_strategy" should be configured.')
                                 ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) {
+                                        return 'workflow' === $v['type'] && 'single_state' === ($v['marking_store']['type'] ?? false);
+                                    })
+                                    ->then(function ($v) {
+                                        @trigger_error('Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.', E_USER_DEPRECATED);
+
+                                        return $v;
+                                    })
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

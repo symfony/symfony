@@ -430,6 +430,27 @@ Workflow
                    property: state
    ```
 
+
+ * Support for using a workflow with a single state marking is dropped. Use a state machine instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: workflow
+               marking_store:
+                   type: single_state
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: state_machine
+   ```
+
 Yaml
 ----
 

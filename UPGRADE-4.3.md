@@ -237,6 +237,29 @@ Workflow
                    property: state
    ```
 
+ * Using a workflow with a single state marking is deprecated. Use a state machine instead.
+
+   Before:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: workflow
+               marking_store:
+                   type: single_state
+   ```
+
+   After:
+   ```yaml
+   framework:
+       workflows:
+           article:
+               type: state_machine
+               marking_store:
+                   # type: single_state # Since the single_state marking store is deprecated, use method instead
+                   type: method
+   ```
+
 Yaml
 ----
 

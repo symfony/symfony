@@ -90,6 +90,40 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 
     /**
      * @group legacy
+     * @expectedDeprecation Using a workflow with type=workflow and a marking_store=single_state is deprecated since Symfony 4.3. Use type=state_machine instead.
+     */
+    public function testWorkflowDeprecateWorkflowSingleState()
+    {
+        $this->createContainerFromClosure(function ($container) {
+            $container->loadFromExtension('framework', [
+                'workflows' => [
+                    'article' => [
+                        'type' => 'workflow',
+                        'marking_store' => [
+                            'type' => 'single_state',
+                        ],
+                        'supports' => [
+                            __CLASS__,
+                        ],
+                        'places' => [
+                            'a',
+                            'b',
+                            'c',
+                        ],
+                        'transitions' => [
+                            'a_to_b' => [
+                                'from' => ['a'],
+                                'to' => ['b'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        });
+    }
+
+    /**
+     * @group legacy
      */
     public function testWorkflowValidationMultipleState()
     {

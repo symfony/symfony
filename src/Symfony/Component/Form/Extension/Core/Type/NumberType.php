@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -33,6 +34,10 @@ class NumberType extends AbstractType
             $options['rounding_mode'],
             $options['html5'] ? 'en' : null
         ));
+
+        if ('string' === $options['input']) {
+            $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
+        }
     }
 
     /**
@@ -56,6 +61,7 @@ class NumberType extends AbstractType
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'compound' => false,
+            'input' => 'number',
             'html5' => false,
         ]);
 
@@ -68,7 +74,7 @@ class NumberType extends AbstractType
             NumberToLocalizedStringTransformer::ROUND_UP,
             NumberToLocalizedStringTransformer::ROUND_CEILING,
         ]);
-
+        $resolver->setAllowedValues('input', ['number', 'string']);
         $resolver->setAllowedTypes('scale', ['null', 'int']);
         $resolver->setAllowedTypes('html5', 'bool');
 

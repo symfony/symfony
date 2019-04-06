@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * StoreFactory create stores and connections.
@@ -23,9 +25,9 @@ use Symfony\Component\Lock\Exception\InvalidArgumentException;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper $connection
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper|string $connection Connection or DSN or Store short name
      *
-     * @return RedisStore|MemcachedStore|ZookeeperStore
+     * @return StoreInterface
      */
     public static function createStore($connection)
     {
@@ -45,7 +47,21 @@ class StoreFactory
         if ($connection instanceof \Zookeeper) {
             return new ZookeeperStore($connection);
         }
+        if (!\is_string($connection)) {
+            throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
+        }
 
-        throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
+        switch (true) {
+            case 'flock' === $connection:
+                return new FlockStore();
+            case 0 === strpos($connection, 'flock://'):
+                return new FlockStore(substr($connection, 8));
+            case 'semaphore' === $connection:
+                return new SemaphoreStore();
+            case preg_match('#^[a-z]++://#', $connection):
+                return static::createStore(AbstractAdapter::createConnection($connection));
+            default:
+                throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));
+        }
     }
 }

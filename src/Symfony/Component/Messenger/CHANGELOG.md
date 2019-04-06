@@ -18,6 +18,13 @@ CHANGELOG
    changed: a required 3rd `SerializerInterface` argument was added.
  * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to
    explicitly handle messages synchronously.
+ * Added `AmqpRoutingKeyStamp` allowing to provide a routing key on message publishing.
+ * [BC BREAK] Removed publishing with a `routing_key` option from queue configuration, for
+   AMQP. Use exchange `default_publish_routing_key` or `AmqpRoutingKeyStamp` instead.
+ * [BC BREAK] Changed the `queue` option in the AMQP transport DSN to be `queues[name]`. You can 
+   therefore name the queue but also configure `binding_keys`, `flags` and `arguments`.
+ * [BC BREAK] The methods `get`, `ack`, `nack` and `queue` of the AMQP `Connection` 
+   have a new argument: the queue name.
  * Added optional parameter `prefetch_count` in connection configuration, 
    to setup channel prefetch count.
  * New classes: `RoutableMessageBus`, `AddBusNameStampMiddleware`
@@ -71,6 +78,7 @@ CHANGELOG
    only. Pass the `auto_setup` connection option to control this.
  * Added a `SetupTransportsCommand` command to setup the transports
  * Added a Doctrine transport. For example, use the `doctrine://default` DSN (this uses the `default` Doctrine entity manager)
+ * [BC BREAK] The `getConnectionConfiguration` method on Amqp's `Connection` has been removed. 
 
 4.2.0
 -----

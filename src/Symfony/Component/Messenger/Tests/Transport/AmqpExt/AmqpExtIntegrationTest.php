@@ -49,7 +49,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
         $receiver = new AmqpReceiver($connection, $serializer);
@@ -79,7 +79,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
         $receiver = new AmqpReceiver($connection, $serializer);
@@ -126,7 +126,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send(new Envelope(new DummyMessage('Hello')));
@@ -173,7 +173,7 @@ TXT
 
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
-        $connection->queue()->purge();
+        $connection->purgeQueues();
 
         $sender = new AmqpSender($connection, $serializer);
 
@@ -182,7 +182,7 @@ TXT
         $sender->send(new Envelope(new DummyMessage('Third')));
 
         sleep(1); // give amqp a moment to have the messages ready
-        $this->assertSame(3, $connection->countMessagesInQueue());
+        $this->assertSame(3, $connection->countMessagesInQueues());
     }
 
     private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)

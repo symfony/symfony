@@ -40,6 +40,8 @@ class DebugClassLoader
     private static $annotatedParameters = [];
     private static $darwinCache = ['/' => ['/', []]];
     private static $method = [];
+    private static $namespaceRemappings = null;
+    private static $shortNamespacesCache = [];
 
     public function __construct(callable $classLoader)
     {
@@ -83,7 +85,7 @@ class DebugClassLoader
     /**
      * Wraps all autoloaders.
      */
-    public static function enable(): void
+    public static function enable(array $deprecationsNamespacesMapping = null): void
     {
         // Ensures we don't hit https://bugs.php.net/42098
         class_exists('Symfony\Component\ErrorHandler\ErrorHandler');
@@ -92,6 +94,8 @@ class DebugClassLoader
         if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
+
+        self::$namespaceRemappings = $deprecationsNamespacesMapping;
 
         foreach ($functions as $function) {
             spl_autoload_unregister($function);
@@ -114,6 +118,8 @@ class DebugClassLoader
         if (!\is_array($functions = spl_autoload_functions())) {
             return;
         }
+
+        self::$namespaceRemappings = null;
 
         foreach ($functions as $function) {
             spl_autoload_unregister($function);
@@ -217,14 +223,6 @@ class DebugClassLoader
     {
         $deprecations = [];
 
-        // Don't trigger deprecations for classes in the same vendor
-        if (2 > $len = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
-            $len = 0;
-            $ns = '';
-        } else {
-            $ns = str_replace('_', '\\', substr($class, 0, $len));
-        }
-
         // Detect annotations on the class
         if (false !== $doc = $refl->getDocComment()) {
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
@@ -268,16 +266,18 @@ class DebugClassLoader
 
         // Detect if the parent is annotated
         foreach ($parentAndOwnInterfaces + class_uses($class, false) as $use) {
+            $areFromTheSameVendor = null;
+
             if (!isset(self::$checkedClasses[$use])) {
                 $this->checkClass($use);
             }
-            if (isset(self::$deprecated[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len) && !isset(self::$deprecated[$class])) {
+            if (isset(self::$deprecated[$use]) && !isset(self::$deprecated[$class]) && !$areFromTheSameVendor = $this->areFromTheSameVendor($class, $use)) {
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
                 $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $class, $type, $verb, $use, self::$deprecated[$use]);
             }
-            if (isset(self::$internal[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len)) {
+            if (isset(self::$internal[$use]) && !($areFromTheSameVendor ?? $this->areFromTheSameVendor($class, $use))) {
                 $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $class);
             }
             if (isset(self::$method[$use])) {
@@ -332,7 +332,7 @@ class DebugClassLoader
 
             if (isset(self::$internalMethods[$class][$method->name])) {
                 list($declaringClass, $message) = self::$internalMethods[$class][$method->name];
-                if (strncmp($ns, $declaringClass, $len)) {
+                if (!$this->areFromTheSameVendor($class, $declaringClass)) {
                     $deprecations[] = sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
                 }
             }
@@ -517,5 +517,35 @@ class DebugClassLoader
         }
 
         return $ownInterfaces;
+    }
+
+    private function areFromTheSameVendor(string $class, string $use): bool
+    {
+        if (!isset(self::$shortNamespacesCache[$class])) {
+            if (!$defaultBehavior = !\is_array(self::$namespaceRemappings)) {
+                $mappedNamespace = $class;
+                while (($defaultBehavior = !isset(self::$namespaceRemappings[$mappedNamespace])) && false !== $lastBackslashPosition = strrpos($mappedNamespace, '\\')) {
+                    $mappedNamespace = substr($mappedNamespace, 0, $lastBackslashPosition);
+                }
+
+                if (!$defaultBehavior) {
+                    self::$shortNamespacesCache[$class] = [\strlen(self::$namespaceRemappings[$mappedNamespace]), self::$namespaceRemappings[$mappedNamespace]];
+                }
+            }
+
+            if ($defaultBehavior) {
+                if (2 > $len = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
+                    // The class is in the root namespace.
+                    $len = 0;
+                    $ns = '';
+                } else {
+                    $ns = str_replace('_', '\\', substr($class, 0, $len));
+                }
+
+                self::$shortNamespacesCache[$class] = [$len, $ns];
+            }
+        }
+
+        return 0 === strncmp(self::$shortNamespacesCache[$class][1], str_replace('_', '\\', $use), $len ?? $len = self::$shortNamespacesCache[$class][0]);
     }
 }

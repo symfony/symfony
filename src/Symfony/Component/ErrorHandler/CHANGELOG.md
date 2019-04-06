@@ -5,3 +5,4 @@ CHANGELOG
 -----
 
  * added the component
+ * added argument `$namespaceRemappings` to `DebugClassLoader::enable()`

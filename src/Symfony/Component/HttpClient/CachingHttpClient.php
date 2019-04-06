@@ -46,7 +46,7 @@ class CachingHttpClient implements HttpClientInterface
         }
 
         $this->client = $client;
-        $kernel = new HttpClientKernel($client, $logger);
+        $kernel = new HttpClientKernel($client);
         $this->cache = new HttpCache($kernel, $store, null, $defaultOptions);
 
         unset($defaultOptions['debug']);

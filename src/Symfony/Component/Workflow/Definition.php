@@ -94,7 +94,7 @@ final class Definition
 
     private function setInitialPlaces($places = null)
     {
-        if (null === $places) {
+        if (!$places) {
             return;
         }
 

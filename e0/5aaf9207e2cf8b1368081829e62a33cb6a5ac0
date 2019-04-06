@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-04-06T15:38:39Z
+
+I like this PR. Thank you
+👍
+
+--------------
+
+Just and FYI:
+
+In xliff we have `notes` and `target-attributes`. Here we introduce `sources`, `comments` and `flags`.
+
+We maybe should have 4 standard thing keys that are shared over all dumpers/loaders.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-06T16:45:07Z
+
+Looks like the tests are broken by the features introduced in this PR. @deguif Can you have a look?
+
+---------------------------------------------------------------------------
+
+by deguif at 2019-04-06T17:16:38Z
+
+Please don't merge, I will rebase it once #30919 will get merged.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-06T17:57:57Z
+
+@deguif You can rebase this one now.
+
+---------------------------------------------------------------------------
+
+by deguif at 2019-04-06T19:16:12Z
+
+@fabpot this should be mergeable, test failures are not related.

@@ -234,6 +234,7 @@ class ConfigurationTest extends TestCase
                     'paths' => [],
                 ],
                 'auto_mapping' => [],
+                'disable_not_compromised_password' => false,
             ],
             'annotations' => [
                 'cache' => 'php_array',

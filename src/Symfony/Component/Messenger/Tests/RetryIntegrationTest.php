@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -22,7 +20,7 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\MessageHandlerFailingFirstTimes;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageHandlerFailingFirstTimes;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Worker;
@@ -43,8 +41,8 @@ class RetryIntegrationTest extends TestCase
 
         $senderLocator = new SendersLocator([], ['*' => true]);
 
-        $handler = new MessageHandlerFailingFirstTimes();
-        $throwingHandler = new MessageHandlerFailingFirstTimes(1);
+        $handler = new DummyMessageHandlerFailingFirstTimes();
+        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
         $handlerLocator = new HandlersLocator([
             DummyMessage::class => [
                 'handler' => $handler,

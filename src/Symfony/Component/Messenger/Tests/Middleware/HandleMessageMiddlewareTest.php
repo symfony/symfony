@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\ChainedHandlerFailedException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
@@ -52,7 +52,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         try {
             $envelope = $middleware->handle($envelope, $this->getStackMock($nextIsCalled));
-        } catch (ChainedHandlerFailedException $e) {
+        } catch (HandlerFailedException $e) {
             $envelope = $e->getEnvelope();
         }
 

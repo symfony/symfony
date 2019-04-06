@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Middleware;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\ChainedHandlerFailedException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -79,7 +79,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
         }
 
         if (\count($exceptions)) {
-            throw new ChainedHandlerFailedException($envelope, ...$exceptions);
+            throw new HandlerFailedException($envelope, $exceptions);
         }
 
         return $stack->next()->handle($envelope, $stack);

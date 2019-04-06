@@ -13,6 +13,7 @@ namespace Symfony\Component\BrowserKit;
 
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -43,13 +44,10 @@ class HttpBrowser extends AbstractBrowser
     protected function doRequest($request)
     {
         $headers = $this->getHeaders($request);
-        $body = '';
-        if (null !== $part = $this->getBody($request)) {
-            $headers = array_merge($headers, $part->getPreparedHeaders()->toArray());
-            $body = $part->bodyToIterable();
-        }
+        [$body, $extraHeaders] = $this->getBodyAndExtraHeaders($request);
+
         $response = $this->client->request($request->getMethod(), $request->getUri(), [
-            'headers' => $headers,
+            'headers' => array_merge($headers, $extraHeaders),
             'body' => $body,
             'max_redirects' => 0,
         ]);
@@ -57,10 +55,13 @@ class HttpBrowser extends AbstractBrowser
         return new Response($response->getContent(false), $response->getStatusCode(), $response->getHeaders(false));
     }
 
-    private function getBody(Request $request): ?AbstractPart
+    /**
+     * @return array [$body, $headers]
+     */
+    private function getBodyAndExtraHeaders(Request $request): array
     {
         if (\in_array($request->getMethod(), ['GET', 'HEAD'])) {
-            return null;
+            return ['', []];
         }
 
         if (!class_exists(AbstractPart::class)) {
@@ -68,19 +69,33 @@ class HttpBrowser extends AbstractBrowser
         }
 
         if (null !== $content = $request->getContent()) {
-            return new TextPart($content, 'utf-8', 'plain', '8bit');
+            $part = new TextPart($content, 'utf-8', 'plain', '8bit');
+
+            return [$part->bodyToString(), $part->getPreparedHeaders()->toArray()];
         }
 
         $fields = $request->getParameters();
+        $hasFile = false;
         foreach ($request->getFiles() as $name => $file) {
             if (!isset($file['tmp_name'])) {
                 continue;
             }
 
+            $hasFile = true;
             $fields[$name] = DataPart::fromPath($file['tmp_name'], $file['name']);
         }
 
-        return new FormDataPart($fields);
+        if ($hasFile) {
+            $part = new FormDataPart($fields);
+
+            return [$part->bodyToIterable(), $part->getPreparedHeaders()->toArray()];
+        }
+
+        if (empty($fields)) {
+            return ['', []];
+        }
+
+        return [http_build_query($fields, '', '&', PHP_QUERY_RFC1738), ['Content-Type' => 'application/x-www-form-urlencoded']];
     }
 
     private function getHeaders(Request $request): array

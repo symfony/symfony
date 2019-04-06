@@ -62,16 +62,16 @@ class SimpleFormTest extends AbstractFormTest
         $config = new FormConfigBuilder($name, null, $this->dispatcher);
         $form = new Form($config);
 
-        $this->assertEquals(new PropertyPath($propertyPath), $form->getPropertyPath());
+        $this->assertEquals($propertyPath, $form->getPropertyPath());
     }
 
     public function provideFormNames()
     {
         yield [null, null];
         yield ['', null];
-        yield ['0', '0'];
-        yield [0, '0'];
-        yield ['name', 'name'];
+        yield ['0', new PropertyPath('0')];
+        yield [0, new PropertyPath('0')];
+        yield ['name', new PropertyPath('name')];
     }
 
     public function testDataIsInitializedToConfiguredValue()

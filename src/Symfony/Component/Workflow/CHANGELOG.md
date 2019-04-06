@@ -6,6 +6,7 @@ CHANGELOG
 
  * Trigger `entered` event for subject entering in the Workflow for the first time.
  * Added a context to `Workflow::apply()`. The `MethodMarkingStore` could be used to leverage this feature.
+ * The `TransitionEvent` is able to modify the context.
  * Add style to transitions by declaring metadata:
 
     use Symfony\Component\Workflow\Definition;

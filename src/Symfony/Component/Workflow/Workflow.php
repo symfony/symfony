@@ -176,7 +176,7 @@ class Workflow implements WorkflowInterface
 
             $this->leave($subject, $transition, $marking);
 
-            $this->transition($subject, $transition, $marking);
+            $context = $this->transition($subject, $transition, $marking, $context);
 
             $this->enter($subject, $transition, $marking);
 
@@ -308,17 +308,20 @@ class Workflow implements WorkflowInterface
         }
     }
 
-    private function transition($subject, Transition $transition, Marking $marking): void
+    private function transition($subject, Transition $transition, Marking $marking, array $context): array
     {
         if (null === $this->dispatcher) {
-            return;
+            return $context;
         }
 
         $event = new TransitionEvent($subject, $marking, $transition, $this);
+        $event->setContext($context);
 
         $this->dispatcher->dispatch($event, WorkflowEvents::TRANSITION);
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.transition', $this->name));
         $this->dispatcher->dispatch($event, sprintf('workflow.%s.transition.%s', $this->name, $transition->getName()));
+
+        return $event->getContext();
     }
 
     private function enter($subject, Transition $transition, Marking $marking): void

@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Event\TransitionEvent;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -416,6 +417,21 @@ class WorkflowTest extends TestCase
         $marking = $workflow->apply($subject, 't1');
 
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
+    public function testApplyWithContext()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener('workflow.transition', function (TransitionEvent $event) {
+            $event->setContext(array_merge($event->getContext(), ['user' => 'admin']));
+        });
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher);
+
+        $workflow->apply($subject, 't1', ['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar', 'user' => 'admin'], $subject->getContext());
     }
 
     public function testEventName()

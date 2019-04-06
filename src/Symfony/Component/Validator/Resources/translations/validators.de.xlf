@@ -354,6 +354,10 @@
                 <source>This collection should contain only unique elements.</source>
                 <target>Diese Sammlung darf keine doppelten Elemente enthalten.</target>
             </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Dieser Wert ist keine gültige Zeitzone.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

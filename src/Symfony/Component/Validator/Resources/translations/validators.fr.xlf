@@ -334,6 +334,10 @@
                 <source>This value should be valid JSON.</source>
                 <target>Cette valeur doit être un JSON valide.</target>
             </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Cette valeur n'est pas un fuseau horaire valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.3.0
+-----
+
+ * changed guessing of DECIMAL to set the `input` option of `NumberType` to string
+
 4.2.0
 -----
 

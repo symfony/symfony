@@ -47,6 +47,7 @@ CHANGELOG
  * dispatch `PostSubmitEvent` on `form.post_submit`
  * dispatch `PreSetDataEvent` on `form.pre_set_data`
  * dispatch `PostSetDataEvent` on `form.post_set_data`
+ * added an `input` option to `NumberType`
 
 4.2.0
 -----

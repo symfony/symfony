@@ -47,6 +47,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'default' => 'bool|int|float|string|array',
             'string' => 'string',
             'trim' => 'string',
+            'require' => 'bool|int|float|string|array',
         ];
     }
 
@@ -102,7 +103,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             return '' === $default ? null : $this->container->getParameter($default);
         }
 
-        if ('file' === $prefix) {
+        if ('file' === $prefix || 'require' === $prefix) {
             if (!is_scalar($file = $getEnv($name))) {
                 throw new RuntimeException(sprintf('Invalid file name: env var "%s" is non-scalar.', $name));
             }
@@ -110,7 +111,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new EnvNotFoundException(sprintf('File "%s" not found (resolved from "%s").', $file, $name));
             }
 
-            return file_get_contents($file);
+            if ('file' === $prefix) {
+                return file_get_contents($file);
+            } else {
+                return require $file;
+            }
         }
 
         if (false !== $i || 'string' !== $prefix) {

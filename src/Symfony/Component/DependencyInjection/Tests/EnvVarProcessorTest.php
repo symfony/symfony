@@ -458,4 +458,32 @@ class EnvVarProcessorTest extends TestCase
             ['NULL', 'NULL'],
          ];
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvNotFoundException
+     * @expectedExceptionMessage missing-file
+     */
+    public function testRequireMissingFile()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $processor->getEnv('require', '/missing-file', function ($name) {
+            return $name;
+        });
+    }
+
+    public function testRequireFile()
+    {
+        $path = __DIR__.'/Fixtures/php/return_foo_string.php';
+
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('require', $path, function ($name) use ($path) {
+            $this->assertSame($path, $name);
+
+            return $path;
+        });
+
+        $this->assertEquals('foo', $result);
+    }
 }

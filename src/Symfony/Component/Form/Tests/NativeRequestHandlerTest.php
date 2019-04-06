@@ -275,4 +275,15 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
             'size' => '100',
         ];
     }
+
+    protected function getFailedUploadedFile($errorCode)
+    {
+        return [
+            'name' => 'upload.txt',
+            'type' => 'text/plain',
+            'tmp_name' => 'owfdskjasdfsa',
+            'error' => $errorCode,
+            'size' => 100,
+        ];
+    }
 }

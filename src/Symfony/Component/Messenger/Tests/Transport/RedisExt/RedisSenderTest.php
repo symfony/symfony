@@ -18,21 +18,20 @@ use Symfony\Component\Messenger\Transport\RedisExt\Connection;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisSender;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
-/**
- * @requires extension redis
- */
 class RedisSenderTest extends TestCase
 {
-    public function testItSendsTheEncodedMessage()
+    public function testSend()
     {
-        $envelope = Envelope::wrap(new DummyMessage('Oy'));
-        $encoded = array('body' => '...', 'headers' => array('type' => DummyMessage::class));
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->getMockBuilder(Connection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection->expects($this->once())->method('add')->with($encoded['body'], $encoded['headers']);
 
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
-
-        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
-        $connection->expects($this->once())->method('add')->with($encoded);
 
         $sender = new RedisSender($connection, $serializer);
         $sender->send($envelope);

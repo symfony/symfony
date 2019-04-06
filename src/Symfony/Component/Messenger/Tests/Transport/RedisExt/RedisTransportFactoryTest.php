@@ -17,27 +17,26 @@ use Symfony\Component\Messenger\Transport\RedisExt\RedisTransport;
 use Symfony\Component\Messenger\Transport\RedisExt\RedisTransportFactory;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
+/**
+ * @requires extension redis
+ */
 class RedisTransportFactoryTest extends TestCase
 {
     public function testSupportsOnlyRedisTransports()
     {
-        $factory = new RedisTransportFactory(
-            $this->getMockBuilder(SerializerInterface::class)->getMock()
-        );
+        $factory = new RedisTransportFactory();
 
-        $this->assertTrue($factory->supports('redis://localhost', array()));
-        $this->assertFalse($factory->supports('sqs://localhost', array()));
-        $this->assertFalse($factory->supports('invalid-dsn', array()));
+        $this->assertTrue($factory->supports('redis://localhost', []));
+        $this->assertFalse($factory->supports('sqs://localhost', []));
+        $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
-    public function testItCreatesTheTransport()
+    public function testCreateTransport()
     {
-        $factory = new RedisTransportFactory(
-            $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock()
-        );
+        $factory = new RedisTransportFactory();
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', ['foo' => 'bar']), $serializer);
 
-        $expectedTransport = new RedisTransport(Connection::fromDsn('redis://localhost', array('foo' => 'bar'), true), $serializer);
-
-        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', array('foo' => 'bar')));
+        $this->assertEquals($expectedTransport, $factory->createTransport('redis://localhost', ['foo' => 'bar'], $serializer));
     }
 }

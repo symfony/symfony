@@ -19,9 +19,6 @@ use Symfony\Component\Messenger\Transport\RedisExt\RedisTransport;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-/**
- * @requires extension redis
- */
 class RedisTransportTest extends TestCase
 {
     public function testItIsATransport()
@@ -39,16 +36,18 @@ class RedisTransportTest extends TestCase
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
-        $encodedMessage = array('body' => 'body', 'headers' => array('my' => 'header'));
 
-        $serializer->method('decode')->with($encodedMessage)->willReturn(Envelope::wrap($decodedMessage));
-        $connection->method('waitAndGet')->willReturn($encodedMessage);
+        $redisEnvelope = [
+            'id' => '5',
+            'body' => 'body',
+            'headers' => ['my' => 'header'],
+        ];
 
-        $transport->receive(function (Envelope $envelope) use ($transport, $decodedMessage) {
-            $this->assertSame($decodedMessage, $envelope->getMessage());
+        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $connection->method('get')->willReturn($redisEnvelope);
 
-            $transport->stop();
-        });
+        $envelopes = iterator_to_array($transport->get());
+        $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
     private function getTransport(SerializerInterface $serializer = null, Connection $connection = null)

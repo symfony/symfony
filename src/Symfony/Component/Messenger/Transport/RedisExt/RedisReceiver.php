@@ -11,61 +11,80 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Transport\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\RedisExt\Exception\RejectMessageExceptionInterface;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
+ * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @experimental in 4.3
  */
 class RedisReceiver implements ReceiverInterface
 {
     private $connection;
     private $serializer;
-    private $shouldStop = false;
 
-    public function __construct(Connection $connection, SerializerInterface $serializer)
+    public function __construct(Connection $connection, SerializerInterface $serializer = null)
     {
         $this->connection = $connection;
-        $this->serializer = $serializer;
+        $this->serializer = $serializer ?? new PhpSerializer();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function receive(callable $handler): void
+    public function get(): iterable
     {
-        while (!$this->shouldStop) {
-            if (null === $message = $this->connection->waitAndGet()) {
-                $handler(null);
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
+        $redisEnvelope = $this->connection->get();
 
-                continue;
-            }
-
-            try {
-                $handler($this->serializer->decode($message));
-                $this->connection->ack($message);
-            } catch (RejectMessageExceptionInterface $e) {
-                $this->connection->reject($message);
-
-                throw $e;
-            } catch (\Throwable $e) {
-                $this->connection->requeue($message);
-
-                throw $e;
-            } finally {
-                if (\function_exists('pcntl_signal_dispatch')) {
-                    pcntl_signal_dispatch();
-                }
-            }
+        if (null === $redisEnvelope) {
+            return [];
         }
+
+        try {
+            $envelope = $this->serializer->decode([
+                'body' => $redisEnvelope['body'],
+                'headers' => $redisEnvelope['headers'],
+            ]);
+        } catch (MessageDecodingFailedException $exception) {
+            $this->connection->reject($redisEnvelope['id']);
+
+            throw $exception;
+        }
+
+        yield $envelope->with(new RedisReceivedStamp($redisEnvelope['id']));
     }
 
-    public function stop(): void
+    /**
+     * {@inheritdoc}
+     */
+    public function ack(Envelope $envelope): void
     {
-        $this->shouldStop = true;
+        $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reject(Envelope $envelope): void
+    {
+        $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
+    }
+
+    private function findRedisReceivedStamp(Envelope $envelope): RedisReceivedStamp
+    {
+        /** @var RedisReceivedStamp|null $redisReceivedStamp */
+        $redisReceivedStamp = $envelope->last(RedisReceivedStamp::class);
+
+        if (null === $redisReceivedStamp) {
+            throw new LogicException('No RedisReceivedStamp found on the Envelope.');
+        }
+
+        return $redisReceivedStamp;
     }
 }

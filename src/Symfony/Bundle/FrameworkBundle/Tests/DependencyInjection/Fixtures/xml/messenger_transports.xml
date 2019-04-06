@@ -17,6 +17,7 @@
                     </framework:queue>
                 </framework:options>
             </framework:transport>
+            <framework:transport name="redis" dsn="redis://127.0.0.1:6379/messages" />
         </framework:messenger>
     </framework:config>
 </container>

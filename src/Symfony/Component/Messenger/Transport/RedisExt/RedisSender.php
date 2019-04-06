@@ -12,11 +12,14 @@
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Transport\SenderInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 /**
+ * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @experimental in 4.3
  */
 class RedisSender implements SenderInterface
 {
@@ -32,8 +35,12 @@ class RedisSender implements SenderInterface
     /**
      * {@inheritdoc}
      */
-    public function send(Envelope $envelope)
+    public function send(Envelope $envelope): Envelope
     {
-        $this->connection->add($this->serializer->encode($envelope));
+        $encodedMessage = $this->serializer->encode($envelope);
+
+        $this->connection->add($encodedMessage['body'], $encodedMessage['headers'] ?? []);
+
+        return $envelope;
     }
 }

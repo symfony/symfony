@@ -113,11 +113,11 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return $this
      *
      * @throws Exception\AlreadySubmittedException     If the form has already been submitted
-     * @throws Exception\LogicException                If the view data does not match the expected type
-     *                                                 according to {@link FormConfigInterface::getDataClass}.
+     * @throws Exception\LogicException                if the view data does not match the expected type
+     *                                                 according to {@link FormConfigInterface::getDataClass}
      * @throws Exception\RuntimeException              If listeners try to call setData in a cycle or if
      *                                                 the form inherits data from its parent
-     * @throws Exception\TransformationFailedException If the synchronization failed.
+     * @throws Exception\TransformationFailedException if the synchronization failed
      */
     public function setData($modelData);
 

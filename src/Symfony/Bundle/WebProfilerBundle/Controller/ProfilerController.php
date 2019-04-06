@@ -370,7 +370,7 @@ class ProfilerController
 
         return $this->templateManager;
     }
-    
+
     private function denyAccessIfProfilerDisabled()
     {
         if (null === $this->profiler) {

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-04T07:58:46Z
+
+Can you paste some before/after screenshots?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-04T08:30:06Z
+
+The red text on dark background for the exception message does not have enough contrast to be readable (and this gets even worse for color-blind people). As that's the most important part of the content, that should be changed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-06T16:45:45Z
+
+Is this one ready?
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-04-06T17:21:27Z
+
+@stof I've added more contrast for the red color, not only for the exception title, but for all red text (ref updated pictures)

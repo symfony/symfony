@@ -34,10 +34,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private static $nativeRequestHandler;
 
-    /**
-     * @var bool
-     */
-
+    protected $locked = false;
     private $dispatcher;
     private $name;
 

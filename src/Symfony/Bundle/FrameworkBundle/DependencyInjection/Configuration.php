@@ -903,6 +903,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
+                        ->booleanNode('throw_exception_on_invalid_property_path')->defaultTrue()->end()
                     ->end()
                 ->end()
             ->end()

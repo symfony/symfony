@@ -56,6 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private $magicCall;
     private $ignoreInvalidIndices;
+    private $ignoreInvalidProperty;
 
     /**
      * @var CacheItemPoolInterface
@@ -70,11 +71,12 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      */
-    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null)
+    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, bool $throwExceptionOnInvalidPropertyPath = true)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
+        $this->ignoreInvalidProperty = !$throwExceptionOnInvalidPropertyPath;
     }
 
     /**
@@ -87,7 +89,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         ];
 
         if (\is_object($objectOrArray) && false === strpbrk((string) $propertyPath, '.[')) {
-            return $this->readProperty($zval, $propertyPath)[self::VALUE];
+            return $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty)[self::VALUE];
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
@@ -313,7 +315,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
                 $zval = $this->readIndex($zval, $property);
             } else {
-                $zval = $this->readProperty($zval, $property);
+                $zval = $this->readProperty($zval, $property, $this->ignoreInvalidProperty);
             }
 
             // the final value of the path must not be validated
@@ -372,14 +374,15 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Reads the a property from an object.
      *
-     * @param array  $zval     The array containing the object to read from
-     * @param string $property The property to read
+     * @param array  $zval                  The array containing the object to read from
+     * @param string $property              The property to read
+     * @param bool   $ignoreInvalidProperty Whether to ignore invalid property or throw an exception
      *
      * @return array The array containing the value of the property
      *
-     * @throws NoSuchPropertyException if the property does not exist or is not public
+     * @throws NoSuchPropertyException If $ignoreInvalidProperty is false and the property does not exist or is not public
      */
-    private function readProperty($zval, $property)
+    private function readProperty($zval, $property, bool $ignoreInvalidProperty = false)
     {
         if (!\is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
@@ -411,7 +414,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             // we call the getter and hope the __call do the job
             $result[self::VALUE] = $object->{$access[self::ACCESS_NAME]}();
-        } else {
+        } elseif (!$ignoreInvalidProperty) {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
 

@@ -30,6 +30,7 @@ CHANGELOG
  * Added support for boolean container parameters within routes.
  * Added the `messenger:setup-transports` command to setup messenger transports
  * Added a `InMemoryTransport` to Messenger. Use it with a DSN starting with `in-memory://`.
+ * Added `framework.property_access.throw_exception_on_invalid_property_path` config option.
 
 4.2.0
 -----

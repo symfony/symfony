@@ -12,8 +12,8 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Luhn;
-use Symfony\Component\Validator\Constraints\NotPwned;
-use Symfony\Component\Validator\Constraints\NotPwnedValidator;
+use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
+use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NotPwnedValidatorTest extends ConstraintValidatorTestCase
+class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 {
     private const PASSWORD_TRIGGERING_AN_ERROR = 'apiError';
     private const PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL = 'https://api.pwnedpasswords.com/range/3EF27'; // https://api.pwnedpasswords.com/range/3EF27 is the range for the value "apiError"
@@ -61,53 +61,53 @@ class NotPwnedValidatorTest extends ConstraintValidatorTestCase
         );
 
         // Pass HttpClient::create() instead of this mock to run the tests against the real API
-        return new NotPwnedValidator($httpClientStub);
+        return new NotCompromisedPasswordValidator($httpClientStub);
     }
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new NotPwned());
+        $this->validator->validate(null, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new NotPwned());
+        $this->validator->validate('', new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
 
     public function testInvalidPassword()
     {
-        $constraint = new NotPwned();
+        $constraint = new NotCompromisedPassword();
         $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
-            ->setCode(NotPwned::PWNED_ERROR)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
             ->assertRaised();
     }
 
     public function testThresholdReached()
     {
-        $constraint = new NotPwned(['threshold' => 3]);
+        $constraint = new NotCompromisedPassword(['threshold' => 3]);
         $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
-            ->setCode(NotPwned::PWNED_ERROR)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
             ->assertRaised();
     }
 
     public function testThresholdNotReached()
     {
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotPwned(['threshold' => 10]));
+        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(['threshold' => 10]));
 
         $this->assertNoViolation();
     }
 
     public function testValidPassword()
     {
-        $this->validator->validate(self::PASSWORD_NOT_LEAKED, new NotPwned());
+        $this->validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
@@ -125,7 +125,7 @@ class NotPwnedValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValue()
     {
-        $this->validator->validate([], new NotPwned());
+        $this->validator->validate([], new NotCompromisedPassword());
     }
 
     /**
@@ -134,12 +134,12 @@ class NotPwnedValidatorTest extends ConstraintValidatorTestCase
      */
     public function testApiError()
     {
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotPwned());
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
     public function testApiErrorSkipped()
     {
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotPwned(['skipOnError' => true]));
+        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(['skipOnError' => true]));
         $this->assertTrue(true); // No exception have been thrown
     }
 }

@@ -12,16 +12,16 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Constraints\NotPwned;
+use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NotPwnedTest extends TestCase
+class NotCompromisedPasswordTest extends TestCase
 {
     public function testDefaultValues()
     {
-        $constraint = new NotPwned();
+        $constraint = new NotCompromisedPassword();
         $this->assertSame(1, $constraint->threshold);
         $this->assertFalse($constraint->skipOnError);
     }

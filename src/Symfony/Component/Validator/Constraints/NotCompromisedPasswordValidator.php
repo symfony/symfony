@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NotPwnedValidator extends ConstraintValidator
+class NotCompromisedPasswordValidator extends ConstraintValidator
 {
     private const RANGE_API = 'https://api.pwnedpasswords.com/range/%s';
 
@@ -48,8 +48,8 @@ class NotPwnedValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint instanceof NotPwned) {
-            throw new UnexpectedTypeException($constraint, NotPwned::class);
+        if (!$constraint instanceof NotCompromisedPassword) {
+            throw new UnexpectedTypeException($constraint, NotCompromisedPassword::class);
         }
 
         if (null !== $value && !is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
@@ -80,7 +80,7 @@ class NotPwnedValidator extends ConstraintValidator
 
             if ($hashPrefix.$hashSuffix === $hash && $constraint->threshold <= (int) $count) {
                 $this->context->buildViolation($constraint->message)
-                    ->setCode(NotPwned::PWNED_ERROR)
+                    ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
                     ->addViolation();
 
                 return;

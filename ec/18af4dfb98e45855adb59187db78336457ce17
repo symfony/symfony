@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-05T16:32:49Z
+
+Just a random thought: Isn't a null transport just a special case of a [memory transport](https://github.com/symfony/symfony/pull/28746) without any listener?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-11-05T19:23:44Z
+
+Note regarding https://github.com/symfony/symfony/pull/29097#issuecomment-435940980: that would mean making the MemoryTransport `MessageBusInterface $bus` constructor argument optional or extract dispatch in a dedicated listener.
+No strong opinion yet.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-11-07T11:55:42Z
+
+@GaryPEGEOT thanks for this contribution! If this is finally merged, please review the [list of Messenger issues](https://github.com/symfony/symfony-docs/issues?q=is%3Aopen+is%3Aissue+label%3AMessenger) and [list of pending Messenger pull requests](https://github.com/symfony/symfony-docs/pulls?q=is%3Aopen+is%3Apr+label%3AMessenger) to see if there are issues/PRs conflicting with this change. If there are not, please open an issue in https://github.com/symfony/symfony-docs/issues to track this change. You don't have to provide the docs yourself if you don't want, but this would help us track the change. Thanks!
+
+---------------------------------------------------------------------------
+
+by stof at 2019-03-20T16:35:21Z
+
+> Just a random thought: Isn't a null transport just a special case of a [memory transport](https://github.com/symfony/symfony/pull/28746) without any listener?
+
+If you never flush your MemoryTransport, it would leak memory. So using it instead of a NullTransport looks wrong (having to flush something when you expect it to be a blackhole is not intuitive)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-03-21T06:31:56Z
+
+> having to flush something when you expect it to be a blackhole is not intuitive)
+
+But it's not just a blackhole (`null` transport might be misleading in this way): this transport is storing the sent envelopes (to be used in tests for instance). So I would have implemented `ResetableInterface` on the `MemoryTransport` and just use a different factory registering it.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-23T14:41:41Z
+
+@GaryPEGEOT can you implement the `ResetableInterface` and test that the messages are properly removed?
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-23T15:56:49Z
+
+Indeed, it would make sense.
+On Sat, 23 Mar 2019 at 22:48, Gary PEGEOT <notifications@github.com> wrote:
+
+> *@GaryPEGEOT* commented on this pull request.
+> ------------------------------
+>
+> In src/Symfony/Component/Messenger/Transport/NullTransport.php
+> <https://github.com/symfony/symfony/pull/29097#discussion_r268399152>:
+>
+> > +    }
+> +
+> +    /**
+> +     * {@inheritdoc}
+> +     */
+> +    public function stop(): void
+> +    {
+> +        $this->stopped = true;
+> +    }
+> +
+> +    /**
+> +     * {@inheritdoc}
+> +     */
+> +    public function send(Envelope $envelope): Envelope
+> +    {
+> +        $this->sent[] = $envelope;
+>
+> @sroze <https://github.com/sroze>, @fabpot <https://github.com/fabpot>
+> I've implemented Symfony\Contracts\Service\ResetInterface and I now see
+> that there is an ack an reject method in the Transport interface. Do you
+> think we need to store which message has been ack / nack?
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/29097#discussion_r268399152>, or mute
+> the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEZUH-p7C_wteK6h840k5Nr_c8SPSks5vZkzOgaJpZM4YOsl_>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2019-03-23T18:44:31Z
+
+@sroze I added the `getAcknowledged` and `getRejected` methods
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-31T08:54:04Z
+
+I agree with @ogizanagi that I would not expect a `null` transport to store things.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T09:45:08Z
+
+`in-memory://`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T16:14:57Z
+
+Well, we also have #28746, which is a "memory" transport where the messages are sent on `kernel.terminate`. Probably we should only merge one... call it `memory://` (?), and have the "send on kernel.terminate` part configurable, so that you could use it for testing (and not handle on kernel.terminate) or decide that you DO want to send it using that.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T16:39:14Z
+
+I agree it should be the same implementation. Though... it could actually be two DSNs `in-memory://` & `symfony://kernel.terminate` IMHO. Let's make this one just `in-memory://` and ask the `kernel.terminate` to be changed to update this transport. WDYT?
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2019-03-31T17:01:39Z
+
+Should it be a black-hole and do nothing at all (no storing nor receiving of message) to avoid duplication with memory listener?
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T17:15:49Z
+
+> to avoid duplication with memory listener
+
+What do you mean? 🤔
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2019-03-31T17:20:22Z
+
+> > to avoid duplication with memory listener
+>
+> What do you mean? thinking
+
+memory *transport*, my bad!, both this transport and the one in #28746 store message in memory, so are kind of duplicate. Should this one do *nothing* instead, ie not storing any message?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-03-31T17:33:21Z
+
+I think the idea is this: This one SHOULD store in memory, and be called `in-memory`. And then #28746 could actually use this transport behind the scenes to read the stored messages and send them.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-03-31T17:43:41Z
+
+Exactly 👍
+
+---------------------------------------------------------------------------
+
+by GaryPEGEOT at 2019-03-31T18:10:06Z
+
+> I think the idea is this: This one SHOULD store in memory, and be called `in-memory`. And then #28746 could actually use this transport behind the scenes to read the stored messages and send them.
+
+Renamed to `InMemoryTransport`, as well as the dsn

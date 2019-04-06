@@ -70,6 +70,11 @@
             <tag name="messenger.transport_factory" />
         </service>
 
+        <service id="messenger.transport.in_memory.factory" class="Symfony\Component\Messenger\Transport\InMemoryTransportFactory">
+            <tag name="messenger.transport_factory" />
+            <tag name="kernel.reset" method="reset" />
+        </service>
+
         <!-- retry -->
         <service id="messenger.retry_strategy_locator">
             <tag name="container.service_locator" />

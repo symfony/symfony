@@ -29,6 +29,7 @@ CHANGELOG
  * Added support for PHP files with translations in translation commands.
  * Added support for boolean container parameters within routes.
  * Added the `messenger:setup-transports` command to setup messenger transports
+ * Added a `InMemoryTransport` to Messenger. Use it with a DSN starting with `in-memory://`.
 
 4.2.0
 -----

@@ -106,7 +106,7 @@ class Connection
      */
     public function send(string $body, array $headers, int $delay = 0): void
     {
-        $now = (\DateTime::createFromFormat('U.u', microtime(true)));
+        $now = new \DateTime();
         $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
 
         $queryBuilder = $this->driverConnection->createQueryBuilder()
@@ -157,7 +157,7 @@ class Connection
                 ->update($this->configuration['table_name'])
                 ->set('delivered_at', ':delivered_at')
                 ->where('id = :id');
-            $now = \DateTime::createFromFormat('U.u', microtime(true));
+            $now = new \DateTime();
             $this->executeQuery($queryBuilder->getSQL(), [
                 ':id' => $doctrineEnvelope['id'],
                 ':delivered_at' => self::formatDateTime($now),
@@ -207,7 +207,7 @@ class Connection
 
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
-        $now = \DateTime::createFromFormat('U.u', microtime(true));
+        $now = new \DateTime();
         $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
         return $this->driverConnection->createQueryBuilder()
@@ -273,6 +273,6 @@ class Connection
 
     public static function formatDateTime(\DateTimeInterface $dateTime)
     {
-        return $dateTime->format('Y-m-d\TH:i:s.uZ');
+        return $dateTime->format('Y-m-d\TH:i:s');
     }
 }

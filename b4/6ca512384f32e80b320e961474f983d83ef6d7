@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-06T15:57:40Z
+
+Can you please have a look at https://github.com/symfony/symfony/pull/30852?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2019-04-06T15:59:51Z
+
+4.2 because `setColumnMaxWidth()` was introduced for that version.
+cf https://symfony.com/blog/new-in-symfony-4-2-console-tables-improvements#setting-the-max-width-of-columns
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2019-04-06T16:19:15Z
+
+@nicolas-grekas  About #30852, it's 2 different problems IMO : this PR relates the trailing `\`, whereas the other relates the too long contents.

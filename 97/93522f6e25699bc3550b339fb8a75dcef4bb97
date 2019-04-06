@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-12-08T16:04:02Z
+
+Well, usually handlers should be pure business/application logic and envelope stamps mostly technical stuff about the transport or cross cutting concerns from middleware. If the data you need from stamps is relevant to the handler, you should think twice if it should not be part of the message itself. If it can't and can only be added as a stamp, is it really the handler's responsibility to be aware of this and act accordingly?
+
+But actually on my side, I'm not against this PR right now. I even thought to suggest this before but was waiting for real demands. What I expressed above only is my own experience with buses within CQRS applications. Not canonical. And bringing more flexibility here might be interesting without implying much overhead.
+
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2018-12-08T16:18:07Z
+
+@ogizanagi Yeah, I don't know how common this would be but our need comes from using PubNub and having to apply the channel to respond to when sending another message from the handler.
+
+Having the channel be part of the message is a solution but that would really mix infrastructure concerns with our business logic.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-08T19:28:40Z
+
+But having the envelope be part of the message is also mixing infrastructure (sf messenger) with domain logic :thinking:
+
+It sounds like a middleware concern IMHO.
+
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2018-12-09T04:46:46Z
+
+@ro0NL It's true, if it's possible to have information from one message to another in the middleware then let me know. Also, handlers you can change, messages you really shouldn't change too much.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-12-13T13:17:41Z
+
+I agree with @ro0NL: handlers are designed to get only the message and not the envelope.
+If you need metadata related to the transport layer, you should write a middleware instead - or a sender.
+
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2018-12-13T13:27:06Z
+
+@nicolas-grekas Yeah, we did solve it with a custom middleware, but it's not really a nice experience atm, but doable.
+
+One problem still exist with auto-register handlers with more than one invoke parameters. I think the message-pass should look like what I did in this PR.
+
+---------------------------------------------------------------------------
+
+by nicholasruunu at 2019-01-10T19:08:24Z
+
+I updated the PR to only deal with auto-registering in MessengerPass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-01-16T12:20:24Z
+
+the changes seem reasonable to me

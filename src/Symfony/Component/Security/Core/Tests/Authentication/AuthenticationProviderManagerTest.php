@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\WrappedEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -192,22 +191,22 @@ class AuthenticationProviderManagerTest extends TestCase
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE, function ($event) use ($providerCN) {
-            if (\get_class($event) === 'Symfony\Component\EventDispatcher\WrappedEvent') {
+            if ('Symfony\Component\EventDispatcher\WrappedEvent' === \get_class($event)) {
                 $event = $event->getWrappedEvent();
             }
 
-            /** @var AuthenticationSensitiveEvent $event */
+            /* @var AuthenticationSensitiveEvent $event */
             $this->assertSame($providerCN, $event->getAuthenticationProviderClassName());
             $this->assertSame('bar', $event->getAuthenticationTokenPassword());
             $this->assertEquals('bar', $event->getPreAuthenticationToken()->getCredentials());
             $this->assertEquals('bar', $event->getAuthenticationToken()->getCredentials());
         });
         $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS, function ($event) {
-            if (\get_class($event) === 'Symfony\Component\EventDispatcher\WrappedEvent') {
+            if ('Symfony\Component\EventDispatcher\WrappedEvent' === \get_class($event)) {
                 $event = $event->getWrappedEvent();
             }
 
-            /** @var AuthenticationSuccessEvent $event */
+            /* @var AuthenticationSuccessEvent $event */
             $this->assertEquals('', $event->getAuthenticationToken()->getCredentials());
         });
 

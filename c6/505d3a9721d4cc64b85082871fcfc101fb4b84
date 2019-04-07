@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-06T14:29:02Z
+
+Before I forget: Can I (or who can) add the FOSSHackathon label?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-06T14:29:43Z
+
+I guess tests are failing due to some other issue...?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-06T14:40:38Z
+
+@mpdude you should add the hashtags in the PR description (allowing to find all these issues and PR through the github search, even on multiple repos)
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-06T14:41:03Z
+
+this requires either a doc PR or at least a doc issue.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-06T14:52:42Z
+
+Doc PR added.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-06T14:53:49Z
+
+> you should add the hashtags in the PR description (allowing to find all these issues and PR through the github search, even on multiple repos)
+
+@stof Not sure I understand how to do this
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-06T22:24:13Z
+
+Regarding the failed tests, every test run fails due to different reasons. In all cases, I don't see how that would be related to this PR.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-04-07T08:30:48Z
+
+Rebased on master to give Travis/CI tests another try.

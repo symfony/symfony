@@ -194,4 +194,11 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(ARRAY_VAR)');
         $bag->resolve();
     }
+
+    public function testDefaultToNullAllowed()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->resolve();
+        $this->assertNotNull($bag->get('env(default::BAR)'));
+    }
 }

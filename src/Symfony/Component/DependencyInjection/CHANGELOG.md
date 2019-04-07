@@ -15,6 +15,7 @@ CHANGELOG
  * added ability to define an index for services in an injected service locator argument
  * made `ServiceLocator` implement `ServiceProviderInterface`
  * deprecated support for non-string default env() parameters
+ * added `%env(require:...)%` processor to `require()` a PHP file and use the value returned from it
 
 4.2.0
 -----

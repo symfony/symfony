@@ -236,9 +236,11 @@ class TransportTest extends TestCase
 
     public function testFromDsnFailover()
     {
+        $user = 'user';
+        $pass = 'pass';
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://null || smtp://null || smtp://null', $dispatcher, null, $logger);
+        $transport = Transport::fromDsn('smtp://example.com || smtp://'.urlencode($user).'@example.com || smtp://'.urlencode($user).':'.urlencode($pass).'@example.com', $dispatcher, null, $logger);
         $this->assertInstanceOf(Transport\FailoverTransport::class, $transport);
         $p = new \ReflectionProperty(Transport\RoundRobinTransport::class, 'transports');
         $p->setAccessible(true);
@@ -247,6 +249,12 @@ class TransportTest extends TestCase
         foreach ($transports as $transport) {
             $this->assertProperties($transport, $dispatcher, $logger);
         }
+        $this->assertSame('', $transports[0]->getUsername());
+        $this->assertSame('', $transports[0]->getPassword());
+        $this->assertSame($user, $transports[1]->getUsername());
+        $this->assertSame('', $transports[1]->getPassword());
+        $this->assertSame($user, $transports[2]->getUsername());
+        $this->assertSame($pass, $transports[2]->getPassword());
     }
 
     public function testFromDsnRoundRobin()

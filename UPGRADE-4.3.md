@@ -155,7 +155,7 @@ TwigBridge
 Workflow
 --------
 
- * `initial_place` is deprecated in favour of `initial_places`.
+ * `initial_place` is deprecated in favour of `initial_marking`.
 
    Before:
    ```yaml
@@ -170,11 +170,8 @@ Workflow
    framework:
       workflows:
           article:
-              initial_places: [draft]
+              initial_marking: [draft]
    ```
-
-Workflow
---------
 
  * `MarkingStoreInterface::setMarking()` will have a third argument in Symfony 5.0.
 

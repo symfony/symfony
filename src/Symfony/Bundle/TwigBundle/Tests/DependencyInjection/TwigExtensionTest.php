@@ -203,8 +203,8 @@ class TwigExtensionTest extends TestCase
     /**
      * @group legacy
      * @dataProvider getFormats
-     * @expectedDeprecation Templates directory "%s/Resources/TwigBundle/views" is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
-     * @expectedDeprecation Templates directory "%s/Resources/views" is deprecated since Symfony 4.2, use "%s/templates" instead.
+     * @expectedDeprecation Loading Twig templates for "TwigBundle" from the "%s/Resources/TwigBundle/views" directory is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
+     * @expectedDeprecation Loading Twig templates from the "%s/Resources/views" directory is deprecated since Symfony 4.2, use "%s/templates" instead.
      */
     public function testLegacyTwigLoaderPaths($format)
     {

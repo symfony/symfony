@@ -145,7 +145,7 @@ EOF
         $viewsPaths = [];
         if (is_dir($dir = $rootDir.'/Resources/views')) {
             if ($dir !== $this->defaultViewsPath) {
-                $notice = sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, ', $dir);
+                $notice = sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, ', $dir);
                 @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
             }
             $viewsPaths[] = $dir;
@@ -173,7 +173,7 @@ EOF
                 }
                 if (is_dir($dir = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
                     $viewsPaths[] = $dir;
-                    $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $dir);
+                    $notice = sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $dir);
                     @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
             } catch (\InvalidArgumentException $e) {
@@ -191,7 +191,7 @@ EOF
                 $viewsPaths = [$path.'/templates'];
                 if (is_dir($dir = $path.'/Resources/views')) {
                     if ($dir !== $this->defaultViewsPath) {
-                        @trigger_error(sprintf('Storing templates in the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use the "%s" directory instead.', $dir, $path.'/templates'), E_USER_DEPRECATED);
                     }
                     $viewsPaths[] = $dir;
                 }
@@ -211,7 +211,7 @@ EOF
                 $viewsPaths[] = $bundle->getPath().'/Resources/views';
                 if (is_dir($deprecatedPath = sprintf('%s/Resources/%s/views', $rootDir, $bundle->getName()))) {
                     $viewsPaths[] = $deprecatedPath;
-                    $notice = sprintf('Storing templates for "%s" in the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $deprecatedPath);
+                    $notice = sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, ', $bundle->getName(), $deprecatedPath);
                     @trigger_error($notice.($this->defaultViewsPath ? sprintf('use the "%s" directory instead.', $this->defaultViewsPath) : 'configure and use "twig.default_path" instead.'), E_USER_DEPRECATED);
                 }
             }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-07T12:55:13Z
+
+@lyrixx Can you rebase on 3.4?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-07T12:59:38Z
+
+@fabpot Oups, I made the fix against 3.4, but forgot to update the base branch. It's now fixed.

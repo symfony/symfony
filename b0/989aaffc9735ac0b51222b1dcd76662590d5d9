@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by sstok at 2019-01-25T08:38:26Z
+
+Can this also be added for the PHP DSL loader? Really nice addition!
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-26T23:47:33Z
+
+Thanks for the positive feedback!
+
+@sstok
+I added the same functionality to PHP DSL loader.
+
+@nicolas-grekas
+
+1. Changed target to master.
+1. Modified the error message so that it refers to argument's name, type or both - depending on the configuration.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-02-12T18:29:41Z
+
+@nicolas-grekas
+> Tests fail because composer.json files need to bump the minimum supported version of di, for http-kernel.
+
+Does it mean I have to make changes in composer.json in my repository? It seems to be identical with the one from Symfony's repository?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-03-04T08:15:15Z
+
+@nicolas-grekas friendly ping
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-05T17:41:09Z
+
+Ping @przemyslaw-bogusz! Will you have time to check out the tweaks? We can hopefully get this into 4.3! :)
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-04-05T22:06:31Z
+
+I will do it tomorrow, so I believe we can close it by the end of the weekend. Hope that's good enough.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-06T07:38:09Z
+
+It's great :). Thank you for your work!
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-06T12:43:43Z
+
+@przemyslaw-bogusz do you have time to finish this or do you want me to take the rest of it ?
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-04-06T22:40:36Z
+
+@nicolas-grekas, @weaverryan Thank you for your patience. If you have any additional comments, please let me know. I hope we will also be able to close #29944.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T10:27:57Z
+
+Thank you @przemyslaw-bogusz.

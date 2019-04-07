@@ -44,11 +44,17 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
             function ($key, $innerItem) use ($defaultLifetime, $poolHash) {
                 $item = new CacheItem();
                 $item->key = $key;
+
+                if (null === $innerItem) {
+                    return $item;
+                }
+
                 $item->value = $v = $innerItem->get();
                 $item->isHit = $innerItem->isHit();
-                $item->defaultLifetime = $defaultLifetime;
                 $item->innerItem = $innerItem;
+                $item->defaultLifetime = $defaultLifetime;
                 $item->poolHash = $poolHash;
+
                 // Detect wrapped values that encode for their expiry and creation duration
                 // For compactness, these values are packed in the key of an array using
                 // magic numbers in the form 9D-..-..-..-..-00-..-..-..-5F
@@ -202,7 +208,18 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
         if (null === $item["\0*\0expiry"] && 0 < $item["\0*\0defaultLifetime"]) {
             $item["\0*\0expiry"] = microtime(true) + $item["\0*\0defaultLifetime"];
         }
-        $innerItem = $item["\0*\0poolHash"] === $this->poolHash ? $item["\0*\0innerItem"] : $this->pool->getItem($this->namespace.$item["\0*\0key"]);
+
+        if ($item["\0*\0poolHash"] === $this->poolHash && $item["\0*\0innerItem"]) {
+            $innerItem = $item["\0*\0innerItem"];
+        } elseif ($this->pool instanceof AdapterInterface) {
+            // this is an optimization specific for AdapterInterface implementations
+            // so we can save a round-trip to the backend by just creating a new item
+            $f = $this->createCacheItem;
+            $innerItem = $f($this->namespace.$item["\0*\0key"], null);
+        } else {
+            $innerItem = $this->pool->getItem($this->namespace.$item["\0*\0key"]);
+        }
+
         ($this->setInnerItem)($innerItem, $item);
 
         return $this->pool->$method($innerItem);

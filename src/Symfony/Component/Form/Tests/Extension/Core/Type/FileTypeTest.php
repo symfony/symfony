@@ -11,15 +11,25 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FileTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
+
+    protected function getExtensions()
+    {
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())->method('trans')->willReturnArgument(0);
+
+        return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
+    }
 
     // https://github.com/symfony/symfony/pull/5028
     public function testSetData()

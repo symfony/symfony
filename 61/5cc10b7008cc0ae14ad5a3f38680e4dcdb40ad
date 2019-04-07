@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-07T07:37:59Z
+
+ping @dbrumann @derrabus @mpdude @OskarStark
+
+---------------------------------------------------------------------------
+
+by hhamon at 2019-04-07T07:50:20Z
+
+French version:
+
+```
+Ce mot de passe a été révélé par une faille de sécurité et ne devrait plus être utilisé. Veuillez utiliser un autre mot de passe.
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-07T08:06:14Z
+
+Why did you target Symfony 3.4? The valdator has been introduced in 4.3
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-07T08:08:24Z
+
+@lyrixx To ease the maintainability of the translations we always add them on the lowest maintained branch. But in fact we already messed up ids between branches. I am trying to clean them up.

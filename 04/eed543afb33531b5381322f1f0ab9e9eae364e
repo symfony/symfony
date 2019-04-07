@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-07T06:32:48Z
+
+Still failing :) https://travis-ci.org/symfony/symfony/jobs/516770133#L4050
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-07T08:39:32Z
+
+Tests are still broken apparently.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-07T08:40:29Z
+
+Still failing on `deps=low`:
+```
+1) Symfony\Component\Lock\Tests\Store\StoreFactoryTest::testCreateStore with data set #7 ('memcached://server.com', 'Symfony\Component\Lock\Store\...dStore')
+Error: Class 'Symfony\Component\Cache\Adapter\AbstractAdapter' not found
+```
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-04-07T08:53:50Z
+
+code changed  @approvers: (check if the Adapter exists)

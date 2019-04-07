@@ -25,7 +25,9 @@ class PhpSerializerTest extends TestCase
 
         $envelope = new Envelope(new DummyMessage('Hello'));
 
-        $this->assertEquals($envelope, $serializer->decode($serializer->encode($envelope)));
+        $encoded = $serializer->encode($envelope);
+        $this->assertNotContains("\0", $encoded['body'], 'Does not contain the binary characters');
+        $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
     public function testDecodingFailsWithMissingBodyKey()
@@ -58,7 +60,7 @@ class PhpSerializerTest extends TestCase
         $serializer = new PhpSerializer();
 
         $serializer->decode([
-            'body' => base64_encode('O:13:"ReceivedSt0mp":0:{}'),
+            'body' => 'O:13:"ReceivedSt0mp":0:{}',
         ]);
     }
 }

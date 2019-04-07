@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-07T07:46:11Z
+
+Very nice! We'd also include another new translation. See #30946.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2019-04-07T07:52:01Z
+
+Thanks Javier!
+
+I've put the french translation for the compromised password constraint in @xabbuh's PR so that he can update the file accordingly :)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2019-04-07T08:33:20Z
+
+I think it's good to go!

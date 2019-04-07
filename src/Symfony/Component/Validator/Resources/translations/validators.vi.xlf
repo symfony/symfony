@@ -338,6 +338,30 @@
                 <source>This collection should contain only unique elements.</source>
                 <target>Danh sách này chỉ nên chứa các phần tử khác nhau.</target>
             </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Giá trị này có thể thực hiện được.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Giá trị này có thể thực hiện được hoặc bằng không.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Giá trị này nên bị từ chối.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Giá trị này nên bị từ chối hoặc bằng không.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Giá trị này không phải là múi giờ hợp lệ.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Mật khẩu này đã bị rò rỉ dữ liệu, không được sử dụng nữa. Xin vui lòng sử dụng mật khẩu khác.</target>
+           </trans-unit>
         </body>
     </file>
 </xliff>

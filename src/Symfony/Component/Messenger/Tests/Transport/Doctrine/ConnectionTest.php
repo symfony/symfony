@@ -213,7 +213,7 @@ class ConnectionTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     * @expectedException \Symfony\Component\Messenger\Exception\InvalidArgumentException
      */
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
     {
@@ -221,7 +221,7 @@ class ConnectionTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Messenger\Exception\TransportException
+     * @expectedException \Symfony\Component\Messenger\Exception\InvalidArgumentException
      */
     public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
     {

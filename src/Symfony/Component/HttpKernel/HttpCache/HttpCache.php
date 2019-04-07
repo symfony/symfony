@@ -40,7 +40,14 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * The available options are:
      *
-     *   * debug:                 If true, the traces are added as a HTTP header to ease debugging
+     *   * debug                  If true, exceptions are thrown when things go wrong. Otherwise, the cache
+     *                            will try to carry on and deliver a meaningful response.
+     *
+     *   * trace_level            May be one of 'none', 'short' and 'full'. For 'short', a concise trace of the
+     *                            master request will be added as an HTTP header. 'full' will add traces for all
+     *                            requests (including ESI subrequests). (default: 'full' if in debug; 'none' otherwise)
+     *
+     *   * trace_header           Header name to use for traces. (default: X-Symfony-Cache)
      *
      *   * default_ttl            The number of seconds that a cache entry should be considered
      *                            fresh when no explicit freshness information is provided in
@@ -87,7 +94,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
             'stale_if_error' => 60,
+            'trace_level' => 'none',
+            'trace_header' => 'X-Symfony-Cache',
         ], $options);
+
+        if (!isset($options['trace_level']) && $this->options['debug']) {
+            $this->options['trace_level'] = 'full';
+        }
     }
 
     /**
@@ -108,6 +121,23 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     public function getTraces()
     {
         return $this->traces;
+    }
+
+    private function addTraces(Response $response)
+    {
+        $traceString = null;
+
+        if ('full' === $this->options['trace_level']) {
+            $traceString = $this->getLog();
+        }
+
+        if ('short' === $this->options['trace_level'] && $masterId = array_key_first($this->traces)) {
+            $traceString = implode('/', $this->traces[$masterId]);
+        }
+
+        if (null !== $traceString) {
+            $response->headers->add([$this->options['trace_header'] => $traceString]);
+        }
     }
 
     /**
@@ -194,8 +224,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $this->restoreResponseBody($request, $response);
 
-        if (HttpKernelInterface::MASTER_REQUEST === $type && $this->options['debug']) {
-            $response->headers->set('X-Symfony-Cache', $this->getLog());
+        if (HttpKernelInterface::MASTER_REQUEST === $type) {
+            $this->addTraces($response);
         }
 
         if (null !== $this->surrogate) {

@@ -24,6 +24,7 @@ CHANGELOG
  * renamed `GetResponseForExceptionEvent` to `ExceptionEvent`
  * renamed `PostResponseEvent` to `TerminateEvent`
  * added `HttpClientKernel` for handling requests with an `HttpClientInterface` instance
+ * added `trace_header` and `trace_level` configuration options to `HttpCache`
 
 4.2.0
 -----

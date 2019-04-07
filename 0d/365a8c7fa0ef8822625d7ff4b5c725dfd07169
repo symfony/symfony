@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-03-26T13:26:16Z
+
+Nice feature, does this works on collection ? (don't think so seeing the code, and wondering if it's doable)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-04-01T14:29:16Z
+
+See https://github.com/symfony/symfony/issues/21669#issuecomment-280889824
+
+I don't think those issues are addressed.
+
+---------------------------------------------------------------------------
+
+by jewome62 at 2019-04-02T12:40:56Z
+
+@joelwurtz i test it tomorrow
+
+---------------------------------------------------------------------------
+
+by jewome62 at 2019-04-03T09:47:29Z
+
+@joelwurtz you have right, an object collection in the parent has no populated object, the problem is to have a reference for linked the object passed in the 'object_to_populate' and the object received by decoding.
+
+Either we consider this PR for objects containing other objects, or we have a solution to bind collection objects to the input received
+
+![image](https://user-images.githubusercontent.com/472429/55469745-683afe80-5606-11e9-9b64-aef872739542.png)
+
+![image](https://user-images.githubusercontent.com/472429/55469769-76891a80-5606-11e9-914e-89caa1b548e4.png)
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-03T15:45:22Z
+
+I don't think this PR should solve that problem, futhermore, some users would have different behavior:
+
+ * Replace: like actually
+ * Merge: mainly if the index key is the same as the populated object we use the previous object for as an object to populate; also if previous index is not present we remove it, and if the new index is not present in the old list we add it
+ * Append: keep current lists and add new object to the list
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-06T19:47:06Z
+
+@jewome62 You need to rebase the PR as we don't merge PRs with merge commits.
+
+---------------------------------------------------------------------------
+
+by jewome62 at 2019-04-06T19:51:26Z
+
+> @jewome62 You need to rebase the PR as we don't merge PRs with merge commits.
+
+I fix that, I have use the confilct resolver into from github
+
+---------------------------------------------------------------------------
+
+by jewome62 at 2019-04-06T22:05:04Z
+
+Failure of unit tests is not related to this PR

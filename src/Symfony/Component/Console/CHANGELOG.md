@@ -6,6 +6,8 @@ CHANGELOG
 
  * added support for hyperlinks
  * added `ProgressBar::iterate()` method that simplify updating the progress bar when iterating
+ * added `Question::setAutocompleterCallback()` to provide a callback function
+   that dynamically generates suggestions as the user types
 
 4.2.0
 -----

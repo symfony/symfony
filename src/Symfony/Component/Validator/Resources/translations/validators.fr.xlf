@@ -334,6 +334,26 @@
                 <source>This value should be valid JSON.</source>
                 <target>Cette valeur doit être un JSON valide.</target>
             </trans-unit>
+            <trans-unit id="87">
+                <source>This value should be positive.</source>
+                <target>Cette valeur doit être strictement positive.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be either positive or zero.</source>
+                <target>Cette valeur doit être positive ou égale à zéro.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be negative.</source>
+                <target>Cette valeur doit être strictement négative.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be either negative or zero.</source>
+                <target>Cette valeur doit être négative ou égale à zéro.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This collection should contain only unique elements.</source>
+                <target>Cette collection ne doit contenir que des éléments uniques.</target>
+            </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
                 <target>Cette valeur n'est pas un fuseau horaire valide.</target>

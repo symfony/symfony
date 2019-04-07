@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-07T08:53:58Z
+
+Renaming makes the code easier to read. `addChoiceViewGroupedBy` and `addChoiceViewsGroupedBy` are almost impossible to distinguish.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-07T08:59:59Z
+
+Is it a bug fix or a refactoring? If that's the latter, it must be done on master.

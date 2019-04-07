@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the webmozart/path-util package.
+ * This file is part of the Symfony package.
  *
- * (c) Bernhard Schussek <bschussek@gmail.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,16 +12,12 @@
 namespace Symfony\Component\Filesystem;
 
 use function array_pop;
-use function array_slice;
 use function basename;
 use function ctype_alpha;
 use function explode;
-use function function_exists;
 use function getenv;
 use function implode;
-use function in_array;
 use InvalidArgumentException;
-use function is_object;
 use function ltrim;
 use function mb_strtolower;
 use function pathinfo;
@@ -29,7 +25,6 @@ use function rtrim;
 use RuntimeException;
 use function sprintf;
 use function str_replace;
-use function strlen;
 use function strpos;
 use function substr;
 
@@ -39,8 +34,6 @@ use function substr;
  * The methods in this class are able to deal with both UNIX and Windows paths
  * with both forward and backward slashes. All methods return normalized parts
  * containing only forward slashes and no excess "." and ".." segments.
- *
- * @since  1.0
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
@@ -88,13 +81,9 @@ final class Path
      *
      * This method is able to deal with both UNIX and Windows paths.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
-     * @return string The canonical path.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
-     * @since 2.1 Added support for `~`.
+     * @return string the canonical path
      */
     public static function canonicalize(string $path): string
     {
@@ -119,7 +108,7 @@ final class Path
         [$root, $pathWithoutRoot] = self::split($path);
 
         $parts = explode('/', $pathWithoutRoot);
-        $canonicalParts = array();
+        $canonicalParts = [];
 
         // Collapse "." and "..", if possible
         foreach ($parts as $part) {
@@ -129,8 +118,8 @@ final class Path
 
             // Collapse ".." with the previous part, if one exists
             // Don't collapse ".." if the previous part is also ".."
-            if ('..' === $part && count($canonicalParts) > 0
-                    && '..' !== $canonicalParts[count($canonicalParts) - 1]
+            if ('..' === $part && \count($canonicalParts) > 0
+                    && '..' !== $canonicalParts[\count($canonicalParts) - 1]
             ) {
                 array_pop($canonicalParts);
 
@@ -149,7 +138,7 @@ final class Path
 
         // Clean up regularly to prevent memory leaks
         if (self::$bufferSize > self::CLEANUP_THRESHOLD) {
-            self::$buffer = array_slice(self::$buffer, -self::CLEANUP_SIZE, null, true);
+            self::$buffer = \array_slice(self::$buffer, -self::CLEANUP_SIZE, null, true);
             self::$bufferSize = self::CLEANUP_SIZE;
         }
 
@@ -167,11 +156,9 @@ final class Path
      *
      * This method is able to deal with both UNIX and Windows paths.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
-     * @return string The normalized path.
-     *
-     * @since 2.2 Added method.
+     * @return string the normalized path
      */
     public static function normalize(string $path): string
     {
@@ -196,15 +183,12 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
      * @return string The canonical directory part. Returns the root directory
      *                if the root directory is passed. Returns an empty string
      *                if a relative path is passed that contains no slashes.
      *                Returns an empty string if an empty string is passed.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
      */
     public static function getDirectory(string $path): string
     {
@@ -254,8 +238,6 @@ final class Path
      * @return string The canonical home directory
      *
      * @throws RuntimeException If your operation system or environment isn't supported
-     *
-     * @since 2.1 Added method.
      */
     public static function getHomeDirectory(): string
     {
@@ -277,13 +259,10 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
      * @return string The canonical root directory. Returns an empty string if
      *                the given path is relative or empty.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
      */
     public static function getRoot(string $path): string
     {
@@ -304,7 +283,7 @@ final class Path
             return $scheme.'/';
         }
 
-        $length = strlen($path);
+        $length = \strlen($path);
 
         // Windows root
         if ($length > 1 && ctype_alpha($path[0]) && ':' === $path[1]) {
@@ -325,12 +304,9 @@ final class Path
     /**
      * Returns the file name from a file path.
      *
-     * @param string $path The path string.
+     * @param string $path the path string
      *
-     * @return string The file name.
-     *
-     * @since 1.1 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
+     * @return string the file name
      */
     public static function getFilename(string $path): string
     {
@@ -344,14 +320,11 @@ final class Path
     /**
      * Returns the file name without the extension from a file path.
      *
-     * @param string      $path      The path string.
-     * @param string|null $extension If specified, only that extension is cut
-     *                               off (may contain leading dot).
+     * @param string      $path      the path string
+     * @param string|null $extension if specified, only that extension is cut
+     *                               off (may contain leading dot)
      *
-     * @return string The file name without extension.
-     *
-     * @since 1.1 Added method.
-     * @since 2.0 Method now fails if $path or $extension have invalid types.
+     * @return string the file name without extension
      */
     public static function getFilenameWithoutExtension(string $path, ?string $extension = null)
     {
@@ -370,15 +343,12 @@ final class Path
     /**
      * Returns the extension from a file path.
      *
-     * @param string $path           The path string.
-     * @param bool   $forceLowerCase Forces the extension to be lower-case
+     * @param string $path           the path string
+     * @param bool   $forceLowerCase forces the extension to be lower-case
      *                               (requires mbstring extension for correct
-     *                               multi-byte character handling in extension).
+     *                               multi-byte character handling in extension)
      *
-     * @return string The extension of the file path (without leading dot).
-     *
-     * @since 1.1 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
+     * @return string the extension of the file path (without leading dot)
      */
     public static function getExtension(string $path, bool $forceLowerCase = false): string
     {
@@ -398,22 +368,19 @@ final class Path
     /**
      * Returns whether the path has an extension.
      *
-     * @param string            $path       The path string.
-     * @param string|string[]|null $extensions If null or not provided, checks if
-     *                                      an extension exists, otherwise
-     *                                      checks for the specified extension
-     *                                      or array of extensions (with or
-     *                                      without leading dot).
-     * @param bool              $ignoreCase Whether to ignore case-sensitivity
-     *                                      (requires mbstring extension for
-     *                                      correct multi-byte character
-     *                                      handling in the extension).
+     * @param string               $path       the path string
+     * @param string|string[]|null $extensions if null or not provided, checks if
+     *                                         an extension exists, otherwise
+     *                                         checks for the specified extension
+     *                                         or array of extensions (with or
+     *                                         without leading dot)
+     * @param bool                 $ignoreCase whether to ignore case-sensitivity
+     *                                         (requires mbstring extension for
+     *                                         correct multi-byte character
+     *                                         handling in the extension)
      *
-     * @return bool Returns `true` if the path has an (or the specified)
-     *              extension and `false` otherwise.
-     *
-     * @since 1.1 Added method.
-     * @since 2.0 Method now fails if $path or $extensions have invalid types.
+     * @return bool returns `true` if the path has an (or the specified)
+     *              extension and `false` otherwise
      */
     public static function hasExtension(string $path, $extensions = null, bool $ignoreCase = false): bool
     {
@@ -437,19 +404,16 @@ final class Path
             $extensions[$key] = ltrim($extension, '.');
         }
 
-        return in_array($actualExtension, $extensions, true);
+        return \in_array($actualExtension, $extensions, true);
     }
 
     /**
      * Changes the extension of a path string.
      *
      * @param string $path      The path string with filename.ext to change.
-     * @param string $extension New extension (with or without leading dot).
+     * @param string $extension new extension (with or without leading dot)
      *
-     * @return string The path string with new file extension.
-     *
-     * @since 1.1 Added method.
-     * @since 2.0 Method now fails if $path or $extension is not a string.
+     * @return string the path string with new file extension
      */
     public static function changeExtension(string $path, string $extension): string
     {
@@ -470,19 +434,16 @@ final class Path
             return $path.('.' === substr($path, -1) ? '' : '.').$extension;
         }
 
-        return substr($path, 0, -strlen($actualExtension)).$extension;
+        return substr($path, 0, -\strlen($actualExtension)).$extension;
     }
 
     /**
      * Returns whether a path is absolute.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
-     * @return bool Returns true if the path is absolute, false if it is
-     *              relative or empty.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
+     * @return bool returns true if the path is absolute, false if it is
+     *              relative or empty
      */
     public static function isAbsolute(string $path): bool
     {
@@ -501,9 +462,9 @@ final class Path
         }
 
         // Windows root
-        if (strlen($path) > 1 && ctype_alpha($path[0]) && ':' === $path[1]) {
+        if (\strlen($path) > 1 && ctype_alpha($path[0]) && ':' === $path[1]) {
             // Special case: "C:"
-            if (2 === strlen($path)) {
+            if (2 === \strlen($path)) {
                 return true;
             }
 
@@ -519,13 +480,10 @@ final class Path
     /**
      * Returns whether a path is relative.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
-     * @return bool Returns true if the path is relative or empty, false if
-     *              it is absolute.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
+     * @return bool returns true if the path is relative or empty, false if
+     *              it is absolute
      */
     public static function isRelative(string $path): bool
     {
@@ -563,19 +521,14 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path     A path to make absolute.
-     * @param string $basePath An absolute base path.
+     * @param string $path     a path to make absolute
+     * @param string $basePath an absolute base path
      *
-     * @return string An absolute path in canonical form.
+     * @return string an absolute path in canonical form
      *
-     * @throws InvalidArgumentException If the base path is not absolute or if
+     * @throws InvalidArgumentException if the base path is not absolute or if
      *                                  the given path is an absolute path with
-     *                                  a different root than the base path.
-     *
-     * @since 1.0   Added method.
-     * @since 2.0   Method now fails if $path or $basePath is not a string.
-     * @since 2.2.2 Method does not fail anymore of $path and $basePath are
-     *              absolute, but on different partitions.
+     *                                  a different root than the base path
      */
     public static function makeAbsolute(string $path, string $basePath): string
     {
@@ -646,17 +599,14 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path     A path to make relative.
-     * @param string $basePath A base path.
+     * @param string $path     a path to make relative
+     * @param string $basePath a base path
      *
-     * @return string A relative path in canonical form.
+     * @return string a relative path in canonical form
      *
-     * @throws InvalidArgumentException If the base path is not absolute or if
+     * @throws InvalidArgumentException if the base path is not absolute or if
      *                                  the given path has a different root
-     *                                  than the base path.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path or $basePath is not a string.
+     *                                  than the base path
      */
     public static function makeRelative(string $path, string $basePath): string
     {
@@ -732,12 +682,9 @@ final class Path
     /**
      * Returns whether the given path is on the local filesystem.
      *
-     * @param string $path A path string.
+     * @param string $path a path string
      *
-     * @return bool Returns true if the path is local, false for a URL.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $path is not a string.
+     * @return bool returns true if the path is local, false for a URL
      */
     public static function isLocal(string $path): bool
     {
@@ -779,14 +726,11 @@ final class Path
      * // => null
      * ```
      *
-     * @param string[] $paths A list of paths.
+     * @param string[] $paths a list of paths
      *
-     * @return string|null The longest common base path in canonical form or
+     * @return string|null the longest common base path in canonical form or
      *                     `null` if the paths are on different Windows
-     *                     partitions.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $paths are not strings.
+     *                     partitions
      */
     public static function getLongestCommonBasePath(array $paths): ?string
     {
@@ -818,7 +762,7 @@ final class Path
                     continue 2;
                 }
 
-                $basePath = dirname($basePath);
+                $basePath = \dirname($basePath);
             }
         }
 
@@ -830,11 +774,9 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string[]|string $paths Path parts as parameters or array.
+     * @param string[]|string $paths path parts as parameters or array
      *
-     * @return string The joint path.
-     *
-     * @since 2.0 Added method.
+     * @return string the joint path
      */
     public static function join(string ...$paths): string
     {
@@ -851,12 +793,12 @@ final class Path
             if (null === $finalPath) {
                 // For first part we keep slashes, like '/top', 'C:\' or 'phar://'
                 $finalPath = $path;
-                $wasScheme = (strpos($path, '://') !== false);
+                $wasScheme = (false !== strpos($path, '://'));
                 continue;
             }
 
             // Only add slash if previous part didn't end with '/' or '\'
-            if (!in_array(substr($finalPath, -1), array('/', '\\'))) {
+            if (!\in_array(substr($finalPath, -1), ['/', '\\'])) {
                 $finalPath .= '/';
             }
 
@@ -892,13 +834,10 @@ final class Path
      * // => false
      * ```
      *
-     * @param string $basePath The base path to test.
-     * @param string $ofPath   The other path.
+     * @param string $basePath the base path to test
+     * @param string $ofPath   the other path
      *
-     * @return bool Whether the base path is a base path of the other path.
-     *
-     * @since 1.0 Added method.
-     * @since 2.0 Method now fails if $basePath or $ofPath is not a string.
+     * @return bool whether the base path is a base path of the other path
      */
     public static function isBasePath(string $basePath, string $ofPath): bool
     {
@@ -928,10 +867,10 @@ final class Path
      * list ($root, $path) = Path::split("C:")
      * // => array("C:/", "")
      *
-     * @param string $path The canonical path to split.
+     * @param string $path the canonical path to split
      *
-     * @return string[] An array with the root directory and the remaining
-     *                  relative path.
+     * @return string[] an array with the root directory and the remaining
+     *                  relative path
      */
     private static function split(string $path): array
     {
@@ -947,10 +886,10 @@ final class Path
             $root = '';
         }
 
-        $length = strlen($path);
+        $length = \strlen($path);
 
         // Remove and remember root directory
-        if (strpos($path, '/') === 0) {
+        if (0 === strpos($path, '/')) {
             $root .= '/';
             $path = $length > 1 ? substr($path, 1) : '';
         } elseif ($length > 1 && ctype_alpha($path[0]) && ':' === $path[1]) {
@@ -977,7 +916,7 @@ final class Path
      */
     private static function toLower(string $str): string
     {
-        if (function_exists('mb_strtolower')) {
+        if (\function_exists('mb_strtolower')) {
             return mb_strtolower($str, mb_detect_encoding($str));
         }
 

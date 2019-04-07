@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the webmozart/path-util package.
+ * This file is part of the Symfony package.
  *
- * (c) Bernhard Schussek <bschussek@gmail.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Path;
  */
 class PathTest extends TestCase
 {
-    protected $storedEnv = array();
+    protected $storedEnv = [];
 
     public function setUp()
     {
@@ -37,134 +37,134 @@ class PathTest extends TestCase
 
     public function tearDown()
     {
-        putenv('HOME=' . $this->storedEnv['HOME']);
-        putenv('HOMEDRIVE=' . $this->storedEnv['HOMEDRIVE']);
-        putenv('HOMEPATH=' . $this->storedEnv['HOMEPATH']);
+        putenv('HOME='.$this->storedEnv['HOME']);
+        putenv('HOMEDRIVE='.$this->storedEnv['HOMEDRIVE']);
+        putenv('HOMEPATH='.$this->storedEnv['HOMEPATH']);
     }
 
     public function provideCanonicalizationTests()
     {
-        return array(
+        return [
             // relative paths (forward slash)
-            array('css/./style.css', 'css/style.css'),
-            array('css/../style.css', 'style.css'),
-            array('css/./../style.css', 'style.css'),
-            array('css/.././style.css', 'style.css'),
-            array('css/../../style.css', '../style.css'),
-            array('./css/style.css', 'css/style.css'),
-            array('../css/style.css', '../css/style.css'),
-            array('./../css/style.css', '../css/style.css'),
-            array('.././css/style.css', '../css/style.css'),
-            array('../../css/style.css', '../../css/style.css'),
-            array('', ''),
-            array('.', ''),
-            array('..', '..'),
-            array('./..', '..'),
-            array('../.', '..'),
-            array('../..', '../..'),
+            ['css/./style.css', 'css/style.css'],
+            ['css/../style.css', 'style.css'],
+            ['css/./../style.css', 'style.css'],
+            ['css/.././style.css', 'style.css'],
+            ['css/../../style.css', '../style.css'],
+            ['./css/style.css', 'css/style.css'],
+            ['../css/style.css', '../css/style.css'],
+            ['./../css/style.css', '../css/style.css'],
+            ['.././css/style.css', '../css/style.css'],
+            ['../../css/style.css', '../../css/style.css'],
+            ['', ''],
+            ['.', ''],
+            ['..', '..'],
+            ['./..', '..'],
+            ['../.', '..'],
+            ['../..', '../..'],
 
             // relative paths (backslash)
-            array('css\\.\\style.css', 'css/style.css'),
-            array('css\\..\\style.css', 'style.css'),
-            array('css\\.\\..\\style.css', 'style.css'),
-            array('css\\..\\.\\style.css', 'style.css'),
-            array('css\\..\\..\\style.css', '../style.css'),
-            array('.\\css\\style.css', 'css/style.css'),
-            array('..\\css\\style.css', '../css/style.css'),
-            array('.\\..\\css\\style.css', '../css/style.css'),
-            array('..\\.\\css\\style.css', '../css/style.css'),
-            array('..\\..\\css\\style.css', '../../css/style.css'),
+            ['css\\.\\style.css', 'css/style.css'],
+            ['css\\..\\style.css', 'style.css'],
+            ['css\\.\\..\\style.css', 'style.css'],
+            ['css\\..\\.\\style.css', 'style.css'],
+            ['css\\..\\..\\style.css', '../style.css'],
+            ['.\\css\\style.css', 'css/style.css'],
+            ['..\\css\\style.css', '../css/style.css'],
+            ['.\\..\\css\\style.css', '../css/style.css'],
+            ['..\\.\\css\\style.css', '../css/style.css'],
+            ['..\\..\\css\\style.css', '../../css/style.css'],
 
             // absolute paths (forward slash, UNIX)
-            array('/css/style.css', '/css/style.css'),
-            array('/css/./style.css', '/css/style.css'),
-            array('/css/../style.css', '/style.css'),
-            array('/css/./../style.css', '/style.css'),
-            array('/css/.././style.css', '/style.css'),
-            array('/./css/style.css', '/css/style.css'),
-            array('/../css/style.css', '/css/style.css'),
-            array('/./../css/style.css', '/css/style.css'),
-            array('/.././css/style.css', '/css/style.css'),
-            array('/../../css/style.css', '/css/style.css'),
+            ['/css/style.css', '/css/style.css'],
+            ['/css/./style.css', '/css/style.css'],
+            ['/css/../style.css', '/style.css'],
+            ['/css/./../style.css', '/style.css'],
+            ['/css/.././style.css', '/style.css'],
+            ['/./css/style.css', '/css/style.css'],
+            ['/../css/style.css', '/css/style.css'],
+            ['/./../css/style.css', '/css/style.css'],
+            ['/.././css/style.css', '/css/style.css'],
+            ['/../../css/style.css', '/css/style.css'],
 
             // absolute paths (backslash, UNIX)
-            array('\\css\\style.css', '/css/style.css'),
-            array('\\css\\.\\style.css', '/css/style.css'),
-            array('\\css\\..\\style.css', '/style.css'),
-            array('\\css\\.\\..\\style.css', '/style.css'),
-            array('\\css\\..\\.\\style.css', '/style.css'),
-            array('\\.\\css\\style.css', '/css/style.css'),
-            array('\\..\\css\\style.css', '/css/style.css'),
-            array('\\.\\..\\css\\style.css', '/css/style.css'),
-            array('\\..\\.\\css\\style.css', '/css/style.css'),
-            array('\\..\\..\\css\\style.css', '/css/style.css'),
+            ['\\css\\style.css', '/css/style.css'],
+            ['\\css\\.\\style.css', '/css/style.css'],
+            ['\\css\\..\\style.css', '/style.css'],
+            ['\\css\\.\\..\\style.css', '/style.css'],
+            ['\\css\\..\\.\\style.css', '/style.css'],
+            ['\\.\\css\\style.css', '/css/style.css'],
+            ['\\..\\css\\style.css', '/css/style.css'],
+            ['\\.\\..\\css\\style.css', '/css/style.css'],
+            ['\\..\\.\\css\\style.css', '/css/style.css'],
+            ['\\..\\..\\css\\style.css', '/css/style.css'],
 
             // absolute paths (forward slash, Windows)
-            array('C:/css/style.css', 'C:/css/style.css'),
-            array('C:/css/./style.css', 'C:/css/style.css'),
-            array('C:/css/../style.css', 'C:/style.css'),
-            array('C:/css/./../style.css', 'C:/style.css'),
-            array('C:/css/.././style.css', 'C:/style.css'),
-            array('C:/./css/style.css', 'C:/css/style.css'),
-            array('C:/../css/style.css', 'C:/css/style.css'),
-            array('C:/./../css/style.css', 'C:/css/style.css'),
-            array('C:/.././css/style.css', 'C:/css/style.css'),
-            array('C:/../../css/style.css', 'C:/css/style.css'),
+            ['C:/css/style.css', 'C:/css/style.css'],
+            ['C:/css/./style.css', 'C:/css/style.css'],
+            ['C:/css/../style.css', 'C:/style.css'],
+            ['C:/css/./../style.css', 'C:/style.css'],
+            ['C:/css/.././style.css', 'C:/style.css'],
+            ['C:/./css/style.css', 'C:/css/style.css'],
+            ['C:/../css/style.css', 'C:/css/style.css'],
+            ['C:/./../css/style.css', 'C:/css/style.css'],
+            ['C:/.././css/style.css', 'C:/css/style.css'],
+            ['C:/../../css/style.css', 'C:/css/style.css'],
 
             // absolute paths (backslash, Windows)
-            array('C:\\css\\style.css', 'C:/css/style.css'),
-            array('C:\\css\\.\\style.css', 'C:/css/style.css'),
-            array('C:\\css\\..\\style.css', 'C:/style.css'),
-            array('C:\\css\\.\\..\\style.css', 'C:/style.css'),
-            array('C:\\css\\..\\.\\style.css', 'C:/style.css'),
-            array('C:\\.\\css\\style.css', 'C:/css/style.css'),
-            array('C:\\..\\css\\style.css', 'C:/css/style.css'),
-            array('C:\\.\\..\\css\\style.css', 'C:/css/style.css'),
-            array('C:\\..\\.\\css\\style.css', 'C:/css/style.css'),
-            array('C:\\..\\..\\css\\style.css', 'C:/css/style.css'),
+            ['C:\\css\\style.css', 'C:/css/style.css'],
+            ['C:\\css\\.\\style.css', 'C:/css/style.css'],
+            ['C:\\css\\..\\style.css', 'C:/style.css'],
+            ['C:\\css\\.\\..\\style.css', 'C:/style.css'],
+            ['C:\\css\\..\\.\\style.css', 'C:/style.css'],
+            ['C:\\.\\css\\style.css', 'C:/css/style.css'],
+            ['C:\\..\\css\\style.css', 'C:/css/style.css'],
+            ['C:\\.\\..\\css\\style.css', 'C:/css/style.css'],
+            ['C:\\..\\.\\css\\style.css', 'C:/css/style.css'],
+            ['C:\\..\\..\\css\\style.css', 'C:/css/style.css'],
 
             // Windows special case
-            array('C:', 'C:/'),
+            ['C:', 'C:/'],
 
             // Don't change malformed path
-            array('C:css/style.css', 'C:css/style.css'),
+            ['C:css/style.css', 'C:css/style.css'],
 
             // absolute paths (stream, UNIX)
-            array('phar:///css/style.css', 'phar:///css/style.css'),
-            array('phar:///css/./style.css', 'phar:///css/style.css'),
-            array('phar:///css/../style.css', 'phar:///style.css'),
-            array('phar:///css/./../style.css', 'phar:///style.css'),
-            array('phar:///css/.././style.css', 'phar:///style.css'),
-            array('phar:///./css/style.css', 'phar:///css/style.css'),
-            array('phar:///../css/style.css', 'phar:///css/style.css'),
-            array('phar:///./../css/style.css', 'phar:///css/style.css'),
-            array('phar:///.././css/style.css', 'phar:///css/style.css'),
-            array('phar:///../../css/style.css', 'phar:///css/style.css'),
+            ['phar:///css/style.css', 'phar:///css/style.css'],
+            ['phar:///css/./style.css', 'phar:///css/style.css'],
+            ['phar:///css/../style.css', 'phar:///style.css'],
+            ['phar:///css/./../style.css', 'phar:///style.css'],
+            ['phar:///css/.././style.css', 'phar:///style.css'],
+            ['phar:///./css/style.css', 'phar:///css/style.css'],
+            ['phar:///../css/style.css', 'phar:///css/style.css'],
+            ['phar:///./../css/style.css', 'phar:///css/style.css'],
+            ['phar:///.././css/style.css', 'phar:///css/style.css'],
+            ['phar:///../../css/style.css', 'phar:///css/style.css'],
 
             // absolute paths (stream, Windows)
-            array('phar://C:/css/style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/css/./style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/css/../style.css', 'phar://C:/style.css'),
-            array('phar://C:/css/./../style.css', 'phar://C:/style.css'),
-            array('phar://C:/css/.././style.css', 'phar://C:/style.css'),
-            array('phar://C:/./css/style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/../css/style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/./../css/style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/.././css/style.css', 'phar://C:/css/style.css'),
-            array('phar://C:/../../css/style.css', 'phar://C:/css/style.css'),
+            ['phar://C:/css/style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/css/./style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/css/../style.css', 'phar://C:/style.css'],
+            ['phar://C:/css/./../style.css', 'phar://C:/style.css'],
+            ['phar://C:/css/.././style.css', 'phar://C:/style.css'],
+            ['phar://C:/./css/style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/../css/style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/./../css/style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/.././css/style.css', 'phar://C:/css/style.css'],
+            ['phar://C:/../../css/style.css', 'phar://C:/css/style.css'],
 
             // paths with "~" UNIX
-            array('~/css/style.css', '/home/webmozart/css/style.css'),
-            array('~/css/./style.css', '/home/webmozart/css/style.css'),
-            array('~/css/../style.css', '/home/webmozart/style.css'),
-            array('~/css/./../style.css', '/home/webmozart/style.css'),
-            array('~/css/.././style.css', '/home/webmozart/style.css'),
-            array('~/./css/style.css', '/home/webmozart/css/style.css'),
-            array('~/../css/style.css', '/home/css/style.css'),
-            array('~/./../css/style.css', '/home/css/style.css'),
-            array('~/.././css/style.css', '/home/css/style.css'),
-            array('~/../../css/style.css', '/css/style.css'),
-        );
+            ['~/css/style.css', '/home/webmozart/css/style.css'],
+            ['~/css/./style.css', '/home/webmozart/css/style.css'],
+            ['~/css/../style.css', '/home/webmozart/style.css'],
+            ['~/css/./../style.css', '/home/webmozart/style.css'],
+            ['~/css/.././style.css', '/home/webmozart/style.css'],
+            ['~/./css/style.css', '/home/webmozart/css/style.css'],
+            ['~/../css/style.css', '/home/css/style.css'],
+            ['~/./../css/style.css', '/home/css/style.css'],
+            ['~/.././css/style.css', '/home/css/style.css'],
+            ['~/../../css/style.css', '/css/style.css'],
+        ];
     }
 
     /**
@@ -181,62 +181,62 @@ class PathTest extends TestCase
      */
     public function testCanonicalizeFailsIfInvalidPath()
     {
-        Path::canonicalize(array());
+        Path::canonicalize([]);
     }
 
     public function provideGetDirectoryTests()
     {
-        return array(
-            array('/webmozart/puli/style.css', '/webmozart/puli'),
-            array('/webmozart/puli', '/webmozart'),
-            array('/webmozart', '/'),
-            array('/', '/'),
-            array('', ''),
+        return [
+            ['/webmozart/puli/style.css', '/webmozart/puli'],
+            ['/webmozart/puli', '/webmozart'],
+            ['/webmozart', '/'],
+            ['/', '/'],
+            ['', ''],
 
-            array('\\webmozart\\puli\\style.css', '/webmozart/puli'),
-            array('\\webmozart\\puli', '/webmozart'),
-            array('\\webmozart', '/'),
-            array('\\', '/'),
+            ['\\webmozart\\puli\\style.css', '/webmozart/puli'],
+            ['\\webmozart\\puli', '/webmozart'],
+            ['\\webmozart', '/'],
+            ['\\', '/'],
 
-            array('C:/webmozart/puli/style.css', 'C:/webmozart/puli'),
-            array('C:/webmozart/puli', 'C:/webmozart'),
-            array('C:/webmozart', 'C:/'),
-            array('C:/', 'C:/'),
-            array('C:', 'C:/'),
+            ['C:/webmozart/puli/style.css', 'C:/webmozart/puli'],
+            ['C:/webmozart/puli', 'C:/webmozart'],
+            ['C:/webmozart', 'C:/'],
+            ['C:/', 'C:/'],
+            ['C:', 'C:/'],
 
-            array('C:\\webmozart\\puli\\style.css', 'C:/webmozart/puli'),
-            array('C:\\webmozart\\puli', 'C:/webmozart'),
-            array('C:\\webmozart', 'C:/'),
-            array('C:\\', 'C:/'),
+            ['C:\\webmozart\\puli\\style.css', 'C:/webmozart/puli'],
+            ['C:\\webmozart\\puli', 'C:/webmozart'],
+            ['C:\\webmozart', 'C:/'],
+            ['C:\\', 'C:/'],
 
-            array('phar:///webmozart/puli/style.css', 'phar:///webmozart/puli'),
-            array('phar:///webmozart/puli', 'phar:///webmozart'),
-            array('phar:///webmozart', 'phar:///'),
-            array('phar:///', 'phar:///'),
+            ['phar:///webmozart/puli/style.css', 'phar:///webmozart/puli'],
+            ['phar:///webmozart/puli', 'phar:///webmozart'],
+            ['phar:///webmozart', 'phar:///'],
+            ['phar:///', 'phar:///'],
 
-            array('phar://C:/webmozart/puli/style.css', 'phar://C:/webmozart/puli'),
-            array('phar://C:/webmozart/puli', 'phar://C:/webmozart'),
-            array('phar://C:/webmozart', 'phar://C:/'),
-            array('phar://C:/', 'phar://C:/'),
+            ['phar://C:/webmozart/puli/style.css', 'phar://C:/webmozart/puli'],
+            ['phar://C:/webmozart/puli', 'phar://C:/webmozart'],
+            ['phar://C:/webmozart', 'phar://C:/'],
+            ['phar://C:/', 'phar://C:/'],
 
-            array('webmozart/puli/style.css', 'webmozart/puli'),
-            array('webmozart/puli', 'webmozart'),
-            array('webmozart', ''),
+            ['webmozart/puli/style.css', 'webmozart/puli'],
+            ['webmozart/puli', 'webmozart'],
+            ['webmozart', ''],
 
-            array('webmozart\\puli\\style.css', 'webmozart/puli'),
-            array('webmozart\\puli', 'webmozart'),
-            array('webmozart', ''),
+            ['webmozart\\puli\\style.css', 'webmozart/puli'],
+            ['webmozart\\puli', 'webmozart'],
+            ['webmozart', ''],
 
-            array('/webmozart/./puli/style.css', '/webmozart/puli'),
-            array('/webmozart/../puli/style.css', '/puli'),
-            array('/webmozart/./../puli/style.css', '/puli'),
-            array('/webmozart/.././puli/style.css', '/puli'),
-            array('/webmozart/../../puli/style.css', '/puli'),
-            array('/.', '/'),
-            array('/..', '/'),
+            ['/webmozart/./puli/style.css', '/webmozart/puli'],
+            ['/webmozart/../puli/style.css', '/puli'],
+            ['/webmozart/./../puli/style.css', '/puli'],
+            ['/webmozart/.././puli/style.css', '/puli'],
+            ['/webmozart/../../puli/style.css', '/puli'],
+            ['/.', '/'],
+            ['/..', '/'],
 
-            array('C:webmozart', ''),
-        );
+            ['C:webmozart', ''],
+        ];
     }
 
     /**
@@ -253,20 +253,20 @@ class PathTest extends TestCase
      */
     public function testGetDirectoryFailsIfInvalidPath()
     {
-        Path::getDirectory(array());
+        Path::getDirectory([]);
     }
 
     public function provideGetFilenameTests()
     {
-        return array(
-            array('/webmozart/puli/style.css', 'style.css'),
-            array('/webmozart/puli/STYLE.CSS', 'STYLE.CSS'),
-            array('/webmozart/puli/style.css/', 'style.css'),
-            array('/webmozart/puli/', 'puli'),
-            array('/webmozart/puli', 'puli'),
-            array('/', ''),
-            array('', ''),
-        );
+        return [
+            ['/webmozart/puli/style.css', 'style.css'],
+            ['/webmozart/puli/STYLE.CSS', 'STYLE.CSS'],
+            ['/webmozart/puli/style.css/', 'style.css'],
+            ['/webmozart/puli/', 'puli'],
+            ['/webmozart/puli', 'puli'],
+            ['/', ''],
+            ['', ''],
+        ];
     }
 
     /**
@@ -283,32 +283,32 @@ class PathTest extends TestCase
      */
     public function testGetFilenameFailsIfInvalidPath()
     {
-        Path::getFilename(array());
+        Path::getFilename([]);
     }
 
     public function provideGetFilenameWithoutExtensionTests()
     {
-        return array(
-            array('/webmozart/puli/style.css.twig', null, 'style.css'),
-            array('/webmozart/puli/style.css.', null, 'style.css'),
-            array('/webmozart/puli/style.css', null, 'style'),
-            array('/webmozart/puli/.style.css', null, '.style'),
-            array('/webmozart/puli/', null, 'puli'),
-            array('/webmozart/puli', null, 'puli'),
-            array('/', null, ''),
-            array('', null, ''),
+        return [
+            ['/webmozart/puli/style.css.twig', null, 'style.css'],
+            ['/webmozart/puli/style.css.', null, 'style.css'],
+            ['/webmozart/puli/style.css', null, 'style'],
+            ['/webmozart/puli/.style.css', null, '.style'],
+            ['/webmozart/puli/', null, 'puli'],
+            ['/webmozart/puli', null, 'puli'],
+            ['/', null, ''],
+            ['', null, ''],
 
-            array('/webmozart/puli/style.css', 'css', 'style'),
-            array('/webmozart/puli/style.css', '.css', 'style'),
-            array('/webmozart/puli/style.css', 'twig', 'style.css'),
-            array('/webmozart/puli/style.css', '.twig', 'style.css'),
-            array('/webmozart/puli/style.css', '', 'style.css'),
-            array('/webmozart/puli/style.css.', '', 'style.css'),
-            array('/webmozart/puli/style.css.', '.', 'style.css'),
-            array('/webmozart/puli/style.css.', '.css', 'style.css'),
-            array('/webmozart/puli/.style.css', 'css', '.style'),
-            array('/webmozart/puli/.style.css', '.css', '.style'),
-        );
+            ['/webmozart/puli/style.css', 'css', 'style'],
+            ['/webmozart/puli/style.css', '.css', 'style'],
+            ['/webmozart/puli/style.css', 'twig', 'style.css'],
+            ['/webmozart/puli/style.css', '.twig', 'style.css'],
+            ['/webmozart/puli/style.css', '', 'style.css'],
+            ['/webmozart/puli/style.css.', '', 'style.css'],
+            ['/webmozart/puli/style.css.', '.', 'style.css'],
+            ['/webmozart/puli/style.css.', '.css', 'style.css'],
+            ['/webmozart/puli/.style.css', 'css', '.style'],
+            ['/webmozart/puli/.style.css', '.css', '.style'],
+        ];
     }
 
     /**
@@ -325,7 +325,7 @@ class PathTest extends TestCase
      */
     public function testGetFilenameWithoutExtensionFailsIfInvalidPath()
     {
-        Path::getFilenameWithoutExtension(array(), '.css');
+        Path::getFilenameWithoutExtension([], '.css');
     }
 
     /**
@@ -334,28 +334,28 @@ class PathTest extends TestCase
      */
     public function testGetFilenameWithoutExtensionFailsIfInvalidExtension()
     {
-        Path::getFilenameWithoutExtension('/style.css', array());
+        Path::getFilenameWithoutExtension('/style.css', []);
     }
 
     public function provideGetExtensionTests()
     {
-        $tests = array(
-            array('/webmozart/puli/style.css.twig', false, 'twig'),
-            array('/webmozart/puli/style.css', false, 'css'),
-            array('/webmozart/puli/style.css.', false, ''),
-            array('/webmozart/puli/', false, ''),
-            array('/webmozart/puli', false, ''),
-            array('/', false, ''),
-            array('', false, ''),
+        $tests = [
+            ['/webmozart/puli/style.css.twig', false, 'twig'],
+            ['/webmozart/puli/style.css', false, 'css'],
+            ['/webmozart/puli/style.css.', false, ''],
+            ['/webmozart/puli/', false, ''],
+            ['/webmozart/puli', false, ''],
+            ['/', false, ''],
+            ['', false, ''],
 
-            array('/webmozart/puli/style.CSS', false, 'CSS'),
-            array('/webmozart/puli/style.CSS', true, 'css'),
-            array('/webmozart/puli/style.ÄÖÜ', false, 'ÄÖÜ'),
-        );
+            ['/webmozart/puli/style.CSS', false, 'CSS'],
+            ['/webmozart/puli/style.CSS', true, 'css'],
+            ['/webmozart/puli/style.ÄÖÜ', false, 'ÄÖÜ'],
+        ];
 
-        if (extension_loaded('mbstring')) {
+        if (\extension_loaded('mbstring')) {
             // This can only be tested, when mbstring is installed
-            $tests[] = array('/webmozart/puli/style.ÄÖÜ', true, 'äöü');
+            $tests[] = ['/webmozart/puli/style.ÄÖÜ', true, 'äöü'];
         }
 
         return $tests;
@@ -375,47 +375,47 @@ class PathTest extends TestCase
      */
     public function testGetExtensionFailsIfInvalidPath()
     {
-        Path::getExtension(array());
+        Path::getExtension([]);
     }
 
     public function provideHasExtensionTests()
     {
-        $tests = array(
-            array(true, '/webmozart/puli/style.css.twig', null, false),
-            array(true, '/webmozart/puli/style.css', null, false),
-            array(false, '/webmozart/puli/style.css.', null, false),
-            array(false, '/webmozart/puli/', null, false),
-            array(false, '/webmozart/puli', null, false),
-            array(false, '/', null, false),
-            array(false, '', null, false),
+        $tests = [
+            [true, '/webmozart/puli/style.css.twig', null, false],
+            [true, '/webmozart/puli/style.css', null, false],
+            [false, '/webmozart/puli/style.css.', null, false],
+            [false, '/webmozart/puli/', null, false],
+            [false, '/webmozart/puli', null, false],
+            [false, '/', null, false],
+            [false, '', null, false],
 
-            array(true, '/webmozart/puli/style.css.twig', 'twig', false),
-            array(false, '/webmozart/puli/style.css.twig', 'css', false),
-            array(true, '/webmozart/puli/style.css', 'css', false),
-            array(true, '/webmozart/puli/style.css', '.css', false),
-            array(true, '/webmozart/puli/style.css.', '', false),
-            array(false, '/webmozart/puli/', 'ext', false),
-            array(false, '/webmozart/puli', 'ext', false),
-            array(false, '/', 'ext', false),
-            array(false, '', 'ext', false),
+            [true, '/webmozart/puli/style.css.twig', 'twig', false],
+            [false, '/webmozart/puli/style.css.twig', 'css', false],
+            [true, '/webmozart/puli/style.css', 'css', false],
+            [true, '/webmozart/puli/style.css', '.css', false],
+            [true, '/webmozart/puli/style.css.', '', false],
+            [false, '/webmozart/puli/', 'ext', false],
+            [false, '/webmozart/puli', 'ext', false],
+            [false, '/', 'ext', false],
+            [false, '', 'ext', false],
 
-            array(false, '/webmozart/puli/style.css', 'CSS', false),
-            array(true, '/webmozart/puli/style.css', 'CSS', true),
-            array(false, '/webmozart/puli/style.CSS', 'css', false),
-            array(true, '/webmozart/puli/style.CSS', 'css', true),
-            array(true, '/webmozart/puli/style.ÄÖÜ', 'ÄÖÜ', false),
+            [false, '/webmozart/puli/style.css', 'CSS', false],
+            [true, '/webmozart/puli/style.css', 'CSS', true],
+            [false, '/webmozart/puli/style.CSS', 'css', false],
+            [true, '/webmozart/puli/style.CSS', 'css', true],
+            [true, '/webmozart/puli/style.ÄÖÜ', 'ÄÖÜ', false],
 
-            array(true, '/webmozart/puli/style.css', array('ext', 'css'), false),
-            array(true, '/webmozart/puli/style.css', array('.ext', '.css'), false),
-            array(true, '/webmozart/puli/style.css.', array('ext', ''), false),
-            array(false, '/webmozart/puli/style.css', array('foo', 'bar', ''), false),
-            array(false, '/webmozart/puli/style.css', array('.foo', '.bar', ''), false),
-        );
+            [true, '/webmozart/puli/style.css', ['ext', 'css'], false],
+            [true, '/webmozart/puli/style.css', ['.ext', '.css'], false],
+            [true, '/webmozart/puli/style.css.', ['ext', ''], false],
+            [false, '/webmozart/puli/style.css', ['foo', 'bar', ''], false],
+            [false, '/webmozart/puli/style.css', ['.foo', '.bar', ''], false],
+        ];
 
-        if (extension_loaded('mbstring')) {
+        if (\extension_loaded('mbstring')) {
             // This can only be tested, when mbstring is installed
-            $tests[] = array(true, '/webmozart/puli/style.ÄÖÜ', 'äöü', true);
-            $tests[] = array(true, '/webmozart/puli/style.ÄÖÜ', array('äöü'), true);
+            $tests[] = [true, '/webmozart/puli/style.ÄÖÜ', 'äöü', true];
+            $tests[] = [true, '/webmozart/puli/style.ÄÖÜ', ['äöü'], true];
         }
 
         return $tests;
@@ -435,7 +435,7 @@ class PathTest extends TestCase
      */
     public function testHasExtensionFailsIfInvalidPath()
     {
-        Path::hasExtension(array());
+        Path::hasExtension([]);
     }
 
     /**
@@ -444,25 +444,25 @@ class PathTest extends TestCase
      */
     public function testHasExtensionFailsIfInvalidExtension()
     {
-        Path::hasExtension('/style.css', (object)array());
+        Path::hasExtension('/style.css', (object) []);
     }
 
     public function provideChangeExtensionTests()
     {
-        return array(
-            array('/webmozart/puli/style.css.twig', 'html', '/webmozart/puli/style.css.html'),
-            array('/webmozart/puli/style.css', 'sass', '/webmozart/puli/style.sass'),
-            array('/webmozart/puli/style.css', '.sass', '/webmozart/puli/style.sass'),
-            array('/webmozart/puli/style.css', '', '/webmozart/puli/style.'),
-            array('/webmozart/puli/style.css.', 'twig', '/webmozart/puli/style.css.twig'),
-            array('/webmozart/puli/style.css.', '', '/webmozart/puli/style.css.'),
-            array('/webmozart/puli/style.css', 'äöü', '/webmozart/puli/style.äöü'),
-            array('/webmozart/puli/style.äöü', 'css', '/webmozart/puli/style.css'),
-            array('/webmozart/puli/', 'css', '/webmozart/puli/'),
-            array('/webmozart/puli', 'css', '/webmozart/puli.css'),
-            array('/', 'css', '/'),
-            array('', 'css', ''),
-        );
+        return [
+            ['/webmozart/puli/style.css.twig', 'html', '/webmozart/puli/style.css.html'],
+            ['/webmozart/puli/style.css', 'sass', '/webmozart/puli/style.sass'],
+            ['/webmozart/puli/style.css', '.sass', '/webmozart/puli/style.sass'],
+            ['/webmozart/puli/style.css', '', '/webmozart/puli/style.'],
+            ['/webmozart/puli/style.css.', 'twig', '/webmozart/puli/style.css.twig'],
+            ['/webmozart/puli/style.css.', '', '/webmozart/puli/style.css.'],
+            ['/webmozart/puli/style.css', 'äöü', '/webmozart/puli/style.äöü'],
+            ['/webmozart/puli/style.äöü', 'css', '/webmozart/puli/style.css'],
+            ['/webmozart/puli/', 'css', '/webmozart/puli/'],
+            ['/webmozart/puli', 'css', '/webmozart/puli.css'],
+            ['/', 'css', '/'],
+            ['', 'css', ''],
+        ];
     }
 
     /**
@@ -481,7 +481,7 @@ class PathTest extends TestCase
      */
     public function testChangeExtensionFailsIfInvalidPath()
     {
-        Path::changeExtension(array(), '.sass');
+        Path::changeExtension([], '.sass');
     }
 
     /**
@@ -490,36 +490,36 @@ class PathTest extends TestCase
      */
     public function testChangeExtensionFailsIfInvalidExtension()
     {
-        Path::changeExtension('/style.css', array());
+        Path::changeExtension('/style.css', []);
     }
 
     public function provideIsAbsolutePathTests()
     {
-        return array(
-            array('/css/style.css', true),
-            array('/', true),
-            array('css/style.css', false),
-            array('', false),
+        return [
+            ['/css/style.css', true],
+            ['/', true],
+            ['css/style.css', false],
+            ['', false],
 
-            array('\\css\\style.css', true),
-            array('\\', true),
-            array('css\\style.css', false),
+            ['\\css\\style.css', true],
+            ['\\', true],
+            ['css\\style.css', false],
 
-            array('C:/css/style.css', true),
-            array('D:/', true),
+            ['C:/css/style.css', true],
+            ['D:/', true],
 
-            array('E:\\css\\style.css', true),
-            array('F:\\', true),
+            ['E:\\css\\style.css', true],
+            ['F:\\', true],
 
-            array('phar:///css/style.css', true),
-            array('phar:///', true),
+            ['phar:///css/style.css', true],
+            ['phar:///', true],
 
             // Windows special case
-            array('C:', true),
+            ['C:', true],
 
             // Not considered absolute
-            array('C:css/style.css', false),
-        );
+            ['C:css/style.css', false],
+        ];
     }
 
     /**
@@ -536,7 +536,7 @@ class PathTest extends TestCase
      */
     public function testIsAbsoluteFailsIfInvalidPath()
     {
-        Path::isAbsolute(array());
+        Path::isAbsolute([]);
     }
 
     /**
@@ -553,35 +553,35 @@ class PathTest extends TestCase
      */
     public function testIsRelativeFailsIfInvalidPath()
     {
-        Path::isRelative(array());
+        Path::isRelative([]);
     }
 
     public function provideGetRootTests()
     {
-        return array(
-            array('/css/style.css', '/'),
-            array('/', '/'),
-            array('css/style.css', ''),
-            array('', ''),
+        return [
+            ['/css/style.css', '/'],
+            ['/', '/'],
+            ['css/style.css', ''],
+            ['', ''],
 
-            array('\\css\\style.css', '/'),
-            array('\\', '/'),
-            array('css\\style.css', ''),
+            ['\\css\\style.css', '/'],
+            ['\\', '/'],
+            ['css\\style.css', ''],
 
-            array('C:/css/style.css', 'C:/'),
-            array('C:/', 'C:/'),
-            array('C:', 'C:/'),
+            ['C:/css/style.css', 'C:/'],
+            ['C:/', 'C:/'],
+            ['C:', 'C:/'],
 
-            array('D:\\css\\style.css', 'D:/'),
-            array('D:\\', 'D:/'),
+            ['D:\\css\\style.css', 'D:/'],
+            ['D:\\', 'D:/'],
 
-            array('phar:///css/style.css', 'phar:///'),
-            array('phar:///', 'phar:///'),
+            ['phar:///css/style.css', 'phar:///'],
+            ['phar:///', 'phar:///'],
 
-            array('phar://C:/css/style.css', 'phar://C:/'),
-            array('phar://C:/', 'phar://C:/'),
-            array('phar://C:', 'phar://C:/'),
-        );
+            ['phar://C:/css/style.css', 'phar://C:/'],
+            ['phar://C:/', 'phar://C:/'],
+            ['phar://C:', 'phar://C:/'],
+        ];
     }
 
     /**
@@ -598,95 +598,95 @@ class PathTest extends TestCase
      */
     public function testGetRootFailsIfInvalidPath()
     {
-        Path::getRoot(array());
+        Path::getRoot([]);
     }
 
     public function providePathTests()
     {
-        return array(
+        return [
             // relative to absolute path
-            array('css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'),
-            array('../css/style.css', '/webmozart/puli', '/webmozart/css/style.css'),
-            array('../../css/style.css', '/webmozart/puli', '/css/style.css'),
+            ['css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'],
+            ['../css/style.css', '/webmozart/puli', '/webmozart/css/style.css'],
+            ['../../css/style.css', '/webmozart/puli', '/css/style.css'],
 
             // relative to root
-            array('css/style.css', '/', '/css/style.css'),
-            array('css/style.css', 'C:', 'C:/css/style.css'),
-            array('css/style.css', 'C:/', 'C:/css/style.css'),
+            ['css/style.css', '/', '/css/style.css'],
+            ['css/style.css', 'C:', 'C:/css/style.css'],
+            ['css/style.css', 'C:/', 'C:/css/style.css'],
 
             // same sub directories in different base directories
-            array('../../puli/css/style.css', '/webmozart/css', '/puli/css/style.css'),
+            ['../../puli/css/style.css', '/webmozart/css', '/puli/css/style.css'],
 
-            array('', '/webmozart/puli', '/webmozart/puli'),
-            array('..', '/webmozart/puli', '/webmozart'),
-        );
+            ['', '/webmozart/puli', '/webmozart/puli'],
+            ['..', '/webmozart/puli', '/webmozart'],
+        ];
     }
 
     public function provideMakeAbsoluteTests()
     {
-        return array_merge($this->providePathTests(), array(
+        return array_merge($this->providePathTests(), [
             // collapse dots
-            array('css/./style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'),
-            array('css/../style.css', '/webmozart/puli', '/webmozart/puli/style.css'),
-            array('css/./../style.css', '/webmozart/puli', '/webmozart/puli/style.css'),
-            array('css/.././style.css', '/webmozart/puli', '/webmozart/puli/style.css'),
-            array('./css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'),
+            ['css/./style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'],
+            ['css/../style.css', '/webmozart/puli', '/webmozart/puli/style.css'],
+            ['css/./../style.css', '/webmozart/puli', '/webmozart/puli/style.css'],
+            ['css/.././style.css', '/webmozart/puli', '/webmozart/puli/style.css'],
+            ['./css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'],
 
-            array('css\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'),
-            array('css\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'),
-            array('css\\.\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'),
-            array('css\\..\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'),
-            array('.\\css\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'),
+            ['css\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'],
+            ['css\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'],
+            ['css\\.\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'],
+            ['css\\..\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'],
+            ['.\\css\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'],
 
             // collapse dots on root
-            array('./css/style.css', '/', '/css/style.css'),
-            array('../css/style.css', '/', '/css/style.css'),
-            array('../css/./style.css', '/', '/css/style.css'),
-            array('../css/../style.css', '/', '/style.css'),
-            array('../css/./../style.css', '/', '/style.css'),
-            array('../css/.././style.css', '/', '/style.css'),
+            ['./css/style.css', '/', '/css/style.css'],
+            ['../css/style.css', '/', '/css/style.css'],
+            ['../css/./style.css', '/', '/css/style.css'],
+            ['../css/../style.css', '/', '/style.css'],
+            ['../css/./../style.css', '/', '/style.css'],
+            ['../css/.././style.css', '/', '/style.css'],
 
-            array('.\\css\\style.css', '\\', '/css/style.css'),
-            array('..\\css\\style.css', '\\', '/css/style.css'),
-            array('..\\css\\.\\style.css', '\\', '/css/style.css'),
-            array('..\\css\\..\\style.css', '\\', '/style.css'),
-            array('..\\css\\.\\..\\style.css', '\\', '/style.css'),
-            array('..\\css\\..\\.\\style.css', '\\', '/style.css'),
+            ['.\\css\\style.css', '\\', '/css/style.css'],
+            ['..\\css\\style.css', '\\', '/css/style.css'],
+            ['..\\css\\.\\style.css', '\\', '/css/style.css'],
+            ['..\\css\\..\\style.css', '\\', '/style.css'],
+            ['..\\css\\.\\..\\style.css', '\\', '/style.css'],
+            ['..\\css\\..\\.\\style.css', '\\', '/style.css'],
 
-            array('./css/style.css', 'C:/', 'C:/css/style.css'),
-            array('../css/style.css', 'C:/', 'C:/css/style.css'),
-            array('../css/./style.css', 'C:/', 'C:/css/style.css'),
-            array('../css/../style.css', 'C:/', 'C:/style.css'),
-            array('../css/./../style.css', 'C:/', 'C:/style.css'),
-            array('../css/.././style.css', 'C:/', 'C:/style.css'),
+            ['./css/style.css', 'C:/', 'C:/css/style.css'],
+            ['../css/style.css', 'C:/', 'C:/css/style.css'],
+            ['../css/./style.css', 'C:/', 'C:/css/style.css'],
+            ['../css/../style.css', 'C:/', 'C:/style.css'],
+            ['../css/./../style.css', 'C:/', 'C:/style.css'],
+            ['../css/.././style.css', 'C:/', 'C:/style.css'],
 
-            array('.\\css\\style.css', 'C:\\', 'C:/css/style.css'),
-            array('..\\css\\style.css', 'C:\\', 'C:/css/style.css'),
-            array('..\\css\\.\\style.css', 'C:\\', 'C:/css/style.css'),
-            array('..\\css\\..\\style.css', 'C:\\', 'C:/style.css'),
-            array('..\\css\\.\\..\\style.css', 'C:\\', 'C:/style.css'),
-            array('..\\css\\..\\.\\style.css', 'C:\\', 'C:/style.css'),
+            ['.\\css\\style.css', 'C:\\', 'C:/css/style.css'],
+            ['..\\css\\style.css', 'C:\\', 'C:/css/style.css'],
+            ['..\\css\\.\\style.css', 'C:\\', 'C:/css/style.css'],
+            ['..\\css\\..\\style.css', 'C:\\', 'C:/style.css'],
+            ['..\\css\\.\\..\\style.css', 'C:\\', 'C:/style.css'],
+            ['..\\css\\..\\.\\style.css', 'C:\\', 'C:/style.css'],
 
-            array('./css/style.css', 'phar:///', 'phar:///css/style.css'),
-            array('../css/style.css', 'phar:///', 'phar:///css/style.css'),
-            array('../css/./style.css', 'phar:///', 'phar:///css/style.css'),
-            array('../css/../style.css', 'phar:///', 'phar:///style.css'),
-            array('../css/./../style.css', 'phar:///', 'phar:///style.css'),
-            array('../css/.././style.css', 'phar:///', 'phar:///style.css'),
+            ['./css/style.css', 'phar:///', 'phar:///css/style.css'],
+            ['../css/style.css', 'phar:///', 'phar:///css/style.css'],
+            ['../css/./style.css', 'phar:///', 'phar:///css/style.css'],
+            ['../css/../style.css', 'phar:///', 'phar:///style.css'],
+            ['../css/./../style.css', 'phar:///', 'phar:///style.css'],
+            ['../css/.././style.css', 'phar:///', 'phar:///style.css'],
 
-            array('./css/style.css', 'phar://C:/', 'phar://C:/css/style.css'),
-            array('../css/style.css', 'phar://C:/', 'phar://C:/css/style.css'),
-            array('../css/./style.css', 'phar://C:/', 'phar://C:/css/style.css'),
-            array('../css/../style.css', 'phar://C:/', 'phar://C:/style.css'),
-            array('../css/./../style.css', 'phar://C:/', 'phar://C:/style.css'),
-            array('../css/.././style.css', 'phar://C:/', 'phar://C:/style.css'),
+            ['./css/style.css', 'phar://C:/', 'phar://C:/css/style.css'],
+            ['../css/style.css', 'phar://C:/', 'phar://C:/css/style.css'],
+            ['../css/./style.css', 'phar://C:/', 'phar://C:/css/style.css'],
+            ['../css/../style.css', 'phar://C:/', 'phar://C:/style.css'],
+            ['../css/./../style.css', 'phar://C:/', 'phar://C:/style.css'],
+            ['../css/.././style.css', 'phar://C:/', 'phar://C:/style.css'],
 
             // absolute paths
-            array('/css/style.css', '/webmozart/puli', '/css/style.css'),
-            array('\\css\\style.css', '/webmozart/puli', '/css/style.css'),
-            array('C:/css/style.css', 'C:/webmozart/puli', 'C:/css/style.css'),
-            array('D:\\css\\style.css', 'D:/webmozart/puli', 'D:/css/style.css'),
-        ));
+            ['/css/style.css', '/webmozart/puli', '/css/style.css'],
+            ['\\css\\style.css', '/webmozart/puli', '/css/style.css'],
+            ['C:/css/style.css', 'C:/webmozart/puli', 'C:/css/style.css'],
+            ['D:\\css\\style.css', 'D:/webmozart/puli', 'D:/css/style.css'],
+        ]);
     }
 
     /**
@@ -703,7 +703,7 @@ class PathTest extends TestCase
      */
     public function testMakeAbsoluteFailsIfInvalidPath()
     {
-        Path::makeAbsolute(array(), '/webmozart/puli');
+        Path::makeAbsolute([], '/webmozart/puli');
     }
 
     /**
@@ -712,7 +712,7 @@ class PathTest extends TestCase
      */
     public function testMakeAbsoluteFailsIfInvalidBasePath()
     {
-        Path::makeAbsolute('css/style.css', array());
+        Path::makeAbsolute('css/style.css', []);
     }
 
     /**
@@ -744,30 +744,30 @@ class PathTest extends TestCase
 
     public function provideAbsolutePathsWithDifferentRoots()
     {
-        return array(
-            array('C:/css/style.css', '/webmozart/puli'),
-            array('C:/css/style.css', '\\webmozart\\puli'),
-            array('C:\\css\\style.css', '/webmozart/puli'),
-            array('C:\\css\\style.css', '\\webmozart\\puli'),
+        return [
+            ['C:/css/style.css', '/webmozart/puli'],
+            ['C:/css/style.css', '\\webmozart\\puli'],
+            ['C:\\css\\style.css', '/webmozart/puli'],
+            ['C:\\css\\style.css', '\\webmozart\\puli'],
 
-            array('/css/style.css', 'C:/webmozart/puli'),
-            array('/css/style.css', 'C:\\webmozart\\puli'),
-            array('\\css\\style.css', 'C:/webmozart/puli'),
-            array('\\css\\style.css', 'C:\\webmozart\\puli'),
+            ['/css/style.css', 'C:/webmozart/puli'],
+            ['/css/style.css', 'C:\\webmozart\\puli'],
+            ['\\css\\style.css', 'C:/webmozart/puli'],
+            ['\\css\\style.css', 'C:\\webmozart\\puli'],
 
-            array('D:/css/style.css', 'C:/webmozart/puli'),
-            array('D:/css/style.css', 'C:\\webmozart\\puli'),
-            array('D:\\css\\style.css', 'C:/webmozart/puli'),
-            array('D:\\css\\style.css', 'C:\\webmozart\\puli'),
+            ['D:/css/style.css', 'C:/webmozart/puli'],
+            ['D:/css/style.css', 'C:\\webmozart\\puli'],
+            ['D:\\css\\style.css', 'C:/webmozart/puli'],
+            ['D:\\css\\style.css', 'C:\\webmozart\\puli'],
 
-            array('phar:///css/style.css', '/webmozart/puli'),
-            array('/css/style.css', 'phar:///webmozart/puli'),
+            ['phar:///css/style.css', '/webmozart/puli'],
+            ['/css/style.css', 'phar:///webmozart/puli'],
 
-            array('phar://C:/css/style.css', 'C:/webmozart/puli'),
-            array('phar://C:/css/style.css', 'C:\\webmozart\\puli'),
-            array('phar://C:\\css\\style.css', 'C:/webmozart/puli'),
-            array('phar://C:\\css\\style.css', 'C:\\webmozart\\puli'),
-        );
+            ['phar://C:/css/style.css', 'C:/webmozart/puli'],
+            ['phar://C:/css/style.css', 'C:\\webmozart\\puli'],
+            ['phar://C:\\css\\style.css', 'C:/webmozart/puli'],
+            ['phar://C:\\css\\style.css', 'C:\\webmozart\\puli'],
+        ];
     }
 
     /**
@@ -783,96 +783,96 @@ class PathTest extends TestCase
     public function provideMakeRelativeTests()
     {
         $paths = array_map(function (array $arguments) {
-            return array($arguments[2], $arguments[1], $arguments[0]);
+            return [$arguments[2], $arguments[1], $arguments[0]];
         }, $this->providePathTests());
 
-        return array_merge($paths, array(
-            array('/webmozart/puli/./css/style.css', '/webmozart/puli', 'css/style.css'),
-            array('/webmozart/puli/../css/style.css', '/webmozart/puli', '../css/style.css'),
-            array('/webmozart/puli/.././css/style.css', '/webmozart/puli', '../css/style.css'),
-            array('/webmozart/puli/./../css/style.css', '/webmozart/puli', '../css/style.css'),
-            array('/webmozart/puli/../../css/style.css', '/webmozart/puli', '../../css/style.css'),
-            array('/webmozart/puli/css/style.css', '/webmozart/./puli', 'css/style.css'),
-            array('/webmozart/puli/css/style.css', '/webmozart/../puli', '../webmozart/puli/css/style.css'),
-            array('/webmozart/puli/css/style.css', '/webmozart/./../puli', '../webmozart/puli/css/style.css'),
-            array('/webmozart/puli/css/style.css', '/webmozart/.././puli', '../webmozart/puli/css/style.css'),
-            array('/webmozart/puli/css/style.css', '/webmozart/../../puli', '../webmozart/puli/css/style.css'),
+        return array_merge($paths, [
+            ['/webmozart/puli/./css/style.css', '/webmozart/puli', 'css/style.css'],
+            ['/webmozart/puli/../css/style.css', '/webmozart/puli', '../css/style.css'],
+            ['/webmozart/puli/.././css/style.css', '/webmozart/puli', '../css/style.css'],
+            ['/webmozart/puli/./../css/style.css', '/webmozart/puli', '../css/style.css'],
+            ['/webmozart/puli/../../css/style.css', '/webmozart/puli', '../../css/style.css'],
+            ['/webmozart/puli/css/style.css', '/webmozart/./puli', 'css/style.css'],
+            ['/webmozart/puli/css/style.css', '/webmozart/../puli', '../webmozart/puli/css/style.css'],
+            ['/webmozart/puli/css/style.css', '/webmozart/./../puli', '../webmozart/puli/css/style.css'],
+            ['/webmozart/puli/css/style.css', '/webmozart/.././puli', '../webmozart/puli/css/style.css'],
+            ['/webmozart/puli/css/style.css', '/webmozart/../../puli', '../webmozart/puli/css/style.css'],
 
             // first argument shorter than second
-            array('/css', '/webmozart/puli', '../../css'),
+            ['/css', '/webmozart/puli', '../../css'],
 
             // second argument shorter than first
-            array('/webmozart/puli', '/css', '../webmozart/puli'),
+            ['/webmozart/puli', '/css', '../webmozart/puli'],
 
-            array('\\webmozart\\puli\\css\\style.css', '\\webmozart\\puli', 'css/style.css'),
-            array('\\webmozart\\css\\style.css', '\\webmozart\\puli', '../css/style.css'),
-            array('\\css\\style.css', '\\webmozart\\puli', '../../css/style.css'),
+            ['\\webmozart\\puli\\css\\style.css', '\\webmozart\\puli', 'css/style.css'],
+            ['\\webmozart\\css\\style.css', '\\webmozart\\puli', '../css/style.css'],
+            ['\\css\\style.css', '\\webmozart\\puli', '../../css/style.css'],
 
-            array('C:/webmozart/puli/css/style.css', 'C:/webmozart/puli', 'css/style.css'),
-            array('C:/webmozart/css/style.css', 'C:/webmozart/puli', '../css/style.css'),
-            array('C:/css/style.css', 'C:/webmozart/puli', '../../css/style.css'),
+            ['C:/webmozart/puli/css/style.css', 'C:/webmozart/puli', 'css/style.css'],
+            ['C:/webmozart/css/style.css', 'C:/webmozart/puli', '../css/style.css'],
+            ['C:/css/style.css', 'C:/webmozart/puli', '../../css/style.css'],
 
-            array('C:\\webmozart\\puli\\css\\style.css', 'C:\\webmozart\\puli', 'css/style.css'),
-            array('C:\\webmozart\\css\\style.css', 'C:\\webmozart\\puli', '../css/style.css'),
-            array('C:\\css\\style.css', 'C:\\webmozart\\puli', '../../css/style.css'),
+            ['C:\\webmozart\\puli\\css\\style.css', 'C:\\webmozart\\puli', 'css/style.css'],
+            ['C:\\webmozart\\css\\style.css', 'C:\\webmozart\\puli', '../css/style.css'],
+            ['C:\\css\\style.css', 'C:\\webmozart\\puli', '../../css/style.css'],
 
-            array('phar:///webmozart/puli/css/style.css', 'phar:///webmozart/puli', 'css/style.css'),
-            array('phar:///webmozart/css/style.css', 'phar:///webmozart/puli', '../css/style.css'),
-            array('phar:///css/style.css', 'phar:///webmozart/puli', '../../css/style.css'),
+            ['phar:///webmozart/puli/css/style.css', 'phar:///webmozart/puli', 'css/style.css'],
+            ['phar:///webmozart/css/style.css', 'phar:///webmozart/puli', '../css/style.css'],
+            ['phar:///css/style.css', 'phar:///webmozart/puli', '../../css/style.css'],
 
-            array('phar://C:/webmozart/puli/css/style.css', 'phar://C:/webmozart/puli', 'css/style.css'),
-            array('phar://C:/webmozart/css/style.css', 'phar://C:/webmozart/puli', '../css/style.css'),
-            array('phar://C:/css/style.css', 'phar://C:/webmozart/puli', '../../css/style.css'),
+            ['phar://C:/webmozart/puli/css/style.css', 'phar://C:/webmozart/puli', 'css/style.css'],
+            ['phar://C:/webmozart/css/style.css', 'phar://C:/webmozart/puli', '../css/style.css'],
+            ['phar://C:/css/style.css', 'phar://C:/webmozart/puli', '../../css/style.css'],
 
             // already relative + already in root basepath
-            array('../style.css', '/', 'style.css'),
-            array('./style.css', '/', 'style.css'),
-            array('../../style.css', '/', 'style.css'),
-            array('..\\style.css', 'C:\\', 'style.css'),
-            array('.\\style.css', 'C:\\', 'style.css'),
-            array('..\\..\\style.css', 'C:\\', 'style.css'),
-            array('../style.css', 'C:/', 'style.css'),
-            array('./style.css', 'C:/', 'style.css'),
-            array('../../style.css', 'C:/', 'style.css'),
-            array('..\\style.css', '\\', 'style.css'),
-            array('.\\style.css', '\\', 'style.css'),
-            array('..\\..\\style.css', '\\', 'style.css'),
-            array('../style.css', 'phar:///', 'style.css'),
-            array('./style.css', 'phar:///', 'style.css'),
-            array('../../style.css', 'phar:///', 'style.css'),
-            array('..\\style.css', 'phar://C:\\', 'style.css'),
-            array('.\\style.css', 'phar://C:\\', 'style.css'),
-            array('..\\..\\style.css', 'phar://C:\\', 'style.css'),
+            ['../style.css', '/', 'style.css'],
+            ['./style.css', '/', 'style.css'],
+            ['../../style.css', '/', 'style.css'],
+            ['..\\style.css', 'C:\\', 'style.css'],
+            ['.\\style.css', 'C:\\', 'style.css'],
+            ['..\\..\\style.css', 'C:\\', 'style.css'],
+            ['../style.css', 'C:/', 'style.css'],
+            ['./style.css', 'C:/', 'style.css'],
+            ['../../style.css', 'C:/', 'style.css'],
+            ['..\\style.css', '\\', 'style.css'],
+            ['.\\style.css', '\\', 'style.css'],
+            ['..\\..\\style.css', '\\', 'style.css'],
+            ['../style.css', 'phar:///', 'style.css'],
+            ['./style.css', 'phar:///', 'style.css'],
+            ['../../style.css', 'phar:///', 'style.css'],
+            ['..\\style.css', 'phar://C:\\', 'style.css'],
+            ['.\\style.css', 'phar://C:\\', 'style.css'],
+            ['..\\..\\style.css', 'phar://C:\\', 'style.css'],
 
-            array('css/../style.css', '/', 'style.css'),
-            array('css/./style.css', '/', 'css/style.css'),
-            array('css\\..\\style.css', 'C:\\', 'style.css'),
-            array('css\\.\\style.css', 'C:\\', 'css/style.css'),
-            array('css/../style.css', 'C:/', 'style.css'),
-            array('css/./style.css', 'C:/', 'css/style.css'),
-            array('css\\..\\style.css', '\\', 'style.css'),
-            array('css\\.\\style.css', '\\', 'css/style.css'),
-            array('css/../style.css', 'phar:///', 'style.css'),
-            array('css/./style.css', 'phar:///', 'css/style.css'),
-            array('css\\..\\style.css', 'phar://C:\\', 'style.css'),
-            array('css\\.\\style.css', 'phar://C:\\', 'css/style.css'),
+            ['css/../style.css', '/', 'style.css'],
+            ['css/./style.css', '/', 'css/style.css'],
+            ['css\\..\\style.css', 'C:\\', 'style.css'],
+            ['css\\.\\style.css', 'C:\\', 'css/style.css'],
+            ['css/../style.css', 'C:/', 'style.css'],
+            ['css/./style.css', 'C:/', 'css/style.css'],
+            ['css\\..\\style.css', '\\', 'style.css'],
+            ['css\\.\\style.css', '\\', 'css/style.css'],
+            ['css/../style.css', 'phar:///', 'style.css'],
+            ['css/./style.css', 'phar:///', 'css/style.css'],
+            ['css\\..\\style.css', 'phar://C:\\', 'style.css'],
+            ['css\\.\\style.css', 'phar://C:\\', 'css/style.css'],
 
             // already relative
-            array('css/style.css', '/webmozart/puli', 'css/style.css'),
-            array('css\\style.css', '\\webmozart\\puli', 'css/style.css'),
+            ['css/style.css', '/webmozart/puli', 'css/style.css'],
+            ['css\\style.css', '\\webmozart\\puli', 'css/style.css'],
 
             // both relative
-            array('css/style.css', 'webmozart/puli', '../../css/style.css'),
-            array('css\\style.css', 'webmozart\\puli', '../../css/style.css'),
+            ['css/style.css', 'webmozart/puli', '../../css/style.css'],
+            ['css\\style.css', 'webmozart\\puli', '../../css/style.css'],
 
             // relative to empty
-            array('css/style.css', '', 'css/style.css'),
-            array('css\\style.css', '', 'css/style.css'),
+            ['css/style.css', '', 'css/style.css'],
+            ['css\\style.css', '', 'css/style.css'],
 
             // different slashes in path and base path
-            array('/webmozart/puli/css/style.css', '\\webmozart\\puli', 'css/style.css'),
-            array('\\webmozart\\puli\\css\\style.css', '/webmozart/puli', 'css/style.css'),
-        ));
+            ['/webmozart/puli/css/style.css', '\\webmozart\\puli', 'css/style.css'],
+            ['\\webmozart\\puli\\css\\style.css', '/webmozart/puli', 'css/style.css'],
+        ]);
     }
 
     /**
@@ -889,7 +889,7 @@ class PathTest extends TestCase
      */
     public function testMakeRelativeFailsIfInvalidPath()
     {
-        Path::makeRelative(array(), '/webmozart/puli');
+        Path::makeRelative([], '/webmozart/puli');
     }
 
     /**
@@ -898,7 +898,7 @@ class PathTest extends TestCase
      */
     public function testMakeRelativeFailsIfInvalidBasePath()
     {
-        Path::makeRelative('/webmozart/puli/css/style.css', array());
+        Path::makeRelative('/webmozart/puli/css/style.css', []);
     }
 
     /**
@@ -939,13 +939,13 @@ class PathTest extends TestCase
 
     public function provideIsLocalTests()
     {
-        return array(
-            array('/bg.png', true),
-            array('bg.png', true),
-            array('http://example.com/bg.png', false),
-            array('http://example.com', false),
-            array('', false),
-        );
+        return [
+            ['/bg.png', true],
+            ['bg.png', true],
+            ['http://example.com/bg.png', false],
+            ['http://example.com', false],
+            ['', false],
+        ];
     }
 
     /**
@@ -962,119 +962,119 @@ class PathTest extends TestCase
      */
     public function testIsLocalFailsIfInvalidPath()
     {
-        Path::isLocal(array());
+        Path::isLocal([]);
     }
 
     public function provideGetLongestCommonBasePathTests()
     {
-        return array(
+        return [
             // same paths
-            array(array('/base/path', '/base/path'), '/base/path'),
-            array(array('C:/base/path', 'C:/base/path'), 'C:/base/path'),
-            array(array('C:\\base\\path', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('C:/base/path', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('phar:///base/path', 'phar:///base/path'), 'phar:///base/path'),
-            array(array('phar://C:/base/path', 'phar://C:/base/path'), 'phar://C:/base/path'),
+            [['/base/path', '/base/path'], '/base/path'],
+            [['C:/base/path', 'C:/base/path'], 'C:/base/path'],
+            [['C:\\base\\path', 'C:\\base\\path'], 'C:/base/path'],
+            [['C:/base/path', 'C:\\base\\path'], 'C:/base/path'],
+            [['phar:///base/path', 'phar:///base/path'], 'phar:///base/path'],
+            [['phar://C:/base/path', 'phar://C:/base/path'], 'phar://C:/base/path'],
 
             // trailing slash
-            array(array('/base/path/', '/base/path'), '/base/path'),
-            array(array('C:/base/path/', 'C:/base/path'), 'C:/base/path'),
-            array(array('C:\\base\\path\\', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('C:/base/path/', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('phar:///base/path/', 'phar:///base/path'), 'phar:///base/path'),
-            array(array('phar://C:/base/path/', 'phar://C:/base/path'), 'phar://C:/base/path'),
+            [['/base/path/', '/base/path'], '/base/path'],
+            [['C:/base/path/', 'C:/base/path'], 'C:/base/path'],
+            [['C:\\base\\path\\', 'C:\\base\\path'], 'C:/base/path'],
+            [['C:/base/path/', 'C:\\base\\path'], 'C:/base/path'],
+            [['phar:///base/path/', 'phar:///base/path'], 'phar:///base/path'],
+            [['phar://C:/base/path/', 'phar://C:/base/path'], 'phar://C:/base/path'],
 
-            array(array('/base/path', '/base/path/'), '/base/path'),
-            array(array('C:/base/path', 'C:/base/path/'), 'C:/base/path'),
-            array(array('C:\\base\\path', 'C:\\base\\path\\'), 'C:/base/path'),
-            array(array('C:/base/path', 'C:\\base\\path\\'), 'C:/base/path'),
-            array(array('phar:///base/path', 'phar:///base/path/'), 'phar:///base/path'),
-            array(array('phar://C:/base/path', 'phar://C:/base/path/'), 'phar://C:/base/path'),
+            [['/base/path', '/base/path/'], '/base/path'],
+            [['C:/base/path', 'C:/base/path/'], 'C:/base/path'],
+            [['C:\\base\\path', 'C:\\base\\path\\'], 'C:/base/path'],
+            [['C:/base/path', 'C:\\base\\path\\'], 'C:/base/path'],
+            [['phar:///base/path', 'phar:///base/path/'], 'phar:///base/path'],
+            [['phar://C:/base/path', 'phar://C:/base/path/'], 'phar://C:/base/path'],
 
             // first in second
-            array(array('/base/path/sub', '/base/path'), '/base/path'),
-            array(array('C:/base/path/sub', 'C:/base/path'), 'C:/base/path'),
-            array(array('C:\\base\\path\\sub', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('C:/base/path/sub', 'C:\\base\\path'), 'C:/base/path'),
-            array(array('phar:///base/path/sub', 'phar:///base/path'), 'phar:///base/path'),
-            array(array('phar://C:/base/path/sub', 'phar://C:/base/path'), 'phar://C:/base/path'),
+            [['/base/path/sub', '/base/path'], '/base/path'],
+            [['C:/base/path/sub', 'C:/base/path'], 'C:/base/path'],
+            [['C:\\base\\path\\sub', 'C:\\base\\path'], 'C:/base/path'],
+            [['C:/base/path/sub', 'C:\\base\\path'], 'C:/base/path'],
+            [['phar:///base/path/sub', 'phar:///base/path'], 'phar:///base/path'],
+            [['phar://C:/base/path/sub', 'phar://C:/base/path'], 'phar://C:/base/path'],
 
             // second in first
-            array(array('/base/path', '/base/path/sub'), '/base/path'),
-            array(array('C:/base/path', 'C:/base/path/sub'), 'C:/base/path'),
-            array(array('C:\\base\\path', 'C:\\base\\path\\sub'), 'C:/base/path'),
-            array(array('C:/base/path', 'C:\\base\\path\\sub'), 'C:/base/path'),
-            array(array('phar:///base/path', 'phar:///base/path/sub'), 'phar:///base/path'),
-            array(array('phar://C:/base/path', 'phar://C:/base/path/sub'), 'phar://C:/base/path'),
+            [['/base/path', '/base/path/sub'], '/base/path'],
+            [['C:/base/path', 'C:/base/path/sub'], 'C:/base/path'],
+            [['C:\\base\\path', 'C:\\base\\path\\sub'], 'C:/base/path'],
+            [['C:/base/path', 'C:\\base\\path\\sub'], 'C:/base/path'],
+            [['phar:///base/path', 'phar:///base/path/sub'], 'phar:///base/path'],
+            [['phar://C:/base/path', 'phar://C:/base/path/sub'], 'phar://C:/base/path'],
 
             // first is prefix
-            array(array('/base/path/di', '/base/path/dir'), '/base/path'),
-            array(array('C:/base/path/di', 'C:/base/path/dir'), 'C:/base/path'),
-            array(array('C:\\base\\path\\di', 'C:\\base\\path\\dir'), 'C:/base/path'),
-            array(array('C:/base/path/di', 'C:\\base\\path\\dir'), 'C:/base/path'),
-            array(array('phar:///base/path/di', 'phar:///base/path/dir'), 'phar:///base/path'),
-            array(array('phar://C:/base/path/di', 'phar://C:/base/path/dir'), 'phar://C:/base/path'),
+            [['/base/path/di', '/base/path/dir'], '/base/path'],
+            [['C:/base/path/di', 'C:/base/path/dir'], 'C:/base/path'],
+            [['C:\\base\\path\\di', 'C:\\base\\path\\dir'], 'C:/base/path'],
+            [['C:/base/path/di', 'C:\\base\\path\\dir'], 'C:/base/path'],
+            [['phar:///base/path/di', 'phar:///base/path/dir'], 'phar:///base/path'],
+            [['phar://C:/base/path/di', 'phar://C:/base/path/dir'], 'phar://C:/base/path'],
 
             // second is prefix
-            array(array('/base/path/dir', '/base/path/di'), '/base/path'),
-            array(array('C:/base/path/dir', 'C:/base/path/di'), 'C:/base/path'),
-            array(array('C:\\base\\path\\dir', 'C:\\base\\path\\di'), 'C:/base/path'),
-            array(array('C:/base/path/dir', 'C:\\base\\path\\di'), 'C:/base/path'),
-            array(array('phar:///base/path/dir', 'phar:///base/path/di'), 'phar:///base/path'),
-            array(array('phar://C:/base/path/dir', 'phar://C:/base/path/di'), 'phar://C:/base/path'),
+            [['/base/path/dir', '/base/path/di'], '/base/path'],
+            [['C:/base/path/dir', 'C:/base/path/di'], 'C:/base/path'],
+            [['C:\\base\\path\\dir', 'C:\\base\\path\\di'], 'C:/base/path'],
+            [['C:/base/path/dir', 'C:\\base\\path\\di'], 'C:/base/path'],
+            [['phar:///base/path/dir', 'phar:///base/path/di'], 'phar:///base/path'],
+            [['phar://C:/base/path/dir', 'phar://C:/base/path/di'], 'phar://C:/base/path'],
 
             // root is common base path
-            array(array('/first', '/second'), '/'),
-            array(array('C:/first', 'C:/second'), 'C:/'),
-            array(array('C:\\first', 'C:\\second'), 'C:/'),
-            array(array('C:/first', 'C:\\second'), 'C:/'),
-            array(array('phar:///first', 'phar:///second'), 'phar:///'),
-            array(array('phar://C:/first', 'phar://C:/second'), 'phar://C:/'),
+            [['/first', '/second'], '/'],
+            [['C:/first', 'C:/second'], 'C:/'],
+            [['C:\\first', 'C:\\second'], 'C:/'],
+            [['C:/first', 'C:\\second'], 'C:/'],
+            [['phar:///first', 'phar:///second'], 'phar:///'],
+            [['phar://C:/first', 'phar://C:/second'], 'phar://C:/'],
 
             // windows vs unix
-            array(array('/base/path', 'C:/base/path'), null),
-            array(array('C:/base/path', '/base/path'), null),
-            array(array('/base/path', 'C:\\base\\path'), null),
-            array(array('phar:///base/path', 'phar://C:/base/path'), null),
+            [['/base/path', 'C:/base/path'], null],
+            [['C:/base/path', '/base/path'], null],
+            [['/base/path', 'C:\\base\\path'], null],
+            [['phar:///base/path', 'phar://C:/base/path'], null],
 
             // different partitions
-            array(array('C:/base/path', 'D:/base/path'), null),
-            array(array('C:/base/path', 'D:\\base\\path'), null),
-            array(array('C:\\base\\path', 'D:\\base\\path'), null),
-            array(array('phar://C:/base/path', 'phar://D:/base/path'), null),
+            [['C:/base/path', 'D:/base/path'], null],
+            [['C:/base/path', 'D:\\base\\path'], null],
+            [['C:\\base\\path', 'D:\\base\\path'], null],
+            [['phar://C:/base/path', 'phar://D:/base/path'], null],
 
             // three paths
-            array(array('/base/path/foo', '/base/path', '/base/path/bar'), '/base/path'),
-            array(array('C:/base/path/foo', 'C:/base/path', 'C:/base/path/bar'), 'C:/base/path'),
-            array(array('C:\\base\\path\\foo', 'C:\\base\\path', 'C:\\base\\path\\bar'), 'C:/base/path'),
-            array(array('C:/base/path//foo', 'C:/base/path', 'C:\\base\\path\\bar'), 'C:/base/path'),
-            array(array('phar:///base/path/foo', 'phar:///base/path', 'phar:///base/path/bar'), 'phar:///base/path'),
-            array(array('phar://C:/base/path/foo', 'phar://C:/base/path', 'phar://C:/base/path/bar'), 'phar://C:/base/path'),
+            [['/base/path/foo', '/base/path', '/base/path/bar'], '/base/path'],
+            [['C:/base/path/foo', 'C:/base/path', 'C:/base/path/bar'], 'C:/base/path'],
+            [['C:\\base\\path\\foo', 'C:\\base\\path', 'C:\\base\\path\\bar'], 'C:/base/path'],
+            [['C:/base/path//foo', 'C:/base/path', 'C:\\base\\path\\bar'], 'C:/base/path'],
+            [['phar:///base/path/foo', 'phar:///base/path', 'phar:///base/path/bar'], 'phar:///base/path'],
+            [['phar://C:/base/path/foo', 'phar://C:/base/path', 'phar://C:/base/path/bar'], 'phar://C:/base/path'],
 
             // three paths with root
-            array(array('/base/path/foo', '/', '/base/path/bar'), '/'),
-            array(array('C:/base/path/foo', 'C:/', 'C:/base/path/bar'), 'C:/'),
-            array(array('C:\\base\\path\\foo', 'C:\\', 'C:\\base\\path\\bar'), 'C:/'),
-            array(array('C:/base/path//foo', 'C:/', 'C:\\base\\path\\bar'), 'C:/'),
-            array(array('phar:///base/path/foo', 'phar:///', 'phar:///base/path/bar'), 'phar:///'),
-            array(array('phar://C:/base/path/foo', 'phar://C:/', 'phar://C:/base/path/bar'), 'phar://C:/'),
+            [['/base/path/foo', '/', '/base/path/bar'], '/'],
+            [['C:/base/path/foo', 'C:/', 'C:/base/path/bar'], 'C:/'],
+            [['C:\\base\\path\\foo', 'C:\\', 'C:\\base\\path\\bar'], 'C:/'],
+            [['C:/base/path//foo', 'C:/', 'C:\\base\\path\\bar'], 'C:/'],
+            [['phar:///base/path/foo', 'phar:///', 'phar:///base/path/bar'], 'phar:///'],
+            [['phar://C:/base/path/foo', 'phar://C:/', 'phar://C:/base/path/bar'], 'phar://C:/'],
 
             // three paths, different roots
-            array(array('/base/path/foo', 'C:/base/path', '/base/path/bar'), null),
-            array(array('/base/path/foo', 'C:\\base\\path', '/base/path/bar'), null),
-            array(array('C:/base/path/foo', 'D:/base/path', 'C:/base/path/bar'), null),
-            array(array('C:\\base\\path\\foo', 'D:\\base\\path', 'C:\\base\\path\\bar'), null),
-            array(array('C:/base/path//foo', 'D:/base/path', 'C:\\base\\path\\bar'), null),
-            array(array('phar:///base/path/foo', 'phar://C:/base/path', 'phar:///base/path/bar'), null),
-            array(array('phar://C:/base/path/foo', 'phar://D:/base/path', 'phar://C:/base/path/bar'), null),
+            [['/base/path/foo', 'C:/base/path', '/base/path/bar'], null],
+            [['/base/path/foo', 'C:\\base\\path', '/base/path/bar'], null],
+            [['C:/base/path/foo', 'D:/base/path', 'C:/base/path/bar'], null],
+            [['C:\\base\\path\\foo', 'D:\\base\\path', 'C:\\base\\path\\bar'], null],
+            [['C:/base/path//foo', 'D:/base/path', 'C:\\base\\path\\bar'], null],
+            [['phar:///base/path/foo', 'phar://C:/base/path', 'phar:///base/path/bar'], null],
+            [['phar://C:/base/path/foo', 'phar://D:/base/path', 'phar://C:/base/path/bar'], null],
 
             // only one path
-            array(array('/base/path'), '/base/path'),
-            array(array('C:/base/path'), 'C:/base/path'),
-            array(array('C:\\base\\path'), 'C:/base/path'),
-            array(array('phar:///base/path'), 'phar:///base/path'),
-            array(array('phar://C:/base/path'), 'phar://C:/base/path'),
-        );
+            [['/base/path'], '/base/path'],
+            [['C:/base/path'], 'C:/base/path'],
+            [['C:\\base\\path'], 'C:/base/path'],
+            [['phar:///base/path'], 'phar:///base/path'],
+            [['phar://C:/base/path'], 'phar://C:/base/path'],
+        ];
     }
 
     /**
@@ -1091,7 +1091,7 @@ class PathTest extends TestCase
      */
     public function testGetLongestCommonBasePathFailsIfInvalidPath()
     {
-        Path::getLongestCommonBasePath(array(array()));
+        Path::getLongestCommonBasePath([[]]);
     }
 
     public function provideIsBasePathTests()
@@ -1191,7 +1191,7 @@ class PathTest extends TestCase
      */
     public function testIsBasePathFailsIfInvalidBasePath()
     {
-        Path::isBasePath(array(), '/base/path');
+        Path::isBasePath([], '/base/path');
     }
 
     /**
@@ -1200,7 +1200,7 @@ class PathTest extends TestCase
      */
     public function testIsBasePathFailsIfInvalidPath()
     {
-        Path::isBasePath('/base/path', array());
+        Path::isBasePath('/base/path', []);
     }
 
     public function provideJoinTests()

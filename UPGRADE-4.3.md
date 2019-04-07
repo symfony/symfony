@@ -38,6 +38,12 @@ DependencyInjection
           env(NAME): '1.5'
    ```
 
+Doctrine Bridge
+---------------
+
+ * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field has been deprecated, pass `null` instead
+ * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field has been deprecated
+
 EventDispatcher
 ---------------
 

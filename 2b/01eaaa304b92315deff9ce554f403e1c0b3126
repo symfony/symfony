@@ -1,0 +1,175 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-04T10:01:47Z
+
+@vudaltsov could you please show a small before/after example ... and maybe also briefly list the changes that existing apps may need to do. Thanks.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-04T10:10:38Z
+
+@javiereguiluz , sure.
+
+```php
+final class UserApiNormalizer implements NormalizerInterface
+{
+    private $absoluteUrlGenerator;
+
+    public function __construct(AbsoluteUrlGeneratorInterface $absoluteUrlGenerator)
+    {
+        $this->absoluteUrlGenerator = $absoluteUrlGenerator;
+    }
+
+    public function normalize($user, $format = null, array $context = [])
+    {
+        return [
+            // ...
+            'avatar' => $this->absoluteUrlGenerator->generateAbsoluteUrl($user->avatar()->path()),
+            // ...
+        ];
+    }
+
+    // ...
+}
+```
+
+No changes needed for existing apps. Everything will continue to work as is. But two useful helping services will appear.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-04T10:32:26Z
+
+`AbsoluteUrlGeneratorInterface` looks like a routing concern.. probably caused by the "generate" term. Im a bit skeptical about introducing these interfaces under these names. Do we want/need the contracts even?
+
+Maybe `RequestContext::toAbsolute/RelativeUrl()`?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-04T10:39:51Z
+
+naming them UrlGenerator will indeed create confusion with the routing component
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-04T10:54:23Z
+
+Agree, I will consider different naming today.
+
+@ro0NL , `RequestContext` is not aware of the `RequestStack`, so it's not gonna work. This helper uses them both to get maximum information to generate an absolute url.
+
+As I explained, I created contracts because you might need to decorate these services once you have some additional context for generating an absolute url.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-04T11:05:17Z
+
+My idea was `RequestContext::toAbsoluteUrl(Request $request = null)`. From a controller pov you have the request at hand.
+
+> decorate these services once you have some additional context for generating an absolute url
+
+is this a feature we want to sell? URL composition is a fixed concept IMHO.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-04T11:55:27Z
+
+@ro0NL , I understand the idea of passing `Request` as an argument. We'll be able to generate paths for any request then.
+
+The problem is that DX is worse since almost always I will have to inject two services instead of one (`+RequestStack`) into non request aware services. Also I don't think it is a responsibility of the `RequestContext` to do this — it's just keeping and providing request data. And I also doubt that I will ever need this in controllers. Mostly in other services, used by commands and message handlers as well (see normalizer example above).
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-04T12:12:13Z
+
+Refactored to `UrlHelper` without interfaces. Looks better? I don't really like the word `helper`, honestly...
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-04-04T17:29:48Z
+
+Why is it final without an interface? Mocking this in userland will be a pain due to its dependencies and internal behavior. If it's something developers shouldn't use, I'd expect it to be `@internal`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-04T17:46:46Z
+
+one could pass a request stack with mocked requests, and any requestcontext. Im not sure utilities need interfaces.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-04-04T17:56:22Z
+
+That creates a massive overhead of objects that you have to bring into the correct state in order to test your function, while their internal behavior is of no concern to your particular test if mocking would be sufficient.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-04T19:09:59Z
+
+what about putting the interface in symfony/contracts? It's a bit weird for HttpFoundation (a specific concept) to introduce a polymorphic matter.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-05T06:10:57Z
+
+I would not create new abstraction for that. Best would be to add that to the Request class instead.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-05T06:57:56Z
+
+@fabpot, this cannot be done in `Request` because we need `RequestContext` as a fallback. The idea of these helper utilities is to provide absolute urls even outside the request scope (commands, for example).
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T12:48:40Z
+
+After discussing with @fabpot , moved to Routing, since the helper depends on the `RequestContext` which is a routing class.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T13:00:49Z
+
+Btw, what's the best way to handle deprecations in `HttpFoundationExtension`?
+Add `@expectedDeprecation`?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T13:15:46Z
+
+@fabpot , looked for places in Symfony where I could replace some code with a helper call (except the Twig `HttpFoundationExtension`). Two looked relevant:
+
+1. https://github.com/symfony/symfony/blob/5fe3701f0541590193b964e86a97d0960c1ecc8b/src/Symfony/Component/Security/Http/HttpUtils.php#L65 .
+2. https://github.com/symfony/symfony/blob/5fe3701f0541590193b964e86a97d0960c1ecc8b/src/Symfony/Bundle/FrameworkBundle/Controller/RedirectController.php#L131
+
+But it seems that `UrlHelper` will not really help there :)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T13:17:08Z
+
+The latest Travis build: https://travis-ci.org/symfony/symfony/builds/516563856
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T14:26:12Z
+
+All comments addressed.
+Marked `HttpFoundationExtensionTest` with `@group legacy` since now all tests are in `UrlHelperTest` class.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T15:10:27Z
+
+@stof , thank you! Moved it back to `HttpFoundation`. The service will work without the routing component, thanx to `"router.request_context" on-invalid="ignore"`
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-06T19:09:45Z
+
+@xabbuh , done!
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-04-07T09:20:50Z
+
+Ready!

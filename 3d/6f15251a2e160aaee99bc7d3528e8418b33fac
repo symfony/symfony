@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-07T08:03:35Z
+
+# Before
+
+```
+src/Symfony/Component/Form/Resources/translations/validators.en.xlf
+===================================================================
+
+PHP Warning:  max(): Array must contain at least one element in /home/gregoire/dev/symfony/src/Symfony/Component/Translation/Resources/bin/translation-status.php on line 162
+
+src/Symfony/Component/Security/Core/Resources/translations/security.en.xlf
+==========================================================================
+
+PHP Warning:  max(): Array must contain at least one element in /home/gregoire/dev/symfony/src/Symfony/Component/Translation/Resources/bin/translation-status.php on line 162
+
+src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+========================================================================
+
+PHP Warning:  max(): Array must contain at least one element in /home/gregoire/dev/symfony/src/Symfony/Component/Translation/Resources/bin/translation-status.php on line 162
+
+```
+
+# After
+
+```
+src/Symfony/Component/Form/Resources/translations/validators.en.xlf
+===================================================================
+
+No translations found
+
+src/Symfony/Component/Security/Core/Resources/translations/security.en.xlf
+==========================================================================
+
+No translations found
+
+src/Symfony/Component/Validator/Resources/translations/validators.en.xlf
+========================================================================
+
+No translations found
+
+```

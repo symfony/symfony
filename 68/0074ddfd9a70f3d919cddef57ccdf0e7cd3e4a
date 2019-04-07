@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2019-04-06T15:21:51Z
+
+This makes the travis tests fail though?
+
+https://travis-ci.org/symfony/symfony/jobs/516576674
+
+```
+1) Symfony\Component\HttpClient\Tests\CurlHttpClientTest::testTimeoutOnStream
+Failed asserting that Array &0 (
+    0 => 't'
+) is identical to Array &0 (
+    0 => '<1>'
+    1 => 't'
+).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T08:06:54Z
+
+Let's just silence the notice
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-07T08:27:00Z
+
+> Let's just silence the notice
+
+That's what I did now.

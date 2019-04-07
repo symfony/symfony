@@ -163,13 +163,10 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         };
 
         $choiceName = function (Options $options) {
-            /** @var IdReader $idReader */
-            $idReader = $options['id_reader'];
-
             // If the object has a single-column, numeric ID, use that ID as
             // field name. We can only use numeric IDs as names, as we cannot
             // guarantee that a non-numeric ID contains a valid form name
-            if ($idReader->isIntId()) {
+            if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isIntId()) {
                 return [__CLASS__, 'createChoiceName'];
             }
 
@@ -181,12 +178,9 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
         // are indexed by an incrementing integer.
         // Use the ID/incrementing integer as choice value.
         $choiceValue = function (Options $options) {
-            /** @var IdReader $idReader */
-            $idReader = $options['id_reader'];
-
             // If the entity has a single-column ID, use that ID as value
-            if ($idReader->isSingleId()) {
-                return [$idReader, 'getIdValue'];
+            if ($options['id_reader'] instanceof IdReader && $options['id_reader']->isSingleId()) {
+                return [$options['id_reader'], 'getIdValue'];
             }
 
             // Otherwise, an incrementing integer is used as value automatically
@@ -240,7 +234,11 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                 $this->idReaders[$hash] = new IdReader($options['em'], $classMetadata);
             }
 
-            return $this->idReaders[$hash];
+            if ($this->idReaders[$hash]->isSingleId()) {
+                return $this->idReaders[$hash];
+            }
+
+            return null;
         };
 
         $resolver->setDefaults([

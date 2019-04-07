@@ -81,6 +81,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->idReader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->idReader->expects($this->any())
+            ->method('isSingleId')
+            ->willReturn(true)
+        ;
+
         $this->objectLoader = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface')->getMock();
         $this->obj1 = (object) ['name' => 'A'];
         $this->obj2 = (object) ['name' => 'B'];
@@ -151,7 +156,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader
+            null
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -189,10 +194,6 @@ class DoctrineChoiceLoaderTest extends TestCase
             $this->idReader
         );
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->never())
             ->method('findAll');
 
@@ -215,10 +216,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->once())
             ->method('findAll')
             ->willReturn($choices);
@@ -238,10 +235,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         );
 
         $value = [$this->idReader, 'getIdValue'];
-
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
 
         $this->repository->expects($this->never())
             ->method('findAll');
@@ -304,10 +297,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj2, $this->obj3];
 
         $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
-        $this->idReader->expects($this->any())
             ->method('getIdField')
             ->willReturn('idField');
 
@@ -343,10 +332,6 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
         $this->repository->expects($this->once())
             ->method('findAll')
             ->willReturn($choices);
@@ -368,10 +353,6 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$this->obj2, $this->obj3];
         $value = [$this->idReader, 'getIdValue'];
-
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
 
         $this->idReader->expects($this->any())
             ->method('getIdField')
@@ -398,7 +379,7 @@ class DoctrineChoiceLoaderTest extends TestCase
     /**
      * @group legacy
      *
-     * @expectedDeprecation Not explicitly passing an instance of "Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.
+     * @expectedDeprecation Not explicitly passing an instance of "Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader" to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.
      */
     public function testLoaderWithoutIdReaderCanBeOptimized()
     {
@@ -445,14 +426,6 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$obj1, $obj2];
 
-        $this->idReader->expects($this->any())
-            ->method('isSingleId')
-            ->willReturn(true);
-
-        $this->idReader->expects($this->any())
-            ->method('getIdField')
-            ->willReturn('idField');
-
         $this->repository->expects($this->never())
             ->method('findAll');
 
@@ -461,13 +434,29 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->with('idField', ['1'])
             ->willReturn($choices);
 
-        $this->idReader->expects($this->any())
-            ->method('getIdValue')
-            ->willReturnMap([
-                [$obj1, '1'],
-                [$obj2, '2'],
-            ]);
-
         $this->assertSame([$obj1], $loader->loadChoicesForValues(['1']));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @deprecationMessage Passing an instance of "Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader" to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" with an entity class "stdClass" that has a composite id is deprecated since Symfony 4.3 and will throw an exception in 5.0.
+     */
+    public function testPassingIdReaderWithoutSingleIdEntity()
+    {
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->expects($this->once())
+            ->method('isSingleId')
+            ->willReturn(false)
+        ;
+
+        $loader = new DoctrineChoiceLoader(
+            $this->om,
+            $this->class,
+            $idReader,
+            $this->objectLoader
+        );
+
+        $this->assertInstanceOf(DoctrineChoiceLoader::class, $loader);
     }
 }

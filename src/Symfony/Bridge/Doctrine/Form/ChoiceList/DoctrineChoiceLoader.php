@@ -42,18 +42,25 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      *
      * @param ObjectManager              $manager      The object manager
      * @param string                     $class        The class name of the loaded objects
-     * @param IdReader                   $idReader     The reader for the object IDs
+     * @param IdReader|null              $idReader     The reader for the object IDs
      * @param EntityLoaderInterface|null $objectLoader The objects loader
      */
     public function __construct(ObjectManager $manager, string $class, IdReader $idReader = null, EntityLoaderInterface $objectLoader = null)
     {
         $classMetadata = $manager->getClassMetadata($class);
 
+        if ($idReader && !$idReader->isSingleId()) {
+            @trigger_error(sprintf('Passing an instance of "%s" to "%s" with an entity class "%s" that has a composite id is deprecated since Symfony 4.3 and will throw an exception in 5.0.', IdReader::class, __CLASS__, $class), E_USER_DEPRECATED);
+
+            // In Symfony 5.0
+            // throw new \InvalidArgumentException(sprintf('The second argument `$idReader` of "%s" must be null when the query cannot be optimized because of composite id fields.', __METHOD__));
+        }
+
         if ((5 > \func_num_args() || false !== func_get_arg(4)) && null === $idReader) {
             $idReader = new IdReader($manager, $classMetadata);
 
             if ($idReader->isSingleId()) {
-                @trigger_error(sprintf('Not explicitly passing an instance of "%s" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.', IdReader::class, $class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not explicitly passing an instance of "%s" to "%s" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.', IdReader::class, __CLASS__, $class), E_USER_DEPRECATED);
             } else {
                 $idReader = null;
             }
@@ -93,7 +100,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance for single-field identifiers. We already
         // know that the IDs are used as values
-        $optimize = null === $value || \is_array($value) && $value[0] === $this->idReader;
+        $optimize = $this->idReader && (null === $value || \is_array($value) && $value[0] === $this->idReader);
 
         // Attention: This optimization does not check choices for existence
         if ($optimize && !$this->choiceList && $this->idReader->isSingleId()) {

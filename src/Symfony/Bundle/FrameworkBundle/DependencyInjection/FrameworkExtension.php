@@ -487,6 +487,11 @@ class FrameworkExtension extends Extension
 
             return;
         }
+        if ($container->hasParameter('fragment.renderer.hinclude.global_template') && null !== $container->getParameter('fragment.renderer.hinclude.global_template') && null !== $config['hinclude_default_template']) {
+            throw new \LogicException('You cannot set both "templating.hinclude_default_template" and "fragments.hinclude_default_template", please only use "fragments.hinclude_default_template".');
+        }
+
+        $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
         $loader->load('fragment_listener.xml');
         $container->setParameter('fragment.path', $config['path']);

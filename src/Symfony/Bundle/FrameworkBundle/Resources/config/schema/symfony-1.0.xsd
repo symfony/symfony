@@ -69,6 +69,7 @@
     <xsd:complexType name="fragments">
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="hinclude-default-template" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="web_link">

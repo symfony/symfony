@@ -159,6 +159,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('esi'));
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testAmbiguousWhenBothTemplatingAndFragments()
+    {
+        $this->createContainerFromFile('template_and_fragments');
+    }
+
     public function testSsi()
     {
         $container = $this->createContainerFromFile('full');

@@ -26,7 +26,7 @@ trait ObjectToPopulateTrait
      */
     protected function extractObjectToPopulate($class, array $context, $key = null)
     {
-        $key = $key ?: 'object_to_populate';
+        $key = $key ?? AbstractNormalizer::OBJECT_TO_POPULATE;
 
         if (isset($context[$key]) && \is_object($context[$key]) && $context[$key] instanceof $class) {
             return $context[$key];

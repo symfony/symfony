@@ -13,6 +13,14 @@ namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsAClassImplementingSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsAnInterfaceThatExtendsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializableWithTheNewMechanism;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializableWithTheNewMechanismThroughVirtualMethods;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsAnInterfaceThatExtendsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable;
+use Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializableWithTheNewMechanism;
 
 class DebugClassLoaderTest extends TestCase
 {
@@ -361,6 +369,40 @@ class DebugClassLoaderTest extends TestCase
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\DefinitionInEvaluatedCode', true));
     }
+
+    /**
+     * @runInSeparateProcess
+     *
+     * @dataProvider implementsSerializableProvider
+     */
+    public function testImplementsSerializable(array $expectedDeprecations, string $class)
+    {
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(E_USER_DEPRECATED);
+
+        class_exists($class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame($expectedDeprecations, $deprecations);
+    }
+
+    public function implementsSerializableProvider(): array
+    {
+        return [
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable" class implements the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ImplementsSerializable::class],
+            [[], ImplementsSerializableWithTheNewMechanism::class],
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable" class implements the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsAClassImplementingSerializable::class],
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ImplementsAnInterfaceThatExtendsSerializable::class],
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsSerializable::class],
+            [[], ExtendsSerializableWithTheNewMechanism::class],
+            [[], ExtendsSerializableWithTheNewMechanismThroughVirtualMethods::class],
+            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsAnInterfaceThatExtendsSerializable::class],
+            [[], 'SymfonyFoo\\'.__NAMESPACE__.'\ImplementsSerializableOutsideOfSymfony'], // We don't trigger if the root namespace is not Symfony
+        ];
+    }
 }
 
 class ClassLoader
@@ -442,6 +484,11 @@ class ClassLoader
             }');
         } elseif ('Test\\'.__NAMESPACE__.'\ExtendsVirtualMagicCall' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualMagicCall extends \\'.__NAMESPACE__.'\Fixtures\VirtualClassMagicCall implements \\'.__NAMESPACE__.'\Fixtures\VirtualInterface {
+            }');
+        } elseif ('SymfonyFoo\\'.__NAMESPACE__.'\ImplementsSerializableOutsideOfSymfony' === $class) {
+            eval('namespace SymfonyFoo\\'.__NAMESPACE__.'; class ImplementsSerializableOutsideOfSymfony implements \Serializable {
+                public function serialize() { }
+                public function unserialize($serialized) { }
             }');
         }
     }

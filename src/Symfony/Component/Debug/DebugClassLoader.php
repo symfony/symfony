@@ -241,18 +241,22 @@ class DebugClassLoader
             if ($refl->isInterface() && false !== \strpos($doc, 'method') && preg_match_all('#\n \* @method\s+(static\s+)?+(?:[\w\|&\[\]\\\]+\s+)?(\w+(?:\s*\([^\)]*\))?)+(.+?([[:punct:]]\s*)?)?(?=\r?\n \*(?: @|/$|\r?\n))#', $doc, $notice, PREG_SET_ORDER)) {
                 foreach ($notice as $method) {
                     $static = '' !== $method[1];
-                    $name = $method[2];
+                    $realName = $name = $method[2];
                     $description = $method[3] ?? null;
-                    if (false === strpos($name, '(')) {
+                    if (false === $i = strpos($name, '(')) {
                         $name .= '()';
+                    } else {
+                        $realName = substr($name, 0, $i);
                     }
+
                     if (null !== $description) {
                         $description = trim($description);
                         if (!isset($method[4])) {
                             $description .= '.';
                         }
                     }
-                    self::$method[$class][] = [$class, $name, $static, $description];
+
+                    self::$method[$class][$realName] = [$class, $name, $static, $description];
                 }
             }
         }
@@ -295,12 +299,11 @@ class DebugClassLoader
                 } elseif (!$refl->isInterface()) {
                     $hasCall = $refl->hasMethod('__call');
                     $hasStaticCall = $refl->hasMethod('__callStatic');
-                    foreach (self::$method[$use] as $method) {
+                    foreach (self::$method[$use] as $realName => $method) {
                         list($interface, $name, $static, $description) = $method;
                         if ($static ? $hasStaticCall : $hasCall) {
                             continue;
                         }
-                        $realName = substr($name, 0, strpos($name, '('));
                         if (!$refl->hasMethod($realName) || !($methodRefl = $refl->getMethod($realName))->isPublic() || ($static && !$methodRefl->isStatic()) || (!$static && $methodRefl->isStatic())) {
                             $deprecations[] = sprintf('Class "%s" should implement method "%s::%s"%s', $class, ($static ? 'static ' : '').$interface, $name, null == $description ? '.' : ': '.$description);
                         }
@@ -311,6 +314,16 @@ class DebugClassLoader
 
         if (\trait_exists($class)) {
             return $deprecations;
+        }
+
+        if (isset($parentAndOwnInterfaces['Serializable'])
+            && 0 === strpos($refl->getNamespaceName(), 'Symfony\\')
+            && (
+                ((!($isInterface = $refl->isInterface()) || !isset(self::$method[$class]['__serialize'])) && !$refl->hasMethod('__serialize'))
+                || (!$refl->hasMethod('__unserialize') && (!$isInterface || !isset(self::$method[$class]['__unserialize'])))
+            )
+        ) {
+            $deprecations[] = sprintf('The "%s" %s the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.', $class, $isInterface ? 'interface extends' : 'class implements');
         }
 
         // Inherit @final, @internal and @param annotations for methods

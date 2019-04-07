@@ -6,8 +6,9 @@ CHANGELOG
 
 * made the `ErrorHandler` and `ExceptionHandler` classes final
 * added `Exception\FlattenException::getAsString` and
-`Exception\FlattenException::getTraceAsString` to increase compatibility to php
-exception objects
+  `Exception\FlattenException::getTraceAsString` to increase compatibility to php exception objects
+* added a deprecation for classes and interfaces that implement or extend the `\Serializable` interface
+  and that are not ready for the new serialization mechanism (currently restricted to Symfony core classes)
 
 4.0.0
 -----

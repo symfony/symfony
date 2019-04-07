@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FileType extends AbstractType
 {
@@ -31,6 +32,13 @@ class FileType extends AbstractType
         self::KIB_BYTES => 'KiB',
         self::MIB_BYTES => 'MiB',
     ];
+
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator = null)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -150,7 +158,13 @@ class FileType extends AbstractType
             $messageTemplate = 'The file could not be uploaded.';
         }
 
-        return new FormError($messageTemplate, $messageTemplate, $messageParameters);
+        if (null !== $this->translator) {
+            $message = $this->translator->trans($messageTemplate, $messageParameters);
+        } else {
+            $message = strtr($messageTemplate, $messageParameters);
+        }
+
+        return new FormError($message, $messageTemplate, $messageParameters);
     }
 
     /**

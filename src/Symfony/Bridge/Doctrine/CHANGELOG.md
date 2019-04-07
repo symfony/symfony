@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated `RegistryInterface`, use `Doctrine\Common\Persistence\ManagerRegistry`
  * added support for invokable event listeners
  * added `getMetadataDriverClass` method to deprecate class parameters in service configuration files
+ * added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
 
 4.3.0
 -----

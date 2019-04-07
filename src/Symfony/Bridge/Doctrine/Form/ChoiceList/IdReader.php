@@ -106,7 +106,7 @@ class IdReader
             $idValue = $this->associationIdReader->getIdValue($idValue);
         }
 
-        return $idValue;
+        return (string) $idValue;
     }
 
     /**

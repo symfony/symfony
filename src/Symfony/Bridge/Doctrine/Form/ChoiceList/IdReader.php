@@ -91,7 +91,7 @@ class IdReader
     public function getIdValue($object)
     {
         if (!$object) {
-            return;
+            return '';
         }
 
         if (!$this->om->contains($object)) {
@@ -106,7 +106,7 @@ class IdReader
             $idValue = $this->associationIdReader->getIdValue($idValue);
         }
 
-        return $idValue;
+        return (string) $idValue;
     }
 
     /**

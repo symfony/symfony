@@ -94,12 +94,18 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->om->expects($this->any())
             ->method('getRepository')
             ->with($this->class)
-            ->willReturn($this->repository);
+            ->willReturn($this->repository)
+        ;
 
         $this->om->expects($this->any())
             ->method('getClassMetadata')
             ->with($this->class)
-            ->willReturn(new ClassMetadata($this->class));
+            ->willReturn(new ClassMetadata($this->class))
+        ;
+        $this->repository->expects($this->any())
+            ->method('findAll')
+            ->willReturn([$this->obj1, $this->obj2, $this->obj3])
+        ;
     }
 
     public function testLoadChoiceList()
@@ -116,7 +122,8 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->repository->expects($this->once())
             ->method('findAll')
-            ->willReturn($choices);
+            ->willReturn($choices)
+        ;
 
         $this->assertEquals($choiceList, $loader->loadChoiceList($value));
 
@@ -202,7 +209,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->with($this->obj2)
             ->willReturn('2');
 
-        $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
+        $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2], [$this->idReader, 'getIdValue']));
     }
 
     public function testLoadValuesForChoicesLoadsIfSingleIntIdAndValueGiven()
@@ -216,7 +223,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->repository->expects($this->once())
+        $this->repository->expects($this->never())
             ->method('findAll')
             ->willReturn($choices);
 
@@ -285,7 +292,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadChoicesForValues([]));
     }
 
-    public function testLoadChoicesForValuesLoadsOnlyChoicesIfSingleIntId()
+    public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -317,8 +324,8 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
-            $loader->loadChoicesForValues([4 => '3', 7 => '2']
-        ));
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue'])
+        );
     }
 
     public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()
@@ -426,8 +433,13 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $choices = [$obj1, $obj2];
 
+        $this->objectLoader->expects($this->never())
+            ->method('getEntities')
+        ;
+
         $this->repository->expects($this->never())
-            ->method('findAll');
+            ->method('findAll')
+        ;
 
         $this->objectLoader->expects($this->once())
             ->method('getEntitiesByIds')

@@ -135,16 +135,21 @@ class CachingFactoryDecoratorTest extends TestCase
     public function testCreateFromChoicesSameValueClosure()
     {
         $choices = [1];
-        $list = new ArrayChoiceList([]);
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
         $closure = function () {};
 
-        $this->decoratedFactory->expects($this->exactly(2))
+        $this->decoratedFactory->expects($this->at(0))
             ->method('createListFromChoices')
             ->with($choices, $closure)
-            ->willReturn($list);
+            ->willReturn($list1);
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromChoices')
+            ->with($choices, $closure)
+            ->willReturn($list2);
 
-        $this->assertSame($list, $this->factory->createListFromChoices($choices, $closure));
-        $this->assertSame($list, $this->factory->createListFromChoices($choices, $closure));
+        $this->assertSame($list1, $this->factory->createListFromChoices($choices, $closure));
+        $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure));
     }
 
     public function testCreateFromChoicesSameValueClosureUseCache()
@@ -183,6 +188,64 @@ class CachingFactoryDecoratorTest extends TestCase
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, $closure1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure2));
+    }
+
+    public function testCreateFromChoicesSameFilterClosure()
+    {
+        $choices = [1];
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
+        $filter = function () {};
+
+        $this->decoratedFactory->expects($this->at(0))
+            ->method('createListFromChoices')
+            ->with($choices, null, $filter)
+            ->willReturn($list1);
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromChoices')
+            ->with($choices, null, $filter)
+            ->willReturn($list2);
+
+        $this->assertSame($list1, $this->factory->createListFromChoices($choices, null, $filter));
+        $this->assertSame($list2, $this->factory->createListFromChoices($choices, null, $filter));
+    }
+
+    public function testCreateFromChoicesSameFilterClosureUseCache()
+    {
+        $choices = [1];
+        $list = new ArrayChoiceList([]);
+        $formType = $this->createMock(FormTypeInterface::class);
+        $filterCallback = function () {};
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromChoices')
+            ->with($choices, null, $filterCallback)
+            ->willReturn($list)
+        ;
+
+        $this->assertSame($list, $this->factory->createListFromChoices($choices, null, ChoiceList::filter($formType, $filterCallback)));
+        $this->assertSame($list, $this->factory->createListFromChoices($choices, null, ChoiceList::filter($formType, function () {})));
+    }
+
+    public function testCreateFromChoicesDifferentFilterClosure()
+    {
+        $choices = [1];
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
+        $closure1 = function () {};
+        $closure2 = function () {};
+
+        $this->decoratedFactory->expects($this->at(0))
+            ->method('createListFromChoices')
+            ->with($choices, null, $closure1)
+            ->willReturn($list1);
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromChoices')
+            ->with($choices, null, $closure2)
+            ->willReturn($list2);
+
+        $this->assertSame($list1, $this->factory->createListFromChoices($choices, null, $closure1));
+        $this->assertSame($list2, $this->factory->createListFromChoices($choices, null, $closure2));
     }
 
     public function testCreateFromLoaderSameLoader()
@@ -308,6 +371,76 @@ class CachingFactoryDecoratorTest extends TestCase
 
         $this->assertSame($list1, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), $closure1));
         $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), $closure2));
+    }
+
+    public function testCreateFromLoaderSameFilterClosure()
+    {
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
+        $type = $this->createMock(FormTypeInterface::class);
+        $list = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
+        $closure = function () {};
+
+        $this->decoratedFactory->expects($this->at(0))
+            ->method('createListFromLoader')
+            ->with($loader, null, $closure)
+            ->willReturn($list)
+        ;
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromLoader')
+            ->with($loader, null, $closure)
+            ->willReturn($list2)
+        ;
+
+        $this->assertSame($list, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), null, $closure));
+        $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), null, $closure));
+    }
+
+    public function testCreateFromLoaderSameFilterClosureUseCache()
+    {
+        $type = $this->createMock(FormTypeInterface::class);
+        $loader = $this->createMock(ChoiceLoaderInterface::class);
+        $list = new ArrayChoiceList([]);
+        $closure = function () {};
+
+        $this->decoratedFactory->expects($this->once())
+            ->method('createListFromLoader')
+            ->with($loader, null, $closure)
+            ->willReturn($list)
+        ;
+
+        $this->assertSame($list, $this->factory->createListFromLoader(
+            ChoiceList::loader($type, $loader),
+            null,
+            ChoiceList::filter($type, $closure)
+        ));
+        $this->assertSame($list, $this->factory->createListFromLoader(
+            ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)),
+            null,
+            ChoiceList::filter($type, function () {})
+        ));
+    }
+
+    public function testCreateFromLoaderDifferentFilterClosure()
+    {
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
+        $type = $this->createMock(FormTypeInterface::class);
+        $list1 = new ArrayChoiceList([]);
+        $list2 = new ArrayChoiceList([]);
+        $closure1 = function () {};
+        $closure2 = function () {};
+
+        $this->decoratedFactory->expects($this->at(0))
+            ->method('createListFromLoader')
+            ->with($loader, null, $closure1)
+            ->willReturn($list1);
+        $this->decoratedFactory->expects($this->at(1))
+            ->method('createListFromLoader')
+            ->with($loader, null, $closure2)
+            ->willReturn($list2);
+
+        $this->assertSame($list1, $this->factory->createListFromLoader(ChoiceList::loader($type, $loader), null, $closure1));
+        $this->assertSame($list2, $this->factory->createListFromLoader(ChoiceList::loader($type, $this->createMock(ChoiceLoaderInterface::class)), null, $closure2));
     }
 
     public function testCreateViewSamePreferredChoices()

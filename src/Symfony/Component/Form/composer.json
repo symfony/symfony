@@ -43,6 +43,7 @@
         "symfony/console": "<4.4",
         "symfony/dependency-injection": "<4.4",
         "symfony/doctrine-bridge": "<4.4",
+        "symfony/error-handler": "<4.4.5",
         "symfony/framework-bundle": "<4.4",
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",

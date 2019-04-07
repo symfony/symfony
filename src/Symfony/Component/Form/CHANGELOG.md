@@ -4,6 +4,8 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added a `choice_filter` option to `ChoiceType`
+ * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()` - not defining them is deprecated.
  * Added a `ChoiceList` facade to leverage explicit choice list caching based on options
  * Added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
  * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.

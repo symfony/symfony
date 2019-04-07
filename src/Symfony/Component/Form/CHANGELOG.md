@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0
 -----
 
+ * Added a `ChoiceList` facade to leverage explicit choice list caching based on options
  * Added an `AbstractChoiceLoader` to simplify implementations and handle global optimizations
  * The `view_timezone` option defaults to the `model_timezone` if no `reference_date` is configured.
  * Added default `inputmode` attribute to Search, Email and Tel form types.

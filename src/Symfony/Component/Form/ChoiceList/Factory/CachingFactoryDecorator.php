@@ -20,6 +20,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * Caches the choice lists created by the decorated factory.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Jules Pietri <jules@heahprod.com>
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterface
 {
@@ -86,8 +87,13 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
             $choices = iterator_to_array($choices);
         }
 
-        // The value is not validated on purpose. The decorated factory may
-        // decide which values to accept and which not.
+        // Only cache per value when needed. The value is not validated on purpose.
+        // The decorated factory may decide which values to accept and which not.
+        if ($value instanceof Cache\ChoiceValue) {
+            $value = $value->getOption();
+        } elseif ($value) {
+            return $this->decoratedFactory->createListFromChoices($choices, $value);
+        }
 
         $hash = self::generateHash([$choices, $value], 'fromChoices');
 
@@ -103,6 +109,24 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
+        $cache = true;
+
+        if ($loader instanceof Cache\ChoiceLoader) {
+            $loader = $loader->getOption();
+        } else {
+            $cache = false;
+        }
+
+        if ($value instanceof Cache\ChoiceValue) {
+            $value = $value->getOption();
+        } elseif ($value) {
+            $cache = false;
+        }
+
+        if (!$cache) {
+            return $this->decoratedFactory->createListFromLoader($loader, $value);
+        }
+
         $hash = self::generateHash([$loader, $value], 'fromLoader');
 
         if (!isset($this->lists[$hash])) {
@@ -117,8 +141,42 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
-        // The input is not validated on purpose. This way, the decorated
-        // factory may decide which input to accept and which not.
+        $cache = true;
+
+        if ($preferredChoices instanceof Cache\PreferredChoice) {
+            $preferredChoices = $preferredChoices->getOption();
+        } elseif ($preferredChoices) {
+            $cache = false;
+        }
+
+        if ($label instanceof Cache\ChoiceLabel) {
+            $label = $label->getOption();
+        } elseif (null !== $label) {
+            $cache = false;
+        }
+
+        if ($index instanceof Cache\ChoiceFieldName) {
+            $index = $index->getOption();
+        } elseif ($index) {
+            $cache = false;
+        }
+
+        if ($groupBy instanceof Cache\GroupBy) {
+            $groupBy = $groupBy->getOption();
+        } elseif ($groupBy) {
+            $cache = false;
+        }
+
+        if ($attr instanceof Cache\ChoiceAttr) {
+            $attr = $attr->getOption();
+        } elseif ($attr) {
+            $cache = false;
+        }
+
+        if (!$cache) {
+            return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        }
+
         $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);
 
         if (!isset($this->views[$hash])) {
@@ -139,5 +197,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     {
         $this->lists = [];
         $this->views = [];
+        Cache\AbstractStaticOption::reset();
     }
 }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sstok at 2019-03-03T16:52:10Z
+
+IIRC the form uses the choice value (in the view) to determine which option was selected, if multiple options share the same value it's no longer possible to safely determine which option (in which group) was selected, and the first matching option is selected.
+
+I might be wrong here, but you can verify (without to much hassle) if this works as expected by running an actual form in the web browser, and checking if the correct choice is marked as selected.
+
+Thanks for working on this 👍
+
+---------------------------------------------------------------------------
+
+by antonch1989 at 2019-03-12T10:42:42Z
+
+@sstok correct, there is no way to determine which exact choice was picked
+![abc123](https://user-images.githubusercontent.com/8297194/54193957-2e298180-44cc-11e9-83aa-2405bd7a7923.png)
+The last one is active, when I create a builder like this $builder = $this->createFormBuilder(['country' => 'DE'])

@@ -139,8 +139,8 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     } elseif (isset($bindings[$bindingName = $type.' $'.$p->name]) || isset($bindings[$bindingName = '$'.$p->name]) || isset($bindings[$bindingName = $type])) {
                         $binding = $bindings[$bindingName];
 
-                        list($bindingValue, $bindingId) = $binding->getValues();
-                        $binding->setValues([$bindingValue, $bindingId, true]);
+                        list($bindingValue, $bindingId, , $bindingType, $bindingFile) = $binding->getValues();
+                        $binding->setValues([$bindingValue, $bindingId, true, $bindingType, $bindingFile]);
 
                         if (!$bindingValue instanceof Reference) {
                             $args[$p->name] = new Reference('.value.'.$container->hash($bindingValue));

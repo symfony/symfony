@@ -29,6 +29,7 @@ class ServicesConfigurator extends AbstractConfigurator
     private $container;
     private $loader;
     private $instanceof;
+    private $path;
     private $anonymousHash;
     private $anonymousCount;
 
@@ -38,6 +39,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $this->container = $container;
         $this->loader = $loader;
         $this->instanceof = &$instanceof;
+        $this->path = $path;
         $this->anonymousHash = ContainerBuilder::hash($path ?: mt_rand());
         $this->anonymousCount = &$anonymousCount;
         $instanceof = [];
@@ -48,7 +50,7 @@ class ServicesConfigurator extends AbstractConfigurator
      */
     final public function defaults(): DefaultsConfigurator
     {
-        return new DefaultsConfigurator($this, $this->defaults = new Definition());
+        return new DefaultsConfigurator($this, $this->defaults = new Definition(), $this->path);
     }
 
     /**
@@ -58,7 +60,7 @@ class ServicesConfigurator extends AbstractConfigurator
     {
         $this->instanceof[$fqcn] = $definition = new ChildDefinition('');
 
-        return new InstanceofConfigurator($this, $definition, $fqcn);
+        return new InstanceofConfigurator($this, $definition, $fqcn, $this->path);
     }
 
     /**
@@ -90,7 +92,7 @@ class ServicesConfigurator extends AbstractConfigurator
         $definition->setBindings($defaults->getBindings());
         $definition->setChanges([]);
 
-        $configurator = new ServiceConfigurator($this->container, $this->instanceof, $allowParent, $this, $definition, $id, $defaults->getTags());
+        $configurator = new ServiceConfigurator($this->container, $this->instanceof, $allowParent, $this, $definition, $id, $defaults->getTags(), $this->path);
 
         return null !== $class ? $configurator->class($class) : $configurator;
     }

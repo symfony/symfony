@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
@@ -392,5 +393,81 @@ class DoctrineChoiceLoaderTest extends TestCase
             ]);
 
         $this->assertSame([$this->obj2], $loader->loadChoicesForValues(['2'], $value));
+    }
+
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation Not explicitly passing an instance of "Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.
+     */
+    public function testLoaderWithoutIdReaderCanBeOptimized()
+    {
+        $obj1 = new SingleIntIdEntity('1', 'one');
+        $obj2 = new SingleIntIdEntity('2', 'two');
+
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['idField'])
+        ;
+        $metadata->expects($this->any())
+            ->method('getIdentifierValues')
+            ->willReturnCallback(function ($obj) use ($obj1, $obj2) {
+                if ($obj === $obj1) {
+                    return ['idField' => '1'];
+                }
+                if ($obj === $obj2) {
+                    return ['idField' => '2'];
+                }
+
+                return null;
+            })
+        ;
+
+        $this->om = $this->createMock(ObjectManager::class);
+        $this->om->expects($this->once())
+            ->method('getClassMetadata')
+            ->with(SingleIntIdEntity::class)
+            ->willReturn($metadata)
+        ;
+        $this->om->expects($this->any())
+            ->method('contains')
+            ->with($this->isInstanceOf(SingleIntIdEntity::class))
+            ->willReturn(true)
+        ;
+
+        $loader = new DoctrineChoiceLoader(
+            $this->om,
+            SingleIntIdEntity::class,
+            null,
+            $this->objectLoader
+        );
+
+        $choices = [$obj1, $obj2];
+
+        $this->idReader->expects($this->any())
+            ->method('isSingleId')
+            ->willReturn(true);
+
+        $this->idReader->expects($this->any())
+            ->method('getIdField')
+            ->willReturn('idField');
+
+        $this->repository->expects($this->never())
+            ->method('findAll');
+
+        $this->objectLoader->expects($this->once())
+            ->method('getEntitiesByIds')
+            ->with('idField', ['1'])
+            ->willReturn($choices);
+
+        $this->idReader->expects($this->any())
+            ->method('getIdValue')
+            ->willReturnMap([
+                [$obj1, '1'],
+                [$obj2, '2'],
+            ]);
+
+        $this->assertSame([$obj1], $loader->loadChoicesForValues(['1']));
     }
 }

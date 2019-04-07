@@ -373,7 +373,7 @@ EOF;
         $fmt = $this->fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
 
         if (!$fmt) {
-            return sprintf('<span class="block trace-file-path">in <a title="%s%3$s"><strong>%s</strong>%s</a></span>', $this->escapeHtml($path), $file, 0 < $line ? ' line '.$line : '');
+            return sprintf('<span class="block trace-file-path">in <span title="%s%3$s"><strong>%s</strong>%s</span></span>', $this->escapeHtml($path), $file, 0 < $line ? ' line '.$line : '');
         }
 
         if (\is_string($fmt)) {
@@ -389,7 +389,11 @@ EOF;
 
             $link = strtr($fmt[0], ['%f' => $path, '%l' => $line]);
         } else {
-            $link = $fmt->format($path, $line);
+            try {
+                $link = $fmt->format($path, $line);
+            } catch (\Exception $e) {
+                return sprintf('<span class="block trace-file-path">in <span title="%s%3$s"><strong>%s</strong>%s</span></span>', $this->escapeHtml($path), $file, 0 < $line ? ' line '.$line : '');
+            }
         }
 
         return sprintf('<span class="block trace-file-path">in <a href="%s" title="Go to source"><strong>%s</string>%s</a></span>', $this->escapeHtml($link), $file, 0 < $line ? ' line '.$line : '');

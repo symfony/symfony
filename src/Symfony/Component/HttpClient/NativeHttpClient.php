@@ -258,7 +258,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     {
         if (null === $proxy) {
             // Ignore HTTP_PROXY except on the CLI to work around httpoxy set of vulnerabilities
-            $proxy = $_SERVER['http_proxy'] ?? ('cli' === \PHP_SAPI ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
+            $proxy = $_SERVER['http_proxy'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? $_SERVER['HTTP_PROXY'] ?? null : null) ?? $_SERVER['all_proxy'] ?? $_SERVER['ALL_PROXY'] ?? null;
 
             if ('https:' === $url['scheme']) {
                 $proxy = $_SERVER['https_proxy'] ?? $_SERVER['HTTPS_PROXY'] ?? $proxy;

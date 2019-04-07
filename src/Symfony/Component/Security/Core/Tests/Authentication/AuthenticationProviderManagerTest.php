@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authentication;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\WrappedEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AuthenticationProviderManagerTest extends TestCase
 {
@@ -189,13 +191,23 @@ class AuthenticationProviderManagerTest extends TestCase
         $providerCN = \get_class($provider);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE, function (AuthenticationSensitiveEvent $event) use ($providerCN) {
+        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE, function ($event) use ($providerCN) {
+            if (\get_class($event) === 'Symfony\Component\EventDispatcher\WrappedEvent') {
+                $event = $event->getWrappedEvent();
+            }
+
+            /** @var AuthenticationSensitiveEvent $event */
             $this->assertSame($providerCN, $event->getAuthenticationProviderClassName());
             $this->assertSame('bar', $event->getAuthenticationTokenPassword());
             $this->assertEquals('bar', $event->getPreAuthenticationToken()->getCredentials());
             $this->assertEquals('bar', $event->getAuthenticationToken()->getCredentials());
         });
-        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS, function (AuthenticationSuccessEvent $event) {
+        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS, function ($event) {
+            if (\get_class($event) === 'Symfony\Component\EventDispatcher\WrappedEvent') {
+                $event = $event->getWrappedEvent();
+            }
+
+            /** @var AuthenticationSuccessEvent $event */
             $this->assertEquals('', $event->getAuthenticationToken()->getCredentials());
         });
 

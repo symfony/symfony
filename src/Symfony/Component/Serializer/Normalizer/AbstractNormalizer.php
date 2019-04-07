@@ -330,6 +330,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
             return $object;
         }
+        // clean up even if no match
+        unset($context[static::OBJECT_TO_POPULATE]);
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {

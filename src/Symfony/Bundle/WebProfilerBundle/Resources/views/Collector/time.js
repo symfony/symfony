@@ -252,11 +252,11 @@ class Legend {
     }
 
     get(category) {
-        return this.categories.find(element => element.value === category);
+        return this.categories.find(element => element.value === category) || this.createCategory(category);
     }
 
     getClassname(category) {
-        return this.classnames[category];
+        return this.classnames[category] || '';
     }
 
     getSectionClassname() {

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\Routing\RequestContext;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -24,13 +25,34 @@ use Twig\TwigFunction;
  */
 class HttpFoundationExtension extends AbstractExtension
 {
-    private $requestStack;
-    private $requestContext;
+    private $urlHelper;
 
-    public function __construct(RequestStack $requestStack, RequestContext $requestContext = null)
+    /**
+     * @param UrlHelper $urlHelper
+     */
+    public function __construct($urlHelper)
     {
-        $this->requestStack = $requestStack;
-        $this->requestContext = $requestContext;
+        if ($urlHelper instanceof UrlHelper) {
+            $this->urlHelper = $urlHelper;
+
+            return;
+        }
+
+        if (!$urlHelper instanceof RequestStack) {
+            throw new \TypeError(sprintf('The first argument must be an instance of "%s" or an instance of "%s".', UrlHelper::class, RequestStack::class));
+        }
+
+        @trigger_error(sprintf('Passing a "%s" instance as the first argument to the "%s" constructor is deprecated since Symfony 4.3, pass a "%s" instance instead.', RequestStack::class, __CLASS__, UrlHelper::class), E_USER_DEPRECATED);
+
+        $requestContext = null;
+        if (2 === \func_num_args()) {
+            $requestContext = \func_get_arg(1);
+            if (!$requestContext instanceof RequestContext) {
+                throw new \TypeError(sprintf('The second argument must be an instance of "%s".', RequestContext::class));
+            }
+        }
+
+        $this->urlHelper = new UrlHelper($urlHelper, $requestContext);
     }
 
     /**
@@ -57,55 +79,7 @@ class HttpFoundationExtension extends AbstractExtension
      */
     public function generateAbsoluteUrl($path)
     {
-        if (false !== strpos($path, '://') || '//' === substr($path, 0, 2)) {
-            return $path;
-        }
-
-        if (!$request = $this->requestStack->getMasterRequest()) {
-            if (null !== $this->requestContext && '' !== $host = $this->requestContext->getHost()) {
-                $scheme = $this->requestContext->getScheme();
-                $port = '';
-
-                if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
-                    $port = ':'.$this->requestContext->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
-                    $port = ':'.$this->requestContext->getHttpsPort();
-                }
-
-                if ('#' === $path[0]) {
-                    $queryString = $this->requestContext->getQueryString();
-                    $path = $this->requestContext->getPathInfo().($queryString ? '?'.$queryString : '').$path;
-                } elseif ('?' === $path[0]) {
-                    $path = $this->requestContext->getPathInfo().$path;
-                }
-
-                if ('/' !== $path[0]) {
-                    $path = rtrim($this->requestContext->getBaseUrl(), '/').'/'.$path;
-                }
-
-                return $scheme.'://'.$host.$port.$path;
-            }
-
-            return $path;
-        }
-
-        if ('#' === $path[0]) {
-            $path = $request->getRequestUri().$path;
-        } elseif ('?' === $path[0]) {
-            $path = $request->getPathInfo().$path;
-        }
-
-        if (!$path || '/' !== $path[0]) {
-            $prefix = $request->getPathInfo();
-            $last = \strlen($prefix) - 1;
-            if ($last !== $pos = strrpos($prefix, '/')) {
-                $prefix = substr($prefix, 0, $pos).'/';
-            }
-
-            return $request->getUriForPath($prefix.$path);
-        }
-
-        return $request->getSchemeAndHttpHost().$path;
+        return $this->urlHelper->getAbsoluteUrl($path);
     }
 
     /**
@@ -121,15 +95,7 @@ class HttpFoundationExtension extends AbstractExtension
      */
     public function generateRelativePath($path)
     {
-        if (false !== strpos($path, '://') || '//' === substr($path, 0, 2)) {
-            return $path;
-        }
-
-        if (!$request = $this->requestStack->getMasterRequest()) {
-            return $path;
-        }
-
-        return $request->getRelativeUriForPath($path);
+        return $this->urlHelper->getRelativePath($path);
     }
 
     /**

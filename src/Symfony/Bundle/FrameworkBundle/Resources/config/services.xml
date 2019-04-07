@@ -63,6 +63,12 @@
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" public="true" />
         <service id="Symfony\Component\HttpFoundation\RequestStack" alias="request_stack" />
 
+        <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="router.request_context" on-invalid="ignore" />
+        </service>
+        <service id="Symfony\Component\HttpFoundation\UrlHelper" alias="url_helper" />
+
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
             <argument type="tagged" tag="kernel.cache_warmer" />
             <argument>%kernel.debug%</argument>

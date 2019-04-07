@@ -27,7 +27,7 @@
         "symfony/stopwatch": "^4.4|^5.0",
         "symfony/config": "^4.4|^5.0",
         "symfony/dependency-injection": "^4.4|^5.0",
-        "symfony/form": "^5.0",
+        "symfony/form": "^5.1",
         "symfony/http-kernel": "^5.0",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/property-access": "^4.4|^5.0",
@@ -49,7 +49,7 @@
     "conflict": {
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
-        "symfony/form": "<5",
+        "symfony/form": "<5.1",
         "symfony/http-kernel": "<5",
         "symfony/messenger": "<4.4",
         "symfony/property-info": "<5",

@@ -100,6 +100,10 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->method('getClassMetadata')
             ->with($this->class)
             ->willReturn(new ClassMetadata($this->class));
+        $this->repository->expects($this->any())
+            ->method('findAll')
+            ->willReturn([$this->obj1, $this->obj2, $this->obj3])
+        ;
     }
 
     public function testLoadChoiceList()
@@ -186,6 +190,11 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadValuesForChoices([]));
     }
 
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation Since symfony/doctrine-bridge 5.1: Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don't pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the "choice_value" option instead.
+     */
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
         $loader = new DoctrineChoiceLoader(
@@ -205,7 +214,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(['2'], $loader->loadValuesForChoices([$this->obj2]));
     }
 
-    public function testLoadValuesForChoicesLoadsIfSingleIntIdAndValueGiven()
+    public function testLoadValuesForChoicesDoesNotLoadIfSingleIntIdAndValueGiven()
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -216,7 +225,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $choices = [$this->obj1, $this->obj2, $this->obj3];
         $value = function (\stdClass $object) { return $object->name; };
 
-        $this->repository->expects($this->once())
+        $this->repository->expects($this->never())
             ->method('findAll')
             ->willReturn($choices);
 
@@ -254,8 +263,7 @@ class DoctrineChoiceLoaderTest extends TestCase
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
-            $this->class,
-            $this->idReader
+            $this->class
         );
 
         $choices = [$this->obj1, $this->obj2, $this->obj3];
@@ -285,7 +293,12 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame([], $loader->loadChoicesForValues([]));
     }
 
-    public function testLoadChoicesForValuesLoadsOnlyChoicesIfSingleIntId()
+    /**
+     * @group legacy
+     *
+     * @expectedDeprecation Not defining explicitly the IdReader as value callback when query can be optimized has been deprecated in 5.1. Don't pass the IdReader to "Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader" or define the choice_value instead.
+     */
+    public function legacyTestLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -318,6 +331,42 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(
             [4 => $this->obj3, 7 => $this->obj2],
             $loader->loadChoicesForValues([4 => '3', 7 => '2']
+        ));
+    }
+
+    public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueUseIdReader()
+    {
+        $loader = new DoctrineChoiceLoader(
+            $this->om,
+            $this->class,
+            $this->idReader,
+            $this->objectLoader
+        );
+
+        $choices = [$this->obj2, $this->obj3];
+
+        $this->idReader->expects($this->any())
+            ->method('getIdField')
+            ->willReturn('idField');
+
+        $this->repository->expects($this->never())
+            ->method('findAll');
+
+        $this->objectLoader->expects($this->once())
+            ->method('getEntitiesByIds')
+            ->with('idField', [4 => '3', 7 => '2'])
+            ->willReturn($choices);
+
+        $this->idReader->expects($this->any())
+            ->method('getIdValue')
+            ->willReturnMap([
+                [$this->obj2, '2'],
+                [$this->obj3, '3'],
+            ]);
+
+        $this->assertSame(
+            [4 => $this->obj3, 7 => $this->obj2],
+            $loader->loadChoicesForValues([4 => '3', 7 => '2'], [$this->idReader, 'getIdValue']
         ));
     }
 

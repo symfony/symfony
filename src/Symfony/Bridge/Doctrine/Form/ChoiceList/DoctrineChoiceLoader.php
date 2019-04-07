@@ -12,26 +12,19 @@
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\Loader\AbstractChoiceLoader;
 
 /**
  * Loads choices using a Doctrine object manager.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DoctrineChoiceLoader implements ChoiceLoaderInterface
+class DoctrineChoiceLoader extends AbstractChoiceLoader
 {
     private $manager;
     private $class;
     private $idReader;
     private $objectLoader;
-
-    /**
-     * @var ChoiceListInterface
-     */
-    private $choiceList;
 
     /**
      * Creates a new choice loader.
@@ -59,81 +52,57 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadChoiceList(callable $value = null)
+    protected function loadChoices(): iterable
     {
-        if ($this->choiceList) {
-            return $this->choiceList;
-        }
-
-        $objects = $this->objectLoader
+        return $this->objectLoader
             ? $this->objectLoader->getEntities()
             : $this->manager->getRepository($this->class)->findAll();
-
-        return $this->choiceList = new ArrayChoiceList($objects, $value);
     }
 
     /**
-     * {@inheritdoc}
+     * @internal to be remove in Symfony 6
      */
-    public function loadValuesForChoices(array $choices, callable $value = null)
+    protected function doLoadValuesForChoices(array $choices): array
     {
-        // Performance optimization
-        if (empty($choices)) {
-            return [];
-        }
-
         // Optimize performance for single-field identifiers. We already
         // know that the IDs are used as values
-        $optimize = $this->idReader && (null === $value || \is_array($value) && $value[0] === $this->idReader);
-
         // Attention: This optimization does not check choices for existence
-        if ($optimize && !$this->choiceList) {
-            $values = [];
-
+        if ($this->idReader) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
             // Maintain order and indices of the given objects
+            $values = [];
             foreach ($choices as $i => $object) {
                 if ($object instanceof $this->class) {
-                    // Make sure to convert to the right format
-                    $values[$i] = (string) $this->idReader->getIdValue($object);
+                    $values[$i] = $this->idReader->getIdValue($object);
                 }
             }
 
             return $values;
         }
 
-        return $this->loadChoiceList($value)->getValuesForChoices($choices);
+        return parent::doLoadValuesForChoices($choices);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function loadChoicesForValues(array $values, callable $value = null)
+    protected function doLoadChoicesForValues(array $values, ?callable $value): array
     {
-        // Performance optimization
-        // Also prevents the generation of "WHERE id IN ()" queries through the
-        // object loader. At least with MySQL and on the development machine
-        // this was tested on, no exception was thrown for such invalid
-        // statements, consequently no test fails when this code is removed.
-        // https://github.com/symfony/symfony/pull/8981#issuecomment-24230557
-        if (empty($values)) {
-            return [];
+        $legacy = $this->idReader && null === $value;
+
+        if ($legacy) {
+            trigger_deprecation('symfony/doctrine-bridge', '5.1', 'Not defining explicitly the IdReader as value callback when query can be optimized is deprecated. Don\'t pass the IdReader to "%s" or define the "choice_value" option instead.', __CLASS__);
         }
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        $optimize = $this->idReader && (null === $value || \is_array($value) && $this->idReader === $value[0]);
-
-        if ($optimize && !$this->choiceList && $this->objectLoader) {
-            $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
-            $objectsById = [];
+        if (($legacy || \is_array($value) && $this->idReader === $value[0]) && $this->objectLoader) {
             $objects = [];
+            $objectsById = [];
 
             // Maintain order and indices from the given $values
             // An alternative approach to the following loop is to add the
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
-            foreach ($unorderedObjects as $object) {
-                $objectsById[(string) $this->idReader->getIdValue($object)] = $object;
+            foreach ($this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values) as $object) {
+                $objectsById[$this->idReader->getIdValue($object)] = $object;
             }
 
             foreach ($values as $i => $id) {
@@ -145,6 +114,6 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             return $objects;
         }
 
-        return $this->loadChoiceList($value)->getChoicesForValues($values);
+        return parent::doLoadChoicesForValues($values, $value);
     }
 }

@@ -143,15 +143,35 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
+     * Returns all the necessary state of the object for serialization purposes.
+     *
+     * There is no need to serialize any entry, they should be returned as-is.
+     * If you extend this method, keep in mind you MUST guarantee parent data is present in the state.
+     * Here is an example of how to extend this method:
+     * <code>
+     *     public function __serialize(): array
+     *     {
+     *         return [$this->childAttribute, parent::__serialize()];
+     *     }
+     * </code>
+     *
+     * @see __unserialize()
+     */
+    public function __serialize(): array
+    {
+        return [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames];
+    }
+
+    /**
      * {@inheritdoc}
      *
-     * @final since Symfony 4.3, use getState() instead
+     * @final since Symfony 4.3, use __serialize() instead
      *
-     * @internal since Symfony 4.3, use getState() instead
+     * @internal since Symfony 4.3, use __serialize() instead
      */
     public function serialize()
     {
-        $serialized = $this->getState();
+        $serialized = $this->__serialize();
 
         if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
@@ -162,56 +182,36 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @final since Symfony 4.3, use setState() instead
-     *
-     * @internal since Symfony 4.3, use setState() instead
-     */
-    public function unserialize($serialized)
-    {
-        $this->setState(\is_array($serialized) ? $serialized : unserialize($serialized));
-    }
-
-    /**
-     * Returns all the necessary state of the object for serialization purposes.
-     *
-     * There is no need to serialize any entry, they should be returned as-is.
-     * If you extend this method, keep in mind you MUST guarantee parent data is present in the state.
-     * Here is an example of how to extend this method:
-     * <code>
-     *     protected function getState(): array
-     *     {
-     *         return [$this->childAttribute, parent::getState()];
-     *     }
-     * </code>
-     *
-     * @see setState()
-     */
-    protected function getState(): array
-    {
-        return [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames];
-    }
-
-    /**
-     * Restores the object state from an array given by getState().
+     * Restores the object state from an array given by __serialize().
      *
      * There is no need to unserialize any entry in $data, they are already ready-to-use.
      * If you extend this method, keep in mind you MUST pass the parent data to its respective class.
      * Here is an example of how to extend this method:
      * <code>
-     *     protected function setState(array $data)
+     *     public function __unserialize(array $data): void
      *     {
      *         [$this->childAttribute, $parentData] = $data;
-     *         parent::setState($parentData);
+     *         parent::__unserialize($parentData);
      *     }
      * </code>
      *
-     * @see getState()
+     * @see __serialize()
      */
-    protected function setState(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames] = $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @final since Symfony 4.3, use __unserialize() instead
+     *
+     * @internal since Symfony 4.3, use __unserialize() instead
+     */
+    public function unserialize($serialized)
+    {
+        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
     /**

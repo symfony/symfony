@@ -148,7 +148,15 @@ class AuthenticationTrustResolverTest extends TestCase
 
 class FakeCustomToken implements TokenInterface
 {
+    public function __serialize(): array
+    {
+    }
+
     public function serialize()
+    {
+    }
+
+    public function __unserialize(array $data): void
     {
     }
 

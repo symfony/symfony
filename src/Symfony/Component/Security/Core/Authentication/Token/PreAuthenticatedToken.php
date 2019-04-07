@@ -75,17 +75,17 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    protected function getState(): array
+    public function __serialize(): array
     {
-        return [$this->credentials, $this->providerKey, parent::getState()];
+        return [$this->credentials, $this->providerKey, parent::__serialize()];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function setState(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->credentials, $this->providerKey, $parentData] = $data;
-        parent::setState($parentData);
+        parent::__unserialize($parentData);
     }
 }

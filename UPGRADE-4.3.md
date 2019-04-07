@@ -115,7 +115,7 @@ Security
  * The `Firewall::handleRequest()` method is deprecated, use `Firewall::callListeners()` instead.
  * The `AbstractToken::serialize()`, `AbstractToken::unserialize()`,
    `AuthenticationException::serialize()` and `AuthenticationException::unserialize()`
-   methods are now final, use `getState()` and `setState()` instead.
+   methods are now final, use `__serialize()` and `__unserialize()` instead.
 
    Before:
    ```php
@@ -133,15 +133,15 @@ Security
 
    After:
    ```php
-   protected function getState(): array
+   public function __serialize(): array
    {
-       return [$this->myLocalVar, parent::getState()];
+       return [$this->myLocalVar, parent::__serialize()];
    }
 
-   protected function setState(array $data)
+   public function __unserialize(array $data): void
    {
        [$this->myLocalVar, $parentData] = $data;
-       parent::setState($parentData);
+       parent::__unserialize($parentData);
    }
    ```
 

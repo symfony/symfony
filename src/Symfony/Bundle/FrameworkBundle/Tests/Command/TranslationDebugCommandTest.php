@@ -68,7 +68,7 @@ class TranslationDebugCommandTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation Storing translations in the "%ssf_translation%s/Resources/translations" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/translations" directory instead.
-     * @expectedDeprecation Storing templates in the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
+     * @expectedDeprecation Loading Twig templates from the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
      */
     public function testDebugLegacyDefaultDirectory()
     {

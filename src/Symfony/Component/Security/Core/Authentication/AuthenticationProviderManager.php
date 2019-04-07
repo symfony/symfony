@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProvid
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationSensitiveEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -66,6 +67,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     {
         $lastException = null;
         $result = null;
+        $providerClassName = null;
 
         foreach ($this->providers as $provider) {
             if (!$provider instanceof AuthenticationProviderInterface) {
@@ -80,6 +82,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 $result = $provider->authenticate($token);
 
                 if (null !== $result) {
+                    $providerClassName = \get_class($provider);
                     break;
                 }
             } catch (AccountStatusException $e) {
@@ -92,6 +95,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         if (null !== $result) {
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(new AuthenticationSensitiveEvent($token, $result, $providerClassName), AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE);
+            }
+
             if (true === $this->eraseCredentials) {
                 $result->eraseCredentials();
             }

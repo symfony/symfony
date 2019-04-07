@@ -12,11 +12,15 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
+use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationSensitiveEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -152,29 +156,58 @@ class AuthenticationProviderManagerTest extends TestCase
         }
     }
 
-    public function testAuthenticateDispatchesAuthenticationSuccessEvent()
+    public function testAuthenticateDispatchesAuthenticationSuccessEvents()
     {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
+        $finalToken = new UsernamePasswordToken('foo', 'bar', 'baz', ['role-01', 'role-02']);
+        $priorToken = new UsernamePasswordToken('foo', 'bar', 'baz');
 
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
-        $provider->expects($this->once())->method('supports')->willReturn(true);
-        $provider->expects($this->once())->method('authenticate')->willReturn($token);
+        $provider = $this->getAuthenticationProvider(true, $finalToken);
+        $providerCN = \get_class($provider);
 
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('dispatch')
-            ->with($this->equalTo(new AuthenticationSuccessEvent($token)), AuthenticationEvents::AUTHENTICATION_SUCCESS);
+            ->withConsecutive([
+                $this->equalTo(new AuthenticationSensitiveEvent($priorToken, $finalToken, $providerCN)), AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE,
+            ], [
+                $this->equalTo(new AuthenticationSuccessEvent($finalToken)), AuthenticationEvents::AUTHENTICATION_SUCCESS,
+            ]);
 
         $manager = new AuthenticationProviderManager([$provider]);
         $manager->setEventDispatcher($dispatcher);
 
-        $this->assertSame($token, $manager->authenticate($token));
+        $this->assertSame($finalToken, $manager->authenticate($priorToken));
+    }
+
+    public function testAuthenticateDispatchesAuthenticationSuccessEventsWithCredentialsAvailableAndRemovedForSuccessiveDispatches()
+    {
+        $finalToken = new UsernamePasswordToken('foo', 'bar', 'baz', ['role-01', 'role-02']);
+        $priorToken = new UsernamePasswordToken('foo', 'bar', 'baz');
+
+        $provider = $this->getAuthenticationProvider(true, $finalToken);
+        $providerCN = \get_class($provider);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE, function (AuthenticationSensitiveEvent $event) use ($providerCN) {
+            $this->assertSame($providerCN, $event->getAuthenticationProviderClassName());
+            $this->assertSame('bar', $event->getAuthenticationTokenPassword());
+            $this->assertEquals('bar', $event->getPreAuthenticationToken()->getCredentials());
+            $this->assertEquals('bar', $event->getAuthenticationToken()->getCredentials());
+        });
+        $dispatcher->addListener(AuthenticationEvents::AUTHENTICATION_SUCCESS, function (AuthenticationSuccessEvent $event) {
+            $this->assertEquals('', $event->getAuthenticationToken()->getCredentials());
+        });
+
+        $manager = new AuthenticationProviderManager([$provider]);
+        $manager->setEventDispatcher($dispatcher);
+
+        $this->assertSame($finalToken, $manager->authenticate($priorToken));
     }
 
     protected function getAuthenticationProvider($supports, $token = null, $exception = null)
     {
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+        $provider = $this->getMockBuilder(AuthenticationProviderInterface::class)->getMock();
         $provider->expects($this->once())
                  ->method('supports')
                  ->will($this->returnValue($supports))

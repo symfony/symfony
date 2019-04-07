@@ -995,6 +995,7 @@ class Configuration implements ConfigurationInterface
                                         ->info('Overwrite the setting from the default provider for this adapter.')
                                     ->end()
                                     ->scalarNode('clearer')->end()
+                                    ->booleanNode('keep_in_memory')->defaultFalse()->end()
                                 ->end()
                             ->end()
                             ->validate()

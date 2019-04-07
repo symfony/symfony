@@ -86,7 +86,7 @@ switch ($vars['REQUEST_URI']) {
 
     case '/timeout-body':
         echo '<1>';
-        ob_flush();
+        @ob_flush();
         flush();
         usleep(500000);
         echo '<2>';
@@ -97,7 +97,7 @@ switch ($vars['REQUEST_URI']) {
         sleep(1);
         while (true) {
             echo '<1>';
-            ob_flush();
+            @ob_flush();
             flush();
             usleep(500);
         }

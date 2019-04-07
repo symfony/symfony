@@ -481,7 +481,7 @@ class ErrorHandlerTest extends TestCase
 
     public function testHandleErrorException()
     {
-        $exception = new \Error("Class 'Foo' not found");
+        $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");
 
         $handler = new ErrorHandler();
         $handler->setExceptionHandler(function () use (&$args) {
@@ -491,7 +491,7 @@ class ErrorHandlerTest extends TestCase
         $handler->handleException($exception);
 
         $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
-        $this->assertStringStartsWith("Attempted to load class \"Foo\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
+        $this->assertStringStartsWith("Attempted to load class \"IReallyReallyDoNotExistAnywhereInTheRepositoryISwear\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
     }
 
     /**

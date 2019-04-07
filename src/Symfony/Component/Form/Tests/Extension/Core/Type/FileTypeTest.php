@@ -184,6 +184,128 @@ class FileTypeTest extends BaseTypeTest
         ];
     }
 
+    /**
+     * @dataProvider uploadFileErrorCodes
+     */
+    public function testFailedFileUploadIsTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE)
+            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->getForm();
+        $form->submit(new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'foo', null, null, $errorCode, true));
+
+        if (UPLOAD_ERR_OK === $errorCode) {
+            $this->assertTrue($form->isValid());
+        } else {
+            $this->assertFalse($form->isValid());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+        }
+    }
+
+    /**
+     * @dataProvider uploadFileErrorCodes
+     */
+    public function testFailedFileUploadIsTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE)
+            ->setRequestHandler(new NativeRequestHandler())
+            ->getForm();
+        $form->submit([
+            'name' => 'foo.txt',
+            'type' => 'text/plain',
+            'tmp_name' => 'owfdskjasdfsa',
+            'error' => $errorCode,
+            'size' => 100,
+        ]);
+
+        if (UPLOAD_ERR_OK === $errorCode) {
+            $this->assertTrue($form->isValid());
+        } else {
+            $this->assertFalse($form->isValid());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+        }
+    }
+
+    /**
+     * @dataProvider uploadFileErrorCodes
+     */
+    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, [
+                'multiple' => true,
+            ])
+            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->getForm();
+        $form->submit([
+            new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'foo', null, null, $errorCode, true),
+            new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'bar', null, null, $errorCode, true),
+        ]);
+
+        if (UPLOAD_ERR_OK === $errorCode) {
+            $this->assertTrue($form->isValid());
+        } else {
+            $this->assertFalse($form->isValid());
+            $this->assertCount(2, $form->getErrors());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+        }
+    }
+
+    /**
+     * @dataProvider uploadFileErrorCodes
+     */
+    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, [
+                'multiple' => true,
+            ])
+            ->setRequestHandler(new NativeRequestHandler())
+            ->getForm();
+        $form->submit([
+            [
+                'name' => 'foo.txt',
+                'type' => 'text/plain',
+                'tmp_name' => 'owfdskjasdfsa',
+                'error' => $errorCode,
+                'size' => 100,
+            ],
+            [
+                'name' => 'bar.txt',
+                'type' => 'text/plain',
+                'tmp_name' => 'owfdskjasdfsa',
+                'error' => $errorCode,
+                'size' => 100,
+            ],
+        ]);
+
+        if (UPLOAD_ERR_OK === $errorCode) {
+            $this->assertTrue($form->isValid());
+        } else {
+            $this->assertFalse($form->isValid());
+            $this->assertCount(2, $form->getErrors());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[0]->getMessage());
+            $this->assertSame($expectedErrorMessage, $form->getErrors()[1]->getMessage());
+        }
+    }
+
+    public function uploadFileErrorCodes()
+    {
+        return [
+            'no error' => [UPLOAD_ERR_OK, null],
+            'upload_max_filesize ini directive' => [UPLOAD_ERR_INI_SIZE, 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.'],
+            'MAX_FILE_SIZE from form' => [UPLOAD_ERR_FORM_SIZE, 'The file is too large.'],
+            'partially uploaded' => [UPLOAD_ERR_PARTIAL, 'The file could not be uploaded.'],
+            'no file upload' => [UPLOAD_ERR_NO_FILE, 'The file could not be uploaded.'],
+            'missing temporary directory' => [UPLOAD_ERR_NO_TMP_DIR, 'The file could not be uploaded.'],
+            'write failure' => [UPLOAD_ERR_CANT_WRITE, 'The file could not be uploaded.'],
+            'stopped by extension' => [UPLOAD_ERR_EXTENSION, 'The file could not be uploaded.'],
+        ];
+    }
+
     private function createUploadedFile(RequestHandlerInterface $requestHandler, $path, $originalName)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {

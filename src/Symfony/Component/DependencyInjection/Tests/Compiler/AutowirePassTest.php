@@ -25,9 +25,9 @@ use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\TypedReference;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -547,13 +547,17 @@ class AutowirePassTest extends TestCase
         );
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @exceptedExceptionMessage Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.
+     */
     public function testWithNonExistingSetterAndAutowiring()
     {
         $container = new ContainerBuilder();
 
-        $definition = $container->register(HttpKernelInterface::class, HttpKernelInterface::class)->setAutowired(true);
+        $definition = $container->register(CaseSensitiveClass::class, CaseSensitiveClass::class)->setAutowired(true);
         $definition->addMethodCall('setLogger');
-        $this->expectException(RuntimeException::class);
+
         (new ResolveClassPass())->process($container);
         (new AutowireRequiredMethodsPass())->process($container);
         (new AutowirePass())->process($container);

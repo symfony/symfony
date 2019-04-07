@@ -65,7 +65,7 @@ class DebugCommandTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Templates directory "%sResources/BarBundle/views" is deprecated since Symfony 4.2, use "%stemplates/bundles/BarBundle" instead.
+     * @expectedDeprecation Loading Twig templates from the "%sResources/BarBundle/views" directory is deprecated since Symfony 4.2, use "%stemplates/bundles/BarBundle" instead.
      */
     public function testDeprecationForWrongBundleOverridingInLegacyPath()
     {

@@ -144,7 +144,12 @@
 
                     <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
                         <div class="trace">
-                            {{ caller.file|file_excerpt(caller.line) }}
+                            {{ caller.file|file_excerpt(caller.line)|replace({
+                                '#DD0000': 'var(--highlight-string)',
+                                '#007700': 'var(--highlight-keyword)',
+                                '#0000BB': 'var(--highlight-default)',
+                                '#FF8000': 'var(--highlight-comment)'
+                            })|raw }}
                         </div>
                     </div>
                 </td>

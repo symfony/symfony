@@ -783,6 +783,9 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals([], $client->getCookieJar()->all(), '->restart() clears the cookies');
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testInsulatedRequests()
     {
         $client = $this->getBrowser();

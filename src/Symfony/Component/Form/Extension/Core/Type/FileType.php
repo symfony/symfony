@@ -13,15 +13,33 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FileType extends AbstractType
 {
+    const KIB_BYTES = 1024;
+    const MIB_BYTES = 1048576;
+
+    private static $suffixes = [
+        1 => 'bytes',
+        self::KIB_BYTES => 'KiB',
+        self::MIB_BYTES => 'MiB',
+    ];
+
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator = null)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +61,10 @@ class FileType extends AbstractType
                 foreach ($files as $file) {
                     if ($requestHandler->isFileUpload($file)) {
                         $data[] = $file;
+
+                        if (method_exists($requestHandler, 'getUploadFileError') && null !== $errorCode = $requestHandler->getUploadFileError($file)) {
+                            $form->addError($this->getFileUploadError($errorCode));
+                        }
                     }
                 }
 
@@ -54,6 +76,8 @@ class FileType extends AbstractType
                 }
 
                 $event->setData($data);
+            } elseif ($requestHandler->isFileUpload($event->getData()) && method_exists($requestHandler, 'getUploadFileError') && null !== $errorCode = $requestHandler->getUploadFileError($event->getData())) {
+                $form->addError($this->getFileUploadError($errorCode));
             } elseif (!$requestHandler->isFileUpload($event->getData())) {
                 $event->setData(null);
             }
@@ -115,5 +139,110 @@ class FileType extends AbstractType
     public function getBlockPrefix()
     {
         return 'file';
+    }
+
+    private function getFileUploadError($errorCode)
+    {
+        $messageParameters = [];
+
+        if (UPLOAD_ERR_INI_SIZE === $errorCode) {
+            list($limitAsString, $suffix) = $this->factorizeSizes(0, self::getMaxFilesize());
+            $messageTemplate = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+            $messageParameters = [
+                '{{ limit }}' => $limitAsString,
+                '{{ suffix }}' => $suffix,
+            ];
+        } elseif (UPLOAD_ERR_FORM_SIZE === $errorCode) {
+            $messageTemplate = 'The file is too large.';
+        } else {
+            $messageTemplate = 'The file could not be uploaded.';
+        }
+
+        if (null !== $this->translator) {
+            $message = $this->translator->trans($messageTemplate, $messageParameters);
+        } else {
+            $message = strtr($messageTemplate, $messageParameters);
+        }
+
+        return new FormError($message, $messageTemplate, $messageParameters);
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini.
+     *
+     * This method should be kept in sync with Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize().
+     *
+     * @return int The maximum size of an uploaded file in bytes
+     */
+    private static function getMaxFilesize()
+    {
+        $iniMax = strtolower(ini_get('upload_max_filesize'));
+
+        if ('' === $iniMax) {
+            return PHP_INT_MAX;
+        }
+
+        $max = ltrim($iniMax, '+');
+        if (0 === strpos($max, '0x')) {
+            $max = \intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = \intval($max, 8);
+        } else {
+            $max = (int) $max;
+        }
+
+        switch (substr($iniMax, -1)) {
+            case 't': $max *= 1024;
+            // no break
+            case 'g': $max *= 1024;
+            // no break
+            case 'm': $max *= 1024;
+            // no break
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
+    }
+
+    /**
+     * Converts the limit to the smallest possible number
+     * (i.e. try "MB", then "kB", then "bytes").
+     *
+     * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::factorizeSizes().
+     */
+    private function factorizeSizes($size, $limit)
+    {
+        $coef = self::MIB_BYTES;
+        $coefFactor = self::KIB_BYTES;
+
+        $limitAsString = (string) ($limit / $coef);
+
+        // Restrict the limit to 2 decimals (without rounding! we
+        // need the precise value)
+        while (self::moreDecimalsThan($limitAsString, 2)) {
+            $coef /= $coefFactor;
+            $limitAsString = (string) ($limit / $coef);
+        }
+
+        // Convert size to the same measure, but round to 2 decimals
+        $sizeAsString = (string) round($size / $coef, 2);
+
+        // If the size and limit produce the same string output
+        // (due to rounding), reduce the coefficient
+        while ($sizeAsString === $limitAsString) {
+            $coef /= $coefFactor;
+            $limitAsString = (string) ($limit / $coef);
+            $sizeAsString = (string) round($size / $coef, 2);
+        }
+
+        return [$limitAsString, self::$suffixes[$coef]];
+    }
+
+    /**
+     * This method should be kept in sync with Symfony\Component\Validator\Constraints\FileValidator::moreDecimalsThan().
+     */
+    private static function moreDecimalsThan($double, $numberOfDecimals)
+    {
+        return \strlen((string) $double) > \strlen(round($double, $numberOfDecimals));
     }
 }

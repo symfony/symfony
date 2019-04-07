@@ -70,6 +70,9 @@
             <tag name="form.type" />
             <argument type="service" id="form.choice_list_factory"/>
         </service>
+        <service id="form.type.file" class="Symfony\Component\Form\Extension\Core\Type\FileType" public="true">
+            <argument type="service" id="translator" on-invalid="ignore" />
+        </service>
 
         <service id="form.type_extension.form.transformation_failure_handling" class="Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />

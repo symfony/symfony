@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Component\HttpClient\Response\NativeResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -36,6 +37,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     use LoggerAwareTrait;
 
     private $defaultOptions = self::OPTIONS_DEFAULTS;
+
+    /** @var NativeClientState */
     private $multi;
 
     /**
@@ -50,18 +53,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
 
-        // Use an internal stdClass object to share state between the client and its responses
-        $this->multi = (object) [
-            'openHandles' => [],
-            'handlesActivity' => [],
-            'pendingResponses' => [],
-            'maxHostConnections' => 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX,
-            'responseCount' => 0,
-            'dnsCache' => [],
-            'handles' => [],
-            'sleep' => false,
-            'id' => random_int(PHP_INT_MIN, PHP_INT_MAX),
-        ];
+        $this->multi = new NativeClientState();
+        $this->multi->maxHostConnections = 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX;
     }
 
     /**
@@ -292,7 +285,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     /**
      * Resolves the IP of the host using the local DNS cache if possible.
      */
-    private static function dnsResolve(array $url, \stdClass $multi, array &$info, ?\Closure $onProgress): array
+    private static function dnsResolve(array $url, NativeClientState $multi, array &$info, ?\Closure $onProgress): array
     {
         if ($port = parse_url($url['authority'], PHP_URL_PORT) ?: '') {
             $info['primary_port'] = $port;
@@ -343,7 +336,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             }
         }
 
-        return static function (\stdClass $multi, ?string $location, $context) use ($redirectHeaders, $proxy, $noProxy, &$info, $maxRedirects, $onProgress): ?string {
+        return static function (NativeClientState $multi, ?string $location, $context) use ($redirectHeaders, $proxy, $noProxy, &$info, $maxRedirects, $onProgress): ?string {
             if (null === $location || $info['http_code'] < 300 || 400 <= $info['http_code']) {
                 $info['redirect_url'] = null;
 

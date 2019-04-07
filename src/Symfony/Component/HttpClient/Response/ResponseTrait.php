@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ClientState;
 
 /**
  * Implements the common logic for response classes.
@@ -49,7 +50,7 @@ trait ResponseTrait
         'error' => null,
     ];
 
-    private $multi;
+    /** @var resource */
     private $handle;
     private $id;
     private $timeout;
@@ -181,12 +182,12 @@ trait ResponseTrait
     /**
      * Performs all pending non-blocking operations.
      */
-    abstract protected static function perform(\stdClass $multi, array &$responses): void;
+    abstract protected static function perform(ClientState $multi, array &$responses): void;
 
     /**
      * Waits for network activity.
      */
-    abstract protected static function select(\stdClass $multi, float $timeout): int;
+    abstract protected static function select(ClientState $multi, float $timeout): int;
 
     private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers): void
     {
@@ -254,6 +255,7 @@ trait ResponseTrait
             $timeoutMax = 0;
             $timeoutMin = $timeout ?? INF;
 
+            /** @var ClientState $multi */
             foreach ($runningResponses as $i => [$multi]) {
                 $responses = &$runningResponses[$i][1];
                 self::perform($multi, $responses);

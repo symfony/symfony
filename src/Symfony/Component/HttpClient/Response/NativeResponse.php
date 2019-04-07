@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -32,11 +33,12 @@ final class NativeResponse implements ResponseInterface
     private $remaining;
     private $buffer;
     private $inflate;
+    private $multi;
 
     /**
      * @internal
      */
-    public function __construct(\stdClass $multi, $context, string $url, $options, bool $gzipEnabled, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
+    public function __construct(NativeClientState $multi, $context, string $url, $options, bool $gzipEnabled, array &$info, callable $resolveRedirect, ?callable $onProgress, ?LoggerInterface $logger)
     {
         $this->multi = $multi;
         $this->id = (int) $context;
@@ -193,7 +195,7 @@ final class NativeResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    private static function perform(\stdClass $multi, array &$responses = null): void
+    private static function perform(NativeClientState $multi, array &$responses = null): void
     {
         // List of native handles for stream_select()
         if (null !== $responses) {
@@ -283,6 +285,7 @@ final class NativeResponse implements ResponseInterface
 
         if ($multi->pendingResponses && \count($multi->handles) < $multi->maxHostConnections) {
             // Open the next pending request - this is a blocking operation so we do only one of them
+            /** @var self $response */
             $response = array_shift($multi->pendingResponses);
             $response->open();
             $responses[$response->id] = $response;
@@ -305,7 +308,7 @@ final class NativeResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    private static function select(\stdClass $multi, float $timeout): int
+    private static function select(NativeClientState $multi, float $timeout): int
     {
         $_ = [];
 

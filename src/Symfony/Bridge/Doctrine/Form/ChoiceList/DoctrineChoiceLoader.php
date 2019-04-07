@@ -49,9 +49,19 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     {
         $classMetadata = $manager->getClassMetadata($class);
 
+        if ((5 > \func_num_args() || false !== func_get_arg(4)) && null === $idReader) {
+            $idReader = new IdReader($manager, $classMetadata);
+
+            if ($idReader->isSingleId()) {
+                @trigger_error(sprintf('Not explicitly passing an instance of "%s" when it can optimize single id entity "%s" has been deprecated in 4.3 and will not apply any optimization in 5.0.', IdReader::class, $class), E_USER_DEPRECATED);
+            } else {
+                $idReader = null;
+            }
+        }
+
         $this->manager = $manager;
         $this->class = $classMetadata->getName();
-        $this->idReader = $idReader ?: new IdReader($manager, $classMetadata);
+        $this->idReader = $idReader;
         $this->objectLoader = $objectLoader;
     }
 
@@ -120,7 +130,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        $optimize = null === $value || \is_array($value) && $this->idReader === $value[0];
+        $optimize = $this->idReader && (null === $value || \is_array($value) && $this->idReader === $value[0]);
 
         if ($optimize && !$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
             $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);

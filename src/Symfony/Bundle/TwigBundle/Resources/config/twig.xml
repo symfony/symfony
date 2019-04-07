@@ -108,8 +108,7 @@
         </service>
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension">
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="router.request_context" on-invalid="ignore" />
+            <argument type="service" id="url_helper" />
         </service>
 
         <service id="twig.extension.debug" class="Twig\Extension\DebugExtension" />

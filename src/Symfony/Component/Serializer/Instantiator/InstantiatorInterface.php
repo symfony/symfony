@@ -11,13 +11,19 @@
 
 namespace Symfony\Component\Serializer\Instantiator;
 
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+
 /**
  * @author Jérôme Desjardins <jewome62@gmail.com>
  */
 interface InstantiatorInterface
 {
+    /**
+     * Instantiate a new object.
+     *
+     * @throws MissingConstructorArgumentsException When some arguments are missing to use the constructor
+     *
+     * @return mixed
+     */
     public function instantiate(string $class, $data, $format = null, array $context = []);
-
-    public function createChildContext(string $class, $data, array $context = [], $attribute);
-
 }

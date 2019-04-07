@@ -25,7 +25,7 @@ class FileTypeTest extends BaseTypeTest
 
     protected function getExtensions()
     {
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
@@ -199,11 +199,12 @@ class FileTypeTest extends BaseTypeTest
      */
     public function testFailedFileUploadIsTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
     {
+        $requestHandler = new HttpFoundationRequestHandler();
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE)
-            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->setRequestHandler($requestHandler)
             ->getForm();
-        $form->submit(new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'foo', null, null, $errorCode, true));
+        $form->submit($this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo', $errorCode));
 
         if (UPLOAD_ERR_OK === $errorCode) {
             $this->assertTrue($form->isValid());
@@ -243,15 +244,16 @@ class FileTypeTest extends BaseTypeTest
      */
     public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
     {
+        $requestHandler = new HttpFoundationRequestHandler();
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE, null, [
                 'multiple' => true,
             ])
-            ->setRequestHandler(new HttpFoundationRequestHandler())
+            ->setRequestHandler($requestHandler)
             ->getForm();
         $form->submit([
-            new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'foo', null, null, $errorCode, true),
-            new UploadedFile(__DIR__.'/../../../Fixtures/foo', 'bar', null, null, $errorCode, true),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo', $errorCode),
+            $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'bar', $errorCode),
         ]);
 
         if (UPLOAD_ERR_OK === $errorCode) {
@@ -316,15 +318,21 @@ class FileTypeTest extends BaseTypeTest
         ];
     }
 
-    private function createUploadedFile(RequestHandlerInterface $requestHandler, $path, $originalName)
+    private function createUploadedFile(RequestHandlerInterface $requestHandler, $path, $originalName, $errorCode = 0)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {
-            return new UploadedFile($path, $originalName, null, null, true);
+            $class = new \ReflectionClass(UploadedFile::class);
+
+            if (5 === $class->getConstructor()->getNumberOfParameters()) {
+                return new UploadedFile($path, $originalName, null, $errorCode, true);
+            }
+
+            return new UploadedFile($path, $originalName, null, null, $errorCode, true);
         }
 
         return [
             'name' => $originalName,
-            'error' => 0,
+            'error' => $errorCode,
             'type' => 'text/plain',
             'tmp_name' => $path,
             'size' => null,

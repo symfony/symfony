@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -45,8 +46,8 @@ class RetryIntegrationTest extends TestCase
         $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
         $handlerLocator = new HandlersLocator([
             DummyMessage::class => [
-                'handler' => $handler,
-                'throwing' => $throwingHandler,
+                new HandlerDescriptor($handler, ['alias' => 'first']),
+                new HandlerDescriptor($throwingHandler, ['alias' => 'throwing']),
             ],
         ]);
 

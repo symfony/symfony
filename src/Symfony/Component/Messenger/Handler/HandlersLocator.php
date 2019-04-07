@@ -12,11 +12,13 @@
 namespace Symfony\Component\Messenger\Handler;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 
 /**
  * Maps a message to a list of handlers.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @experimental in 4.2
  */
@@ -25,7 +27,7 @@ class HandlersLocator implements HandlersLocatorInterface
     private $handlers;
 
     /**
-     * @param callable[][] $handlers
+     * @param HandlerDescriptor[][]|callable[][] $handlers
      */
     public function __construct(array $handlers)
     {
@@ -40,10 +42,23 @@ class HandlersLocator implements HandlersLocatorInterface
         $seen = [];
 
         foreach (self::listTypes($envelope) as $type) {
-            foreach ($this->handlers[$type] ?? [] as $alias => $handler) {
-                if (!\in_array($handler, $seen, true)) {
-                    yield $alias => $seen[] = $handler;
+            foreach ($this->handlers[$type] ?? [] as $handlerDescriptor) {
+                if (\is_callable($handlerDescriptor)) {
+                    $handlerDescriptor = new HandlerDescriptor($handlerDescriptor);
                 }
+
+                if (!$this->shouldHandle($envelope, $handlerDescriptor)) {
+                    continue;
+                }
+
+                $name = $handlerDescriptor->getName();
+                if (\in_array($name, $seen)) {
+                    continue;
+                }
+
+                $seen[] = $name;
+
+                yield $handlerDescriptor;
             }
         }
     }
@@ -59,5 +74,18 @@ class HandlersLocator implements HandlersLocatorInterface
             + class_parents($class)
             + class_implements($class)
             + ['*' => '*'];
+    }
+
+    private function shouldHandle(Envelope $envelope, HandlerDescriptor $handlerDescriptor)
+    {
+        if (null === $received = $envelope->last(ReceivedStamp::class)) {
+            return true;
+        }
+
+        if (null === $expectedTransport = $handlerDescriptor->getOption('from_transport')) {
+            return true;
+        }
+
+        return $received->getTransportName() === $expectedTransport;
     }
 }

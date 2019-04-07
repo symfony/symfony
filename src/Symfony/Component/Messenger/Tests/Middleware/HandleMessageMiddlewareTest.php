@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
@@ -79,28 +80,26 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         ];
 
         yield 'A stamp is added per handler' => [
-            ['first' => $first, 'second' => $second],
             [
-                new HandledStamp('first result', $firstClass.'::__invoke', 'first'),
-                new HandledStamp(null, $secondClass.'::__invoke', 'second'),
+                new HandlerDescriptor($first, ['alias' => 'first']),
+                new HandlerDescriptor($second, ['alias' => 'second']),
             ],
-            true,
-        ];
-
-        yield 'Yielded locator alias is used' => [
-            ['first_alias' => $first, $second],
             [
-                new HandledStamp('first result', $firstClass.'::__invoke', 'first_alias'),
-                new HandledStamp(null, $secondClass.'::__invoke'),
+                new HandledStamp('first result', $firstClass.'::__invoke@first'),
+                new HandledStamp(null, $secondClass.'::__invoke@second'),
             ],
             true,
         ];
 
         yield 'It tries all handlers' => [
-            ['first' => $first, 'failing' => $failing, 'second' => $second],
             [
-                new HandledStamp('first result', $firstClass.'::__invoke', 'first'),
-                new HandledStamp(null, $secondClass.'::__invoke', 'second'),
+                new HandlerDescriptor($first, ['alias' => 'first']),
+                new HandlerDescriptor($failing, ['alias' => 'failing']),
+                new HandlerDescriptor($second, ['alias' => 'second']),
+            ],
+            [
+                new HandledStamp('first result', $firstClass.'::__invoke@first'),
+                new HandledStamp(null, $secondClass.'::__invoke@second'),
             ],
             false,
         ];

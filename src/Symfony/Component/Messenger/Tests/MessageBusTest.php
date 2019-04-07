@@ -71,7 +71,7 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanAddSomeStampsToTheEnvelope()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, [new ReceivedStamp()]);
+        $envelope = new Envelope($message, [new ReceivedStamp('transport')]);
         $envelopeWithAnotherStamp = $envelope->with(new AnEnvelopeStamp());
 
         $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
@@ -109,7 +109,7 @@ class MessageBusTest extends TestCase
     public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeStamps()
     {
         $message = new DummyMessage('Hello');
-        $envelope = new Envelope($message, $stamps = [new ReceivedStamp()]);
+        $envelope = new Envelope($message, $stamps = [new ReceivedStamp('transport')]);
 
         $changedMessage = new DummyMessage('Changed');
         $expectedEnvelope = new Envelope($changedMessage, $stamps);

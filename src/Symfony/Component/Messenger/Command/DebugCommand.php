@@ -84,7 +84,9 @@ EOF
             foreach ($handlersByMessage as $message => $handlers) {
                 $tableRows[] = [sprintf('<fg=cyan>%s</fg=cyan>', $message)];
                 foreach ($handlers as $handler) {
-                    $tableRows[] = [sprintf('    handled by <info>%s</>', $handler)];
+                    $tableRows[] = [
+                        sprintf('    handled by <info>%s</>', $handler[0]).$this->formatConditions($handler[1]),
+                    ];
                 }
             }
 
@@ -96,5 +98,19 @@ EOF
                 $io->warning(sprintf('No handled message found in bus "%s".', $bus));
             }
         }
+    }
+
+    private function formatConditions(array $options): string
+    {
+        if (!$options) {
+            return '';
+        }
+
+        $optionsMapping = [];
+        foreach ($options as $key => $value) {
+            $optionsMapping[] = ' '.$key.'='.$value;
+        }
+
+        return ' (when'.implode(', ', $optionsMapping).')';
     }
 }

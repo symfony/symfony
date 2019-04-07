@@ -25,7 +25,7 @@ class EnvelopeTest extends TestCase
 {
     public function testConstruct()
     {
-        $receivedStamp = new ReceivedStamp();
+        $receivedStamp = new ReceivedStamp('transport');
         $envelope = new Envelope($dummy = new DummyMessage('dummy'), [$receivedStamp]);
 
         $this->assertSame($dummy, $envelope->getMessage());
@@ -37,12 +37,12 @@ class EnvelopeTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('dummy'));
 
-        $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp()));
+        $this->assertNotSame($envelope, $envelope->with(new ReceivedStamp('transport')));
     }
 
     public function testWithoutAll()
     {
-        $envelope = new Envelope(new DummyMessage('dummy'), [new ReceivedStamp(), new ReceivedStamp(), new DelayStamp(5000)]);
+        $envelope = new Envelope(new DummyMessage('dummy'), [new ReceivedStamp('transport1'), new ReceivedStamp('transport2'), new DelayStamp(5000)]);
 
         $envelope = $envelope->withoutAll(ReceivedStamp::class);
 
@@ -52,7 +52,7 @@ class EnvelopeTest extends TestCase
 
     public function testLast()
     {
-        $receivedStamp = new ReceivedStamp();
+        $receivedStamp = new ReceivedStamp('transport');
         $envelope = new Envelope($dummy = new DummyMessage('dummy'), [$receivedStamp]);
 
         $this->assertSame($receivedStamp, $envelope->last(ReceivedStamp::class));
@@ -62,7 +62,7 @@ class EnvelopeTest extends TestCase
     public function testAll()
     {
         $envelope = (new Envelope($dummy = new DummyMessage('dummy')))
-            ->with($receivedStamp = new ReceivedStamp())
+            ->with($receivedStamp = new ReceivedStamp('transport'))
             ->with($validationStamp = new ValidationStamp(['foo']))
         ;
 
@@ -76,7 +76,7 @@ class EnvelopeTest extends TestCase
     public function testWrapWithMessage()
     {
         $message = new \stdClass();
-        $stamp = new ReceivedStamp();
+        $stamp = new ReceivedStamp('transport');
         $envelope = Envelope::wrap($message, [$stamp]);
 
         $this->assertSame($message, $envelope->getMessage());
@@ -86,7 +86,7 @@ class EnvelopeTest extends TestCase
     public function testWrapWithEnvelope()
     {
         $envelope = new Envelope(new \stdClass(), [new DelayStamp(5)]);
-        $envelope = Envelope::wrap($envelope, [new ReceivedStamp()]);
+        $envelope = Envelope::wrap($envelope, [new ReceivedStamp('transport')]);
 
         $this->assertCount(1, $envelope->all(DelayStamp::class));
         $this->assertCount(1, $envelope->all(ReceivedStamp::class));

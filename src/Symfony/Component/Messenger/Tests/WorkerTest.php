@@ -44,10 +44,15 @@ class WorkerTest extends TestCase
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
 
-        $bus->expects($this->at(0))->method('dispatch')->with($envelope = new Envelope($apiMessage, [new ReceivedStamp()]))->willReturn($envelope);
-        $bus->expects($this->at(1))->method('dispatch')->with($envelope = new Envelope($ipaMessage, [new ReceivedStamp()]))->willReturn($envelope);
+        $bus->expects($this->at(0))->method('dispatch')->with(
+            $envelope = new Envelope($apiMessage, [new ReceivedStamp('transport')])
+        )->willReturn($envelope);
 
-        $worker = new Worker([$receiver], $bus);
+        $bus->expects($this->at(1))->method('dispatch')->with(
+            $envelope = new Envelope($ipaMessage, [new ReceivedStamp('transport')])
+        )->willReturn($envelope);
+
+        $worker = new Worker(['transport' => $receiver], $bus);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {
@@ -62,12 +67,12 @@ class WorkerTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('API'));
         $receiver = new DummyReceiver([[$envelope]]);
-        $envelope = $envelope->with(new ReceivedStamp());
+        $envelope = $envelope->with(new ReceivedStamp('transport'));
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
         $bus->expects($this->at(0))->method('dispatch')->with($envelope)->willReturn($envelope);
 
-        $worker = new Worker([$receiver], $bus, []);
+        $worker = new Worker(['transport' => $receiver], $bus, []);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {

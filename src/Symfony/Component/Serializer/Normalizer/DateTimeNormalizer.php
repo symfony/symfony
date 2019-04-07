@@ -114,7 +114,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
-            throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+            // let the validator show the error and do not throw 500.
         }
     }
 

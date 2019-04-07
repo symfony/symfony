@@ -235,12 +235,9 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     */
-    public function testDenormalizeInvalidDataThrowsException()
+    public function testDenormalizeInvalidDataDoesNotThrowsException()
     {
-        $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
+        $this->assertEmpty($this->normalizer->denormalize('invalid date', \DateTimeInterface::class));
     }
 
     /**

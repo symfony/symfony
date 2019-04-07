@@ -16,22 +16,6 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase
 {
-    public function testShouldRedeliverToSenderWithAlias()
-    {
-        $stamp = new RedeliveryStamp(5, 'foo_alias');
-
-        $this->assertFalse($stamp->shouldRedeliverToSender('Foo\Bar\Sender', 'bar_alias'));
-        $this->assertTrue($stamp->shouldRedeliverToSender('Foo\Bar\Sender', 'foo_alias'));
-    }
-
-    public function testShouldRedeliverToSenderWithoutAlias()
-    {
-        $stampToRedeliverToSender1 = new RedeliveryStamp(5, 'App\Sender1');
-
-        $this->assertTrue($stampToRedeliverToSender1->shouldRedeliverToSender('App\Sender1', null));
-        $this->assertFalse($stampToRedeliverToSender1->shouldRedeliverToSender('App\Sender2', null));
-    }
-
     public function testGetters()
     {
         $stamp = new RedeliveryStamp(10, 'sender_alias');

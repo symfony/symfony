@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -19,10 +20,10 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageHandlerFailingFirstTimes;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Worker;
 
@@ -30,20 +31,15 @@ class RetryIntegrationTest extends TestCase
 {
     public function testRetryMechanism()
     {
-        $apiMessage = new DummyMessage('API');
+        $senderAndReceiver = new DummySenderAndReceiver();
 
-        $receiver = $this->createMock(ReceiverInterface::class);
-        $receiver->method('get')
-            ->willReturn([
-                new Envelope($apiMessage, [
-                    new SentStamp('Some\Sender', 'sender_alias'),
-                ]),
-            ]);
+        $senderLocator = $this->createMock(ContainerInterface::class);
+        $senderLocator->method('has')->with('sender_alias')->willReturn(true);
+        $senderLocator->method('get')->with('sender_alias')->willReturn($senderAndReceiver);
+        $senderLocator = new SendersLocator([DummyMessage::class => ['sender_alias']], $senderLocator);
 
-        $senderLocator = new SendersLocator([], ['*' => true]);
-
-        $handler = new DummyMessageHandlerFailingFirstTimes();
-        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
+        $handler = new DummyMessageHandlerFailingFirstTimes(0, 'A');
+        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1, 'B');
         $handlerLocator = new HandlersLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($handler, ['alias' => 'first']),
@@ -51,14 +47,54 @@ class RetryIntegrationTest extends TestCase
             ],
         ]);
 
+        // dispatch the message, which will get "sent" and then received by DummySenderAndReceiver
         $bus = new MessageBus([new SendMessageMiddleware($senderLocator), new HandleMessageMiddleware($handlerLocator)]);
+        $envelope = new Envelope(new DummyMessage('API'));
+        $bus->dispatch($envelope);
 
-        $worker = new Worker(['receiverName' => $receiver], $bus, ['receiverName' => new MultiplierRetryStrategy()]);
-        $worker->run([], function () use ($worker) {
-            $worker->stop();
+        $worker = new Worker(['receiverName' => $senderAndReceiver], $bus, ['receiverName' => new MultiplierRetryStrategy()]);
+        $worker->run([], function (?Envelope $envelope) use ($worker) {
+            if (null === $envelope) {
+                $worker->stop();
+            }
         });
 
         $this->assertSame(1, $handler->getTimesCalledWithoutThrowing());
         $this->assertSame(1, $throwingHandler->getTimesCalledWithoutThrowing());
+    }
+}
+
+class DummySenderAndReceiver implements ReceiverInterface, SenderInterface
+{
+    private $messagesWaiting = [];
+
+    private $messagesReceived = [];
+
+    public function get(): iterable
+    {
+        $message = array_shift($this->messagesWaiting);
+
+        if (null === $message) {
+            return [];
+        }
+
+        $this->messagesReceived[] = $message;
+
+        return [$message];
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+    }
+
+    public function send(Envelope $envelope): Envelope
+    {
+        $this->messagesWaiting[] = $envelope;
+
+        return $envelope;
     }
 }

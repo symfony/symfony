@@ -15,6 +15,7 @@ use Doctrine\DBAL\DBALException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -47,11 +48,11 @@ class DoctrineSender implements SenderInterface
         $delay = null !== $delayStamp ? $delayStamp->getDelay() : 0;
 
         try {
-            $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
+            $id = $this->connection->send($encodedMessage['body'], $encodedMessage['headers'] ?? [], $delay);
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
-        return $envelope;
+        return $envelope->with(new TransportMessageIdStamp($id));
     }
 }

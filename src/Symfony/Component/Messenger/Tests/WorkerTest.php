@@ -97,7 +97,7 @@ class WorkerTest extends TestCase
             $this->assertNotNull($redeliveryStamp);
             // retry count now at 1
             $this->assertSame(1, $redeliveryStamp->getRetryCount());
-            $this->assertTrue($redeliveryStamp->shouldRedeliverToSender('Some\Sender', 'sender_alias'));
+            $this->assertSame('sender_alias', $redeliveryStamp->getSenderClassOrAlias());
 
             // received stamp is removed
             $this->assertNull($envelope->last(ReceivedStamp::class));

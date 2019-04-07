@@ -40,9 +40,9 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -284,6 +284,9 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_debug');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
+            $container->removeDefinition('console.command.messenger_failed_messages_retry');
+            $container->removeDefinition('console.command.messenger_failed_messages_show');
+            $container->removeDefinition('console.command.messenger_failed_messages_remove');
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
@@ -1743,22 +1746,48 @@ class FrameworkExtension extends Extension
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
-            $senders = [];
+
+            // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
-                $senders[$sender] = new Reference($senderAliases[$sender] ?? $sender);
+                if (!isset($senderAliases[$sender])) {
+                    $senderAliases[$sender] = $sender;
+                }
             }
 
-            $messageToSendersMapping[$message] = new IteratorArgument($senders);
+            $messageToSendersMapping[$message] = $messageConfiguration['senders'];
             $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
+        }
+
+        $senderReferences = [];
+        foreach ($senderAliases as $alias => $serviceId) {
+            $senderReferences[$alias] = new Reference($serviceId);
         }
 
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
-            ->replaceArgument(1, $messagesToSendAndHandle)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
+            ->replaceArgument(2, $messagesToSendAndHandle)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
+
+        $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
+            ->replaceArgument(1, $config['failure_transport']);
+
+        if ($config['failure_transport']) {
+            $container->getDefinition('console.command.messenger_failed_messages_retry')
+                ->replaceArgument(0, $config['failure_transport'])
+                ->replaceArgument(4, $transportRetryReferences[$config['failure_transport']] ?? null);
+            $container->getDefinition('console.command.messenger_failed_messages_show')
+                ->replaceArgument(0, $config['failure_transport']);
+            $container->getDefinition('console.command.messenger_failed_messages_remove')
+                ->replaceArgument(0, $config['failure_transport']);
+        } else {
+            $container->removeDefinition('console.command.messenger_failed_messages_retry');
+            $container->removeDefinition('console.command.messenger_failed_messages_show');
+            $container->removeDefinition('console.command.messenger_failed_messages_remove');
+        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

@@ -9,7 +9,8 @@
 
         <!-- Asynchronous -->
         <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
-            <argument type="collection" /> <!-- Per message sender iterators -->
+            <argument type="collection" /> <!-- Per message senders map -->
+            <argument /> <!-- senders locator -->
             <argument type="collection" /> <!-- Messages to send and handle -->
         </service>
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
@@ -90,6 +91,20 @@
             <argument /> <!-- delay ms -->
             <argument /> <!-- multiplier -->
             <argument /> <!-- max delay ms -->
+        </service>
+
+        <!-- failed handling -->
+        <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument /> <!-- Failure transport name -->
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <!-- routable message bus -->
+        <service id="messenger.routable_message_bus" class="Symfony\Component\Messenger\RoutableMessageBus">
+            <argument /> <!-- Message bus locator -->
         </service>
     </services>
 </container>

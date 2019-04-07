@@ -328,6 +328,7 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
                 'routing' => [],
                 'transports' => [],
+                'failure_transport' => null,
                 'serializer' => [
                     'default_serializer' => 'messenger.transport.native_php_serializer',
                     'symfony_serializer' => [

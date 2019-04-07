@@ -247,12 +247,18 @@ class MessengerPass implements CompilerPassInterface
         foreach ($receiverMapping as $name => $reference) {
             $receiverNames[(string) $reference] = $name;
         }
-        if ($container->hasDefinition('console.command.messenger_consume_messages')) {
-            $buses = [];
-            foreach ($busIds as $busId) {
-                $buses[$busId] = new Reference($busId);
-            }
 
+        $buses = [];
+        foreach ($busIds as $busId) {
+            $buses[$busId] = new Reference($busId);
+        }
+
+        if ($container->hasDefinition('messenger.routable_message_bus')) {
+            $container->getDefinition('messenger.routable_message_bus')
+                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses));
+        }
+
+        if ($container->hasDefinition('console.command.messenger_consume_messages')) {
             $container->getDefinition('console.command.messenger_consume_messages')
                 ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
                 ->replaceArgument(3, array_values($receiverNames));
@@ -264,6 +270,18 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
+
+        $failedCommandIds = [
+            'console.command.messenger_failed_messages_retry',
+            'console.command.messenger_failed_messages_show',
+            'console.command.messenger_failed_messages_remove',
+        ];
+        foreach ($failedCommandIds as $failedCommandId) {
+            if ($container->hasDefinition($failedCommandId)) {
+                $definition = $container->getDefinition($failedCommandId);
+                $definition->replaceArgument(1, $receiverMapping[$definition->getArgument(0)]);
+            }
+        }
     }
 
     private function registerBusToCollector(ContainerBuilder $container, string $busId)

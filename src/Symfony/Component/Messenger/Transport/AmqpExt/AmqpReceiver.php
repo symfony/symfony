@@ -110,7 +110,11 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function getMessageCount(): int
     {
-        return $this->connection->countMessagesInQueues();
+        try {
+            return $this->connection->countMessagesInQueues();
+        } catch (\AMQPException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     private function rejectAmqpEnvelope(\AMQPEnvelope $amqpEnvelope, string $queueName): void

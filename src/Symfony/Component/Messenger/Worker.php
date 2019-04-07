@@ -47,7 +47,7 @@ class Worker implements WorkerInterface
      * @param ReceiverInterface[]      $receivers       Where the key is the transport name
      * @param RetryStrategyInterface[] $retryStrategies Retry strategies for each receiver (array keys must match)
      */
-    public function __construct(array $receivers, MessageBusInterface $bus, $retryStrategies = [], EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
+    public function __construct(array $receivers, MessageBusInterface $bus, array $retryStrategies = [], EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
     {
         $this->receivers = $receivers;
         $this->bus = $bus;
@@ -114,9 +114,14 @@ class Worker implements WorkerInterface
         $this->dispatchEvent(new WorkerStoppedEvent());
     }
 
-    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName, ?RetryStrategyInterface $retryStrategy)
+    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName, ?RetryStrategyInterface $retryStrategy): void
     {
-        $this->dispatchEvent(new WorkerMessageReceivedEvent($envelope, $transportName));
+        $event = new WorkerMessageReceivedEvent($envelope, $transportName);
+        $this->dispatchEvent($event);
+
+        if (!$event->shouldHandle()) {
+            return;
+        }
 
         $message = $envelope->getMessage();
         $context = [
@@ -148,7 +153,7 @@ class Worker implements WorkerInterface
 
                 // add the delay and retry stamp info + remove ReceivedStamp
                 $retryEnvelope = $envelope->with(new DelayStamp($retryStrategy->getWaitingTime($envelope)))
-                    ->with(new RedeliveryStamp($retryCount, $this->getSenderAlias($envelope)))
+                    ->with(new RedeliveryStamp($retryCount, $this->getSenderClassOrAlias($envelope)))
                     ->withoutAll(ReceivedStamp::class);
 
                 // re-send the message
@@ -199,6 +204,15 @@ class Worker implements WorkerInterface
             return false;
         }
 
+        $sentStamp = $envelope->last(SentStamp::class);
+        if (null === $sentStamp) {
+            if (null !== $this->logger) {
+                $this->logger->warning('Message will not be retried because the SentStamp is missing and so the target sender cannot be determined.');
+            }
+
+            return false;
+        }
+
         return $retryStrategy->isRetryable($envelope);
     }
 
@@ -210,11 +224,16 @@ class Worker implements WorkerInterface
         return $retryMessageStamp ? $retryMessageStamp->getRetryCount() : 0;
     }
 
-    private function getSenderAlias(Envelope $envelope): ?string
+    private function getSenderClassOrAlias(Envelope $envelope): string
     {
         /** @var SentStamp|null $sentStamp */
         $sentStamp = $envelope->last(SentStamp::class);
 
-        return $sentStamp ? $sentStamp->getSenderAlias() : null;
+        if (null === $sentStamp) {
+            // should not happen, because of the check in shouldRetry()
+            throw new LogicException('Could not find SentStamp.');
+        }
+
+        return $sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass();
     }
 }

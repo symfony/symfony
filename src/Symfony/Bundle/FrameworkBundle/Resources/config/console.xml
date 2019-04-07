@@ -114,6 +114,31 @@
             <tag name="console.command" command="messenger:stop-workers" />
         </service>
 
+        <service id="console.command.messenger_failed_messages_retry" class="Symfony\Component\Messenger\Command\FailedMessagesRetryCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument type="service" id="event_dispatcher" />
+            <argument /> <!-- Retry strategy -->
+            <argument type="service" id="logger" />
+
+            <tag name="console.command" command="messenger:failed:retry" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_show" class="Symfony\Component\Messenger\Command\FailedMessagesShowCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:show" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_remove" class="Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:remove" />
+        </service>
+
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />

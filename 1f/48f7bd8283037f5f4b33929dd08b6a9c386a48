@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-01-06T15:25:03Z
+
+Hello @corphi, this is not a bug but the expected behavior. Only objects are not traversed by default.
+This would be a BC breaking new feature that should deal with a BC layer.
+
+---------------------------------------------------------------------------
+
+by corphi at 2019-01-06T16:22:49Z
+
+The [specification is pretty clear](https://beanvalidation.org/2.0/spec/#constraintdeclarationvalidationprocess-requirements-graphvalidation) that cascading is only controlled by the `Valid` annotation. The failing test shows that traversing and cascading is also triggered by a `Callback` constraint on an array - or any other constraint, as noted in the original bug report. Without a constraint, the array is neither traversed nor its values validated. This is correct behaviour. Thus, “always“ has to be weakened to “if we actually want to cascade” - as expressed by the `Valid` constraint. The patch does exactly that and fixes accidentally cascading into the array.
+
+Traversal strategies have been introduced by the 2.5 refactoring and don’t exist in the specification. I believe, this was done to deal with `Traversable`s that mix more than one responsibility into a single class. This way, you can stop accidental traversals of e.g. lazy-loaded entries. The Java implementation doesn’t need this feature.
+
+Bug fixes obviously break the incorrect behaviour. But the documentation has been incorrect for quite a while and could use some love.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-01-06T21:09:58Z
+
+I was considering this documentation: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php#L357 as the expected behavior. I'm not sure how much we want to follow Java specs here.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-01-07T07:37:37Z
+
+Ok I got your point in #27090. But still, 2.5 is pretty old now, and breaking BC is not the same in both directions.
+
+I mean with the current code, expectation *may* fail but invalid data *should* not be able to be persisted, displaying an invalid message instead.
+With the proposed changes, expectation is *right* but some invalid data *can* be persisted without anyone or anything noticing.
+
+But if the PR were to be merged, I think we should at least update the phpdoc I link above and some inline comment (i.e https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php#L372) consistently, even re-introduce this behavior in master with a proper BC layer.
+
+---------------------------------------------------------------------------
+
+by spackmat at 2019-01-07T10:09:12Z
+
+> I mean with the current code, expectation _may_ fail but invalid data _should_ not be able to be persisted, displaying an invalid message instead.
+> With the proposed changes, expectation is _right_ but some invalid data _can_ be persisted without anyone or anything noticing.
+
+@HeahDude In my case, no invalid data is newly persisted (it is only invalid after changes, but legacy data is still in the database that must be updated on next edit). Now I cannot insert a relation to such legacy data elsewhere since the validation is (incorrectly) traversed and I cannot stop that behavior. Only `@Valid` constraints should trigger such traversal.
+
+And to make things worse: In my case, there is no error shown at all unless I configure the `error_mapping`, as shown here https://github.com/symfony/symfony/issues/27090#issuecomment-404419560. (I have a collection field with one or more relations to another entity and for now I cannot use the Count-constraint to ensure at least one relation is persisted, which ist really bad.)
+
+---------------------------------------------------------------------------
+
+by corphi at 2019-01-07T19:44:38Z
+
+Unfortunately, the inline comments are often outdated. The [comment in line 372](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php#L372) is correct, but misleading. It means: Traversal strategies are ignored on arrays. `validateEachObjectIn()` actually executes cascading into the array. So this condition is already met. (And both aspects are covered by test cases. :tada:) But the [line 357 one](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Validator/RecursiveContextualValidator.php#L357) is plain wrong. I’ll try to improve the comments. And probably the documentation, too.
+
+The way I read it, the Java specification is the single source of truth:
+> The Validator component provides tools to validate values following the JSR-303 Bean Validation specification.
+> [Symfony Validator documentation](https://symfony.com/doc/current/components/validator.html), first sentence
+
+I linked the current version 2.0 (JSR-380) because of its nicer formatting, but the parts relevant to this issue haven’t changed since 1.0 (JSR-303). We are just lagging behind [on the feature side](https://github.com/symfony/symfony/issues/28608).
+
+About the BC layer: @HeahDude, do you suggest triggering a deprecation notice if the wrong annotation incorrectly causes traversal, and fixing the bug in 5.0? An opt-in for the correct behaviour seems a little over the top. A deprecation notice won’t hurt, though. I’d rather fix it sooner than later.
+
+---------------------------------------------------------------------------
+
+by corphi at 2019-01-12T18:46:41Z
+
+Adding a deprecation would mean that this fix had to target 4.3 and could only be corrected in 5.0, according to semantic versioning. A quick scan of existing deprecation messages showed that they are concerned with BC breaks according to the [Symfony BC promise](https://symfony.com/doc/current/contributing/code/bc.html). It only covers changes to code structure, not changed behaviour. A message like “you might have been doing this wrong the entire time” didn’t fit the scheme.
+
+Also, this is why I labeled this PR as without a BC; the rules are linked in the PR template.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-24T20:13:39Z
+
+Could you please rebase? That would remove all the short-array related diffs and ease reviews. Thanks!

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2019-04-07T09:54:26Z
+
+Can you add some information on what the goal of this PR is?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2019-04-07T09:58:10Z
+
+@webmozart I've updated the description.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-07T09:58:38Z
+
+@webmozart simplifying the DoctrineChoiceLoader in a follow-up PR refactoring the caching of choice loaders (which is currently broken for most cases except the doctrine one).
+Anyone using the DoctrineType does not rely on this implicit optimization, as DoctrineType already does the check.

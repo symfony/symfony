@@ -37,25 +37,25 @@ abstract class ObjectRouteLoader extends Loader
     /**
      * Calls the service that will load the routes.
      *
-     * @param mixed       $resource Some value that will resolve to a callable
+     * @param string      $resource Some value that will resolve to a callable
      * @param string|null $type     The resource type
      *
      * @return RouteCollection
      */
     public function load($resource, $type = null)
     {
+        if (!preg_match('/^[^\:]+(?:::?(?:[^\:]+))?$/', $resource)) {
+            throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method" or "service" if your service has an "__invoke" method.', $resource));
+        }
+
         if (1 === substr_count($resource, ':')) {
             $resource = str_replace(':', '::', $resource);
             @trigger_error(sprintf('Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), E_USER_DEPRECATED);
         }
 
         $parts = explode('::', $resource);
-        if (2 != \count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method"', $resource));
-        }
-
         $serviceString = $parts[0];
-        $method = $parts[1];
+        $method = $parts[1] ?? '__invoke';
 
         $loaderObject = $this->getServiceObject($serviceString);
 

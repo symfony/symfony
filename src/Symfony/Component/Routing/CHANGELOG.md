@@ -11,6 +11,7 @@ CHANGELOG
  * deprecated implementing `Serializable` for `Route` and `CompiledRoute`; if you serialize them, please
    ensure your unserialization logic can recover from a failure related to an updated serialization format
  * exposed `utf8` Route option, defaults "locale" and "format" in configuration loaders and configurators
+ * added support for invokable route loader services
 
 4.2.0
 -----

@@ -58,7 +58,7 @@ class StoreFactory
                 return new FlockStore(substr($connection, 8));
             case 'semaphore' === $connection:
                 return new SemaphoreStore();
-            case preg_match('#^[a-z]++://#', $connection):
+            case \class_exists(AbstractAdapter::class) && preg_match('#^[a-z]++://#', $connection):
                 return static::createStore(AbstractAdapter::createConnection($connection));
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Extension\Core\CoreExtension;
-
 /**
  * Entry point of the Form component.
  *
@@ -105,10 +103,7 @@ final class Forms
      */
     public static function createFormFactoryBuilder()
     {
-        $builder = new FormFactoryBuilder();
-        $builder->addExtension(new CoreExtension());
-
-        return $builder;
+        return new FormFactoryBuilder(true);
     }
 
     /**

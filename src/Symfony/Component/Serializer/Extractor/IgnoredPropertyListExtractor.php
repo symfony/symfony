@@ -17,6 +17,8 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
  * Remove properties given a ignore list of attributes in the context.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
+ *
+ * @experimental in 4.3
  */
 final class IgnoredPropertyListExtractor implements PropertyListExtractorInterface
 {

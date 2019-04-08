@@ -18,8 +18,10 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  * Filter properties given a specific set of groups
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
+ *
+ * @experimental in 4.3
  */
-class GroupPropertyListExtractor implements PropertyListExtractorInterface
+final class GroupPropertyListExtractor implements PropertyListExtractorInterface
 {
     public const GROUPS = 'groups';
 

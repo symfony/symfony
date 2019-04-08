@@ -17,6 +17,8 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
  * Allow properties given an allowed list of properties in the context.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
+ *
+ * @experimental in 4.3
  */
 final class AllowedPropertyListExtractor implements PropertyListExtractorInterface
 {

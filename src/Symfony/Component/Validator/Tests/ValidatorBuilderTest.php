@@ -14,11 +14,12 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
     /**
-     * @var ValidatorBuilder
+     * @var ValidatorBuilderInterface
      */
     protected $builder;
 

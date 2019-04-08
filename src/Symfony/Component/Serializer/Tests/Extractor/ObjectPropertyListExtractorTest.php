@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 use Symfony\Component\Serializer\Extractor\ObjectPropertyListExtractor;
 
 class ObjectPropertyListExtractorTest extends TestCase
@@ -57,5 +58,20 @@ class ObjectPropertyListExtractorTest extends TestCase
             $properties,
             (new ObjectPropertyListExtractor($propertyListExtractor, $classResolver))->getProperties($object, $context)
         );
+    }
+
+    public function testDecorateChildContext()
+    {
+        $extractor = $this
+            ->getMockBuilder([PropertyListExtractorInterface::class, ChildContextBuilderInterface::class])
+            ->getMock()
+        ;
+
+        $extractor->method('createChildContextForAttribute')->willReturn([]);
+        $objectExtractor = new ObjectPropertyListExtractor($extractor);
+
+        $childContext = $objectExtractor->createChildContextForAttribute(['test'], 'some_attribute');
+
+        $this->assertSame([], $childContext);
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 
 /**
  * Allow properties given an allowed list of properties in the context.
@@ -20,7 +21,7 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
  *
  * @experimental in 4.3
  */
-final class AllowedPropertyListExtractor implements PropertyListExtractorInterface
+final class AllowedPropertyListExtractor implements PropertyListExtractorInterface, ChildContextBuilderInterface
 {
     public const ATTRIBUTES = 'attributes';
 
@@ -49,5 +50,23 @@ final class AllowedPropertyListExtractor implements PropertyListExtractorInterfa
         }
 
         return array_intersect($properties, $allowed);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createChildContextForAttribute(array $context, string $attribute): array
+    {
+        if ($this->extractor instanceof ChildContextBuilderInterface) {
+            $context = $this->extractor->createChildContextForAttribute($context, $attribute);
+        }
+
+        if (isset($context[self::ATTRIBUTES][$attribute])) {
+            $context[self::ATTRIBUTES] = $context[self::ATTRIBUTES][$attribute];
+        } else {
+            unset($context[self::ATTRIBUTES]);
+        }
+
+        return $context;
     }
 }

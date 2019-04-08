@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 
 /**
  * Remove properties given a ignore list of attributes in the context.
@@ -20,11 +21,11 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
  *
  * @experimental in 4.3
  */
-final class IgnoredPropertyListExtractor implements PropertyListExtractorInterface
+final class IgnoredPropertyListExtractor implements PropertyListExtractorInterface, ChildContextBuilderInterface
 {
-    public const ATTRIBUTES = 'ignored_attributes';
+    use DecorateChildContextBuilderTrait;
 
-    private $extractor;
+    public const ATTRIBUTES = 'ignored_attributes';
 
     public function __construct(PropertyListExtractorInterface $extractor)
     {

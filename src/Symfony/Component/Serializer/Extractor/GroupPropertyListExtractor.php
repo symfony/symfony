@@ -12,22 +12,23 @@
 namespace Symfony\Component\Serializer\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
- * Filter properties given a specific set of groups
+ * Filter properties given a specific set of groups.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  *
  * @experimental in 4.3
  */
-final class GroupPropertyListExtractor implements PropertyListExtractorInterface
+final class GroupPropertyListExtractor implements PropertyListExtractorInterface, ChildContextBuilderInterface
 {
+    use DecorateChildContextBuilderTrait;
+
     public const GROUPS = 'groups';
 
     private $classMetadataFactory;
-
-    private $extractor;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory, PropertyListExtractorInterface $extractor = null)
     {

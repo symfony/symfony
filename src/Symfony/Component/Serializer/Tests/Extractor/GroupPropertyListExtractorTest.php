@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 use Symfony\Component\Serializer\Extractor\GroupPropertyListExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -110,8 +111,8 @@ class GroupPropertyListExtractorTest extends TestCase
 
         $extractor->method('getProperties')->willReturn(null);
 
-        $ignored = new GroupPropertyListExtractor($factory, $extractor);
-        $properties = $ignored->getProperties(DummyNoGroups::class);
+        $groupExtractor = new GroupPropertyListExtractor($factory, $extractor);
+        $properties = $groupExtractor->getProperties(DummyNoGroups::class);
 
         $this->assertNull($properties);
     }
@@ -119,13 +120,29 @@ class GroupPropertyListExtractorTest extends TestCase
     public function testNoExtractor()
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $ignored = new GroupPropertyListExtractor($factory);
-        $properties = $ignored->getProperties(DummyNoGroups::class);
+        $groupExtractor = new GroupPropertyListExtractor($factory);
+        $properties = $groupExtractor->getProperties(DummyNoGroups::class);
         
         $this->assertInternalType('array', $properties);
         $this->assertContains('foo', $properties);
         $this->assertContains('bar', $properties);
         $this->assertContains('baz', $properties);
+    }
+
+    public function testDecorateChildContext()
+    {
+        $extractor = $this
+            ->getMockBuilder([PropertyListExtractorInterface::class, ChildContextBuilderInterface::class])
+            ->getMock()
+        ;
+
+        $extractor->method('createChildContextForAttribute')->willReturn([]);
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $groupExtractor = new GroupPropertyListExtractor($factory, $extractor);
+
+        $childContext = $groupExtractor->createChildContextForAttribute(['test'], 'some_attribute');
+
+        $this->assertSame([], $childContext);
     }
 }
 

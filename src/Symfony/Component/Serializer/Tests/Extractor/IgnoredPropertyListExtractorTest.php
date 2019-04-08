@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Extractor;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 use Symfony\Component\Serializer\Extractor\IgnoredPropertyListExtractor;
 
 class IgnoredPropertyListExtractorTest extends TestCase
@@ -62,5 +63,20 @@ class IgnoredPropertyListExtractorTest extends TestCase
         $properties = $ignored->getProperties('SomeClass');
 
         $this->assertNull($properties);
+    }
+
+    public function testDecorateChildContext()
+    {
+        $extractor = $this
+            ->getMockBuilder([PropertyListExtractorInterface::class, ChildContextBuilderInterface::class])
+            ->getMock()
+        ;
+
+        $extractor->method('createChildContextForAttribute')->willReturn([]);
+        $ignored = new IgnoredPropertyListExtractor($extractor);
+
+        $childContext = $ignored->createChildContextForAttribute(['test'], 'some_attribute');
+
+        $this->assertSame([], $childContext);
     }
 }

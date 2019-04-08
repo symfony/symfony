@@ -12,13 +12,14 @@
 namespace Symfony\Component\Serializer\Extractor;
 
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Serializer\Context\ChildContextBuilderInterface;
 
 /**
  * @author David Maicher <mail@dmaicher.de>
  *
  * @experimental in 4.3
  */
-final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterface
+final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterface, ChildContextBuilderInterface
 {
     private $propertyListExtractor;
     private $objectClassResolver;
@@ -37,5 +38,17 @@ final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorIn
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         return $this->propertyListExtractor->getProperties($class, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createChildContextForAttribute(array $context, string $attribute): array
+    {
+        if ($this->propertyListExtractor instanceof ChildContextBuilderInterface) {
+            return $this->propertyListExtractor->createChildContextForAttribute($context, $attribute);
+        }
+
+        return $context;
     }
 }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T21:04:39Z
+
+Sorry I started commenting using regular comments, here is one more to thank you for this PR :)
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-08T11:08:32Z
+
+thanks. i improved the exception messages and cleaned up the max_depth_handler to only validate when we need, and to refuse `null`
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-08T13:10:37Z
+
+typo fixed. i rebased on 4.2 because there where (unrelated) failing tests.

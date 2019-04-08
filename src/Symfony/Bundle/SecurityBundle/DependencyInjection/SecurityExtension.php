@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -570,10 +571,28 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 }
 
                 throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
+            } elseif (\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+                @trigger_error('Configuring an encoder based on the "argon2i" algorithm while only "argon2id" is supported is deprecated since Symfony 4.3, use "argon2id" instead.', E_USER_DEPRECATED);
             }
 
             return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+                'arguments' => [
+                    $config['memory_cost'],
+                    $config['time_cost'],
+                    $config['threads'],
+                ],
+            ];
+        }
+
+        // Argon2id encoder
+        if ('argon2id' === $config['algorithm']) {
+            if (!Argon2idPasswordEncoder::isSupported()) {
+                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
+            }
+
+            return [
+                'class' => Argon2idPasswordEncoder::class,
                 'arguments' => [
                     $config['memory_cost'],
                     $config['time_cost'],

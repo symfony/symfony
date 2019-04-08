@@ -15,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -72,7 +73,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordArgon2i()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
+        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
             $this->markTestSkipped('Argon2i algorithm not available.');
         }
         $this->setupArgon2i();
@@ -80,6 +81,27 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Custom\Class\Argon2i\User',
+        ], ['interactive' => false]);
+
+        $output = $this->passwordEncoderCommandTester->getDisplay();
+        $this->assertContains('Password encoding succeeded', $output);
+
+        $encoder = new Argon2iPasswordEncoder();
+        preg_match('#  Encoded password\s+(\$argon2i?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
+        $hash = $matches[1];
+        $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
+    }
+
+    public function testEncodePasswordArgon2id()
+    {
+        if (!Argon2idPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Argon2i algorithm not available.');
+        }
+        $this->setupArgon2id();
+        $this->passwordEncoderCommandTester->execute([
+            'command' => 'security:encode-password',
+            'password' => 'password',
+            'user-class' => 'Custom\Class\Argon2id\User',
         ], ['interactive' => false]);
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
@@ -153,8 +175,8 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordArgon2iOutput()
     {
-        if (!Argon2iPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+            $this->markTestSkipped('Argon2id algorithm not available.');
         }
 
         $this->setupArgon2i();
@@ -162,6 +184,22 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'p@ssw0rd',
             'user-class' => 'Custom\Class\Argon2i\User',
+        ], ['interactive' => false]);
+
+        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+    }
+
+    public function testEncodePasswordArgon2idOutput()
+    {
+        if (!Argon2idPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Argon2id algorithm not available.');
+        }
+
+        $this->setupArgon2id();
+        $this->passwordEncoderCommandTester->execute([
+            'command' => 'security:encode-password',
+            'password' => 'p@ssw0rd',
+            'user-class' => 'Custom\Class\Argon2id\User',
         ], ['interactive' => false]);
 
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
@@ -251,6 +289,19 @@ EOTXT
     {
         putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
         $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'argon2i.yml']);
+        $kernel->boot();
+
+        $application = new Application($kernel);
+
+        $passwordEncoderCommand = $application->get('security:encode-password');
+
+        $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
+    }
+
+    private function setupArgon2id()
+    {
+        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
+        $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'argon2id.yml']);
         $kernel->boot();
 
         $application = new Application($kernel);

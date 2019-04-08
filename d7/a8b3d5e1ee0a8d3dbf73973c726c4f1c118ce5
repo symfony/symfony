@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by kunicmarko20 at 2019-02-07T09:29:58Z
+
+Isn't it a better solution to check phpunit version here:
+
+https://github.com/symfony/symfony/blob/e8c3f9e0d00ddd6cf72340c5f61fb78932a23e4c/src/Symfony/Bridge/PhpUnit/TextUI/TestRunner.php#L22-L26
+
+and then provide the class with or without final? (if it is even possible like that)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-20T09:00:47Z
+
+@kunicmarko20 could you please have a look if that would be possible? Can you find any other alternative?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-02-20T09:11:41Z
+
+@nicolas-grekas is it maybe possible to remove the TestRunner and move this logic to the Test Command?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-01T18:37:06Z
+
+@nicolas-grekas @alexander-schranz How can we move forward here?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-02T08:41:14Z
+
+Will have a look at it, at the _EU-FOSSA Hackathon_.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-04-04T10:41:32Z
+
+Could this help? https://github.com/dg/bypass-finals
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-06T08:58:22Z
+
+@ostrolucky think we don't want to remove all finals.
+
+Maybe there is some suggestion by @sebastianbergmann how we could automatically register the SymfonyListener programmatically now. Did create an issue at the phpunit repository https://github.com/sebastianbergmann/phpunit/issues/3594
+
+#EU-FOSSA
+
+---------------------------------------------------------------------------
+
+by sebastianbergmann at 2019-04-06T09:22:17Z
+
+As I already wrote in https://github.com/sebastianbergmann/phpunit/issues/3594#issuecomment-480487689 (why do we have to discuss the same issue in different places?), "automatically registereing" is not possible, and intentionally so: the test runner should not be extended through inheritance but by hooking into certain events. You can find the available hooks [here](https://github.com/sebastianbergmann/phpunit/tree/master/src/Runner/Hook).
+
+What you should do is implement a class that implements one or more of these `Hook` interfaces. Then have PHPUnit load that class through its configuration file. PHPUnit will then register the hooks.
+
+I can only advise against "hacking around" or "extending" the PHPUnit test runner and then, again and again, update your workarounds when internal implementation details of PHPUnit change. Please do not rely on private implementation details.
+
+In https://github.com/symfony/symfony/pull/30085#pullrequestreview-200951632 @nicolas-grekas wrote
+
+> we should also report the issue to Sebastian so that he knows some extensibility point is now missing
+
+Yes, please: let me know if you are missing an extension point. While working on https://github.com/Roave/no-leaks @Ocramius ran into limitations of the current hooks provided and we plan to work on this in the future.
+
+On a related note, the whole idea of phpunit-bridge is a mystery to me. I do not know what problem(s) you are trying to solve with it. It would be great if somebody could explain that at some point to me. It might be that there are solutions in there for problems that could be solved differently, either inside PHPUnit or in Symfony. I am not conviced that the best medium for this explanation would be a ticket or email. This should, ideally, be a real conversation. Maybe somebody from Symfony can come to a PHPUnit code sprint (there is one in Würzburg this month) or I can come to a Symfony code sprint.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-06T10:08:11Z
+
+Meeting in person would be great for sure! I'm pretty busy this spring so not sure I can join the next sprint but let's tell each other if we see any opportunity!
+
+The bridge creates an alternative "phpunit binary" that provides some extra features out of the box. With inheritance, it was possible to wire a different behavior by default, but now I'm not sure we can (I didn't have a deeper look). Which features? some extra annotations (`@expectedDeprecation`, `@time-sensitive`, etc) and some extra behaviors: the deprecations report that is displayed after running the tests, or a record/replay feature for skipped tests, maybe some more.
+
+The extra features related to annotations work with a line in config files, but the extra behaviors are shipped out of the box when using the bridge.
+
+That's why there is this specific bootstrapping extra layer, which is closed now, with `final`.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-07T13:20:18Z
+
+Analysed more the current state and I think I could fix it by moving the logic from the TestRunner to the Command.
+
+#EUFOSSA
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T13:32:00Z
+
+if it works, perfect :)
+wasn't `TestRunnerForV6` reference somewhere?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-07T13:46:05Z
+
+Can we also remove the `src/Symfony/Bridge/PhpUnit/TextUI/TestRunner.php` file?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-07T13:54:04Z
+
+@xabbuh It's still used in the `CommandForV5`, isn't it?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-07T13:57:09Z
+
+@xabbuh done and move the v5 testrunner logic also to the commandforv5

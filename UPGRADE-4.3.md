@@ -153,6 +153,8 @@ Security
    ```
 
  * The `Argon2iPasswordEncoder` class has been deprecated, use `SodiumPasswordEncoder` instead.
+ * Not implementing the methods `__serialize` and `__unserialize` in classes implementing
+   the `TokenInterface` is deprecated
 
 SecurityBundle
 --------------

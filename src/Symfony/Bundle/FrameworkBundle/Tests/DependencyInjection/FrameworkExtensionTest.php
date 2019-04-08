@@ -160,6 +160,7 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      */
     public function testAmbiguousWhenBothTemplatingAndFragments()

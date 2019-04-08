@@ -48,6 +48,14 @@ class ApplicationTest extends TestCase
         $this->colSize = getenv('COLUMNS');
     }
 
+    protected function tearDown()
+    {
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
+        putenv('SHELL_VERBOSITY');
+        unset($_ENV['SHELL_VERBOSITY']);
+        unset($_SERVER['SHELL_VERBOSITY']);
+    }
+
     public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
@@ -1697,14 +1705,6 @@ class ApplicationTest extends TestCase
         } catch (\Error $e) {
             $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
         }
-    }
-
-    protected function tearDown()
-    {
-        putenv($this->colSize ? 'COLUMNS' : 'COLUMNS='.$this->colSize);
-        putenv('SHELL_VERBOSITY');
-        unset($_ENV['SHELL_VERBOSITY']);
-        unset($_SERVER['SHELL_VERBOSITY']);
     }
 }
 

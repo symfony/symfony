@@ -82,6 +82,32 @@ class RouterTest extends TestCase
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
+    public function testGenerateWithDefaultLocale()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'testFoo';
+
+        foreach (['hr' => '/test-hr', 'en' => '/test-en'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $sc = $this->getServiceContainer($routes);
+
+        $router = new Router($sc, '', [], null, null, null, 'hr');
+
+        $this->assertSame('/test-hr', $router->generate($name));
+
+        $this->assertSame('/test-en', $router->generate($name, ['_locale' => 'en']));
+        $this->assertSame('/test-hr', $router->generate($name, ['_locale' => 'hr']));
+    }
+
     public function testDefaultsPlaceholders()
     {
         $routes = new RouteCollection();

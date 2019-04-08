@@ -48,6 +48,11 @@
             <tag name="console.command" command="cache:pool:delete" />
         </service>
 
+        <service id="console.command.cache_pool_list" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolListCommand">
+            <argument /> <!-- Pool names -->
+            <tag name="console.command" command="cache:pool:list" />
+        </service>
+
         <service id="console.command.cache_warmup" class="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
             <argument type="service" id="cache_warmer" />
             <tag name="console.command" command="cache:warmup" />

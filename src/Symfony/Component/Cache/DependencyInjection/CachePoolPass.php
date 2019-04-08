@@ -136,6 +136,10 @@ class CachePoolPass implements CompilerPassInterface
                 $clearer->addTag($this->cacheSystemClearerTag);
             }
         }
+
+        if ($container->hasDefinition('console.command.cache_pool_list')) {
+            $container->getDefinition('console.command.cache_pool_list')->replaceArgument(0, array_keys($pools));
+        }
     }
 
     private function getNamespace($seed, $id)

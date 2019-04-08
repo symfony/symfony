@@ -17,16 +17,16 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class ChildCustomUserMessageAuthenticationException extends CustomUserMessageAuthenticationException
 {
-    protected function getState(): array
+    public function __serialize(): array
     {
-        return [$this->childMember, parent::getState()];
+        return [$this->childMember, parent::__serialize()];
     }
 
-    public function setState(array $data)
+    public function __unserialize(array $data): void
     {
         [$this->childMember, $parentData] = $data;
 
-        parent::setState($parentData);
+        parent::__unserialize($parentData);
     }
 }
 

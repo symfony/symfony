@@ -46,18 +46,11 @@ class Argon2idPasswordEncoder extends BasePasswordEncoder implements SelfSalting
         if (\defined('PASSWORD_ARGON2ID')) {
             return $this->encodePasswordNative($raw, \PASSWORD_ARGON2ID);
         }
-        if (!\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+        if (!self::isDefaultSodiumAlgorithm()) {
             throw new LogicException('Algorithm "argon2id" is not supported. Please install the libsodium extension or upgrade to PHP 7.3+.');
         }
 
-        $hash = \sodium_crypto_pwhash_str(
-            $raw,
-            \SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE,
-            \SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE
-        );
-        \sodium_memzero($raw);
-
-        return $hash;
+        return $this->encodePasswordSodiumFunction($raw);
     }
 
     /**
@@ -81,5 +74,15 @@ class Argon2idPasswordEncoder extends BasePasswordEncoder implements SelfSalting
         }
 
         throw new LogicException('Algorithm "argon2id" is not supported. Please install the libsodium extension or upgrade to PHP 7.3+.');
+    }
+
+    /**
+     * @internal
+     */
+    public static function isDefaultSodiumAlgorithm()
+    {
+        return \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')
+            && \defined('SODIUM_CRYPTO_PWHASH_ALG_DEFAULT')
+            && \SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13 === \SODIUM_CRYPTO_PWHASH_ALG_DEFAULT;
     }
 }

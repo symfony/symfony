@@ -73,7 +73,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordArgon2i()
     {
-        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+        if (!Argon2iPasswordEncoder::isSupported() || !\defined('PASSWORD_ARGON2I') && Argon2idPasswordEncoder::isDefaultSodiumAlgorithm()) {
             $this->markTestSkipped('Argon2i algorithm not available.');
         }
         $this->setupArgon2i();
@@ -95,7 +95,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
     public function testEncodePasswordArgon2id()
     {
         if (!Argon2idPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
+            $this->markTestSkipped('Argon2id algorithm not available.');
         }
         $this->setupArgon2id();
         $this->passwordEncoderCommandTester->execute([
@@ -107,7 +107,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $output = $this->passwordEncoderCommandTester->getDisplay();
         $this->assertContains('Password encoding succeeded', $output);
 
-        $encoder = new Argon2iPasswordEncoder();
+        $encoder = new Argon2idPasswordEncoder();
         preg_match('#  Encoded password\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
         $hash = $matches[1];
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
@@ -175,7 +175,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordArgon2iOutput()
     {
-        if (!Argon2iPasswordEncoder::isSupported() || \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+        if (!Argon2iPasswordEncoder::isSupported() || !\defined('PASSWORD_ARGON2I') && Argon2idPasswordEncoder::isDefaultSodiumAlgorithm()) {
             $this->markTestSkipped('Argon2id algorithm not available.');
         }
 

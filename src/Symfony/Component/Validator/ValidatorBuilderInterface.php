@@ -12,10 +12,11 @@
 namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A configurable builder for ValidatorInterface objects.
@@ -134,9 +135,10 @@ interface ValidatorBuilderInterface
     /**
      * Sets the translator used for translating violation messages.
      *
+     * @param TranslatorInterface|LegacyTranslatorInterface $translator
      * @return $this
      */
-    public function setTranslator(TranslatorInterface $translator);
+    public function setTranslator($translator);
 
     /**
      * Sets the default translation domain of violation messages.

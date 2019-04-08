@@ -14,12 +14,11 @@ namespace Symfony\Component\Validator\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\ValidatorBuilder;
-use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
     /**
-     * @var ValidatorBuilderInterface
+     * @var ValidatorBuilder
      */
     protected $builder;
 
@@ -102,7 +101,7 @@ class ValidatorBuilderTest extends TestCase
     public function testSetTranslator()
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock())
+            $this->getMockBuilder('Symfony\Contracts\Translation\TranslatorInterface')->getMock())
         );
     }
 

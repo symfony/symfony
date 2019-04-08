@@ -23,6 +23,24 @@ class CommandForV5 extends \PHPUnit_TextUI_Command
      */
     protected function createRunner()
     {
-        return new TestRunnerForV5($this->arguments['loader']);
+        $listener = new SymfonyTestsListenerForV5();
+
+        $this->arguments['listeners'] = isset($this->arguments['listeners']) ? $this->arguments['listeners'] : array();
+
+        $registeredLocally = false;
+
+        foreach ($this->arguments['listeners'] as $registeredListener) {
+            if ($registeredListener instanceof SymfonyTestsListenerForV5) {
+                $registeredListener->globalListenerDisabled();
+                $registeredLocally = true;
+                break;
+            }
+        }
+
+        if (!$registeredLocally) {
+            $this->arguments['listeners'][] = $listener;
+        }
+
+        return parent::createRunner();
     }
 }

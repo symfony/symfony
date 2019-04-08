@@ -385,6 +385,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
             return $object;
         }
+        // clean up even if no match
+        unset($context[static::OBJECT_TO_POPULATE]);
 
         $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
@@ -453,7 +455,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $parameter->getClass(), self::class));
                 }
                 $parameterClass = $parameter->getClass()->getName();
-                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName));
+                $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $parameterName, $format));
             }
         } catch (\ReflectionException $e) {
             throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $parameterName), 0, $e);
@@ -468,14 +470,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param array  $parentContext
-     * @param string $attribute
+     * @param array       $parentContext
+     * @param string      $attribute     Attribute name
+     * @param string|null $format
      *
      * @return array
      *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute)
+    protected function createChildContext(array $parentContext, $attribute/*, string $format = null */)
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

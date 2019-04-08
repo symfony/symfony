@@ -394,6 +394,30 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testObjectToPopulateNoMatch()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, null, null, new PhpDocExtractor());
+        new Serializer([$this->normalizer]);
+
+        $objectToPopulate = new ObjectInner();
+        $objectToPopulate->foo = 'foo';
+
+        $outer = $this->normalizer->denormalize([
+            'foo' => 'foo',
+            'inner' => [
+                'bar' => 'bar',
+            ],
+        ], ObjectOuter::class, null, [ObjectNormalizer::OBJECT_TO_POPULATE => $objectToPopulate]);
+
+        $this->assertInstanceOf(ObjectOuter::class, $outer);
+        $inner = $outer->getInner();
+        $this->assertInstanceOf(ObjectInner::class, $inner);
+        $this->assertNotSame($objectToPopulate, $inner);
+        $this->assertSame('bar', $inner->bar);
+        $this->assertNull($inner->foo);
+    }
+
     /**
      * @dataProvider provideCallbacks
      */
@@ -470,6 +494,16 @@ class ObjectNormalizerTest extends TestCase
 
         $this->assertEquals(
             ['fooBar' => 'foobar'],
+            $this->normalizer->normalize($obj, 'any')
+        );
+
+        $this->normalizer->setIgnoredAttributes(['foo', 'baz', 'camelCase', 'object']);
+
+        $this->assertEquals(
+            [
+                'fooBar' => 'foobar',
+                'bar' => 'bar',
+            ],
             $this->normalizer->normalize($obj, 'any')
         );
     }
@@ -1208,6 +1242,9 @@ class ObjectOuter
 {
     public $foo;
     public $bar;
+    /**
+     * @var ObjectInner
+     */
     private $inner;
     private $date;
 

@@ -129,7 +129,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)), $class, $format, $context);
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute, $format)), $class, $format, $context);
         }
 
         return $data;
@@ -185,21 +185,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $allowedAttributes;
         }
 
-        if ($context[self::ATTRIBUTES] ?? $this->defaultContext[self::ATTRIBUTES] ?? false) {
-            return $this->extractAttributes($object, $format, $context);
-        }
-
-        if (isset($this->attributesCache[$class])) {
-            return $this->attributesCache[$class];
-        }
-
         $attributes = $this->extractAttributes($object, $format, $context);
 
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForMappedObject($object)) {
             array_unshift($attributes, $mapping->getTypeProperty());
         }
 
-        return $this->attributesCache[$class] = $attributes;
+        if ($context['cache_key']) {
+            $this->attributesCache[$key] = $attributes;
+        }
+
+        return $attributes;
     }
 
     /**
@@ -347,7 +343,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
                 }
 
-                $childContext = $this->createChildContext($context, $attribute);
+                $childContext = $this->createChildContext($context, $attribute, $format);
                 if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
                     return $this->serializer->denormalize($data, $class, $format, $childContext);
                 }
@@ -477,7 +473,32 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Gets the cache key to use.
+     * Overwritten to update the cache key for the child.
+     *
+     * We must not mix up the attribute cache between parent and children.
+     *
+     * {@inheritdoc}
+     */
+    protected function createChildContext(array $parentContext, $attribute/*, string $format = null */)
+    {
+        if (\func_num_args() >= 3) {
+            $format = \func_get_arg(2);
+        } else {
+            // will be deprecated in version 4
+            $format = null;
+        }
+
+        $context = parent::createChildContext($parentContext, $attribute, $format);
+        // format is already included in the cache_key of the parent.
+        $context['cache_key'] = $this->getCacheKey($format, $context);
+
+        return $context;
+    }
+
+    /**
+     * Builds the cache key for the attributes cache.
+     *
+     * The key must be different for every option in the context that could change which attributes should be handled.
      *
      * @return bool|string
      */
@@ -487,9 +508,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             unset($context[$key]);
         }
         unset($context[self::EXCLUDE_FROM_CACHE_KEY]);
+        unset($context['cache_key']); // avoid artificially different keys
 
         try {
-            return md5($format.serialize($context));
+            return md5($format.serialize([
+                'context' => $context,
+                'ignored' => $this->ignoredAttributes,
+                'camelized' => $this->camelizedAttributes,
+            ]));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache
             return false;

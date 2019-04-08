@@ -497,7 +497,8 @@ class ObjectNormalizerTest extends TestCase
             $this->normalizer->normalize($obj, 'any')
         );
 
-        $this->normalizer->setIgnoredAttributes(['foo', 'baz', 'camelCase', 'object']);
+        $ignoredAttributes = ['foo', 'baz', 'camelCase', 'object'];
+        $legacy ? $this->normalizer->setIgnoredAttributes($ignoredAttributes) : $this->createNormalizer([ObjectNormalizer::IGNORED_ATTRIBUTES => $ignoredAttributes]);
 
         $this->assertEquals(
             [

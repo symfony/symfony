@@ -30,7 +30,7 @@
         "symfony/config": "~3.4|~4.0",
         "symfony/console": "~3.4|~4.0",
         "symfony/css-selector": "~3.4|~4.0",
-        "symfony/dependency-injection": "^4.2",
+        "symfony/dependency-injection": "^4.3",
         "symfony/dom-crawler": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
@@ -49,7 +49,7 @@
     "conflict": {
         "symfony/browser-kit": "<4.3",
         "symfony/config": "<3.4",
-        "symfony/dependency-injection": "<4.2",
+        "symfony/dependency-injection": "<4.3",
         "symfony/translation": "<4.2",
         "symfony/var-dumper": "<4.1.1",
         "twig/twig": "<1.34|<2.4,>=2"

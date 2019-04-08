@@ -10,7 +10,7 @@
     </imports>
 
     <sec:config>
-        <sec:encoder class="JMS\FooBundle\Entity\User7" algorithm="argon2id" memory_cost="256" time_cost="1" threads="2" />
+        <sec:encoder class="JMS\FooBundle\Entity\User7" algorithm="sodium" />
     </sec:config>
 
 </container>

@@ -326,8 +326,7 @@ Security
    }
    ```
 
- * Using `Argon2iPasswordEncoder` while only the `argon2id` algorithm is supported
-   now throws a `\LogicException`, use `Argon2idPasswordEncoder` instead
+ * The `Argon2iPasswordEncoder` class has been removed, use `SodiumPasswordEncoder` instead.
 
 SecurityBundle
 --------------
@@ -348,8 +347,7 @@ SecurityBundle
    changed to underscores.
    Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
    After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
- * Configuring encoders using `argon2i` as algorithm while only `argon2id` is supported
-   now throws a `\LogicException`, use `argon2id` instead
+ * Configuring encoders using `argon2i` as algorithm is not supported anymore, use `sodium` instead.
 
 Serializer
 ----------

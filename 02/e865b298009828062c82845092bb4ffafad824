@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-04-07T20:36:31Z
+
+Could you explain why in a small sentence?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-07T21:04:03Z
+
+> Could you explain why in a small sentence?
+
+The old constructor signature was `(RequestStack $requestStack, RequestContext $requestContext = null)`, so `null` was a valid second argument until #30862. This PR basically restores BC.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-04-07T21:06:21Z
+
+Ah yes I thought it on the linked PR from Valentin 👍🏻
+Thanks for the feedback, it makes sense 😊

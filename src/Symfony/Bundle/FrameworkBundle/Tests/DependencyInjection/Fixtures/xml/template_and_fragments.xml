@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd
+        http://symfony.com/schema/dic/symfony https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:fragments enabled="true" hinclude-default-template="global_hinclude_template"/>
+        <framework:esi enabled="true" />
+        <framework:ssi enabled="true" />
+        <framework:assets />
+        <framework:templating cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
+            <framework:loader>loader.foo</framework:loader>
+            <framework:loader>loader.bar</framework:loader>
+            <framework:engine>php</framework:engine>
+            <framework:engine>twig</framework:engine>
+            <framework:form>
+                <framework:resource>theme1</framework:resource>
+                <framework:resource>theme2</framework:resource>
+            </framework:form>
+        </framework:templating>
+    </framework:config>
+</container>

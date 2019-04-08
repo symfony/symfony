@@ -209,6 +209,7 @@ class ConfigurationTest extends TestCase
             'fragments' => [
                 'enabled' => false,
                 'path' => '/_fragment',
+                'hinclude_default_template' => null,
             ],
             'profiler' => [
                 'enabled' => false,

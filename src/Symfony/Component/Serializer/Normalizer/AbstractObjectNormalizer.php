@@ -59,6 +59,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
+
+        if (isset($this->defaultContext[self::MAX_DEPTH_HANDLER]) && !\is_callable($this->defaultContext[self::MAX_DEPTH_HANDLER])) {
+            throw new InvalidArgumentException(sprintf('The "%s" given in the default context is not callable.', self::MAX_DEPTH_HANDLER));
+        }
+
         $this->defaultContext[self::EXCLUDE_FROM_CACHE_KEY] = [self::CIRCULAR_REFERENCE_LIMIT_COUNTERS];
 
         $this->propertyTypeExtractor = $propertyTypeExtractor;
@@ -87,6 +92,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
+        if (isset($context[self::CALLBACKS])) {
+            if (!\is_array($context[self::CALLBACKS])) {
+                throw new InvalidArgumentException(sprintf('The "%s" context option must be an array of callables.', self::CALLBACKS));
+            }
+
+            foreach ($context[self::CALLBACKS] as $attribute => $callback) {
+                if (!\is_callable($callback)) {
+                    throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s" context option.', $attribute, self::CALLBACKS));
+                }
+            }
+        }
+
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object, $format, $context);
         }
@@ -96,7 +113,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $attributes = $this->getAttributes($object, $format, $context);
         $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
-        $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER] ?? $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+        if (isset($context[self::MAX_DEPTH_HANDLER])) {
+            $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
+            if (!\is_callable($maxDepthHandler)) {
+                throw new InvalidArgumentException(sprintf('The "%s" given in the context is not callable.', self::MAX_DEPTH_HANDLER));
+            }
+        } else {
+            // already validated in constructor resp by type declaration of setMaxDepthHandler
+            $maxDepthHandler = $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+        }
 
         foreach ($attributes as $attribute) {
             $maxDepthReached = false;

@@ -99,10 +99,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $this->nameConverter = $nameConverter;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
-        if (\is_array($this->defaultContext[self::CALLBACKS] ?? null)) {
+        if (isset($this->defaultContext[self::CALLBACKS])) {
+            if (!\is_array($this->defaultContext[self::CALLBACKS])) {
+                throw new InvalidArgumentException(sprintf('The "%s" default context option must be an array of callables.', self::CALLBACKS));
+            }
+
             foreach ($this->defaultContext[self::CALLBACKS] as $attribute => $callback) {
                 if (!\is_callable($callback)) {
-                    throw new InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
+                    throw new InvalidArgumentException(sprintf('Invalid callback found for attribute "%s" in the "%s" default context option.', $attribute, self::CALLBACKS));
                 }
             }
         }

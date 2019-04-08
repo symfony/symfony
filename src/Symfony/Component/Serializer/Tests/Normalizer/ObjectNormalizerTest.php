@@ -815,7 +815,11 @@ class ObjectNormalizerTest extends TestCase
                 $this->normalizer->setMaxDepthHandler($handler);
             }
         } else {
-            $this->createNormalizer([ObjectNormalizer::MAX_DEPTH_HANDLER => $handler], $classMetadataFactory);
+            $context = [];
+            if (null !== $handler) {
+                $context[ObjectNormalizer::MAX_DEPTH_HANDLER] = $handler;
+            }
+            $this->createNormalizer($context, $classMetadataFactory);
         }
         $this->serializer = new Serializer([$this->normalizer]);
         $this->normalizer->setSerializer($this->serializer);

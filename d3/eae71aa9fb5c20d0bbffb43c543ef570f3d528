@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-08T09:31:39Z
+
+This should make tests pass for the `4.2` branch. I have no idea why tests on `3.4` don't fail though.
+
+On `4.2` tests fail because the `COLUMN` environment variable is erroneously set to the empty string which leads to the terminal width being interpreted as `0`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-08T09:39:22Z
+
+ping @greg0ire

@@ -571,7 +571,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 }
 
                 throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
-            } elseif (\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) {
+            } elseif (!\defined('PASSWORD_ARGON2I') && Argon2idPasswordEncoder::isDefaultSodiumAlgorithm()) {
                 @trigger_error('Configuring an encoder based on the "argon2i" algorithm while only "argon2id" is supported is deprecated since Symfony 4.3, use "argon2id" instead.', E_USER_DEPRECATED);
             }
 

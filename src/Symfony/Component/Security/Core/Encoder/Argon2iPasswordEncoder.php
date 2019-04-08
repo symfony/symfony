@@ -48,11 +48,11 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
         if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I')) {
             return $this->encodePasswordNative($raw, \PASSWORD_ARGON2I);
         } elseif (\function_exists('sodium_crypto_pwhash_str')) {
-            if (0 === strpos($hash = $this->encodePasswordSodiumFunction($raw), Argon2idPasswordEncoder::HASH_PREFIX)) {
+            if (Argon2idPasswordEncoder::isDefaultSodiumAlgorithm()) {
                 @trigger_error(sprintf('Using "%s" while only the "argon2id" algorithm is supported is deprecated since Symfony 4.3, use "%s" instead.', __CLASS__, Argon2idPasswordEncoder::class), E_USER_DEPRECATED);
             }
 
-            return $hash;
+            return $this->encodePasswordSodiumFunction($raw);
         }
         if (\extension_loaded('libsodium')) {
             return $this->encodePasswordSodiumExtension($raw);
@@ -70,12 +70,12 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
             return false;
         }
 
-        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I')) {
-            // If $encoded was created via "sodium_crypto_pwhash_str()", the hashing algorithm may be "argon2id" instead of "argon2i"
-            if ($isArgon2id = (0 === strpos($encoded, Argon2idPasswordEncoder::HASH_PREFIX))) {
-                @trigger_error(sprintf('Calling "%s()" with a password hashed using argon2id is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Argon2idPasswordEncoder::class), E_USER_DEPRECATED);
-            }
+        // If $encoded was created via "sodium_crypto_pwhash_str()", the hashing algorithm may be "argon2id" instead of "argon2i"
+        if ($isArgon2id = (0 === strpos($encoded, Argon2idPasswordEncoder::HASH_PREFIX))) {
+            @trigger_error(sprintf('Calling "%s()" with a password hashed using argon2id is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Argon2idPasswordEncoder::class), E_USER_DEPRECATED);
+        }
 
+        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I')) {
             // Remove the right part of the OR in 5.0
             if (\defined('PASSWORD_ARGON2I') || $isArgon2id && \defined('PASSWORD_ARGON2ID')) {
                 return password_verify($raw, $encoded);

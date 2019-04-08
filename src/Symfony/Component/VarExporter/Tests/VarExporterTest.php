@@ -197,6 +197,8 @@ class VarExporterTest extends TestCase
         yield ['abstract-parent', new ConcreteClass()];
 
         yield ['foo-serializable', new FooSerializable('bar')];
+
+        yield ['private-constructor', PrivateConstructor::create('bar')];
     }
 }
 
@@ -247,6 +249,21 @@ class MyNotCloneable
     private function __clone()
     {
         throw new \Exception('__clone should never be called');
+    }
+}
+
+class PrivateConstructor
+{
+    public $prop;
+
+    public static function create($prop): self
+    {
+        return new self($prop);
+    }
+
+    private function __construct($prop)
+    {
+        $this->prop = $prop;
     }
 }
 

@@ -65,14 +65,14 @@ class Registry
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
     {
-        if (!\class_exists($class) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
+        if (!($isClass = \class_exists($class)) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
             throw new ClassNotFoundException($class);
         }
         $reflector = new \ReflectionClass($class);
 
         if ($instantiableWithoutConstructor) {
             $proto = $reflector->newInstanceWithoutConstructor();
-        } elseif (!$reflector->isInstantiable()) {
+        } elseif (!$isClass || $reflector->isAbstract()) {
             throw new NotInstantiableTypeException($class);
         } elseif ($reflector->name !== $class) {
             $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, $instantiableWithoutConstructor, $cloneable);

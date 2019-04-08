@@ -71,7 +71,7 @@ class CachingHttpClient implements HttpClientInterface
         $url = implode('', $url);
         $options['extra']['no_cache'] = $options['extra']['no_cache'] ?? !$options['buffer'];
 
-        if ($options['extra']['no_cache'] || !empty($options['body']) || !\in_array($method, ['GET', 'HEAD', 'OPTIONS'])) {
+        if (!empty($options['body']) || $options['extra']['no_cache'] || !\in_array($method, ['GET', 'HEAD', 'OPTIONS'])) {
             return $this->client->request($method, $url, $options);
         }
 

@@ -39,7 +39,7 @@ class MockHttpClient implements HttpClientInterface
             $responseFactory = [$responseFactory];
         }
 
-        if (null !== $responseFactory && !\is_callable($responseFactory) && !$responseFactory instanceof \Iterator) {
+        if (!$responseFactory instanceof \Iterator && null !== $responseFactory && !\is_callable($responseFactory)) {
             $responseFactory = (static function () use ($responseFactory) {
                 yield from $responseFactory;
             })();

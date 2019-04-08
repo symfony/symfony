@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient;
 
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
@@ -278,7 +277,7 @@ trait HttpClientTrait
                 $fingerprint[$algo] = 'pin-sha256' === $algo ? (array) $hash : str_replace(':', '', $hash);
             }
         } else {
-            throw new InvalidArgumentException(sprintf('Option "peer_fingerprint" must be string or array, %s given.', \gettype($body)));
+            throw new InvalidArgumentException(sprintf('Option "peer_fingerprint" must be string or array, %s given.', \gettype($fingerprint)));
         }
 
         return $fingerprint;

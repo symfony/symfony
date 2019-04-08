@@ -76,10 +76,12 @@ class AbstractNormalizerTest extends TestCase
 
         $a2 = new AttributeMetadata('a2');
         $a2->addGroup('test');
+        $a2->setSince('1.8.0');
         $classMetadata->addAttributeMetadata($a2);
 
         $a3 = new AttributeMetadata('a3');
         $a3->addGroup('other');
+        $a3->setUntil('2.1');
         $classMetadata->addAttributeMetadata($a3);
 
         $a4 = new AttributeMetadata('a4');
@@ -130,5 +132,43 @@ class AbstractNormalizerTest extends TestCase
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
 
         $this->assertNull($dummy->getFoo());
+    }
+
+    public function testObjectWithVersioning()
+    {
+        $classMetadata = new ClassMetadata('c');
+
+        $a = new AttributeMetadata('a');
+        $a->setSince('1.8.0');
+        $a->addGroup('test');
+        $classMetadata->addAttributeMetadata($a);
+
+        $b = new AttributeMetadata('b');
+        $b->setUntil('2.1');
+        $b->addGroup('test');
+        $classMetadata->addAttributeMetadata($b);
+
+        $c = new AttributeMetadata('c');
+        $c->setSince('1.8');
+        $c->setUntil('2.0');
+        $c->addGroup('test');
+        $classMetadata->addAttributeMetadata($c);
+
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.8'
+        ], true);
+        $this->assertEquals(['b', 'c'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.7'
+        ], true);
+        $this->assertEquals(['b'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '2.3'
+        ], true);
+        $this->assertEquals(['a'], $result);
     }
 }

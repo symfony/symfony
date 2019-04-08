@@ -107,4 +107,15 @@ class YamlFileLoaderTest extends TestCase
 
         $this->assertEquals($expected, $classMetadata);
     }
+
+    public function testVersion()
+    {
+        $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\VersionDummy');
+        $this->loader->loadClassMetadata($classMetadata);
+
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        $this->assertEquals('1.0', $attributesMetadata['foo']->getSince());
+        $this->assertEquals('1.1.9', $attributesMetadata['foo']->getUntil());
+    }
 }

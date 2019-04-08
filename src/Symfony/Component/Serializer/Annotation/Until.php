@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\Serializer\Annotation;
 
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+
 /**
  * Annotation class for @Until().
  *
@@ -17,9 +19,17 @@ class Until
      */
     private $version;
 
-    public function __construct(string $version)
+    public function __construct(array $data)
     {
-        $this->version = $version;
+        if (!isset($data['value'])) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" should be set.', \get_class($this)));
+        }
+
+        if (!\is_string($data['value']) || empty($data['value'])) {
+            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a non-empty string.', \get_class($this)));
+        }
+
+        $this->version = $data['value'];
     }
 
     public function getVersion(): string

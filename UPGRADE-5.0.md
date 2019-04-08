@@ -327,7 +327,7 @@ Security
    ```
 
  * Using `Argon2iPasswordEncoder` while only the `argon2id` algorithm is supported
-   now throws a \LogicException`, use `Argon2idPasswordEncoder` instead
+   now throws a `\LogicException`, use `Argon2idPasswordEncoder` instead
 
 SecurityBundle
 --------------

@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-07T10:32:35Z
+
+done @stof @fabpot
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-07T19:51:38Z
+
+It does work properly since I didnt removed anything I just added the
+deprecation
+
+Le dim. 7 avr. 2019 à 18:53, Fabien Potencier <notifications@github.com> a
+écrit :
+
+> *@fabpot* commented on this pull request.
+> ------------------------------
+>
+> In
+> src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+> <https://github.com/symfony/symfony/pull/30959#discussion_r272842433>:
+>
+> > @@ -487,6 +487,7 @@ private function registerFragmentsConfiguration(array $config, ContainerBuilder
+>
+>              return;
+>          }
+> +        $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
+>
+> Does it work even when providing the value via the old key and not via the
+> new one?
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/30959#pullrequestreview-223591636>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8hOp9EZCqrgg-gnArTKIx-YNs2wCks5veiJvgaJpZM4cgo9l>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-07T19:57:02Z
+
+Ooow I understand, I will write one !
+
+Le dim. 7 avr. 2019 à 21:56, Robin Chalas <notifications@github.com> a
+écrit :
+
+> *@chalasr* commented on this pull request.
+> ------------------------------
+>
+> In
+> src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+> <https://github.com/symfony/symfony/pull/30959#discussion_r272849303>:
+>
+> > @@ -487,6 +487,7 @@ private function registerFragmentsConfiguration(array $config, ContainerBuilder
+>
+>              return;
+>          }
+> +        $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
+>
+> @Simperfit <https://github.com/Simperfit> You are setting a parameter
+> with no prior existence/emptiness check at 2 different places so only one
+> can win (and potentially not the expected one). We need a test I guess :)
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/30959#discussion_r272849303>, or mute
+> the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8gQ9gFaNNDHFMwT6HHFKttPRNSDgks5vek1egaJpZM4cgo9l>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-08T06:04:29Z
+
+I've added an existence check to not replace if it has been already setted.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-08T07:41:20Z
+
+@fabpot Should be ok now, I've added a test.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-08T09:17:13Z
+
+@fabpot PR ready, CI failure not related to this PR.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-08T10:55:54Z
+
+done @fabpot
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-08T11:17:23Z
+
+done @fabpot

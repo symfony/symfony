@@ -16,6 +16,15 @@ use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
 {
+    private $colSize;
+    private $lineSize;
+
+    protected function setUp()
+    {
+        $this->colSize = getenv('COLUMNS');
+        $this->lineSize = getenv('LINES');
+    }
+
     public function test()
     {
         putenv('COLUMNS=100');
@@ -29,6 +38,12 @@ class TerminalTest extends TestCase
         $terminal = new Terminal();
         $this->assertSame(120, $terminal->getWidth());
         $this->assertSame(60, $terminal->getHeight());
+    }
+
+    protected function tearDown()
+    {
+        putenv($this->colSize ? 'COLUMNS' : 'COLUMNS='.$this->colSize);
+        putenv($this->lineSize ? 'LINES' : 'LINES='.$this->lineSize);
     }
 
     public function test_zero_values()

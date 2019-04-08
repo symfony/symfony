@@ -25,6 +25,7 @@ Config
  * The `Processor` class has been made final
  * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead.
  * Using environment variables with `cannotBeEmpty()` if the value is validated with `validate()` will throw an exception.
+ * Removed the `root()` method in `TreeBuilder`, pass the root node information to the constructor instead
 
 Console
 -------

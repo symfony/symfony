@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T13:04:26Z
+
+What is the "embed" SAPI?
+Can you please have a look at the whole code base for similar changes?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2019-04-07T13:08:06Z
+
+>What is the "embed" SAPI?
+
+I'm not super familiar with it, but as per [this comment](https://github.com/humbug/box/issues/332#issuecomment-441943166):
+
+>Generally speaking if you compile the PHP\ZE into another program (so you could, say, use PHP as a script host) PHP will report as running in a embed SAPI. This makes it more useful in admittedly rather esoteric scenarios, but if the cost of support is 'embed'==PHP_SAPI, why not do it.
+
+So up to you wether or not we want to remove that part.
+
+>Can you please have a look at the whole code base for similar changes?
+
+~~Looked it up already: the simple use case is for `simple-phpunit` (in which we don't check if it's a CLI context at all before using HTTP_PROXY which should be fine in theory since it's a dev CLI tool only, but could register under https://httpoxy.org still). So I can add a check there as well if you wish to~~
+
+There is no other occurrences

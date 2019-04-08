@@ -1569,7 +1569,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * {@inheritdoc}
      */
-    protected function getEnv($name)
+    public function getEnv($name)
     {
         $value = parent::getEnv($name);
         $bag = $this->getParameterBag();

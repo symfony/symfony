@@ -140,7 +140,17 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 if (!isset($match[1])) {
                     return '%';
                 }
-                $value = $this->container->getParameter($match[1]);
+
+                $subEnv = $match[1];
+                if ($this->container instanceof Container) {
+                    if (0 === strpos($subEnv, 'env(') && ')' === substr($subEnv, -1) && 'env()' !== $subEnv) {
+                        $subEnv = substr($subEnv, 4, -1);
+                    }
+
+                    $value = $this->container->getEnv($subEnv);
+                } else {
+                    $value = $this->container->getParameter($subEnv);
+                }
                 if (!is_scalar($value)) {
                     throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, \gettype($value)));
                 }

@@ -136,6 +136,7 @@ interface ValidatorBuilderInterface
      * Sets the translator used for translating violation messages.
      *
      * @param TranslatorInterface|LegacyTranslatorInterface $translator
+     *
      * @return $this
      */
     public function setTranslator($translator);

@@ -31,7 +31,7 @@ class ProgressBarTest extends TestCase
 
     protected function tearDown()
     {
-        putenv($this->colSize ? 'COLUMNS' : 'COLUMNS='.$this->colSize);
+        putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
     public function testMultipleStart()

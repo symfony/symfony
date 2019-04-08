@@ -380,6 +380,16 @@ class ObjectNormalizerTest extends TestCase
             ['fooBar' => 'foobar'],
             $this->normalizer->normalize($obj, 'any')
         );
+
+        $this->normalizer->setIgnoredAttributes(['foo', 'baz', 'camelCase', 'object']);
+
+        $this->assertEquals(
+            [
+                'fooBar' => 'foobar',
+                'bar' => 'bar',
+            ],
+            $this->normalizer->normalize($obj, 'any')
+        );
     }
 
     public function testIgnoredAttributesDenormalize()

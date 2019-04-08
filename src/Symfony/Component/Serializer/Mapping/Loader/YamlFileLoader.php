@@ -99,7 +99,7 @@ class YamlFileLoader extends FileLoader
                 }
 
                 if (isset($data['until'])) {
-                    $attributeMetadata->setSince((string) $data['until']);
+                    $attributeMetadata->setUntil((string) $data['until']);
                 }
             }
         }

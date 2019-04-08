@@ -76,7 +76,7 @@ class XmlFileLoader extends FileLoader
                 }
 
                 if (isset($attribute['until'])) {
-                    $attributeMetadata->setSince((string) $attribute['until']);
+                    $attributeMetadata->setUntil((string) $attribute['until']);
                 }
             }
 

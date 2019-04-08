@@ -123,9 +123,17 @@ class AnnotationLoader implements LoaderInterface
 
                     $attributeMetadata->setSerializedName($annotation->getSerializedName());
                 } elseif ($annotation instanceof Since) {
-                    $attributesMetadata[$method->name]->setSince($annotation->getVersion());
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Since on "%s::%s" cannot be added. Since can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setSince($annotation->getVersion());
                 } elseif ($annotation instanceof Until) {
-                    $attributesMetadata[$method->name]->setUntil($annotation->getVersion());
+                    if (!$accessorOrMutator) {
+                        throw new MappingException(sprintf('Until on "%s::%s" cannot be added. Until can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
+                    }
+
+                    $attributeMetadata->setUntil($annotation->getVersion());
                 }
 
                 $loaded = true;

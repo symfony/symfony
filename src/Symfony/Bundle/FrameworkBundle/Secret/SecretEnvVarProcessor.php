@@ -11,8 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Secret;
 
+use Symfony\Bundle\FrameworkBundle\Exception\SecretNotFoundException;
+use Symfony\Bundle\FrameworkBundle\Secret\Storage\SecretStorageInterface;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 
+/**
+ * @author Tobias Schultze <http://tobion.de>
+ */
 class SecretEnvVarProcessor implements EnvVarProcessorInterface
 {
     private $secretStorage;
@@ -37,6 +43,10 @@ class SecretEnvVarProcessor implements EnvVarProcessorInterface
      */
     public function getEnv($prefix, $name, \Closure $getEnv)
     {
-        return $this->secretStorage->getSecret($name);
+        try {
+            return $this->secretStorage->getSecret($name);
+        } catch (SecretNotFoundException $e) {
+            throw new EnvNotFoundException($e->getMessage(), 0, $e);
+        }
     }
 }

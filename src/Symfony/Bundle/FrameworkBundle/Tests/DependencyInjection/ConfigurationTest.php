@@ -437,6 +437,11 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
             ],
             'error_controller' => 'error_controller',
+            'secrets' => [
+                'enabled' => false,
+                'encrypted_secrets_dir' => '%kernel.project_dir%/config/secrets/%kernel.environment%',
+                'encryption_key' => '%kernel.project_dir%/config/secrets/encryption_%kernel.environment%.key',
+            ],
         ];
     }
 }

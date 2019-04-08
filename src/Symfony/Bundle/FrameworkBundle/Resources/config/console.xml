@@ -202,17 +202,24 @@
         </service>
 
         <service id="console.command.secrets_add" class="Symfony\Bundle\FrameworkBundle\Command\SecretsAddCommand">
-            <argument type="service" id="secrets.storage.cache" />
+            <argument type="service" id="secrets.storage.files" />
             <tag name="console.command" command="secrets:add" />
         </service>
 
+        <service id="console.command.secrets_remove" class="Symfony\Bundle\FrameworkBundle\Command\SecretsRemoveCommand">
+            <argument type="service" id="secrets.storage.files" />
+            <tag name="console.command" command="secrets:remove" />
+        </service>
+
         <service id="console.command.secrets_generate_key" class="Symfony\Bundle\FrameworkBundle\Command\SecretsGenerateKeyCommand">
+            <argument type="service" id="secrets.encoder.sodium"/>
+            <argument type="service" id="secrets.storage.files"/>
             <tag name="console.command" command="secrets:generate-key" />
         </service>
 
         <service id="console.command.secrets_list" class="Symfony\Bundle\FrameworkBundle\Command\SecretsListCommand">
             <argument type="service" id="secrets.storage.cache" />
-            <tag name="console.command" command="secrets:list" />
+            <tag name="console.command" command="debug:secrets" />
         </service>
     </services>
 </container>

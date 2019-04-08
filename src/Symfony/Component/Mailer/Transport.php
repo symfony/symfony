@@ -171,7 +171,17 @@ class Transport
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
             default:
                 if ('smtp' === $parsedDsn['scheme']) {
-                    return new Transport\Smtp\EsmtpTransport($parsedDsn['host'], $parsedDsn['port'] ?? 25, $query['encryption'] ?? null, $query['auth_mode'] ?? null, $dispatcher, $logger);
+                    $transport = new Transport\Smtp\EsmtpTransport($parsedDsn['host'], $parsedDsn['port'] ?? 25, $query['encryption'] ?? null, $query['auth_mode'] ?? null, $dispatcher, $logger);
+
+                    if ($user) {
+                        $transport->setUsername($user);
+                    }
+
+                    if ($pass) {
+                        $transport->setPassword($pass);
+                    }
+
+                    return $transport;
                 }
 
                 throw new LogicException(sprintf('The "%s" mailer is not supported.', $parsedDsn['host']));

@@ -64,16 +64,35 @@ class RoundRobinTransportTest extends TestCase
         $t->send(new RawMessage(''));
     }
 
-    public function testSendOneDeadButRecover()
+    public function testSendOneDeadAndRecoveryNotWithinRetryPeriod()
     {
         $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->at(0))->method('send')->will($this->throwException(new TransportException()));
-        $t1->expects($this->at(1))->method('send');
+        $t1->expects($this->exactly(4))->method('send');
         $t2 = $this->createMock(TransportInterface::class);
+        $t2->expects($this->at(0))->method('send')->will($this->throwException(new TransportException()));
         $t2->expects($this->once())->method('send');
-        $t = new RoundRobinTransport([$t1, $t2], 1);
+        $t = new RoundRobinTransport([$t1, $t2], 60);
         $t->send(new RawMessage(''));
-        sleep(2);
+        $t->send(new RawMessage(''));
+        $t->send(new RawMessage(''));
+        $t->send(new RawMessage(''));
+    }
+
+    public function testSendOneDeadAndRecoveryWithinRetryPeriod()
+    {
+        $t1 = $this->createMock(TransportInterface::class);
+        $t1->expects($this->exactly(3))->method('send');
+        $t2 = $this->createMock(TransportInterface::class);
+        $t2->expects($this->at(0))->method('send')->will($this->throwException(new TransportException()));
+        $t2->expects($this->at(1))->method('send');
+        $t2->expects($this->exactly(2))->method('send');
+        $t = new RoundRobinTransport([$t1, $t2], 3);
+        $t->send(new RawMessage(''));
+        sleep(5);
+        $t->send(new RawMessage(''));
+        sleep(5);
+        $t->send(new RawMessage(''));
+        sleep(5);
         $t->send(new RawMessage(''));
     }
 }

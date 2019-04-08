@@ -66,10 +66,19 @@ class RoundRobinTransport implements TransportInterface
             if (!$this->isTransportDead($transport)) {
                 break;
             }
+
             if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
                 $this->deadTransports->detach($transport);
 
                 break;
+            }
+
+            if ($transport) {
+                $this->transports[] = $transport;
+            }
+
+            if ($this->deadTransports->count() >= \count($this->transports)) {
+                return null;
             }
         }
 

@@ -16,8 +16,10 @@
         </service>
         <service id="Symfony\Contracts\HttpClient\HttpClientInterface" alias="http_client" />
 
-        <service id="psr18.http_client" class="Symfony\Component\HttpClient\Psr18Client" autowire="true">
+        <service id="psr18.http_client" class="Symfony\Component\HttpClient\Psr18Client">
             <argument type="service" id="http_client" />
+            <argument type="service" id="Psr\Http\Message\ResponseFactoryInterface" on-invalid="ignore" />
+            <argument type="service" id="Psr\Http\Message\StreamFactoryInterface" on-invalid="ignore" />
         </service>
         <service id="Psr\Http\Client\ClientInterface" alias="psr18.http_client" />
     </services>

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Exception\EncryptionKeyNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Secret\Storage\MutableSecretStorageInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,12 +19,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * @author Tobias Schultze <http://tobion.de>
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-final class SecretsAddCommand extends Command
+final class SecretsRemoveCommand extends Command
 {
-    protected static $defaultName = 'secrets:add';
+    protected static $defaultName = 'secrets:remove';
 
     private $secretsStorage;
 
@@ -42,9 +40,9 @@ final class SecretsAddCommand extends Command
             ->setDefinition([
                 new InputArgument('name', InputArgument::REQUIRED, 'The name of the secret'),
             ])
-            ->setDescription('Adds a secret in the storage.')
+            ->setDescription('Removes a secret from the storage.')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command stores a secret.
+The <info>%command.name%</info> command remove a secret.
 
     %command.full_name% <name>
 EOF
@@ -56,15 +54,8 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $name = $input->getArgument('name');
-        $secret = $io->askHidden('Value of the secret');
+        $this->secretsStorage->removeSecret($input->getArgument('name'));
 
-        try {
-            $this->secretsStorage->setSecret($name, $secret);
-        } catch (EncryptionKeyNotFoundException $e) {
-            throw new \LogicException(sprintf('No encryption keys found. You should call the "%s" command.', SecretsGenerateKeyCommand::getDefaultName()));
-        }
-
-        $io->success('Secret was successfully stored.');
+        $io->success('Secret was successfully removed.');
     }
 }

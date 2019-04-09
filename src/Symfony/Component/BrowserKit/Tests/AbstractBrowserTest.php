@@ -13,6 +13,7 @@ namespace Symfony\Component\BrowserKit\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Response;
@@ -80,6 +81,16 @@ class AbstractBrowserTest extends TestCase
         return new TestClient($server, $history, $cookieJar);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testAbstractBrowserIsAClient()
+    {
+        $browser = $this->getBrowser();
+
+        $this->assertInstanceOf(Client::class, $browser);
+    }
+
     public function testGetHistory()
     {
         $client = $this->getBrowser([], $history = new History());
@@ -102,7 +113,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetRequestNull()
     {
@@ -140,7 +151,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetResponseNull()
     {
@@ -161,7 +172,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetInternalResponseNull()
     {
@@ -189,7 +200,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testGetCrawlerNull()
     {
@@ -894,7 +905,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Tests\%s::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
      */
     public function testInternalRequestNull()
     {
@@ -904,7 +915,7 @@ class AbstractBrowserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "Symfony\Component\BrowserKit\AbstractBrowser::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     * @expectedDeprecation The "Symfony\Component\BrowserKit\Tests\ClassThatInheritClient::submit()" method will have a new "array $serverParameters = []" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
      */
     public function testInheritedClassCallSubmitWithTwoArguments()
     {

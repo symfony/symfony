@@ -19,9 +19,7 @@ CHANGELOG
  * Dispatch `AuthenticationFailureEvent` on `security.authentication.failure`
  * Dispatch `InteractiveLoginEvent` on `security.interactive_login`
  * Dispatch `SwitchUserEvent` on `security.switch_user`
- * Added `Argon2idPasswordEncoder`
- * Deprecated using `Argon2iPasswordEncoder` while only the `argon2id` algorithm
-   is supported, use `Argon2idPasswordEncoder` instead
+ * deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
 
 4.2.0
 -----

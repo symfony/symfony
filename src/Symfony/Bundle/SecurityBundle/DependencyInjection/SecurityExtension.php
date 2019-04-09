@@ -29,8 +29,8 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Encoder\Argon2idPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 use Symfony\Component\Templating\PhpEngine;
@@ -565,14 +565,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // Argon2i encoder
         if ('argon2i' === $config['algorithm']) {
+            @trigger_error('Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "sodium" instead.', E_USER_DEPRECATED);
+
             if (!Argon2iPasswordEncoder::isSupported()) {
                 if (\extension_loaded('sodium') && !\defined('SODIUM_CRYPTO_PWHASH_SALTBYTES')) {
                     throw new InvalidConfigurationException('The installed libsodium version does not have support for Argon2i. Use Bcrypt instead.');
                 }
 
                 throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
-            } elseif (!\defined('PASSWORD_ARGON2I') && Argon2idPasswordEncoder::isDefaultSodiumAlgorithm()) {
-                @trigger_error('Configuring an encoder based on the "argon2i" algorithm while only "argon2id" is supported is deprecated since Symfony 4.3, use "argon2id" instead.', E_USER_DEPRECATED);
             }
 
             return [
@@ -585,19 +585,14 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ];
         }
 
-        // Argon2id encoder
-        if ('argon2id' === $config['algorithm']) {
-            if (!Argon2idPasswordEncoder::isSupported()) {
-                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
+        if ('sodium' === $config['algorithm']) {
+            if (!SodiumPasswordEncoder::isSupported()) {
+                throw new InvalidConfigurationException('Libsodium is not available. Install the sodium extension or use BCrypt instead.');
             }
 
             return [
-                'class' => Argon2idPasswordEncoder::class,
-                'arguments' => [
-                    $config['memory_cost'],
-                    $config['time_cost'],
-                    $config['threads'],
-                ],
+                'class' => SodiumPasswordEncoder::class,
+                'arguments' => [],
             ];
         }
 

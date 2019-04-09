@@ -151,14 +151,12 @@ Security
    }
    ```
 
- * Using `Argon2iPasswordEncoder` while only the `argon2id` algorithm is supported
-   is deprecated, use `Argon2idPasswordEncoder` instead
+ * The `Argon2iPasswordEncoder` class has been deprecated, use `SodiumPasswordEncoder` instead.
 
 SecurityBundle
 --------------
 
- * Configuring encoders using `argon2i` as algorithm while only `argon2id` is
-   supported is deprecated, use `argon2id` instead
+ * Configuring encoders using `argon2i` as algorithm has been deprecated, use `sodium` instead.
 
 TwigBridge
 ----------

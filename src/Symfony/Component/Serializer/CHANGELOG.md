@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0
 -----
 
+ * added versioning to serialize or not properties considering the `version` context option and the `since` and/or `until` mapping
  * added the list of constraint violations' parameters in `ConstraintViolationListNormalizer`
  * added support for serializing `DateTimeZone` objects
  * added a `deep_object_to_populate` context option to recursive denormalize on `object_to_populate` object.

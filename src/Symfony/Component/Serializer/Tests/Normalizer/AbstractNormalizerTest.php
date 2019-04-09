@@ -76,12 +76,10 @@ class AbstractNormalizerTest extends TestCase
 
         $a2 = new AttributeMetadata('a2');
         $a2->addGroup('test');
-        $a2->setSince('1.8.0');
         $classMetadata->addAttributeMetadata($a2);
 
         $a3 = new AttributeMetadata('a3');
         $a3->addGroup('other');
-        $a3->setUntil('2.1');
         $classMetadata->addAttributeMetadata($a3);
 
         $a4 = new AttributeMetadata('a4');

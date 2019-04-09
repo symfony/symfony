@@ -509,11 +509,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return true;
         }
 
-        if ((null !== $sinceVersion) && version_compare($sinceVersion, $context['version'], '>')) {
+        if (null !== $sinceVersion && version_compare($sinceVersion, $context['version'], '>')) {
             return false;
         }
 
-        if ((null !== $untilVersion) && version_compare($untilVersion, $context['version'], '<')) {
+        if (null !== $untilVersion && version_compare($untilVersion, $context['version'], '<')) {
             return false;
         }
 

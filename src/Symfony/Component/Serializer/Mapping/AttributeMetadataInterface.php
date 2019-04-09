@@ -83,12 +83,12 @@ interface AttributeMetadataInterface
     public function getSince(): ?string;
 
     /**
-     * Sets the version number after which the attribute must not be serialized
+     * Sets the version number after which the attribute must not be serialized.
      */
     public function setUntil(string $version);
 
     /**
-     * Gets the version number after which the attribute must not be serialized
+     * Gets the version number after which the attribute must not be serialized.
      */
-    public function getUntil(): ?string ;
+    public function getUntil(): ?string;
 }

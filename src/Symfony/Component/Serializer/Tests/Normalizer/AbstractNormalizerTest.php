@@ -155,17 +155,17 @@ class AbstractNormalizerTest extends TestCase
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
 
         $result = $this->normalizer->getAllowedAttributes('c', [
-            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.8'
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.8',
         ], true);
         $this->assertEquals(['b', 'c'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [
-            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.7'
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '1.7',
         ], true);
         $this->assertEquals(['b'], $result);
 
         $result = $this->normalizer->getAllowedAttributes('c', [
-            AbstractNormalizer::GROUPS => ['test'], 'version' => '2.3'
+            AbstractNormalizer::GROUPS => ['test'], 'version' => '2.3',
         ], true);
         $this->assertEquals(['a'], $result);
     }

@@ -86,14 +86,14 @@ class Registry
                 $proto = $reflector->newInstanceWithoutConstructor();
                 $instantiableWithoutConstructor = true;
             } catch (\ReflectionException $e) {
-                $proto = $reflector->implementsInterface('Serializable') ? 'C:' : 'O:';
+                $proto = $reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__unserialize')) ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
                 } elseif (false === $proto = @unserialize($proto.\strlen($class).':"'.$class.'":0:{}')) {
                     throw new NotInstantiableTypeException($class);
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__serialize'))) {
                 try {
                     serialize($proto);
                 } catch (\Exception $e) {
@@ -103,7 +103,7 @@ class Registry
         }
 
         if (null === $cloneable) {
-            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup'))) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__unserialize')))) {
                 throw new NotInstantiableTypeException($class);
             }
 

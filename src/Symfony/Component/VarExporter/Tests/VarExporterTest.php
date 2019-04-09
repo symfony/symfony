@@ -82,7 +82,7 @@ class VarExporterTest extends TestCase
         $marshalledValue = VarExporter::export($value, $isStaticValue);
 
         $this->assertSame($staticValueExpected, $isStaticValue);
-        if ('var-on-sleep' !== $testName) {
+        if ('var-on-sleep' !== $testName && 'php74-serializable' !== $testName) {
             $this->assertDumpEquals($dumpedValue, $value);
         }
 
@@ -199,6 +199,8 @@ class VarExporterTest extends TestCase
         yield ['foo-serializable', new FooSerializable('bar')];
 
         yield ['private-constructor', PrivateConstructor::create('bar')];
+
+        yield ['php74-serializable', new Php74Serializable()];
     }
 }
 
@@ -385,5 +387,38 @@ class FooSerializable implements \Serializable
     public function unserialize($str)
     {
         list($this->foo) = unserialize($str);
+    }
+}
+
+class Php74Serializable implements \Serializable
+{
+    public function __serialize()
+    {
+        return [$this->foo = new \stdClass()];
+    }
+
+    public function __unserialize(array $data)
+    {
+        list($this->foo) = $data;
+    }
+
+    public function __sleep()
+    {
+        throw new \BadMethodCallException();
+    }
+
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException();
+    }
+
+    public function serialize()
+    {
+        throw new \BadMethodCallException();
+    }
+
+    public function unserialize($ser)
+    {
+        throw new \BadMethodCallException();
     }
 }

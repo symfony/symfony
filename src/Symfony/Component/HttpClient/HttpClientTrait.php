@@ -294,7 +294,7 @@ trait HttpClientTrait
         $flags = $flags ?? (JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRESERVE_ZERO_FRACTION);
 
         if (!\is_array($value) && !$value instanceof \JsonSerializable) {
-            throw new InvalidArgumentException(sprintf('Option "json" must be array or JsonSerializable, %s given.', __CLASS__, \is_object($value) ? \get_class($value) : \gettype($value)));
+            throw new InvalidArgumentException(sprintf('Option "json" must be array or JsonSerializable, %s given.', \is_object($value) ? \get_class($value) : \gettype($value)));
         }
 
         try {

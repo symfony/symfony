@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Serializer\Annotation;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -10,7 +19,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @Annotation
  * @Target({"PROPERTY", "METHOD"})
  *
- * @author Arnaud Tarroux
+ * @author Arnaud Tarroux <ta.arnaud@gmail.com>
  */
 class Since
 {

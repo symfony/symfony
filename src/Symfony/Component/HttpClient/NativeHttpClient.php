@@ -400,17 +400,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         // Matching "no_proxy" should follow the behavior of curl
 
         foreach ($noProxy as $rule) {
-            if ('*' === $rule) {
-                return stream_context_set_option($context, 'http', 'header', $requestHeaders);
-            }
+            $dotRule = '.'.ltrim($rule, '.');
 
-            if ($host === $rule) {
-                return stream_context_set_option($context, 'http', 'header', $requestHeaders);
-            }
-
-            $rule = '.'.ltrim($rule, '.');
-
-            if (substr($host, -\strlen($rule)) === $rule) {
+            if ('*' === $rule || $host === $rule || substr($host, -\strlen($dotRule)) === $dotRule) {
                 return stream_context_set_option($context, 'http', 'header', $requestHeaders);
             }
         }

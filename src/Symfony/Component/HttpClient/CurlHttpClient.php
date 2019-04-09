@@ -48,6 +48,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
      */
     public function __construct(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50)
     {
+        if (!\extension_loaded('curl')) {
+            throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
+        }
+
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, self::OPTIONS_DEFAULTS);
         }
@@ -109,7 +113,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
                 $options['headers']['range'] ?? null,
             ];
 
-            if ('GET' === $method && !$options['body'] && $expectedHeaders === $pushedHeaders) {
+            if ('GET' === $method && $expectedHeaders === $pushedHeaders && !$options['body']) {
                 $this->logger && $this->logger->debug(sprintf('Connecting request to pushed response: "%s %s"', $method, $url));
 
                 // Reinitialize the pushed response with request's options

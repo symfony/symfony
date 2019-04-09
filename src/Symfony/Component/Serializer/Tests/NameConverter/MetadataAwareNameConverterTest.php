@@ -102,6 +102,7 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['foo', 'baz'],
             ['bar', 'qux'],
             ['quux', 'quux'],
+            [0, 0],
         ];
     }
 
@@ -111,6 +112,7 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['foo', 'baz'],
             ['bar', 'qux'],
             ['quux', 'QUUX'],
+            [0, 0],
         ];
     }
 }

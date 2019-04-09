@@ -20,6 +20,7 @@ Config
 ------
 
  * Deprecated using environment variables with `cannotBeEmpty()` if the value is validated with `validate()`
+ * Deprecated the `root()` method in `TreeBuilder`, pass the root node information to the constructor instead
 
 DependencyInjection
 -------------------

@@ -199,6 +199,15 @@ class HttpClientTraitTest extends TestCase
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpClient\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Define either the "json" or the "body" option, setting both is not supported
+     */
+    public function testSetJSONAndBodyOptions()
+    {
+        self::prepareRequest('POST', 'http://example.com', ['json' => ['foo' => 'bar'], 'body' => '<html/>'], HttpClientInterface::OPTIONS_DEFAULTS);
+    }
+
     public function providePrepareAuthBasic()
     {
         yield ['foo:bar', 'Zm9vOmJhcg=='];

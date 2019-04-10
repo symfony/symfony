@@ -45,7 +45,11 @@ trait HttpClientTrait
         $options = self::mergeDefaultOptions($options, $defaultOptions, $allowExtraOptions);
 
         if (isset($options['json'])) {
+            if (isset($options['body']) && '' !== $options['body']) {
+                throw new InvalidArgumentException('Define either the "json" or the "body" option, setting both is not supported.');
+            }
             $options['body'] = self::jsonEncode($options['json']);
+            unset($options['json']);
             $options['headers']['content-type'] = $options['headers']['content-type'] ?? ['application/json'];
         }
 

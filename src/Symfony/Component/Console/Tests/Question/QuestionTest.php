@@ -60,9 +60,11 @@ class QuestionTest extends TestCase
         self::assertFalse($this->question->isHidden());
     }
 
-    public function testSetHiddenWithAutocompleterValues()
+    public function testSetHiddenWithAutocompleterCallback()
     {
-        $this->question->setAutocompleterValues(['a', 'b']);
+        $this->question->setAutocompleterCallback(
+            function (string $input): array { return []; }
+        );
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -72,10 +74,12 @@ class QuestionTest extends TestCase
         $this->question->setHidden(true);
     }
 
-    public function testSetHiddenWithNoAutocompleterValues()
+    public function testSetHiddenWithNoAutocompleterCallback()
     {
-        $this->question->setAutocompleterValues(['a', 'b']);
-        $this->question->setAutocompleterValues(null);
+        $this->question->setAutocompleterCallback(
+            function (string $input): array { return []; }
+        );
+        $this->question->setAutocompleterCallback(null);
 
         $exception = null;
         try {
@@ -154,7 +158,51 @@ class QuestionTest extends TestCase
         $this->question->setAutocompleterValues($values);
     }
 
-    public function testSetAutocompleterValuesWhenHidden()
+    public function testSetAutocompleterValuesWithTraversable()
+    {
+        $question1 = new Question('Test question 1');
+        $iterator1 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator1
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator(['Potato']));
+        $question1->setAutocompleterValues($iterator1);
+
+        $question2 = new Question('Test question 2');
+        $iterator2 = $this->getMockForAbstractClass(\IteratorAggregate::class);
+        $iterator2
+            ->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator(['Carrot']));
+        $question2->setAutocompleterValues($iterator2);
+
+        // Call multiple times to verify that Traversable result is cached, and
+        // that there is no crosstalk between cached copies.
+        self::assertSame(['Potato'], $question1->getAutocompleterValues());
+        self::assertSame(['Carrot'], $question2->getAutocompleterValues());
+        self::assertSame(['Potato'], $question1->getAutocompleterValues());
+        self::assertSame(['Carrot'], $question2->getAutocompleterValues());
+    }
+
+    public function testGetAutocompleterValuesDefault()
+    {
+        self::assertNull($this->question->getAutocompleterValues());
+    }
+
+    public function testGetSetAutocompleterCallback()
+    {
+        $callback = function (string $input): array { return []; };
+
+        $this->question->setAutocompleterCallback($callback);
+        self::assertSame($callback, $this->question->getAutocompleterCallback());
+    }
+
+    public function testGetAutocompleterCallbackDefault()
+    {
+        self::assertNull($this->question->getAutocompleterCallback());
+    }
+
+    public function testSetAutocompleterCallbackWhenHidden()
     {
         $this->question->setHidden(true);
 
@@ -163,27 +211,26 @@ class QuestionTest extends TestCase
             'A hidden question cannot use the autocompleter.'
         );
 
-        $this->question->setAutocompleterValues(['a', 'b']);
+        $this->question->setAutocompleterCallback(
+            function (string $input): array { return []; }
+        );
     }
 
-    public function testSetAutocompleterValuesWhenNotHidden()
+    public function testSetAutocompleterCallbackWhenNotHidden()
     {
         $this->question->setHidden(true);
         $this->question->setHidden(false);
 
         $exception = null;
         try {
-            $this->question->setAutocompleterValues(['a', 'b']);
+            $this->question->setAutocompleterCallback(
+                function (string $input): array { return []; }
+            );
         } catch (\Exception $exception) {
             // Do nothing
         }
 
         $this->assertNull($exception);
-    }
-
-    public function testGetAutocompleterValuesDefault()
-    {
-        self::assertNull($this->question->getAutocompleterValues());
     }
 
     public function providerGetSetValidator()

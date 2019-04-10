@@ -29,13 +29,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class NotCompromisedPasswordValidator extends ConstraintValidator
 {
-    private const RANGE_API = 'https://api.pwnedpasswords.com/range/%s';
+    private const DEFAULT_API_ENDPOINT = 'https://api.pwnedpasswords.com/range/%s';
 
     private $httpClient;
     private $charset;
-    private $disabled;
+    private $enabled;
+    private $endpoint;
 
-    public function __construct(HttpClientInterface $httpClient = null, string $charset = 'UTF-8', bool $disabled = false)
+    public function __construct(HttpClientInterface $httpClient = null, string $charset = 'UTF-8', bool $enabled = true, string $endpoint = null)
     {
         if (null === $httpClient && !class_exists(HttpClient::class)) {
             throw new \LogicException(sprintf('The "%s" class requires the "HttpClient" component. Try running "composer require symfony/http-client".', self::class));
@@ -43,7 +44,8 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
 
         $this->httpClient = $httpClient ?? HttpClient::create();
         $this->charset = $charset;
-        $this->disabled = $disabled;
+        $this->enabled = $enabled;
+        $this->endpoint = $endpoint ?? self::DEFAULT_API_ENDPOINT;
     }
 
     /**
@@ -57,7 +59,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, NotCompromisedPassword::class);
         }
 
-        if ($this->disabled) {
+        if (!$this->enabled) {
             return;
         }
 
@@ -76,7 +78,7 @@ class NotCompromisedPasswordValidator extends ConstraintValidator
 
         $hash = strtoupper(sha1($value));
         $hashPrefix = substr($hash, 0, 5);
-        $url = sprintf(self::RANGE_API, $hashPrefix);
+        $url = sprintf($this->endpoint, $hashPrefix);
 
         try {
             $result = $this->httpClient->request('GET', $url)->getContent();

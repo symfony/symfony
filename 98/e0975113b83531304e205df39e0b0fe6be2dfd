@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-09T07:25:24Z
+
+Do you have some case where the object is a class and not an object ?
+
+I'm not sure we want to do that, as the current signature https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L237 specify an object (and not a string or object).
+
+---------------------------------------------------------------------------
+
+by jdecool at 2019-04-09T08:23:10Z
+
+I have the problem on a project I'm working on.
+
+I know that the interface specify that the argument need to be an object.
+
+But the class isn't specify as `@internal` and therefore can be used by inheritance. The argument cannot by strongly type in the method because of PHP requirements.
+
+So it create an implicit contract for existing apps. And the change can break some projects whereas we want to make a _bugfix_ update of Symfony.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-09T11:50:59Z
+
+can we maybe trigger an error / deprecation when it's not an object and make it strict in 5.0 (by throwing an error if not an object), not necessarily here, will do the PR if that's ok with you.
+
+---------------------------------------------------------------------------
+
+by jdecool at 2019-04-09T12:11:43Z
+
+I push the changed suggested by @nicolas-grekas.
+
+@joelwurtz I let you trigger the error, it's ok for me
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-09T12:55:24Z
+
+@jdecool like @nicolas-grekas said you should base your branch on 4.2 and not on master (otherwise you will still have the bug in new 4.2 versions :) )
+
+---------------------------------------------------------------------------
+
+by jdecool at 2019-04-09T13:04:55Z
+
+@joelwurtz Oh sorry.
+
+It's now OK 👍

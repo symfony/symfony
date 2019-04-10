@@ -494,12 +494,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         return $parentContext;
     }
 
-    /**
-     * @param array                      $context
-     * @param AttributeMetadataInterface $attributeMetadata
-     *
-     * @return bool
-     */
     protected function attributeAllowedWithVersion(array $context, AttributeMetadataInterface $attributeMetadata): bool
     {
         $sinceVersion = $attributeMetadata->getSince();

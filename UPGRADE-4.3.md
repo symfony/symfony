@@ -45,6 +45,12 @@ Doctrine Bridge
  * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field has been deprecated, pass `null` instead
  * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field has been deprecated
 
+Dotenv
+------
+
+ * First parameter of `Dontenv::__construct()` will change from `true` to `false` in Symfony 5.0. A deprecation warning
+   will be triggered if no parameter is used. Use `$usePutenv=true` to upgrade without breaking changes.  
+
 EventDispatcher
 ---------------
 

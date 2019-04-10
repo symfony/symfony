@@ -35,6 +35,21 @@ final class Dotenv
     private $data;
     private $end;
     private $values;
+    private $usePutenv = true;
+
+    /**
+     * @var bool If we should use `putenv()` to define environment variables
+     *           or not. Since Symfony 5.0 the default value is false
+     *           because `putenv()` is not thread safe.
+     */
+    public function __construct(bool $usePutenv = true)
+    {
+        if (0 === \func_num_args()) {
+            @trigger_error(sprintf('The default value of "$usePutenv" argument of "%s\'s constructor will change from "true" to "false" in Symfony 5.0, you should define its value explicitly.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $this->usePutenv = $usePutenv;
+    }
 
     /**
      * Loads one or several .env files.
@@ -126,7 +141,10 @@ final class Dotenv
                 continue;
             }
 
-            putenv("$name=$value");
+            if ($this->usePutenv) {
+                putenv("$name=$value");
+            }
+
             $_ENV[$name] = $value;
             if ($notHttpName) {
                 $_SERVER[$name] = $value;
@@ -140,7 +158,11 @@ final class Dotenv
         if ($updateLoadedVars) {
             unset($loadedVars['']);
             $loadedVars = implode(',', array_keys($loadedVars));
-            putenv('SYMFONY_DOTENV_VARS='.$_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars);
+            $_ENV['SYMFONY_DOTENV_VARS'] = $_SERVER['SYMFONY_DOTENV_VARS'] = $loadedVars;
+
+            if ($this->usePutenv) {
+                putenv('SYMFONY_DOTENV_VARS='.$loadedVars);
+            }
         }
     }
 

@@ -328,6 +328,8 @@ Security
    ```
 
  * The `Argon2iPasswordEncoder` class has been removed, use `SodiumPasswordEncoder` instead.
+ * Classes implementing the `TokenInterface` must implement the two new methods
+   `__serialize` and `__unserialize`
 
 SecurityBundle
 --------------

@@ -20,6 +20,7 @@ CHANGELOG
  * Dispatch `InteractiveLoginEvent` on `security.interactive_login`
  * Dispatch `SwitchUserEvent` on `security.switch_user`
  * deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+ * Added methods `__serialize` and `__unserialize` to the `TokenInterface`
 
 4.2.0
 -----

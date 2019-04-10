@@ -18,6 +18,7 @@ use function explode;
 use function getenv;
 use function implode;
 use InvalidArgumentException;
+use function is_string;
 use function ltrim;
 use function mb_strtolower;
 use function pathinfo;
@@ -391,8 +392,12 @@ final class Path
         $actualExtension = self::getExtension($path, $ignoreCase);
 
         // Only check if path has any extension
-        if (empty($extensions)) {
+        if ([] === $extensions || null === $extensions) {
             return '' !== $actualExtension;
+        }
+
+        if (is_string($extensions)) {
+            $extensions = [$extensions];
         }
 
         foreach ($extensions as $key => $extension) {
@@ -532,6 +537,10 @@ final class Path
      */
     public static function makeAbsolute(string $path, string $basePath): string
     {
+        if ('' === $basePath) {
+            throw new \InvalidArgumentException(sprintf('The base path must be a non-empty string. Got: "%s"', $basePath));
+        }
+
         if (!static::isAbsolute($basePath)) {
             throw new InvalidArgumentException(sprintf(
                 'The base path "%s" is not an absolute path.',
@@ -773,8 +782,6 @@ final class Path
      * Joins two or more path strings.
      *
      * The result is a canonical path.
-     *
-     * @param string[]|string $paths path parts as parameters or array
      *
      * @return string the joint path
      */

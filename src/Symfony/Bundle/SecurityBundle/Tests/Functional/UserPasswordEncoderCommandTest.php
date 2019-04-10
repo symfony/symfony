@@ -126,14 +126,12 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordEmptySaltOutput()
     {
-        $this->passwordEncoderCommandTester->execute(
-            [
-                'command' => 'security:encode-password',
-                'password' => 'p@ssw0rd',
-                'user-class' => 'Symfony\Component\Security\Core\User\User',
-                '--empty-salt' => true,
-            ]
-        );
+        $this->passwordEncoderCommandTester->execute([
+            'command' => 'security:encode-password',
+            'password' => 'p@ssw0rd',
+            'user-class' => 'Symfony\Component\Security\Core\User\User',
+            '--empty-salt' => true,
+        ]);
 
         $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
         $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());

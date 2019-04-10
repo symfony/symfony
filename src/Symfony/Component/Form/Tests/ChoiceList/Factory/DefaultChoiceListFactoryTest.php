@@ -144,12 +144,10 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromChoicesGrouped()
     {
-        $list = $this->factory->createListFromChoices(
-            [
-                'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
-                'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
-            ]
-        );
+        $list = $this->factory->createListFromChoices([
+            'Group 1' => ['A' => $this->obj1, 'B' => $this->obj2],
+            'Group 2' => ['C' => $this->obj3, 'D' => $this->obj4],
+        ]);
 
         $this->assertObjectListWithGeneratedValues($list);
     }

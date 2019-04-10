@@ -95,9 +95,7 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->obj2 = (object) ['label' => 'B', 'index' => 'x', 'value' => 'b', 'preferred' => true, 'group' => 'Group 1', 'attr' => ['attr1' => 'value1']];
         $this->obj3 = (object) ['label' => 'C', 'index' => 'y', 'value' => 1, 'preferred' => true, 'group' => 'Group 2', 'attr' => ['attr2' => 'value2']];
         $this->obj4 = (object) ['label' => 'D', 'index' => 'z', 'value' => 2, 'preferred' => false, 'group' => 'Group 2', 'attr' => []];
-        $this->list = new ArrayChoiceList(
-            ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4]
-        );
+        $this->list = new ArrayChoiceList(['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4]);
         $this->factory = new DefaultChoiceListFactory();
     }
 
@@ -111,9 +109,7 @@ class DefaultChoiceListFactoryTest extends TestCase
 
     public function testCreateFromChoicesFlat()
     {
-        $list = $this->factory->createListFromChoices(
-            ['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4]
-        );
+        $list = $this->factory->createListFromChoices(['A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4]);
 
         $this->assertObjectListWithGeneratedValues($list);
     }

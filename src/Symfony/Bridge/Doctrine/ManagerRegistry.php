@@ -46,7 +46,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
         $manager = $this->container->get($name);
 
         if (!$manager instanceof LazyLoadingInterface) {
-            throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Set the "%s" service as lazy and require "symfony/proxy-manager-bridge" in your composer.json file instead.', $name));
+            throw new \LogicException('Resetting a non-lazy manager service is not supported. '.(interface_exists(LazyLoadingInterface::class) ? sprintf('Declare the "%s" service as lazy.', $name) : 'Try running "composer require symfony/proxy-manager-bridge".'));
         }
         $manager->setProxyInitializer(\Closure::bind(
             function (&$wrappedInstance, LazyLoadingInterface $manager) use ($name) {

@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-06T14:17:59Z
+
+Please use a single PR per issue next time, easier to review.
+
+Fixes themself are fine.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-06T14:21:00Z
+
+Actually it shouldn't be based on `master` as it's a bugfix. I'll see if I can rebase it on 3.4.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-06T14:49:42Z
+
+@chalasr I just discussed with @michaelcullum that I think we should consider merging it into `master` anyway despite being a bugfix, as older applications may actually be accidentally relying on the broken behavior.
+
+So I'd prefer putting it into `master` instead and documenting it as a B/C breaking bugfix in the upgrade guide.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T20:45:42Z
+
+Let's add some notes in the CHANGELOG.md file of the component, and give some instructions in UPGRADE-4.3.md then
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-08T08:48:48Z
+
+@dimabory can you pick that up?
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-04-08T13:07:28Z
+
+@curry684, @nicolas-grekas  I'm not sure about B/C breaking. Can you guide me on what exactly can be broken with this change?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-08T16:47:06Z
+
+The change may cause the AccessDeniedHandler to be executed now in cases where it wasn't before, and applications may depend on the previous erroneous behavior to some degree.
+
+Technically everything that changes existing behavior is to be considered BC breakage, but in this case the old behavior was technically wrong and out of spec, hence why we're accepting the fix in a minor release, but not backporting it. But the PR should mention it in the upgrade guide.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-08T21:38:45Z
+
+Looking at the patch and the fixed ticket, I think we should merge in 3.4, every bugfix breaks someone's behavior.
+Calling the access denied handler doesn't sound harmful, is it?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-09T07:10:04Z
+
+I'm mainly hesitant because it'll be a patch level change in low level security behavior. I'm hard pressed to find a harmful scenario but I prefer to err on the side of caution where access control is involved...  😉
+
+---------------------------------------------------------------------------
+
+by dimabory at 2019-04-09T12:37:16Z
+
+So what's the base branch `3.4` or `master`?
+
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-09T13:12:31Z
+
+3.4.
+
+Technically it's correct for a bugfix, I won't object to it and @chalasr is the boss of security component  😉

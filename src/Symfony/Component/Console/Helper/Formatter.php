@@ -29,18 +29,18 @@ class Formatter implements FormatterInterface
     public function formatBlock($messages, $style, $large = false): string
     {
         if (!\is_array($messages)) {
-            $messages = array($messages);
+            $messages = [$messages];
         }
 
         $len = 0;
-        $lines = array();
+        $lines = [];
         foreach ($messages as $message) {
             $message = OutputFormatter::escape($message);
             $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
             $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
         }
 
-        $messages = $large ? array(str_repeat(' ', $len)) : array();
+        $messages = $large ? [str_repeat(' ', $len)] : [];
         for ($i = 0; isset($lines[$i]); ++$i) {
             $messages[] = $lines[$i].str_repeat(' ', $len - $this->strlen($lines[$i]));
         }
@@ -57,17 +57,17 @@ class Formatter implements FormatterInterface
 
     public function formatTime(int $secs): string
     {
-        static $timeFormats = array(
-            array(0, '< 1 sec'),
-            array(1, '1 sec'),
-            array(2, 'secs', 1),
-            array(60, '1 min'),
-            array(120, 'mins', 60),
-            array(3600, '1 hr'),
-            array(7200, 'hrs', 3600),
-            array(86400, '1 day'),
-            array(172800, 'days', 86400),
-        );
+        static $timeFormats = [
+            [0, '< 1 sec'],
+            [1, '1 sec'],
+            [2, 'secs', 1],
+            [60, '1 min'],
+            [120, 'mins', 60],
+            [3600, '1 hr'],
+            [7200, 'hrs', 3600],
+            [86400, '1 day'],
+            [172800, 'days', 86400],
+        ];
 
         foreach ($timeFormats as $index => $format) {
             if ($secs >= $format[0]) {

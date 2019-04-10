@@ -25,7 +25,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
 {
     public function testAskChoice()
     {
-        $heroes = array('Superman', 'Batman', 'Spiderman');
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
         $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
@@ -64,21 +64,21 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Batman'), $dialog->ask());
-        $this->assertEquals(array('Superman', 'Spiderman'), $dialog->ask());
-        $this->assertEquals(array('Superman', 'Spiderman'), $dialog->ask());
+        $this->assertEquals(['Batman'], $dialog->ask());
+        $this->assertEquals(['Superman', 'Spiderman'], $dialog->ask());
+        $this->assertEquals(['Superman', 'Spiderman'], $dialog->ask());
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0,1');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertEquals(['Superman', 'Batman'], $dialog->ask());
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, ' 0 , 1 ');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertEquals(['Superman', 'Batman'], $dialog->ask());
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, 0);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream, true), $this->createOutputInterface(), $question);
@@ -88,7 +88,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function testAskChoiceNonInteractive()
     {
-        $heroes = array('Superman', 'Batman', 'Spiderman');
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
         $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0');
@@ -119,18 +119,18 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $question = new ChoiceQuestion('Who are your favorite superheros?', $heroes, '0, 1');
         $question->setMultiselect(true);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream, false), $this->createOutputInterface(), $question);
-        $this->assertSame(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertSame(['Superman', 'Batman'], $dialog->ask());
 
         $question = new ChoiceQuestion('Who are your favorite superheros?', $heroes, '0, 1');
         $question->setMultiselect(true);
         $question->setValidator(null);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream, false), $this->createOutputInterface(), $question);
-        $this->assertSame(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertSame(['Superman', 'Batman'], $dialog->ask());
 
         $question = new ChoiceQuestion('Who are your favorite superheros?', $heroes, '0, Batman');
         $question->setMultiselect(true);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream, false), $this->createOutputInterface(), $question);
-        $this->assertSame(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertSame(['Superman', 'Batman'], $dialog->ask());
 
         $question = new ChoiceQuestion('Who are your favorite superheros?', $heroes, null);
         $question->setMultiselect(true);
@@ -180,7 +180,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
 
         $question = new Question('Please select a bundle', 'FrameworkBundle');
-        $question->setAutocompleterValues(array('AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle'));
+        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
 
         $this->assertEquals('AcmeDemoBundle', $dialog->ask());
@@ -202,7 +202,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
         // <UP ARROW><UP ARROW><NEWLINE><DOWN ARROW><DOWN ARROW><NEWLINE>
         $inputStream = $this->getInputStream("\033[A\033[A\n\033[B\033[B\n");
 
-        $question = new ChoiceQuestion('Please select a bundle', array(1 => 'AcmeDemoBundle', 4 => 'AsseticBundle'));
+        $question = new ChoiceQuestion('Please select a bundle', [1 => 'AcmeDemoBundle', 4 => 'AsseticBundle']);
         $question->setMaxAttempts(1);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
 
@@ -217,11 +217,11 @@ class AskQuestionTest extends AbstractAskQuestionTest
         }
 
         $inputStream = $this->getInputStream("b\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             'a' => 'berlin',
             'b' => 'copenhagen',
             'c' => 'amsterdam',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select a city', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -240,7 +240,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
         $question = new Question('');
         $expectedCompletion = 'ExampleNamespace\\';
-        $question->setAutocompleterValues(array($expectedCompletion));
+        $question->setAutocompleterValues([$expectedCompletion]);
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
 
         $dialog->ask();
@@ -251,11 +251,11 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
         // Shell control (esc) sequences are not so important: we only care that
         // <hl> tag is interpreted correctly and replaced
-        $irrelevantEscSequences = array(
+        $irrelevantEscSequences = [
             "\0337" => '', // Save cursor position
             "\0338" => '', // Restore cursor position
             "\033[K" => '', // Clear line from cursor till the end
-        );
+        ];
 
         $importantActualOutput = strtr($actualOutput, $irrelevantEscSequences);
 
@@ -294,14 +294,14 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function getAskConfirmationData()
     {
-        return array(
-            array('', true),
-            array('', false, false),
-            array('y', true),
-            array('yes', true),
-            array('n', false),
-            array('no', false),
-        );
+        return [
+            ['', true],
+            ['', false, false],
+            ['y', true],
+            ['yes', true],
+            ['n', false],
+            ['no', false],
+        ];
     }
 
     public function testAskConfirmationWithCustomTrueAnswer()
@@ -321,7 +321,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
     {
         $error = 'This is not a color!';
         $validator = function ($color) use ($error) {
-            if (!\in_array($color, array('white', 'black'))) {
+            if (!\in_array($color, ['white', 'black'])) {
                 throw new \InvalidArgumentException($error);
             }
 
@@ -354,11 +354,11 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
     {
         $inputStream = $this->getInputStream($providedAnswer."\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             'My environment 1',
             'My environment 2',
             'My environment 3',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -370,14 +370,14 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function simpleAnswerProvider()
     {
-        return array(
-            array(0, 'My environment 1'),
-            array(1, 'My environment 2'),
-            array(2, 'My environment 3'),
-            array('My environment 1', 'My environment 1'),
-            array('My environment 2', 'My environment 2'),
-            array('My environment 3', 'My environment 3'),
-        );
+        return [
+            [0, 'My environment 1'],
+            [1, 'My environment 2'],
+            [2, 'My environment 3'],
+            ['My environment 1', 'My environment 1'],
+            ['My environment 2', 'My environment 2'],
+            ['My environment 3', 'My environment 3'],
+        ];
     }
 
     /**
@@ -386,10 +386,10 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue)
     {
         $inputStream = $this->getInputStream($providedAnswer."\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             '.',
             'src',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select the directory', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -402,10 +402,10 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function specialCharacterInMultipleChoice()
     {
-        return array(
-            array('.', array('.')),
-            array('., src', array('.', 'src')),
-        );
+        return [
+            ['.', ['.']],
+            ['., src', ['.', 'src']],
+        ];
     }
 
     /**
@@ -414,12 +414,12 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
     {
         $inputStream = $this->getInputStream($providedAnswer."\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             '0' => 'No environment',
             '1' => 'My environment 1',
             'env_2' => 'My environment 2',
             3 => 'My environment 3',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -431,14 +431,14 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function mixedKeysChoiceListAnswerProvider()
     {
-        return array(
-            array('0', '0'),
-            array('No environment', '0'),
-            array('1', '1'),
-            array('env_2', 'env_2'),
-            array(3, '3'),
-            array('My environment 1', '1'),
-        );
+        return [
+            ['0', '0'],
+            ['No environment', '0'],
+            ['1', '1'],
+            ['env_2', 'env_2'],
+            [3, '3'],
+            ['My environment 1', '1'],
+        ];
     }
 
     /**
@@ -447,11 +447,11 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
     {
         $inputStream = $this->getInputStream($providedAnswer."\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             'env_1' => 'My environment 1',
             'env_2' => 'My environment',
             'env_3' => 'My environment',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -468,11 +468,11 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testAmbiguousChoiceFromChoicelist()
     {
         $inputStream = $this->getInputStream("My environment\n");
-        $possibleChoices = array(
+        $possibleChoices = [
             'env_1' => 'My first environment',
             'env_2' => 'My environment',
             'env_3' => 'My environment',
-        );
+        ];
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
         $question->setMaxAttempts(1);
@@ -483,12 +483,12 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     public function answerProvider()
     {
-        return array(
-            array('env_1', 'env_1'),
-            array('env_2', 'env_2'),
-            array('env_3', 'env_3'),
-            array('My environment 1', 'env_1'),
-        );
+        return [
+            ['env_1', 'env_1'],
+            ['env_2', 'env_2'],
+            ['env_3', 'env_3'],
+            ['My environment 1', 'env_1'],
+        ];
     }
 
     public function testNoInteraction()
@@ -505,17 +505,17 @@ class AskQuestionTest extends AbstractAskQuestionTest
     public function testChoiceOutputFormattingQuestionForUtf8Keys()
     {
         $question = 'Lorem ipsum?';
-        $possibleChoices = array(
+        $possibleChoices = [
             'foo' => 'foo',
             'żółw' => 'bar',
             'łabądź' => 'baz',
-        );
-        $outputShown = array(
+        ];
+        $outputShown = [
             $question,
             '  [<info>foo   </info>] foo',
             '  [<info>żółw  </info>] bar',
             '  [<info>łabądź</info>] baz',
-        );
+        ];
         $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->method('getFormatter')->willReturn(new OutputFormatter());
 
@@ -559,7 +559,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
      */
     public function testEmptyChoices()
     {
-        new ChoiceQuestion('Question', array(), 'irrelevant');
+        new ChoiceQuestion('Question', [], 'irrelevant');
     }
 
     public function testTraversableAutocomplete()
@@ -579,7 +579,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
 
         $question = new Question('Please select a bundle', 'FrameworkBundle');
-        $question->setAutocompleterValues(new AutocompleteValues(array('irrelevant' => 'AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle')));
+        $question->setAutocompleterValues(new AutocompleteValues(['irrelevant' => 'AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']));
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
 
         $this->assertEquals('AcmeDemoBundle', $dialog->ask());

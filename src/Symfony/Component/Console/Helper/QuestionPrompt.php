@@ -151,7 +151,7 @@ class QuestionPrompt
         $message = $this->question->getQuestion();
 
         if ($this->question instanceof ChoiceQuestion) {
-            $maxWidth = max(array_map(array($this->formatter, 'strlen'), array_keys($this->question->getChoices())));
+            $maxWidth = max(array_map([$this->formatter, 'strlen'], array_keys($this->question->getChoices())));
 
             $messages = (array) $this->question->getQuestion();
             foreach ($this->question->getChoices() as $key => $value) {
@@ -390,7 +390,7 @@ class QuestionPrompt
         if (file_exists('/usr/bin/env')) {
             // handle other OSs with bash/zsh/ksh/csh if available to hide the answer
             $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
-            foreach (array('bash', 'zsh', 'ksh', 'csh') as $sh) {
+            foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
                 if ('OK' === rtrim(shell_exec(sprintf($test, $sh)))) {
                     self::$shell = $sh;
                     break;

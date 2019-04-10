@@ -14,7 +14,7 @@ class SymfonyQuestionPromptTest extends AbstractQuestionHelperTest
 {
     public function testAskChoice()
     {
-        $heroes = array('Superman', 'Batman', 'Spiderman');
+        $heroes = ['Superman', 'Batman', 'Spiderman'];
         $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
@@ -51,28 +51,28 @@ class SymfonyQuestionPromptTest extends AbstractQuestionHelperTest
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new SymfonyQuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Batman'), $dialog->ask());
-        $this->assertEquals(array('Superman', 'Spiderman'), $dialog->ask());
-        $this->assertEquals(array('Superman', 'Spiderman'), $dialog->ask());
+        $this->assertEquals(['Batman'], $dialog->ask());
+        $this->assertEquals(['Superman', 'Spiderman'], $dialog->ask());
+        $this->assertEquals(['Superman', 'Spiderman'], $dialog->ask());
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0,1');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new SymfonyQuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertEquals(['Superman', 'Batman'], $dialog->ask());
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, ' 0 , 1 ');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
         $dialog = new SymfonyQuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
-        $this->assertEquals(array('Superman', 'Batman'), $dialog->ask());
+        $this->assertEquals(['Superman', 'Batman'], $dialog->ask());
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
     }
 
     public function testAskChoiceWithChoiceValueAsDefault()
     {
-        $question = new ChoiceQuestion('What is your favorite superhero?', array('Superman', 'Batman', 'Spiderman'), 'Batman');
+        $question = new ChoiceQuestion('What is your favorite superhero?', ['Superman', 'Batman', 'Spiderman'], 'Batman');
         $question->setMaxAttempts(1);
         $dialog = new SymfonyQuestionPrompt($this->createStreamableInputInterfaceMock($this->getInputStream("Batman\n")), $output = $this->createOutputInterface(), $question);
 

@@ -65,14 +65,14 @@ class Registry
 
     public static function getClassReflector($class, $instantiableWithoutConstructor = false, $cloneable = null)
     {
-        if (!\class_exists($class) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
+        if (!($isClass = \class_exists($class)) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
             throw new ClassNotFoundException($class);
         }
         $reflector = new \ReflectionClass($class);
 
         if ($instantiableWithoutConstructor) {
             $proto = $reflector->newInstanceWithoutConstructor();
-        } elseif (!$reflector->isInstantiable()) {
+        } elseif (!$isClass || $reflector->isAbstract()) {
             throw new NotInstantiableTypeException($class);
         } elseif ($reflector->name !== $class) {
             $reflector = self::$reflectors[$name = $reflector->name] ?? self::getClassReflector($name, $instantiableWithoutConstructor, $cloneable);
@@ -86,14 +86,14 @@ class Registry
                 $proto = $reflector->newInstanceWithoutConstructor();
                 $instantiableWithoutConstructor = true;
             } catch (\ReflectionException $e) {
-                $proto = $reflector->implementsInterface('Serializable') ? 'C:' : 'O:';
+                $proto = $reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__unserialize')) ? 'C:' : 'O:';
                 if ('C:' === $proto && !$reflector->getMethod('unserialize')->isInternal()) {
                     $proto = null;
                 } elseif (false === $proto = @unserialize($proto.\strlen($class).':"'.$class.'":0:{}')) {
                     throw new NotInstantiableTypeException($class);
                 }
             }
-            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep')) {
+            if (null !== $proto && !$proto instanceof \Throwable && !$proto instanceof \Serializable && !\method_exists($class, '__sleep') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__serialize'))) {
                 try {
                     serialize($proto);
                 } catch (\Exception $e) {
@@ -103,7 +103,7 @@ class Registry
         }
 
         if (null === $cloneable) {
-            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup'))) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !\method_exists($proto, '__wakeup') && (\PHP_VERSION_ID < 70400 || !\method_exists($class, '__unserialize')))) {
                 throw new NotInstantiableTypeException($class);
             }
 

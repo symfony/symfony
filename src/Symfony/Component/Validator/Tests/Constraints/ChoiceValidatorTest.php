@@ -54,11 +54,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             null,
-            new Choice(
-                [
-                    'choices' => ['foo', 'bar'],
-                ]
-            )
+            new Choice([
+                'choices' => ['foo', 'bar'],
+            ])
         );
 
         $this->assertNoViolation();
@@ -100,13 +98,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceCallbackClosure()
     {
-        $constraint = new Choice(
-            [
-                'callback' => function () {
-                    return ['foo', 'bar'];
-                },
-            ]
-        );
+        $constraint = new Choice([
+            'callback' => function () {
+                return ['foo', 'bar'];
+            },
+        ]);
 
         $this->validator->validate('bar', $constraint);
 

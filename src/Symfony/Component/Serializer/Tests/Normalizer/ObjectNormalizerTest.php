@@ -1043,6 +1043,30 @@ class ObjectNormalizerTest extends TestCase
         $this->assertArrayHasKey('foo-Symfony\Component\Serializer\Tests\Normalizer\ObjectDummy-json-bar', $normalizer->normalize(new ObjectDummy(), 'json', ['foo' => 'bar']));
     }
 
+    public function testDefaultObjectClassResolver()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $obj = new ObjectDummy();
+        $obj->setFoo('foo');
+        $obj->bar = 'bar';
+        $obj->setBaz(true);
+        $obj->setCamelCase('camelcase');
+        $obj->unwantedProperty = 'notwanted';
+
+        $this->assertEquals(
+            [
+                'foo' => 'foo',
+                'bar' => 'bar',
+                'baz' => true,
+                'fooBar' => 'foobar',
+                'camelCase' => 'camelcase',
+                'object' => null,
+            ],
+            $normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testObjectClassResolver()
     {
         $classResolver = function ($object) {

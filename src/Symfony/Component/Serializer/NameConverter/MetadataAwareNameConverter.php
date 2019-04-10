@@ -69,7 +69,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$denormalizeCache[$class][$propertyName] ?? $this->denormalizeFallback($propertyName, $class, $format, $context);
     }
 
-    private function getCacheValueForNormalization(string $propertyName, string $class): ?string
+    private function getCacheValueForNormalization($propertyName, string $class)
     {
         if (!$this->metadataFactory->hasMetadataFor($class)) {
             return null;
@@ -83,12 +83,12 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return $attributesMetadata[$propertyName]->getSerializedName() ?? null;
     }
 
-    private function normalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    private function normalizeFallback($propertyName, string $class = null, string $format = null, array $context = [])
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->normalize($propertyName, $class, $format, $context) : $propertyName;
     }
 
-    private function getCacheValueForDenormalization(string $propertyName, string $class): ?string
+    private function getCacheValueForDenormalization($propertyName, string $class)
     {
         if (!isset(self::$attributesMetadataCache[$class])) {
             self::$attributesMetadataCache[$class] = $this->getCacheValueForAttributesMetadata($class);
@@ -97,7 +97,7 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
         return self::$attributesMetadataCache[$class][$propertyName] ?? null;
     }
 
-    private function denormalizeFallback(string $propertyName, string $class = null, string $format = null, array $context = []): string
+    private function denormalizeFallback($propertyName, string $class = null, string $format = null, array $context = [])
     {
         return $this->fallbackNameConverter ? $this->fallbackNameConverter->denormalize($propertyName, $class, $format, $context) : $propertyName;
     }

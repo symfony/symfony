@@ -3,7 +3,8 @@ VarExporter Component
 
 The VarExporter component allows exporting any serializable PHP data structure to
 plain PHP code. While doing so, it preserves all the semantics associated with
-the serialization mechanism of PHP (`__wakeup`, `__sleep`, `Serializable`).
+the serialization mechanism of PHP (`__wakeup`, `__sleep`, `Serializable`,
+`__serialize`, `__unserialize`).
 
 It also provides an instantiator that allows creating and populating objects
 without calling their constructor nor any other methods.

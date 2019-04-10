@@ -205,38 +205,36 @@ class DateIntervalType extends AbstractType
             }));
         };
 
-        $resolver->setDefaults(
-            [
-                'with_years' => true,
-                'with_months' => true,
-                'with_days' => true,
-                'with_weeks' => false,
-                'with_hours' => false,
-                'with_minutes' => false,
-                'with_seconds' => false,
-                'with_invert' => false,
-                'years' => range(0, 100),
-                'months' => range(0, 12),
-                'weeks' => range(0, 52),
-                'days' => range(0, 31),
-                'hours' => range(0, 24),
-                'minutes' => range(0, 60),
-                'seconds' => range(0, 60),
-                'widget' => 'choice',
-                'input' => 'dateinterval',
-                'placeholder' => $placeholderDefault,
-                'by_reference' => true,
-                'error_bubbling' => false,
-                // If initialized with a \DateInterval object, FormType initializes
-                // this option to "\DateInterval". Since the internal, normalized
-                // representation is not \DateInterval, but an array, we need to unset
-                // this option.
-                'data_class' => null,
-                'compound' => $compound,
-                'empty_data' => $emptyData,
-                'labels' => [],
-            ]
-        );
+        $resolver->setDefaults([
+            'with_years' => true,
+            'with_months' => true,
+            'with_days' => true,
+            'with_weeks' => false,
+            'with_hours' => false,
+            'with_minutes' => false,
+            'with_seconds' => false,
+            'with_invert' => false,
+            'years' => range(0, 100),
+            'months' => range(0, 12),
+            'weeks' => range(0, 52),
+            'days' => range(0, 31),
+            'hours' => range(0, 24),
+            'minutes' => range(0, 60),
+            'seconds' => range(0, 60),
+            'widget' => 'choice',
+            'input' => 'dateinterval',
+            'placeholder' => $placeholderDefault,
+            'by_reference' => true,
+            'error_bubbling' => false,
+            // If initialized with a \DateInterval object, FormType initializes
+            // this option to "\DateInterval". Since the internal, normalized
+            // representation is not \DateInterval, but an array, we need to unset
+            // this option.
+            'data_class' => null,
+            'compound' => $compound,
+            'empty_data' => $emptyData,
+            'labels' => [],
+        ]);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('labels', $labelsNormalizer);
 

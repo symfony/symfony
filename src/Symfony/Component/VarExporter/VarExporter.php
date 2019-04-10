@@ -69,14 +69,30 @@ final class VarExporter
 
         $classes = [];
         $values = [];
-        $wakeups = [];
+        $states = [];
         foreach ($objectsPool as $i => $v) {
             list(, $classes[], $values[], $wakeup) = $objectsPool[$v];
-            if ($wakeup) {
-                $wakeups[$wakeup] = $i;
+            if (0 < $wakeup) {
+                $states[$wakeup] = $i;
+            } elseif (0 > $wakeup) {
+                $states[-$wakeup] = [$i, array_pop($values)];
+                $values[] = [];
             }
         }
-        ksort($wakeups);
+        ksort($states);
+
+        $wakeups = [null];
+        foreach ($states as $k => $v) {
+            if (\is_array($v)) {
+                $wakeups[-$v[0]] = $v[1];
+            } else {
+                $wakeups[] = $v;
+            }
+        }
+
+        if (null === $wakeups[0]) {
+            unset($wakeups[0]);
+        }
 
         $properties = [];
         foreach ($values as $i => $vars) {

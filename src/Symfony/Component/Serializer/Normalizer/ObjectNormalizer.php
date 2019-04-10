@@ -43,7 +43,10 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $this->objectClassResolver = $objectClassResolver;
+
+        $this->objectClassResolver = $objectClassResolver ?? function ($class) {
+            return \is_object($class) ? \get_class($class) : $class;
+        };
     }
 
     /**
@@ -63,7 +66,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
         $attributes = [];
 
         // methods
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $class = ($this->objectClassResolver)($object);
         $reflClass = new \ReflectionClass($class);
 
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {

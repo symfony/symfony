@@ -851,13 +851,11 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'int[][]');
 
-        $this->resolver->resolve(
-            [
-                'foo' => [
-                    [1.2],
-                ],
-            ]
-        );
+        $this->resolver->resolve([
+            'foo' => [
+                [1.2],
+            ],
+        ]);
     }
 
     /**
@@ -1918,13 +1916,11 @@ class OptionsResolverTest extends TestCase
                     1, 2,
                 ],
             ],
-        ], $this->resolver->resolve(
-            [
-                'foo' => [
-                    [1, 2],
-                ],
-            ]
-        ));
+        ], $this->resolver->resolve([
+            'foo' => [
+                [1, 2],
+            ],
+        ]));
     }
 
     public function testNested2Arrays()
@@ -1964,17 +1960,15 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefined('foo');
         $this->resolver->setAllowedTypes('foo', 'float[][][][]');
 
-        $this->resolver->resolve(
-            [
-                'foo' => [
+        $this->resolver->resolve([
+            'foo' => [
+                [
                     [
-                        [
-                            [1, 2],
-                        ],
+                        [1, 2],
                     ],
                 ],
-            ]
-        );
+            ],
+        ]);
     }
 
     /**

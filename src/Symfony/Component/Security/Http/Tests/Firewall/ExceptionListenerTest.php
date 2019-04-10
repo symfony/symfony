@@ -130,10 +130,8 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $accessDeniedHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface')->getMock();
-        $accessDeniedHandler->expects($this->once())->method('handle')->will($this->returnValue(new Response('error')));
+        $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), null, null, null, $this->createCustomAccessDeniedHandler(new Response('error')));
 
-        $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), null, null, null, $accessDeniedHandler);
         $listener->onKernelException($event);
 
         $this->assertEquals('error', $event->getResponse()->getContent());
@@ -147,13 +145,48 @@ class ExceptionListenerTest extends TestCase
     {
         $event = $this->createEvent($exception);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
-        $tokenStorage->expects($this->once())->method('getToken')->will($this->returnValue($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
-
-        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
+        $listener = $this->createExceptionListener($this->createTokenStorage(), $this->createTrustResolver(false), null, $this->createEntryPoint());
         $listener->onKernelException($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+    }
+
+    /**
+     * @dataProvider getAccessDeniedExceptionProvider
+     */
+    public function testAccessDeniedExceptionNotFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, \Exception $eventException = null)
+    {
+        $event = $this->createEvent($exception);
+
+        $listener = $this->createExceptionListener($this->createTokenStorage(), $this->createTrustResolver(false), null, $this->createEntryPoint(), null, $this->createCustomAccessDeniedHandler(new Response('denied', 403)));
+        $listener->onKernelException($event);
+
+        $this->assertEquals('denied', $event->getResponse()->getContent());
+        $this->assertEquals(403, $event->getResponse()->getStatusCode());
+        $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
+    }
+
+    /**
+     * @dataProvider getAccessDeniedExceptionProvider
+     */
+    public function testAccessDeniedExceptionNotFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, \Exception $eventException = null)
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel->expects($this->once())->method('handle')->will($this->returnValue(new Response('Unauthorized', 401)));
+
+        $event = $this->createEvent($exception, $kernel);
+
+        $httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
+        $httpUtils->expects($this->once())->method('createRequest')->will($this->returnValue(Request::create('/error')));
+
+        $listener = $this->createExceptionListener($this->createTokenStorage(), $this->createTrustResolver(true), $httpUtils, null, '/error');
+        $listener->onKernelException($event);
+
+        $this->assertTrue($event->isAllowingCustomResponseCode());
+
+        $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
+        $this->assertEquals(401, $event->getResponse()->getStatusCode());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
     }
 
@@ -166,6 +199,22 @@ class ExceptionListenerTest extends TestCase
             [new \LogicException('random', 0, $e = new AccessDeniedException('embed', new AuthenticationException())), $e],
             [new AccessDeniedException('random', new \LogicException())],
         ];
+    }
+
+    private function createTokenStorage()
+    {
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage->expects($this->once())->method('getToken')->will($this->returnValue($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()));
+
+        return $tokenStorage;
+    }
+
+    private function createCustomAccessDeniedHandler(Response $response)
+    {
+        $accessDeniedHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface')->getMock();
+        $accessDeniedHandler->expects($this->once())->method('handle')->will($this->returnValue($response));
+
+        return $accessDeniedHandler;
     }
 
     private function createEntryPoint(Response $response = null)

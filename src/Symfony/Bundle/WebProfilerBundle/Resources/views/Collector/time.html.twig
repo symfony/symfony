@@ -95,7 +95,11 @@
 
     <h2>Execution timeline</h2>
 
-    {% if collector.events is empty %}
+    {% if not collector.isStopwatchInstalled() %}
+        <div class="empty">
+            <p>The Stopwatch component is not installed. If you want to see timing events, run: <code>composer require symfony/stopwatch</code>.</p>
+        </div>
+    {% elseif collector.events is empty %}
         <div class="empty">
             <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
         </div>

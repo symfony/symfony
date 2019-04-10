@@ -22,7 +22,7 @@ class DotenvTest extends TestCase
      */
     public function testParseWithFormatError($data, $error)
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
 
         try {
             $dotenv->parse($data);
@@ -62,7 +62,7 @@ class DotenvTest extends TestCase
      */
     public function testParse($data, $expected)
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $this->assertSame($expected, $dotenv->parse($data));
     }
 
@@ -193,7 +193,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new Dotenv())->load($path1, $path2);
+        (new Dotenv(true))->load($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -224,7 +224,7 @@ class DotenvTest extends TestCase
         // .env
 
         file_put_contents($path, 'FOO=BAR');
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
         $this->assertSame('dev', getenv('TEST_APP_ENV'));
 
@@ -232,33 +232,33 @@ class DotenvTest extends TestCase
 
         $_SERVER['TEST_APP_ENV'] = 'local';
         file_put_contents("$path.local", 'FOO=localBAR');
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('localBAR', getenv('FOO'));
 
         // special case for test
 
         $_SERVER['TEST_APP_ENV'] = 'test';
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('BAR', getenv('FOO'));
 
         // .env.dev
 
         unset($_SERVER['TEST_APP_ENV']);
         file_put_contents("$path.dev", 'FOO=devBAR');
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devBAR', getenv('FOO'));
 
         // .env.dev.local
 
         file_put_contents("$path.dev.local", 'FOO=devlocalBAR');
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('devlocalBAR', getenv('FOO'));
 
         // .env.dist
 
         unlink($path);
         file_put_contents("$path.dist", 'BAR=distBAR');
-        (new DotEnv())->loadEnv($path, 'TEST_APP_ENV');
+        (new Dotenv(true))->loadEnv($path, 'TEST_APP_ENV');
         $this->assertSame('distBAR', getenv('BAR'));
 
         putenv('FOO');
@@ -290,7 +290,7 @@ class DotenvTest extends TestCase
         file_put_contents($path1, 'FOO=BAR');
         file_put_contents($path2, 'BAR=BAZ');
 
-        (new Dotenv())->overload($path1, $path2);
+        (new Dotenv(true))->overload($path1, $path2);
 
         $foo = getenv('FOO');
         $bar = getenv('BAR');
@@ -310,7 +310,7 @@ class DotenvTest extends TestCase
      */
     public function testLoadDirectory()
     {
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->load(__DIR__);
     }
 
@@ -318,7 +318,7 @@ class DotenvTest extends TestCase
     {
         $originalValue = $_SERVER['argc'];
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['argc' => 'new_value']);
 
         $this->assertSame($originalValue, $_SERVER['argc']);
@@ -329,7 +329,7 @@ class DotenvTest extends TestCase
         putenv('TEST_ENV_VAR=original_value');
         $_SERVER['TEST_ENV_VAR'] = 'original_value';
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['TEST_ENV_VAR' => 'new_value']);
 
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
@@ -339,7 +339,7 @@ class DotenvTest extends TestCase
     {
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['HTTP_TEST_ENV_VAR' => 'env_value']);
 
         $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
@@ -351,7 +351,7 @@ class DotenvTest extends TestCase
     {
         putenv('TEST_ENV_VAR_OVERRIDEN=original_value');
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['TEST_ENV_VAR_OVERRIDEN' => 'new_value'], true);
 
         $this->assertSame('new_value', getenv('TEST_ENV_VAR_OVERRIDEN'));
@@ -373,7 +373,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db']);
 
         $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
@@ -390,7 +390,7 @@ class DotenvTest extends TestCase
         unset($_SERVER['DATABASE_URL']);
         putenv('DATABASE_URL');
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db']);
         $dotenv->populate(['DATABASE_URL' => 'sqlite:///somedb.sqlite']);
 
@@ -406,12 +406,29 @@ class DotenvTest extends TestCase
         putenv('BAZ=baz');
         putenv('DOCUMENT_ROOT=/var/www');
 
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(true);
         $dotenv->populate(['FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot']);
 
         $this->assertSame('foo1', getenv('FOO'));
         $this->assertSame('bar1', getenv('BAR'));
         $this->assertSame('baz1', getenv('BAZ'));
         $this->assertSame('/var/www', getenv('DOCUMENT_ROOT'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The default value of "$usePutenv" argument of "%s's constructor will change from "true" to "false" in Symfony 5.0, you should define its value explicitly.
+     */
+    public function testDeprecationWarning()
+    {
+        new Dotenv();
+    }
+
+    public function testNoDeprecationWarning()
+    {
+        $dotenv = new Dotenv(true);
+        $this->assertInstanceOf(Dotenv::class, $dotenv);
+        $dotenv = new Dotenv(false);
+        $this->assertInstanceOf(Dotenv::class, $dotenv);
     }
 }

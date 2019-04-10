@@ -98,22 +98,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceCallbackClosure()
     {
-<<<<<<< HEAD
-        $constraint = new Choice(
-            [
-                'callback' => function () {
-                    return ['foo', 'bar'];
-                },
-            ]
-        );
-=======
         $constraint = new Choice([
-            'strict' => true,
             'callback' => function () {
                 return ['foo', 'bar'];
             },
         ]);
->>>>>>> 3.4
 
         $this->validator->validate('bar', $constraint);
 

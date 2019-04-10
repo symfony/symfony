@@ -159,6 +159,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $this->multi->dnsCache = $options['resolve'] + $this->multi->dnsCache;
         }
 
+        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, implode('', $url)));
+
         [$host, $port, $url['authority']] = self::dnsResolve($url, $this->multi, $info, $onProgress);
 
         if (!isset($options['headers']['host'])) {
@@ -208,10 +210,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $context = stream_context_create($context, ['notification' => $notification]);
         self::configureHeadersAndProxy($context, $host, $options['request_headers'], $proxy, $noProxy);
 
-        $url = implode('', $url);
-        $this->logger && $this->logger->info(sprintf('Request: %s %s', $method, $url));
-
-        return new NativeResponse($this->multi, $context, $url, $options, $gzipEnabled, $info, $resolveRedirect, $onProgress, $this->logger);
+        return new NativeResponse($this->multi, $context, implode('', $url), $options, $gzipEnabled, $info, $resolveRedirect, $onProgress, $this->logger);
     }
 
     /**

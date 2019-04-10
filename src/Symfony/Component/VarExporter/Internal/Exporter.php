@@ -74,10 +74,23 @@ class Exporter
             }
 
             $class = \get_class($value);
+            $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
+
+            if ($reflector->hasMethod('__serialize')) {
+                if (!$reflector->getMethod('__serialize')->isPublic()) {
+                    throw new \Error(sprintf('Call to %s method %s::__serialize()', $reflector->getMethod('__serialize')->isProtected() ? 'protected' : 'private', $class));
+                }
+
+                if (!\is_array($properties = $value->__serialize())) {
+                    throw new \Typerror($class.'::__serialize() must return an array');
+                }
+
+                goto prepare_value;
+            }
+
             $properties = [];
             $sleep = null;
             $arrayValue = (array) $value;
-            $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
             $proto = Registry::$prototypes[$class];
 
             if (($value instanceof \ArrayIterator || $value instanceof \ArrayObject) && null !== $proto) {
@@ -154,10 +167,11 @@ class Exporter
                 }
             }
 
+            prepare_value:
             $objectsPool[$value] = [$id = \count($objectsPool)];
             $properties = self::prepare($properties, $objectsPool, $refsPool, $objectsCount, $valueIsStatic);
             ++$objectsCount;
-            $objectsPool[$value] = [$id, $class, $properties, \method_exists($class, '__wakeup') ? $objectsCount : 0];
+            $objectsPool[$value] = [$id, $class, $properties, \method_exists($class, '__unserialize') ? -$objectsCount : (\method_exists($class, '__wakeup') ? $objectsCount : 0)];
 
             $value = new Reference($id);
 

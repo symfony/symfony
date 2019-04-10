@@ -15,7 +15,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
+use Symfony\Component\Console\Helper\SymfonyQuestionPrompt;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -35,7 +35,6 @@ class SymfonyStyle extends OutputStyle
     const MAX_LINE_LENGTH = 120;
 
     private $input;
-    private $questionHelper;
     private $progressBar;
     private $lineLength;
     private $bufferedOutput;
@@ -287,11 +286,8 @@ class SymfonyStyle extends OutputStyle
             $this->autoPrependBlock();
         }
 
-        if (!$this->questionHelper) {
-            $this->questionHelper = new SymfonyQuestionHelper();
-        }
-
-        $answer = $this->questionHelper->ask($this->input, $this, $question);
+        $prompt = new SymfonyQuestionPrompt($this->input, $this, $question);
+        $answer = $prompt->ask();
 
         if ($this->input->isInteractive()) {
             $this->newLine();

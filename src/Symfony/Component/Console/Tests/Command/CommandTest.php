@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -214,8 +214,8 @@ class CommandTest extends TestCase
         $application = new Application();
         $command = new \TestCommand();
         $command->setApplication($application);
-        $formatterHelper = new FormatterHelper();
-        $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
+        $formatterHelper = new DebugFormatterHelper();
+        $this->assertEquals($formatterHelper->getName(), $command->getHelper('debug_formatter')->getName(), '->getHelper() returns the correct helper');
     }
 
     /**
@@ -225,7 +225,7 @@ class CommandTest extends TestCase
     public function testGetHelperWithoutHelperSet()
     {
         $command = new \TestCommand();
-        $command->getHelper('formatter');
+        $command->getHelper('debug_formatter');
     }
 
     public function testMergeApplicationDefinition()

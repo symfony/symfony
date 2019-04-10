@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -99,10 +100,12 @@ class CommandTesterTest extends TestCase
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
-            $helper = $command->getHelper('question');
-            $helper->ask($input, $output, new Question($questions[0]));
-            $helper->ask($input, $output, new Question($questions[1]));
-            $helper->ask($input, $output, new Question($questions[2]));
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[0]));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[1]));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[2]));
+            $prompt->ask();
         });
 
         $tester = new CommandTester($command);
@@ -124,10 +127,12 @@ class CommandTesterTest extends TestCase
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
-            $helper = $command->getHelper('question');
-            $helper->ask($input, $output, new Question($questions[0], 'Bobby'));
-            $helper->ask($input, $output, new Question($questions[1], 'Fine'));
-            $helper->ask($input, $output, new Question($questions[2], 'France'));
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[0], 'Bobby'));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[1], 'Fine'));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[2], 'France'));
+            $prompt->ask();
         });
 
         $tester = new CommandTester($command);
@@ -153,11 +158,14 @@ class CommandTesterTest extends TestCase
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
-            $helper = $command->getHelper('question');
-            $helper->ask($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
-            $helper->ask($input, $output, new Question($questions[0]));
-            $helper->ask($input, $output, new Question($questions[1]));
-            $helper->ask($input, $output, new Question($questions[2]));
+            $prompt = new QuestionPrompt($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[0]));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[1]));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[2]));
+            $prompt->ask();
         });
 
         $tester = new CommandTester($command);
@@ -180,11 +188,15 @@ class CommandTesterTest extends TestCase
         $command = new Command('foo');
         $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
-            $helper = $command->getHelper('question');
-            $helper->ask($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
-            $helper->ask($input, $output, new Question($questions[0]));
-            $helper->ask($input, $output, new Question($questions[1]));
-            $helper->ask($input, $output, new Question($questions[2]));
+            $prompt = new QuestionPrompt($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[0]));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[1]));
+            $prompt->ask();
+
+            $prompt = new QuestionPrompt($input, $output, new Question($questions[2]));
+            $prompt->ask();
         });
 
         $tester = new CommandTester($command);

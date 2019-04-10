@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Tester;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -72,10 +72,12 @@ class ApplicationTesterTest extends TestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('foo')->setCode(function ($input, $output) {
-            $helper = new QuestionHelper();
-            $helper->ask($input, $output, new Question('Q1'));
-            $helper->ask($input, $output, new Question('Q2'));
-            $helper->ask($input, $output, new Question('Q3'));
+            $prompt = new QuestionPrompt($input, $output, new Question('Q1'));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question('Q2'));
+            $prompt->ask();
+            $prompt = new QuestionPrompt($input, $output, new Question('Q3'));
+            $prompt->ask();
         });
         $tester = new ApplicationTester($application);
 

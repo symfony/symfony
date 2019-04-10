@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -154,7 +154,7 @@ class ConsoleSectionOutputTest extends TestCase
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
 
-        (new QuestionHelper())->ask($input, $output, new Question('What\'s your favorite super hero?'));
+        (new QuestionPrompt($input, $output, new Question('What\'s your favorite super hero?')))->ask();
         $output->clear();
 
         rewind($output->getStream());

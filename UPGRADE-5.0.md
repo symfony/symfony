@@ -70,6 +70,11 @@ DomCrawler
 
  * The `Crawler::children()` method has a new `$selector` argument.
 
+Dotenv
+------
+
+ * First parameter `$usePutenv` of `Dotenv::__construct()` now default to `false`.
+
 EventDispatcher
 ---------------
 

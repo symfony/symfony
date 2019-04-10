@@ -48,8 +48,8 @@ Doctrine Bridge
 Dotenv
 ------
 
- * First parameter of `Dontenv::__construct()` will change from `true` to `false` in Symfony 5.0. A deprecation warning
-   will be triggered if no parameter is used. Use `$usePutenv=true` to upgrade without breaking changes.  
+ * First parameter of `Dotenv::__construct()` will change from `true` to `false` in Symfony 5.0. A deprecation warning
+   is triggered if no parameter is used. Use `$usePutenv = true` to upgrade without breaking changes.  
 
 EventDispatcher
 ---------------

@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "symfony/http-kernel": "~3.3|~4.0",
+        "symfony/http-kernel": "~3.4.25|^4.2.6",
         "symfony/polyfill-php70": "~1.0",
         "symfony/routing": "~2.8|~3.0|~4.0",
         "symfony/twig-bridge": "~2.8|~3.0|~4.0",

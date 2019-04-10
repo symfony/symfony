@@ -83,6 +83,10 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             }
         }
 
+        if (false === $this->container->has((string) $value) && $graph->hasNode($currentId)) {
+            return $value;
+        }
+
         throw new ServiceNotFoundException($id, $currentId);
     }
 }

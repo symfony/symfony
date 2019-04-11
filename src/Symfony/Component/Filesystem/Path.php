@@ -79,7 +79,7 @@ final class Path
 
         // Replace "~" with user's home directory.
         if ('~' === $path[0]) {
-            $path = static::getHomeDirectory().\substr($path, 1);
+            $path = self::getHomeDirectory().\substr($path, 1);
         }
 
         $path = \str_replace('\\', '/', $path);
@@ -169,7 +169,7 @@ final class Path
             return '';
         }
 
-        $path = static::canonicalize($path);
+        $path = self::canonicalize($path);
 
         // Maintain scheme
         if (false !== ($pos = \strpos($path, '://'))) {
@@ -214,12 +214,12 @@ final class Path
     {
         // For UNIX support
         if (\getenv('HOME')) {
-            return static::canonicalize(\getenv('HOME'));
+            return self::canonicalize(\getenv('HOME'));
         }
 
         // For >= Windows8 support
         if (\getenv('HOMEDRIVE') && \getenv('HOMEPATH')) {
-            return static::canonicalize(\getenv('HOMEDRIVE').\getenv('HOMEPATH'));
+            return self::canonicalize(\getenv('HOMEDRIVE').\getenv('HOMEPATH'));
         }
 
         throw new \RuntimeException("Cannot find the home directory path: Your environment or operation system isn't supported");
@@ -437,7 +437,7 @@ final class Path
      */
     public static function isRelative(string $path): bool
     {
-        return !static::isAbsolute($path);
+        return !self::isAbsolute($path);
     }
 
     /**
@@ -483,15 +483,15 @@ final class Path
             throw new \InvalidArgumentException(\sprintf('The base path must be a non-empty string. Got: "%s"', $basePath));
         }
 
-        if (!static::isAbsolute($basePath)) {
+        if (!self::isAbsolute($basePath)) {
             throw new \InvalidArgumentException(\sprintf(
                 'The base path "%s" is not an absolute path.',
                 $basePath
             ));
         }
 
-        if (static::isAbsolute($path)) {
-            return static::canonicalize($path);
+        if (self::isAbsolute($path)) {
+            return self::canonicalize($path);
         }
 
         if (false !== ($pos = \strpos($basePath, '://'))) {
@@ -556,8 +556,8 @@ final class Path
      */
     public static function makeRelative(string $path, string $basePath): string
     {
-        $path = static::canonicalize($path);
-        $basePath = static::canonicalize($basePath);
+        $path = self::canonicalize($path);
+        $basePath = self::canonicalize($basePath);
 
         [$root, $relativePath] = self::split($path);
         [$baseRoot, $relativeBasePath] = self::split($basePath);

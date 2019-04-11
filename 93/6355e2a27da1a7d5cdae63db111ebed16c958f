@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-10T15:20:17Z
+
+Have you done the changes manually? Because we need to apply it first on 3.4 and then upwards.
+
+---------------------------------------------------------------------------
+
+by rubenrua at 2019-04-10T15:31:39Z
+
+Yes, I used a macro in emacs. I can do a new pull request to 3.4
+
+---------------------------------------------------------------------------
+
+by rubenrua at 2019-04-10T16:11:44Z
+
+check https://github.com/symfony/symfony/pull/31064
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-11T11:19:59Z
+
+PRs for 3.4 and 4.2 are now merged up to master, please rebase to see if anything remains for master.
+
+---------------------------------------------------------------------------
+
+by rubenrua at 2019-04-11T15:01:00Z
+
+Done

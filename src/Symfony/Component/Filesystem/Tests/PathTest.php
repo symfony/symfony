@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Generator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
 
 /**
- * @since  1.0
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Thomas Schulz <mail@king2500.net>
  */
@@ -43,7 +40,7 @@ class PathTest extends TestCase
         putenv('HOMEPATH='.$this->storedEnv['HOMEPATH']);
     }
 
-    public function provideCanonicalizationTests(): Generator
+    public function provideCanonicalizationTests(): \Generator
     {
         // relative paths (forward slash)
        yield ['css/./style.css', 'css/style.css'];
@@ -174,7 +171,7 @@ class PathTest extends TestCase
         $this->assertSame($canonicalized, Path::canonicalize($path));
     }
 
-    public function provideGetDirectoryTests(): Generator
+    public function provideGetDirectoryTests(): \Generator
     {
         yield ['/webmozart/puli/style.css', '/webmozart/puli'];
         yield ['/webmozart/puli', '/webmozart'];
@@ -235,7 +232,7 @@ class PathTest extends TestCase
         $this->assertSame($directory, Path::getDirectory($path));
     }
 
-    public function provideGetFilenameTests(): Generator
+    public function provideGetFilenameTests(): \Generator
     {
         yield ['/webmozart/puli/style.css', 'style.css'];
         yield ['/webmozart/puli/STYLE.CSS', 'STYLE.CSS'];
@@ -254,7 +251,7 @@ class PathTest extends TestCase
         $this->assertSame($filename, Path::getFilename($path));
     }
 
-    public function provideGetFilenameWithoutExtensionTests(): Generator
+    public function provideGetFilenameWithoutExtensionTests(): \Generator
     {
         yield ['/webmozart/puli/style.css.twig', null, 'style.css'];
         yield ['/webmozart/puli/style.css.', null, 'style.css'];
@@ -285,7 +282,7 @@ class PathTest extends TestCase
         $this->assertSame($filename, Path::getFilenameWithoutExtension($path, $extension));
     }
 
-    public function provideGetExtensionTests(): Generator
+    public function provideGetExtensionTests(): \Generator
     {
         yield ['/webmozart/puli/style.css.twig', false, 'twig'];
         yield ['/webmozart/puli/style.css', false, 'css'];
@@ -313,7 +310,7 @@ class PathTest extends TestCase
         $this->assertSame($extension, Path::getExtension($path, $forceLowerCase));
     }
 
-    public function provideHasExtensionTests(): Generator
+    public function provideHasExtensionTests(): \Generator
     {
         yield [true, '/webmozart/puli/style.css.twig', null, false];
         yield [true, '/webmozart/puli/style.css', null, false];
@@ -362,7 +359,7 @@ class PathTest extends TestCase
         $this->assertSame($hasExtension, Path::hasExtension($path, $extension, $ignoreCase));
     }
 
-    public function provideChangeExtensionTests(): Generator
+    public function provideChangeExtensionTests(): \Generator
     {
         yield ['/webmozart/puli/style.css.twig', 'html', '/webmozart/puli/style.css.html'];
         yield ['/webmozart/puli/style.css', 'sass', '/webmozart/puli/style.sass'];
@@ -388,7 +385,7 @@ class PathTest extends TestCase
         ++$call;
     }
 
-    public function provideIsAbsolutePathTests(): Generator
+    public function provideIsAbsolutePathTests(): \Generator
     {
         yield ['/css/style.css', true];
         yield ['/', true];
@@ -431,7 +428,7 @@ class PathTest extends TestCase
         $this->assertSame(!$isAbsolute, Path::isRelative($path));
     }
 
-    public function provideGetRootTests(): Generator
+    public function provideGetRootTests(): \Generator
     {
         yield ['/css/style.css', '/'];
         yield ['/', '/'];
@@ -465,7 +462,7 @@ class PathTest extends TestCase
         $this->assertSame($root, Path::getRoot($path));
     }
 
-    public function providePathTests(): Generator
+    public function providePathTests(): \Generator
     {
         // relative to absolute path
         yield ['css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'];
@@ -484,7 +481,7 @@ class PathTest extends TestCase
         yield ['..', '/webmozart/puli', '/webmozart'];
     }
 
-    public function provideMakeAbsoluteTests(): Generator
+    public function provideMakeAbsoluteTests(): \Generator
     {
         foreach ($this->providePathTests() as $set) {
             yield $set;
@@ -577,7 +574,7 @@ class PathTest extends TestCase
         Path::makeAbsolute('css/style.css', '');
     }
 
-    public function provideAbsolutePathsWithDifferentRoots(): Generator
+    public function provideAbsolutePathsWithDifferentRoots(): \Generator
     {
         yield ['C:/css/style.css', '/webmozart/puli'];
         yield ['C:/css/style.css', '\\webmozart\\puli'];
@@ -613,7 +610,7 @@ class PathTest extends TestCase
         $this->assertSame(Path::canonicalize($absolutePath), Path::makeAbsolute($absolutePath, $basePath));
     }
 
-    public function provideMakeRelativeTests(): Generator
+    public function provideMakeRelativeTests(): \Generator
     {
         foreach ($this->providePathTests() as $set) {
             yield [$set[2], $set[1], $set[0]];
@@ -740,7 +737,7 @@ class PathTest extends TestCase
         Path::makeRelative($absolutePath, $basePath);
     }
 
-    public function provideIsLocalTests(): Generator
+    public function provideIsLocalTests(): \Generator
     {
         yield ['/bg.png', true];
         yield ['bg.png', true];
@@ -757,7 +754,7 @@ class PathTest extends TestCase
         $this->assertSame($isLocal, Path::isLocal($path));
     }
 
-    public function provideGetLongestCommonBasePathTests(): Generator
+    public function provideGetLongestCommonBasePathTests(): \Generator
     {
         // same paths
         yield [['/base/path', '/base/path'], '/base/path'];
@@ -877,7 +874,7 @@ class PathTest extends TestCase
         $this->assertSame($basePath, Path::getLongestCommonBasePath($paths));
     }
 
-    public function provideIsBasePathTests(): Generator
+    public function provideIsBasePathTests(): \Generator
     {
         // same paths
         yield ['/base/path', '/base/path', true];
@@ -966,7 +963,7 @@ class PathTest extends TestCase
         $this->assertSame($result, Path::isBasePath($path, $ofPath));
     }
 
-    public function provideJoinTests(): Generator
+    public function provideJoinTests(): \Generator
     {
         yield [['', ''], ''];
         yield [['/path/to/test', ''], '/path/to/test'];

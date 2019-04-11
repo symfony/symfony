@@ -29,6 +29,7 @@ class RoundRobinTransport implements TransportInterface
     private $deadTransports;
     private $transports = [];
     private $retryPeriod;
+    private $cursor = 0;
 
     /**
      * @param TransportInterface[] $transports
@@ -62,20 +63,26 @@ class RoundRobinTransport implements TransportInterface
      */
     protected function getNextTransport(): ?TransportInterface
     {
-        while ($transport = array_shift($this->transports)) {
+        $cursor = $this->cursor;
+        while (true) {
+            $transport = $this->transports[$cursor];
+
             if (!$this->isTransportDead($transport)) {
                 break;
             }
+
             if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
                 $this->deadTransports->detach($transport);
 
                 break;
             }
+
+            if ($this->cursor === $cursor = $this->moveCursor($cursor)) {
+                return null;
+            }
         }
 
-        if ($transport) {
-            $this->transports[] = $transport;
-        }
+        $this->cursor = $this->moveCursor($cursor);
 
         return $transport;
     }
@@ -83,5 +90,10 @@ class RoundRobinTransport implements TransportInterface
     protected function isTransportDead(TransportInterface $transport): bool
     {
         return $this->deadTransports->contains($transport);
+    }
+
+    private function moveCursor(int $cursor): int
+    {
+        return ++$cursor >= \count($this->transports) ? 0 : $cursor;
     }
 }

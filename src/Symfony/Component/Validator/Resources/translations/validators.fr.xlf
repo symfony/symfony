@@ -360,7 +360,7 @@
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
-                <target>Ce mot de passe a été révélé par une faille de sécurité et ne doit plus être utilisé. Veuillez utiliser un autre mot de passe.</target>
+                <target>Ce mot de passe a été divulgué lors d'une fuite de données, il ne doit plus être utilisé. Veuillez utiliser un autre mot de passe.</target>
             </trans-unit>
         </body>
     </file>

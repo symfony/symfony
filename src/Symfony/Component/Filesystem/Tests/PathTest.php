@@ -375,9 +375,7 @@ class PathTest extends TestCase
      */
     public function testChangeExtension(string $path, string $extension, string $pathExpected): void
     {
-        static $call = 0;
         $this->assertSame($pathExpected, Path::changeExtension($path, $extension));
-        ++$call;
     }
 
     public function provideIsAbsolutePathTests(): \Generator

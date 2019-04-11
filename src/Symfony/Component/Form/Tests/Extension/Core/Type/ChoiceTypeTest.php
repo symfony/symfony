@@ -1841,12 +1841,11 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $builder = $this->factory->createBuilder();
         $builder->add('choice', static::TESTED_TYPE, [
-                'choices' => [
-                    '1' => '1',
-                    '2' => '2',
-                ],
-            ]
-        );
+            'choices' => [
+                '1' => '1',
+                '2' => '2',
+            ],
+        ]);
         $builder->add('subChoice', 'Symfony\Component\Form\Tests\Fixtures\ChoiceSubType');
         $form = $builder->getForm();
 

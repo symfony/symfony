@@ -180,16 +180,14 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register(NamedArgumentsVariadicsDummy::class, NamedArgumentsVariadicsDummy::class);
-        $definition->setArguments(
-            [
-                '$class' => new \stdClass(),
-                '$variadics' => [
-                    new Reference('foo'),
-                    new Reference('bar'),
-                    new Reference('baz'),
-                ],
-            ]
-        );
+        $definition->setArguments([
+            '$class' => new \stdClass(),
+            '$variadics' => [
+                new Reference('foo'),
+                new Reference('bar'),
+                new Reference('baz'),
+            ],
+        ]);
 
         $pass = new ResolveNamedArgumentsPass();
         $pass->process($container);

@@ -146,12 +146,10 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidHtml5Emails($email)
     {
-        $constraint = new Email(
-            [
-                'message' => 'myMessage',
-                'mode' => Email::VALIDATION_MODE_HTML5,
-            ]
-        );
+        $constraint = new Email([
+            'message' => 'myMessage',
+            'mode' => Email::VALIDATION_MODE_HTML5,
+        ]);
 
         $this->validator->validate($email, $constraint);
 

@@ -296,10 +296,7 @@ class PathTest extends TestCase
         yield ['/webmozart/symfony/style.CSS', true, 'css'];
         yield ['/webmozart/symfony/style.ÄÖÜ', false, 'ÄÖÜ'];
 
-        if (\extension_loaded('mbstring')) {
-            // This can only be tested, when mbstring is installed
-            yield ['/webmozart/symfony/style.ÄÖÜ', true, 'äöü'];
-        }
+        yield ['/webmozart/symfony/style.ÄÖÜ', true, 'äöü'];
     }
 
     /**
@@ -342,11 +339,9 @@ class PathTest extends TestCase
         yield [false, '/webmozart/symfony/style.css', ['foo', 'bar', ''], false];
         yield [false, '/webmozart/symfony/style.css', ['.foo', '.bar', ''], false];
 
-        if (\extension_loaded('mbstring')) {
-            // This can only be tested, when mbstring is installed
-            yield [true, '/webmozart/symfony/style.ÄÖÜ', 'äöü', true];
-            yield [true, '/webmozart/symfony/style.ÄÖÜ', ['äöü'], true];
-        }
+        // This can only be tested, when mbstring is installed
+        yield [true, '/webmozart/symfony/style.ÄÖÜ', 'äöü', true];
+        yield [true, '/webmozart/symfony/style.ÄÖÜ', ['äöü'], true];
     }
 
     /**

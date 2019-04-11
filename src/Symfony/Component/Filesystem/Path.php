@@ -306,8 +306,6 @@ final class Path
      * Returns the extension from a file path (without leading dot).
      *
      * @param bool   $forceLowerCase forces the extension to be lower-case
-     *                               (requires mbstring extension for correct
-     *                               multi-byte character handling in extension)
      */
     public static function getExtension(string $path, bool $forceLowerCase = false): string
     {
@@ -334,9 +332,6 @@ final class Path
      *                                         or array of extensions (with or
      *                                         without leading dot)
      * @param bool                 $ignoreCase whether to ignore case-sensitivity
-     *                                         (requires mbstring extension for
-     *                                         correct multi-byte character
-     *                                         handling in the extension)
      */
     public static function hasExtension(string $path, $extensions = null, bool $ignoreCase = false): bool
     {
@@ -578,9 +573,7 @@ final class Path
         // cannot generate a relative path
         if ('' !== $root && '' === $baseRoot) {
             throw new \InvalidArgumentException(\sprintf(
-                'The absolute path "%s" cannot be made relative to the '.
-                'relative path "%s". You should provide an absolute base '.
-                'path instead.',
+                'The absolute path "%s" cannot be made relative to the relative path "%s". You should provide an absolute base path instead.',
                 $path,
                 $basePath
             ));
@@ -589,8 +582,7 @@ final class Path
         // Fail if the roots of the two paths are different
         if ($baseRoot && $root !== $baseRoot) {
             throw new \InvalidArgumentException(\sprintf(
-                'The path "%s" cannot be made relative to "%s", because they '.
-                'have different roots ("%s" and "%s").',
+                'The path "%s" cannot be made relative to "%s", because they have different roots ("%s" and "%s").',
                 $path,
                 $basePath,
                 $root,
@@ -836,11 +828,7 @@ final class Path
      */
     private static function toLower(string $str): string
     {
-        if (\function_exists('mb_strtolower')) {
-            return \mb_strtolower($str, mb_detect_encoding($str));
-        }
-
-        return strtolower($str);
+        return \mb_strtolower($str, mb_detect_encoding($str));
     }
 
     private function __construct()

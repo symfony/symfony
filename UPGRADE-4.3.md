@@ -48,8 +48,8 @@ Doctrine Bridge
 Dotenv
 ------
 
- * First parameter of `Dotenv::__construct()` will change from `true` to `false` in Symfony 5.0. A deprecation warning
-   is triggered if no parameter is used. Use `$usePutenv = true` to upgrade without breaking changes.  
+ * First parameter of `Dotenv::__construct()` will be changed from `true` to `false` in Symfony 5.0. A deprecation warning
+   is triggered if no parameter is provided. Use `$usePutenv = true` to upgrade without breaking changes.
 
 EventDispatcher
 ---------------
@@ -170,7 +170,7 @@ SecurityBundle
 TwigBridge
 ----------
 
- * deprecated the `$requestStack` and `$requestContext` arguments of the 
+ * deprecated the `$requestStack` and `$requestContext` arguments of the
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead
 

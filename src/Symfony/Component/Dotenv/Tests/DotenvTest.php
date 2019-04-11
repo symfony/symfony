@@ -417,7 +417,7 @@ class DotenvTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The default value of "$usePutenv" argument of "%s's constructor will change from "true" to "false" in Symfony 5.0, you should define its value explicitly.
+     * @expectedDeprecation The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.
      */
     public function testDeprecationWarning()
     {

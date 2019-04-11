@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by scuben at 2019-04-08T21:52:17Z
+
+Hmm not sure why PHP 7.1 and 7.3 fails while 7.2 is green..?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T22:21:25Z
+
+The line running 7.2 tests branch 4.2 with dependencies set to master. It means it doesn't run the Mailer tests in practice here. You should focus on the other lines and make them green. Thanks.
+
+---------------------------------------------------------------------------
+
+by scuben at 2019-04-09T09:03:50Z
+
+Thank you @nicolas-grekas for pointing it out and please review my new tests carefully.

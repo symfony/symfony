@@ -87,7 +87,7 @@ class JsonDescriptor extends Descriptor
                 }
             }
         }
-        $data['has_normalizer'] = isset($definition['normalizer']);
+        $data['has_normalizer'] = isset($definition['normalizers']);
 
         $this->writeData($data, $options);
     }

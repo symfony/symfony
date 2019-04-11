@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-11T10:52:23Z
+
+It looks like the issue exists also on 3.4, isn't it?
+Can you please rebase+retarget for 3.4?
+Beware that you will have to use PHP5.5 compatible syntax.
+
+---------------------------------------------------------------------------
+
+by dhaarbrink at 2019-04-11T10:56:48Z
+
+No, the deprecation is from 4.2 onward: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Normalizer/AbstractNormalizer.php#L142
+
+Should my PR be PHP5.5 compatible for v4.2?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-11T11:03:02Z
+
+Oh, sorry. 4.2 is PHP7.1, so all good then.

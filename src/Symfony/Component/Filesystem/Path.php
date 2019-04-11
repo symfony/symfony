@@ -305,7 +305,7 @@ final class Path
     /**
      * Returns the extension from a file path (without leading dot).
      *
-     * @param bool   $forceLowerCase forces the extension to be lower-case
+     * @param bool $forceLowerCase forces the extension to be lower-case
      */
     public static function getExtension(string $path, bool $forceLowerCase = false): string
     {
@@ -469,8 +469,8 @@ final class Path
      * @param string $basePath an absolute base path
      *
      * @throws \InvalidArgumentException if the base path is not absolute or if
-     *                                  the given path is an absolute path with
-     *                                  a different root than the base path
+     *                                   the given path is an absolute path with
+     *                                   a different root than the base path
      */
     public static function makeAbsolute(string $path, string $basePath): string
     {
@@ -546,8 +546,8 @@ final class Path
      * The result is a canonical path.
      *
      * @throws \InvalidArgumentException if the base path is not absolute or if
-     *                                  the given path has a different root
-     *                                  than the base path
+     *                                   the given path has a different root
+     *                                   than the base path
      */
     public static function makeRelative(string $path, string $basePath): string
     {

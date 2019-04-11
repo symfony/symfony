@@ -43,124 +43,124 @@ class PathTest extends TestCase
     public function provideCanonicalizationTests(): \Generator
     {
         // relative paths (forward slash)
-       yield ['css/./style.css', 'css/style.css'];
-       yield ['css/../style.css', 'style.css'];
-       yield ['css/./../style.css', 'style.css'];
-       yield ['css/.././style.css', 'style.css'];
-       yield ['css/../../style.css', '../style.css'];
-       yield ['./css/style.css', 'css/style.css'];
-       yield ['../css/style.css', '../css/style.css'];
-       yield ['./../css/style.css', '../css/style.css'];
-       yield ['.././css/style.css', '../css/style.css'];
-       yield ['../../css/style.css', '../../css/style.css'];
-       yield ['', ''];
-       yield ['.', ''];
-       yield ['..', '..'];
-       yield ['./..', '..'];
-       yield ['../.', '..'];
-       yield ['../..', '../..'];
+        yield ['css/./style.css', 'css/style.css'];
+        yield ['css/../style.css', 'style.css'];
+        yield ['css/./../style.css', 'style.css'];
+        yield ['css/.././style.css', 'style.css'];
+        yield ['css/../../style.css', '../style.css'];
+        yield ['./css/style.css', 'css/style.css'];
+        yield ['../css/style.css', '../css/style.css'];
+        yield ['./../css/style.css', '../css/style.css'];
+        yield ['.././css/style.css', '../css/style.css'];
+        yield ['../../css/style.css', '../../css/style.css'];
+        yield ['', ''];
+        yield ['.', ''];
+        yield ['..', '..'];
+        yield ['./..', '..'];
+        yield ['../.', '..'];
+        yield ['../..', '../..'];
 
         // relative paths (backslash)
-       yield ['css\\.\\style.css', 'css/style.css'];
-       yield ['css\\..\\style.css', 'style.css'];
-       yield ['css\\.\\..\\style.css', 'style.css'];
-       yield ['css\\..\\.\\style.css', 'style.css'];
-       yield ['css\\..\\..\\style.css', '../style.css'];
-       yield ['.\\css\\style.css', 'css/style.css'];
-       yield ['..\\css\\style.css', '../css/style.css'];
-       yield ['.\\..\\css\\style.css', '../css/style.css'];
-       yield ['..\\.\\css\\style.css', '../css/style.css'];
-       yield ['..\\..\\css\\style.css', '../../css/style.css'];
+        yield ['css\\.\\style.css', 'css/style.css'];
+        yield ['css\\..\\style.css', 'style.css'];
+        yield ['css\\.\\..\\style.css', 'style.css'];
+        yield ['css\\..\\.\\style.css', 'style.css'];
+        yield ['css\\..\\..\\style.css', '../style.css'];
+        yield ['.\\css\\style.css', 'css/style.css'];
+        yield ['..\\css\\style.css', '../css/style.css'];
+        yield ['.\\..\\css\\style.css', '../css/style.css'];
+        yield ['..\\.\\css\\style.css', '../css/style.css'];
+        yield ['..\\..\\css\\style.css', '../../css/style.css'];
 
         // absolute paths (forward slash, UNIX)
-       yield ['/css/style.css', '/css/style.css'];
-       yield ['/css/./style.css', '/css/style.css'];
-       yield ['/css/../style.css', '/style.css'];
-       yield ['/css/./../style.css', '/style.css'];
-       yield ['/css/.././style.css', '/style.css'];
-       yield ['/./css/style.css', '/css/style.css'];
-       yield ['/../css/style.css', '/css/style.css'];
-       yield ['/./../css/style.css', '/css/style.css'];
-       yield ['/.././css/style.css', '/css/style.css'];
-       yield ['/../../css/style.css', '/css/style.css'];
+        yield ['/css/style.css', '/css/style.css'];
+        yield ['/css/./style.css', '/css/style.css'];
+        yield ['/css/../style.css', '/style.css'];
+        yield ['/css/./../style.css', '/style.css'];
+        yield ['/css/.././style.css', '/style.css'];
+        yield ['/./css/style.css', '/css/style.css'];
+        yield ['/../css/style.css', '/css/style.css'];
+        yield ['/./../css/style.css', '/css/style.css'];
+        yield ['/.././css/style.css', '/css/style.css'];
+        yield ['/../../css/style.css', '/css/style.css'];
 
         // absolute paths (backslash, UNIX)
-       yield ['\\css\\style.css', '/css/style.css'];
-       yield ['\\css\\.\\style.css', '/css/style.css'];
-       yield ['\\css\\..\\style.css', '/style.css'];
-       yield ['\\css\\.\\..\\style.css', '/style.css'];
-       yield ['\\css\\..\\.\\style.css', '/style.css'];
-       yield ['\\.\\css\\style.css', '/css/style.css'];
-       yield ['\\..\\css\\style.css', '/css/style.css'];
-       yield ['\\.\\..\\css\\style.css', '/css/style.css'];
-       yield ['\\..\\.\\css\\style.css', '/css/style.css'];
-       yield ['\\..\\..\\css\\style.css', '/css/style.css'];
+        yield ['\\css\\style.css', '/css/style.css'];
+        yield ['\\css\\.\\style.css', '/css/style.css'];
+        yield ['\\css\\..\\style.css', '/style.css'];
+        yield ['\\css\\.\\..\\style.css', '/style.css'];
+        yield ['\\css\\..\\.\\style.css', '/style.css'];
+        yield ['\\.\\css\\style.css', '/css/style.css'];
+        yield ['\\..\\css\\style.css', '/css/style.css'];
+        yield ['\\.\\..\\css\\style.css', '/css/style.css'];
+        yield ['\\..\\.\\css\\style.css', '/css/style.css'];
+        yield ['\\..\\..\\css\\style.css', '/css/style.css'];
 
         // absolute paths (forward slash, Windows)
-       yield ['C:/css/style.css', 'C:/css/style.css'];
-       yield ['C:/css/./style.css', 'C:/css/style.css'];
-       yield ['C:/css/../style.css', 'C:/style.css'];
-       yield ['C:/css/./../style.css', 'C:/style.css'];
-       yield ['C:/css/.././style.css', 'C:/style.css'];
-       yield ['C:/./css/style.css', 'C:/css/style.css'];
-       yield ['C:/../css/style.css', 'C:/css/style.css'];
-       yield ['C:/./../css/style.css', 'C:/css/style.css'];
-       yield ['C:/.././css/style.css', 'C:/css/style.css'];
-       yield ['C:/../../css/style.css', 'C:/css/style.css'];
+        yield ['C:/css/style.css', 'C:/css/style.css'];
+        yield ['C:/css/./style.css', 'C:/css/style.css'];
+        yield ['C:/css/../style.css', 'C:/style.css'];
+        yield ['C:/css/./../style.css', 'C:/style.css'];
+        yield ['C:/css/.././style.css', 'C:/style.css'];
+        yield ['C:/./css/style.css', 'C:/css/style.css'];
+        yield ['C:/../css/style.css', 'C:/css/style.css'];
+        yield ['C:/./../css/style.css', 'C:/css/style.css'];
+        yield ['C:/.././css/style.css', 'C:/css/style.css'];
+        yield ['C:/../../css/style.css', 'C:/css/style.css'];
 
         // absolute paths (backslash, Windows)
-       yield ['C:\\css\\style.css', 'C:/css/style.css'];
-       yield ['C:\\css\\.\\style.css', 'C:/css/style.css'];
-       yield ['C:\\css\\..\\style.css', 'C:/style.css'];
-       yield ['C:\\css\\.\\..\\style.css', 'C:/style.css'];
-       yield ['C:\\css\\..\\.\\style.css', 'C:/style.css'];
-       yield ['C:\\.\\css\\style.css', 'C:/css/style.css'];
-       yield ['C:\\..\\css\\style.css', 'C:/css/style.css'];
-       yield ['C:\\.\\..\\css\\style.css', 'C:/css/style.css'];
-       yield ['C:\\..\\.\\css\\style.css', 'C:/css/style.css'];
-       yield ['C:\\..\\..\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\css\\.\\style.css', 'C:/css/style.css'];
+        yield ['C:\\css\\..\\style.css', 'C:/style.css'];
+        yield ['C:\\css\\.\\..\\style.css', 'C:/style.css'];
+        yield ['C:\\css\\..\\.\\style.css', 'C:/style.css'];
+        yield ['C:\\.\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\..\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\.\\..\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\..\\.\\css\\style.css', 'C:/css/style.css'];
+        yield ['C:\\..\\..\\css\\style.css', 'C:/css/style.css'];
 
         // Windows special case
-       yield ['C:', 'C:/'];
+        yield ['C:', 'C:/'];
 
         // Don't change malformed path
-       yield ['C:css/style.css', 'C:css/style.css'];
+        yield ['C:css/style.css', 'C:css/style.css'];
 
         // absolute paths (stream, UNIX)
-       yield ['phar:///css/style.css', 'phar:///css/style.css'];
-       yield ['phar:///css/./style.css', 'phar:///css/style.css'];
-       yield ['phar:///css/../style.css', 'phar:///style.css'];
-       yield ['phar:///css/./../style.css', 'phar:///style.css'];
-       yield ['phar:///css/.././style.css', 'phar:///style.css'];
-       yield ['phar:///./css/style.css', 'phar:///css/style.css'];
-       yield ['phar:///../css/style.css', 'phar:///css/style.css'];
-       yield ['phar:///./../css/style.css', 'phar:///css/style.css'];
-       yield ['phar:///.././css/style.css', 'phar:///css/style.css'];
-       yield ['phar:///../../css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///css/./style.css', 'phar:///css/style.css'];
+        yield ['phar:///css/../style.css', 'phar:///style.css'];
+        yield ['phar:///css/./../style.css', 'phar:///style.css'];
+        yield ['phar:///css/.././style.css', 'phar:///style.css'];
+        yield ['phar:///./css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///../css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///./../css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///.././css/style.css', 'phar:///css/style.css'];
+        yield ['phar:///../../css/style.css', 'phar:///css/style.css'];
 
         // absolute paths (stream, Windows)
-       yield ['phar://C:/css/style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/css/./style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/css/../style.css', 'phar://C:/style.css'];
-       yield ['phar://C:/css/./../style.css', 'phar://C:/style.css'];
-       yield ['phar://C:/css/.././style.css', 'phar://C:/style.css'];
-       yield ['phar://C:/./css/style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/../css/style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/./../css/style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/.././css/style.css', 'phar://C:/css/style.css'];
-       yield ['phar://C:/../../css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/css/./style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/css/../style.css', 'phar://C:/style.css'];
+        yield ['phar://C:/css/./../style.css', 'phar://C:/style.css'];
+        yield ['phar://C:/css/.././style.css', 'phar://C:/style.css'];
+        yield ['phar://C:/./css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/../css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/./../css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/.././css/style.css', 'phar://C:/css/style.css'];
+        yield ['phar://C:/../../css/style.css', 'phar://C:/css/style.css'];
 
         // paths with "~" UNIX
-       yield ['~/css/style.css', '/home/webmozart/css/style.css'];
-       yield ['~/css/./style.css', '/home/webmozart/css/style.css'];
-       yield ['~/css/../style.css', '/home/webmozart/style.css'];
-       yield ['~/css/./../style.css', '/home/webmozart/style.css'];
-       yield ['~/css/.././style.css', '/home/webmozart/style.css'];
-       yield ['~/./css/style.css', '/home/webmozart/css/style.css'];
-       yield ['~/../css/style.css', '/home/css/style.css'];
-       yield ['~/./../css/style.css', '/home/css/style.css'];
-       yield ['~/.././css/style.css', '/home/css/style.css'];
-       yield ['~/../../css/style.css', '/css/style.css'];
+        yield ['~/css/style.css', '/home/webmozart/css/style.css'];
+        yield ['~/css/./style.css', '/home/webmozart/css/style.css'];
+        yield ['~/css/../style.css', '/home/webmozart/style.css'];
+        yield ['~/css/./../style.css', '/home/webmozart/style.css'];
+        yield ['~/css/.././style.css', '/home/webmozart/style.css'];
+        yield ['~/./css/style.css', '/home/webmozart/css/style.css'];
+        yield ['~/../css/style.css', '/home/css/style.css'];
+        yield ['~/./../css/style.css', '/home/css/style.css'];
+        yield ['~/.././css/style.css', '/home/css/style.css'];
+        yield ['~/../../css/style.css', '/css/style.css'];
     }
 
     /**
@@ -479,7 +479,7 @@ class PathTest extends TestCase
         foreach ($this->providePathTests() as $set) {
             yield $set;
         }
-        
+
         // collapse dots
         yield ['css/./style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
         yield ['css/../style.css', '/webmozart/symfony', '/webmozart/symfony/style.css'];
@@ -608,7 +608,7 @@ class PathTest extends TestCase
         foreach ($this->providePathTests() as $set) {
             yield [$set[2], $set[1], $set[0]];
         }
-        
+
         yield ['/webmozart/symfony/./css/style.css', '/webmozart/symfony', 'css/style.css'];
         yield ['/webmozart/symfony/../css/style.css', '/webmozart/symfony', '../css/style.css'];
         yield ['/webmozart/symfony/.././css/style.css', '/webmozart/symfony', '../css/style.css'];
@@ -714,7 +714,6 @@ class PathTest extends TestCase
 
     public function testMakeRelativeFailsIfAbsolutePathAndBasePathEmpty(): void
     {
-        
         $this->expectExceptionMessage('The absolute path "/webmozart/symfony/css/style.css" cannot be made relative to the relative path "". You should provide an absolute base path instead.');
 
         Path::makeRelative('/webmozart/symfony/css/style.css', '');
@@ -726,7 +725,7 @@ class PathTest extends TestCase
     public function testMakeRelativeFailsIfDifferentRoot(string $absolutePath, string $basePath): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        
+
         Path::makeRelative($absolutePath, $basePath);
     }
 
@@ -859,7 +858,7 @@ class PathTest extends TestCase
 
     /**
      * @dataProvider provideGetLongestCommonBasePathTests
-     * 
+     *
      * @param string[] $paths
      */
     public function testGetLongestCommonBasePath(array $paths, ?string $basePath): void

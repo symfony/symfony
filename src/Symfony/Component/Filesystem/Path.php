@@ -63,10 +63,6 @@ final class Path
      * ```
      *
      * This method is able to deal with both UNIX and Windows paths.
-     *
-     * @param string $path a path string
-     *
-     * @return string the canonical path
      */
     public static function canonicalize(string $path): string
     {
@@ -138,10 +134,6 @@ final class Path
      * path.
      *
      * This method is able to deal with both UNIX and Windows paths.
-     *
-     * @param string $path a path string
-     *
-     * @return string the normalized path
      */
     public static function normalize(string $path): string
     {
@@ -165,8 +157,6 @@ final class Path
      * otherwise.
      *
      * The result is a canonical path.
-     *
-     * @param string $path a path string
      *
      * @return string The canonical directory part. Returns the root directory
      *                if the root directory is passed. Returns an empty string
@@ -218,8 +208,6 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @return string The canonical home directory
-     *
      * @throws \RuntimeException If your operation system or environment isn't supported
      */
     public static function getHomeDirectory(): string
@@ -234,15 +222,13 @@ final class Path
             return static::canonicalize(\getenv('HOMEDRIVE').\getenv('HOMEPATH'));
         }
 
-        throw new \RuntimeException("Your environment or operation system isn't supported");
+        throw new \RuntimeException("Cannot find the home directory path: Your environment or operation system isn't supported");
     }
 
     /**
      * Returns the root directory of a path.
      *
      * The result is a canonical path.
-     *
-     * @param string $path a path string
      *
      * @return string The canonical root directory. Returns an empty string if
      *                the given path is relative or empty.
@@ -286,10 +272,6 @@ final class Path
 
     /**
      * Returns the file name from a file path.
-     *
-     * @param string $path the path string
-     *
-     * @return string the file name
      */
     public static function getFilename(string $path): string
     {
@@ -303,11 +285,8 @@ final class Path
     /**
      * Returns the file name without the extension from a file path.
      *
-     * @param string      $path      the path string
      * @param string|null $extension if specified, only that extension is cut
      *                               off (may contain leading dot)
-     *
-     * @return string the file name without extension
      */
     public static function getFilenameWithoutExtension(string $path, ?string $extension = null)
     {
@@ -324,14 +303,11 @@ final class Path
     }
 
     /**
-     * Returns the extension from a file path.
+     * Returns the extension from a file path (without leading dot).
      *
-     * @param string $path           the path string
      * @param bool   $forceLowerCase forces the extension to be lower-case
      *                               (requires mbstring extension for correct
      *                               multi-byte character handling in extension)
-     *
-     * @return string the extension of the file path (without leading dot)
      */
     public static function getExtension(string $path, bool $forceLowerCase = false): string
     {
@@ -349,7 +325,7 @@ final class Path
     }
 
     /**
-     * Returns whether the path has an extension.
+     * Returns whether the path has an (or the specified) extension.
      *
      * @param string               $path       the path string
      * @param string|string[]|null $extensions if null or not provided, checks if
@@ -361,9 +337,6 @@ final class Path
      *                                         (requires mbstring extension for
      *                                         correct multi-byte character
      *                                         handling in the extension)
-     *
-     * @return bool returns `true` if the path has an (or the specified)
-     *              extension and `false` otherwise
      */
     public static function hasExtension(string $path, $extensions = null, bool $ignoreCase = false): bool
     {
@@ -426,11 +399,6 @@ final class Path
 
     /**
      * Returns whether a path is absolute.
-     *
-     * @param string $path a path string
-     *
-     * @return bool returns true if the path is absolute, false if it is
-     *              relative or empty
      */
     public static function isAbsolute(string $path): bool
     {
@@ -465,12 +433,7 @@ final class Path
     }
 
     /**
-     * Returns whether a path is relative.
-     *
-     * @param string $path a path string
-     *
-     * @return bool returns true if the path is relative or empty, false if
-     *              it is absolute
+     * Returns whether or not a path is relative.
      */
     public static function isRelative(string $path): bool
     {
@@ -478,7 +441,7 @@ final class Path
     }
 
     /**
-     * Turns a relative path into an absolute path.
+     * Turns a relative path into an absolute path in canonical form.
      *
      * Usually, the relative path is appended to the given base path. Dot
      * segments ("." and "..") are removed/collapsed and all slashes turned
@@ -508,10 +471,7 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path     a path to make absolute
      * @param string $basePath an absolute base path
-     *
-     * @return string an absolute path in canonical form
      *
      * @throws \InvalidArgumentException if the base path is not absolute or if
      *                                  the given path is an absolute path with
@@ -590,11 +550,6 @@ final class Path
      *
      * The result is a canonical path.
      *
-     * @param string $path     a path to make relative
-     * @param string $basePath a base path
-     *
-     * @return string a relative path in canonical form
-     *
      * @throws \InvalidArgumentException if the base path is not absolute or if
      *                                  the given path has a different root
      *                                  than the base path
@@ -672,10 +627,6 @@ final class Path
 
     /**
      * Returns whether the given path is on the local filesystem.
-     *
-     * @param string $path a path string
-     *
-     * @return bool returns true if the path is local, false for a URL
      */
     public static function isLocal(string $path): bool
     {
@@ -683,26 +634,27 @@ final class Path
     }
 
     /**
-     * Returns the longest common base path of a set of paths.
+     * Returns the longest common base path in canonical form of a set of paths or
+     * `null` if the paths are on different Windows partitions.
      *
      * Dot segments ("." and "..") are removed/collapsed and all slashes turned
      * into forward slashes.
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath(array(
+     * $basePath = Path::getLongestCommonBasePath([
      *     '/webmozart/css/style.css',
      *     '/webmozart/css/..'
-     * ));
+     * ]);
      * // => /webmozart
      * ```
      *
      * The root is returned if no common base path can be found:
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath(array(
+     * $basePath = Path::getLongestCommonBasePath([
      *     '/webmozart/css/style.css',
      *     '/puli/css/..'
-     * ));
+     * ]);
      * // => /
      * ```
      *
@@ -710,20 +662,14 @@ final class Path
      * returned.
      *
      * ```php
-     * $basePath = Path::getLongestCommonBasePath(array(
+     * $basePath = Path::getLongestCommonBasePath([
      *     'C:/webmozart/css/style.css',
      *     'D:/webmozart/css/..'
-     * ));
+     * ]);
      * // => null
      * ```
-     *
-     * @param string[] $paths a list of paths
-     *
-     * @return string|null the longest common base path in canonical form or
-     *                     `null` if the paths are on different Windows
-     *                     partitions
      */
-    public static function getLongestCommonBasePath(array $paths): ?string
+    public static function getLongestCommonBasePath(string ...$paths): ?string
     {
         [$bpRoot, $basePath] = self::split(self::canonicalize(reset($paths)));
 
@@ -761,11 +707,7 @@ final class Path
     }
 
     /**
-     * Joins two or more path strings.
-     *
-     * The result is a canonical path.
-     *
-     * @return string the joint path
+     * Joins two or more path strings into a canonical path.
      */
     public static function join(string ...$paths): string
     {
@@ -822,11 +764,6 @@ final class Path
      * Path::isBasePath('/webmozart', '/puli');
      * // => false
      * ```
-     *
-     * @param string $basePath the base path to test
-     * @param string $ofPath   the other path
-     *
-     * @return bool whether the base path is a base path of the other path
      */
     public static function isBasePath(string $basePath, string $ofPath): bool
     {
@@ -842,7 +779,7 @@ final class Path
     }
 
     /**
-     * Splits a part into its root directory and the remainder.
+     * Splits a canonical path into its root directory and the remainder.
      *
      * If the path has no root directory, an empty root directory will be
      * returned.
@@ -851,12 +788,10 @@ final class Path
      * will always contain a trailing slash.
      *
      * list ($root, $path) = Path::split("C:/webmozart")
-     * // => array("C:/", "webmozart")
+     * // => ["C:/", "webmozart"]
      *
      * list ($root, $path) = Path::split("C:")
-     * // => array("C:/", "")
-     *
-     * @param string $path the canonical path to split
+     * // => ["C:/", ""]
      *
      * @return string[] an array with the root directory and the remaining
      *                  relative path
@@ -897,11 +832,7 @@ final class Path
     }
 
     /**
-     * Converts string to lower-case (multi-byte safe if mbstring is installed).
-     *
-     * @param string $str The string
-     *
-     * @return string Lower case string
+     * Converts string to lower-case.
      */
     private static function toLower(string $str): string
     {

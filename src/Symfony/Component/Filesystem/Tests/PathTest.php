@@ -173,51 +173,51 @@ class PathTest extends TestCase
 
     public function provideGetDirectoryTests(): \Generator
     {
-        yield ['/webmozart/puli/style.css', '/webmozart/puli'];
-        yield ['/webmozart/puli', '/webmozart'];
+        yield ['/webmozart/symfony/style.css', '/webmozart/symfony'];
+        yield ['/webmozart/symfony', '/webmozart'];
         yield ['/webmozart', '/'];
         yield ['/', '/'];
         yield ['', ''];
 
-        yield ['\\webmozart\\puli\\style.css', '/webmozart/puli'];
-        yield ['\\webmozart\\puli', '/webmozart'];
+        yield ['\\webmozart\\symfony\\style.css', '/webmozart/symfony'];
+        yield ['\\webmozart\\symfony', '/webmozart'];
         yield ['\\webmozart', '/'];
         yield ['\\', '/'];
 
-        yield ['C:/webmozart/puli/style.css', 'C:/webmozart/puli'];
-        yield ['C:/webmozart/puli', 'C:/webmozart'];
+        yield ['C:/webmozart/symfony/style.css', 'C:/webmozart/symfony'];
+        yield ['C:/webmozart/symfony', 'C:/webmozart'];
         yield ['C:/webmozart', 'C:/'];
         yield ['C:/', 'C:/'];
         yield ['C:', 'C:/'];
 
-        yield ['C:\\webmozart\\puli\\style.css', 'C:/webmozart/puli'];
-        yield ['C:\\webmozart\\puli', 'C:/webmozart'];
+        yield ['C:\\webmozart\\symfony\\style.css', 'C:/webmozart/symfony'];
+        yield ['C:\\webmozart\\symfony', 'C:/webmozart'];
         yield ['C:\\webmozart', 'C:/'];
         yield ['C:\\', 'C:/'];
 
-        yield ['phar:///webmozart/puli/style.css', 'phar:///webmozart/puli'];
-        yield ['phar:///webmozart/puli', 'phar:///webmozart'];
+        yield ['phar:///webmozart/symfony/style.css', 'phar:///webmozart/symfony'];
+        yield ['phar:///webmozart/symfony', 'phar:///webmozart'];
         yield ['phar:///webmozart', 'phar:///'];
         yield ['phar:///', 'phar:///'];
 
-        yield ['phar://C:/webmozart/puli/style.css', 'phar://C:/webmozart/puli'];
-        yield ['phar://C:/webmozart/puli', 'phar://C:/webmozart'];
+        yield ['phar://C:/webmozart/symfony/style.css', 'phar://C:/webmozart/symfony'];
+        yield ['phar://C:/webmozart/symfony', 'phar://C:/webmozart'];
         yield ['phar://C:/webmozart', 'phar://C:/'];
         yield ['phar://C:/', 'phar://C:/'];
 
-        yield ['webmozart/puli/style.css', 'webmozart/puli'];
-        yield ['webmozart/puli', 'webmozart'];
+        yield ['webmozart/symfony/style.css', 'webmozart/symfony'];
+        yield ['webmozart/symfony', 'webmozart'];
         yield ['webmozart', ''];
 
-        yield ['webmozart\\puli\\style.css', 'webmozart/puli'];
-        yield ['webmozart\\puli', 'webmozart'];
+        yield ['webmozart\\symfony\\style.css', 'webmozart/symfony'];
+        yield ['webmozart\\symfony', 'webmozart'];
         yield ['webmozart', ''];
 
-        yield ['/webmozart/./puli/style.css', '/webmozart/puli'];
-        yield ['/webmozart/../puli/style.css', '/puli'];
-        yield ['/webmozart/./../puli/style.css', '/puli'];
-        yield ['/webmozart/.././puli/style.css', '/puli'];
-        yield ['/webmozart/../../puli/style.css', '/puli'];
+        yield ['/webmozart/./symfony/style.css', '/webmozart/symfony'];
+        yield ['/webmozart/../symfony/style.css', '/symfony'];
+        yield ['/webmozart/./../symfony/style.css', '/symfony'];
+        yield ['/webmozart/.././symfony/style.css', '/symfony'];
+        yield ['/webmozart/../../symfony/style.css', '/symfony'];
         yield ['/.', '/'];
         yield ['/..', '/'];
 
@@ -234,11 +234,11 @@ class PathTest extends TestCase
 
     public function provideGetFilenameTests(): \Generator
     {
-        yield ['/webmozart/puli/style.css', 'style.css'];
-        yield ['/webmozart/puli/STYLE.CSS', 'STYLE.CSS'];
-        yield ['/webmozart/puli/style.css/', 'style.css'];
-        yield ['/webmozart/puli/', 'puli'];
-        yield ['/webmozart/puli', 'puli'];
+        yield ['/webmozart/symfony/style.css', 'style.css'];
+        yield ['/webmozart/symfony/STYLE.CSS', 'STYLE.CSS'];
+        yield ['/webmozart/symfony/style.css/', 'style.css'];
+        yield ['/webmozart/symfony/', 'symfony'];
+        yield ['/webmozart/symfony', 'symfony'];
         yield ['/', ''];
         yield ['', ''];
     }
@@ -253,25 +253,25 @@ class PathTest extends TestCase
 
     public function provideGetFilenameWithoutExtensionTests(): \Generator
     {
-        yield ['/webmozart/puli/style.css.twig', null, 'style.css'];
-        yield ['/webmozart/puli/style.css.', null, 'style.css'];
-        yield ['/webmozart/puli/style.css', null, 'style'];
-        yield ['/webmozart/puli/.style.css', null, '.style'];
-        yield ['/webmozart/puli/', null, 'puli'];
-        yield ['/webmozart/puli', null, 'puli'];
+        yield ['/webmozart/symfony/style.css.twig', null, 'style.css'];
+        yield ['/webmozart/symfony/style.css.', null, 'style.css'];
+        yield ['/webmozart/symfony/style.css', null, 'style'];
+        yield ['/webmozart/symfony/.style.css', null, '.style'];
+        yield ['/webmozart/symfony/', null, 'symfony'];
+        yield ['/webmozart/symfony', null, 'symfony'];
         yield ['/', null, ''];
         yield ['', null, ''];
 
-        yield ['/webmozart/puli/style.css', 'css', 'style'];
-        yield ['/webmozart/puli/style.css', '.css', 'style'];
-        yield ['/webmozart/puli/style.css', 'twig', 'style.css'];
-        yield ['/webmozart/puli/style.css', '.twig', 'style.css'];
-        yield ['/webmozart/puli/style.css', '', 'style.css'];
-        yield ['/webmozart/puli/style.css.', '', 'style.css'];
-        yield ['/webmozart/puli/style.css.', '.', 'style.css'];
-        yield ['/webmozart/puli/style.css.', '.css', 'style.css'];
-        yield ['/webmozart/puli/.style.css', 'css', '.style'];
-        yield ['/webmozart/puli/.style.css', '.css', '.style'];
+        yield ['/webmozart/symfony/style.css', 'css', 'style'];
+        yield ['/webmozart/symfony/style.css', '.css', 'style'];
+        yield ['/webmozart/symfony/style.css', 'twig', 'style.css'];
+        yield ['/webmozart/symfony/style.css', '.twig', 'style.css'];
+        yield ['/webmozart/symfony/style.css', '', 'style.css'];
+        yield ['/webmozart/symfony/style.css.', '', 'style.css'];
+        yield ['/webmozart/symfony/style.css.', '.', 'style.css'];
+        yield ['/webmozart/symfony/style.css.', '.css', 'style.css'];
+        yield ['/webmozart/symfony/.style.css', 'css', '.style'];
+        yield ['/webmozart/symfony/.style.css', '.css', '.style'];
     }
 
     /**
@@ -284,21 +284,21 @@ class PathTest extends TestCase
 
     public function provideGetExtensionTests(): \Generator
     {
-        yield ['/webmozart/puli/style.css.twig', false, 'twig'];
-        yield ['/webmozart/puli/style.css', false, 'css'];
-        yield ['/webmozart/puli/style.css.', false, ''];
-        yield ['/webmozart/puli/', false, ''];
-        yield ['/webmozart/puli', false, ''];
+        yield ['/webmozart/symfony/style.css.twig', false, 'twig'];
+        yield ['/webmozart/symfony/style.css', false, 'css'];
+        yield ['/webmozart/symfony/style.css.', false, ''];
+        yield ['/webmozart/symfony/', false, ''];
+        yield ['/webmozart/symfony', false, ''];
         yield ['/', false, ''];
         yield ['', false, ''];
 
-        yield ['/webmozart/puli/style.CSS', false, 'CSS'];
-        yield ['/webmozart/puli/style.CSS', true, 'css'];
-        yield ['/webmozart/puli/style.ÄÖÜ', false, 'ÄÖÜ'];
+        yield ['/webmozart/symfony/style.CSS', false, 'CSS'];
+        yield ['/webmozart/symfony/style.CSS', true, 'css'];
+        yield ['/webmozart/symfony/style.ÄÖÜ', false, 'ÄÖÜ'];
 
         if (\extension_loaded('mbstring')) {
             // This can only be tested, when mbstring is installed
-            yield ['/webmozart/puli/style.ÄÖÜ', true, 'äöü'];
+            yield ['/webmozart/symfony/style.ÄÖÜ', true, 'äöü'];
         }
     }
 
@@ -312,40 +312,40 @@ class PathTest extends TestCase
 
     public function provideHasExtensionTests(): \Generator
     {
-        yield [true, '/webmozart/puli/style.css.twig', null, false];
-        yield [true, '/webmozart/puli/style.css', null, false];
-        yield [false, '/webmozart/puli/style.css.', null, false];
-        yield [false, '/webmozart/puli/', null, false];
-        yield [false, '/webmozart/puli', null, false];
+        yield [true, '/webmozart/symfony/style.css.twig', null, false];
+        yield [true, '/webmozart/symfony/style.css', null, false];
+        yield [false, '/webmozart/symfony/style.css.', null, false];
+        yield [false, '/webmozart/symfony/', null, false];
+        yield [false, '/webmozart/symfony', null, false];
         yield [false, '/', null, false];
         yield [false, '', null, false];
 
-        yield [true, '/webmozart/puli/style.css.twig', 'twig', false];
-        yield [false, '/webmozart/puli/style.css.twig', 'css', false];
-        yield [true, '/webmozart/puli/style.css', 'css', false];
-        yield [true, '/webmozart/puli/style.css', '.css', false];
-        yield [true, '/webmozart/puli/style.css.', '', false];
-        yield [false, '/webmozart/puli/', 'ext', false];
-        yield [false, '/webmozart/puli', 'ext', false];
+        yield [true, '/webmozart/symfony/style.css.twig', 'twig', false];
+        yield [false, '/webmozart/symfony/style.css.twig', 'css', false];
+        yield [true, '/webmozart/symfony/style.css', 'css', false];
+        yield [true, '/webmozart/symfony/style.css', '.css', false];
+        yield [true, '/webmozart/symfony/style.css.', '', false];
+        yield [false, '/webmozart/symfony/', 'ext', false];
+        yield [false, '/webmozart/symfony', 'ext', false];
         yield [false, '/', 'ext', false];
         yield [false, '', 'ext', false];
 
-        yield [false, '/webmozart/puli/style.css', 'CSS', false];
-        yield [true, '/webmozart/puli/style.css', 'CSS', true];
-        yield [false, '/webmozart/puli/style.CSS', 'css', false];
-        yield [true, '/webmozart/puli/style.CSS', 'css', true];
-        yield [true, '/webmozart/puli/style.ÄÖÜ', 'ÄÖÜ', false];
+        yield [false, '/webmozart/symfony/style.css', 'CSS', false];
+        yield [true, '/webmozart/symfony/style.css', 'CSS', true];
+        yield [false, '/webmozart/symfony/style.CSS', 'css', false];
+        yield [true, '/webmozart/symfony/style.CSS', 'css', true];
+        yield [true, '/webmozart/symfony/style.ÄÖÜ', 'ÄÖÜ', false];
 
-        yield [true, '/webmozart/puli/style.css', ['ext', 'css'], false];
-        yield [true, '/webmozart/puli/style.css', ['.ext', '.css'], false];
-        yield [true, '/webmozart/puli/style.css.', ['ext', ''], false];
-        yield [false, '/webmozart/puli/style.css', ['foo', 'bar', ''], false];
-        yield [false, '/webmozart/puli/style.css', ['.foo', '.bar', ''], false];
+        yield [true, '/webmozart/symfony/style.css', ['ext', 'css'], false];
+        yield [true, '/webmozart/symfony/style.css', ['.ext', '.css'], false];
+        yield [true, '/webmozart/symfony/style.css.', ['ext', ''], false];
+        yield [false, '/webmozart/symfony/style.css', ['foo', 'bar', ''], false];
+        yield [false, '/webmozart/symfony/style.css', ['.foo', '.bar', ''], false];
 
         if (\extension_loaded('mbstring')) {
             // This can only be tested, when mbstring is installed
-            yield [true, '/webmozart/puli/style.ÄÖÜ', 'äöü', true];
-            yield [true, '/webmozart/puli/style.ÄÖÜ', ['äöü'], true];
+            yield [true, '/webmozart/symfony/style.ÄÖÜ', 'äöü', true];
+            yield [true, '/webmozart/symfony/style.ÄÖÜ', ['äöü'], true];
         }
     }
 
@@ -361,16 +361,16 @@ class PathTest extends TestCase
 
     public function provideChangeExtensionTests(): \Generator
     {
-        yield ['/webmozart/puli/style.css.twig', 'html', '/webmozart/puli/style.css.html'];
-        yield ['/webmozart/puli/style.css', 'sass', '/webmozart/puli/style.sass'];
-        yield ['/webmozart/puli/style.css', '.sass', '/webmozart/puli/style.sass'];
-        yield ['/webmozart/puli/style.css', '', '/webmozart/puli/style.'];
-        yield ['/webmozart/puli/style.css.', 'twig', '/webmozart/puli/style.css.twig'];
-        yield ['/webmozart/puli/style.css.', '', '/webmozart/puli/style.css.'];
-        yield ['/webmozart/puli/style.css', 'äöü', '/webmozart/puli/style.äöü'];
-        yield ['/webmozart/puli/style.äöü', 'css', '/webmozart/puli/style.css'];
-        yield ['/webmozart/puli/', 'css', '/webmozart/puli/'];
-        yield ['/webmozart/puli', 'css', '/webmozart/puli.css'];
+        yield ['/webmozart/symfony/style.css.twig', 'html', '/webmozart/symfony/style.css.html'];
+        yield ['/webmozart/symfony/style.css', 'sass', '/webmozart/symfony/style.sass'];
+        yield ['/webmozart/symfony/style.css', '.sass', '/webmozart/symfony/style.sass'];
+        yield ['/webmozart/symfony/style.css', '', '/webmozart/symfony/style.'];
+        yield ['/webmozart/symfony/style.css.', 'twig', '/webmozart/symfony/style.css.twig'];
+        yield ['/webmozart/symfony/style.css.', '', '/webmozart/symfony/style.css.'];
+        yield ['/webmozart/symfony/style.css', 'äöü', '/webmozart/symfony/style.äöü'];
+        yield ['/webmozart/symfony/style.äöü', 'css', '/webmozart/symfony/style.css'];
+        yield ['/webmozart/symfony/', 'css', '/webmozart/symfony/'];
+        yield ['/webmozart/symfony', 'css', '/webmozart/symfony.css'];
         yield ['/', 'css', '/'];
         yield ['', 'css', ''];
     }
@@ -465,9 +465,9 @@ class PathTest extends TestCase
     public function providePathTests(): \Generator
     {
         // relative to absolute path
-        yield ['css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'];
-        yield ['../css/style.css', '/webmozart/puli', '/webmozart/css/style.css'];
-        yield ['../../css/style.css', '/webmozart/puli', '/css/style.css'];
+        yield ['css/style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
+        yield ['../css/style.css', '/webmozart/symfony', '/webmozart/css/style.css'];
+        yield ['../../css/style.css', '/webmozart/symfony', '/css/style.css'];
 
         // relative to root
         yield ['css/style.css', '/', '/css/style.css'];
@@ -475,10 +475,10 @@ class PathTest extends TestCase
         yield ['css/style.css', 'C:/', 'C:/css/style.css'];
 
         // same sub directories in different base directories
-        yield ['../../puli/css/style.css', '/webmozart/css', '/puli/css/style.css'];
+        yield ['../../symfony/css/style.css', '/webmozart/css', '/symfony/css/style.css'];
 
-        yield ['', '/webmozart/puli', '/webmozart/puli'];
-        yield ['..', '/webmozart/puli', '/webmozart'];
+        yield ['', '/webmozart/symfony', '/webmozart/symfony'];
+        yield ['..', '/webmozart/symfony', '/webmozart'];
     }
 
     public function provideMakeAbsoluteTests(): \Generator
@@ -488,17 +488,17 @@ class PathTest extends TestCase
         }
         
         // collapse dots
-        yield ['css/./style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'];
-        yield ['css/../style.css', '/webmozart/puli', '/webmozart/puli/style.css'];
-        yield ['css/./../style.css', '/webmozart/puli', '/webmozart/puli/style.css'];
-        yield ['css/.././style.css', '/webmozart/puli', '/webmozart/puli/style.css'];
-        yield ['./css/style.css', '/webmozart/puli', '/webmozart/puli/css/style.css'];
+        yield ['css/./style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
+        yield ['css/../style.css', '/webmozart/symfony', '/webmozart/symfony/style.css'];
+        yield ['css/./../style.css', '/webmozart/symfony', '/webmozart/symfony/style.css'];
+        yield ['css/.././style.css', '/webmozart/symfony', '/webmozart/symfony/style.css'];
+        yield ['./css/style.css', '/webmozart/symfony', '/webmozart/symfony/css/style.css'];
 
-        yield ['css\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'];
-        yield ['css\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'];
-        yield ['css\\.\\..\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'];
-        yield ['css\\..\\.\\style.css', '\\webmozart\\puli', '/webmozart/puli/style.css'];
-        yield ['.\\css\\style.css', '\\webmozart\\puli', '/webmozart/puli/css/style.css'];
+        yield ['css\\.\\style.css', '\\webmozart\\symfony', '/webmozart/symfony/css/style.css'];
+        yield ['css\\..\\style.css', '\\webmozart\\symfony', '/webmozart/symfony/style.css'];
+        yield ['css\\.\\..\\style.css', '\\webmozart\\symfony', '/webmozart/symfony/style.css'];
+        yield ['css\\..\\.\\style.css', '\\webmozart\\symfony', '/webmozart/symfony/style.css'];
+        yield ['.\\css\\style.css', '\\webmozart\\symfony', '/webmozart/symfony/css/style.css'];
 
         // collapse dots on root
         yield ['./css/style.css', '/', '/css/style.css'];
@@ -544,10 +544,10 @@ class PathTest extends TestCase
         yield ['../css/.././style.css', 'phar://C:/', 'phar://C:/style.css'];
 
         // absolute paths
-        yield ['/css/style.css', '/webmozart/puli', '/css/style.css'];
-        yield ['\\css\\style.css', '/webmozart/puli', '/css/style.css'];
-        yield ['C:/css/style.css', 'C:/webmozart/puli', 'C:/css/style.css'];
-        yield ['D:\\css\\style.css', 'D:/webmozart/puli', 'D:/css/style.css'];
+        yield ['/css/style.css', '/webmozart/symfony', '/css/style.css'];
+        yield ['\\css\\style.css', '/webmozart/symfony', '/css/style.css'];
+        yield ['C:/css/style.css', 'C:/webmozart/symfony', 'C:/css/style.css'];
+        yield ['D:\\css\\style.css', 'D:/webmozart/symfony', 'D:/css/style.css'];
     }
 
     /**
@@ -561,9 +561,9 @@ class PathTest extends TestCase
     public function testMakeAbsoluteFailsIfBasePathNotAbsolute(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The base path "webmozart/puli" is not an absolute path.');
+        $this->expectExceptionMessage('The base path "webmozart/symfony" is not an absolute path.');
 
-        Path::makeAbsolute('css/style.css', 'webmozart/puli');
+        Path::makeAbsolute('css/style.css', 'webmozart/symfony');
     }
 
     public function testMakeAbsoluteFailsIfBasePathEmpty(): void
@@ -576,28 +576,28 @@ class PathTest extends TestCase
 
     public function provideAbsolutePathsWithDifferentRoots(): \Generator
     {
-        yield ['C:/css/style.css', '/webmozart/puli'];
-        yield ['C:/css/style.css', '\\webmozart\\puli'];
-        yield ['C:\\css\\style.css', '/webmozart/puli'];
-        yield ['C:\\css\\style.css', '\\webmozart\\puli'];
+        yield ['C:/css/style.css', '/webmozart/symfony'];
+        yield ['C:/css/style.css', '\\webmozart\\symfony'];
+        yield ['C:\\css\\style.css', '/webmozart/symfony'];
+        yield ['C:\\css\\style.css', '\\webmozart\\symfony'];
 
-        yield ['/css/style.css', 'C:/webmozart/puli'];
-        yield ['/css/style.css', 'C:\\webmozart\\puli'];
-        yield ['\\css\\style.css', 'C:/webmozart/puli'];
-        yield ['\\css\\style.css', 'C:\\webmozart\\puli'];
+        yield ['/css/style.css', 'C:/webmozart/symfony'];
+        yield ['/css/style.css', 'C:\\webmozart\\symfony'];
+        yield ['\\css\\style.css', 'C:/webmozart/symfony'];
+        yield ['\\css\\style.css', 'C:\\webmozart\\symfony'];
 
-        yield ['D:/css/style.css', 'C:/webmozart/puli'];
-        yield ['D:/css/style.css', 'C:\\webmozart\\puli'];
-        yield ['D:\\css\\style.css', 'C:/webmozart/puli'];
-        yield ['D:\\css\\style.css', 'C:\\webmozart\\puli'];
+        yield ['D:/css/style.css', 'C:/webmozart/symfony'];
+        yield ['D:/css/style.css', 'C:\\webmozart\\symfony'];
+        yield ['D:\\css\\style.css', 'C:/webmozart/symfony'];
+        yield ['D:\\css\\style.css', 'C:\\webmozart\\symfony'];
 
-        yield ['phar:///css/style.css', '/webmozart/puli'];
-        yield ['/css/style.css', 'phar:///webmozart/puli'];
+        yield ['phar:///css/style.css', '/webmozart/symfony'];
+        yield ['/css/style.css', 'phar:///webmozart/symfony'];
 
-        yield ['phar://C:/css/style.css', 'C:/webmozart/puli'];
-        yield ['phar://C:/css/style.css', 'C:\\webmozart\\puli'];
-        yield ['phar://C:\\css\\style.css', 'C:/webmozart/puli'];
-        yield ['phar://C:\\css\\style.css', 'C:\\webmozart\\puli'];
+        yield ['phar://C:/css/style.css', 'C:/webmozart/symfony'];
+        yield ['phar://C:/css/style.css', 'C:\\webmozart\\symfony'];
+        yield ['phar://C:\\css\\style.css', 'C:/webmozart/symfony'];
+        yield ['phar://C:\\css\\style.css', 'C:\\webmozart\\symfony'];
     }
 
     /**
@@ -616,42 +616,42 @@ class PathTest extends TestCase
             yield [$set[2], $set[1], $set[0]];
         }
         
-        yield ['/webmozart/puli/./css/style.css', '/webmozart/puli', 'css/style.css'];
-        yield ['/webmozart/puli/../css/style.css', '/webmozart/puli', '../css/style.css'];
-        yield ['/webmozart/puli/.././css/style.css', '/webmozart/puli', '../css/style.css'];
-        yield ['/webmozart/puli/./../css/style.css', '/webmozart/puli', '../css/style.css'];
-        yield ['/webmozart/puli/../../css/style.css', '/webmozart/puli', '../../css/style.css'];
-        yield ['/webmozart/puli/css/style.css', '/webmozart/./puli', 'css/style.css'];
-        yield ['/webmozart/puli/css/style.css', '/webmozart/../puli', '../webmozart/puli/css/style.css'];
-        yield ['/webmozart/puli/css/style.css', '/webmozart/./../puli', '../webmozart/puli/css/style.css'];
-        yield ['/webmozart/puli/css/style.css', '/webmozart/.././puli', '../webmozart/puli/css/style.css'];
-        yield ['/webmozart/puli/css/style.css', '/webmozart/../../puli', '../webmozart/puli/css/style.css'];
+        yield ['/webmozart/symfony/./css/style.css', '/webmozart/symfony', 'css/style.css'];
+        yield ['/webmozart/symfony/../css/style.css', '/webmozart/symfony', '../css/style.css'];
+        yield ['/webmozart/symfony/.././css/style.css', '/webmozart/symfony', '../css/style.css'];
+        yield ['/webmozart/symfony/./../css/style.css', '/webmozart/symfony', '../css/style.css'];
+        yield ['/webmozart/symfony/../../css/style.css', '/webmozart/symfony', '../../css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '/webmozart/./symfony', 'css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '/webmozart/../symfony', '../webmozart/symfony/css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '/webmozart/./../symfony', '../webmozart/symfony/css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '/webmozart/.././symfony', '../webmozart/symfony/css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '/webmozart/../../symfony', '../webmozart/symfony/css/style.css'];
 
         // first argument shorter than second
-        yield ['/css', '/webmozart/puli', '../../css'];
+        yield ['/css', '/webmozart/symfony', '../../css'];
 
         // second argument shorter than first
-        yield ['/webmozart/puli', '/css', '../webmozart/puli'];
+        yield ['/webmozart/symfony', '/css', '../webmozart/symfony'];
 
-        yield ['\\webmozart\\puli\\css\\style.css', '\\webmozart\\puli', 'css/style.css'];
-        yield ['\\webmozart\\css\\style.css', '\\webmozart\\puli', '../css/style.css'];
-        yield ['\\css\\style.css', '\\webmozart\\puli', '../../css/style.css'];
+        yield ['\\webmozart\\symfony\\css\\style.css', '\\webmozart\\symfony', 'css/style.css'];
+        yield ['\\webmozart\\css\\style.css', '\\webmozart\\symfony', '../css/style.css'];
+        yield ['\\css\\style.css', '\\webmozart\\symfony', '../../css/style.css'];
 
-        yield ['C:/webmozart/puli/css/style.css', 'C:/webmozart/puli', 'css/style.css'];
-        yield ['C:/webmozart/css/style.css', 'C:/webmozart/puli', '../css/style.css'];
-        yield ['C:/css/style.css', 'C:/webmozart/puli', '../../css/style.css'];
+        yield ['C:/webmozart/symfony/css/style.css', 'C:/webmozart/symfony', 'css/style.css'];
+        yield ['C:/webmozart/css/style.css', 'C:/webmozart/symfony', '../css/style.css'];
+        yield ['C:/css/style.css', 'C:/webmozart/symfony', '../../css/style.css'];
 
-        yield ['C:\\webmozart\\puli\\css\\style.css', 'C:\\webmozart\\puli', 'css/style.css'];
-        yield ['C:\\webmozart\\css\\style.css', 'C:\\webmozart\\puli', '../css/style.css'];
-        yield ['C:\\css\\style.css', 'C:\\webmozart\\puli', '../../css/style.css'];
+        yield ['C:\\webmozart\\symfony\\css\\style.css', 'C:\\webmozart\\symfony', 'css/style.css'];
+        yield ['C:\\webmozart\\css\\style.css', 'C:\\webmozart\\symfony', '../css/style.css'];
+        yield ['C:\\css\\style.css', 'C:\\webmozart\\symfony', '../../css/style.css'];
 
-        yield ['phar:///webmozart/puli/css/style.css', 'phar:///webmozart/puli', 'css/style.css'];
-        yield ['phar:///webmozart/css/style.css', 'phar:///webmozart/puli', '../css/style.css'];
-        yield ['phar:///css/style.css', 'phar:///webmozart/puli', '../../css/style.css'];
+        yield ['phar:///webmozart/symfony/css/style.css', 'phar:///webmozart/symfony', 'css/style.css'];
+        yield ['phar:///webmozart/css/style.css', 'phar:///webmozart/symfony', '../css/style.css'];
+        yield ['phar:///css/style.css', 'phar:///webmozart/symfony', '../../css/style.css'];
 
-        yield ['phar://C:/webmozart/puli/css/style.css', 'phar://C:/webmozart/puli', 'css/style.css'];
-        yield ['phar://C:/webmozart/css/style.css', 'phar://C:/webmozart/puli', '../css/style.css'];
-        yield ['phar://C:/css/style.css', 'phar://C:/webmozart/puli', '../../css/style.css'];
+        yield ['phar://C:/webmozart/symfony/css/style.css', 'phar://C:/webmozart/symfony', 'css/style.css'];
+        yield ['phar://C:/webmozart/css/style.css', 'phar://C:/webmozart/symfony', '../css/style.css'];
+        yield ['phar://C:/css/style.css', 'phar://C:/webmozart/symfony', '../../css/style.css'];
 
         // already relative + already in root basepath
         yield ['../style.css', '/', 'style.css'];
@@ -687,20 +687,20 @@ class PathTest extends TestCase
         yield ['css\\.\\style.css', 'phar://C:\\', 'css/style.css'];
 
         // already relative
-        yield ['css/style.css', '/webmozart/puli', 'css/style.css'];
-        yield ['css\\style.css', '\\webmozart\\puli', 'css/style.css'];
+        yield ['css/style.css', '/webmozart/symfony', 'css/style.css'];
+        yield ['css\\style.css', '\\webmozart\\symfony', 'css/style.css'];
 
         // both relative
-        yield ['css/style.css', 'webmozart/puli', '../../css/style.css'];
-        yield ['css\\style.css', 'webmozart\\puli', '../../css/style.css'];
+        yield ['css/style.css', 'webmozart/symfony', '../../css/style.css'];
+        yield ['css\\style.css', 'webmozart\\symfony', '../../css/style.css'];
 
         // relative to empty
         yield ['css/style.css', '', 'css/style.css'];
         yield ['css\\style.css', '', 'css/style.css'];
 
         // different slashes in path and base path
-        yield ['/webmozart/puli/css/style.css', '\\webmozart\\puli', 'css/style.css'];
-        yield ['\\webmozart\\puli\\css\\style.css', '/webmozart/puli', 'css/style.css'];
+        yield ['/webmozart/symfony/css/style.css', '\\webmozart\\symfony', 'css/style.css'];
+        yield ['\\webmozart\\symfony\\css\\style.css', '/webmozart/symfony', 'css/style.css'];
     }
 
     /**
@@ -714,17 +714,17 @@ class PathTest extends TestCase
     public function testMakeRelativeFailsIfAbsolutePathAndBasePathNotAbsolute(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The absolute path "/webmozart/puli/css/style.css" cannot be made relative to the relative path "webmozart/puli". You should provide an absolute base path instead.');
+        $this->expectExceptionMessage('The absolute path "/webmozart/symfony/css/style.css" cannot be made relative to the relative path "webmozart/symfony". You should provide an absolute base path instead.');
 
-        Path::makeRelative('/webmozart/puli/css/style.css', 'webmozart/puli');
+        Path::makeRelative('/webmozart/symfony/css/style.css', 'webmozart/symfony');
     }
 
     public function testMakeRelativeFailsIfAbsolutePathAndBasePathEmpty(): void
     {
         
-        $this->expectExceptionMessage('The absolute path "/webmozart/puli/css/style.css" cannot be made relative to the relative path "". You should provide an absolute base path instead.');
+        $this->expectExceptionMessage('The absolute path "/webmozart/symfony/css/style.css" cannot be made relative to the relative path "". You should provide an absolute base path instead.');
 
-        Path::makeRelative('/webmozart/puli/css/style.css', '');
+        Path::makeRelative('/webmozart/symfony/css/style.css', '');
     }
 
     /**
@@ -871,7 +871,7 @@ class PathTest extends TestCase
      */
     public function testGetLongestCommonBasePath(array $paths, ?string $basePath): void
     {
-        $this->assertSame($basePath, Path::getLongestCommonBasePath($paths));
+        $this->assertSame($basePath, Path::getLongestCommonBasePath(...$paths));
     }
 
     public function provideIsBasePathTests(): \Generator

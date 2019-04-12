@@ -63,6 +63,7 @@ test_script:
     - SET X=0
     - cd c:\php && copy /Y php.ini-min php.ini
     - cd c:\projects\symfony
+    - IF %APPVEYOR_REPO_BRANCH% neq master (rm -Rf src\Symfony\Bridge\PhpUnit)
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
     - cd c:\php && 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul && copy /Y php.ini-min php.ini
     - cd c:\projects\symfony

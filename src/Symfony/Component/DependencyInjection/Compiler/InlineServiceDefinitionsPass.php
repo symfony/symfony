@@ -60,6 +60,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             $analyzedContainer = $container;
         }
         try {
+            $remainingInlinedIds = [];
             $this->connectedIds = $this->notInlinedIds = $container->getDefinitions();
             do {
                 if ($this->analyzingPass) {
@@ -83,8 +84,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
                     }
                 }
 
-                foreach ($this->inlinedIds as $id => $isPublic) {
-                    if (!$isPublic) {
+                foreach ($this->inlinedIds as $id => $isPublicOrNotShared) {
+                    if ($isPublicOrNotShared) {
+                        $remainingInlinedIds[$id] = $id;
+                    } else {
                         $container->removeDefinition($id);
                         $analyzedContainer->removeDefinition($id);
                     }
@@ -93,6 +96,14 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
 
             if ($this->inlinedIds && $this->repeatedPass) {
                 $this->repeatedPass->setRepeat();
+            }
+
+            foreach ($remainingInlinedIds as $id) {
+                $definition = $container->getDefinition($id);
+
+                if (!$definition->isShared() && !$definition->isPublic()) {
+                    $container->removeDefinition($id);
+                }
             }
         } finally {
             $this->container = null;
@@ -131,7 +142,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
 
         $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
-        $this->inlinedIds[$id] = $definition->isPublic();
+        $this->inlinedIds[$id] = $definition->isPublic() || !$definition->isShared();
         $this->notInlinedIds[$this->currentId] = true;
 
         if ($definition->isShared()) {

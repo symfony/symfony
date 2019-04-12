@@ -54,6 +54,7 @@ test_script:
     - SET X=0
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
     - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - IF %APPVEYOR_REPO_BRANCH% neq master (rm -Rf src\Symfony\Bridge\PhpUnit)
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!

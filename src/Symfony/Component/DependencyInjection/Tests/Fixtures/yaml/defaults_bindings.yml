@@ -8,4 +8,4 @@ services:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
 
     foo:
-        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy
+        class: stdClass

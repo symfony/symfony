@@ -747,6 +747,6 @@ class YamlFileLoaderTest extends TestCase
 
         (new ResolveBindingsPass())->process($container);
 
-        $this->assertTrue(true);
+        $this->assertSame('overridden', $container->get('bar')->quz);
     }
 }

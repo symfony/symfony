@@ -1,7 +1,7 @@
 services:
     _defaults:
         bind:
-            $quz: ~
+            $quz: overridden
 
     bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <defaults>
+            <bind key="$quz">value</bind>
+            <bind key="$foo" type="collection">
+                <bind>value</bind>
+            </bind>
+        </defaults>
+
+        <service id="bar" class="Symfony\Component\DependencyInjection\Tests\Fixtures\Bar"/>
+
+        <service id="foo" class="stdClass"/>
+    </services>
+</container>

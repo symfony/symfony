@@ -198,6 +198,12 @@ install:
       fi
 
     - |
+      # Skip the phpunit-bridge on not-master branches when $deps is empty
+      if [[ ! $deps && $TRAVIS_BRANCH != master ]]; then
+          COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -not -wholename '*/Bridge/PhpUnit/*' -printf '%h\n')
+      fi
+
+    - |
       # Install symfony/flex
       if [[ $deps = low ]]; then
           export SYMFONY_REQUIRE='>=2.3'

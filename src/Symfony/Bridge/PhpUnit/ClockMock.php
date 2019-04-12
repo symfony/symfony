@@ -79,11 +79,20 @@ class ClockMock
         return \date($format, $timestamp);
     }
 
+    public static function gmdate($format, $timestamp = null)
+    {
+        if (null === $timestamp) {
+            $timestamp = self::time();
+        }
+
+        return \gmdate($format, $timestamp);
+    }
+
     public static function register($class)
     {
         $self = \get_called_class();
 
-        $mockedNs = array(substr($class, 0, strrpos($class, '\\')));
+        $mockedNs = [substr($class, 0, strrpos($class, '\\'))];
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));
@@ -122,6 +131,10 @@ function date(\$format, \$timestamp = null)
     return \\$self::date(\$format, \$timestamp);
 }
 
+function gmdate(\$format, \$timestamp = null)
+{
+    return \\$self::gmdate(\$format, \$timestamp);
+}
 EOPHP
             );
         }

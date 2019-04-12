@@ -62,4 +62,11 @@ class ClockMockTest extends TestCase
     {
         $this->assertSame('1234567890', date('U'));
     }
+
+    public function testGmDate()
+    {
+        ClockMock::withClockMock(1555075769);
+
+        $this->assertSame('1555075769', gmdate('U'));
+    }
 }

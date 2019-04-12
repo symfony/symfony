@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by GuilhemN at 2019-04-08T06:57:40Z
+
+If this is accepted I think we should rely on the DebugClassLoader (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Debug/DebugClassLoader.php#L283) instead of the constructor which isn't safe (it may be overriden).
+
+---------------------------------------------------------------------------
+
+by aweelex at 2019-04-08T07:21:17Z
+
+> If this is accepted I think we should rely on the DebugClassLoader (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Debug/DebugClassLoader.php#L283) instead of the constructor which isn't safe (it may be overriden).
+
+I think it's ok to remove `@trigger_error` at all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T07:24:14Z
+
+Why is this triggered? What does trigger it? What is specific to `Controller` that makes it special *vs* other classes that have the call?
+
+---------------------------------------------------------------------------
+
+by aweelex at 2019-04-08T09:39:10Z
+
+> Why is this triggered? What does trigger it? What is specific to `Controller` that makes it special _vs_ other classes that have the call?
+
+I don't sure why it happens, but you can test it by yourself. If you will use `composer install --optimize-autoloader`, `var/cache/dev/srcApp_KernelDevDebugContainerDeprecations.log` will store this DEPRECATION. It's wrong behavior.
+
+And if you using `Monolog`, it will print Deprecation in profiler, even if `Controller` is not used.

@@ -16,8 +16,6 @@ namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
  */
 class Configuration
 {
-    const GROUPS = ['total', 'indirect', 'direct', 'self'];
-
     /**
      * @var int[]
      */
@@ -46,9 +44,11 @@ class Configuration
      */
     private function __construct(array $thresholds = [], $regex = '', $verboseOutput = true)
     {
+        $groups = ['total', 'indirect', 'direct', 'self'];
+
         foreach ($thresholds as $group => $threshold) {
-            if (!\in_array($group, self::GROUPS, true)) {
-                throw new \InvalidArgumentException(sprintf('Unrecognized threshold "%s", expected one of "%s"', $group, implode('", "', self::GROUPS)));
+            if (!\in_array($group, $groups, true)) {
+                throw new \InvalidArgumentException(sprintf('Unrecognized threshold "%s", expected one of "%s"', $group, implode('", "', $groups)));
             }
             if (!is_numeric($threshold)) {
                 throw new \InvalidArgumentException(sprintf('Threshold for group "%s" has invalid value "%s"', $group, $threshold));
@@ -66,7 +66,7 @@ class Configuration
                 'self' => $this->thresholds['indirect'],
             ];
         }
-        foreach (self::GROUPS as $group) {
+        foreach ($groups as $group) {
             if (!isset($this->thresholds[$group])) {
                 $this->thresholds[$group] = 999999;
             }

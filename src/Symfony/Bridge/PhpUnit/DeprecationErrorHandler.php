@@ -227,8 +227,10 @@ class DeprecationErrorHandler
             return $this->configuration = Configuration::inWeakMode();
         }
         if (self::MODE_WEAK_VENDORS === $mode) {
-            echo sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode).PHP_EOL;
-            exit(1);
+            ++$this->deprecations['remaining selfCount'];
+            $msg = sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode);
+            $ref = &$this->deprecations['remaining self'][$msg]['count'];
+            ++$ref;
         }
         if (isset($mode[0]) && '/' === $mode[0]) {
             return $this->configuration = Configuration::fromRegex($mode);

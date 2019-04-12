@@ -234,6 +234,28 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertFlatView($view);
     }
 
+    public function testCreateViewFlatPreferredChoicesSameOrder()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj1, $this->obj4, $this->obj3]
+        );
+
+        $preferredLabels = array_map(static function (ChoiceView $view): string {
+            return $view->label;
+        }, $view->preferredChoices);
+
+        $this->assertSame(
+            [
+                1 => 'B',
+                0 => 'A',
+                3 => 'D',
+                2 => 'C',
+            ],
+            $preferredLabels
+        );
+    }
+
     public function testCreateViewFlatPreferredChoicesEmptyArray()
     {
         $view = $this->factory->createView(

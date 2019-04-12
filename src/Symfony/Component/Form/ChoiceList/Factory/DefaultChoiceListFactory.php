@@ -48,13 +48,16 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
         $preferredViews = [];
+        $preferredViewsOrder = [];
         $otherViews = [];
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
         if (!\is_callable($preferredChoices) && !empty($preferredChoices)) {
-            $preferredChoices = function ($choice) use ($preferredChoices) {
-                return \in_array($choice, $preferredChoices, true);
+            // make sure we have keys that reflect order
+            $preferredChoices = array_values($preferredChoices);
+            $preferredChoices = static function ($choice) use ($preferredChoices) {
+                return array_search($choice, $preferredChoices, true);
             };
         }
 
@@ -80,6 +83,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $attr,
                     $preferredChoices,
                     $preferredViews,
+                    $preferredViewsOrder,
                     $otherViews
                 );
             }
@@ -108,14 +112,21 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $preferredChoices,
                 $preferredViews,
+                $preferredViewsOrder,
                 $otherViews
             );
         }
 
+        uksort($preferredViews, static function ($a, $b) use ($preferredViewsOrder): int {
+            return isset($preferredViewsOrder[$a], $preferredViewsOrder[$b])
+                ? $preferredViewsOrder[$a] <=> $preferredViewsOrder[$b]
+                : 0;
+        });
+
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
@@ -143,14 +154,15 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         );
 
         // $isPreferred may be null if no choices are preferred
-        if ($isPreferred && $isPreferred($choice, $key, $value)) {
+        if ($isPreferred && false !== $preferredKey = $isPreferred($choice, $key, $value)) {
             $preferredViews[$nextIndex] = $view;
+            $preferredViewsOrder[$nextIndex] = $preferredKey;
         } else {
             $otherViews[$nextIndex] = $view;
         }
     }
 
-    private static function addChoiceViewsFromStructuredValues($values, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewsFromStructuredValues($values, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
     {
         foreach ($values as $key => $value) {
             if (null === $value) {
@@ -171,6 +183,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $attr,
                     $isPreferred,
                     $preferredViewsForGroup,
+                    $preferredViewsOrder,
                     $otherViewsForGroup
                 );
 
@@ -195,12 +208,13 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $isPreferred,
                 $preferredViews,
+                $preferredViewsOrder,
                 $otherViews
             );
         }
     }
 
-    private static function addChoiceViewsGroupedByCallable($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewsGroupedByCallable($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$preferredViewsOrder, &$otherViews)
     {
         $groupLabels = $groupBy($choice, $keys[$value], $value);
 
@@ -215,6 +229,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $isPreferred,
                 $preferredViews,
+                $preferredViewsOrder,
                 $otherViews
             );
 
@@ -240,6 +255,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $attr,
                 $isPreferred,
                 $preferredViews[$groupLabel]->choices,
+                $preferredViewsOrder,
                 $otherViews[$groupLabel]->choices
             );
         }

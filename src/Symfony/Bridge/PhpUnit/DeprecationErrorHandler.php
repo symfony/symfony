@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Configuration;
+use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
+
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
  *
@@ -18,23 +21,30 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DeprecationErrorHandler
 {
-    const MODE_WEAK = 'weak';
+    /**
+     * @deprecated since Symfony 4.3, use max[self]=0 instead
+     */
     const MODE_WEAK_VENDORS = 'weak_vendors';
-    const MODE_DISABLED = 'disabled';
 
-    private $mode = false;
-    private $resolvedMode = false;
+    const MODE_DISABLED = 'disabled';
+    const MODE_WEAK = 'max[total]=999999&verbose=0';
+    const MODE_STRICT = 'max[total]=0';
+
+    private $mode;
+    private $configuration;
     private $deprecations = [
         'unsilencedCount' => 0,
-        'remainingCount' => 0,
+        'remaining selfCount' => 0,
         'legacyCount' => 0,
         'otherCount' => 0,
-        'remaining vendorCount' => 0,
+        'remaining directCount' => 0,
+        'remaining indirectCount' => 0,
         'unsilenced' => [],
-        'remaining' => [],
+        'remaining self' => [],
         'legacy' => [],
         'other' => [],
-        'remaining vendor' => [],
+        'remaining direct' => [],
+        'remaining indirect' => [],
     ];
 
     private static $isRegistered = false;
@@ -43,13 +53,16 @@ class DeprecationErrorHandler
     /**
      * Registers and configures the deprecation handler.
      *
-     * The following reporting modes are supported:
-     * - use "weak" to hide the deprecation report but keep a global count;
-     * - use "weak_vendors" to fail only on deprecations triggered in your own code;
-     * - use "/some-regexp/" to stop the test suite whenever a deprecation
-     *   message matches the given regular expression;
-     * - use a number to define the upper bound of allowed deprecations,
-     *   making the test suite fail whenever more notices are triggered.
+     * The mode is a query string with options:
+     *  - "disabled" to disable the deprecation handler
+     *  - "verbose" to enable/disable displaying the deprecation report
+     *  - "max" to configure the number of deprecations to allow before exiting with a non-zero
+     *    status code; it's an array with keys "total", "self", "direct" and "indirect"
+     *
+     * The default mode is "max[total]=0&verbose=1".
+     *
+     * The mode can alternatively be "/some-regexp/" to stop the test suite whenever
+     * a deprecation message matches the given regular expression.
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */
@@ -108,76 +121,41 @@ class DeprecationErrorHandler
      */
     public function handleError($type, $msg, $file, $line, $context = [])
     {
-        if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || self::MODE_DISABLED === $mode = $this->getMode()) {
+        if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || !$this->getConfiguration()->isEnabled()) {
             $ErrorHandler = self::$utilPrefix.'ErrorHandler';
 
             return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
         }
 
-        $trace = debug_backtrace();
+        $deprecation = new Deprecation($msg, debug_backtrace(), $file);
         $group = 'other';
-        $isVendor = self::MODE_WEAK_VENDORS === $mode && self::inVendors($file);
 
-        $i = \count($trace);
-        while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
-            // No-op
-        }
-
-        if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
-            if (isset($trace[$i]['class']) && 0 === strpos($trace[$i]['class'], 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor')) {
-                $parsedMsg = unserialize($msg);
-                $msg = $parsedMsg['deprecation'];
-                $class = $parsedMsg['class'];
-                $method = $parsedMsg['method'];
-                // If the deprecation has been triggered via
-                // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
-                // then we need to use the serialized information to determine
-                // if the error has been triggered from vendor code.
-                $isVendor = self::MODE_WEAK_VENDORS === $mode && isset($parsedMsg['triggering_file']) && self::inVendors($parsedMsg['triggering_file']);
-            } else {
-                $class = isset($trace[$i]['object']) ? \get_class($trace[$i]['object']) : $trace[$i]['class'];
-                $method = $trace[$i]['function'];
-            }
-
-            $Test = self::$utilPrefix.'Test';
+        if ($deprecation->originatesFromAnObject()) {
+            $class = $deprecation->originatingClass();
+            $method = $deprecation->originatingMethod();
 
             if (0 !== error_reporting()) {
                 $group = 'unsilenced';
-            } elseif (0 === strpos($method, 'testLegacy')
-                || 0 === strpos($method, 'provideLegacy')
-                || 0 === strpos($method, 'getLegacy')
-                || strpos($class, '\Legacy')
-                || \in_array('legacy', $Test::getGroups($class, $method), true)
-            ) {
+            } elseif ($deprecation->isLegacy(self::$utilPrefix)) {
                 $group = 'legacy';
-            } elseif ($isVendor) {
-                $group = 'remaining vendor';
+            } elseif (!$deprecation->isSelf()) {
+                $group = $deprecation->isIndirect() ? 'remaining indirect' : 'remaining direct';
             } else {
-                $group = 'remaining';
+                $group = 'remaining self';
             }
 
-            if (isset($mode[0]) && '/' === $mode[0] && preg_match($mode, $msg)) {
-                $e = new \Exception($msg);
-                $r = new \ReflectionProperty($e, 'trace');
-                $r->setAccessible(true);
-                $r->setValue($e, \array_slice($trace, 1, $i));
-
-                echo "\n".ucfirst($group).' deprecation triggered by '.$class.'::'.$method.':';
-                echo "\n".$msg;
-                echo "\nStack trace:";
-                echo "\n".str_replace(' '.getcwd().\DIRECTORY_SEPARATOR, ' ', $e->getTraceAsString());
-                echo "\n";
+            if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {
+                echo "\n".ucfirst($group).' '.$deprecation->toString();
 
                 exit(1);
             }
-
-            if ('legacy' !== $group && self::MODE_WEAK !== $mode) {
+            if ('legacy' !== $group) {
                 $ref = &$this->deprecations[$group][$msg]['count'];
                 ++$ref;
                 $ref = &$this->deprecations[$group][$msg][$class.'::'.$method];
                 ++$ref;
             }
-        } elseif (self::MODE_WEAK !== $mode) {
+        } else {
             $ref = &$this->deprecations[$group][$msg]['count'];
             ++$ref;
         }
@@ -190,9 +168,9 @@ class DeprecationErrorHandler
      */
     public function shutdown()
     {
-        $mode = $this->getMode();
+        $configuration = $this->getConfiguration();
 
-        if (isset($mode[0]) && '/' === $mode[0]) {
+        if ($configuration->isInRegexMode()) {
             return;
         }
 
@@ -200,28 +178,22 @@ class DeprecationErrorHandler
         restore_error_handler();
 
         if ($currErrorHandler !== [$this, 'handleError']) {
-            echo "\n", self::colorize('THE ERROR HANDLER HAS CHANGED!', true, $mode), "\n";
+            echo "\n", self::colorize('THE ERROR HANDLER HAS CHANGED!', true), "\n";
         }
 
-        $groups = ['unsilenced', 'remaining'];
+        $groups = ['unsilenced', 'remaining self', 'remaining direct', 'remaining indirect', 'legacy', 'other'];
 
-        if (self::MODE_WEAK_VENDORS === $mode) {
-            $groups[] = 'remaining vendor';
-        }
-
-        array_push($groups, 'legacy', 'other');
-
-        $this->displayDeprecations($groups, $mode);
+        $this->displayDeprecations($groups, $configuration);
 
         // store failing status
-        $isFailing = self::MODE_WEAK !== $mode && $mode < $this->deprecations['unsilencedCount'] + $this->deprecations['remainingCount'] + $this->deprecations['otherCount'];
+        $isFailing = !$configuration->tolerates($this->deprecations);
 
         // reset deprecations array
         foreach ($this->deprecations as $group => $arrayOrInt) {
             $this->deprecations[$group] = \is_int($arrayOrInt) ? 0 : [];
         }
 
-        register_shutdown_function(function () use ($isFailing, $groups, $mode) {
+        register_shutdown_function(function () use ($isFailing, $groups, $configuration) {
             foreach ($this->deprecations as $group => $arrayOrInt) {
                 if (0 < (\is_int($arrayOrInt) ? $arrayOrInt : \count($arrayOrInt))) {
                     echo "Shutdown-time deprecations:\n";
@@ -229,85 +201,55 @@ class DeprecationErrorHandler
                 }
             }
 
-            $this->displayDeprecations($groups, $mode);
+            $this->displayDeprecations($groups, $configuration);
 
-            if ($isFailing || self::MODE_WEAK !== $mode && $mode < $this->deprecations['unsilencedCount'] + $this->deprecations['remainingCount'] + $this->deprecations['otherCount']) {
+            if ($isFailing || !$configuration->tolerates($this->deprecations)) {
                 exit(1);
             }
         });
     }
 
-    private function getMode()
+    private function getConfiguration()
     {
-        if (false !== $this->resolvedMode) {
-            return $this->resolvedMode;
+        if (null !== $this->configuration) {
+            return $this->configuration;
         }
-
         if (false === $mode = $this->mode) {
             $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
         }
-
-        if (self::MODE_DISABLED !== $mode
-            && self::MODE_WEAK !== $mode
-            && self::MODE_WEAK_VENDORS !== $mode
-            && (!isset($mode[0]) || '/' !== $mode[0])
-        ) {
-            $mode = preg_match('/^[1-9][0-9]*$/', $mode) ? (int) $mode : 0;
+        if ('strict' === $mode) {
+            return $this->configuration = Configuration::inStrictMode();
+        }
+        if (self::MODE_DISABLED === $mode) {
+            return $this->configuration = Configuration::inDisabledMode();
+        }
+        if ('weak' === $mode) {
+            return $this->configuration = Configuration::inWeakMode();
+        }
+        if (self::MODE_WEAK_VENDORS === $mode) {
+            echo sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode).PHP_EOL;
+            exit(1);
+        }
+        if (isset($mode[0]) && '/' === $mode[0]) {
+            return $this->configuration = Configuration::fromRegex($mode);
         }
 
-        return $this->resolvedMode = $mode;
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return bool
-     */
-    private static function inVendors($path)
-    {
-        /** @var string[] absolute paths to vendor directories */
-        static $vendors;
-
-        if (null === $vendors) {
-            foreach (get_declared_classes() as $class) {
-                if ('C' !== $class[0] || 0 !== strpos($class, 'ComposerAutoloaderInit')) {
-                    continue;
-                }
-
-                $r = new \ReflectionClass($class);
-                $v = \dirname(\dirname($r->getFileName()));
-
-                if (file_exists($v.'/composer/installed.json')) {
-                    $vendors[] = $v;
-                }
-            }
+        if (preg_match('/^[1-9][0-9]*$/', (string) $mode)) {
+            return $this->configuration = Configuration::fromNumber($mode);
         }
 
-        $realPath = realpath($path);
-
-        if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
-            return true;
-        }
-
-        foreach ($vendors as $vendor) {
-            if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, \strlen($vendor), 1), '/'.\DIRECTORY_SEPARATOR)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->configuration = Configuration::fromUrlEncodedString((string) $mode);
     }
 
     /**
      * @param string $str
      * @param bool   $red
-     * @param mixed  $mode
      *
      * @return string
      */
-    private static function colorize($str, $red, $mode)
+    private static function colorize($str, $red)
     {
-        if (!self::hasColorSupport() || self::MODE_WEAK === $mode) {
+        if (!self::hasColorSupport()) {
             return $str;
         }
 
@@ -317,36 +259,36 @@ class DeprecationErrorHandler
     }
 
     /**
-     * @param string[] $groups
-     * @param mixed    $mode
+     * @param string[]      $groups
+     * @param Configuration $configuration
      */
-    private function displayDeprecations($groups, $mode)
+    private function displayDeprecations($groups, $configuration)
     {
         $cmp = function ($a, $b) {
             return $b['count'] - $a['count'];
         };
 
         foreach ($groups as $group) {
-            if (!$this->deprecations[$group.'Count']) {
-                continue;
-            }
+            if ($this->deprecations[$group.'Count']) {
+                echo "\n", self::colorize(
+                    sprintf('%s deprecation notices (%d)', ucfirst($group), $this->deprecations[$group.'Count']),
+                    'legacy' !== $group && 'remaining indirect' !== $group
+                ), "\n";
 
-            echo "\n", self::colorize(
-                sprintf('%s deprecation notices (%d)', ucfirst($group), $this->deprecations[$group.'Count']),
-                'legacy' !== $group && 'remaining vendor' !== $group,
-                $mode
-            ), "\n";
+                if (!$configuration->verboseOutput()) {
+                    continue;
+                }
+                uasort($this->deprecations[$group], $cmp);
 
-            uasort($this->deprecations[$group], $cmp);
+                foreach ($this->deprecations[$group] as $msg => $notices) {
+                    echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
 
-            foreach ($this->deprecations[$group] as $msg => $notices) {
-                echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
+                    arsort($notices);
 
-                arsort($notices);
-
-                foreach ($notices as $method => $count) {
-                    if ('count' !== $method) {
-                        echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                    foreach ($notices as $method => $count) {
+                        if ('count' !== $method) {
+                            echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                        }
                     }
                 }
             }

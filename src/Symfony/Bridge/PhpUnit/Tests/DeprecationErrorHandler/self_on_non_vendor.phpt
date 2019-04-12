@@ -1,5 +1,5 @@
 --TEST--
-Test DeprecationErrorHandler in weak vendors mode on a non vendor file
+Test DeprecationErrorHandler with no self deprecations on self deprecation
 --FILE--
 <?php
 

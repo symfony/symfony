@@ -73,7 +73,7 @@ Unsilenced deprecation notices (3)
   1x: unsilenced bar deprecation
     1x in FooTestCase::testNonLegacyBar
 
-Remaining deprecation notices (1)
+Remaining self deprecation notices (1)
 
   1x: silenced bar deprecation
     1x in FooTestCase::testNonLegacyBar

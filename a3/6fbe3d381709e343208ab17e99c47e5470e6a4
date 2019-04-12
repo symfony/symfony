@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-11-24T13:39:45Z
+
+>  make the code 5.5 compatible cry
+
+Why when you are targetting master?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-24T13:43:05Z
+
+IIRC that's because recent versions of the bridge will be used to test old versions of other Symfony components:
+
+https://github.com/symfony/symfony/blob/f9414a8e818988ebaff4f6ec219cccce811f06c2/src/Symfony/Bridge/PhpUnit/composer.json#L19-L21
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-24T15:58:24Z
+
+Wait @nicolas-grekas , is it really 5.3, not 5.5? Did you maybe tell me we could bump to 5.5?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-11-24T16:00:35Z
+
+5.5 will be good soon because 2.8 will be out of maintenance in 1 week.
+We'll have to bump that 5.3 in Symfony 4.3
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-11-25T17:04:39Z
+
+Here is how the "Improve stack trace display" commit changes things:
+
+# Before
+
+```
+#0 [internal function]: Symfony\Bridge\PhpUnit\DeprecationErrorHandler::Symfony\Bridge\PhpUnit\{closure}(16384, 'The Sonata\\Core...', '/home/greg/dev/...', 17, Array)
+#1 /home/greg/dev/SonataAdminBundle/vendor/sonata-project/core-bundle/src/Model/Adapter/AdapterInterface.php(17): trigger_error('The Sonata\\Core...', 16384)
+#2 /home/greg/dev/SonataAdminBundle/vendor/composer/ClassLoader.php(444): include('/home/greg/dev/...')
+#3 /home/greg/dev/SonataAdminBundle/vendor/composer/ClassLoader.php(322): Composer\Autoload\includeFile('/home/greg/dev/...')
+#4 [internal function]: Composer\Autoload\ClassLoader->loadClass('Sonata\\CoreBund...')
+#5 /home/greg/dev/SonataAdminBundle/tests/Admin/AdminTest.php(1817): spl_autoload_call('Sonata\\CoreBund...')
+#6 [internal function]: Sonata\AdminBundle\Tests\Admin\AdminTest->provideGetSubject()
+#7 phar:///home/greg/bin/phpunit/phpunit/Util/Test.php(856): ReflectionMethod->invoke(Object(Sonata\AdminBundle\Tests\Admin\AdminTest))
+#8 phar:///home/greg/bin/phpunit/phpunit/Util/Test.php(410): PHPUnit\Util\Test::getDataFromDataProviderAnnotation('/**\n     * @dat...', 'Sonata\\AdminBun...', 'testGetSubjectF...')
+#9 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(157): PHPUnit\Util\Test::getProvidedData('Sonata\\AdminBun...', 'testGetSubjectF...')
+#10 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(906): PHPUnit\Framework\TestSuite::createTest(Object(ReflectionClass), 'testGetSubjectF...')
+#11 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(397): PHPUnit\Framework\TestSuite->addTestMethod(Object(ReflectionClass), Object(ReflectionMethod))
+#12 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(511): PHPUnit\Framework\TestSuite->__construct(Object(ReflectionClass))
+#13 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(592): PHPUnit\Framework\TestSuite->addTestSuite(Object(ReflectionClass))
+#14 phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(618): PHPUnit\Framework\TestSuite->addTestFile('/home/greg/dev/...')
+#15 phar:///home/greg/bin/phpunit/phpunit/Util/Configuration.php(1139): PHPUnit\Framework\TestSuite->addTestFiles(Array)
+#16 phar:///home/greg/bin/phpunit/phpunit/Util/Configuration.php(988): PHPUnit\Util\Configuration->getTestSuite(Object(DOMElement), Array)
+#17 phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(889): PHPUnit\Util\Configuration->getTestSuiteConfiguration('')
+#18 phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(170): PHPUnit\TextUI\Command->handleArguments(Array)
+#19 phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(159): PHPUnit\TextUI\Command->run(Array, true)
+#20 /home/greg/bin/phpunit(595): PHPUnit\TextUI\Command::main()
+#21 {main}
+```
+
+# After:
+
+```
+#0 [internal function] Symfony\Bridge\PhpUnit\DeprecationErrorHandler::Symfony\Bridge\PhpUnit\{closure}(16384, 'The Sonata\Core…', '/home/greg/dev/…', 17, Array)
+#1 [sonata-project/core-bundle] /home/greg/dev/SonataAdminBundle/vendor/sonata-project/core-bundle/src/Model/Adapter/AdapterInterface.php(17): ::trigger_error('The Sonata\Core…', 16384)
+#2 [composer] /home/greg/dev/SonataAdminBundle/vendor/composer/ClassLoader.php(444): ::include('/home/greg/dev/…')
+#3 [composer] /home/greg/dev/SonataAdminBundle/vendor/composer/ClassLoader.php(322): ::Composer\Autoload\includeFile('/home/greg/dev/…')
+#4 [internal function] Composer\Autoload\ClassLoader::loadClass('Sonata\CoreBund…')
+#5 [source code] /home/greg/dev/SonataAdminBundle/tests/Admin/AdminTest.php(1817): ::spl_autoload_call('Sonata\CoreBund…')
+#6 [internal function] Sonata\AdminBundle\Tests\Admin\AdminTest::provideGetSubject()
+#7 [unknown] phar:///home/greg/bin/phpunit/phpunit/Util/Test.php(856): ReflectionMethod::invoke(Object(Sonata\AdminBundle\Tests\Admin\AdminTest))
+#8 [unknown] phar:///home/greg/bin/phpunit/phpunit/Util/Test.php(410): PHPUnit\Util\Test::getDataFromDataProviderAnnotation('/**\n     * @dat…', 'Sonata\AdminBun…', 'testGetSubjectF…')
+#9 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(157): PHPUnit\Util\Test::getProvidedData('Sonata\AdminBun…', 'testGetSubjectF…')
+#10 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(906): PHPUnit\Framework\TestSuite::createTest(Object(ReflectionClass), 'testGetSubjectF…')
+#11 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(397): PHPUnit\Framework\TestSuite::addTestMethod(Object(ReflectionClass), Object(ReflectionMethod))
+#12 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(511): PHPUnit\Framework\TestSuite::__construct(Object(ReflectionClass))
+#13 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(592): PHPUnit\Framework\TestSuite::addTestSuite(Object(ReflectionClass))
+#14 [unknown] phar:///home/greg/bin/phpunit/phpunit/Framework/TestSuite.php(618): PHPUnit\Framework\TestSuite::addTestFile('/home/greg/dev/…')
+#15 [unknown] phar:///home/greg/bin/phpunit/phpunit/Util/Configuration.php(1139): PHPUnit\Framework\TestSuite::addTestFiles(Array)
+#16 [unknown] phar:///home/greg/bin/phpunit/phpunit/Util/Configuration.php(988): PHPUnit\Util\Configuration::getTestSuite(Object(DOMElement), Array)
+#17 [unknown] phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(889): PHPUnit\Util\Configuration::getTestSuiteConfiguration('…')
+#18 [unknown] phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(170): PHPUnit\TextUI\Command::handleArguments(Array)
+#19 [unknown] phar:///home/greg/bin/phpunit/phpunit/TextUI/Command.php(159): PHPUnit\TextUI\Command::run(Array, true)
+#20 [source code] /home/greg/bin/phpunit(595): PHPUnit\TextUI\Command::main()
+```
+
+The package name is now included, which helps me. Tell me if you do not like it, and I will remove it just before this is merged.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-27T18:10:44Z
+
+Needs rebase :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-10T19:55:06Z
+
+I'm finally reviewing this PR \o/
+I rebase+squashed it, then added a commit. I think there is no need for deprecating any mode except "weak_vendor". This means the "regexp" key in the query string should be removed. Then I'll really insist to never use the term "vendor" anywhere except in the doc. Fingerpointing at vendors is wrong and doesn't encourage the correct attitude. There are only "self" (replaces "internal"), "direct" and "indirect" deprecations.

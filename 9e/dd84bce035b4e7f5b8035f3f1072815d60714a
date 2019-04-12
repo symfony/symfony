@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-07T10:38:10Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T16:04:49Z
+
+> Symfony\Component\VarDumper\Caster\SymfonyCaster should be updated for the new type of the multi property.
+
+actually, there is nothing to do on the topic, the caster just cuts the property:
+https://github.com/symfony/symfony/blob/4e1244ecdbada0d29cdec412e4d01621dc88cae6/src/Symfony/Component/VarDumper/Caster/SymfonyCaster.php#L44-L50
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-04-10T08:43:52Z
+
+PR is ready for review again.

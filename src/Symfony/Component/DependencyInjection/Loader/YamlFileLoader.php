@@ -400,6 +400,9 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['class'])) {
+            if ($service['class'] !== $id && class_exists($id)) {
+                throw new InvalidArgumentException(sprintf('Using the class "%s" as id for a service which have defined "%s" as "class" option is not allowed.', $id, $service['class']));
+            }
             $definition->setClass($service['class']);
         }
 

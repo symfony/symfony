@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -130,10 +131,7 @@ class MockResponse implements ResponseInterface
             throw new InvalidArgumentException('MockResponse instances must be issued by MockHttpClient before processing.');
         }
 
-        $multi = self::$mainMulti ?? self::$mainMulti = (object) [
-            'handlesActivity' => [],
-            'openHandles' => [],
-        ];
+        $multi = self::$mainMulti ?? self::$mainMulti = new ClientState();
 
         if (!isset($runningResponses[0])) {
             $runningResponses[0] = [$multi, []];
@@ -145,7 +143,7 @@ class MockResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected static function perform(\stdClass $multi, array &$responses): void
+    protected static function perform(ClientState $multi, array &$responses): void
     {
         foreach ($responses as $response) {
             $id = $response->id;
@@ -185,7 +183,7 @@ class MockResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected static function select(\stdClass $multi, float $timeout): int
+    protected static function select(ClientState $multi, float $timeout): int
     {
         return 42;
     }

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient\Response;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -26,11 +27,12 @@ final class CurlResponse implements ResponseInterface
     use ResponseTrait;
 
     private static $performing = false;
+    private $multi;
 
     /**
      * @internal
      */
-    public function __construct(\stdClass $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null)
+    public function __construct(CurlClientState $multi, $ch, array $options = null, LoggerInterface $logger = null, string $method = 'GET', callable $resolveRedirect = null)
     {
         $this->multi = $multi;
 
@@ -186,8 +188,8 @@ final class CurlResponse implements ResponseInterface
 
                 $this->multi->pushedResponses = [];
                 // Schedule DNS cache eviction for the next request
-                $this->multi->dnsCache[2] = $this->multi->dnsCache[2] ?: $this->multi->dnsCache[1];
-                $this->multi->dnsCache[1] = $this->multi->dnsCache[0] = [];
+                $this->multi->dnsCache->evictions = $this->multi->dnsCache->evictions ?: $this->multi->dnsCache->removals;
+                $this->multi->dnsCache->removals = $this->multi->dnsCache->hostnames = [];
             }
         }
     }
@@ -195,7 +197,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected function close(): void
+    private function close(): void
     {
         unset($this->multi->openHandles[$this->id], $this->multi->handlesActivity[$this->id]);
         curl_multi_remove_handle($this->multi->handle, $this->handle);
@@ -213,7 +215,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected static function schedule(self $response, array &$runningResponses): void
+    private static function schedule(self $response, array &$runningResponses): void
     {
         if (isset($runningResponses[$i = (int) $response->multi->handle])) {
             $runningResponses[$i][1][$response->id] = $response;
@@ -231,7 +233,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected static function perform(\stdClass $multi, array &$responses = null): void
+    private static function perform(CurlClientState $multi, array &$responses = null): void
     {
         if (self::$performing) {
             return;
@@ -253,7 +255,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * {@inheritdoc}
      */
-    protected static function select(\stdClass $multi, float $timeout): int
+    private static function select(CurlClientState $multi, float $timeout): int
     {
         return curl_multi_select($multi->handle, $timeout);
     }
@@ -261,7 +263,7 @@ final class CurlResponse implements ResponseInterface
     /**
      * Parses header lines as curl yields them to us.
      */
-    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, \stdClass $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
+    private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
     {
         if (!\in_array($waitFor = @curl_getinfo($ch, CURLINFO_PRIVATE), ['headers', 'destruct'], true)) {
             return \strlen($data); // Ignore HTTP trailers
@@ -295,11 +297,11 @@ final class CurlResponse implements ResponseInterface
             $info['redirect_url'] = $resolveRedirect($ch, $location);
             $url = parse_url($location ?? ':');
 
-            if (isset($url['host']) && null !== $ip = $multi->dnsCache[0][$url['host'] = strtolower($url['host'])] ?? null) {
+            if (isset($url['host']) && null !== $ip = $multi->dnsCache->hostnames[$url['host'] = strtolower($url['host'])] ?? null) {
                 // Populate DNS cache for redirects if needed
                 $port = $url['port'] ?? ('http' === ($url['scheme'] ?? parse_url(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL), PHP_URL_SCHEME)) ? 80 : 443);
                 curl_setopt($ch, CURLOPT_RESOLVE, ["{$url['host']}:$port:$ip"]);
-                $multi->dnsCache[1]["-{$url['host']}:$port"] = "-{$url['host']}:$port";
+                $multi->dnsCache->removals["-{$url['host']}:$port"] = "-{$url['host']}:$port";
             }
         }
 

@@ -68,7 +68,7 @@ final class DoctrineLoader implements LoaderInterface
 
         // Type and nullable aren't handled here, use the PropertyInfo Loader instead.
         foreach ($doctrineMetadata->fieldMappings as $mapping) {
-            if (true === $mapping['unique'] && !isset($existingUniqueFields[$mapping['fieldName']])) {
+            if (true === ($mapping['unique'] ?? false) && !isset($existingUniqueFields[$mapping['fieldName']])) {
                 $metadata->addConstraint(new UniqueEntity(['fields' => $mapping['fieldName']]));
             }
 

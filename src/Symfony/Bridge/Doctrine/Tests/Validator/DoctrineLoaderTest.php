@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\DoctrineLoader;
@@ -70,6 +71,30 @@ class DoctrineLoaderTest extends TestCase
         $this->assertInstanceOf(Length::class, $alreadyMappedMaxLengthConstraints[0]);
         $this->assertSame(10, $alreadyMappedMaxLengthConstraints[0]->max);
         $this->assertSame(1, $alreadyMappedMaxLengthConstraints[0]->min);
+    }
+
+    public function testFieldMappingsConfiguration()
+    {
+        if (!method_exists(ValidatorBuilder::class, 'addLoader')) {
+            $this->markTestSkipped('Auto-mapping requires symfony/validation 4.2+');
+        }
+
+        $validator = Validation::createValidatorBuilder()
+            ->enableAnnotationMapping()
+            ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
+            ->addLoader(
+                new DoctrineLoader(
+                    DoctrineTestHelper::createTestEntityManager(
+                        DoctrineTestHelper::createTestConfigurationWithXmlLoader()
+                    ), '{}'
+                )
+            )
+            ->getValidator();
+
+        $classMetadata = $validator->getMetadataFor(new BaseUser(1, 'DemoUser'));
+
+        $constraints = $classMetadata->getConstraints();
+        $this->assertCount(0, $constraints);
     }
 
     /**

@@ -138,7 +138,7 @@ class Configuration
      *
      * @return self
      */
-    public static function fromUrlEncodedString(string $serializedConfiguration)
+    public static function fromUrlEncodedString($serializedConfiguration)
     {
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
@@ -157,7 +157,7 @@ class Configuration
         }
 
         return new self(
-            $normalizedConfiguration['max'] ?? [],
+            isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
             '',
             $verboseOutput
         );
@@ -193,7 +193,7 @@ class Configuration
     /**
      * @return self
      */
-    public static function fromNumber(int $upperBound)
+    public static function fromNumber($upperBound)
     {
         return new self(['total' => $upperBound]);
     }
@@ -201,7 +201,7 @@ class Configuration
     /**
      * @return self
      */
-    public static function fromRegex(string $regex)
+    public static function fromRegex($regex)
     {
         return new self([], $regex);
     }

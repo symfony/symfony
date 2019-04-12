@@ -231,6 +231,7 @@ class DeprecationErrorHandler
             $msg = sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode);
             $ref = &$this->deprecations['remaining self'][$msg]['count'];
             ++$ref;
+            $mode = 'max[self]=0';
         }
         if (isset($mode[0]) && '/' === $mode[0]) {
             return $this->configuration = Configuration::fromRegex($mode);

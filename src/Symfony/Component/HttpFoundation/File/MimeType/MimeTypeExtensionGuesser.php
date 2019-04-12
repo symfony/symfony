@@ -139,6 +139,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'application/tei+xml' => 'tei',
         'application/thraud+xml' => 'tfi',
         'application/timestamped-data' => 'tsd',
+        'application/twig' => 'twig',
         'application/vnd.3gpp.pic-bw-large' => 'plb',
         'application/vnd.3gpp.pic-bw-small' => 'psb',
         'application/vnd.3gpp.pic-bw-var' => 'pvb',

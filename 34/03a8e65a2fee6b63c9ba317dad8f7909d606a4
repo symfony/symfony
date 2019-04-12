@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-01-24T07:30:57Z
+
+Typo in PR headline:
+```diff
+- [DI] Fixes: #28326 - Overriding services autowired by name under _deaults bind not working
++ [DI] Fixes: #28326 - Overriding services autowired by name under _defaults bind not working
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-01-24T18:06:53Z
+
+See comment in #29949: there may be an issue that makes the container load all classes at compile time. We should avoid it if confirmed.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-01-27T01:33:11Z
+
+@GuilhemN Thanks for the suggestion. I added the funcionality for `PhpFileLoader`, and as a consequence I moved code from `FileLoader` into `ContainerBuilder` to avoid duplication.
+
+@nicolas-grekas This PR is rather simple so I don't think I've made a change that would cause
+
+> the container load all classes at compile time
+
+At least, I'm not aware of that.

@@ -60,7 +60,8 @@ class CommandTester
         }
 
         $this->input = new ArrayInput($input);
-        // Use an in-memory input stream even if no inputs are set so that QuestionHelper::ask() does not rely on the blocking STDIN.
+        // Use an in-memory input stream even if no inputs are set so that
+        // QuestionHelper::ask() and QuestionPrompt do not rely on the blocking STDIN.
         $this->input->setStream(self::createStream($this->inputs));
 
         if (isset($options['interactive'])) {

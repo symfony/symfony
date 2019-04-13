@@ -72,7 +72,13 @@ class QuestionPrompt
         if (!$this->input->isInteractive()) {
             $default = $this->question->getDefault();
 
-            if (null !== $default && $this->question instanceof ChoiceQuestion) {
+            if (null === $default) {
+                return $default;
+            }
+
+            if ($validator = $this->question->getValidator()) {
+                return \call_user_func($this->question->getValidator(), $default);
+            } elseif ($this->question instanceof ChoiceQuestion) {
                 $choices = $this->question->getChoices();
 
                 if (!$this->question->isMultiselect()) {
@@ -105,7 +111,7 @@ class QuestionPrompt
         $this->writePrompt();
 
         $inputStream = $this->inputStream ?: STDIN;
-        $autocomplete = $this->question->getAutocompleterValues();
+        $autocomplete = $this->question->getAutocompleterCallback();
 
         if (null === $autocomplete || !$this->hasSttyAvailable()) {
             $ret = false;
@@ -122,12 +128,12 @@ class QuestionPrompt
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted.');
                 }
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete(\is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
+            $ret = trim($this->autocomplete($autocomplete));
         }
 
         if ($this->output instanceof ConsoleSectionOutput) {
@@ -180,13 +186,13 @@ class QuestionPrompt
     /**
      * Autocompletes a question.
      */
-    private function autocomplete(array $autocomplete): string
+    private function autocomplete(callable $autocomplete): string
     {
         $ret = '';
 
         $i = 0;
         $ofs = -1;
-        $matches = $autocomplete;
+        $matches = $autocomplete($ret);
         $numMatches = \count($matches);
 
         $sttyMode = shell_exec('stty -g');
@@ -201,8 +207,11 @@ class QuestionPrompt
         while (!feof($this->inputStream)) {
             $c = fread($this->inputStream, 1);
 
-            // Backspace Character
-            if ("\177" === $c) {
+            // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
+            if (false === $c || ('' === $ret && '' === $c && null === $this->question->getDefault())) {
+                shell_exec(sprintf('stty %s', $sttyMode));
+                throw new RuntimeException('Aborted.');
+            } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
                     // Move cursor backwards
@@ -211,7 +220,7 @@ class QuestionPrompt
 
                 if (0 === $i) {
                     $ofs = -1;
-                    $matches = $autocomplete;
+                    $matches = $autocomplete($ret);
                     $numMatches = \count($matches);
                 } else {
                     $numMatches = 0;
@@ -239,22 +248,33 @@ class QuestionPrompt
             } elseif (\ord($c) < 32) {
                 if ("\t" === $c || "\n" === $c) {
                     if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = $matches[$ofs];
+                        $ret = (string) $matches[$ofs];
                         // Echo out remaining chars for current match
                         $this->output->write(substr($ret, $i));
                         $i = \strlen($ret);
+
+                        $matches = array_filter(
+                            $autocomplete($ret),
+                            function ($match) use ($ret) {
+                                return '' === $ret || 0 === strpos($match, $ret);
+                            }
+                        );
+                        $numMatches = \count($matches);
+                        $ofs = -1;
                     }
 
                     if ("\n" === $c) {
                         $this->output->write($c);
                         break;
                     }
-
-                    $numMatches = 0;
                 }
 
                 continue;
             } else {
+                if ("\x80" <= $c) {
+                    $c .= fread($this->inputStream, ["\xC0" => 1, "\xD0" => 1, "\xE0" => 2, "\xF0" => 3][$c & "\xF0"]);
+                }
+
                 $this->output->write($c);
                 $ret .= $c;
                 ++$i;
@@ -262,7 +282,7 @@ class QuestionPrompt
                 $numMatches = 0;
                 $ofs = 0;
 
-                foreach ($autocomplete as $value) {
+                foreach ($autocomplete($ret) as $value) {
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
                     if (0 === strpos($value, $ret)) {
                         $matches[$numMatches++] = $value;
@@ -324,7 +344,7 @@ class QuestionPrompt
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new RuntimeException('Aborted');
+                throw new RuntimeException('Aborted.');
             }
 
             $value = trim($value);

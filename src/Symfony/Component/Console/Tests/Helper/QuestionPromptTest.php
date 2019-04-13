@@ -137,6 +137,10 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream, false), $this->createOutputInterface(), $question);
         $this->assertNull($dialog->ask());
 
+        $question = new ChoiceQuestion('Who are your favorite superheros?', ['a' => 'Batman', 'b' => 'Superman'], 'a');
+        $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock('', false), $this->createOutputInterface(), $question);
+        $this->assertSame('a', $dialog->ask(), 'ChoiceQuestion validator returns the key if it\'s a string');
+
         try {
             $question = new ChoiceQuestion('Who are your favorite superheros?', $heroes, '');
             $question->setMultiselect(true);
@@ -193,6 +197,62 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $this->assertEquals('FooBundle', $dialog->ask());
     }
 
+    public function testAskWithAutocompleteCallback()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // Po<TAB>Cr<TAB>P<DOWN ARROW><DOWN ARROW><NEWLINE>
+        $inputStream = $this->getInputStream("Pa\177\177o\tCr\t\033[A\033[A\033[A\n");
+
+        $question = new Question('What\'s for dinner?');
+
+        // A simple test callback - return an array containing the words the
+        // user has already completed, suffixed with all known words.
+        //
+        // Eg: If the user inputs "Potato C", the return will be:
+        //
+        //     ["Potato Carrot ", "Potato Creme ", "Potato Curry ", ...]
+        //
+        // No effort is made to avoid irrelevant suggestions, as this is handled
+        // by the autocomplete function.
+        $callback = function ($input) {
+            $knownWords = [
+                'Carrot',
+                'Creme',
+                'Curry',
+                'Parsnip',
+                'Pie',
+                'Potato',
+                'Tart',
+            ];
+
+            $inputWords = explode(' ', $input);
+            $lastInputWord = array_pop($inputWords);
+            $suggestionBase = $inputWords
+                ? implode(' ', $inputWords).' '
+                : '';
+
+            return array_map(
+                function ($word) use ($suggestionBase) {
+                    return $suggestionBase.$word.' ';
+                },
+                $knownWords
+            );
+        };
+
+        $question->setAutocompleterCallback($callback);
+
+        $dialog = new QuestionPrompt(
+            $this->createStreamableInputInterfaceMock($inputStream),
+            $this->createOutputInterface(),
+            $question
+        );
+
+        $this->assertSame('Potato Creme Pie', $dialog->ask());
+    }
+
     public function testAskWithAutocompleteWithNonSequentialKeys()
     {
         if (!$this->hasSttyAvailable()) {
@@ -228,6 +288,42 @@ class AskQuestionTest extends AbstractAskQuestionTest
         $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
 
         $this->assertSame('b', $dialog->ask());
+    }
+
+    public function getInputs()
+    {
+        return [
+            ['$'], // 1 byte character
+            ['¢'], // 2 bytes character
+            ['€'], // 3 bytes character
+            ['𐍈'], // 4 bytes character
+        ];
+    }
+
+    /**
+     * @dataProvider getInputs
+     */
+    public function testAskWithAutocompleteWithMultiByteCharacter($character)
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $inputStream = $this->getInputStream("$character\n");
+
+        $possibleChoices = [
+            '$' => '1 byte character',
+            '¢' => '2 bytes character',
+            '€' => '3 bytes character',
+            '𐍈' => '4 bytes character',
+        ];
+
+        $question = new ChoiceQuestion('Please select a character', $possibleChoices);
+        $question->setMaxAttempts(1);
+
+        $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+
+        $this->assertSame($character, $dialog->ask());
     }
 
     public function testAutocompleteWithTrailingBackslash()
@@ -528,7 +624,7 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     /**
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted
+     * @expectedExceptionMessage Aborted.
      */
     public function testAskThrowsExceptionOnMissingInput()
     {
@@ -538,7 +634,17 @@ class AskQuestionTest extends AbstractAskQuestionTest
 
     /**
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
-     * @expectedExceptionMessage Aborted
+     * @expectedExceptionMessage Aborted.
+     */
+    public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
+    {
+        $dialog = new QuestionPrompt($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
+        $dialog->ask();
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted.
      */
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {

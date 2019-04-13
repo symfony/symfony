@@ -14,8 +14,6 @@ namespace Symfony\Component\Console\Tests\Tester;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -98,7 +96,6 @@ class CommandTesterTest extends TestCase
         ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $prompt = new QuestionPrompt($input, $output, new Question($questions[0]));
             $prompt->ask();
@@ -125,7 +122,6 @@ class CommandTesterTest extends TestCase
         ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $prompt = new QuestionPrompt($input, $output, new Question($questions[0], 'Bobby'));
             $prompt->ask();
@@ -156,7 +152,6 @@ class CommandTesterTest extends TestCase
         ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $prompt = new QuestionPrompt($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
             $prompt->ask();
@@ -186,7 +181,6 @@ class CommandTesterTest extends TestCase
         ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $prompt = new QuestionPrompt($input, $output, new ChoiceQuestion('choice', ['a', 'b']));
             $prompt->ask();

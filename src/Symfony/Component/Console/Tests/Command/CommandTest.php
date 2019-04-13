@@ -220,7 +220,7 @@ class CommandTest extends TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage Cannot retrieve helper "formatter" because there is no HelperSet defined.
+     * @expectedExceptionMessage Cannot retrieve helper "debug_formatter" because there is no HelperSet defined.
      */
     public function testGetHelperWithoutHelperSet()
     {

@@ -31,13 +31,15 @@ class ExceptionController
     protected $debug;
     protected $profiler;
     private $fileLinkFormat;
+    private $privateVendors;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null)
+    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug, FileLinkFormatter $fileLinkFormat = null, array $privateVendors)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->debug = $debug;
         $this->fileLinkFormat = $fileLinkFormat;
+        $this->privateVendors = $privateVendors;
     }
 
     /**
@@ -75,6 +77,7 @@ class ExceptionController
                 'status_text' => Response::$statusTexts[$code],
                 'exception' => $exception,
                 'logger' => null,
+                'private_vendors' => $this->privateVendors,
                 'currentContent' => '',
             ]
         ), 200, ['Content-Type' => 'text/html']);

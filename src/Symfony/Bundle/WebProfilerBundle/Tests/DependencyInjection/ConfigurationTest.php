@@ -32,11 +32,11 @@ class ConfigurationTest extends TestCase
     public function getDebugModes()
     {
         return [
-            [[], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt']],
-            [['intercept_redirects' => true], ['intercept_redirects' => true, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt']],
-            [['intercept_redirects' => false], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt']],
-            [['toolbar' => true], ['intercept_redirects' => false, 'toolbar' => true, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt']],
-            [['excluded_ajax_paths' => 'test'], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => 'test']],
+            [[], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'private_vendors' => []]],
+            [['intercept_redirects' => true], ['intercept_redirects' => true, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'private_vendors' => []]],
+            [['intercept_redirects' => false], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'private_vendors' => []]],
+            [['toolbar' => true], ['intercept_redirects' => false, 'toolbar' => true, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'private_vendors' => []]],
+            [['excluded_ajax_paths' => 'test'], ['intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => 'test', 'private_vendors' => []]],
         ];
     }
 }

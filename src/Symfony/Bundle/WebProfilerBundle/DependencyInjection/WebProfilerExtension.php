@@ -54,6 +54,7 @@ class WebProfilerExtension extends Extension
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
+        $container->setParameter('web_profiler.debug_toolbar.private_vendors', $config['private_vendors']);
 
         if (Kernel::VERSION_ID >= 40008 || (Kernel::VERSION_ID >= 30408 && Kernel::VERSION_ID < 40000)) {
             $container->getDefinition('debug.file_link_formatter')

@@ -37,6 +37,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('toolbar')->defaultFalse()->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
+                ->arrayNode('private_vendors')->scalarPrototype()->end()->end()
                 ->scalarNode('excluded_ajax_paths')->defaultValue('^/((index|app(_[\w]+)?)\.php/)?_wdt')->end()
             ->end()
         ;

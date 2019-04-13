@@ -102,7 +102,7 @@ class WebProfilerExtensionTest extends TestCase
     public function testToolbarConfig($toolbarEnabled, $interceptRedirects, $listenerInjected, $listenerEnabled)
     {
         $extension = new WebProfilerExtension();
-        $extension->load([['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]], $this->container);
+        $extension->load([['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects, 'private_vendors' => []]], $this->container);
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 

@@ -22,7 +22,7 @@
         <div id="trace-html-{{ index }}" class="sf-toggle-content">
         {% set _is_first_user_code = true %}
         {% for i, trace in exception.trace %}
-            {% set _is_vendor_trace = trace.file is not empty and ('/vendor/' in trace.file or '/var/cache/' in trace.file) %}
+            {% set _is_vendor_trace = trace.file is not empty and ('/vendor/' in trace.file or '/var/cache/' in trace.file or trace.file not in private_vendors) %}
             {% set _display_code_snippet = _is_first_user_code and not _is_vendor_trace %}
             {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
             <div class="trace-line {{ _is_vendor_trace ? 'trace-from-vendor' }}">

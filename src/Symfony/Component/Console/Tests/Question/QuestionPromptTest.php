@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Tests\Helper;
+namespace Symfony\Component\Console\Tests\Question;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\QuestionPrompt;
 
 /**
  * @group tty
  */
-class AskQuestionTest extends AbstractAskQuestionTest
+class AskQuestionTest extends AbstractQuestionPromptTest
 {
     public function testAskChoice()
     {

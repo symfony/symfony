@@ -13,12 +13,12 @@ namespace Symfony\Component\Console\Tests\Output;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\QuestionPrompt;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\QuestionPrompt;
 
 class ConsoleSectionOutputTest extends TestCase
 {

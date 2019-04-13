@@ -1,16 +1,16 @@
 <?php
 
-namespace Symfony\Component\Console\Tests\Helper;
+namespace Symfony\Component\Console\Tests\Question;
 
-use Symfony\Component\Console\Helper\SymfonyQuestionPrompt;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\SymfonyQuestionPrompt;
 
 /**
  * @group tty
  */
-class SymfonyQuestionPromptTest extends AbstractQuestionHelperTest
+class SymfonyQuestionPromptTest extends AbstractQuestionPromptTest
 {
     public function testAskChoice()
     {

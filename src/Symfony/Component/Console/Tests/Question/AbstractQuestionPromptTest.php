@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Tests\Helper;
+namespace Symfony\Component\Console\Tests\Question;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 
-abstract class AbstractAskQuestionTest extends TestCase
+abstract class AbstractQuestionPromptTest extends TestCase
 {
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {

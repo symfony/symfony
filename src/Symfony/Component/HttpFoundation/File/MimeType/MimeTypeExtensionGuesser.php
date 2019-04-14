@@ -728,6 +728,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'text/tab-separated-values' => 'tsv',
         'text/troff' => 't',
         'text/turtle' => 'ttl',
+        'text/twig' => 'twig',
         'text/uri-list' => 'uri',
         'text/vcard' => 'vcard',
         'text/vnd.curl' => 'curl',

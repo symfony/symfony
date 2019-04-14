@@ -187,6 +187,17 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
     }
 
+    public function testNonGreedyTrailingRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}', [], ['a' => '\d+']));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->expects($this->once())->method('redirect')->with('/123')->willReturn([]);
+
+        $this->assertEquals(['_route' => 'a', 'a' => '123'], $matcher->match('/123/'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', [$routes, $context ?: new RequestContext()]);

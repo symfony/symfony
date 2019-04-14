@@ -131,15 +131,20 @@ trait PhpMatcherTrait
                     }
 
                     $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
+
+                    if ($hasTrailingVar && ($hasTrailingSlash || '/' !== substr($matches[\count($vars)], -1)) && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                        if ($hasTrailingSlash) {
+                            $matches = $n;
+                        } else {
+                            $hasTrailingVar = false;
+                        }
+                    }
+
                     if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
                         if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
                             return $allow = $allowSchemes = [];
                         }
                         continue;
-                    }
-
-                    if ($hasTrailingSlash && $hasTrailingVar && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
-                        $matches = $n;
                     }
 
                     foreach ($vars as $i => $v) {

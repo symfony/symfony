@@ -316,14 +316,17 @@ class DebugClassLoader
             return $deprecations;
         }
 
-        if (isset($parentAndOwnInterfaces['Serializable'])
-            && 0 === strpos($refl->getNamespaceName(), 'Symfony\\')
-            && (
-                ((!($isInterface = $refl->isInterface()) || !isset(self::$method[$class]['__serialize'])) && !$refl->hasMethod('__serialize'))
-                || (!$refl->hasMethod('__unserialize') && (!$isInterface || !isset(self::$method[$class]['__unserialize'])))
-            )
-        ) {
-            $deprecations[] = sprintf('The "%s" %s the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.', $class, $isInterface ? 'interface extends' : 'class implements');
+        if (is_subclass_of($class, 'Serializable')) {
+            foreach (['serialize', 'unserialize'] as $methodName) {
+                if ($class !== $refl->getMethod($methodName)->class || isset(self::$method[$class]['__'.$methodName])) {
+                    continue;
+                }
+
+                if ($refl->hasMethod('__'.$methodName) ? $class !== $refl->getMethod('__'.$methodName)->class : 0 === strpos($class, 'Symfony\\')) {
+                    $deprecations[] = sprintf('Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "%s".', $class);
+                    break;
+                }
+            }
         }
 
         // Inherit @final, @internal and @param annotations for methods

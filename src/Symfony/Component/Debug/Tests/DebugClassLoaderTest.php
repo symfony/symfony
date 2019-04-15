@@ -392,14 +392,14 @@ class DebugClassLoaderTest extends TestCase
     public function implementsSerializableProvider(): array
     {
         return [
-            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable" class implements the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ImplementsSerializable::class],
+            [['Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable".'], ImplementsSerializable::class],
             [[], ImplementsSerializableWithTheNewMechanism::class],
-            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable" class implements the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsAClassImplementingSerializable::class],
-            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ImplementsAnInterfaceThatExtendsSerializable::class],
-            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsSerializable::class],
+            [['Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ImplementsSerializable".'], ExtendsAClassImplementingSerializable::class],
+            [['Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable".'], ImplementsAnInterfaceThatExtendsSerializable::class],
+            [['Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable".'], ExtendsSerializable::class],
             [[], ExtendsSerializableWithTheNewMechanism::class],
             [[], ExtendsSerializableWithTheNewMechanismThroughVirtualMethods::class],
-            [['The "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable" interface extends the broken "Serializable" interface. You should implement the new "__serialize" and "__unserialize" methods instead.'], ExtendsAnInterfaceThatExtendsSerializable::class],
+            [['Implementing "Serializable" without also implementing the "__serialize" and "__unserialize" methods is deprecated in "Symfony\Component\Debug\Tests\Fixtures\DiscourageSerializable\ExtendsSerializable".'], ExtendsAnInterfaceThatExtendsSerializable::class],
             [[], 'SymfonyFoo\\'.__NAMESPACE__.'\ImplementsSerializableOutsideOfSymfony'], // We don't trigger if the root namespace is not Symfony
         ];
     }

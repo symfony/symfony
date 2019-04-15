@@ -541,7 +541,7 @@ abstract class HttpClientTestCase extends TestCase
 
         $response = null;
         $this->expectException(TransportExceptionInterface::class);
-        $client->request('GET', 'http://symfony.com:8057/');
+        $client->request('GET', 'http://symfony.com:8057/', ['timeout' => 3]);
     }
 
     public function testTimeoutOnAccess()

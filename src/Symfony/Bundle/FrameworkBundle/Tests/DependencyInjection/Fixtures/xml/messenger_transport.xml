@@ -8,12 +8,13 @@
     <framework:config>
         <framework:serializer enabled="true" />
         <framework:messenger>
-            <framework:default-serializer>messenger.transport.symfony_serializer</framework:default-serializer>
-            <framework:symfony-serializer format="csv">
-                <framework:context>
-                    <framework:enable_max_depth>true</framework:enable_max_depth>
-                </framework:context>
-            </framework:symfony-serializer>
+            <framework:serializer default-serializer="messenger.transport.symfony_serializer">
+                <framework:symfony-serializer format="csv">
+                    <framework:context>
+                        <framework:enable_max_depth>true</framework:enable_max_depth>
+                    </framework:context>
+                </framework:symfony-serializer>
+            </framework:serializer>
             <framework:transport name="default" dsn="amqp://localhost/%2f/messages" />
         </framework:messenger>
     </framework:config>

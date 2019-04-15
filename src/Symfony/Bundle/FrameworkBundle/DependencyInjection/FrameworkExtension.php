@@ -1692,9 +1692,9 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.amqp.factory');
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
-                ->replaceArgument(1, $config['symfony_serializer']['format'])
-                ->replaceArgument(2, $config['symfony_serializer']['context']);
-            $container->setAlias('messenger.default_serializer', $config['default_serializer']);
+                ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])
+                ->replaceArgument(2, $config['serializer']['symfony_serializer']['context']);
+            $container->setAlias('messenger.default_serializer', $config['serializer']['default_serializer']);
         }
 
         $senderAliases = [];

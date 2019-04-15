@@ -407,15 +407,19 @@
 
     <xsd:complexType name="messenger">
         <xsd:sequence>
-            <xsd:element name="default-serializer" type="xsd:string" minOccurs="0" />
-            <xsd:element name="symfony-serializer" type="messenger_symfony_serializer" minOccurs="0" />
-            <xsd:element name="encoder" type="xsd:string" minOccurs="0" />
-            <xsd:element name="decoder" type="xsd:string" minOccurs="0" />
+            <xsd:element name="serializer" type="messenger_serializer" minOccurs="0" />
             <xsd:element name="routing" type="messenger_routing" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="transport" type="messenger_transport" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="bus" type="messenger_bus" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="default-bus" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_serializer">
+        <xsd:sequence>
+            <xsd:element name="symfony-serializer" type="messenger_symfony_serializer" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="default-serializer" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="messenger_symfony_serializer">

@@ -442,7 +442,7 @@ class DateIntervalTypeTest extends BaseTypeTest
 
     public function provideEmptyData()
     {
-        $expectedData = \DateInterval::createFromDateString('6 years and 4 months');
+        $expectedData = new \DateInterval('P6Y4M');
 
         return [
             'Simple field' => ['single_text', 'P6Y4M0D', $expectedData],

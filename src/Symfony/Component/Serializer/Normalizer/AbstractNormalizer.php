@@ -97,7 +97,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
-        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
         if (isset($this->defaultContext[self::CALLBACKS])) {
             if (!\is_array($this->defaultContext[self::CALLBACKS])) {
@@ -110,6 +109,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 }
             }
         }
+
+        if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
+            throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
+        }
+
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**

@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-09T17:17:59Z
+
+class_alias() doesn't work really well for deprecation layers because the notice is thrown depending on the loading order. Deprecating the service in favor of test.browser might be better?
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-04-09T17:28:59Z
+
+It is true that `class_alias` is limited. However I am not sure if I understand your suggestion. The library I am using has the following class definition:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace FriendsOfBehat\SymfonyExtension\Driver;
+
+use Behat\Mink\Driver\BrowserKitDriver;
+use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\HttpKernel\KernelInterface;
+
+final class SymfonyDriver extends BrowserKitDriver
+{
+    public function __construct(KernelInterface $kernel, string $baseUrl)
+    {
+        if (!$kernel->getContainer()->has('test.client')) {
+            throw new \RuntimeException(sprintf(
+                'Kernel "%s" used by Behat with "%s" environment and debug %s does not have "test.client" service. ' . "\n" .
+                'Please make sure the kernel is using "test" environment or have "framework.test" configuration option enabled.',
+                get_class($kernel),
+                $kernel->getEnvironment(),
+                $kernel->isDebug() ? 'enabled' : 'disabled'
+            ));
+        }
+
+        $testClient = $kernel->getContainer()->get('test.client');
+
+        if (!$testClient instanceof Client) {
+            throw new \RuntimeException(sprintf(
+                'Service "test.client" should be an instance of "%s", "%s" given.',
+                Client::class,
+                get_class($testClient)
+            ));
+        }
+
+        parent::__construct($testClient, $baseUrl);
+    }
+}
+```
+
+The service `test.client` could be deprecated. But still the `instanceof` check should succeed. I don't see how to do the latter without `class_alias` (or rearranging the class hierarchy).
+
+Or do you mean that in _addition_ to the `class_alias` to define a new service `test.browser` and deprecating `test.client`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-09T17:40:28Z
+
+I was hopping that creating a new service would be enough but it wouldn't allow passing legacy type hints.
+The best solution then is to make AbstractBrowser extend from Client.
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-04-09T17:52:48Z
+
+If I am not mistaken, the Client should also have the same public interface as AbstractBrowser then. I'm not sure if that's worth it? Wouldn't  it be against the intent of the original PR?
+
+It is possible though, rename AbstractBrowser back to Client. Create a new empty AbstractBrowser extending from Client. Then upon removal of Client drop AbstractBrowser and rename Client to AbstractBrowser. Bit cumbersome, but perhaps the safest way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-09T18:10:32Z
+
+It does have the same public interface, see its implementation, unless I missed something?
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-04-10T06:35:20Z
+
+I meant that all methods from AbstractBrowser have to be moved to Client if Client is the top of the hierarchy.
+
+Anyway, I am willing to do this. However I am not sure how deprecation will work. We cannot trigger an error in Client then as AbstractBrowser will depend on it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-10T06:38:56Z
+
+We will have to remove the deprecation notice and keep the annotation. DebugClassLoader will still warn ppl that extend Client directly.
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-04-10T07:06:49Z
+
+Sounds good. I think I have one last question concerning the deprecation messages. Currently the tests expect them on AbstractBrowser methods.
+
+```
+Calling the "Symfony\Component\BrowserKit\AbstractBrowser::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+```
+If I alter the class hierarchy `__METHOD__` will resolve to methods on `Client` and yield this:
+
+```
+ Calling the "Symfony\Component\BrowserKit\Client::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+```
+
+I can do three things:
+
+ 1. Alter the tests to expect the latter deprecation instead of the first. But people might be confused to see deprecated Client appear the message while they don't depend on it themselves.
+ 2. Hardcode the deprecation messages such that they refer to AbstractBrowser instead.
+ 3. Use `static::class` or `get_called_class` to generate deprecation messages. This means that the message contains always the concrete instance type. For example `KernelBrowser::getInternalRequest()`.
+
+I don't know how you guys usually solve this. I don't see evidence of variant 2 or 3 in the code base so far. Solution 1 is the way to go?
+
+Thanks for bearing with me and my questions :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-10T08:57:13Z
+
+Option 1. makes the most sense to me: all existing code uses `Client` - and not yet written code should not use the method anyway.
+
+---------------------------------------------------------------------------
+
+by Devristo at 2019-04-10T10:02:06Z
+
+You are right :). I have pushed a separate commit with the changes we discussed.

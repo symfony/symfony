@@ -14,5 +14,5 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (bar)
  --------------------- ----------------------------------- 
   Allowed values        -                                  
  --------------------- ----------------------------------- 
-  Normalizer            -                                  
+  Normalizers           -                                  
  --------------------- -----------------------------------

@@ -118,7 +118,7 @@ class TextDescriptor extends Descriptor
             'Default' => 'default',
             'Allowed types' => 'allowedTypes',
             'Allowed values' => 'allowedValues',
-            'Normalizer' => 'normalizer',
+            'Normalizers' => 'normalizers',
         ];
         $rows = [];
         foreach ($map as $label => $name) {

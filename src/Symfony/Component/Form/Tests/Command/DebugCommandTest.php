@@ -164,27 +164,29 @@ TXT
 Symfony\Component\Form\Tests\Command\FooType (foo)
 ==================================================
 
- ---------------- -----------------------------------------------------------%s
-  Required         true                                                      %w
- ---------------- -----------------------------------------------------------%s
-  Default          -                                                         %w
- ---------------- -----------------------------------------------------------%s
-  Allowed types    [                                                         %w
-                     "string"                                                %w
-                   ]                                                         %w
- ---------------- -----------------------------------------------------------%s
-  Allowed values   [                                                         %w
-                     "bar",                                                  %w
-                     "baz"                                                   %w
-                   ]                                                         %w
- ---------------- -----------------------------------------------------------%s
-  Normalizer       Closure(Options $options, $value) {                       %w
-                     class: "Symfony\Component\Form\Tests\Command\FooType"   %w
-                     this: Symfony\Component\Form\Tests\Command\FooType { …} %w
-                     file: "%s"%w
-                     line: "%d to %d"%w
-                   }                                                         %w
- ---------------- -----------------------------------------------------------%s
+ ---------------- -----------%s
+  Required         true      %s
+ ---------------- -----------%s
+  Default          -         %s
+ ---------------- -----------%s
+  Allowed types    [         %s
+                     "string"%s
+                   ]         %s
+ ---------------- -----------%s
+  Allowed values   [         %s
+                     "bar",  %s
+                     "baz"   %s
+                   ]         %s
+ ---------------- -----------%s
+  Normalizers      [         %s
+                     Closure(%s
+                       class:%s
+                       this: %s
+                       file: %s
+                       line: %s
+                     }       %s
+                   ]         %s
+ ---------------- -----------%s
 
 TXT
             , $tester->getDisplay(true));

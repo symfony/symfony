@@ -120,7 +120,7 @@ abstract class Descriptor implements DescriptorInterface
             'lazy' => 'getLazyClosures',
             'allowedTypes' => 'getAllowedTypes',
             'allowedValues' => 'getAllowedValues',
-            'normalizer' => 'getNormalizer',
+            'normalizers' => 'getNormalizers',
             'deprecationMessage' => 'getDeprecationMessage',
         ];
 

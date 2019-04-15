@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -66,5 +67,43 @@ class ConstraintViolationListNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->normalizer->normalize($list));
+    }
+
+    public function testNormalizeWithNameConverter()
+    {
+        $normalizer = new ConstraintViolationListNormalizer([], new CamelCaseToSnakeCaseNameConverter());
+
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('too short', 'a', [], 'c', 'shortDescription', ''),
+            new ConstraintViolation('too long', 'b', [], '3', 'product.shortDescription', 'Lorem ipsum dolor sit amet'),
+            new ConstraintViolation('error', 'b', [], '3', '', ''),
+        ]);
+
+        $expected = [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'detail' => 'short_description: too short
+product.short_description: too long
+error',
+            'violations' => [
+                [
+                    'propertyPath' => 'short_description',
+                    'title' => 'too short',
+                    'parameters' => [],
+                ],
+                [
+                    'propertyPath' => 'product.short_description',
+                    'title' => 'too long',
+                    'parameters' => [],
+                ],
+                [
+                    'propertyPath' => '',
+                    'title' => 'error',
+                    'parameters' => [],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($list));
     }
 }

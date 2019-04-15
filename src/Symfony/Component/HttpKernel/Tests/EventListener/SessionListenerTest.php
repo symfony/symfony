@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -41,8 +43,16 @@ class SessionListenerTest extends TestCase
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
 
+        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
+        $requestStack->expects($this->once())->method('getMasterRequest')->willReturn(null);
+
+        $sessionStorage = $this->getMockBuilder(NativeSessionStorage::class)->getMock();
+        $sessionStorage->expects($this->never())->method('setOptions')->with(['cookie_secure' => true]);
+
         $container = new Container();
         $container->set('session', $session);
+        $container->set('request_stack', $requestStack);
+        $container->set('session_storage', $sessionStorage);
 
         $request = new Request();
         $listener = new SessionListener($container);

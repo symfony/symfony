@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T07:32:21Z
+
+Another proposal would be to always use addslashes/stripslashes on the serialized payload.
+That would allow removing the option - ie less complexity. WDYT?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-08T12:54:55Z
+
+> Another proposal would be to always use addslashes/stripslashes on the serialized payload.
+That would allow removing the option - ie less complexity. WDYT?
+
+I think this *does* fix the problem. It would not allow message objects themselves to contain binary data, but probably that's not supported? Here is what SQS says about character sets:
+
+> A message can include only XML, JSON, and unformatted text. The following Unicode characters are allowed:
+
+> #x9 | #xA | #xD | #x20 to #xD7FF | #xE000 to #xFFFD | #x10000 to #x10FFFF
+
+Is addslashes sufficient?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-08T13:07:38Z
+
+> That would allow removing the option - ie less complexity. WDYT?
+
+I don't like this option. I often copy/paste message from/to AMQP. More over I often have different language between my producer and my consumer. (But I'm not sure the messenger component is designed for such use cases).
+
+---
+
+Instead of an option, why don't you add  `Transport::needEscaping()` ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-08T13:13:38Z
+
+> I often copy/paste message from/to AMQP.
+
+What's the format you usually use? serialized PHP or JSON?
+
+> More over I often have different language between my producer and my consumer. (But I'm not sure the messenger component is designed for such use cases).
+
+It absolutely is. But in that case, you'd be using the Symfony serializer (JSON) or something custom. Indeed the PhpSerializer is (mostly) only for the situation where you plan to send and consume from your Symfony app.
+
+> Instead of an option, why don't you add Transport::needEscaping() ?
+
+That's an interesting idea. In fact, the transport is responsible for calling the serializer... and so it could even pass this as an option to `encode()` and `decode()`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T13:17:26Z
+
+> It would not allow message objects themselves to contain binary data
+
+addslashes encodes `\0`, `'`, `"` and `\`
+
+> More over I often have different language between my producer and my consumer
+
+then you're not using the PhpSerializer - my comment applies only to it.
+
+we could also and/or alternatively define a new `messenger.transport.base64_encoded_php_serializer` service instead of adding a new option
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-08T13:26:55Z
+
+> we could also and/or alternatively define a new messenger.transport.base64_encoded_php_serializer service instead of adding a new option
+
+I like this way.
+
+> Instead of an option, why don't you add Transport::needEscaping() ?
+
+On 2nd thought, this might be hard to implement, as this whole escaping thing only applies if you're using the PhpSerializer... and the user may or may not be using it. So, it would be a weird transport option that only applies sometimes.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-08T16:18:27Z
+
+> What's the format you usually use? serialized PHP or JSON?
+
+JSON of course :)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-10T22:46:29Z
+
+Ready for review again - I've updated the description, etc. This changes to use `addslashes` instead of `base64_encode()`. This only applies to the PhpSerializer.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-15T14:27:44Z
+
+> messenger.transport.base64_encoded_php_serializer
+> for another PR when needed?
+
+Yep, exactly. It's trivial anyways - you could even decorate the `PhpSerializer`
+
+Ready to go!

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Contracts\Translation\Test\TranslatorTest;
 
@@ -35,5 +36,18 @@ class IdentityTranslatorTest extends TranslatorTest
     public function getTranslator()
     {
         return new IdentityTranslator();
+    }
+
+    public function testDebugNotThrow()
+    {
+        $identityTranslator = new IdentityTranslator(false);
+        $this->assertSame('', $identityTranslator->transChoice('', 1, []));
+    }
+
+    public function testDebugThrow()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $identityTranslator = new IdentityTranslator(true);
+        $identityTranslator->transChoice('', 1, []);
     }
 }

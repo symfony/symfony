@@ -28,13 +28,20 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
     }
 
     private $selector;
+    private $debug;
 
-    public function __construct(MessageSelector $selector = null)
+    /**
+     * @param bool $debug
+     */
+    public function __construct($debug = true)
     {
-        $this->selector = $selector;
-
-        if (__CLASS__ !== \get_class($this)) {
-            @trigger_error(sprintf('Calling "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        if (null === $debug || $debug instanceof MessageSelector) {
+            $this->selector = $debug;
+            $this->debug = true;
+        } elseif (!\is_bool($debug)) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be iterable of %s, %s given.', __METHOD__, \gettype($debug)));
+        } else {
+            $this->debug = $debug;
         }
     }
 
@@ -67,7 +74,15 @@ class IdentityTranslator implements LegacyTranslatorInterface, TranslatorInterfa
             return strtr($this->selector->choose((string) $id, $number, $locale ?: $this->getLocale()), $parameters);
         }
 
-        return $this->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
+        try {
+            return $this->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
+        } catch (\InvalidArgumentException $e) {
+            if ($this->debug) {
+                throw $e;
+            }
+
+            return strtr($id, $parameters);
+        }
     }
 
     private function getPluralizationRule(int $number, string $locale): int

@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -44,7 +44,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
                 return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Intl::getCurrencyBundle()->getCurrencyNames($choiceTranslationLocale));
+                    return array_flip(Currencies::getNames($choiceTranslationLocale));
                 });
             },
             'choice_translation_domain' => false,
@@ -83,7 +83,7 @@ class CurrencyType extends AbstractType implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getCurrencyBundle()->getCurrencyNames()), $value);
+        return $this->choiceList = new ArrayChoiceList(array_flip(Currencies::getNames()), $value);
     }
 
     /**

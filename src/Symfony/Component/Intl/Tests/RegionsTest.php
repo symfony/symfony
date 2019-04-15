@@ -9,22 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Data\Provider;
+namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
+use Symfony\Component\Intl\Regions;
 
 /**
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @group legacy
+ * @group intl-data
  */
-abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
+class RegionsTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $territories = [
+    private static $territories = [
         'AC',
         'AD',
         'AE',
@@ -282,26 +279,9 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         'ZW',
     ];
 
-    /**
-     * @var RegionDataProvider
-     */
-    protected $dataProvider;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->dataProvider = new RegionDataProvider(
-            $this->getDataDirectory().'/'.Intl::REGION_DIR,
-            $this->createEntryReader()
-        );
-    }
-
-    abstract protected function getDataDirectory();
-
     public function testGetRegions()
     {
-        $this->assertSame(static::$territories, $this->dataProvider->getRegions());
+        $this->assertSame(self::$territories, Regions::getRegionCodes());
     }
 
     /**
@@ -309,21 +289,18 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetNames($displayLocale)
     {
-        $countries = array_keys($this->dataProvider->getNames($displayLocale));
+        $countries = array_keys(Regions::getNames($displayLocale));
 
         sort($countries);
 
-        $this->assertSame(static::$territories, $countries);
+        $this->assertSame(self::$territories, $countries);
     }
 
     public function testGetNamesDefaultLocale()
     {
         Locale::setDefault('de_AT');
 
-        $this->assertSame(
-            $this->dataProvider->getNames('de_AT'),
-            $this->dataProvider->getNames()
-        );
+        $this->assertSame(Regions::getNames('de_AT'), Regions::getNames());
     }
 
     /**
@@ -334,10 +311,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(
-            $this->dataProvider->getNames($ofLocale),
-            $this->dataProvider->getNames($alias)
-        );
+        $this->assertEquals(Regions::getNames($ofLocale), Regions::getNames($alias));
     }
 
     /**
@@ -345,10 +319,28 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      */
     public function testGetName($displayLocale)
     {
-        $names = $this->dataProvider->getNames($displayLocale);
+        $names = Regions::getNames($displayLocale);
 
         foreach ($names as $country => $name) {
-            $this->assertSame($name, $this->dataProvider->getName($country, $displayLocale));
+            $this->assertSame($name, Regions::getName($country, $displayLocale));
         }
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testLocaleAliasesAreLoaded()
+    {
+        \Locale::setDefault('zh_TW');
+        $countryNameZhTw = Regions::getName('AD');
+
+        \Locale::setDefault('zh_Hant_TW');
+        $countryNameHantZhTw = Regions::getName('AD');
+
+        \Locale::setDefault('zh');
+        $countryNameZh = Regions::getName('AD');
+
+        $this->assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
+        $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
 }

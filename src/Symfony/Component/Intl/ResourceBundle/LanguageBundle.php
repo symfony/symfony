@@ -22,7 +22,7 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal
+ * @internal to be removed in 5.0.
  */
 class LanguageBundle extends LanguageDataProvider implements LanguageBundleInterface
 {

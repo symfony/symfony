@@ -243,6 +243,15 @@ HttpKernel
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
 
+Intl
+----
+
+ * Removed `ResourceBundle` namespace
+ * Removed `Intl::getLanguageBundle()`, use `Languages` or `Scripts` instead
+ * Removed `Intl::getCurrencyBundle()`, use `Currencies` instead
+ * Removed `Intl::getLocaleBundle()`, use `Locales` instead
+ * Removed `Intl::getRegionBundle()`, use `Regions` instead
+
 Messenger
 ---------
 

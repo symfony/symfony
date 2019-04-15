@@ -19,6 +19,7 @@ use Symfony\Component\Intl\Tests\Data\Provider\AbstractLocaleDataProviderTest;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group intl-data
+ * @group legacy
  */
 class JsonLocaleDataProviderTest extends AbstractLocaleDataProviderTest
 {

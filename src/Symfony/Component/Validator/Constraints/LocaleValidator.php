@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -46,10 +47,8 @@ class LocaleValidator extends ConstraintValidator
         if ($constraint->canonicalize) {
             $value = \Locale::canonicalize($value);
         }
-        $localeBundle = Intl::getLocaleBundle();
-        $locales = $localeBundle->getLocaleNames();
 
-        if (!isset($locales[$value]) && !\in_array($value, $localeBundle->getAliases(), true)) {
+        if (!Locales::exists($value) && !\in_array($value, Locales::getAliases(), true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($inputValue))
                 ->setCode(Locale::NO_SUCH_LOCALE_ERROR)

@@ -9,19 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Intl\Tests\Data\Provider;
+namespace Symfony\Component\Intl\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Locale;
 
-/**
- * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @group legacy
- */
-abstract class AbstractDataProviderTest extends TestCase
+abstract class ResourceBundleTestCase extends TestCase
 {
     // Include the locales statically so that the data providers are decoupled
     // from the Intl class. Otherwise tests will fail if the intl extension is
@@ -747,7 +740,7 @@ abstract class AbstractDataProviderTest extends TestCase
     protected function getRootLocales()
     {
         if (null === self::$rootLocales) {
-            self::$rootLocales = array_filter(static::getLocales(), function ($locale) {
+            self::$rootLocales = array_filter($this->getLocales(), function ($locale) {
                 // no locales for which fallback is possible (e.g "en_GB")
                 return false === strpos($locale, '_');
             });
@@ -755,20 +748,4 @@ abstract class AbstractDataProviderTest extends TestCase
 
         return self::$rootLocales;
     }
-
-    /**
-     * @return BundleEntryReader
-     */
-    protected function createEntryReader()
-    {
-        $entryReader = new BundleEntryReader($this->createBundleReader());
-        $entryReader->setLocaleAliases($this->getLocaleAliases());
-
-        return $entryReader;
-    }
-
-    /**
-     * @return BundleReaderInterface
-     */
-    abstract protected function createBundleReader();
 }

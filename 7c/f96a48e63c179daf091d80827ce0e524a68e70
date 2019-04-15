@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-04-12T10:22:34Z
+
+A bit of topic but as you are on it... In the Allowed types section shouldn’t it be null without quotes? 🤔
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-12T11:45:19Z
+
+Hi @OskarStark, the output is consistent with its definition, we pass `'null'` as allowed type:
+https://github.com/symfony/symfony/blob/572864b223fd3f8937cc626bed969313e0c9e224/src/Symfony/Bridge/Doctrine/Form/Type/EntityType.php#L43
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-15T13:17:16Z
+
+Rebased and conflict fixed

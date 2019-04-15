@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-25T18:44:39Z
+
+i've moved all data bundles, ready for first round of review.
+
+The new `intl-data` tests are passing locally :+1:, i've copied from `Symfony\Component\Intl\Tests\Data\Provider` so perhaps remove the legacy tests already? as they are somewhat big (but not sure we care).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T17:17:26Z
+
+@webmozart thanks for review, it's done :) i was a bit confused by `locales` vs. `currency codes` (e.g. not `locale codes` nor `currencies`). But "code" is indeed part of their domain terminology, so is language code, script code etc. But not locales :)
+
+Last but not least for local variables, e.g. `$currency` we mean the "code" and not the name or other. Works for me :+1:
+
+Ill fix the remaning deprecations asap.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2019-04-08T18:19:39Z
+
+@ro0NL Exactly! :) It takes some wrapping your mind around, but once you understand the domain language of CLDR, this naming makes total sense.
+
+As for `$currency` et al., I'd even go as far as naming that `$currencyCode` (otherwise - is it the code? The name? A `Currency` object?). But I know this may go a little far and am really fine with either way. :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-11T08:33:20Z
+
+status: ready :)

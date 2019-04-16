@@ -112,6 +112,38 @@ class ContainerBuilderTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @dataProvider provideBadId
+     */
+    public function testBadAliasId($id)
+    {
+        $builder = new ContainerBuilder();
+        $builder->setAlias($id, 'foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @dataProvider provideBadId
+     */
+    public function testBadDefinitionId($id)
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinition($id, new Definition('Foo'));
+    }
+
+    public function provideBadId()
+    {
+        return [
+            [''],
+            ["\0"],
+            ["\r"],
+            ["\n"],
+            ["'"],
+            ['ab\\'],
+        ];
+    }
+
+    /**
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage You have requested a synthetic service ("foo"). The DIC does not know how to construct this service.
      */

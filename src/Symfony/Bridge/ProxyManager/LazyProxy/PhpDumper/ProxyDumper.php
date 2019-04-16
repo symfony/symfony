@@ -54,12 +54,13 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
-            $instantiation .= " \$this->services['$id'] =";
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
-            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
+        if (ContainerInterface::SCOPE_CONTAINER === $scope = $definition->getScope()) {
+            $instantiation .= ' $this->services[%s] =';
+        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
+            $instantiation .= ' $this->services[%s] = $this->scopedServices[%s][%1$s] =';
         }
 
+        $instantiation = sprintf($instantiation, var_export($id, true), var_export($scope, true));
         $methodName = 'get'.Container::camelize($id).'Service';
         $proxyClass = $this->getProxyClassName($definition);
 

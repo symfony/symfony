@@ -622,6 +622,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $alias = strtolower($alias);
 
+        if ('' === $alias || '\\' === substr($alias, -1) || \strlen($alias) !== strcspn($alias, "\0\r\n'")) {
+            throw new InvalidArgumentException(sprintf('Invalid alias id: "%s"', $alias));
+        }
+
         if (is_string($id)) {
             $id = new Alias($id);
         } elseif (!$id instanceof Alias) {
@@ -755,6 +759,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $id = strtolower($id);
+
+        if ('' === $id || '\\' === substr($id, -1) || \strlen($id) !== strcspn($id, "\0\r\n'")) {
+            throw new InvalidArgumentException(sprintf('Invalid service id: "%s"', $id));
+        }
 
         unset($this->aliasDefinitions[$id]);
 

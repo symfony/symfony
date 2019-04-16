@@ -90,16 +90,19 @@ class ConfigurationTest extends TestCase
         $config = $processor->processConfiguration($configuration, [['assets' => null]]);
 
         $defaultConfig = [
-            'enabled' => true,
-            'version_strategy' => null,
-            'version' => null,
-            'version_format' => '%%s?%%s',
-            'base_path' => '',
-            'base_urls' => [],
-            'packages' => [],
-            'json_manifest_path' => null,
-        ];
-
+                'enabled' => true,
+                'version_strategy' => null,
+                'version' => null,
+                'version_format' => '%%s?%%s',
+                'base_path' => '',
+                'base_urls' => [],
+                'packages' => [],
+                'json_manifest_path' => null,
+                'json_manifest' => [
+                    'path' => null,
+                    'allow_missing' => false,
+                ],
+            ];
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
@@ -174,18 +177,18 @@ class ConfigurationTest extends TestCase
         yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "version" at the same time under "assets" packages.'];
 
         $config = [
-            'json_manifest_path' => '/foo.json',
+            'json_manifest' => ['path' => '/foo.json'],
             'version_strategy' => 'foo',
         ];
-        yield [$config, 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".'];
-        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.'];
+        yield [$config, 'You cannot use both "version_strategy" and "json_manifest.path" at the same time under "assets".'];
+        yield [$createPackageConfig($config), 'You cannot use both "version_strategy" and "json_manifest.path" at the same time under "assets" packages.'];
 
         $config = [
-            'json_manifest_path' => '/foo.json',
+            'json_manifest' => ['path' => '/foo.json'],
             'version' => '1',
         ];
-        yield [$config, 'You cannot use both "version" and "json_manifest_path" at the same time under "assets".'];
-        yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
+        yield [$config, 'You cannot use both "version" and "json_manifest.path" at the same time under "assets".'];
+        yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest.path" at the same time under "assets" packages.'];
     }
 
     public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()

@@ -26,13 +26,15 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
 {
     private $manifestPath;
     private $manifestData;
+    private $allowMissing;
 
     /**
      * @param string $manifestPath Absolute path to the manifest file
      */
-    public function __construct(string $manifestPath)
+    public function __construct(string $manifestPath, bool $allowMissing = false)
     {
         $this->manifestPath = $manifestPath;
+        $this->allowMissing = $allowMissing;
     }
 
     /**
@@ -54,6 +56,11 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     {
         if (null === $this->manifestData) {
             if (!file_exists($this->manifestPath)) {
+                if ($this->allowMissing) {
+                    $this->manifestData = [];
+
+                    return null;
+                }
                 throw new \RuntimeException(sprintf('Asset manifest file "%s" does not exist.', $this->manifestPath));
             }
 

@@ -131,10 +131,15 @@
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
+    <xsd:complexType name="json-manifest">
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="allow-missing" type="xsd:string" />
+    </xsd:complexType>
     <xsd:complexType name="assets">
         <xsd:sequence>
             <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="json-manifest" type="json-manifest" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
@@ -148,6 +153,7 @@
     <xsd:complexType name="package">
         <xsd:sequence>
             <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="json-manifest" type="json-manifest" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
         <xsd:attribute name="name" type="xsd:string" use="required" />
@@ -156,6 +162,7 @@
         <xsd:attribute name="version" type="xsd:string" />
         <xsd:attribute name="version-format" type="xsd:string" />
         <xsd:attribute name="json-manifest-path" type="xsd:string" />
+        <xsd:attribute name="json-manifest-allow-missing" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="templating">

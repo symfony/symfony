@@ -46,6 +46,12 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy->getVersion('main.js');
     }
 
+    public function testMissingManifestFileNotThrowsException()
+    {
+        $strategy = $this->createStrategy('non-existent-file.json', true);
+        $this->assertNotNull($strategy->getVersion('main.js'));
+    }
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Error parsing JSON
@@ -56,8 +62,8 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy->getVersion('main.js');
     }
 
-    private function createStrategy($manifestFilename)
+    private function createStrategy($manifestFilename, $allowMissing = false)
     {
-        return new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestFilename);
+        return new JsonManifestVersionStrategy(__DIR__.'/../fixtures/'.$manifestFilename, $allowMissing);
     }
 }

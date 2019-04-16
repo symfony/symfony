@@ -639,6 +639,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $versionStrategy = $container->getDefinition((string) $package->getArgument(1));
         $this->assertEquals('assets.json_manifest_version_strategy', $versionStrategy->getParent());
         $this->assertEquals('/path/to/manifest.json', $versionStrategy->getArgument(0));
+        $this->assertFalse($versionStrategy->getArgument(1));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()

@@ -663,6 +663,18 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('assets')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return isset($v['json_manifest_path']) && !isset($v['json_manifest']['path']); })
+                        ->then(function ($v) {
+                            return $v;
+                        })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return null === $v; })
+                        ->then(function ($v) {
+                            return $v = ['json_manifest' => ['path' => null, 'allow_missing' => false]];
+                        })
+                    ->end()
                     ->info('assets configuration')
                     ->{!class_exists(FullStack::class) && class_exists(Package::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('base_url')
@@ -670,8 +682,14 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('version_strategy')->defaultNull()->end()
                         ->scalarNode('version')->defaultNull()->end()
                         ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
-                        ->scalarNode('json_manifest_path')->defaultNull()->end()
+                        ->scalarNode('json_manifest_path')->setDeprecated('The "json_manifest_path" configuration key has been deprecated in Symfony 4.4, use "json_manifest.path" instead.')->defaultNull()->end()
                         ->scalarNode('base_path')->defaultValue('')->end()
+                        ->arrayNode('json_manifest')
+                            ->children()
+                                ->scalarNode('path')->defaultNull()->end()
+                                ->booleanNode('allow_missing')->defaultFalse()->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('base_urls')
                             ->requiresAtLeastOneElement()
                             ->beforeNormalization()
@@ -689,15 +707,15 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                            return isset($v['version_strategy']) && (isset($v['json_manifest']['path']) || isset($v['json_manifest_path']));
                         })
-                        ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets".')
+                        ->thenInvalid('You cannot use both "version_strategy" and "json_manifest.path" at the same time under "assets".')
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version']) && isset($v['json_manifest_path']);
+                            return isset($v['version']) && (isset($v['json_manifest']['path']) || isset($v['json_manifest_path']));
                         })
-                        ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets".')
+                        ->thenInvalid('You cannot use both "version" and "json_manifest.path" at the same time under "assets".')
                     ->end()
                     ->fixXmlConfig('package')
                     ->children()
@@ -705,6 +723,14 @@ class Configuration implements ConfigurationInterface
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->prototype('array')
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return isset($v['json_manifest_path']) && !isset($v['json']['manifest_path']); })
+                                ->then(function ($v) {
+                                    $v['json_manifest']['path'] = $v['json_manifest_path'];
+
+                                    return $v;
+                                })
+                            ->end()
                                 ->fixXmlConfig('base_url')
                                 ->children()
                                     ->scalarNode('version_strategy')->defaultNull()->end()
@@ -715,7 +741,14 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
-                                    ->scalarNode('json_manifest_path')->defaultNull()->end()
+                                    ->scalarNode('json_manifest_path')->setDeprecated('The "json_manifest_path" configuration key has been deprecated in Symfony 4.4. Use "json_manifest.path" instead.')->defaultNull()->end()
+                                    ->arrayNode('json_manifest')
+                                        ->children()
+                                            ->scalarNode('path')->defaultNull()->end()
+                                            ->booleanNode('allow_missing')->defaultFalse()->end()
+                                        ->end()
+
+                                    ->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()
                                     ->arrayNode('base_urls')
                                         ->requiresAtLeastOneElement()
@@ -734,15 +767,15 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version_strategy']) && isset($v['json_manifest_path']);
+                                        return isset($v['version_strategy']) && (isset($v['json_manifest']['path']) || isset($v['json_manifest_path']));
                                     })
-                                    ->thenInvalid('You cannot use both "version_strategy" and "json_manifest_path" at the same time under "assets" packages.')
+                                    ->thenInvalid('You cannot use both "version_strategy" and "json_manifest.path" at the same time under "assets" packages.')
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) {
-                                        return isset($v['version']) && isset($v['json_manifest_path']);
+                                        return isset($v['version']) && (isset($v['json_manifest']['path']) || isset($v['json_manifest_path']));
                                     })
-                                    ->thenInvalid('You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.')
+                                    ->thenInvalid('You cannot use both "version" and "json_manifest.path" at the same time under "assets" packages.')
                                 ->end()
                             ->end()
                         ->end()

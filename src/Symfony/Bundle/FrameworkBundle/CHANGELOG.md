@@ -42,6 +42,9 @@ CHANGELOG
  * Added a `InMemoryTransport` to Messenger. Use it with a DSN starting with `in-memory://`.
  * Added `framework.property_access.throw_exception_on_invalid_property_path` config option.
  * Added `cache:pool:list` command to list all available cache pools.
+ * Deprecated the `json_manifest_path` option in favor of `json_manifest.path`
+ * Added a new option to the version strategy called `json_manifest.allow_missing`
+   that allows to ignore a missing JSON file.
 
 4.2.0
 -----

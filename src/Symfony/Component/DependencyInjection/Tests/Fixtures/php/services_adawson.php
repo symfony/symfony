@@ -71,11 +71,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getBusService()
     {
-        $a = ($this->services['App\Db'] ?? $this->getDbService());
+        $a = ($this->services['App\\Db'] ?? $this->getDbService());
 
-        $this->services['App\Bus'] = $instance = new \App\Bus($a);
+        $this->services['App\\Bus'] = $instance = new \App\Bus($a);
 
-        $b = ($this->privates['App\Schema'] ?? $this->getSchemaService());
+        $b = ($this->privates['App\\Schema'] ?? $this->getSchemaService());
         $c = new \App\Registry();
         $c->processor = [0 => $a, 1 => $instance];
 
@@ -94,9 +94,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getDbService()
     {
-        $this->services['App\Db'] = $instance = new \App\Db();
+        $this->services['App\\Db'] = $instance = new \App\Db();
 
-        $instance->schema = ($this->privates['App\Schema'] ?? $this->getSchemaService());
+        $instance->schema = ($this->privates['App\\Schema'] ?? $this->getSchemaService());
 
         return $instance;
     }
@@ -108,12 +108,12 @@ class ProjectServiceContainer extends Container
      */
     protected function getSchemaService()
     {
-        $a = ($this->services['App\Db'] ?? $this->getDbService());
+        $a = ($this->services['App\\Db'] ?? $this->getDbService());
 
-        if (isset($this->privates['App\Schema'])) {
-            return $this->privates['App\Schema'];
+        if (isset($this->privates['App\\Schema'])) {
+            return $this->privates['App\\Schema'];
         }
 
-        return $this->privates['App\Schema'] = new \App\Schema($a);
+        return $this->privates['App\\Schema'] = new \App\Schema($a);
     }
 }

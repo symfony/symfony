@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
+class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
 {
     private $parameters;
     private $targetDirs = [];
@@ -30,8 +30,9 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
 
         $this->services = $this->privates = [];
         $this->methodMap = [
-            'Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor' => 'getRot13EnvVarProcessorService',
-            'container.env_var_processors_locator' => 'getContainer_EnvVarProcessorsLocatorService',
+            'bar$' => 'getBarService',
+            'bar$!' => 'getBar2Service',
+            'foo*/oh-no' => 'getFooohnoService',
         ];
 
         $this->aliases = [];
@@ -62,25 +63,33 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     }
 
     /**
-     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor' shared service.
+     * Gets the public 'bar$' shared service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
+     * @return \FooClass
      */
-    protected function getRot13EnvVarProcessorService()
+    protected function getBarService()
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
+        return $this->services['bar$'] = new \FooClass();
     }
 
     /**
-     * Gets the public 'container.env_var_processors_locator' shared service.
+     * Gets the public 'bar$!' shared service.
      *
-     * @return \Symfony\Component\DependencyInjection\ServiceLocator
+     * @return \FooClass
      */
-    protected function getContainer_EnvVarProcessorsLocatorService()
+    protected function getBar2Service()
     {
-        return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\ServiceLocator(['rot13' => function () {
-            return ($this->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] ?? ($this->services['Symfony\\Component\\DependencyInjection\\Tests\\Dumper\\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor()));
-        }]);
+        return $this->services['bar$!'] = new \FooClass();
+    }
+
+    /**
+     * Gets the public 'foo oh-no' shared service.
+     *
+     * @return \FooClass
+     */
+    protected function getFooohnoService()
+    {
+        return $this->services['foo*/oh-no'] = new \FooClass();
     }
 
     public function getParameter($name)
@@ -122,9 +131,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
         return $this->parameterBag;
     }
 
-    private $loadedDynamicParameters = [
-        'hello' => false,
-    ];
+    private $loadedDynamicParameters = [];
     private $dynamicParameters = [];
 
     /**
@@ -138,13 +145,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      */
     private function getDynamicParameter($name)
     {
-        switch ($name) {
-            case 'hello': $value = $this->getEnv('rot13:foo'); break;
-            default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
-        }
-        $this->loadedDynamicParameters[$name] = true;
-
-        return $this->dynamicParameters[$name] = $value;
+        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
     /**
@@ -155,7 +156,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     protected function getDefaultParameters()
     {
         return [
-            'env(foo)' => 'jbeyq',
+            '\'' => 'oh-no',
         ];
     }
 }

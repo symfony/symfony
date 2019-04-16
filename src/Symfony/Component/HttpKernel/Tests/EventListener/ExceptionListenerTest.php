@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
+use Symfony\Component\HttpKernel\EventListener\ExceptionListenerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
@@ -154,6 +155,24 @@ class ExceptionListenerTest extends TestCase
 
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
+    }
+
+    public function testExceptionListener()
+    {
+        $request = new Request();
+        $exception = new \Exception('foo');
+        $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+        $listener = new TestExceptionListener();
+        $listener->onKernelException($event);
+        $this->assertEquals(new Response('foo'), $event->getResponse());
+    }
+}
+
+class TestExceptionListener implements ExceptionListenerInterface
+{
+    public function onKernelException(ExceptionEvent $event)
+    {
+        $event->setResponse(new Response('foo'));
     }
 }
 

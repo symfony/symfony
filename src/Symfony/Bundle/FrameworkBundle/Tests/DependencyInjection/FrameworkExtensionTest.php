@@ -39,6 +39,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\EventListener\ExceptionListenerInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -1254,6 +1256,34 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setLogger', $calls[0][0], 'Method name should be "setLogger"');
         $this->assertInstanceOf(Reference::class, $calls[0][1][0]);
         $this->assertSame('logger', (string) $calls[0][1][0], 'Argument should be a reference to "logger"');
+    }
+
+    public function testExceptionListenerRegistration()
+    {
+        $container = $this->createContainerFromFile('full', [], true, false);
+        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
+        $container->register(
+            'Symfony\\Component\\HttpKernel\\EventListener\\ExceptionListenerInterface',
+            ExceptionListenerInterface::class
+        )
+            ->setPublic(true)
+            ->setAutoconfigured(true);
+        $container->compile();
+        $definition = $container->findDefinition(
+            'Symfony\\Component\\HttpKernel\\EventListener\\ExceptionListenerInterface'
+        );
+        $this->assertTrue(
+            $definition->hasTag('kernel.event_listener'),
+            'Definition should contain tag name kernel.event_listener'
+        );
+        $tag = $definition->getTag('kernel.event_listener');
+        $this->assertCount(1, $tag, 'Tag should contain 1 property');
+        $this->assertArrayHasKey('event', $tag[0], 'Tag should contain event');
+        $this->assertEquals(
+            KernelEvents::EXCEPTION,
+            $tag[0]['event'],
+            sprintf('Tag event should equal %s', KernelEvents::EXCEPTION)
+        );
     }
 
     public function testSessionCookieSecureAuto()

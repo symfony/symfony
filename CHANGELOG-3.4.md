@@ -7,6 +7,32 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.25 (2019-04-16)
+
+ * bug #29944 [DI] Overriding services autowired by name under _defaults bind not working (przemyslaw-bogusz, renanbr)
+ * bug #31076 [HttpKernel] Fixed LoggerDataCollector crashing on empty file (althaus)
+ * bug #31071 property normalizer should also pass format and context to isAllowedAttribute (dbu)
+ * bug #31059 Show more accurate message in profiler when missing stopwatch (linaori)
+ * bug #30423 [Security] Rework firewall's access denied rule (dimabory)
+ * bug #31012 [Process] Fix missing $extraDirs when open_basedir returns (arsonik)
+ * bug #30907 [Serializer] Respect ignored attributes in cache key of normalizer (dbu)
+ * bug #30085 Fix TestRunner compatibility to PhpUnit 8 (alexander-schranz)
+ * bug #30977 [serializer] prevent mixup in normalizer of the object to populate (dbu)
+ * bug #30976 [Debug] Fixed error handling when an error is already handled when another error is already handled (5) (lyrixx)
+ * bug #30979 Fix the configurability of CoreExtension deps in standalone usage (stof)
+ * bug #30918 [Cache] fix using ProxyAdapter inside TagAwareAdapter (dmaicher)
+ * bug #30961 [Form] fix translating file validation error message (xabbuh)
+ * bug #30951 Handle case where no translations were found (greg0ire)
+ * bug #29800 [Validator] Only traverse arrays that are cascaded into (corphi)
+ * bug #30921 [Translator] Warm up the translations cache in dev (tgalopin)
+ * bug #30922 [TwigBridge] fix horizontal spacing of inlined Bootstrap forms (xabbuh)
+ * bug #30895 [Form] turn failed file uploads into form errors (xabbuh)
+ * bug #30919 [Translator] Fix wrong dump for PO files (deguif)
+ * bug #30889 [DependencyInjection] Fix a wrong error when using a factory (Simperfit)
+ * bug #30879 [Form] Php doc fixes and cs + optimizations (Jules Pietri)
+ * bug #30883 [Console] Fix stty not reset when aborting in QuestionHelper::autocomplete() (Simperfit)
+ * bug #30878 [Console] Fix inconsistent result for choice questions in non-interactive mode (chalasr)
+
 * 3.4.24 (2019-04-02)
 
  * bug #30660 [Bridge][Twig] DebugCommand - fix escaping and filter (SpacePossum)

@@ -14,44 +14,23 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
 {
     private $parameters;
     private $targetDirs = [];
 
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = \dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = [];
-        $this->normalizedIds = [
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c1' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1',
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c2' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2',
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c3' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3',
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\parentnotexists' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists',
-        ];
         $this->methodMap = [
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => 'getParentNotExistsService',
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1' => 'getC1Service',
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2' => 'getC2Service',
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => 'getC3Service',
-        ];
-        $this->privates = [
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => true,
+            'bar$' => 'getBarService',
+            'bar$!' => 'getBar2Service',
+            'foo*/oh-no' => 'getFooohnoService',
         ];
 
         $this->aliases = [];
-
-        $this->privates['service_container'] = function () {
-            include_once $this->targetDirs[1].'/includes/HotPath/I1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/P1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
-            include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
-        };
     }
 
     public function getRemovedIds()
@@ -59,7 +38,6 @@ class ProjectServiceContainer extends Container
         return [
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => true,
         ];
     }
 
@@ -81,48 +59,33 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists' shared service.
+     * Gets the public 'bar$' shared service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
+     * @return \FooClass
      */
-    protected function getParentNotExistsService()
+    protected function getBarService()
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
+        return $this->services['bar$'] = new \FooClass();
     }
 
     /**
-     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1' shared service.
+     * Gets the public 'bar$!' shared service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1
+     * @return \FooClass
      */
-    protected function getC1Service()
+    protected function getBar2Service()
     {
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1();
+        return $this->services['bar$!'] = new \FooClass();
     }
 
     /**
-     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2' shared service.
+     * Gets the public 'foo oh-no' shared service.
      *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2
+     * @return \FooClass
      */
-    protected function getC2Service()
+    protected function getFooohnoService()
     {
-        include_once $this->targetDirs[1].'/includes/HotPath/C2.php';
-        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
-
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(${($_ = isset($this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3']) ? $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3'] : ($this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3())) && false ?: '_'});
-    }
-
-    /**
-     * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3
-     */
-    protected function getC3Service()
-    {
-        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
-
-        return $this->services['Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3();
+        return $this->services['foo*/oh-no'] = new \FooClass();
     }
 
     public function getParameter($name)
@@ -209,7 +172,7 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters()
     {
         return [
-            'inline_requires' => true,
+            '\'' => 'oh-no',
         ];
     }
 }

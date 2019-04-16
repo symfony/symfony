@@ -53,15 +53,17 @@ class ProxyDumper implements DumperInterface
     public function getProxyFactoryCode(Definition $definition, $id)
     {
         $instantiation = 'return';
+        $scope = '';
 
         if ($definition->isShared()) {
-            $instantiation .= " \$this->services['$id'] =";
+            $instantiation .= ' $this->services[%s] =';
 
             if (\defined('Symfony\Component\DependencyInjection\ContainerInterface::SCOPE_CONTAINER') && ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
-                $instantiation .= " \$this->scopedServices['$scope']['$id'] =";
+                $instantiation .= ' $this->scopedServices[%s][%1$s] =';
             }
         }
 
+        $instantiation = sprintf($instantiation, var_export($id, true), var_export($scope, true));
         $methodName = 'get'.Container::camelize($id).'Service';
         $proxyClass = $this->getProxyClassName($definition);
 

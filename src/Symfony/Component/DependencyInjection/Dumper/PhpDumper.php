@@ -379,9 +379,9 @@ class PhpDumper extends Dumper
         $instantiation = '';
 
         if (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_CONTAINER === $definition->getScope(false)) {
-            $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
+            $instantiation = sprintf('$this->services[%s] = %s', var_export($id, true), $simple ? '' : '$instance');
         } elseif (!$isProxyCandidate && $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope(false)) {
-            $instantiation = "\$this->services['$id'] = \$this->scopedServices['$scope']['$id'] = ".($simple ? '' : '$instance');
+            $instantiation = sprintf('$this->services[%s] = $this->scopedServices[%s][%1$s] = %s', var_export($id, true), var_export($scope, true), $simple ? '' : '$instance');
         } elseif (!$simple) {
             $instantiation = '$instance';
         }
@@ -609,6 +609,9 @@ class PhpDumper extends Dumper
      * Gets the $public '$id'$shared$autowired service.
      *
      * $return
+EOF;
+            $code = str_replace('*/', ' ', $code).<<<EOF
+
      */
     {$visibility} function get{$this->camelize($id)}Service($lazyInitialization)
     {
@@ -620,7 +623,7 @@ EOF;
         if (!\in_array($scope, array(ContainerInterface::SCOPE_CONTAINER, ContainerInterface::SCOPE_PROTOTYPE))) {
             $code .= <<<EOF
         if (!isset(\$this->scopedServices['$scope'])) {
-            throw new InactiveScopeException('$id', '$scope');
+            throw new InactiveScopeException({$this->export($id)}, '$scope');
         }
 
 
@@ -628,7 +631,7 @@ EOF;
         }
 
         if ($definition->isSynthetic()) {
-            $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
+            $code .= sprintf("        throw new RuntimeException(%s);\n    }\n", var_export("You have requested a synthetic service (\"$id\"). The DIC does not know how to construct this service.", true));
         } else {
             if ($definition->isDeprecated()) {
                 $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", var_export($definition->getDeprecationMessage($id), true));
@@ -706,10 +709,11 @@ EOF;
                             $arguments[] = $this->dumpValue($value);
                         }
 
-                        $call = $this->wrapServiceConditionals($call[1], sprintf("\$this->get('%s')->%s(%s);", $definitionId, $call[0], implode(', ', $arguments)));
+                        $definitionId = var_export($definitionId, true);
+                        $call = $this->wrapServiceConditionals($call[1], sprintf('$this->get(%s)->%s(%s);', $definitionId, $call[0], implode(', ', $arguments)));
 
                         $code .= <<<EOF
-        if (\$this->initialized('$definitionId')) {
+        if (\$this->initialized($definitionId)) {
             $call
         }
 
@@ -1142,7 +1146,7 @@ EOF;
 
         $conditions = array();
         foreach ($services as $service) {
-            $conditions[] = sprintf("\$this->has('%s')", $service);
+            $conditions[] = sprintf('$this->has(%s)', var_export($service, true));
         }
 
         // re-indent the wrapped code
@@ -1419,11 +1423,13 @@ EOF;
      */
     public function dumpParameter($name)
     {
+        $name = (string) $name;
+
         if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
             return $this->dumpValue($this->container->getParameter($name), false);
         }
 
-        return sprintf("\$this->getParameter('%s')", strtolower($name));
+        return sprintf('$this->getParameter(%s)', var_export($name, true));
     }
 
     /**
@@ -1458,10 +1464,10 @@ EOF;
         }
 
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
+            return sprintf('$this->get(%s, ContainerInterface::NULL_ON_INVALID_REFERENCE)', var_export($id, true));
         }
 
-        return sprintf('$this->get(\'%s\')', $id);
+        return sprintf('$this->get(%s)', var_export($id, true));
     }
 
     /**

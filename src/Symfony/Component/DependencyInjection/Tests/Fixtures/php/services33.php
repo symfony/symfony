@@ -55,7 +55,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        return $this->services['Bar\Foo'] = new \Bar\Foo();
+        return $this->services['Bar\\Foo'] = new \Bar\Foo();
     }
 
     /**
@@ -65,6 +65,6 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo2Service()
     {
-        return $this->services['Foo\Foo'] = new \Foo\Foo();
+        return $this->services['Foo\\Foo'] = new \Foo\Foo();
     }
 }

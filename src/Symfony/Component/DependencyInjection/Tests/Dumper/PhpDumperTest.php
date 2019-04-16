@@ -264,12 +264,18 @@ class PhpDumperTest extends TestCase
     {
         $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';
         $container = new ContainerBuilder();
+        $container->setParameter("'", 'oh-no');
+        $container->register("foo*/oh-no", 'FooClass')->setPublic(true);
         $container->register('bar$', 'FooClass')->setPublic(true);
         $container->register('bar$!', 'FooClass')->setPublic(true);
         $container->compile();
         $dumper = new PhpDumper($container);
-        eval('?>'.$dumper->dump(['class' => $class]));
 
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_unsupported_characters.php', $dumper->dump(['class' => $class]));
+
+        require_once self::$fixturesPath.'/php/services_unsupported_characters.php';
+
+        $this->assertTrue(method_exists($class, 'getFooOhNoService'));
         $this->assertTrue(method_exists($class, 'getBarService'));
         $this->assertTrue(method_exists($class, 'getBar2Service'));
     }

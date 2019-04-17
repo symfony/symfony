@@ -111,7 +111,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             ];
 
             try {
-                $this->writeProperty($zval, $propertyPath, $value);
+                $this->writeProperty($zval, $propertyPath, ...\array_slice(\func_get_args(), 2));
 
                 return;
             } catch (\TypeError $e) {
@@ -515,21 +515,21 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
-    private function writeProperty(array $zval, string $property, $value)
+    private function writeProperty(array $zval, string $property, ...$value)
     {
         if (!\is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%1$s]" instead?', $property));
         }
 
         $object = $zval[self::VALUE];
-        $access = $this->getWriteAccessInfo(\get_class($object), $property, $value);
+        $access = $this->getWriteAccessInfo(\get_class($object), $property, $value[0]);
 
         if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $object->{$access[self::ACCESS_NAME]}(...$value);
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]} = $value;
+            $object->{$access[self::ACCESS_NAME]} = $value[0];
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
-            $this->writeCollection($zval, $property, $value, $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER]);
+            $this->writeCollection($zval, $property, $value[0], $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER]);
         } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
             // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
@@ -537,9 +537,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             // returns true, consequently the following line will result in a
             // fatal error.
 
-            $object->$property = $value;
+            $object->$property = $value[0];
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
-            $object->{$access[self::ACCESS_NAME]}($value);
+            $object->{$access[self::ACCESS_NAME]}($value[0]);
         } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
             throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s"%s', $property, \get_class($object), isset($access[self::ACCESS_NAME]) ? ': '.$access[self::ACCESS_NAME] : '.'));
         } else {

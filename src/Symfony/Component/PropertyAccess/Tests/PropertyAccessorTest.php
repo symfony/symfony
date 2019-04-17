@@ -780,4 +780,37 @@ class PropertyAccessorTest extends TestCase
         $object = new TestClassSetValue(0);
         $this->propertyAccessor->setValue($object, 'foo', 1);
     }
+
+    public function generateAnonymousClassWithVariadicSetter()
+    {
+        return eval('return new class() 
+        {
+            private $property;
+
+            public function setProperty(int ...$args) {
+                $this->property = implode(",", $args);
+            }
+
+            public function getProperty() {
+                return $this->property;
+            }
+        };');
+    }
+
+    public function testVariadicSetter()
+    {
+        $object = $this->generateAnonymousClassWithVariadicSetter();
+
+        $this->propertyAccessor->setValue($object, 'property', ...[1, 2, 3]);
+
+        $this->assertEquals('1,2,3', $this->propertyAccessor->getValue($object, 'property'));
+    }
+
+    public function testThrowInvalidArgumentExceptionOfVariadicType()
+    {
+        $this->expectException('Symfony\Component\PropertyAccess\Exception\InvalidArgumentException');
+
+        $object = $this->generateAnonymousClassWithVariadicSetter();
+        $this->propertyAccessor->setValue($object, 'property', ...[1, 2, new \stdClass()]);
+    }
 }

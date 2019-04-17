@@ -7,6 +7,9 @@ CHANGELOG
  * Deprecated class `LdapUserProvider`, use `Symfony\Component\Ldap\Security\LdapUserProvider` instead
  * Added method `needsRehash()` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
  * Added `MigratingPasswordEncoder`
+ * Added and implemented `PasswordUpgraderInterface`, for opportunistic password migrations
+ * Added `Guard\PasswordAuthenticatedInterface`, an optional interface
+   for "guard" authenticators that deal with user passwords
 
 4.3.0
 -----

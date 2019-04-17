@@ -55,6 +55,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
@@ -882,7 +883,11 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
-        $this->assertEquals([new Reference('translator')], $calls[1][1]);
+        if (class_exists(LegacyTranslatorProxy::class)) {
+            $this->assertEquals([new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])], $calls[1][1]);
+        } else {
+            $this->assertEquals([new Reference('translator')], $calls[1][1]);
+        }
         $this->assertSame('setTranslationDomain', $calls[2][0]);
         $this->assertSame(['%validator.translation_domain%'], $calls[2][1]);
         $this->assertSame('addXmlMappings', $calls[3][0]);

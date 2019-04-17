@@ -110,6 +110,7 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -1207,6 +1208,12 @@ class FrameworkExtension extends Extension
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
+
+        if (class_exists(LegacyTranslatorProxy::class)) {
+            $calls = $validatorBuilder->getMethodCalls();
+            $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
+            $validatorBuilder->setMethodCalls($calls);
+        }
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 

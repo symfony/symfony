@@ -258,7 +258,11 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setTranslator(LegacyTranslatorInterface $translator)
     {
-        $this->translator = $translator instanceof LegacyTranslatorProxy ? $translator->getTranslator() : $translator;
+        $this->translator = $translator;
+
+        while ($this->translator instanceof LegacyTranslatorProxy) {
+            $this->translator = $this->translator->getTranslator();
+        }
 
         return $this;
     }

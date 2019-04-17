@@ -133,6 +133,8 @@ class ExceptionListener
             } catch (\Exception $e) {
                 $event->setException($e);
             }
+
+            return;
         }
 
         if (null !== $this->logger) {
@@ -150,7 +152,7 @@ class ExceptionListener
                 $subRequest = $this->httpUtils->createRequest($event->getRequest(), $this->errorPage);
                 $subRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $exception);
 
-                $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST));
+                $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
                 $event->allowCustomResponseCode();
             }
         } catch (\Exception $e) {

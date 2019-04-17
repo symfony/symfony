@@ -94,6 +94,18 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('jpeg', $file->guessClientExtension());
     }
 
+    public function testCaseSensitiveMimeType()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/case-sensitive-mime-type.xlsm',
+            'test.xlsm',
+            'application/vnd.ms-excel.sheet.macroEnabled.12',
+            null
+        );
+
+        $this->assertEquals('xlsm', $file->guessClientExtension());
+    }
+
     public function testErrorIsOkByDefault()
     {
         $file = new UploadedFile(

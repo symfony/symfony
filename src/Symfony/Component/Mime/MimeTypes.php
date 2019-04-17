@@ -39,6 +39,7 @@ use Symfony\Component\Mime\Exception\LogicException;
 final class MimeTypes implements MimeTypesInterface
 {
     private $extensions = [];
+    private $mimeTypes = [];
 
     /**
      * @var MimeTypeGuesserInterface[]
@@ -50,6 +51,10 @@ final class MimeTypes implements MimeTypesInterface
     {
         foreach ($map as $mimeType => $extensions) {
             $this->extensions[$mimeType] = $extensions;
+
+            foreach ($extensions as $extension) {
+                $this->mimeTypes[$extension] = $mimeType;
+            }
         }
         $this->registerGuesser(new FileBinaryMimeTypeGuesser());
         $this->registerGuesser(new FileinfoMimeTypeGuesser());
@@ -80,7 +85,11 @@ final class MimeTypes implements MimeTypesInterface
      */
     public function getExtensions(string $mimeType): array
     {
-        return $this->extensions[$mimeType] ?? self::$map[$mimeType] ?? [];
+        if ($this->extensions) {
+            $extensions = $this->extensions[$mimeType] ?? $this->extensions[$lcMimeType = strtolower($mimeType)] ?? null;
+        }
+
+        return $extensions ?? self::$map[$mimeType] ?? self::$map[$lcMimeType ?? strtolower($mimeType)] ?? [];
     }
 
     /**
@@ -88,7 +97,11 @@ final class MimeTypes implements MimeTypesInterface
      */
     public function getMimeTypes(string $ext): array
     {
-        return self::$reverseMap[$ext] ?? [];
+        if ($this->mimeTypes) {
+            $mimeTypes = $this->mimeTypes[$ext] ?? $this->mimeTypes[$lcExt = strtolower($ext)] ?? null;
+        }
+
+        return $mimeTypes ?? self::$reverseMap[$ext] ?? self::$reverseMap[$lcExt ?? strtolower($ext)] ?? [];
     }
 
     /**

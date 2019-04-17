@@ -94,14 +94,15 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * The *credentials* are the return value from getCredentials()
      *
-     * @param mixed         $credentials
-     * @param UserInterface $user
+     * @param mixed                     $credentials
+     * @param UserInterface             $user
+     * @param PasswordUpgraderInterface $passwordUpgrader
      *
      * @return bool
      *
      * @throws AuthenticationException
      */
-    public function checkCredentials($credentials, UserInterface $user);
+    public function checkCredentials($credentials, UserInterface $user/*, PasswordUpgraderInterface $passwordUpgrader = null*/);
 
     /**
      * Create an authenticated token for the given user.

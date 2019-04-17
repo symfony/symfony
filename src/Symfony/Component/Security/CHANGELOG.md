@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * Added `MigratingPasswordEncoder`
+ * Added methods `PasswordEncoderInterface::needsRehash()` and `UserPasswordEncoderInterface::needsRehash()`
+ * Added and implemented `PasswordUpgraderInterface`
+
 4.3.0
 -----
 

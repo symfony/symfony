@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -110,7 +111,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         $this->userChecker->checkPreAuth($user);
-        if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user)) {
+        if (true !== $guardAuthenticator->checkCredentials($token->getCredentials(), $user, $this->userProvider instanceof PasswordUpgraderInterface ? $this->userProvider : null)) {
             throw new BadCredentialsException(sprintf('Authentication failed because %s::checkCredentials() did not return true.', \get_class($guardAuthenticator)));
         }
         $this->userChecker->checkPostAuth($user);

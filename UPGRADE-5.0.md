@@ -313,6 +313,7 @@ Routing
 Security
 --------
 
+ * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` must have a new `needsRehash()` method
  * The `Role` and `SwitchUserRole` classes have been removed.
  * The `getReachableRoles()` method of the `RoleHierarchy` class has been removed. It has been replaced by the new
    `getReachableRoleNames()` method.

@@ -87,4 +87,12 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
 
         return \strlen($raw) <= self::MAX_PASSWORD_LENGTH && password_verify($raw, $encoded);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function needsRehash(string $encoded): bool
+    {
+        return password_needs_rehash($encoded, $this->algo, $this->options);
+    }
 }

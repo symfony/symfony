@@ -60,6 +60,12 @@ class BasePasswordEncoderTest extends TestCase
         $this->assertFalse($this->invokeIsPasswordTooLong(str_repeat('a', 10)));
     }
 
+    public function testNeedsRehash()
+    {
+        $encoder = new PasswordEncoder();
+        $this->assertFalse($encoder->needsRehash('foo'));
+    }
+
     protected function invokeDemergePasswordAndSalt($password)
     {
         $encoder = new PasswordEncoder();

@@ -46,4 +46,14 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
 
         return $encoder->isPasswordValid($user->getPassword(), $raw, $user->getSalt());
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function needsRehash(UserInterface $user, string $encoded): bool
+    {
+        $encoder = $this->encoderFactory->getEncoder($user);
+
+        return method_exists($encoder, 'needsRehash') && $encoder->needsRehash($encoded);
+    }
 }

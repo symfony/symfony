@@ -41,6 +41,11 @@ MonologBridge
 
  * The `RouteProcessor` has been marked final.
 
+Security
+--------
+
+ * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
+
 TwigBridge
 ----------
 

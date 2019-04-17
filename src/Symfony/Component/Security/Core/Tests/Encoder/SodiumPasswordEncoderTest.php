@@ -60,4 +60,17 @@ class SodiumPasswordEncoderTest extends TestCase
         $result = $encoder->encodePassword('password', 'salt');
         $this->assertTrue($encoder->isPasswordValid($result, 'password', 'anotherSalt'));
     }
+
+    public function testNeedsRehash()
+    {
+        $encoder = new SodiumPasswordEncoder(4, 11000);
+
+        $this->assertTrue($encoder->needsRehash('dummyhash'));
+
+        $hash = $encoder->encodePassword('foo', 'salt');
+        $this->assertFalse($encoder->needsRehash($hash));
+
+        $encoder = new SodiumPasswordEncoder(5, 11000);
+        $this->assertTrue($encoder->needsRehash($hash));
+    }
 }

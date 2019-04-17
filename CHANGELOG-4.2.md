@@ -7,6 +7,19 @@ in 4.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.2.0...v4.2.1
 
+* 4.2.7 (2019-04-17)
+
+ * bug #31107 [Routing] fix trailing slash redirection with non-greedy trailing vars (nicolas-grekas)
+ * bug #31108 [FrameworkBundle] decorate the ValidatorBuilder's translator with LegacyTranslatorProxy (nicolas-grekas)
+ * bug #31121 [HttpKernel] Fix get session when the request stack is empty (yceruto)
+ * bug #31084 [HttpFoundation] Make MimeTypeExtensionGuesser case insensitive (vermeirentony)
+ * bug #31142 Revert "bug #30423 [Security] Rework firewall's access denied rule (dimabory)" (chalasr)
+ * security #cve-2019-10910 [DI] Check service IDs are valid (nicolas-grekas)
+ * security #cve-2019-10909 [FrameworkBundle][Form] Fix XSS issues in the form theme of the PHP templating engine (stof)
+ * security #cve-2019-10912 [Cache][PHPUnit Bridge] Prevent destructors with side-effects from being unserialized (nicolas-grekas)
+ * security #cve-2019-10911 [Security] Add a separator in the remember me cookie hash (pborreli)
+ * security #cve-2019-10913 [HttpFoundation] reject invalid method override (nicolas-grekas)
+
 * 4.2.6 (2019-04-16)
 
  * bug #31088 [DI] fix removing non-shared definition while inlining them (nicolas-grekas)

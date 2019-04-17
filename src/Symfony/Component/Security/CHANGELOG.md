@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added method `needsRehash()` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+ * Added `MigratingPasswordEncoder`
 
 4.3.0
 -----

@@ -7,6 +7,14 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.50 (2019-04-17)
+
+ * security #cve-2019-10910 [DI] Check service IDs are valid (nicolas-grekas)
+ * security #cve-2019-10909 [FrameworkBundle][Form] Fix XSS issues in the form theme of the PHP templating engine (stof)
+ * security #cve-2019-10912 [PHPUnit Bridge] Prevent destructors with side-effects from being unserialized (nicolas-grekas)
+ * security #cve-2019-10911 [Security] Add a separator in the remember me cookie hash (pborreli)
+ * security #cve-2019-10913 [HttpFoundation] reject invalid method override (nicolas-grekas)
+
 * 2.8.49 (2018-12-06)
 
  * security #cve-2018-19790 [Security\Http] detect bad redirect targets using backslashes (xabbuh)

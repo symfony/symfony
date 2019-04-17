@@ -25,6 +25,15 @@ $container->loadFromExtension('security', [
             'algorithm' => 'bcrypt',
             'cost' => 15,
         ],
+        'JMS\FooBundle\Entity\User7' => [
+            'algorithm' => 'native',
+            'time_cost' => 8,
+            'memory_cost' => 100,
+            'cost' => 15,
+        ],
+        'JMS\FooBundle\Entity\User8' => [
+            'algorithm' => 'auto',
+        ],
     ],
     'providers' => [
         'default' => [

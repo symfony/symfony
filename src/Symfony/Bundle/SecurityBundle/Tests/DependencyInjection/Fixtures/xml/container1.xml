@@ -18,6 +18,10 @@
 
         <encoder class="JMS\FooBundle\Entity\User6" algorithm="bcrypt" cost="15" />
 
+        <encoder class="JMS\FooBundle\Entity\User7" algorithm="native" time-cost="8" memory-cost="100" cost="15" />
+
+        <encoder class="JMS\FooBundle\Entity\User8" algorithm="auto" />
+
         <provider name="default">
             <memory>
                 <user name="foo" password="foo" roles="ROLE_USER" />

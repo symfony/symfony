@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-17T10:12:25Z
+
+Todo:
+- [x] fix tests
+- [x] update SecurityExtension
+- [x] find a default cost for Argon2 that is at least as good as `13` for Bcrypt's (any idea?)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T10:46:44Z
+
+is there any reason to keep `BCryptPasswordEncoder`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-17T10:51:12Z
+
+> is there any reason to keep BCryptPasswordEncoder?
+
+I don't think so, we should deprecate it in 4.4

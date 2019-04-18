@@ -194,6 +194,16 @@ class StopwatchEvent
     }
 
     /**
+     * Gets the formatted duration of the events (including all periods).
+     *
+     * @return string The formatted duration
+     */
+    public function getFormattedDuration()
+    {
+        return Helper::formatTime($this->getDuration());
+    }
+
+    /**
      * Gets the max memory usage of all periods.
      *
      * @return int The memory usage (in bytes)

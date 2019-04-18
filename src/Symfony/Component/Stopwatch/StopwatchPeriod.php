@@ -65,6 +65,16 @@ class StopwatchPeriod
     }
 
     /**
+     * Gets the formatted time spent in this period.
+     *
+     * @return string The formatted period duration
+     */
+    public function getFormattedDuration()
+    {
+        return Helper::formatTime($this->getDuration());
+    }
+
+    /**
      * Gets the memory usage.
      *
      * @return int The memory usage (in bytes)

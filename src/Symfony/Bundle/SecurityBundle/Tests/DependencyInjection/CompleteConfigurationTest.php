@@ -283,7 +283,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
                 'ignore_case' => false,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -295,7 +295,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'ignore_case' => false,
                 'encode_as_base64' => true,
                 'iterations' => 5000,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -308,6 +308,22 @@ abstract class CompleteConfigurationTest extends TestCase
             'JMS\FooBundle\Entity\User6' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => [15],
+            ],
+            'JMS\FooBundle\Entity\User7' => [
+                'class' => 'Symfony\Component\Security\Core\Encoder\NativePasswordEncoder',
+                'arguments' => [8, 102400, 15],
+            ],
+            'JMS\FooBundle\Entity\User8' => [
+                'algorithm' => 'auto',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -332,7 +348,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
                 'ignore_case' => false,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -344,7 +360,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'ignore_case' => false,
                 'encode_as_base64' => true,
                 'iterations' => 5000,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -360,7 +376,19 @@ abstract class CompleteConfigurationTest extends TestCase
             ],
             'JMS\FooBundle\Entity\User7' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder',
-                'arguments' => [],
+                'arguments' => [8, 128 * 1024 * 1024],
+            ],
+            'JMS\FooBundle\Entity\User8' => [
+                'algorithm' => 'auto',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
@@ -368,7 +396,7 @@ abstract class CompleteConfigurationTest extends TestCase
     /**
      * @group legacy
      *
-     * @expectedDeprecation Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "sodium" instead.
+     * @expectedDeprecation Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "auto" instead.
      */
     public function testEncodersWithArgon2i()
     {
@@ -390,7 +418,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'hash_algorithm' => 'sha512',
                 'key_length' => 40,
                 'ignore_case' => false,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -402,7 +430,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 'ignore_case' => false,
                 'encode_as_base64' => true,
                 'iterations' => 5000,
-                'cost' => 13,
+                'cost' => null,
                 'memory_cost' => null,
                 'time_cost' => null,
                 'threads' => null,
@@ -419,6 +447,18 @@ abstract class CompleteConfigurationTest extends TestCase
             'JMS\FooBundle\Entity\User7' => [
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
                 'arguments' => [256, 1, 2],
+            ],
+            'JMS\FooBundle\Entity\User8' => [
+                'algorithm' => 'auto',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => null,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ],
         ]], $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }

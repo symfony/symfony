@@ -4,6 +4,8 @@ CHANGELOG
 4.3.0
 -----
 
+ * Added methods `__serialize` and `__unserialize` to the `TokenInterface`
+ * Added `SodiumPasswordEncoder` and `NativePasswordEncoder`
  * The `Role` and `SwitchUserRole` classes are deprecated and will be removed in 5.0. Use strings for roles
    instead.
  * The `getReachableRoles()` method of the `RoleHierarchyInterface` is deprecated and will be removed in 5.0.
@@ -19,8 +21,7 @@ CHANGELOG
  * Dispatch `AuthenticationFailureEvent` on `security.authentication.failure`
  * Dispatch `InteractiveLoginEvent` on `security.interactive_login`
  * Dispatch `SwitchUserEvent` on `security.switch_user`
- * deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
- * Added methods `__serialize` and `__unserialize` to the `TokenInterface`
+ * Deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder`
 
 4.2.0
 -----

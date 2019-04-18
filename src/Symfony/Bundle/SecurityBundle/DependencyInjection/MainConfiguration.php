@@ -394,9 +394,10 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('encoders')
                     ->example([
-                        'App\Entity\User1' => 'bcrypt',
+                        'App\Entity\User1' => 'auto',
                         'App\Entity\User2' => [
-                            'algorithm' => 'bcrypt',
+                            'algorithm' => 'auto',
+                            'time_cost' => 8,
                             'cost' => 13,
                         ],
                     ])
@@ -416,11 +417,14 @@ class MainConfiguration implements ConfigurationInterface
                             ->integerNode('cost')
                                 ->min(4)
                                 ->max(31)
-                                ->defaultValue(13)
+                                ->defaultNull()
                             ->end()
                             ->scalarNode('memory_cost')->defaultNull()->end()
                             ->scalarNode('time_cost')->defaultNull()->end()
-                            ->scalarNode('threads')->defaultNull()->end()
+                            ->scalarNode('threads')
+                                ->defaultNull()
+                                ->setDeprecated('The "%path%.%node%" configuration key has no effect since Symfony 4.3 and will be removed in 5.0.')
+                            ->end()
                             ->scalarNode('id')->end()
                         ->end()
                     ->end()

@@ -174,7 +174,7 @@ Security
 SecurityBundle
 --------------
 
- * Configuring encoders using `argon2i` as algorithm has been deprecated, use `sodium` instead.
+ * Configuring encoders using `argon2i` as algorithm has been deprecated, use `auto` instead.
 
 TwigBridge
 ----------

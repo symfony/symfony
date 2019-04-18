@@ -132,7 +132,7 @@ trait PhpMatcherTrait
 
                     $hasTrailingVar = $trimmedPathinfo !== $pathinfo && $hasTrailingVar;
 
-                    if ($hasTrailingVar && ($hasTrailingSlash || '/' !== substr($matches[\count($vars)], -1)) && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
+                    if ($hasTrailingVar && ($hasTrailingSlash || !($n = $matches[\count($vars)] ?? '') || '/' !== substr($n, -1)) && preg_match($regex, $this->matchHost ? $host.'.'.$trimmedPathinfo : $trimmedPathinfo, $n) && $m === (int) $n['MARK']) {
                         if ($hasTrailingSlash) {
                             $matches = $n;
                         } else {

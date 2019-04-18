@@ -166,6 +166,7 @@ abstract class AbstractToken implements TokenInterface
      * @return string
      *
      * @final since Symfony 4.3, use __serialize() instead
+     *
      * @internal since Symfony 4.3, use __serialize() instead
      */
     public function serialize()
@@ -313,6 +314,13 @@ abstract class AbstractToken implements TokenInterface
         }
 
         if ($this->user->getSalt() !== $user->getSalt()) {
+            return true;
+        }
+
+        $userRoles = array_map('strval', (array) $user->getRoles());
+        $rolesChanged = \count($userRoles) !== \count($this->getRoleNames()) || \count($userRoles) !== \count(array_intersect($userRoles, $this->getRoleNames()));
+
+        if ($rolesChanged) {
             return true;
         }
 

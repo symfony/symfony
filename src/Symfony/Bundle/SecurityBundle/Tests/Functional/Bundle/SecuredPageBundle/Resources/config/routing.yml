@@ -1,0 +1,3 @@
+admin:
+    path:     /admin
+    defaults: { _controller: \Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SecuredPageBundle\Controller\AdminController::indexAction }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -33,6 +35,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class ContextListenerTest extends TestCase
 {
@@ -299,6 +302,26 @@ class ContextListenerTest extends TestCase
         $this->handleEventWithPreviousSession(new TokenStorage(), [new NotSupportingUserProvider(), new NotSupportingUserProvider()]);
     }
 
+    public function testLogoutOnChangeEventAsBeenSent()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new User('foobar', 'baz');
+
+        $user = new User('foo', 'bar');
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], 'context_key', null, null, null, new testRememberMeServices($this));
+        $listener->setLogoutOnUserChange($refreshedUser);
+        $listener->handle(new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
     public function testAcceptsProvidersAsTraversable()
     {
         $tokenStorage = new TokenStorage();
@@ -393,6 +416,24 @@ class NotSupportingUserProvider implements UserProviderInterface
     public function supportsClass($class)
     {
         return false;
+    }
+}
+
+class testRememberMeServices implements RememberMeServicesInterface
+{
+    public function autoLogin(Request $request)
+    {
+    }
+
+    public function loginFail(Request $request, \Exception $exception = null)
+    {
+        Assert::assertTrue($request->cookies->get('MOCKSESSID'));
+
+        return null;
+    }
+
+    public function loginSuccess(Request $request, Response $response, TokenInterface $token)
+    {
     }
 }
 

@@ -29,6 +29,7 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -49,11 +50,13 @@ class ContextListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
+    private $logoutOnUserChange = false;
+    private $rememberMeServices;
 
     /**
      * @param iterable|UserProviderInterface[] $userProviders
      */
-    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null, RememberMeServicesInterface $rememberMeServices = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -65,6 +68,7 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+        $this->rememberMeServices = $rememberMeServices;
     }
 
     /**
@@ -109,6 +113,10 @@ class ContextListener implements ListenerInterface
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
+
+            if (null === $token && null !== $this->rememberMeServices) {
+                $this->rememberMeServices->loginFail($request);
+            }
         } elseif (null !== $token) {
             if (null !== $this->logger) {
                 $this->logger->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);

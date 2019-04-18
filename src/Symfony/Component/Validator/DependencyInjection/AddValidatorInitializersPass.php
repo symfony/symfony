@@ -65,7 +65,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
                     $translator = $translator->getParent();
                 }
 
-                if (!is_subclass_of($class, LegacyTranslatorInterface::class)) {
+                if (class_exists(LegacyTranslatorProxy::class)) {
                     $arguments[0] = (new Definition(LegacyTranslatorProxy::class))->addArgument($arguments[0]);
                 }
             }

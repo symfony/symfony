@@ -1108,12 +1108,6 @@ class FrameworkExtension extends Extension
 
         $validatorBuilder = $container->getDefinition('validator.builder');
 
-        if (class_exists(LegacyTranslatorProxy::class)) {
-            $calls = $validatorBuilder->getMethodCalls();
-            $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
-            $validatorBuilder->setMethodCalls($calls);
-        }
-
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
         $files = ['xml' => [], 'yml' => []];

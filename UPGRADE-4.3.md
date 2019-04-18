@@ -168,13 +168,14 @@ Security
    ```
 
  * The `Argon2iPasswordEncoder` class has been deprecated, use `SodiumPasswordEncoder` instead.
+ * The `BCryptPasswordEncoder` class has been deprecated, use `NativePasswordEncoder` instead.
  * Not implementing the methods `__serialize` and `__unserialize` in classes implementing
    the `TokenInterface` is deprecated
 
 SecurityBundle
 --------------
 
- * Configuring encoders using `argon2i` as algorithm has been deprecated, use `auto` instead.
+ * Configuring encoders using `argon2i` or `bcrypt` as algorithm has been deprecated, use `auto` instead.
 
 TwigBridge
 ----------

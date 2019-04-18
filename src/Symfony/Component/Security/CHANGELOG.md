@@ -21,7 +21,8 @@ CHANGELOG
  * Dispatch `AuthenticationFailureEvent` on `security.authentication.failure`
  * Dispatch `InteractiveLoginEvent` on `security.interactive_login`
  * Dispatch `SwitchUserEvent` on `security.switch_user`
- * Deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder`
+ * Deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+ * Deprecated `BCryptPasswordEncoder`, use `NativePasswordEncoder` instead
 
 4.2.0
 -----

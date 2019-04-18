@@ -28,7 +28,8 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "^4.1"
+        "symfony/routing": "^4.2",
+        "symfony/translation": "^4.2"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",
@@ -48,7 +49,6 @@
         "symfony/security-csrf": "~3.4|~4.0",
         "symfony/serializer": "^4.2",
         "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/translation": "~4.2",
         "symfony/templating": "~3.4|~4.0",
         "symfony/validator": "^4.1",
         "symfony/var-dumper": "~3.4|~4.0",

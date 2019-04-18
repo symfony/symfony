@@ -106,7 +106,6 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * FrameworkExtension.
@@ -1110,14 +1109,9 @@ class FrameworkExtension extends Extension
         $validatorBuilder = $container->getDefinition('validator.builder');
 
         if (class_exists(LegacyTranslatorProxy::class)) {
-            $translatorClass = $container->getDefinition('translator')->getClass();
-            $translatorInterfaces = class_implements($translatorClass);
-
-            if (!\in_array(TranslatorInterface::class, $translatorInterfaces)) {
-                $calls = $validatorBuilder->getMethodCalls();
-                $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
-                $validatorBuilder->setMethodCalls($calls);
-            }
+            $calls = $validatorBuilder->getMethodCalls();
+            $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
+            $validatorBuilder->setMethodCalls($calls);
         }
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);

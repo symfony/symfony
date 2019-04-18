@@ -1113,7 +1113,7 @@ class FrameworkExtension extends Extension
             $translatorClass = $container->getDefinition('translator')->getClass();
             $translatorInterfaces = class_implements($translatorClass);
 
-            if (!in_array(TranslatorInterface::class, $translatorInterfaces)) {
+            if (!\in_array(TranslatorInterface::class, $translatorInterfaces)) {
                 $calls = $validatorBuilder->getMethodCalls();
                 $calls[1] = ['setTranslator', [new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])]];
                 $validatorBuilder->setMethodCalls($calls);

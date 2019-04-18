@@ -280,6 +280,13 @@ class ReflectionCaster
         return $a;
     }
 
+    public static function castReference(\ReflectionReference $c, array $a, Stub $stub, $isNested)
+    {
+        $a[Caster::PREFIX_VIRTUAL.'id'] = $c->getId();
+
+        return $a;
+    }
+
     public static function castExtension(\ReflectionExtension $c, array $a, Stub $stub, $isNested)
     {
         self::addMap($a, $c, [

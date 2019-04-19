@@ -106,6 +106,7 @@ class EncoderFactory implements EncoderFactoryInterface
                     ],
                 ];
 
+            /* @deprecated since Symfony 4.3 */
             case 'bcrypt':
                 return [
                     'class' => BCryptPasswordEncoder::class,

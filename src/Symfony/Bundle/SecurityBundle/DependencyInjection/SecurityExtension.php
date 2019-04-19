@@ -558,6 +558,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
+            @trigger_error('Configuring an encoder with "bcrypt" as algorithm is deprecated since Symfony 4.3, use "auto" instead.', E_USER_DEPRECATED);
+
             return [
                 'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => [$config['cost'] ?? 13],

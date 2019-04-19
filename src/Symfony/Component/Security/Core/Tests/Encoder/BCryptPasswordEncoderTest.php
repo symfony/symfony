@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
+ *
+ * @group legacy
  */
 class BCryptPasswordEncoderTest extends TestCase
 {

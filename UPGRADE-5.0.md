@@ -342,6 +342,7 @@ Security
    ```
 
  * The `Argon2iPasswordEncoder` class has been removed, use `SodiumPasswordEncoder` instead.
+ * The `BCryptPasswordEncoder` class has been removed, use `NativePasswordEncoder` instead.
  * Classes implementing the `TokenInterface` must implement the two new methods
    `__serialize` and `__unserialize`
 
@@ -364,7 +365,7 @@ SecurityBundle
    changed to underscores.
    Before: `my-cookie` deleted the `my_cookie` cookie (with an underscore).
    After: `my-cookie` deletes the `my-cookie` cookie (with a dash).
- * Configuring encoders using `argon2i` as algorithm is not supported anymore, use `sodium` instead.
+ * Configuring encoders using `argon2i` or `bcrypt` as algorithm is not supported anymore, use `auto` instead.
 
 Serializer
 ----------

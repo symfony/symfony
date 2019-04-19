@@ -22,16 +22,12 @@ $container->loadFromExtension('security', [
             'key_length' => 30,
         ],
         'JMS\FooBundle\Entity\User6' => [
-            'algorithm' => 'bcrypt',
-            'cost' => 15,
-        ],
-        'JMS\FooBundle\Entity\User7' => [
             'algorithm' => 'native',
             'time_cost' => 8,
             'memory_cost' => 100,
             'cost' => 15,
         ],
-        'JMS\FooBundle\Entity\User8' => [
+        'JMS\FooBundle\Entity\User7' => [
             'algorithm' => 'auto',
         ],
     ],

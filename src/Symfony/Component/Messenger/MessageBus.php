@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger;
 
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
-use Symfony\Component\Messenger\Middleware\StackMiddleware;
+use Symfony\Component\Messenger\Middleware\Pipeline;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -23,30 +23,14 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
  */
 class MessageBus implements MessageBusInterface
 {
-    private $middlewareAggregate;
+    private $middlewares;
 
     /**
      * @param MiddlewareInterface[]|iterable $middlewareHandlers
      */
-    public function __construct(iterable $middlewareHandlers = [])
+    public function __construct(array $middlewares = [])
     {
-        if ($middlewareHandlers instanceof \IteratorAggregate) {
-            $this->middlewareAggregate = $middlewareHandlers;
-        } elseif (\is_array($middlewareHandlers)) {
-            $this->middlewareAggregate = new \ArrayObject($middlewareHandlers);
-        } else {
-            $this->middlewareAggregate = new class() {
-                public $aggregate;
-                public $iterator;
-
-                public function getIterator()
-                {
-                    return $this->aggregate = new \ArrayObject(iterator_to_array($this->iterator, false));
-                }
-            };
-            $this->middlewareAggregate->aggregate = &$this->middlewareAggregate;
-            $this->middlewareAggregate->iterator = $middlewareHandlers;
-        }
+        $this->middlewares = $middlewares;
     }
 
     /**
@@ -57,19 +41,10 @@ class MessageBus implements MessageBusInterface
         if (!\is_object($message)) {
             throw new \TypeError(sprintf('Invalid argument provided to "%s()": expected object, but got %s.', __METHOD__, \gettype($message)));
         }
+
         $envelope = Envelope::wrap($message, $stamps);
-        $middlewareIterator = $this->middlewareAggregate->getIterator();
+        $pipeline = new Pipeline($this->middlewares);
 
-        while ($middlewareIterator instanceof \IteratorAggregate) {
-            $middlewareIterator = $middlewareIterator->getIterator();
-        }
-        $middlewareIterator->rewind();
-
-        if (!$middlewareIterator->valid()) {
-            return $envelope;
-        }
-        $stack = new StackMiddleware($middlewareIterator);
-
-        return $middlewareIterator->current()->handle($envelope, $stack);
+        return $pipeline->handle($envelope);
     }
 }

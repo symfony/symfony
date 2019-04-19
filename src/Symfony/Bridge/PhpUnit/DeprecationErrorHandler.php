@@ -241,6 +241,10 @@ class DeprecationErrorHandler
             return $this->configuration = Configuration::fromNumber($mode);
         }
 
+        if (!$mode) {
+            return $this->configuration = Configuration::fromNumber(0);
+        }
+
         return $this->configuration = Configuration::fromUrlEncodedString((string) $mode);
     }
 

@@ -12,16 +12,11 @@
 namespace Symfony\Component\Stopwatch;
 
 /**
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Alexey Okhorzin <ohor.info@gmail.com>
  */
 class Helper
 {
-    /**
-     * @param int $time
-     *
-     * @return string
-     */
-    public static function formatTime(int $time)
+    public static function formatTime(int $time): string
     {
         $hours = floor($time / 3600);
         $minutes = floor(($time / 60) % 60);

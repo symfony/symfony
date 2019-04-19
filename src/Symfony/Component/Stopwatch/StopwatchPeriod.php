@@ -69,7 +69,7 @@ class StopwatchPeriod
      *
      * @return string The formatted period duration
      */
-    public function getFormattedDuration()
+    public function getFormattedDuration(): string
     {
         return Helper::formatTime($this->getDuration());
     }

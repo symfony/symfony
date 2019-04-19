@@ -19,7 +19,7 @@ class HelperTest extends TestCase
     /**
      * @dataProvider provideFormattedTime
      */
-    public function testFormatTime($time, $formattedTime)
+    public function testFormatTime(int $time, string $formattedTime)
     {
         $this->assertSame(Helper::formatTime($time), $formattedTime);
     }

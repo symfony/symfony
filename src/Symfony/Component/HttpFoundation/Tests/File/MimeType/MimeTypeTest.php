@@ -20,7 +20,18 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
  */
 class MimeTypeTest extends TestCase
 {
-    protected $path;
+    public function testGuessWithLeadingDash()
+    {
+        $cwd = getcwd();
+        chdir(__DIR__.'/../Fixtures');
+        try {
+            $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess('-test'));
+            chdir($cwd);
+        } catch(\Exception $e) {
+            chdir($cwd);
+            throw $e;
+        }
+    }
 
     public function testGuessImageWithoutExtension()
     {

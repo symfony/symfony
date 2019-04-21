@@ -110,6 +110,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 }
             }
         }
+
+        if (isset($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER]) && !\is_callable($this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER])) {
+            throw new InvalidArgumentException(sprintf('Invalid callback found in the "%s" default context option.', self::CIRCULAR_REFERENCE_HANDLER));
+        }
     }
 
     /**

@@ -1,0 +1,9 @@
+{
+    "Version": "2.1.47.86",
+    "Names": {
+        "America\/Miquelon": "St Pierre & Miquelon Time (Miquelon)",
+        "Australia\/Adelaide": "Central Australia Time (Adelaide)",
+        "Australia\/Broken_Hill": "Central Australia Time (Broken Hill)",
+        "Australia\/Darwin": "Central Australia Time (Darwin)"
+    }
+}

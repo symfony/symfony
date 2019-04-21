@@ -20,6 +20,7 @@ use Symfony\Component\Intl\Data\Generator\LanguageDataGenerator;
 use Symfony\Component\Intl\Data\Generator\LocaleDataGenerator;
 use Symfony\Component\Intl\Data\Generator\RegionDataGenerator;
 use Symfony\Component\Intl\Data\Generator\ScriptDataGenerator;
+use Symfony\Component\Intl\Data\Generator\TimezoneDataGenerator;
 use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
 use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
@@ -195,6 +196,7 @@ foreach ($workingDirs as $targetDir) {
         $targetDir.'/'.Intl::LOCALE_DIR,
         $targetDir.'/'.Intl::REGION_DIR,
         $targetDir.'/'.Intl::SCRIPT_DIR,
+        $targetDir.'/'.Intl::TIMEZONE_DIR,
     ]);
 }
 
@@ -255,6 +257,11 @@ $generator->generateData($config);
 //$compiler->compile($txtDir.'/'.Intl::LOCALE_DIR, $resDir.'/'.Intl::LOCALE_DIR);
 //
 //$filesystem->remove($txtDir);
+
+echo "Generating zone data...\n";
+
+$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR);
+$generator->generateData($config);
 
 echo "Resource bundle compilation complete.\n";
 

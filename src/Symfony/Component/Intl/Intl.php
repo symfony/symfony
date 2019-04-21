@@ -65,6 +65,11 @@ final class Intl
     const REGION_DIR = 'regions';
 
     /**
+     * The directory name of the zone data.
+     */
+    public const TIMEZONE_DIR = 'timezones';
+
+    /**
      * @var ResourceBundle\CurrencyBundleInterface
      */
     private static $currencyBundle;

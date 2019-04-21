@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-04-18T10:02:35Z
+
+based on the diff, the only relevant changes for this component are:
+
+- region name for `MK` is updated
+- locale names for `mk_MK` and `sq_MK` are updated (probably related to previous change)
+
+Other ICU changes are not impacting the data we bundle.

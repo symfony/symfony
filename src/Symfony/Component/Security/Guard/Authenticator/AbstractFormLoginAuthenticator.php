@@ -60,6 +60,8 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * @param string         $providerKey
      *
      * @return RedirectResponse
+     *
+     * @deprecated since version 3.1, to be removed in 4.0
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {

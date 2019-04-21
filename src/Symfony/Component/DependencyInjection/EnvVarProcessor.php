@@ -117,6 +117,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 if (\function_exists('opcache_invalidate') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
                     @opcache_invalidate($file);
                 }
+                
                 return require $file;
             }
         }

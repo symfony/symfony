@@ -23,6 +23,7 @@ CHANGELOG
  * Dispatch `SwitchUserEvent` on `security.switch_user`
  * Deprecated `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
  * Deprecated `BCryptPasswordEncoder`, use `NativePasswordEncoder` instead
+ * Added `DeauthenticatedEvent` dispatched in case the user has changed when trying to refresh it
 
 4.2.0
 -----

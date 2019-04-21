@@ -31,6 +31,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 class ContextListenerTest extends TestCase
@@ -311,6 +312,33 @@ class ContextListenerTest extends TestCase
         $this->handleEventWithPreviousSession($tokenStorage, new \ArrayObject([new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)]), $refreshedUser);
 
         $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
+    }
+
+    public function testDeauthenticatedEvent()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new User('foobar', 'baz');
+
+        $user = new User('foo', 'bar');
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken($user, '', 'context_key', ['ROLE_USER'])));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(DeauthenticatedEvent::class, function (DeauthenticatedEvent $event) use ($user) {
+            $this->assertTrue($event->getOriginalToken()->isAuthenticated());
+            $this->assertEquals($event->getOriginalToken()->getUser(), $user);
+            $this->assertFalse($event->getRefreshedToken()->isAuthenticated());
+            $this->assertNotEquals($event->getRefreshedToken()->getUser(), $user);
+        });
+
+        $listener = new ContextListener($tokenStorage, [new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)], 'context_key', null, $eventDispatcher);
+        $listener(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
+
+        $this->assertNull($tokenStorage->getToken());
     }
 
     protected function runSessionOnKernelResponse($newToken, $original = null)

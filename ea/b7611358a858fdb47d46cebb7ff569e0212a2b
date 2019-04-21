@@ -1,0 +1,282 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-10-12T10:09:10Z
+
+note im not yet convinved about form type integration... if we go that way, we might want an option `intl => true` to optionally change the source from `DateTimeZone::listIdentifiers()` to `TimezoneBundle`
+
+The intl variant IMHO should include, and be sorted by offset, from `-xx:00` to `+xx:00`.
+
+![image](https://user-images.githubusercontent.com/1047696/46863494-dfda5e80-ce17-11e8-813a-ff2f5203939d.png)
+
+here we also see a different format `meta - city` vs. `meta (city)`, i tend to prefer the latter =/
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-12-13T16:42:17Z
+
+ill rebase and compile the full list tomorrow. Meanwhile, can we decide on #28846 Not sure we want to add the boilerplate classes now, only to deprecate them later again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-03-13T15:53:19Z
+
+@ro0NL up to rebase and address any remaining comment?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-03-16T08:54:07Z
+
+@nicolas-grekas i've refigured out how the compile process went, and added a binary for it as such. Works for me :) Please validate.
+
+Need to solve remaining comments still, but compiling is fast at least now :)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2019-04-06T15:17:25Z
+
+Should be rebased and finished as soon as https://github.com/symfony/symfony/pull/28846 is merged IMO.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-15T11:54:37Z
+
+@ro0NL #28846 has been merged now, so I think we can work on finishing this one.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-16T11:16:03Z
+
+status ready :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-16T14:19:09Z
+
+Roland, thanks a lot for working on this feature. I like it a lot.
+
+My only concern is the way the data is exposed. If I'm right, a `<select>` with the current data would look like this:
+
+```
+"Central European Standard Time (Amsterdam)",
+"Central European Standard Time (Andorra)",
+"Moscow Standard Time (Astrakhan)",
+"Eastern European Standard Time (Athens)",
+"Central European Standard Time (Belgrade)",
+"Central European Standard Time (Berlin)",
+"Central European Standard Time (Bratislava)",
+"Central European Standard Time (Brussels)",
+"Eastern European Standard Time (Bucharest)",
+"Central European Standard Time (Budapest)",
+"Central European Standard Time (Busingen)",
+"Eastern European Standard Time (Chisinau)",
+"Central European Standard Time (Copenhagen)",
+"Irish Standard Time (Dublin)",
+"Central European Standard Time (Gibraltar)",
+```
+
+If that's true, I think we're giving too much attention to each timezone long name (e.g. "Irish Standard Time" and "Central European Standard Time"). Although displaying timezones is not easy, I think we should focus more on the "Continent + City" because that's easier for users. Example:
+
+```
+Europe/Amsterdam (UTC +02:00)
+Europe/Andorra (UTC +02:00)
+Europe/Astrakhan (UTC +03:00)
+Europe/Athens (UTC +03:00)
+Europe/Belgrade (UTC +02:00)
+Europe/Berlin (UTC +02:00)
+Europe/Bratislava (UTC +02:00)
+Europe/Brussels (UTC +02:00)
+Europe/Bucharest (UTC +03:00)
+Europe/Budapest (UTC +02:00)
+Europe/Busingen (UTC +02:00)
+Europe/Chisinau (UTC +03:00)
+Europe/Copenhagen (UTC +02:00)
+Europe/Dublin (UTC +01:00)
+Europe/Gibraltar (UTC +02:00)
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-16T14:29:23Z
+
+@javiereguiluz my idea for a form widget would be something like https://github.com/symfony/symfony/pull/28831#issuecomment-429275779 (the screenshot is from Google Calendar)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-16T14:33:32Z
+
+@ro0NL OK, but can you display such a form widget with the data of the generated files included in this PR?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-16T15:24:26Z
+
+@javiereguiluz maybe, maybe not :D i tend to believe we should add `Timezones::getOffset()` for this still. And for better performance probably compile this data.
+
+Doesnt block this PR for now :)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2019-04-16T19:45:46Z
+
+If you display the form widget with the current data, then that produces:
+
+> (GMT+00:00) Greenwich Mean Time (Abidjan)
+
+If you want to display it like in your example, you'd need to change the compiled format with the city in braces to a city after a dash:
+
+> (GMT+00:00) Greenwich Mean Time - Abidjan
+
+I'm indifferent about this, just want to point this out.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-16T20:00:01Z
+
+Hm right, i felt awkward about a possible double `-`, yet Google did this:
+
+![image](https://user-images.githubusercontent.com/1047696/56240032-b504e780-6092-11e9-82ed-795fde4b3845.png)
+
+As a plain list, without any context, i chose to avoid this duplication by using `()`.
+
+For the form, an alternative approach is to use optgroups per offset. Semantically (for JS & co) that might be more useful even. Havent come to play around with this though.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T07:49:44Z
+
+compiled the TZ offsets :)
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2019-04-17T09:11:06Z
+
+hm shouldn't the offset be based on DST too?
+Europe/Berlin as MEZ (+01:00) and MESZ (+02:00)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T09:31:08Z
+
+hm yes :) but we need a local time for that. Something like https://3v4l.org/57U2J could be taken into account in `get(Raw)Offset()`, allowing a local date (default now) to be specified.
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T10:13:18Z
+
+@Hanmac i've removed the last commit, i dont think we need to compile offsets and instead simply use `DateTimeZone` directly.
+
+status: needs review (still ready :))
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2019-04-17T14:35:26Z
+
+@ro0NL Question about the Translation: i saw in the german translation something about normal time, but isn't that wrong for DST and should it say summer time instead?
+
+maybe instead of going directly from DateTimeZone "Europe/Berlin" to Translation, maybe instead use `getTransitions` for the abbr like "CET"/"CEST" and translate that ?
+
+https://github.com/unicode-org/icu/blob/master/icu4c/source/data/zone also has different lables for that
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T18:59:20Z
+
+@Hanmac i checked the google widget again :) today it includes
+
+```
+(GMT+02:00) Midden-Europese tijd - Amsterdam
+```
+
+(in english `Central European Time`)
+
+so per https://github.com/unicode-org/icu/blob/78a4abc5ed5db9ddadb57dca0f5222e7639c124c/icu4c/source/data/zone/en.txt#L292-L295 it seems to always pick `lg` (out of `lg`, `ls` and `ld`) and only differs the offset based on local time.
+
+I interpreted these codes as
+
+`lg`: long generic, e.g. "Central European Time"
+`ls`: long specific (not DST), e.g. "Central European Standard Time"
+`ld`: long DST, e.g. "Central European Summer Time"
+
+(http://site.icu-project.org/design/formatting/timezone/icu-4-8-time-zone-names#TOC-UTS-35-Time-Zone-Display-Name-Basics)
+
+Symfony now follows `ls > lg > ld`. I tend to believe we should also always use `lg` instead, as the fallback probably never happens (not sure why i picked `ls` instead :thinking: perhaps due this "standard" term)
+
+So using `lg` gives in fact shorter names :tada: and is more in line with what @javiereguiluz expected in https://github.com/symfony/symfony/pull/28831#issuecomment-483679575 (AFAIK there's no mapping, nor translations available for continents, e.g. "Europe")
+
+IMHO using the generic name solves the issue of names varied based on local time, thus a more simple implementation :+1: (the offset should be dynamic and is a display/rendering concern for now - unrelated here)
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T19:28:46Z
+
+@Hanmac see 3e09816, can you verify ... IMHO the results are much better now.
+
+status: needs review
+
+cc @fabpot
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2019-04-17T20:01:59Z
+
+the Translations are in the Meta like de used for CET or MEZ `meta:Europe_Central` like `lg{"Mitteleuropäische Zeit"}` if you want you could use `sg{"MEZ"}` too.
+From what i have seen you already use the meta stuff?
+
+i think it is okay for now if the name you show is DST independent.
+
+I think what the pro way would be:
+* input timezone String "Europe/Berlin" call getTransitions on it with now time
+* that gives you the offset and the abbr "CET"/"CEST" and if DST is on or off
+
+do you need to parse the abbr?
+i got the thinking you might need https://github.com/unicode-org/icu/blob/master/icu4c/source/data/zone/tzdbNames.txt but i am unsure now, because you already knew from the DST param what kind of label it should use? But that would make it depend on the local time and you can't prebuild it?
+
+i currently don't know what the best way would be there
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T20:17:41Z
+
+@Hanmac can you check once more :) the fallback for `ls` is in fact required for translating Etc/GMT & co :man_shrugging:
+
+de.json currently is `"Europe\/Berlin": "Mitteleuropäische Zeit (Berlin)"`, that's OK right? Im not sure i understand why we need the abbr. :/
+
+> From what i have seen you already use the meta stuff?
+
+Yes
+
+https://github.com/unicode-org/icu/blob/30d203459720bb64c850680a79b0f393a60934ca/icu4c/source/data/misc/metaZones.txt#L3553-L3557 gives us europe/berlin > Europe_Central
+
+https://github.com/unicode-org/icu/blob/30d203459720bb64c850680a79b0f393a60934ca/icu4c/source/data/zone/de.txt#L1512-L1514 gives us Europe_Central > lg (Mitteleuropäische Zeit)
+
+> i think it is okay for now if the name you show is DST independent.
+
+agree :)
+
+> I think what the pro way would be:
+> - input timezone String "Europe/Berlin" call getTransitions on it with now time
+> - that gives you the offset and the abbr "CET"/"CEST" and if DST is on or off
+
+agree :)
+
+> do you need to parse the abbr?
+
+again, not sure how the abbr. is related...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T20:22:08Z
+
+to clarify, Symfony `Timezones` will not provide you the DST specific name (for now), only the generic one. Hence i suggested to only show the local offset with the generic tz name; that's what google does.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-17T20:27:08Z
+
+I think i understand, `sg`, `ss`, `sd`, most likely stands for "short generic/standard/dst" :sweat_smile: didnt know these were translatable (CEST in dutch, is MESZ in german :|)
+
+Still, for the name itself, it's just another fallback. We only provide the long generic name for now.

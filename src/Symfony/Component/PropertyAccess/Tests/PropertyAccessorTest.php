@@ -17,6 +17,8 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidArgumentLength;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestAdderRemoverInvalidMethods;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
@@ -761,5 +763,55 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'aircraft', ['aeroplane']);
 
         $this->assertEquals(['aeroplane'], $object->getAircraft());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessageRegExp /.*The add method "addFoo" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestAdderRemoverInvalidMethods" was found, but the corresponding remove method "removeFoo" was not found\./
+     */
+    public function testAdderWithoutRemover()
+    {
+        $object = new TestAdderRemoverInvalidMethods();
+        $this->propertyAccessor->setValue($object, 'foos', [1, 2]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessageRegExp /.*The remove method "removeBar" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestAdderRemoverInvalidMethods" was found, but the corresponding add method "addBar" was not found\./
+     */
+    public function testRemoverWithoutAdder()
+    {
+        $object = new TestAdderRemoverInvalidMethods();
+        $this->propertyAccessor->setValue($object, 'bars', [1, 2]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessageRegExp /.*The method "addFoo" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestAdderRemoverInvalidArgumentLength" requires 0 arguments, but should accept only 1\. The method "removeFoo" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./
+     */
+    public function testAdderAndRemoveNeedsTheExactParametersDefined()
+    {
+        $object = new TestAdderRemoverInvalidArgumentLength();
+        $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessageRegExp /.*The method "setBar" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestAdderRemoverInvalidArgumentLength" requires 2 arguments, but should accept only 1\./
+     */
+    public function testSetterNeedsTheExactParametersDefined()
+    {
+        $object = new TestAdderRemoverInvalidArgumentLength();
+        $this->propertyAccessor->setValue($object, 'bar', [1, 2]);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedExceptionMessageRegExp /.*The method "setFoo" in class "Symfony\\Component\\PropertyAccess\\Tests\\Fixtures\\TestClassSetValue" was found but does not have public access./
+     */
+    public function testSetterNeedsPublicAccess()
+    {
+        $object = new TestClassSetValue(0);
+        $this->propertyAccessor->setValue($object, 'foo', 1);
     }
 }

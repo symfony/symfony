@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-12T08:15:50Z
+
+Can you add a test case that would prevent future regressions? I guess this also needs to be fixed in 3.4 too, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-14T16:24:50Z
+
+@xabbuh I just checked: this file is master only.
+@ksaveras waiting for a test case if you can provide one please :)
+
+---------------------------------------------------------------------------
+
+by ksaveras at 2019-04-14T16:29:14Z
+
+On Monday only. On vacation currently.
+Looks like this index is not available in rare cases.
+
+On Sun, Apr 14, 2019, 19:25 Nicolas Grekas <notifications@github.com> wrote:
+
+> @xabbuh <https://github.com/xabbuh> I just checked: this file is master
+> only.
+> @ksaveras <https://github.com/ksaveras> waiting for a test case if you
+> can provide one please :)
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/31085#issuecomment-483010441>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAdm91P5GB5qYLja0VZykQuSL1KEtyRKks5vg1ZqgaJpZM4crkVO>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ksaveras at 2019-04-15T21:26:51Z
+
+Yep it happens with XML loader. Annotation has default values, but XML loader - not.
+
+---------------------------------------------------------------------------
+
+by ksaveras at 2019-04-15T21:36:27Z
+
+@xabbuh Added simple test.
+
+---------------------------------------------------------------------------
+
+by ksaveras at 2019-04-19T12:11:23Z
+
+So what are next steps?

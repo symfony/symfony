@@ -162,6 +162,82 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/de', $url);
     }
 
+    public function testGenerateWithDefaultLocale()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'test';
+
+        foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $generator = $this->getGenerator($routes, [], null, 'hr');
+
+        $this->assertSame(
+            'http://localhost/app.php/foo',
+            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+    }
+
+    public function testGenerateWithOverriddenParameterLocale()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'test';
+
+        foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $generator = $this->getGenerator($routes, [], null, 'hr');
+
+        $this->assertSame(
+            'http://localhost/app.php/bar',
+            $generator->generate($name, ['_locale' => 'en'], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+    }
+
+    public function testGenerateWithOverriddenParameterLocaleFromRequestContext()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'test';
+
+        foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $generator = $this->getGenerator($routes, [], null, 'hr');
+
+        $context = new RequestContext('/app.php');
+        $context->setParameter('_locale', 'en');
+        $generator->setContext($context);
+
+        $this->assertSame(
+            'http://localhost/app.php/bar',
+            $generator->generate($name, [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
      */
@@ -169,6 +245,29 @@ class UrlGeneratorTest extends TestCase
     {
         $routes = $this->getRoutes('foo', new Route('/testing/{foo}'));
         $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
+     */
+    public function testGenerateWithInvalidLocale()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('');
+
+        $name = 'test';
+
+        foreach (['hr' => '/foo', 'en' => '/bar'] as $locale => $path) {
+            $localizedRoute = clone $route;
+            $localizedRoute->setDefault('_locale', $locale);
+            $localizedRoute->setDefault('_canonical_route', $name);
+            $localizedRoute->setPath($path);
+            $routes->add($name.'.'.$locale, $localizedRoute);
+        }
+
+        $generator = $this->getGenerator($routes, [], null, 'fr');
+        $generator->generate($name);
     }
 
     /**
@@ -720,7 +819,7 @@ class UrlGeneratorTest extends TestCase
         yield ['/app.php/bar/a/b/bam/c/d/e', '/bar/{foo}/bam/{baz}', '(?<!^).+'];
     }
 
-    protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null)
+    protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, string $defaultLocale = null)
     {
         $context = new RequestContext('/app.php');
         foreach ($parameters as $key => $value) {
@@ -728,7 +827,7 @@ class UrlGeneratorTest extends TestCase
             $context->$method($value);
         }
 
-        return new UrlGenerator($routes, $context, $logger);
+        return new UrlGenerator($routes, $context, $logger, $defaultLocale);
     }
 
     protected function getRoutes($name, Route $route)

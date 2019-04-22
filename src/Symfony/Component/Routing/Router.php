@@ -74,6 +74,11 @@ class Router implements RouterInterface, RequestMatcherInterface
     protected $logger;
 
     /**
+     * @var string|null
+     */
+    protected $defaultLocale;
+
+    /**
      * @var ConfigCacheFactoryInterface|null
      */
     private $configCacheFactory;
@@ -90,13 +95,14 @@ class Router implements RouterInterface, RequestMatcherInterface
      * @param RequestContext  $context  The context
      * @param LoggerInterface $logger   A logger instance
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
     {
         $this->loader = $loader;
         $this->resource = $resource;
         $this->logger = $logger;
         $this->context = $context ?: new RequestContext();
         $this->setOptions($options);
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -321,7 +327,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger, $this->defaultLocale);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -340,7 +346,7 @@ class Router implements RouterInterface, RequestMatcherInterface
                 require_once $cache->getPath();
             }
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger, $this->defaultLocale);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

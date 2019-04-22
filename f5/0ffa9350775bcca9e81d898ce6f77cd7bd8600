@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T20:27:10Z
+
+> the constraint for symfony/routing should be bumped to ^4.2.6 in the composer.json
+
+please do it in this PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T21:14:46Z
+
+Tests will be green once the patch is merged up to master.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-04-09T20:58:14Z
+
+I just tested the case I described in the linked ticket, and it does behave like I wrote it so this change could technically break someone workflow.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-15T09:28:36Z
+
+@fancyweb the scenario you describe would apply to the cli but not to the web, right? Having a consistent behavior looks more important to me that preserving a non-consistent one to me. Makes sense?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-04-15T09:58:24Z
+
+It also applies to the web context but I guess it's very unlikely that someone relies on this behavior.

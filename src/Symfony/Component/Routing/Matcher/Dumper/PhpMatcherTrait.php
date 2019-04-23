@@ -42,7 +42,7 @@ trait PhpMatcherTrait
             throw new MethodNotAllowedException(array_keys($allow));
         }
         if (!$this instanceof RedirectableUrlMatcherInterface) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
         }
         if (!\in_array($this->context->getMethod(), ['HEAD', 'GET'], true)) {
             // no-op
@@ -67,7 +67,7 @@ trait PhpMatcherTrait
             }
         }
 
-        throw new ResourceNotFoundException();
+        throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
     }
 
     private function doMatch(string $pathinfo, array &$allow = [], array &$allowSchemes = []): array
@@ -110,10 +110,8 @@ trait PhpMatcherTrait
             }
 
             $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
-            if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                if ($hasRequiredScheme) {
-                    $allow += $requiredMethods;
-                }
+            if ($hasRequiredScheme && $requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                $allow += $requiredMethods;
                 continue;
             }
 
@@ -157,15 +155,13 @@ trait PhpMatcherTrait
                         }
                     }
 
-                    $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
-                    if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                        if ($hasRequiredScheme) {
-                            $allow += $requiredMethods;
-                        }
+                    if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {
+                        $allowSchemes += $requiredSchemes;
                         continue;
                     }
-                    if (!$hasRequiredScheme) {
-                        $allowSchemes += $requiredSchemes;
+
+                    if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                        $allow += $requiredMethods;
                         continue;
                     }
 

@@ -92,18 +92,20 @@ class FormPass implements CompilerPassInterface
             $serviceDefinition = $container->getDefinition($serviceId);
 
             $tag = $serviceDefinition->getTag($this->formTypeExtensionTag);
+            $typeExtensionClass = $container->getParameterBag()->resolveValue($serviceDefinition->getClass());
+
             if (isset($tag[0]['extended_type'])) {
-                if (!method_exists($serviceDefinition->getClass(), 'getExtendedTypes')) {
-                    @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', $serviceDefinition->getClass(), FormTypeExtensionInterface::class), E_USER_DEPRECATED);
+                if (!method_exists($typeExtensionClass, 'getExtendedTypes')) {
+                    @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', $typeExtensionClass, FormTypeExtensionInterface::class), E_USER_DEPRECATED);
                 }
 
                 $typeExtensions[$tag[0]['extended_type']][] = new Reference($serviceId);
-                $typeExtensionsClasses[] = $serviceDefinition->getClass();
-            } elseif (method_exists($serviceDefinition->getClass(), 'getExtendedTypes')) {
+                $typeExtensionsClasses[] = $typeExtensionClass;
+            } elseif (method_exists($typeExtensionClass, 'getExtendedTypes')) {
                 $extendsTypes = false;
 
-                $typeExtensionsClasses[] = $serviceDefinition->getClass();
-                foreach ($serviceDefinition->getClass()::getExtendedTypes() as $extendedType) {
+                $typeExtensionsClasses[] = $typeExtensionClass;
+                foreach ($typeExtensionClass::getExtendedTypes() as $extendedType) {
                     $typeExtensions[$extendedType][] = new Reference($serviceId);
                     $extendsTypes = true;
                 }
@@ -112,7 +114,7 @@ class FormPass implements CompilerPassInterface
                     throw new InvalidArgumentException(sprintf('The getExtendedTypes() method for service "%s" does not return any extended types.', $serviceId));
                 }
             } else {
-                throw new InvalidArgumentException(sprintf('"%s" tagged services have to implement the static getExtendedTypes() method. The class for service "%s" does not implement it.', $this->formTypeExtensionTag, $serviceId));
+                throw new InvalidArgumentException(sprintf('"%s" tagged services have to implement the static getExtendedTypes() method. Class "%s" for service "%s" does not implement it.', $this->formTypeExtensionTag, $typeExtensionClass, $serviceId));
             }
         }
 

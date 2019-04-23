@@ -219,12 +219,11 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
-        // In PHP <7.2 session_write_close() does not error if the session is
-        // not started.
+        // In PHP <7.2 session_write_close() returns void if the session is not started.
+        // @see https://www.php.net/manual/function.session-write-close.php
         if (!$this->started) {
             return;
         }
-
         $session = $_SESSION;
 
         foreach ($this->bags as $bag) {

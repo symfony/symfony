@@ -67,6 +67,7 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="parameter_bag" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument>%kernel.default_locale%</argument>
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>

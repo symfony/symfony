@@ -1525,7 +1525,9 @@ class FrameworkExtension extends Extension
         }
 
         if ($config['max_depth_handler'] ?? false) {
-            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setMaxDepthHandler', [new Reference($config['max_depth_handler'])]);
+            $defaultContext = $container->getDefinition('serializer.normalizer.object')->getArgument(6);
+            $defaultContext += ['max_depth_handler' => new Reference($config['max_depth_handler'])];
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(6, $defaultContext);
         }
     }
 

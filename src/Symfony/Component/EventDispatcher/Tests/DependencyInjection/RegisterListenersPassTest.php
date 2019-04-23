@@ -182,6 +182,29 @@ class RegisterListenersPassTest extends TestCase
         ];
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
+
+    public function testPrioritizedEventListener()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', PrioritizedInvokableListenerService::class)->addTag('kernel.event_listener', ['event' => 'event']);
+        $container->register('event_dispatcher', \stdClass::class);
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expectedCalls = [
+            [
+                'addListener',
+                [
+                    'event',
+                    [new ServiceClosureArgument(new Reference('foo')), '__invoke'],
+                    420,
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedCalls, $definition->getMethodCalls());
+    }
 }
 
 class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
@@ -202,5 +225,17 @@ class InvokableListenerService
 
     public function onEvent()
     {
+    }
+}
+
+class PrioritizedInvokableListenerService
+{
+    public function __invoke()
+    {
+    }
+
+    public static function getDefaultPriority(): int
+    {
+        return 420;
     }
 }

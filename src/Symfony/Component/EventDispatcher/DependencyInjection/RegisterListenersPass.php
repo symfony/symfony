@@ -64,7 +64,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->listenerTag, true) as $id => $events) {
             foreach ($events as $event) {
-                $priority = isset($event['priority']) ? $event['priority'] : 0;
+                $priority = isset($event['priority']) ? $event['priority'] : $this->getDefaultPriority($id, $container);
 
                 if (!isset($event['event'])) {
                     throw new InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
@@ -121,6 +121,17 @@ class RegisterListenersPass implements CompilerPassInterface
             $extractingDispatcher->listeners = [];
             ExtractingEventDispatcher::$aliases = [];
         }
+    }
+
+    private function getDefaultPriority(string $id, ContainerBuilder $container): int
+    {
+        $class = $container->getDefinition($id)->getClass();
+
+        if (null !== $class && ($r = $container->getReflectionClass($class, false)) && $r->hasMethod('getDefaultPriority')) {
+            return $class::getDefaultPriority();
+        }
+
+        return 0;
     }
 }
 

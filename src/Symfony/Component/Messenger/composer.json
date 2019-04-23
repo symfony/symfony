@@ -27,7 +27,7 @@
         "symfony/dependency-injection": "^3.4.19|^4.1.8|^5.0",
         "symfony/doctrine-bridge": "^3.4|^4.0|^5.0",
         "symfony/event-dispatcher": "^4.3|^5.0",
-        "symfony/http-kernel": "^3.4|^4.0|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0",
         "symfony/process": "^3.4|^4.0|^5.0",
         "symfony/property-access": "^3.4|^4.0|^5.0",
         "symfony/serializer": "^3.4|^4.0|^5.0",
@@ -38,7 +38,8 @@
     },
     "conflict": {
         "symfony/event-dispatcher": "<4.3",
-        "symfony/debug": "<4.1"
+        "symfony/http-kernel": "<4.4",
+        "symfony/debug": "<4.4"
     },
     "suggest": {
         "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."

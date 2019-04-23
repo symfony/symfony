@@ -288,6 +288,7 @@ HttpFoundation
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
  * `ApacheRequest` has been removed, use the `Request` class instead.
  * The third argument of the `HeaderBag::get()` method has been removed, use method `all()` instead.
+ * Getting the container from a non-booted kernel is not possible anymore.
 
 HttpKernel
 ----------

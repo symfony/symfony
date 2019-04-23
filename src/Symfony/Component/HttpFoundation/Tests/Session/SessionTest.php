@@ -261,13 +261,4 @@ class SessionTest extends TestCase
         $this->assertTrue($this->session->isEmpty());
     }
 
-    public function testSaveIfNotStarted()
-    {
-        $storage = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface')->getMock();
-        $session = new Session($storage);
-
-        $storage->expects($this->once())->method('isStarted')->willReturn(false);
-        $storage->expects($this->never())->method('save');
-        $session->save();
-    }
 }

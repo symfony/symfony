@@ -105,6 +105,13 @@ class NativeSessionStorageTest extends TestCase
         $this->assertSame($id, $storage->getId(), 'ID stays after saving session');
     }
 
+    public function testSaveIfNotStarted()
+    {
+        $storage = $this->getStorage();
+        $this->assertNull($storage->save(), 'Saving unstarted sessions does not error');
+        $this->assertEmpty(glob($this->savePath.'/*'));
+    }
+
     public function testRegenerate()
     {
         $storage = $this->getStorage();

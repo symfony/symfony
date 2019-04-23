@@ -24,6 +24,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class ServerLogCommand extends Command
 {
@@ -77,6 +79,8 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        @trigger_error('Using the WebserverBundle is deprecated since 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
+
         $filter = $input->getOption('filter');
         if ($filter) {
             if (!class_exists(ExpressionLanguage::class)) {

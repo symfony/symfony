@@ -23,6 +23,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Stops a background process running a local web server.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
+ *
+ * @deprecated since version 4.4, to be removed in 5.0; the new Symfony local server has more features, you can use it instead.
  */
 class ServerStopCommand extends Command
 {
@@ -61,6 +63,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        @trigger_error('Using the WebserverBundle is deprecated since 4.4. The new Symfony local server has more features, you can use it instead.', E_USER_DEPRECATED);
+
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         try {

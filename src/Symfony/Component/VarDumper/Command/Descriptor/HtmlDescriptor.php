@@ -92,6 +92,13 @@ HTML
         );
     }
 
+    /**
+     * Returns formatted date
+     *
+     * @param  array
+     * @param  string
+     * @return string
+     */
     private function extractDate(array $context, string $format = 'r'): string
     {
         return date($format, $context['timestamp']);

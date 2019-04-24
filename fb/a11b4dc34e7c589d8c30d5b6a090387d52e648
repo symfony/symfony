@@ -1,0 +1,190 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-02-25T06:44:20Z
+
+Thanks for pushing this forward.
+I'm wondering: does the filesystem storage benefit from the change in terms of performance?
+Can you post a blackfire comparison maybe for both adapters?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-02-25T12:42:24Z
+
+> I'm wondering: does the filesystem storage benefit from the change in terms of performance?
+> Can you post a blackfire comparison maybe for both adapters?
+
+It does make a noticeable difference. If you still want blackfire profile I can look into rebuilding docker env for that, but even just with web debug toolbar; if we take a demo install of eZ Platform EE _(v2, Symfony 3.4LTS, dev mode, using server:start)_, without some other ongoing optimizations:
+- Default "cache.app" which uses files system: ~950ms total time, Cache calls 6078 in ~310ms
+- FileSystemTagAwareAdapter: ~730ms total time, Cache calls 3048 in ~135ms
+
+Those 6078 cache calls results in 17,639 filesystem stat calls:
+- Where 11,462 are cache misses _(tags with no expiry yet)_, which PHP does not have stat cache for
+    - => _These are eliminated completely with FileSystemTagAwareAdapter_
+- And hits, unlike Opcache or APC cache, results in a actual disk read with fopen once initial cached stat call with file_exists() is done _(however fixing that is outside of scope here)_
+
+----
+On Redis the benefit is larger, taking the total time down from 3 to 2 seconds _(and further down to <1sec with other optimizations on eZ side)_, where about 1.5-2 seconds are spent connecting Redis _(Redis as a local docker container over TCP using Predis)_. I expect Redis over network to produce _bigger_ difference.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-03-07T19:43:25Z
+
+Tests added, both optimized TagAware Adapters fail on these:
+- ::testTagsAreCleanedOnSave
+- :::testTagsAreCleanedOnDelete
+
+Edit: I’ll add fixes for those two failures, shouldn’t be to hard, might allow me to cleanup some things here while at it.
+
+@nicolas-grekas What are you missing here before this can be moved out of draft besides that?
+
+---------------------------------------------------------------------------
+
+by flaushi at 2019-03-24T21:40:40Z
+
+I'd like to test this PR in my project (currently on 4.2.4). I do not get how to select this PR (what is the branch name??) in my composer.json (or symfony.lock) file. Can you help me ?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-03-25T06:59:52Z
+
+@flaushi 👍you'll need to add something like this in [composer.json](https://getcomposer.org/doc/05-repositories.md#vcs):
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/andrerom/symfony"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "dev-tagaware_adapters as 4.3.x-dev"
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-03T12:25:50Z
+
+@andrerom Any news on this one? How can we move forward?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-07T17:54:08Z
+
+@fabpot / @nicolas-grekas / @OskarStark Cache tests passing. I found a way to simplify doSave() approach, so this is ready for review from my side now.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-04-10T14:40:31Z
+
+Thanks for working on this @andrerom, awesome stuff! I'd like to ask for a bit more detail regarding the implementation. So as far as I could see from a quick review, these are additional tag aware adapters alongside the existing `TagAwareAdapter`, right?
+So I have a few questions here:
+
+* Nobody will benefit from these changes by just updating to the new version. Did you think about an alternative? Were there some blockers we don't know about?
+* You've introduced a new `AbstractTagAwareAdapter` but the existing `TagAwareAdapter` does not use this. Seems a bit strange to me, any reason for this?
+
+Also in general: I'm not sure about the support for `predis/predis` (see https://github.com/nrk/predis/issues/524). At least the decision should be in line with the Redis support for the Messenger component (https://github.com/symfony/symfony/pull/30917) where there's currently no `predis/predis` support planned (also likely not going to happen because it needs at least version 5 of Redis and `predis/predis` is not compatible and we don't know if it ever will be).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-10T14:51:08Z
+
+@Toflar I can answer your question I think:
+
+> Nobody will benefit from these changes by just updating to the new version. Did you think about an alternative? Were there some blockers we don't know about?
+
+The code here is a totally new strategy to store the tags. It does not replace the existing one but completes it when one wants to use it. Both have valid use cases, with advantages and drawbacks.
+
+> TagAwareAdapter does not use AbstractTagAwareAdapter
+
+sure, it shouldn't: `TagAwareAdapter` invalidates tags using versioning, and `AbstractTagAwareAdapter` is the base for adapters that invalidate using relations.
+
+> Also in general: I'm not sure about the support for predis/predis
+
+support for predis is already backed into the component since a long time. Messenger is just catching up, and anyway, it's a separate component, with its own need (eg v5)
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-04-10T14:54:32Z
+
+Very good, all questions answered. Then it's just a matter of documentation so that people choose the right strategy. I'll happily help out writing them 😄 👍
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-15T06:53:07Z
+
+Updated, all review points fixed and back to green.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-15T16:22:01Z
+
+@nicolas-grekas two things I'd like to add here:
+1. Handle case where people switch adapters. Suggested handling for going from plain to TagAware in ddac001, but maybe we should handle other way around also?
+2. Consider that we should throw on invalidation if Redis server is older then 3.2, to make people more aware of requirements. If so I'll want to be able to reuse get hosts logic in `RedisTrait::doClear` by moving it to own method.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-15T16:35:44Z
+
+> Handle case where people switch adapters
+
+The logic looks great for robustness - there is a missing `\is_array($value)` somewhere btw, isn't it?
+An additional measure could be to generate a different namespace. `CachePoolPass::getNamespace()` could add the class of the adapter to the hash, don't you think?
+
+> Consider that we should throw on invalidation if Redis server is older then 3.2
+
+would be a contracts break - `invalidateTags()` should return false and when a logger is provided to the adapter, this should be logged for sure
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-15T16:52:20Z
+
+> The logic looks great for robustness - there is a missing \is_array($value) somewhere btw, isn't it?
+An additional measure could be to generate a different namespace. CachePoolPass::getNamespace() could add the class of the adapter to the hash, don't you think?
+
+that would be an alternative, and probably cleaner. Any prefs besides what you wrote?
+This is actually not an issue for FilesystemAdapters as they use `static::class` in `getFile()`
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-15T16:55:58Z
+
+>> Consider that we should throw on invalidation if Redis server is older then 3.2
+>
+> would be a contracts break - invalidateTags() should return false and when a logger is provided to the adapter, this should be logged for sure
+
+hmm, silently fail then. Maybe this is a feature request to requirements handling for symfony, to not have to look that up on runtime?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-15T17:01:56Z
+
+> any prefs?
+
+Doing both :)
+
+> silently fail then.
+
+The constructor can throw
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-15T18:31:47Z
+
+> Doing both :)
+
+ok with the namespace thing as separate PR?
+
+> The constructor can throw
+
+I'd rather not do the requirement check with server lookup on every request, this is why I proposed to align with doClear and do it on demand on call to `doInvalidate()`.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-04-21T15:35:54Z
+
+@nicolas-grekas Updated
+
+EDIT: Added test for the namespace being seeded by adapter name.

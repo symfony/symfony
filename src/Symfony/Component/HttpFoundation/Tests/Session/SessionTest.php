@@ -260,5 +260,4 @@ class SessionTest extends TestCase
         $flash->get('hello');
         $this->assertTrue($this->session->isEmpty());
     }
-
 }

@@ -97,9 +97,13 @@ class FormPassTest extends TestCase
     /**
      * @dataProvider addTaggedTypeExtensionsDataProvider
      */
-    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions)
+    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions, array $parameters = [])
     {
         $container = $this->createContainerBuilder();
+
+        foreach ($parameters as $name => $value) {
+            $container->setParameter($name, $value);
+        }
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
 
@@ -191,6 +195,27 @@ class FormPassTest extends TestCase
                     ]),
                 ],
             ],
+            [
+                [
+                    'my.type_extension1' => [
+                        'class' => '%type1_extension_class%',
+                        'tag' => ['extended_type' => 'type1'],
+                    ],
+                    'my.type_extension2' => [
+                        'class' => '%type1_extension_class%',
+                        'tag' => [],
+                    ],
+                ],
+                [
+                    'type1' => new IteratorArgument([
+                        new Reference('my.type_extension1'),
+                        new Reference('my.type_extension2'),
+                    ]),
+                ],
+                [
+                    'type1_extension_class' => Type1TypeExtension::class,
+                ],
+            ],
         ];
     }
 
@@ -261,7 +286,7 @@ class FormPassTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "form.type_extension" tagged services have to implement the static getExtendedTypes() method. The class for service "my.type_extension" does not implement it.
+     * @expectedExceptionMessage "form.type_extension" tagged services have to implement the static getExtendedTypes() method. Class "stdClass" for service "my.type_extension" does not implement it.
      */
     public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttributeNorImplementingGetExtendedTypes()
     {

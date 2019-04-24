@@ -321,33 +321,13 @@ trait RedisTrait
     protected function doClear($namespace)
     {
         $cleared = true;
-        $hosts = [$this->redis];
-        $evalArgs = [[$namespace], 0];
-
         if ($this->redis instanceof \Predis\Client) {
             $evalArgs = [0, $namespace];
-
-            $connection = $this->redis->getConnection();
-            if ($connection instanceof ClusterInterface && $connection instanceof \Traversable) {
-                $hosts = [];
-                foreach ($connection as $c) {
-                    $hosts[] = new \Predis\Client($c);
-                }
-            }
-        } elseif ($this->redis instanceof \RedisArray) {
-            $hosts = [];
-            foreach ($this->redis->_hosts() as $host) {
-                $hosts[] = $this->redis->_instance($host);
-            }
-        } elseif ($this->redis instanceof RedisClusterProxy || $this->redis instanceof \RedisCluster) {
-            $hosts = [];
-            foreach ($this->redis->_masters() as $host) {
-                $hosts[] = $h = new \Redis();
-                $h->connect($host[0], $host[1]);
-            }
+        } else {
+            $evalArgs = [[$namespace], 0];
         }
 
-        foreach ($hosts as $host) {
+        foreach ($this->getHosts() as $host) {
             if (!isset($namespace[0])) {
                 $cleared = $host->flushDb() && $cleared;
                 continue;
@@ -478,5 +458,32 @@ trait RedisTrait
         foreach ($ids as $k => $id) {
             yield $id => $results[$k];
         }
+    }
+
+    private function getHosts(): array
+    {
+        $hosts = [$this->redis];
+        if ($this->redis instanceof \Predis\Client) {
+            $connection = $this->redis->getConnection();
+            if ($connection instanceof ClusterInterface && $connection instanceof \Traversable) {
+                $hosts = [];
+                foreach ($connection as $c) {
+                    $hosts[] = new \Predis\Client($c);
+                }
+            }
+        } elseif ($this->redis instanceof \RedisArray) {
+            $hosts = [];
+            foreach ($this->redis->_hosts() as $host) {
+                $hosts[] = $this->redis->_instance($host);
+            }
+        } elseif ($this->redis instanceof RedisClusterProxy || $this->redis instanceof \RedisCluster) {
+            $hosts = [];
+            foreach ($this->redis->_masters() as $host) {
+                $hosts[] = $h = new \Redis();
+                $h->connect($host[0], $host[1]);
+            }
+        }
+
+        return $hosts;
     }
 }

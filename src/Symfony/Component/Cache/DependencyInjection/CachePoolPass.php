@@ -68,14 +68,20 @@ class CachePoolPass implements CompilerPassInterface
             if ($pool->isAbstract()) {
                 continue;
             }
+            $class = $adapter->getClass();
             while ($adapter instanceof ChildDefinition) {
                 $adapter = $container->findDefinition($adapter->getParent());
+                $class = $class ?: $adapter->getClass();
                 if ($t = $adapter->getTag($this->cachePoolTag)) {
                     $tags[0] += $t[0];
                 }
             }
             $name = $tags[0]['name'] ?? $id;
             if (!isset($tags[0]['namespace'])) {
+                if (null !== $class) {
+                    $seed .= '.'.$class;
+                }
+
                 $tags[0]['namespace'] = $this->getNamespace($seed, $name);
             }
             if (isset($tags[0]['clearer'])) {

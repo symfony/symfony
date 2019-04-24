@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\ResettableInterface;
-use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Component\Cache\Traits\AbstractAdapterTrait;
 use Symfony\Component\Cache\Traits\ContractsTrait;
 use Symfony\Contracts\Cache\CacheInterface;
 
@@ -27,14 +26,11 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
-    use AbstractTrait;
+    use AbstractAdapterTrait;
     use ContractsTrait;
 
     private static $apcuSupported;
     private static $phpFilesSupported;
-
-    private $createCacheItem;
-    private $mergeByLifetime;
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
@@ -145,81 +141,6 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
-    {
-        if ($this->deferred) {
-            $this->commit();
-        }
-        $id = $this->getId($key);
-
-        $f = $this->createCacheItem;
-        $isHit = false;
-        $value = null;
-
-        try {
-            foreach ($this->doFetch([$id]) as $value) {
-                $isHit = true;
-            }
-        } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', ['key' => $key, 'exception' => $e]);
-        }
-
-        return $f($key, $value, $isHit);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItems(array $keys = [])
-    {
-        if ($this->deferred) {
-            $this->commit();
-        }
-        $ids = [];
-
-        foreach ($keys as $key) {
-            $ids[] = $this->getId($key);
-        }
-        try {
-            $items = $this->doFetch($ids);
-        } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested items', ['keys' => $keys, 'exception' => $e]);
-            $items = [];
-        }
-        $ids = array_combine($ids, $keys);
-
-        return $this->generateItems($items, $ids);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save(CacheItemInterface $item)
-    {
-        if (!$item instanceof CacheItem) {
-            return false;
-        }
-        $this->deferred[$item->getKey()] = $item;
-
-        return $this->commit();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function saveDeferred(CacheItemInterface $item)
-    {
-        if (!$item instanceof CacheItem) {
-            return false;
-        }
-        $this->deferred[$item->getKey()] = $item;
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function commit()
     {
         $ok = true;
@@ -270,34 +191,5 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         }
 
         return $ok;
-    }
-
-    public function __destruct()
-    {
-        if ($this->deferred) {
-            $this->commit();
-        }
-    }
-
-    private function generateItems($items, &$keys)
-    {
-        $f = $this->createCacheItem;
-
-        try {
-            foreach ($items as $id => $value) {
-                if (!isset($keys[$id])) {
-                    $id = key($keys);
-                }
-                $key = $keys[$id];
-                unset($keys[$id]);
-                yield $key => $f($key, $value, true);
-            }
-        } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested items', ['keys' => array_values($keys), 'exception' => $e]);
-        }
-
-        foreach ($keys as $key) {
-            yield $key => $f($key, null, false);
-        }
     }
 }

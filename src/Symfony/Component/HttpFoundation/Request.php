@@ -58,6 +58,14 @@ class Request
     const METHOD_TRACE = 'TRACE';
     const METHOD_CONNECT = 'CONNECT';
 
+    const HEADER_REQUEST_METHOD = 'REQUEST_METHOD';
+    const HEADER_METHOD_OVERRIDE = 'X-HTTP-METHOD-OVERRIDE';
+    const HEADER_CONTENT_TYPE = 'CONTENT_TYPE';
+    const HEADER_REQUEST_URI = 'REQUEST_URI';
+
+    const PORT_HTTPS = 443;
+    const PORT_HTTP = 80;
+
     /**
      * @var string[]
      */
@@ -97,49 +105,49 @@ class Request
     /**
      * Custom parameters.
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var ParameterBag
      */
     public $attributes;
 
     /**
      * Request body parameters ($_POST).
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var ParameterBag
      */
     public $request;
 
     /**
      * Query string parameters ($_GET).
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var ParameterBag
      */
     public $query;
 
     /**
      * Server and execution environment parameters ($_SERVER).
      *
-     * @var \Symfony\Component\HttpFoundation\ServerBag
+     * @var ServerBag
      */
     public $server;
 
     /**
      * Uploaded files ($_FILES).
      *
-     * @var \Symfony\Component\HttpFoundation\FileBag
+     * @var FileBag
      */
     public $files;
 
     /**
      * Cookies ($_COOKIE).
      *
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var ParameterBag
      */
     public $cookies;
 
     /**
      * Headers (taken from the $_SERVER).
      *
-     * @var \Symfony\Component\HttpFoundation\HeaderBag
+     * @var HeaderBag
      */
     public $headers;
 
@@ -199,7 +207,7 @@ class Request
     protected $format;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @var SessionInterface
      */
     protected $session;
 
@@ -250,8 +258,15 @@ class Request
      * @param array                $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
-    public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
-    {
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
@@ -268,8 +283,15 @@ class Request
      * @param array                $server     The SERVER parameters
      * @param string|resource|null $content    The raw body data
      */
-    public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
-    {
+    public function initialize(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
         $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
         $this->attributes = new ParameterBag($attributes);
@@ -307,14 +329,14 @@ class Request
                 $server['CONTENT_LENGTH'] = $_SERVER['HTTP_CONTENT_LENGTH'];
             }
             if (\array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)) {
-                $server['CONTENT_TYPE'] = $_SERVER['HTTP_CONTENT_TYPE'];
+                $server[self::HEADER_CONTENT_TYPE] = $_SERVER['HTTP_CONTENT_TYPE'];
             }
         }
 
         $request = self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $server);
 
-        if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])
+        if (0 === strpos($request->headers->get(self::HEADER_CONTENT_TYPE), 'application/x-www-form-urlencoded')
+            && \in_array(strtoupper($request->server->get(self::HEADER_REQUEST_METHOD, self::METHOD_GET)), [self::METHOD_PUT, self::METHOD_DELETE, self::METHOD_PATCH])
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -339,11 +361,18 @@ class Request
      *
      * @return static
      */
-    public static function create($uri, $method = 'GET', $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
-    {
+    public static function create(
+        $uri,
+        $method = self::METHOD_GET,
+        $parameters = [],
+        $cookies = [],
+        $files = [],
+        $server = [],
+        $content = null
+    ) {
         $server = array_replace([
             'SERVER_NAME' => 'localhost',
-            'SERVER_PORT' => 80,
+            'SERVER_PORT' => self::PORT_HTTP,
             'HTTP_HOST' => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony/3.X',
             'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -357,7 +386,7 @@ class Request
         ], $server);
 
         $server['PATH_INFO'] = '';
-        $server['REQUEST_METHOD'] = strtoupper($method);
+        $server[self::HEADER_REQUEST_METHOD] = strtoupper($method);
 
         $components = parse_url($uri);
         if (isset($components['host'])) {
@@ -368,10 +397,10 @@ class Request
         if (isset($components['scheme'])) {
             if ('https' === $components['scheme']) {
                 $server['HTTPS'] = 'on';
-                $server['SERVER_PORT'] = 443;
+                $server['SERVER_PORT'] = self::PORT_HTTPS;
             } else {
                 unset($server['HTTPS']);
-                $server['SERVER_PORT'] = 80;
+                $server['SERVER_PORT'] = self::PORT_HTTP;
             }
         }
 
@@ -393,14 +422,14 @@ class Request
         }
 
         switch (strtoupper($method)) {
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-                if (!isset($server['CONTENT_TYPE'])) {
-                    $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
+            case self::METHOD_POST:
+            case self::METHOD_PUT:
+            case self::METHOD_DELETE:
+                if (!isset($server[self::HEADER_CONTENT_TYPE])) {
+                    $server[self::HEADER_CONTENT_TYPE] = 'application/x-www-form-urlencoded';
                 }
                 // no break
-            case 'PATCH':
+            case self::METHOD_PATCH:
                 $request = $parameters;
                 $query = [];
                 break;
@@ -425,7 +454,7 @@ class Request
             $queryString = http_build_query($query, '', '&');
         }
 
-        $server['REQUEST_URI'] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
+        $server[self::HEADER_REQUEST_URI] = $components['path'].('' !== $queryString ? '?'.$queryString : '');
         $server['QUERY_STRING'] = $queryString;
 
         return self::createRequestFromFactory($query, $request, [], $cookies, $files, $server, $content);
@@ -457,8 +486,14 @@ class Request
      *
      * @return static
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null)
-    {
+    public function duplicate(
+        array $query = null,
+        array $request = null,
+        array $attributes = null,
+        array $cookies = null,
+        array $files = null,
+        array $server = null
+    ) {
         $dup = clone $this;
         if (null !== $query) {
             $dup->query = new ParameterBag($query);
@@ -566,7 +601,7 @@ class Request
 
         foreach ($this->headers->all() as $key => $value) {
             $key = strtoupper(str_replace('-', '_', $key));
-            if (\in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH'])) {
+            if (\in_array($key, [self::HEADER_CONTENT_TYPE, 'CONTENT_LENGTH'])) {
                 $_SERVER[$key] = implode(', ', $value);
             } else {
                 $_SERVER['HTTP_'.$key] = implode(', ', $value);
@@ -1041,7 +1076,7 @@ class Request
             return (int) substr($host, $pos + 1);
         }
 
-        return 'https' === $this->getScheme() ? 443 : 80;
+        return 'https' === $this->getScheme() ? self::PORT_HTTPS : self::PORT_HTTP;
     }
 
     /**
@@ -1093,7 +1128,7 @@ class Request
         $scheme = $this->getScheme();
         $port = $this->getPort();
 
-        if (('http' == $scheme && 80 == $port) || ('https' == $scheme && 443 == $port)) {
+        if (('http' == $scheme && self::PORT_HTTP == $port) || ('https' == $scheme && self::PORT_HTTPS == $port)) {
             return $this->getHost();
         }
 
@@ -1326,7 +1361,7 @@ class Request
     public function setMethod($method)
     {
         $this->method = null;
-        $this->server->set('REQUEST_METHOD', $method);
+        $this->server->set(self::HEADER_REQUEST_METHOD, $method);
     }
 
     /**
@@ -1350,16 +1385,16 @@ class Request
             return $this->method;
         }
 
-        $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+        $this->method = strtoupper($this->server->get(self::HEADER_REQUEST_METHOD, self::METHOD_GET));
 
-        if ('POST' !== $this->method) {
+        if (self::METHOD_POST !== $this->method) {
             return $this->method;
         }
 
-        $method = $this->headers->get('X-HTTP-METHOD-OVERRIDE');
+        $method = $this->headers->get(self::HEADER_METHOD_OVERRIDE);
 
         if (!$method && self::$httpMethodParameterOverride) {
-            $method = $this->request->get('_method', $this->query->get('_method', 'POST'));
+            $method = $this->request->get('_method', $this->query->get('_method', self::METHOD_POST));
         }
 
         if (!\is_string($method)) {
@@ -1368,7 +1403,19 @@ class Request
 
         $method = strtoupper($method);
 
-        if (\in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE'], true)) {
+        $knownMethods = [
+            self::METHOD_HEAD,
+            self::METHOD_GET,
+            self::METHOD_POST,
+            self::METHOD_PUT,
+            self::METHOD_PATCH,
+            self::METHOD_DELETE,
+            self::METHOD_PURGE,
+            self::METHOD_OPTIONS,
+            self::METHOD_TRACE,
+            self::METHOD_CONNECT,
+        ];
+        if (\in_array($method, $knownMethods, true)) {
             return $this->method = $method;
         }
 
@@ -1388,7 +1435,7 @@ class Request
      */
     public function getRealMethod()
     {
-        return strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+        return strtoupper($this->server->get(self::HEADER_REQUEST_METHOD, self::METHOD_GET));
     }
 
     /**
@@ -1505,7 +1552,7 @@ class Request
      */
     public function getContentType()
     {
-        return $this->getFormat($this->headers->get('CONTENT_TYPE'));
+        return $this->getFormat($this->headers->get(self::HEADER_CONTENT_TYPE));
     }
 
     /**
@@ -1580,10 +1627,13 @@ class Request
             // then setting $andCacheable to false should be deprecated in 4.1
             @trigger_error('Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is deprecated since Symfony 3.2 and will throw an exception in 4.0. Disable checking only for cacheable methods by calling the method with `false` as first argument or use the Request::isMethodCacheable() instead.', E_USER_DEPRECATED);
 
-            return \in_array($this->getMethod(), ['GET', 'HEAD']);
+            return \in_array($this->getMethod(), [self::METHOD_GET, self::METHOD_HEAD]);
         }
 
-        return \in_array($this->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE']);
+        return \in_array(
+            $this->getMethod(),
+            [self::METHOD_GET, self::METHOD_HEAD, self::METHOD_OPTIONS, self::METHOD_TRACE]
+        );
     }
 
     /**
@@ -1593,7 +1643,18 @@ class Request
      */
     public function isMethodIdempotent()
     {
-        return \in_array($this->getMethod(), ['HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE']);
+        return \in_array(
+            $this->getMethod(),
+            [
+                self::METHOD_HEAD,
+                self::METHOD_GET,
+                self::METHOD_PUT,
+                self::METHOD_DELETE,
+                self::METHOD_TRACE,
+                self::METHOD_OPTIONS,
+                self::METHOD_PURGE,
+            ]
+        );
     }
 
     /**
@@ -1605,7 +1666,7 @@ class Request
      */
     public function isMethodCacheable()
     {
-        return \in_array($this->getMethod(), ['GET', 'HEAD']);
+        return \in_array($this->getMethod(), [self::METHOD_GET, self::METHOD_HEAD]);
     }
 
     /**
@@ -1746,30 +1807,37 @@ class Request
             return $this->languages;
         }
 
-        $languages = AcceptHeader::fromString($this->headers->get('Accept-Language'))->all();
+        $languageHeaderValue = $this->headers->get('Accept-Language');
+        $languages = array_keys(AcceptHeader::fromString($languageHeaderValue)->all());
+
+        $delimiter = '-';
         $this->languages = [];
-        foreach ($languages as $lang => $acceptHeaderItem) {
-            if (false !== strpos($lang, '-')) {
-                $codes = explode('-', $lang);
-                if ('i' === $codes[0]) {
-                    // Language not listed in ISO 639 that are not variants
-                    // of any listed language, which can be registered with the
-                    // i-prefix, such as i-cherokee
-                    if (\count($codes) > 1) {
-                        $lang = $codes[1];
-                    }
+
+        foreach ($languages as $currentLanguage) {
+            if (false === strpos($currentLanguage, $delimiter)) {
+                $this->languages[] = $currentLanguage;
+                continue;
+            }
+
+            $codes = explode($delimiter, $currentLanguage);
+
+            // Language not listed in ISO 639 that are not variants
+            // of any listed language, which can be registered with the
+            // i-prefix, such as i-cherokee
+            if ('i' === $codes[0] && \count($codes) > 1) {
+                $this->languages[] = $codes[1];
+                continue;
+            }
+
+            for ($i = 0, $max = \count($codes); $i < $max; ++$i) {
+                if (0 === $i) {
+                    $currentLanguage = strtolower($codes[0]);
                 } else {
-                    for ($i = 0, $max = \count($codes); $i < $max; ++$i) {
-                        if (0 === $i) {
-                            $lang = strtolower($codes[0]);
-                        } else {
-                            $lang .= '_'.strtoupper($codes[$i]);
-                        }
-                    }
+                    $currentLanguage .= '_'.strtoupper($codes[$i]);
                 }
             }
 
-            $this->languages[] = $lang;
+            $this->languages[] = $currentLanguage;
         }
 
         return $this->languages;
@@ -1849,8 +1917,8 @@ class Request
             $requestUri = $this->server->get('UNENCODED_URL');
             $this->server->remove('UNENCODED_URL');
             $this->server->remove('IIS_WasUrlRewritten');
-        } elseif ($this->server->has('REQUEST_URI')) {
-            $requestUri = $this->server->get('REQUEST_URI');
+        } elseif ($this->server->has(self::HEADER_REQUEST_URI)) {
+            $requestUri = $this->server->get(self::HEADER_REQUEST_URI);
 
             if ('' !== $requestUri && '/' === $requestUri[0]) {
                 // To only use path and query remove the fragment.
@@ -1880,7 +1948,7 @@ class Request
         }
 
         // normalize the request URI to ease creating sub-requests from this request
-        $this->server->set('REQUEST_URI', $requestUri);
+        $this->server->set(self::HEADER_REQUEST_URI, $requestUri);
 
         return $requestUri;
     }
@@ -2106,10 +2174,11 @@ class Request
     {
         $clientValues = [];
         $forwardedValues = [];
+        $defaultIp = '0.0.0.0';
 
         if (self::$trustedHeaders[$type] && $this->headers->has(self::$trustedHeaders[$type])) {
             foreach (explode(',', $this->headers->get(self::$trustedHeaders[$type])) as $v) {
-                $clientValues[] = (self::HEADER_CLIENT_PORT === $type ? '0.0.0.0:' : '').trim($v);
+                $clientValues[] = (self::HEADER_CLIENT_PORT === $type ? $defaultIp.':' : '').trim($v);
             }
         }
 
@@ -2119,9 +2188,10 @@ class Request
             if (self::HEADER_CLIENT_PORT === $type) {
                 foreach ($forwardedValues as $k => $v) {
                     if (']' === substr($v, -1) || false === $v = strrchr($v, ':')) {
-                        $v = $this->isSecure() ? ':443' : ':80';
+                        $port = $this->isSecure() ? self::PORT_HTTPS : self::PORT_HTTP;
+                        $v = ':'.$port;
                     }
-                    $forwardedValues[$k] = '0.0.0.0'.$v;
+                    $forwardedValues[$k] = $defaultIp.$v;
                 }
             }
         }
@@ -2140,7 +2210,7 @@ class Request
         }
 
         if (!$this->isForwardedValid) {
-            return null !== $ip ? ['0.0.0.0', $ip] : [];
+            return null !== $ip ? [$defaultIp, $ip] : [];
         }
         $this->isForwardedValid = false;
 

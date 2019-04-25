@@ -1543,31 +1543,35 @@ class RequestTest extends TestCase
         $this->assertEquals(['application/vnd.wap.wmlscriptc', 'text/vnd.wap.wml', 'application/vnd.wap.xhtml+xml', 'application/xhtml+xml', 'text/html', 'multipart/mixed', '*/*'], $request->getAcceptableContentTypes());
     }
 
-    public function testGetLanguages()
+    /**
+     * @return array
+     */
+    public function languagesTestDataProvider()
+    {
+        return [
+            ['zh, en-us; q=0.8, en; q=0.6', ['zh', 'en_US', 'en']],
+            ['zh, en-us; q=0.6, en; q=0.8', ['zh', 'en', 'en_US']], // Test out of order qvalues
+            ['zh, en, en-us', ['zh', 'en', 'en_US']], // Test equal weighting without qvalues
+            ['zh; q=0.6, en, en-us; q=0.6', ['en', 'zh', 'en_US']], // Test equal weighting with qvalues
+            ['zh, i-cherokee; q=0.6', ['zh', 'cherokee']],
+            ['i-imaginary-lang, a-never-existing-lang; q=0.6', ['imaginary', 'a_NEVER_EXISTING_LANG']], // Imaginary languages, to validate specific cases
+        ];
+    }
+
+    /**
+     * @dataProvider languagesTestDataProvider
+     *
+     * @param string $languageHeaderValue
+     * @param array  $expectedResult
+     */
+    public function testGetLanguages($languageHeaderValue, $expectedResult)
     {
         $request = new Request();
         $this->assertEquals([], $request->getLanguages());
 
         $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
-        $this->assertEquals(['zh', 'en_US', 'en'], $request->getLanguages());
-        $this->assertEquals(['zh', 'en_US', 'en'], $request->getLanguages());
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en-us; q=0.6, en; q=0.8');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test out of order qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, en, en-us');
-        $this->assertEquals(['zh', 'en', 'en_US'], $request->getLanguages()); // Test equal weighting without qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh; q=0.6, en, en-us; q=0.6');
-        $this->assertEquals(['en', 'zh', 'en_US'], $request->getLanguages()); // Test equal weighting with qvalues
-
-        $request = new Request();
-        $request->headers->set('Accept-language', 'zh, i-cherokee; q=0.6');
-        $this->assertEquals(['zh', 'cherokee'], $request->getLanguages());
+        $request->headers->set('Accept-language', $languageHeaderValue);
+        $this->assertEquals($expectedResult, $request->getLanguages());
     }
 
     public function testGetRequestFormat()

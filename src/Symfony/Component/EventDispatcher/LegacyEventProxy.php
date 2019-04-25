@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 /**
  * @internal to be removed in 5.0.
  */
-final class WrappedEvent extends Event
+final class LegacyEventProxy extends Event
 {
     private $event;
 
@@ -32,7 +32,7 @@ final class WrappedEvent extends Event
     /**
      * @return object $event
      */
-    public function getWrappedEvent()
+    public function getEvent()
     {
         return $this->event;
     }
@@ -53,5 +53,10 @@ final class WrappedEvent extends Event
         }
 
         $this->event->stopPropagation();
+    }
+
+    public function __call($name, $args)
+    {
+        return $this->event->{$name}(...$args);
     }
 }

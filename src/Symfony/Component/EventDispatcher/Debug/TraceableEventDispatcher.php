@@ -295,7 +295,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     protected function beforeDispatch(string $eventName, $event)
     {
-        $this->preDispatch($eventName, $event);
+        if ($event instanceof Event) {
+            $this->preDispatch($eventName, $event);
+        }
     }
 
     /**
@@ -305,7 +307,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     protected function afterDispatch(string $eventName, $event)
     {
-        $this->postDispatch($eventName, $event);
+        if ($event instanceof Event) {
+            $this->postDispatch($eventName, $event);
+        }
     }
 
     /**

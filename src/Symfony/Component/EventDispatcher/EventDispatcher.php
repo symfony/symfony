@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
+use Symfony\Component\EventDispatcher\Debug\WrappedListener;
 use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 
 /**
@@ -242,7 +243,8 @@ class EventDispatcher implements EventDispatcherInterface
             if ($stoppable && $event->isPropagationStopped()) {
                 break;
             }
-            $listener($event instanceof Event ? $event : new WrappedEvent($event), $eventName, $this);
+            // @deprecated: the ternary operator is part of a BC layer and should be removed in 5.0
+            $listener($event instanceof Event || !$listener instanceof WrappedListener ? $event : new WrappedEvent($event), $eventName, $this);
         }
     }
 

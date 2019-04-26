@@ -28,17 +28,17 @@ use Symfony\Component\HttpFoundation\Test\Constraint as ResponseConstraint;
  */
 trait WebTestAssertionsTrait
 {
-    public static function assertResponseIsSuccessful(string $message = ''): void
+    protected static function assertResponseIsSuccessful(string $message = ''): void
     {
         self::assertThat(static::getResponse(), new ResponseConstraint\ResponseIsSuccessful(), $message);
     }
 
-    public static function assertResponseStatusCodeSame(int $expectedCode, string $message = ''): void
+    protected static function assertResponseStatusCodeSame(int $expectedCode, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
     }
 
-    public static function assertResponseRedirects(string $expectedLocation = null, int $expectedCode = null, string $message = ''): void
+    protected static function assertResponseRedirects(string $expectedLocation = null, int $expectedCode = null, string $message = ''): void
     {
         $constraint = new ResponseConstraint\ResponseIsRedirected();
         if ($expectedLocation) {
@@ -51,37 +51,37 @@ trait WebTestAssertionsTrait
         self::assertThat(static::getResponse(), $constraint, $message);
     }
 
-    public static function assertResponseHasHeader(string $headerName, string $message = ''): void
+    protected static function assertResponseHasHeader(string $headerName, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHasHeader($headerName), $message);
     }
 
-    public static function assertResponseNotHasHeader(string $headerName, string $message = ''): void
+    protected static function assertResponseNotHasHeader(string $headerName, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasHeader($headerName)), $message);
     }
 
-    public static function assertResponseHeaderSame(string $headerName, string $expectedValue, string $message = ''): void
+    protected static function assertResponseHeaderSame(string $headerName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue), $message);
     }
 
-    public static function assertResponseHeaderNotSame(string $headerName, string $expectedValue, string $message = ''): void
+    protected static function assertResponseHeaderNotSame(string $headerName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
     }
 
-    public static function assertResponseHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertResponseHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
     }
 
-    public static function assertResponseNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertResponseNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasCookie($name, $path, $domain)), $message);
     }
 
-    public static function assertResponseCookieValueSame(string $name, string $expectedValue, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertResponseCookieValueSame(string $name, string $expectedValue, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getResponse(), LogicalAnd::fromConstraints(
             new ResponseConstraint\ResponseHasCookie($name, $path, $domain),
@@ -89,17 +89,17 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertBrowserHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertBrowserHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getClient(), new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain), $message);
     }
 
-    public static function assertBrowserNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertBrowserNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getClient(), new LogicalNot(new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain)), $message);
     }
 
-    public static function assertBrowserCookieValueSame(string $name, string $expectedValue, bool $raw = false, string $path = '/', string $domain = null, string $message = ''): void
+    protected static function assertBrowserCookieValueSame(string $name, string $expectedValue, bool $raw = false, string $path = '/', string $domain = null, string $message = ''): void
     {
         self::assertThat(static::getClient(), LogicalAnd::fromConstraints(
             new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain),
@@ -107,17 +107,17 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertSelectorExists(string $selector, string $message = ''): void
+    protected static function assertSelectorExists(string $selector, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), new DomCrawlerConstraint\CrawlerSelectorExists($selector), $message);
     }
 
-    public static function assertSelectorNotExists(string $selector, string $message = ''): void
+    protected static function assertSelectorNotExists(string $selector, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorExists($selector)), $message);
     }
 
-    public static function assertSelectorTextContains(string $selector, string $text, string $message = ''): void
+    protected static function assertSelectorTextContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
@@ -125,7 +125,7 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertSelectorTextSame(string $selector, string $text, string $message = ''): void
+    protected static function assertSelectorTextSame(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
@@ -133,7 +133,7 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertSelectorTextNotContains(string $selector, string $text, string $message = ''): void
+    protected static function assertSelectorTextNotContains(string $selector, string $text, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
@@ -141,17 +141,17 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertPageTitleSame(string $expectedTitle, string $message = ''): void
+    protected static function assertPageTitleSame(string $expectedTitle, string $message = ''): void
     {
         self::assertSelectorTextSame('title', $expectedTitle, $message);
     }
 
-    public static function assertPageTitleContains(string $expectedTitle, string $message = ''): void
+    protected static function assertPageTitleContains(string $expectedTitle, string $message = ''): void
     {
         self::assertSelectorTextContains('title', $expectedTitle, $message);
     }
 
-    public static function assertInputValueSame(string $fieldName, string $expectedValue, string $message = ''): void
+    protected static function assertInputValueSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
@@ -159,7 +159,7 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertInputValueNotSame(string $fieldName, string $expectedValue, string $message = ''): void
+    protected static function assertInputValueNotSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
         self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
@@ -167,12 +167,12 @@ trait WebTestAssertionsTrait
         ), $message);
     }
 
-    public static function assertRequestAttributeValueSame(string $name, string $expectedValue, string $message = ''): void
+    protected static function assertRequestAttributeValueSame(string $name, string $expectedValue, string $message = ''): void
     {
         self::assertThat(static::getRequest(), new ResponseConstraint\RequestAttributeValueSame($name, $expectedValue), $message);
     }
 
-    public static function assertRouteSame($expectedRoute, array $parameters = [], string $message = ''): void
+    protected static function assertRouteSame($expectedRoute, array $parameters = [], string $message = ''): void
     {
         $constraint = new ResponseConstraint\RequestAttributeValueSame('_route', $expectedRoute);
         $constraints = [];
@@ -186,7 +186,7 @@ trait WebTestAssertionsTrait
         self::assertThat(static::getRequest(), $constraint, $message);
     }
 
-    private static function getClient(): KernelBrowser
+    protected static function getClient(): KernelBrowser
     {
         if (!static::$client instanceof KernelBrowser) {
             static::fail(\sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient"?', __CLASS__));
@@ -195,7 +195,7 @@ trait WebTestAssertionsTrait
         return static::$client;
     }
 
-    private static function getCrawler(): Crawler
+    protected static function getCrawler(): Crawler
     {
         if (!$crawler = static::getClient()->getCrawler()) {
             static::fail('A client must have a crawler to make assertions. Did you forget to make an HTTP request?');
@@ -204,7 +204,7 @@ trait WebTestAssertionsTrait
         return $crawler;
     }
 
-    private static function getResponse(): Response
+    protected static function getResponse(): Response
     {
         if (!$response = static::getClient()->getResponse()) {
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
@@ -213,7 +213,7 @@ trait WebTestAssertionsTrait
         return $response;
     }
 
-    private static function getRequest(): Request
+    protected static function getRequest(): Request
     {
         if (!$request = static::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');

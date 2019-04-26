@@ -69,6 +69,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         $this->uri = $uri;
         $this->baseHref = $baseHref ?: $uri;
+        $this->html5Parser = class_exists(HTML5::class) ? new HTML5(['disable_html_ns' => true]) : null;
 
         $this->add($node);
     }
@@ -190,13 +191,7 @@ class Crawler implements \Countable, \IteratorAggregate
     public function addHtmlContent($content, $charset = 'UTF-8')
     {
         // Use HTML5 parser if the content is HTML5 and the library is available
-        if (!$this->html5Parser
-            && class_exists(HTML5::class)
-            && '<!doctype html>' === strtolower(substr(ltrim($content), 0, 15))) {
-            $this->html5Parser = new HTML5(['disable_html_ns' => true]);
-        }
-
-        $dom = null !== $this->html5Parser ? $this->parseHtml5($content, $charset) : $this->parseXhtml($content, $charset);
+        $dom = null !== $this->html5Parser && strspn($content, " \t\r\n") === stripos($content, '<!doctype html>') ? $this->parseHtml5($content, $charset) : $this->parseXhtml($content, $charset);
         $this->addDocument($dom);
 
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(['href']);
@@ -599,18 +594,16 @@ class Crawler implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        if (null !== $this->html5Parser) {
-            $html = '';
-            foreach ($this->getNode(0)->childNodes as $child) {
-                $html .= $this->html5Parser->saveHTML($child);
-            }
+        $node = $this->getNode(0);
+        $owner = $node->ownerDocument;
 
-            return $html;
+        if (null !== $this->html5Parser && '<!DOCTYPE html>' === $owner->saveXML($owner->childNodes[0])) {
+            $owner = $this->html5Parser;
         }
 
         $html = '';
-        foreach ($this->getNode(0)->childNodes as $child) {
-            $html .= $child->ownerDocument->saveHTML($child);
+        foreach ($node->childNodes as $child) {
+            $html .= $owner->saveHTML($child);
         }
 
         return $html;

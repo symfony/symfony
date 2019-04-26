@@ -210,7 +210,7 @@ EOF;
         foreach ($staticRoutes as $url => $routes) {
             $code .= self::export($url)." => [\n";
             foreach ($routes as $name => list($route, $hasTrailingSlash)) {
-                $code .= $this->compileRoute($route, $name, !$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null, $hasTrailingSlash, false, $conditions);
+                $code .= $this->compileRoute($route, $name, (!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex()) ?: null, $hasTrailingSlash, false, $conditions);
             }
             $code .= "],\n";
         }

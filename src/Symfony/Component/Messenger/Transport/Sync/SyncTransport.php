@@ -27,22 +27,22 @@ class SyncTransport implements TransportInterface
 {
     public function get(): iterable
     {
-        throw new InvalidArgumentException('You cannot receive messages from the SyncTransport.');
+        throw new InvalidArgumentException('You cannot receive messages from the Messenger SyncTransport.');
     }
 
     public function stop(): void
     {
-        throw new InvalidArgumentException('You cannot call stop() on the SyncTransport.');
+        throw new InvalidArgumentException('You cannot call stop() on the Messenger SyncTransport.');
     }
 
     public function ack(Envelope $envelope): void
     {
-        throw new InvalidArgumentException('You cannot call ack() on the SyncTransport.');
+        throw new InvalidArgumentException('You cannot call ack() on the Messenger SyncTransport.');
     }
 
     public function reject(Envelope $envelope): void
     {
-        throw new InvalidArgumentException('You cannot call reject() on the SyncTransport.');
+        throw new InvalidArgumentException('You cannot call reject() on the Messenger SyncTransport.');
     }
 
     public function send(Envelope $envelope): Envelope

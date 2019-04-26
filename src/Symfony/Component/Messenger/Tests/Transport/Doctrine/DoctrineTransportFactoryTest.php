@@ -51,7 +51,7 @@ class DoctrineTransportFactoryTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Messenger\Exception\TransportException
-     * @expectedExceptionMessage Could not find Doctrine connection from DSN "doctrine://default".
+     * @expectedExceptionMessage Could not find Doctrine connection from Messenger DSN "doctrine://default".
      */
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {

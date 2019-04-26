@@ -25,6 +25,15 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
+    /**
+     * In PHP, The $timezone parameter and the current timezone are ignored when the $time parameter either is a UNIX timestamp (e.g. @946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
+     *
+     * The denormalizer assumes that all DateTimeInterface object returned will have the timezone returned by the getTimezone() method.
+     * Default PHP behavior will occur if the getTimezone() method returns null or context[self::PRESERVE_CONTEXT_TIMEZONE] is set to false.
+     * This flag will be ignored in Symfony/Serializer 5.0+
+     */
+    const PRESERVE_CONTEXT_TIMEZONE = 'preserve_context_timezone';
+
     private $defaultContext;
 
     private static $supportedTypes = [
@@ -47,6 +56,12 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
             @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
+            $defaultContext[self::TIMEZONE_KEY] = $timezone;
+        }
+
+        if (!isset($defaultContext[self::TIMEZONE_KEY]) && null !== $timezone) {
+            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+
             $defaultContext[self::TIMEZONE_KEY] = $timezone;
         }
 
@@ -92,16 +107,21 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
+        $preserveContextTimezone = $this->isPreserveContextTimezone($context);
 
         if ('' === $data || null === $data) {
             throw new NotNormalizableValueException('The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         }
 
         if (null !== $dateTimeFormat) {
-            $object = \DateTime::class === $class ? \DateTime::createFromFormat($dateTimeFormat, $data, $timezone) : \DateTimeImmutable::createFromFormat($dateTimeFormat, $data, $timezone);
+            $object = \DateTime::createFromFormat($dateTimeFormat, $data, $timezone);
 
             if (false !== $object) {
-                return $object;
+                if ($preserveContextTimezone) {
+                    $object->setTimezone($timezone);
+                }
+
+                return \DateTime::class === $class ? $object : new \DateTimeImmutable($object->format(\DATE_RFC3339));
             }
 
             $dateTimeErrors = \DateTime::class === $class ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
@@ -116,7 +136,13 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
 
         try {
-            return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
+            $object = new \DateTime($data, $timezone);
+
+            if ($preserveContextTimezone) {
+                $object->setTimezone($timezone);
+            }
+
+            return \DateTime::class === $class ? $object : new \DateTimeImmutable($object->format(\DATE_RFC3339));
         } catch (\Exception $e) {
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
         }
@@ -163,5 +189,23 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         }
 
         return $dateTimeZone instanceof \DateTimeZone ? $dateTimeZone : new \DateTimeZone($dateTimeZone);
+    }
+
+    private function isPreserveContextTimezone(array $context): bool
+    {
+        //Version 5.0 of Symfony/Serializer will always preserve the context timezone, so this method always will return true, unless the timezone equals null.
+        if (null === $this->getTimezone($context)) {
+            return false;
+        }
+
+        if (!isset($context[self::PRESERVE_CONTEXT_TIMEZONE]) && !isset($this->defaultContext[self::PRESERVE_CONTEXT_TIMEZONE])) {
+            @trigger_error('Not setting the boolean "PRESERVE_CONTEXT_TIMEZONE" flag is deprecated. Set the flag to "true" to apply the context timezone consistently, otherwise setting the flag to "false" will preserve default PHP behavior.', E_USER_DEPRECATED);
+        }
+
+        if (!isset($context[self::PRESERVE_CONTEXT_TIMEZONE])) {
+            return (bool) isset($this->defaultContext[self::PRESERVE_CONTEXT_TIMEZONE]) ? $this->defaultContext[self::PRESERVE_CONTEXT_TIMEZONE] : false;
+        }
+
+        return (bool) isset($context[self::PRESERVE_CONTEXT_TIMEZONE]) ? $context[self::PRESERVE_CONTEXT_TIMEZONE] : false;
     }
 }

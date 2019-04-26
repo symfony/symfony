@@ -838,7 +838,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
-        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer]);
+        $serializer = new Serializer([new ArrayDenormalizer(), new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d', DateTimeNormalizer::PRESERVE_CONTEXT_TIMEZONE => false]), $normalizer]);
 
         $obj = $serializer->denormalize([
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],

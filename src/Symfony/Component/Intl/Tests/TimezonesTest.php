@@ -543,4 +543,16 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame('GMT-03:00', Timezones::getGmtOffset('America/Buenos_Aires'));
         $this->assertSame('GMT+05:45', Timezones::getGmtOffset('Asia/Katmandu'));
     }
+
+    public function testGetCountryCode()
+    {
+        $this->assertSame('NL', Timezones::getCountryCode('Europe/Amsterdam'));
+        $this->assertSame('US', Timezones::getCountryCode('America/New_York'));
+    }
+
+    public function testForCountryCode()
+    {
+        $this->assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
+        $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
+    }
 }

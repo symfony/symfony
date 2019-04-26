@@ -76,6 +76,16 @@ final class Timezones extends ResourceBundle
         return sprintf('GMT%s%02d:%02d', 0 <= $offset ? '+' : '-', $abs / 3600, $abs / 60 % 60);
     }
 
+    public static function getCountryCode(string $timezone): string
+    {
+        return self::readEntry(['ZoneToCountry', $timezone], 'meta');
+    }
+
+    public static function forCountryCode(string $country): array
+    {
+        return self::readEntry(['CountryToZone', $country], 'meta');
+    }
+
     protected static function getPath(): string
     {
         return Intl::getDataDirectory().'/'.Intl::TIMEZONE_DIR;

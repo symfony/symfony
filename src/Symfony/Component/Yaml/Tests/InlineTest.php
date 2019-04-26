@@ -56,6 +56,8 @@ class InlineTest extends TestCase
     {
         return [
             ['!php/const Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT],
+            ['!php/const Symfony\Component\Yaml\Yaml::class', Yaml::class],
+            ['!php/const Symfony\Component\Yaml\Yaml::CLASS', Yaml::class],
             ['!php/const PHP_INT_MAX', PHP_INT_MAX],
             ['[!php/const PHP_INT_MAX]', [PHP_INT_MAX]],
             ['{ foo: !php/const PHP_INT_MAX }', ['foo' => PHP_INT_MAX]],

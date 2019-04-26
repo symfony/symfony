@@ -592,6 +592,8 @@ class Inline
                             $i = 0;
                             if (\defined($const = self::parseScalar(substr($scalar, 11), 0, null, $i, false))) {
                                 return \constant($const);
+                            } elseif ('::class' === strtolower(substr($const, -7)) && class_exists($class = (string) substr($const, 0, -7))) {
+                                return $class;
                             }
 
                             throw new ParseException(sprintf('The constant "%s" is not defined.', $const), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);

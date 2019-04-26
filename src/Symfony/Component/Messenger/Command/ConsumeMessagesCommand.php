@@ -249,21 +249,4 @@ EOF
 
         return $max;
     }
-
-    private function findAlternatives($name, array $collection)
-    {
-        $alternatives = [];
-        foreach ($collection as $item) {
-            $lev = levenshtein($name, $item);
-            if ($lev <= \strlen($name) / 3 || false !== strpos($item, $name)) {
-                $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
-            }
-        }
-
-        $threshold = 1e3;
-        $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        ksort($alternatives, SORT_NATURAL | SORT_FLAG_CASE);
-
-        return array_keys($alternatives);
-    }
 }

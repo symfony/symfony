@@ -114,7 +114,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         try {
             $datetime = new \DateTime($data, $timezone);
             /**
-             * PHP docs say when created a new DateTime object:
+             * PHP docs say when created a new DateTime object:.
              *
              * The $timezone parameter and the current timezone are ignored when the $time parameter either is a UNIX timestamp (e.g. @946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
              *
@@ -122,8 +122,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
              *
              * If you specify the timezone when denormalizing, you'd expect all datetimes to come out in that timezone, regardless of (user) input.
              */
-            if ($timezone instanceof \DateTimeZone)
+            if ($timezone instanceof \DateTimeZone) {
                 $datetime->setTimezone($timezone);
+            }
+
             return \DateTime::class === $class ? $datetime : new \DateTimeImmutable($datetime->format(\DATE_RFC3339), $timezone);
         } catch (\Exception $e) {
             throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);

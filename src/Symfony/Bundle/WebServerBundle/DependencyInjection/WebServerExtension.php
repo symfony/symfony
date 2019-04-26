@@ -31,6 +31,12 @@ class WebServerExtension extends Extension
         $container->getDefinition('web_server.command.server_run')->replaceArgument(0, $publicDirectory);
         $container->getDefinition('web_server.command.server_start')->replaceArgument(0, $publicDirectory);
 
+        $pidFileDirectory = $this->getPidFileDirectory($container);
+        $container->getDefinition('web_server.command.server_run')->replaceArgument(2, $pidFileDirectory);
+        $container->getDefinition('web_server.command.server_start')->replaceArgument(2, $pidFileDirectory);
+        $container->getDefinition('web_server.command.server_stop')->replaceArgument(0, $pidFileDirectory);
+        $container->getDefinition('web_server.command.server_status')->replaceArgument(0, $pidFileDirectory);
+
         if (!class_exists(ConsoleFormatter::class)) {
             $container->removeDefinition('web_server.command.server_log');
         }
@@ -53,5 +59,17 @@ class WebServerExtension extends Extension
         }
 
         return $kernelProjectDir.'/'.$publicDir;
+    }
+
+    private function getPidFileDirectory(ContainerBuilder $container): string
+    {
+        $kernelCacheDir = $container->getParameter('kernel.cache_dir');
+        $environment = $container->getParameter('kernel.environment');
+
+        if (basename($kernelCacheDir) !== $environment) {
+            return $container->getParameter('kernel.project_dir');
+        }
+
+        return \dirname($container->getParameter('kernel.cache_dir'));
     }
 }

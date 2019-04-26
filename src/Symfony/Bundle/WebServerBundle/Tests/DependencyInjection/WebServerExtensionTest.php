@@ -22,6 +22,8 @@ class WebServerExtensionTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.project_dir', __DIR__);
+        $container->setParameter('kernel.cache_dir', __DIR__.'/var/cache/test');
+        $container->setParameter('kernel.environment', 'test');
         (new WebServerExtension())->load([], $container);
 
         $this->assertSame(
@@ -32,6 +34,24 @@ class WebServerExtensionTest extends TestCase
             __DIR__.'/test',
             $container->getDefinition('web_server.command.server_start')->getArgument(0)
         );
+
+        $this->assertSame(
+            __DIR__.'/var/cache',
+            $container->getDefinition('web_server.command.server_run')->getArgument(2)
+        );
+        $this->assertSame(
+            __DIR__.'/var/cache',
+            $container->getDefinition('web_server.command.server_start')->getArgument(2)
+        );
+        $this->assertSame(
+            __DIR__.'/var/cache',
+            $container->getDefinition('web_server.command.server_stop')->getArgument(0)
+        );
+        $this->assertSame(
+            __DIR__.'/var/cache',
+            $container->getDefinition('web_server.command.server_status')->getArgument(0)
+        );
+
         $this->assertTrue($container->hasDefinition('web_server.command.server_run'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_start'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_stop'));

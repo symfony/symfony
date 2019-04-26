@@ -436,6 +436,12 @@ class Parser
                     $value = '';
 
                     foreach ($this->lines as $line) {
+                        if ('' === trim($line) && '' !== $line && \in_array($this->currentLine, ['{', '['])) {
+                            continue;
+                        } elseif ('' === trim($line) && '' !== $line) {
+                            $line = '';
+                        }
+
                         // If the indentation is not consistent at offset 0, it is to be considered as a ParseError
                         if (0 === $this->offset && !$deprecatedUsage && isset($line[0]) && ' ' === $line[0]) {
                             throw new ParseException('Unable to parse.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);

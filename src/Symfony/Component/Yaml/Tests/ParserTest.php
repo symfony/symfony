@@ -1757,6 +1757,11 @@ EOF;
 
         $tests[] = [$yaml, $expected, false];
 
+        $yaml = "{\n \n}";
+        $expected = [];
+
+        $tests[] = [$yaml, $expected, false];
+
         return $tests;
     }
 

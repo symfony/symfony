@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
@@ -187,11 +188,12 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
 
-        $eventDispatcher->expects($this->exactly(2))
+        $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageHandledEvent::class)]
+                [$this->isInstanceOf(WorkerMessageHandledEvent::class)],
+                [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
 
         $worker = new Worker([$receiver], $bus, [], $eventDispatcher);
@@ -214,11 +216,12 @@ class WorkerTest extends TestCase
 
         $eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
 
-        $eventDispatcher->expects($this->exactly(2))
+        $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
                 [$this->isInstanceOf(WorkerMessageReceivedEvent::class)],
-                [$this->isInstanceOf(WorkerMessageFailedEvent::class)]
+                [$this->isInstanceOf(WorkerMessageFailedEvent::class)],
+                [$this->isInstanceOf(WorkerStoppedEvent::class)]
             );
 
         $worker = new Worker([$receiver], $bus, [], $eventDispatcher);

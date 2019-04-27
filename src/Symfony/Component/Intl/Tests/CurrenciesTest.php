@@ -772,6 +772,20 @@ class CurrenciesTest extends ResourceBundleTestCase
         Currencies::forNumericCode($currency);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetNameWithInvalidCurrencyCode()
+    {
+        Currencies::getName('foo');
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(Currencies::exists('EUR'));
+        $this->assertFalse(Currencies::exists('XXX'));
+    }
+
     private function getNumericToAlpha3Mapping()
     {
         $numericToAlpha3 = [];

@@ -343,4 +343,18 @@ class RegionsTest extends ResourceBundleTestCase
         $this->assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
         $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetNameWithInvalidRegionCode()
+    {
+        Regions::getName('foo');
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(Regions::exists('NL'));
+        $this->assertFalse(Regions::exists('ZZ'));
+    }
 }

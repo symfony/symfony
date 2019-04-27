@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T21:12:25Z
+
+Please note that we will ask you to squash the git history of the PR before merging, to keep at most one commit per author.
+
+---------------------------------------------------------------------------
+
+by joelwurtz at 2019-04-08T06:57:55Z
+
+About squashing, if it's easier for you @dbu i don't mind having my name removed from the commit list
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-08T07:37:08Z
+
+i squashed. i don't feel much of an author on those, mostly moved the tests from elsewhere :-D
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-08T09:02:42Z
+
+@dbu Is it still WIP?
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-08T09:12:44Z
+
+yes, still WIP. i want to go over the changes to streamline them a bit, and i want to wait for the bugfixes #30977, #30950 and #30907 landing in master to rebase and solve the conflicts that will happen.
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-11T05:55:22Z
+
+I now consider this ready for final review /cc @joelwurtz @dunglas
+
+the open points can be done in follow-up pull requests and i don't have any more time to start fresh things (but will of course wrap up if you have feedback on this PR so that we can merge it)
+
+---------------------------------------------------------------------------
+
+by dbu at 2019-04-26T11:03:27Z
+
+what do we need to be able to merge this?

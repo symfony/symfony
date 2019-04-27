@@ -19,9 +19,9 @@
             <td>
                 {% if exception.trace|length %}
                 <pre class="stacktrace">
-                {%- filter escape('html') -%}
+                {%- apply escape('html') -%}
                     {{- include('@Twig/Exception/traces.txt.twig', { exception: exception, format: 'html' }, with_context = false) }}
-                {% endfilter %}
+                {% endapply %}
                 </pre>
                 {% endif %}
             </td>

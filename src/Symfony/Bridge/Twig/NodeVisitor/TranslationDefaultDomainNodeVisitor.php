@@ -24,6 +24,7 @@ use Twig\Node\ModuleNode;
 use Twig\Node\Node;
 use Twig\Node\SetNode;
 use Twig\NodeVisitor\AbstractNodeVisitor;
+use Twig\TokenParser\ApplyTokenParser;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -95,7 +96,8 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
     protected function doLeaveNode(Node $node, Environment $env)
     {
         if ($node instanceof TransDefaultDomainNode) {
-            return false;
+            // must return null as of Twig 2.9
+            return class_exists(ApplyTokenParser::class) ? null : false;
         }
 
         if ($node instanceof BlockNode || $node instanceof ModuleNode) {

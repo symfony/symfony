@@ -60,7 +60,26 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidTimezones(): iterable
     {
+        // ICU standard (alias/BC in PHP)
+        yield ['Etc/UTC'];
+        yield ['Etc/GMT'];
+        yield ['America/Buenos_Aires'];
+
+        // PHP standard (alias in ICU)
+        yield ['UTC'];
         yield ['America/Argentina/Buenos_Aires'];
+
+        // not deprecated in ICU
+        yield ['CST6CDT'];
+        yield ['EST5EDT'];
+        yield ['MST7MDT'];
+        yield ['PST8PDT'];
+        yield ['America/Montreal'];
+
+        // expired in ICU
+        yield ['Europe/Saratov'];
+
+        // standard
         yield ['America/Barbados'];
         yield ['America/Toronto'];
         yield ['Antarctica/Syowa'];
@@ -71,7 +90,6 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Europe/Copenhagen'];
         yield ['Europe/Paris'];
         yield ['Pacific/Noumea'];
-        yield ['UTC'];
     }
 
     /**
@@ -90,6 +108,8 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidGroupedTimezones(): iterable
     {
+        yield ['America/Buenos_Aires', \DateTimeZone::AMERICA | \DateTimeZone::AUSTRALIA]; // icu
+        yield ['America/Argentina/Buenos_Aires', \DateTimeZone::AMERICA]; // php
         yield ['America/Argentina/Cordoba', \DateTimeZone::AMERICA];
         yield ['America/Barbados', \DateTimeZone::AMERICA];
         yield ['Africa/Cairo', \DateTimeZone::AFRICA];
@@ -124,6 +144,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidTimezones(): iterable
     {
+        yield ['Buenos_Aires/America'];
         yield ['Buenos_Aires/Argentina/America'];
         yield ['Mayotte/Indian'];
         yield ['foobar'];
@@ -149,11 +170,15 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidGroupedTimezones(): iterable
     {
+        yield ['America/Buenos_Aires', \DateTimeZone::ASIA | \DateTimeZone::AUSTRALIA]; // icu
+        yield ['America/Argentina/Buenos_Aires', \DateTimeZone::EUROPE]; // php
         yield ['Antarctica/McMurdo', \DateTimeZone::AMERICA];
         yield ['America/Barbados', \DateTimeZone::ANTARCTICA];
         yield ['Europe/Kiev', \DateTimeZone::ARCTIC];
         yield ['Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN];
         yield ['Asia/Ho_Chi_Minh', \DateTimeZone::INDIAN | \DateTimeZone::ANTARCTICA];
+        yield ['UTC', \DateTimeZone::EUROPE];
+        yield ['Etc/UTC', \DateTimeZone::EUROPE];
     }
 
     /**
@@ -173,6 +198,8 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidGroupedTimezonesByCountry(): iterable
     {
+        yield ['America/Buenos_Aires', 'AR']; // icu
+        yield ['America/Argentina/Buenos_Aires', 'AR']; // php
         yield ['America/Argentina/Cordoba', 'AR'];
         yield ['America/Barbados', 'BB'];
         yield ['Africa/Cairo', 'EG'];
@@ -215,6 +242,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['America/Argentina/Cordoba', 'FR'];
         yield ['America/Barbados', 'PT'];
         yield ['Europe/Bern', 'FR'];
+        yield ['Etc/UTC', 'NL'];
         yield ['Europe/Amsterdam', 'AC']; // "AC" has no timezones, but is a valid country code
     }
 
@@ -267,8 +295,6 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function getDeprecatedTimezones(): iterable
     {
-        yield ['America/Buenos_Aires'];
-        yield ['America/Montreal'];
         yield ['Australia/ACT'];
         yield ['Australia/LHI'];
         yield ['Australia/Queensland'];
@@ -277,13 +303,29 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Canada/Mountain'];
         yield ['Canada/Pacific'];
         yield ['CET'];
-        yield ['CST6CDT'];
-        yield ['Etc/GMT'];
+        yield ['GMT'];
         yield ['Etc/Greenwich'];
         yield ['Etc/UCT'];
         yield ['Etc/Universal'];
-        yield ['Etc/UTC'];
         yield ['Etc/Zulu'];
         yield ['US/Pacific'];
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testIntlCompatibility()
+    {
+        $constraint = new Timezone([
+            'message' => 'myMessage',
+            'intlCompatible' => true,
+        ]);
+
+        $this->validator->validate('Europe/Saratov', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"Europe/Saratov"')
+            ->setCode(Timezone::TIMEZONE_IDENTIFIER_INTL_ERROR)
+            ->assertRaised();
     }
 }

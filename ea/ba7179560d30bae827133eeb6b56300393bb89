@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-04-18T18:10:18Z
+
+The method name was also wrong. It's okay to change because it's `@internal`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-22T09:05:22Z
+
+Even if the method is marked as internal, we won't rename the method in 3.4 as this is not a bug fix. So, the phpdoc can be merged in 3.4, but the rest should be done in master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-26T07:54:43Z
+
+These methods have been released for the 1st time 10 days ago, see #29944
+I think we can/should change them in 3.4.

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Intl;
 
 use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Exception\RuntimeException;
 
 /**
  * Gives access to timezone-related ICU data.
@@ -50,6 +51,29 @@ final class Timezones extends ResourceBundle
     public static function getNames(string $displayLocale = null): array
     {
         return self::asort(self::readEntry(['Names'], $displayLocale), $displayLocale);
+    }
+
+    public static function getRawOffset(string $timezone, int $timestamp = null): int
+    {
+        if (null === $timestamp) {
+            $timestamp = time();
+        }
+
+        $transitions = (new \DateTimeZone($timezone))->getTransitions($timestamp, $timestamp);
+
+        if (!isset($transitions[0]['offset'])) {
+            throw new RuntimeException('No timezone transitions available.');
+        }
+
+        return $transitions[0]['offset'];
+    }
+
+    public static function getGmtOffset(string $timezone, int $timestamp = null): string
+    {
+        $offset = self::getRawOffset($timezone, $timestamp);
+        $abs = abs($offset);
+
+        return sprintf('GMT%s%02d:%02d', 0 <= $offset ? '+' : '-', $abs / 3600, $abs / 60 % 60);
     }
 
     protected static function getPath(): string

@@ -27,6 +27,20 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
+    private const QUERY_FRAGMENT_DECODED = [
+        // RFC 3986 explicitly allows those in the query/fragment to reference other URIs unencoded
+        '%2F' => '/',
+        '%3F' => '?',
+        // reserved chars that have no special meaning for HTTP URIs in a query or fragment
+        // this excludes esp. "&", "=" and also "+" because PHP would treat it as a space (form-encoded)
+        '%40' => '@',
+        '%3A' => ':',
+        '%21' => '!',
+        '%3B' => ';',
+        '%2C' => ',',
+        '%2A' => '*',
+    ];
+
     protected $routes;
     protected $context;
 
@@ -275,13 +289,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         if ($extra && $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986)) {
-            // "/" and "?" can be left decoded for better user experience, see
-            // http://tools.ietf.org/html/rfc3986#section-3.4
-            $url .= '?'.strtr($query, ['%2F' => '/']);
+            $url .= '?'.strtr($query, self::QUERY_FRAGMENT_DECODED);
         }
 
         if ('' !== $fragment) {
-            $url .= '#'.strtr(rawurlencode($fragment), ['%2F' => '/', '%3F' => '?']);
+            $url .= '#'.strtr(rawurlencode($fragment), self::QUERY_FRAGMENT_DECODED);
         }
 
         return $url;

@@ -68,7 +68,7 @@ class Connection
     public static function buildConfiguration($dsn, array $options = [])
     {
         if (false === $components = parse_url($dsn)) {
-            throw new InvalidArgumentException(sprintf('The given Doctrine DSN "%s" is invalid.', $dsn));
+            throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
         }
 
         $query = [];

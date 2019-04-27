@@ -39,7 +39,7 @@ class TransportFactory implements TransportFactoryInterface
             }
         }
 
-        throw new InvalidArgumentException(sprintf('No transport supports the given DSN "%s".', $dsn));
+        throw new InvalidArgumentException(sprintf('No transport supports the given Messenger DSN "%s".', $dsn));
     }
 
     public function supports(string $dsn, array $options): bool

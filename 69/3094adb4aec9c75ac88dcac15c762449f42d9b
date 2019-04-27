@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-24T05:05:43Z
+
+Thanks for submitting but #31220 is enough.
+
+---------------------------------------------------------------------------
+
+by AngelFQC at 2019-04-24T05:08:47Z
+
+Ok. Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-24T07:25:18Z
+
+This looks like a new feature to me, right?
+
+---------------------------------------------------------------------------
+
+by AngelFQC at 2019-04-24T14:11:37Z
+
+@fabpot No. Well I think no, because the html attributes defined in a form with `label_attr`currently are not being printed in label html tag... so it a bug :)

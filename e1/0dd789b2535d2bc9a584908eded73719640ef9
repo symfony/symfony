@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-04-10T09:53:45Z
+
+Can you also provide the few missing translations in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Resources/translations/validators.eu.xlf (English goes to id 93 while Basque only has them until id 85) ?
+
+---------------------------------------------------------------------------
+
+by cluster28 at 2019-04-10T10:12:33Z
+
+> I will assume that the translations themselves are good. I don't think we have anyone in the core team speaking Basque to review them (I may be wrong though)
+
+Maybe @javiereguiluz? He's from Vitoria.
+
+---------------------------------------------------------------------------
+
+by cluster28 at 2019-04-10T10:13:40Z
+
+> Can you also provide the few missing translations in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Resources/translations/validators.eu.xlf (English goes to id 93 while Basque only has them until id 85) ?
+
+I'm going to see what can I do...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-10T10:32:45Z
+
+Yes, I understand some Basque. Translation looks correct to me, but we could ping our friend @ikerib who speaks Basque perfectly and contributed some translations in the past! Thanks.
+
+---------------------------------------------------------------------------
+
+by ikerib at 2019-04-10T11:28:38Z
+
+> Yes, I understand some Basque. Translation looks correct to me, but we could ping our friend @ikerib who speaks Basque perfectly and contributed some translations in the past! Thanks.
+
+This was done before
+https://github.com/symfony/symfony/pull/30223/commits/f496ab638e0f9161812938e942f5fb22012b20a3
+
+Do I need to do it again?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-10T13:47:42Z
+
+@ikerib in f496ab6 you contributed the translations related to "validators" ... but in Symfony we have other translation files. In this PR, @cluster28 is translating the "security" file. So, we wonder if you have some time to double check these new translations and propose some fixes if needed. Thanks!
+
+---------------------------------------------------------------------------
+
+by ikerib at 2019-04-10T22:02:05Z
+
+Ahhhh I see. Ok, I’m on holidays now but I’ll do it as soon as possible ;-)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-11T11:14:24Z
+
+Why does this PR update `security.eu.xlf` and `validators.es.xlf` but not `validators.eu.xlf`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-04-11T11:19:12Z
+
+@nicolas-grekas the title of the PR is misleading. We're updating two different languages in the same PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-26T08:05:07Z
+
+Should we merge as is for now?

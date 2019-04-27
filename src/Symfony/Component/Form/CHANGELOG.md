@@ -48,6 +48,7 @@ CHANGELOG
  * dispatch `PreSetDataEvent` on `form.pre_set_data`
  * dispatch `PostSetDataEvent` on `form.post_set_data`
  * added an `input` option to `NumberType`
+ * removed default option grouping in `TimezoneType`, use `group_by` instead
 
 4.2.0
 -----

@@ -32,6 +32,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const REQUIREMENT_MISMATCH = 1;
     const ROUTE_MATCH = 2;
 
+    /** @var RequestContext */
     protected $context;
 
     /**
@@ -166,14 +167,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 }
             }
 
-            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
-                    return $this->allow = $this->allowSchemes = [];
-                }
-
-                continue;
-            }
-
             $hostMatches = [];
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
                 continue;
@@ -182,6 +175,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
+                continue;
+            }
+
+            if ('/' !== $pathinfo && !$hasTrailingVar && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
+                    return $this->allow = $this->allowSchemes = [];
+                }
+
                 continue;
             }
 

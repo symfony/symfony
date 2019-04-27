@@ -15,11 +15,14 @@ use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
+ *
+ * @property RequestContext $context
  */
 trait CompiledUrlMatcherTrait
 {
@@ -89,13 +92,6 @@ trait CompiledUrlMatcherTrait
                 continue;
             }
 
-            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
-                if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
-                    return $allow = $allowSchemes = [];
-                }
-                continue;
-            }
-
             if ($requiredHost) {
                 if ('#' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
                     continue;
@@ -106,6 +102,13 @@ trait CompiledUrlMatcherTrait
                 }
             }
 
+            if ('/' !== $pathinfo && $hasTrailingSlash === ($trimmedPathinfo === $pathinfo)) {
+                if ($supportsRedirections && (!$requiredMethods || isset($requiredMethods['GET']))) {
+                    return $allow = $allowSchemes = [];
+                }
+                continue;
+            }
+
             $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
             if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
                 if ($hasRequiredScheme) {
@@ -113,6 +116,7 @@ trait CompiledUrlMatcherTrait
                 }
                 continue;
             }
+
             if (!$hasRequiredScheme) {
                 $allowSchemes += $requiredSchemes;
                 continue;

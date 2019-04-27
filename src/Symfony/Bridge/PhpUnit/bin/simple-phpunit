@@ -37,6 +37,9 @@ $getEnvVar = function ($name, $default = false) {
     }
     if (false !== $phpunitConfig) {
         $var = new DOMXpath($phpunitConfig);
+        foreach ($var->query('//php/server[@name="'.$name.'"]') as $var) {
+            return $var->getAttribute('value');
+        }
         foreach ($var->query('//php/env[@name="'.$name.'"]') as $var) {
             return $var->getAttribute('value');
         }
@@ -94,7 +97,7 @@ $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rt
     : 'composer';
 
 
-$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy symfony/yaml');
+$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml': ''));
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default

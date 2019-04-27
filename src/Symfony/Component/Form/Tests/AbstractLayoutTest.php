@@ -2260,10 +2260,9 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertWidgetMatchesXpath($form->createView(), [],
 '/input
-    [@type="text"]
+    [@type="url"]
     [@name="name"]
     [@value="http://www.google.com?foo1=bar1&foo2=bar2"]
-    [@inputmode="url"]
 '
         );
     }

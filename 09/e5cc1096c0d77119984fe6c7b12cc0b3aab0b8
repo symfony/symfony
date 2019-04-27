@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2019-04-06T16:33:31Z
+
+Needs `[Messenger]` prefix  ;)
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-07T10:00:23Z
+
+The implementation can now be reviewed again. Pending messages are now handled.
+
+I don't know if there is anything possible about a DelayStamp in redis so this is currently not implemented.
+
+/cc @Nyholm, @sroze
+
+---------------------------------------------------------------------------
+
+by onEXHovia at 2019-04-10T16:15:43Z
+
+@alexander-schranz If this is possible in Redis, it is probably worth implementing the interface `Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface`, as is done for Doctrine/Amqp.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-10T17:40:39Z
+
+@onEXHovia there is no easy count for the messages for a specific receiver but will have a look at it but would see it at current state like the delayedstamp out of scope for this PR.
+
+But what should be the result for the count function?
+
+There are 3 states a message could have before being acked or reject:
+
+ - Messages InDelay ( messages which are delayed )
+ - Messages InQueue ( messages which were not yet getted by the receiver)
+ - Messages InProcess ( messages which were getted but not yet acked or rejected )
+
+Should the count return all messages which where not yet acked or rejected also the delayed and inqueue messages?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-10T17:49:36Z
+
+I'm not sure why PHP 7.1 and PHP 7.3 (on lowest) is throwing an [segmentation fault](https://travis-ci.org/symfony/symfony/builds/518274483) on travis. Does somebody maybe have an idea?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-11T13:14:09Z
+
+Good question - the count would be a sum of the first two: delayed + InQueue. This method is meant to be a possible “approximation”, and is intended for giving the user a general “status” of the size.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2019-04-11T15:14:34Z
+
+> I'm not sure why PHP 7.1 and PHP 7.3 (on lowest) is throwing an segmentation fault on travis. Does somebody maybe have an idea?
+
+I'd try to reproduce locally, this would give you the ability to create a core dump and would give more information. I've not enough time currently to work on this :|.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-12T00:20:38Z
+
+Finally green :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-15T05:31:36Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-04-24T09:44:14Z
+
+@chalasr thank you for your review. did fix it and register the factory in the framework bundle.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-25T11:45:18Z
+
+Adding a test in https://github.com/symfony/symfony/blob/a7d20195614d0d0ccec5d15e5852ab0a7d03dc45/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php#L680 as for amqp would be nice.

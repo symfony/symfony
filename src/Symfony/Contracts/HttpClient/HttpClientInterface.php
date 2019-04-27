@@ -37,7 +37,7 @@ interface HttpClientInterface
                                 //   an array is passed, it is meant as a form payload of field names and values
         'json' => null,         // array|\JsonSerializable - when set, implementations MUST set the "body" option to
                                 //   the JSON-encoded value and set the "content-type" headers to a JSON-compatible
-                                //   value it is they are not defined - typically "application/json"
+                                //   value if they are not defined - typically "application/json"
         'user_data' => null,    // mixed - any extra data to attach to the request (scalar, callable, object...) that
                                 //   MUST be available via $response->getInfo('user_data') - not used internally
         'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower or equal to 0 means

@@ -33,13 +33,60 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
-    const ENABLE_MAX_DEPTH = 'enable_max_depth';
-    const DEPTH_KEY_PATTERN = 'depth_%s::%s';
-    const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
-    const SKIP_NULL_VALUES = 'skip_null_values';
-    const MAX_DEPTH_HANDLER = 'max_depth_handler';
-    const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
-    const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
+    /**
+     * Set to true to respect the max depth metadata on fields.
+     */
+    public const ENABLE_MAX_DEPTH = 'enable_max_depth';
+
+    /**
+     * How to track the current depth in the context.
+     */
+    private const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+
+    /**
+     * While denormalizing, we can verify that types match.
+     *
+     * You can disable this by setting this flag to true.
+     */
+    public const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
+
+    /**
+     * Flag to control whether fields with the value `null` should be output
+     * when normalizing or omitted.
+     */
+    public const SKIP_NULL_VALUES = 'skip_null_values';
+
+    /**
+     * Callback to allow to set a value for an attribute when the max depth has
+     * been reached.
+     *
+     * If no callback is given, the attribute is skipped. If a callable is
+     * given, its return value is used (even if null).
+     *
+     * The arguments are:
+     *
+     * - mixed  $attributeValue value of this field
+     * - object $object         the whole object being normalized
+     * - string $attributeName  name of the attribute being normalized
+     * - string $format         the requested format
+     * - array  $context        the serialization context
+     */
+    public const MAX_DEPTH_HANDLER = 'max_depth_handler';
+
+    /**
+     * Specify which context key are not relevant to determine which attributes
+     * of an object to (de)normalize.
+     */
+    public const EXCLUDE_FROM_CACHE_KEY = 'exclude_from_cache_key';
+
+    /**
+     * Flag to tell the denormalizer to also populate existing objects on
+     * attributes of the main object.
+     *
+     * Setting this to true is only useful if you also specify the root object
+     * in OBJECT_TO_POPULATE.
+     */
+    public const DEEP_OBJECT_TO_POPULATE = 'deep_object_to_populate';
 
     private $propertyTypeExtractor;
     private $typesCache = [];

@@ -42,4 +42,9 @@ class MaxDepthDummy
     {
         return $this->child;
     }
+
+    public function getFoo()
+    {
+        return $this->foo;
+    }
 }

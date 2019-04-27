@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Component\EventDispatcher\LegacyEventProxy;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
@@ -295,7 +296,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     protected function beforeDispatch(string $eventName, $event)
     {
-        $this->preDispatch($eventName, $event);
+        $this->preDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
     }
 
     /**
@@ -305,7 +306,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     protected function afterDispatch(string $eventName, $event)
     {
-        $this->postDispatch($eventName, $event);
+        $this->postDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
     }
 
     /**

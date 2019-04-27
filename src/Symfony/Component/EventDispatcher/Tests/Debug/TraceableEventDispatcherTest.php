@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
 
 class TraceableEventDispatcherTest extends TestCase
 {
@@ -137,6 +138,19 @@ class TraceableEventDispatcherTest extends TestCase
         unset($listeners[0]['stub']);
         $this->assertEquals([], $tdispatcher->getCalledListeners());
         $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
+    }
+
+    public function testDispatchContractsEvent()
+    {
+        $expectedEvent = new ContractsEvent();
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', function ($event) use ($expectedEvent) {
+            $this->assertSame($event, $expectedEvent);
+        }, 5);
+        $tdispatcher->dispatch($expectedEvent, 'foo');
+
+        $listeners = $tdispatcher->getCalledListeners();
+        $this->assertArrayHasKey('stub', $listeners[0]);
     }
 
     public function testDispatchAfterReset()

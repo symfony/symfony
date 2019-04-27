@@ -33,33 +33,26 @@ class Some extends AbstractComposite
      *
      * Message for notice Max Violation
      */
-    public $maxMessage = '{{ limit }} or less element of this collection should pass validation.';
-
-    /**
-     * @var string
-     *
-     * Message for notice Exactly Violation
-     */
-    public $exactlyMessage = 'Exactly {{ limit }} element of this collection should pass validation.|Exactly {{ limit }} elements of this collection should pass validation';
+    public $maxMessage = '{{ limit }} or less element of this collection should pass validation.|{{ limit }} or less elements of this collection should pass validation.';
 
     /**
      * @var int
      *
-     * Min number of Succeds expected
+     * Min number of Success expected
      */
     public $min;
 
     /**
      * @var int
      *
-     * Max number of Succeds expected
+     * Max number of Success expected
      */
     public $max;
 
     /**
      * @var int
      *
-     * Exactly number of Succeds expected
+     * Exactly number of Success expected
      */
     public $exactly;
 
@@ -69,17 +62,16 @@ class Some extends AbstractComposite
     public function __construct($options = null)
     {
         parent::__construct($options);
-
-        if ((isset($this->min) || isset($this->max)) && isset($this->exactly)) {
-            throw new MissingOptionsException(sprintf('"min" or "max" and "exactly" must not be given at the same time: %s', __CLASS__), ['min', 'max', 'exactly']);
+        if ((null !== $this->min || null !== $this->max) && null !== $this->exactly) {
+            throw new MissingOptionsException('The "exactly" option cannot be used with "min" or "max" at the same time.', ['min', 'max', 'exactly']);
         }
 
-        if (!isset($this->min) && !isset($this->exactly)) {
+        if (null === $this->min && null === $this->min) {
             $this->min = 1;
         }
 
         if (isset($this->max) && ($this->min > $this->max)) {
-            throw new MissingOptionsException(sprintf('"min" must not be given great than "max": %s', __CLASS__), ['min', 'max']);
+            throw new MissingOptionsException('The "min" option must not be greater than "max".', ['min', 'max']);
         }
     }
 }

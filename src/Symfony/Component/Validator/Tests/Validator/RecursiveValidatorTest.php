@@ -12,8 +12,8 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Translation\IdentityTranslator;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Each;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -119,7 +119,7 @@ class RecursiveValidatorTest extends AbstractTest
 
     public function testAllConstraintValidateAllGroupsForNestedConstraints()
     {
-        $this->metadata->addPropertyConstraint('data', new All(['constraints' => [
+        $this->metadata->addPropertyConstraint('data', new Each(['constraints' => [
             new NotBlank(['groups' => 'one']),
             new Length(['min' => 2, 'groups' => 'two', 'allowEmptyString' => false]),
         ]]));
@@ -128,7 +128,6 @@ class RecursiveValidatorTest extends AbstractTest
         $entity->data = ['one' => 't', 'two' => ''];
 
         $violations = $this->validator->validate($entity, null, ['one', 'two']);
-
         $this->assertCount(3, $violations);
         $this->assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
         $this->assertInstanceOf(Length::class, $violations->get(1)->getConstraint());

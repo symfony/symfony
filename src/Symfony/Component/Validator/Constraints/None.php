@@ -19,10 +19,5 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class None extends AbstractComposite
 {
-    /**
-     * @var string
-     *
-     * Message for notice Violation
-     */
     public $message = 'None of this collection should pass validation.';
 }

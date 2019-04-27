@@ -22,6 +22,6 @@ namespace Symfony\Component\Validator\Constraints;
  * @deprecated Deprecated in 4.3, to be removed in 5.0. Use
  *             {@link \Symfony\Component\Validator\Constraints\Each} instead.
  */
-class All extends Each
+class All extends AbstractComposite
 {
 }

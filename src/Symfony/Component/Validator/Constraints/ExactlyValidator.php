@@ -17,11 +17,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
- * @author Marc Morera Merino <yuhu@mmoreram.com>
- * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class NoneValidator extends ConstraintValidator
+class ExactlyValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
@@ -32,33 +30,33 @@ class NoneValidator extends ConstraintValidator
             return;
         }
 
-        if (!$constraint instanceof None) {
-            throw new UnexpectedTypeException($constraint, None::class);
+        if (!$constraint instanceof Exactly) {
+            throw new UnexpectedTypeException($constraint, Exactly::class);
         }
 
         if (!is_iterable($value)) {
             throw new UnexpectedValueException($value, 'array or Traversable');
         }
 
-        $validator = $this->context->getValidator()->inContext($this->context);
-
         $totalIterations = \count($value) * \count($constraint->constraints);
+
+        $validator = $this->context->getValidator()->inContext($this->context);
 
         foreach ($value as $key => $element) {
             $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
         }
 
         $constraintsSuccess = $totalIterations - (int) $this->context->getViolations()->count();
-
-        //We clear all violations as just current Validator should add real Violations
         $violations = $this->context->getViolations();
         // We clear all violations as just current Validator should add real Violations
         foreach ($this->context->getViolations() as $key => $violation) {
             $violations->remove($key);
         }
 
-        if ($constraintsSuccess > 0) {
-            $this->context->addViolation($constraint->message);
+        if (isset($constraint->exactly) && $constraintsSuccess != $constraint->exactly) {
+            $this->context->buildViolation($constraint->exactlyMessage)
+                ->setParameter('{{ limit }}', $constraint->exactly)
+                ->addViolation();
         }
     }
 }

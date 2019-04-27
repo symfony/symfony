@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * @author Marc Morera Merino <yuhu@mmoreram.com>
@@ -30,45 +31,45 @@ class SomeValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array or Traversable');
+        if (!$constraint instanceof Some) {
+            throw new UnexpectedTypeException($constraint, Some::class);
         }
 
-        $group = $this->context->getGroup();
+        if (!is_iterable($value)) {
+            throw new UnexpectedValueException($value, 'array or Traversable');
+        }
 
         $totalIterations = \count($value) * \count($constraint->constraints);
 
+        $validator = $this->context->getValidator()->inContext($this->context);
+
         foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
-            }
+            $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
         }
 
         $constraintsSuccess = $totalIterations - (int) $this->context->getViolations()->count();
-
+        $violations = $this->context->getViolations();
         // We clear all violations as just current Validator should add real Violations
-        $this->context->clearViolations();
+        foreach ($this->context->getViolations() as $key => $violation) {
+            $violations->remove($key);
+        }
 
         if (isset($constraint->exactly) && $constraintsSuccess != $constraint->exactly) {
-            $this->context->addViolation($constraint->exactlyMessage, [
-                '{{ limit }}' => $constraint->exactly,
-            ], null, true);
-
-            return;
+            $this->context->buildViolation($constraint->exactlyMessage)
+                ->setParameter('{{ limit }}', $constraint->exactly)
+                ->addViolation();
         }
 
         if (isset($constraint->min) && $constraintsSuccess < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, [
-                    '{{ limit }}' => $constraint->min,
-            ]);
-
-            return;
+            $this->context->buildViolation($constraint->minMessage)
+                ->setParameter('{{ limit }}', $constraint->min)
+                ->addViolation();
         }
 
         if (isset($constraint->max) && $constraintsSuccess > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, [
-                '{{ limit }}' => $constraint->max,
-            ], null, true);
+            $this->context->buildViolation($constraint->maxMessage)
+                ->setParameter('{{ limit }}', $constraint->max)
+                ->addViolation();
         }
     }
 }

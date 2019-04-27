@@ -17,6 +17,6 @@ namespace Symfony\Component\Validator\Constraints;
  * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  */
-class Each extends AbstractComposite
+class Each extends All
 {
 }

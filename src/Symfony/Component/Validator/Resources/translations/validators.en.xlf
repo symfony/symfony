@@ -366,6 +366,34 @@
                 <source>This value should be between {{ min }} and {{ max }}.</source>
                 <target>This value should be between {{ min }} and {{ max }}.</target>
             </trans-unit>
+            <trans-unit id="95">
+                <source>Exactly {{ limit }} elements of this collection should pass validation.</source>
+                <target>Exactly {{ limit }} elements of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>None of this collection should pass validation.</source>
+                <target>None of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>At least {{ limit }} element of this collection should pass validation.</source>
+                <target>At least {{ limit }} element of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>At least {{ limit }} elements or more of this collection should pass validation.</source>
+                <target>At least {{ limit }} elements or more of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>{{ limit }} or less element of this collection should pass validation.</source>
+                <target>{{ limit }} or less element of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>{{ limit }} or less elements of this collection should pass validation.</source>
+                <target>{{ limit }} or less elements of this collection should pass validation.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>Exactly {{ limit }} element of this collection should pass validation.</source>
+                <target>Exactly {{ limit }} element of this collection should pass validation.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

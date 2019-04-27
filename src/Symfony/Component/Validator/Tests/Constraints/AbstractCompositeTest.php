@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\AbstractComposite;
 
 /**
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  * @author Marc Morera Merino <yuhu@mmoreram.com>
  */
-class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
+class AbstractCompositeTest extends TestCase
 {
     /**
      * @var Constraint
@@ -26,15 +28,12 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
      */
     private $simpleConstraint;
 
-    /**
-     * Setup method.
-     */
     public function setUp()
     {
         parent::setUp();
 
         $this->simpleConstraint = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraint')
+            ->getMockBuilder(Constraint::class)
             ->disableOriginalConstructor()
             ->setMethods(null)
             ->getMock();
@@ -50,7 +49,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testEmptyGroups()
     {
         $composite = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraints\AbstractComposite')
+            ->getMockBuilder(AbstractComposite::class)
             ->setConstructorArgs([
                 'constraints' => [
                     $this->simpleConstraint,
@@ -79,7 +78,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testCollectionGroups()
     {
         $composite = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraints\AbstractComposite')
+            ->getMockBuilder(AbstractComposite::class)
             ->setConstructorArgs([
                 [
                     'constraints' => [
@@ -116,7 +115,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testConstraintsGroups()
     {
         $this->simpleConstraint = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraint')
+            ->getMockBuilder(Constraint::class)
             ->setConstructorArgs([
                 [
                     'groups' => [
@@ -129,7 +128,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $composite = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraints\AbstractComposite')
+            ->getMockBuilder(AbstractComposite::class)
             ->setConstructorArgs([
                 [
                     'constraints' => [
@@ -162,7 +161,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     public function testBothGroups()
     {
         $this->simpleConstraint = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraint')
+            ->getMockBuilder(Constraint::class)
             ->setConstructorArgs([
                 [
                     'groups' => [
@@ -175,7 +174,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $composite = $this
-            ->getMockBuilder('Symfony\Component\Validator\Constraints\AbstractComposite')
+            ->getMockBuilder(AbstractComposite::class)
             ->setConstructorArgs([
                 [
                     'constraints' => [

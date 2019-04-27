@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\None;
-use Symfony\Component\Validator\Constraints\NoneValidator;
+use Symfony\Component\Validator\Constraints\Exactly;
+use Symfony\Component\Validator\Constraints\ExactlyValidator;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
- * @author Marc Morera Merino <yuhu@mmoreram.com>
- * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class NoneValidatorTest extends ConstraintValidatorTestCase
+class ExactlyValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        return $this->validator = new NoneValidator();
+        return $this->validator = new ExactlyValidator();
     }
 
     /**
@@ -43,11 +41,12 @@ class NoneValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate(
             null,
-            new None(
+            new Exactly(
                 [
                     'constraints' => [
-                        new Range(['min' => 10]),
+                        new Range(['min' => 4]),
                     ],
+                    'exactly' => 1,
                 ]
             )
         );
@@ -55,63 +54,44 @@ class NoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Validator\Exception\MissingOptionsException
      */
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->validator->validate('foo.barbar', new None(new Range(['min' => 4])));
+        $this->validator->validate('foo.barbar', new Exactly(new Range(['min' => 4])));
     }
 
     /**
-     * Validates success min.
-     *
-     * @dataProvider getValidArguments
+     * @expectedException \Symfony\Component\Validator\Exception\MissingOptionsException
      */
-    public function testNotSuccessValidate($array)
+    public function testThrowsExceptionExactlyNotFound()
     {
-        $constraint1 = new Range(['min' => 8]);
-        $constraint2 = new Range(['min' => 9]);
-
-        $this->setValidateValueAssertions($array, $constraint1, $constraint2);
-
         $this->validator->validate(
-            $array,
-            new None(
-                [
-                    'constraints' => [
-                        $constraint1,
-                        $constraint2,
-                    ],
-                ]
-            ));
-
-        $this->assertCount(1, $this->context->getViolations());
+            null,
+            new Exactly(
+                []
+            )
+        );
     }
 
     /**
-     * Not validates success min.
-     *
-     * @dataProvider getValidArguments
+     * Testing when min and max are defined.
      */
-    public function testSuccessValidate($array)
+    public function testMinAndMax()
     {
-        $constraint1 = new Range(['min' => 2]);
-        $constraint2 = new Range(['min' => 7]);
-
-        $this->setValidateValueAssertions($array, $constraint1, $constraint2);
-
         $this->validator->validate(
-            $array,
-            new None(
+            null,
+            new Exactly(
                 [
                     'constraints' => [
-                        $constraint1,
-                        $constraint2,
+                        new Range(['min' => 4]),
                     ],
+                    'exactly' => 1,
                 ]
             )
         );
-        $this->assertCount(1, $this->context->getViolations());
+
+        $this->assertNoViolation();
     }
 
     /**

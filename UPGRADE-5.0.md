@@ -486,6 +486,8 @@ Validator
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
  * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
+ * Removed `All`, use the `Each` constraint instead.
+ * Removed `AllValidator`, use the `EachValidator` validator instead.
 
 WebProfilerBundle
 -----------------

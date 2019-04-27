@@ -12,42 +12,32 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Component\Validator\Constraints\Exactly;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @author Marc Morera Merino <yuhu@mmoreram.com>
  * @author Marc Morales Valldepérez <marcmorales83@gmail.com>
  */
-class UniqueTest extends TestCase
+class ExactlyTest extends TestCase
 {
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
-     */
-    public function testRejectInvalidFieldsOption()
-    {
-        new Unique([
-            'fields' => 'foo',
-        ]);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectNonConstraints()
     {
-        new Unique([
-            'foo' => 'bar',
+        new Exactly([
+            'foo',
         ]);
     }
 
     /**
-     * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
     public function testRejectValidConstraint()
     {
-        new Unique([
-            'foo' => new Valid(),
+        new Exactly([
+            new Valid(),
         ]);
     }
 }

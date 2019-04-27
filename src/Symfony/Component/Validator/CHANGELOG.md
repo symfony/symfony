@@ -11,6 +11,15 @@ CHANGELOG
  * added the `compared_value_path` parameter in violations when using any 
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`
+ * deprecated `All` in favor of `Each` constraint
+ * deprecated `AllValidator` in favor of `EachValidator` validator
+ * added `Each` constraint
+ * added `EachValidator`
+ * added `None` constraint
+ * added `NoneValidator`
+ * added `Some` constraint
+ * added `SomeValidator`
+ * added `AbstractComposite` constraint
  * added a new `allowEmptyString` option to the `Length` constraint to allow rejecting empty strings when `min` is set, by setting it to `false`.
  * Added new `minPropertyPath` and `maxPropertyPath` options
    to `Range` constraint in order to get the value to compare
@@ -36,17 +45,7 @@ CHANGELOG
  * added `PositiveOrZero` constraint
  * added `Negative` constraint
  * added `NegativeOrZero` constraint
- * added `AbstractComposite` constraint
- * deprecate `All` constraint
- * deprecate `AllValidator` 
- * added `Each` constraint
- * added `EachValidator`
- * added `None` constraint
- * added `NoneValidator`
- * added `Some` constraint
- * added `SomeValidator`
- * added `Unique` contraint
- 
+
 4.2.0
 -----
 

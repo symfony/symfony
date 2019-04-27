@@ -143,6 +143,8 @@ Validator
    method in 5.0.
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
    Pass it as the first argument instead.
+ * Deprecated `All` in favor of `Each` constraint
+ * Deprecated `AllValidator` in favor of `EachValidator` validator
  * The `Length` constraint expects the `allowEmptyString` option to be defined
    when the `min` option is used.
    Set it to `true` to keep the current behavior and `false` to reject empty strings.

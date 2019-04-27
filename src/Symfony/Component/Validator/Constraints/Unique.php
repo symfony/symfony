@@ -23,13 +23,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class Unique extends Constraint
 {
-    /**
-     * @var string
-     *
-     * Message for notice Exactly Violation
-     */
-    public $message = 'This collection has repeated elements';
-
     public const IS_NOT_UNIQUE = '7911c98d-b845-4da0-94b7-a8dac36bc55a';
 
     protected static $errorNames = [

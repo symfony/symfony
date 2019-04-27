@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-27T07:38:31Z
+
+seeing https://github.com/twigphp/Twig/blob/2e68b5fdc4b57860241528b4961cbbb5d3c7a917/src/NodeVisitor/NodeVisitorInterface.php#L34 was a bit confusing, it includes the deprecated type (false) still right?
+
+edit: oh it's fixed in the 3.x branch :thinking:

@@ -25,7 +25,7 @@
         "symfony/property-access": "~2.8|~3.0|~4.0",
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
         "symfony/cache": "~3.1|~4.0",
-        "symfony/property-info": "~3.1|~4.0",
+        "symfony/property-info": "^3.4.13|~4.0",
         "doctrine/annotations": "~1.0",
         "symfony/dependency-injection": "~3.2|~4.0",
         "doctrine/cache": "~1.0",

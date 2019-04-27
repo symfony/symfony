@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-26T07:06:17Z
+
+See alternative in #31258
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-26T22:00:59Z
+
+Remaining issue fixed, ready.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-27T09:16:09Z
+
+What about also adding an assertion to the test which checks that the event instance passed to the listener actually is an instance of the `ContractsEvent`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-27T09:21:15Z
+
+> the event instance passed to the listener actually is an instance of the ContractsEvent?
+
+implementing this interface is not a requirement
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T13:17:42Z
+
+Assertion added to ensure that the event passed to the listener is the same as the dispatched one (and not a proxy), also rebased to make the CI green.

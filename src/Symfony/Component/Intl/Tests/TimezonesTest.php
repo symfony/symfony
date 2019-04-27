@@ -515,4 +515,18 @@ class TimezonesTest extends ResourceBundleTestCase
             $this->assertSame($name, Timezones::getName($language));
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetNameWithInvalidTimezoneId()
+    {
+        Timezones::getName('foo');
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(Timezones::exists('Europe/Amsterdam'));
+        $this->assertFalse(Timezones::exists('Etc/Unknown'));
+    }
 }

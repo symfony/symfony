@@ -84,4 +84,18 @@ class LocalesTest extends ResourceBundleTestCase
             $this->assertSame($name, Locales::getName($locale));
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetNameWithInvalidLocale()
+    {
+        Locales::getName('foo');
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(Locales::exists('nl_NL'));
+        $this->assertFalse(Locales::exists('zxx_ZZ'));
+    }
 }

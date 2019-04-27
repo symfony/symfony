@@ -274,4 +274,18 @@ class ScriptsTest extends ResourceBundleTestCase
             $this->assertSame($name, Scripts::getName($script));
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetNameWithInvalidScriptCode()
+    {
+        Scripts::getName('foo');
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(Scripts::exists('Hans'));
+        $this->assertTrue(Scripts::exists('Zzzz'));
+    }
 }

@@ -1,0 +1,34 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Messenger\Transport\RedisExt;
+
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
+/**
+ * @author Alexander Schranz <alexander@sulu.io>
+ *
+ * @experimental in 4.3
+ */
+class RedisReceivedStamp implements StampInterface
+{
+    private $id;
+
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+}

@@ -1700,6 +1700,7 @@ class FrameworkExtension extends Extension
         if (empty($config['transports'])) {
             $container->removeDefinition('messenger.transport.symfony_serializer');
             $container->removeDefinition('messenger.transport.amqp.factory');
+            $container->removeDefinition('messenger.transport.redis.factory');
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')
                 ->replaceArgument(1, $config['serializer']['symfony_serializer']['format'])

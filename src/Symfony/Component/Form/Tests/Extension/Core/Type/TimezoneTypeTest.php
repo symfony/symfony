@@ -65,6 +65,15 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertEquals([new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')], $form->getData());
     }
 
+    public function testDateTimeZoneInputWithBc()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'datetimezone']);
+        $form->submit('Europe/Saratov');
+
+        $this->assertEquals(new \DateTimeZone('Europe/Saratov'), $form->getData());
+        $this->assertContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
@@ -75,5 +84,39 @@ class TimezoneTypeTest extends BaseTypeTest
             ->createView()->vars['choices'];
 
         $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Amsterdam'), $choices, '', false, false);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testIntlTimeZoneInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, \IntlTimeZone::createTimeZone('America/New_York'), ['input' => 'intltimezone']);
+
+        $this->assertSame('America/New_York', $form->createView()->vars['value']);
+
+        $form->submit('Europe/Amsterdam');
+
+        $this->assertEquals(\IntlTimeZone::createTimeZone('Europe/Amsterdam'), $form->getData());
+
+        $form = $this->factory->create(static::TESTED_TYPE, [\IntlTimeZone::createTimeZone('America/New_York')], ['input' => 'intltimezone', 'multiple' => true]);
+
+        $this->assertSame(['America/New_York'], $form->createView()->vars['value']);
+
+        $form->submit(['Europe/Amsterdam', 'Europe/Paris']);
+
+        $this->assertEquals([\IntlTimeZone::createTimeZone('Europe/Amsterdam'), \IntlTimeZone::createTimeZone('Europe/Paris')], $form->getData());
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testIntlTimeZoneInputWithBc()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone']);
+        $form->submit('Europe/Saratov');
+
+        $this->assertNull($form->getData());
+        $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 }

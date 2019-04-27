@@ -45,14 +45,12 @@ class RoutableMessageBus implements MessageBusInterface
 
         /** @var BusNameStamp $busNameStamp */
         $busNameStamp = $envelope->last(BusNameStamp::class);
-        if (null === $busNameStamp) {
-            throw new InvalidArgumentException('Envelope does not contain a BusNameStamp.');
+        $busName = null !== $busNameStamp ? $busNameStamp->getBusName() : MessageBusInterface::class;
+
+        if (!$this->busLocator->has($busName)) {
+            throw new InvalidArgumentException(sprintf('Bus name "%s" does not exists.', $busName));
         }
 
-        if (!$this->busLocator->has($busNameStamp->getBusName())) {
-            throw new InvalidArgumentException(sprintf('Invalid bus name "%s" on BusNameStamp.', $busNameStamp->getBusName()));
-        }
-
-        return $this->busLocator->get($busNameStamp->getBusName())->dispatch($envelope, $stamps);
+        return $this->busLocator->get($busName)->dispatch($envelope, $stamps);
     }
 }

@@ -41,15 +41,35 @@ class RoutableMessageBusTest extends TestCase
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
     }
 
-    public function testItExceptionOnMissingStamp()
+    public function testItRoutesToDefaultBus()
+    {
+        $envelope = new Envelope(new \stdClass());
+        $stamp = new DelayStamp(5);
+        $defaultBus = $this->createMock(MessageBusInterface::class);
+        $defaultBus->expects($this->once())->method('dispatch')->with($envelope, [$stamp])
+            ->willReturn($envelope);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())->method('has')->with(MessageBusInterface::class)
+            ->willReturn(true);
+        $container->expects($this->once())->method('get')->with(MessageBusInterface::class)
+            ->willReturn($defaultBus);
+
+        $routableBus = new RoutableMessageBus($container);
+
+        $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
+    }
+
+    public function testItExceptionOnDefaultBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('does not contain a BusNameStamp');
+        $this->expectExceptionMessage(sprintf('Bus name "%s" does not exists.', MessageBusInterface::class));
 
         $envelope = new Envelope(new \stdClass());
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->never())->method('has');
+        $container->expects($this->once())->method('has')->with(MessageBusInterface::class)
+            ->willReturn(false);
 
         $routableBus = new RoutableMessageBus($container);
         $routableBus->dispatch($envelope);
@@ -58,7 +78,7 @@ class RoutableMessageBusTest extends TestCase
     public function testItExceptionOnBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid bus name');
+        $this->expectExceptionMessage(sprintf('Bus name "%s" does not exists.', 'foo_bus'));
 
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('foo_bus')]);
 

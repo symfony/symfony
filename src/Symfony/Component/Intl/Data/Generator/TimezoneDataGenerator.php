@@ -126,6 +126,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             }
         }
 
+        $regionFormat = $localeBundle['zoneStrings']['regionFormat'] ?? $rootBundle['zoneStrings']['regionFormat'] ?? '{0}';
         $zones = [];
         foreach (array_keys($available) as $zone) {
             // lg: long generic, e.g. "Central European Time"
@@ -143,14 +144,12 @@ class TimezoneDataGenerator extends AbstractDataGenerator
                 $city = str_replace('_', ' ', substr($zone, $i + 1));
             }
             if (null === $name) {
-                continue;
-            }
-            if (null !== $city) {
+                $name = null === $city ? str_replace([':', '_'], ' ', $zone) : str_replace('{0}', $city, $regionFormat);
+            } elseif (null !== $city && $name !== str_replace('{0}', $city, $regionFormat)) {
                 $name .= ' ('.$city.')';
             }
 
-            $id = str_replace(':', '/', $zone);
-            $zones[$id] = $name;
+            $zones[str_replace(':', '/', $zone)] = $name;
         }
 
         return $zones;

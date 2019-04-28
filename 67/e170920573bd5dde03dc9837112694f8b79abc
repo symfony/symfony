@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-22T19:10:29Z
+
+As long as it’s clear in your documentation PR I think it’s okay 👍
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-22T19:23:49Z
+
+@insidestyles what I meant is only one class here but two service definitions within [the DoctrineBundle](https://github.com/doctrine/DoctrineBundle) where you need to register the services (in the `messenger.xml`).
+
+---------------------------------------------------------------------------
+
+by insidestyles at 2019-04-22T19:29:00Z
+
+> @insidestyles what I meant is only one class here but two service definitions within [the DoctrineBundle](https://github.com/doctrine/DoctrineBundle) where you need to register the services (in the `messenger.xml`).
+
+I understood. Should I revert the last commit?
+
+I also created https://github.com/doctrine/DoctrineBundle/pull/956
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2019-04-23T05:49:46Z
+
+@sroze what Symfony version are you targeting with this? Is this still eligible for 4.3 or will this land in 4.4 by default?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-24T07:30:14Z
+
+I will stop merging new features for 4.3 probably at the end of the week. But I would really like this one to be part of 4.3 :) We need some approvals.
+
+---------------------------------------------------------------------------
+
+by insidestyles at 2019-04-28T14:34:39Z
+
+> Can you add a note in the CHANGELOG as well as the `@experimental in 4.3` annotation on the two classes, please?
+
+@sroze Done.

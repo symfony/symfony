@@ -22,7 +22,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -1371,29 +1370,16 @@ class Configuration implements ConfigurationInterface
                                 ->beforeNormalization()
                                     ->always()
                                     ->then(function ($config) {
-                                        if (!trait_exists(HttpClientTrait::class)) {
+                                        if (!class_exists(HttpClient::class)) {
                                             throw new LogicException('HttpClient support cannot be enabled as the component is not installed. Try running "composer require symfony/http-client".');
                                         }
 
-                                        $config = \is_array($config) ? $config : ['base_uri' => $config];
-
-                                        if (!isset($config['scope']) && isset($config['base_uri'])) {
-                                            $urlResolver = new class() {
-                                                use HttpClientTrait {
-                                                    resolveUrl as public;
-                                                    parseUrl as public;
-                                                }
-                                            };
-
-                                            $config['scope'] = preg_quote(implode('', $urlResolver->resolveUrl($urlResolver->parseUrl('.'), $urlResolver->parseUrl($config['base_uri']))));
-                                        }
-
-                                        return $config;
+                                        return \is_array($config) ? $config : ['base_uri' => $config];
                                     })
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return !isset($v['scope']); })
-                                    ->thenInvalid('either "scope" or "base_uri" should be defined.')
+                                    ->ifTrue(function ($v) { return !isset($v['scope']) && !isset($v['base_uri']); })
+                                    ->thenInvalid('Either "scope" or "base_uri" should be defined.')
                                 ->end()
                                 ->validate()
                                     ->ifTrue(function ($v) { return isset($v['query']) && !isset($v['base_uri']); })

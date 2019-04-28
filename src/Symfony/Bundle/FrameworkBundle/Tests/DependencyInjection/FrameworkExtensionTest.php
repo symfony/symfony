@@ -1489,19 +1489,17 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertSame(['foo' => 'bar'], $container->getDefinition('http_client')->getArgument(0)['headers']);
         $this->assertSame(4, $container->getDefinition('http_client')->getArgument(1));
+        $this->assertSame('http://example.com', $container->getDefinition('foo')->getArgument(1));
 
         $expected = [
-            'http\://example\.com/' => [
-                'base_uri' => 'http://example.com',
-                'headers' => [
-                    'bar' => 'baz',
-                ],
-                'query' => [],
-                'resolve' => [],
+            'base_uri' => 'http://example.com',
+            'headers' => [
+                'bar' => 'baz',
             ],
+            'query' => [],
+            'resolve' => [],
         ];
-
-        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(1));
+        $this->assertSame($expected, $container->getDefinition('foo')->getArgument(2));
     }
 
     public function testHttpClientFullDefaultOptions()

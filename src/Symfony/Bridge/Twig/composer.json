@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.1.3",
         "symfony/contracts": "^1.0.2",
-        "twig/twig": "^1.38.1|^2.7.1"
+        "twig/twig": "^1.40|^2.9"
     },
     "require-dev": {
         "symfony/asset": "~3.4|~4.0",

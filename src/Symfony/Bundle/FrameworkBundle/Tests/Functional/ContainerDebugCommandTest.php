@@ -85,6 +85,7 @@ class ContainerDebugCommandTest extends WebTestCase
         return [
             [BackslashClass::class],
             ['FixturesBackslashClass'],
+            ['\\'.BackslashClass::class],
         ];
     }
 }

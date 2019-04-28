@@ -28,6 +28,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -223,6 +224,10 @@ class ContextListener implements ListenerInterface
         if ($userDeauthenticated) {
             if (null !== $this->logger) {
                 $this->logger->debug('Token was deauthenticated after trying to refresh it.');
+            }
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(new DeauthenticatedEvent($token, $newToken), DeauthenticatedEvent::class);
             }
 
             return null;

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\RedisExt;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\RedisExt\Connection;
 
 /**
@@ -103,7 +103,7 @@ class ConnectionTest extends TestCase
 
     public function testUnexpectedRedisError()
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Redis error happens');
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
         $redis->expects($this->once())->method('xreadgroup')->willReturn(false);

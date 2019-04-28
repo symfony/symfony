@@ -1,0 +1,191 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-18T14:34:48Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-18T14:44:14Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-18T14:46:00Z
+
+Thanks @linaori and @noniagriconomie for the review !
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2019-04-18T17:00:18Z
+
+@Simperfit do not forget to update the doc accordingly when PR is finished :)
+https://github.com/symfony/symfony-docs/pull/11450/files#diff-2f19b023cc3b9935394ee5a983d40cdcR286
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-20T22:12:40Z
+
+You need to alias the event in the framework bundle services.xml file also
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-21T06:33:27Z
+
+done @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-21T13:00:23Z
+
+Can you update the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-21T15:02:29Z
+
+@chalasr updated !
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-21T16:22:34Z
+
+@Simperfit rebase needed
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-21T16:28:23Z
+
+@chalasr  done :p
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-22T05:59:14Z
+
+AppVeyor failure is not linked
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-04-24T07:47:45Z
+
+Generally very much 👍 on this. I'm not sure the event ist triggered in the correct place though. It could actually mean it is triggered multiple times, because we're looping over possibly multiple user providers.
+
+I would also love to get the `$userDeauthenticated` and `$userNotFoundByProvider` information in the event.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-24T09:02:06Z
+
+@aschempp as we are are logging at each provider I think we should trigger the event at each provider, maybe I'm wrong :p.
+
+Got it for both information will add them.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-04-24T09:16:50Z
+
+Sorry to say, but I think you are wrong 😇
+We're logging in on the first provider that can provider a valid user / authenticate the token. I would say in most implementations there is only one user provider, but technically there can be multiple I guess … not sure why that ever makes sense, but that's not really the point of this PR.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-24T09:18:51Z
+
+Understood, will change that too :p.
+@aschempp @nicolas-grekas Thanks for the review !
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-04-24T09:46:19Z
+
+You're very welcome 😊
+Feel free to ping me on any updates or related/similar issues/PRs, I'm happy to review. I just can't follow/keep up with all Symfony issues 😆
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-24T11:59:53Z
+
+All comments have been addressed :rocket:
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-24T13:11:19Z
+
+@aschempp Yes it's intended, we are sending the event only when the user has been deauthenticated and not when he was not found.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-24T13:11:32Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by aschempp at 2019-04-25T15:05:52Z
+
+> @aschempp Yes it's intended, we are sending the event only when the user has been deauthenticated and not when he was not found.
+
+Then does it make sense to have `$userNotFoundByProvider` or `$userDeauthenticated`? Because one could "randomly" be true and the second one always has to be?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-25T19:39:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-25T19:51:35Z
+
+Thanks @chalasr for the review !
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-26T13:06:42Z
+
+updated @chalasr, I hope we're done :p
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-26T15:20:08Z
+
+Tests failure are not related
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-26T22:06:29Z
+
+Reverted my suggestion about allowing to reauthenticate the token from a listener, bad idea. Also renamed to `DeauthenticatedEvent` to save us from renaming the event in 5.0 as we want to get rid of the `User` concept (#30914).
+Ready to go 👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-04-27T09:08:37Z
+
+If we also do not want to rely on the user concept, would it make sense to pass the old and the refreshed token instead of the user?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T13:42:15Z
+
+@xabbuh 👍 Changed to `getOriginalToken()` and `getDeauthenticatedToken()`.
+Wording suggestions welcome (`getRefreshedToken()` vs `getDeauthenticatedToken()`?)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-27T14:02:39Z
+
+I like `getRefreshedToken()` better :p
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T14:37:18Z
+
+Renamed
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-27T14:39:50Z
+
+Thanks for helping me finishing this @chalasr ;).

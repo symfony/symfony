@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-04-07T11:14:53Z
+
+I see some drawbacks with current configuration:
+* All this `queues[3rdparty][binding_keys][]=3rdparty&queues[projection][binding_keys][]=projection` dsn strings is quite hard to understand and write. And dsn string became longer and longer on each new queue.
+* You should create +1 transport for consuming messages from each queue (`events_3rdparty`, `events_projection`)
+* Handler (code level) knows about transport name (config level) - it similar to breaking dependency inversion principe but for config
+
+Please consider move out queue name from dsn and extend routing configuration:
+
+```yaml
+framework:
+    messenger:
+        transports:
+            events: amqp://guest:guest@127.0.0.1/%2f/events
+        routing:
+            App\Message\RegisterBet:
+                -   transport: events
+                    queue: events_projection
+                    handler: App\MessageHandler\RegisterBetHandler
+                -   transport: events
+                    queue: events_3rdparty
+                    handler: App\MessageHandler\SomethingOnBetRegister
+
+```
+Handler can be omited for cases when we just pulishing messages and don't comsuming they through Messenger.
+
+This kind of config is super easy to understand. We have configuration of message-transport/queue-handler in single place.
+
+Of course `messenger:consume` command should be updated to use handler name as argument `messenger:consume 'App\MessageHandler\RegisterBetHandler'`
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-07T12:06:28Z
+
+@Koc I don't see your point as being against this proposed implementation here. The main point is to create this `HandlerDescriptor`, which allows us to have additional metadata on a specific handler (following a very long discussion with @webmozart).
+
+In the example given, the handler indeed knows about the transport (it's already knowing about _things_ like the `bus` and its own `priority` when using the `MessageSubscriberInterface`). But it allows us to harvest these options (`HandlerDescriptor`'s `options`) from outside now, which can indeed be a YAML configuration.
+
+Regarding the overhead in terms of configuring the exchange and the queue bindings, you could also use the `options` if you don't want it in the DSN and might challenge would here be that actually you'd be better in creating this setup by yourself in RabbitMq. Having to create multiple transports actually simplifies the configuration because we don't need to introduce this extra concept `queue` that you suggested above.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-07T12:49:07Z
+
+(requires CHANGELOG when a few 👍 will be around 😉 )
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-07T13:25:14Z
+
+Open question: should we only have `handlerName` in `HandlerDescriptor` instead of directly the handler so it can later be serialized if needed?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-07T16:10:01Z
+
+Makes sense to me - we do this with the bus name stamp and sender name for retry.
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-22T16:20:09Z
+
+@nicolas-grekas @weaverryan updated 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-26T22:35:03Z
+
+> But, the only possibly better key I can think of is: 'only_handle_from_transport' => 'events_projection',
+
+Maybe `from_transport` is enough to avoid the confusion?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-27T17:20:41Z
+
+Hmm, I do kinda like `from_transport`
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-28T11:40:15Z
+
+Happy with `from_transport` as well. Let me change this 👍
+
+---------------------------------------------------------------------------
+
+by sroze at 2019-04-28T15:13:36Z
+
+This PR should be ready :)

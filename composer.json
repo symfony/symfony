@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "doctrine/common": "~2.4",
         "fig/link-util": "^1.0",
-        "twig/twig": "^1.35|^2.4.4",
+        "twig/twig": "^1.40|^2.9",
         "psr/cache": "~1.0",
         "psr/container": "^1.0",
         "psr/link": "^1.0",

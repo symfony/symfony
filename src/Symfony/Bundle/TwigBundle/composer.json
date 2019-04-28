@@ -22,7 +22,7 @@
         "symfony/http-foundation": "~2.8|~3.0|~4.0",
         "symfony/http-kernel": "^3.3|~4.0",
         "symfony/polyfill-ctype": "~1.8",
-        "twig/twig": "~1.34|~2.4"
+        "twig/twig": "~1.40|~2.9"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0|~4.0",

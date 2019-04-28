@@ -65,7 +65,7 @@ class HandleTraitTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Messenger\Exception\LogicException
-     * @expectedExceptionMessage Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "dummy_2".
+     * @expectedExceptionMessage Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".
      */
     public function testHandleThrowsOnMultipleHandledStamps()
     {
@@ -74,7 +74,7 @@ class HandleTraitTest extends TestCase
 
         $query = new DummyMessage('Hello');
         $bus->expects($this->once())->method('dispatch')->willReturn(
-            new Envelope($query, [new HandledStamp('first_result', 'FirstDummyHandler::__invoke'), new HandledStamp('second_result', 'SecondDummyHandler::__invoke', 'dummy_2')])
+            new Envelope($query, [new HandledStamp('first_result', 'FirstDummyHandler::__invoke'), new HandledStamp('second_result', 'SecondDummyHandler::__invoke')])
         );
 
         $queryBus->query($query);

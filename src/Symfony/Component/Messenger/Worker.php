@@ -44,7 +44,7 @@ class Worker implements WorkerInterface
     private $shouldStop = false;
 
     /**
-     * @param ReceiverInterface[]      $receivers       Where the key will be used as the string "identifier"
+     * @param ReceiverInterface[]      $receivers       Where the key is the transport name
      * @param RetryStrategyInterface[] $retryStrategies Retry strategies for each receiver (array keys must match)
      */
     public function __construct(array $receivers, MessageBusInterface $bus, $retryStrategies = [], EventDispatcherInterface $eventDispatcher = null, LoggerInterface $logger = null)
@@ -86,13 +86,13 @@ class Worker implements WorkerInterface
 
         while (false === $this->shouldStop) {
             $envelopeHandled = false;
-            foreach ($this->receivers as $receiverName => $receiver) {
+            foreach ($this->receivers as $transportName => $receiver) {
                 $envelopes = $receiver->get();
 
                 foreach ($envelopes as $envelope) {
                     $envelopeHandled = true;
 
-                    $this->handleMessage($envelope, $receiver, $receiverName, $this->retryStrategies[$receiverName] ?? null);
+                    $this->handleMessage($envelope, $receiver, $transportName, $this->retryStrategies[$transportName] ?? null);
                     $onHandled($envelope);
                 }
 
@@ -114,9 +114,9 @@ class Worker implements WorkerInterface
         $this->dispatchEvent(new WorkerStoppedEvent());
     }
 
-    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $receiverName, ?RetryStrategyInterface $retryStrategy)
+    private function handleMessage(Envelope $envelope, ReceiverInterface $receiver, string $transportName, ?RetryStrategyInterface $retryStrategy)
     {
-        $this->dispatchEvent(new WorkerMessageReceivedEvent($envelope, $receiverName));
+        $this->dispatchEvent(new WorkerMessageReceivedEvent($envelope, $transportName));
 
         $message = $envelope->getMessage();
         $context = [
@@ -125,7 +125,7 @@ class Worker implements WorkerInterface
         ];
 
         try {
-            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp()));
+            $envelope = $this->bus->dispatch($envelope->with(new ReceivedStamp($transportName)));
         } catch (\Throwable $throwable) {
             if ($throwable instanceof HandlerFailedException) {
                 $envelope = $throwable->getEnvelope();
@@ -133,7 +133,7 @@ class Worker implements WorkerInterface
 
             $shouldRetry = $this->shouldRetry($throwable, $envelope, $retryStrategy);
 
-            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $receiverName, $throwable, $shouldRetry));
+            $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable, $shouldRetry));
 
             if ($shouldRetry) {
                 if (null === $retryStrategy) {
@@ -166,7 +166,7 @@ class Worker implements WorkerInterface
             return;
         }
 
-        $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $receiverName));
+        $this->dispatchEvent(new WorkerMessageHandledEvent($envelope, $transportName));
 
         if (null !== $this->logger) {
             $this->logger->info('{class} was handled successfully (acknowledging to transport).', $context);

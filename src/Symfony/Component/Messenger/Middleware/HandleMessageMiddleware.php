@@ -16,6 +16,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocatorInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
@@ -54,17 +55,16 @@ class HandleMessageMiddleware implements MiddlewareInterface
         ];
 
         $exceptions = [];
-        foreach ($this->handlersLocator->getHandlers($envelope) as $alias => $handler) {
-            $alias = \is_string($alias) ? $alias : null;
-
-            if ($this->messageHasAlreadyBeenHandled($envelope, $handler, $alias)) {
+        foreach ($this->handlersLocator->getHandlers($envelope) as $handlerDescriptor) {
+            if ($this->messageHasAlreadyBeenHandled($envelope, $handlerDescriptor)) {
                 continue;
             }
 
             try {
-                $handledStamp = HandledStamp::fromCallable($handler, $handler($message), $alias);
+                $handler = $handlerDescriptor->getHandler();
+                $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message));
                 $envelope = $envelope->with($handledStamp);
-                $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getCallableName()]);
+                $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[] = $e;
             }
@@ -85,12 +85,11 @@ class HandleMessageMiddleware implements MiddlewareInterface
         return $stack->next()->handle($envelope, $stack);
     }
 
-    private function messageHasAlreadyBeenHandled(Envelope $envelope, callable $handler, ?string $alias): bool
+    private function messageHasAlreadyBeenHandled(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
     {
         $some = array_filter($envelope
-            ->all(HandledStamp::class), function (HandledStamp $stamp) use ($handler, $alias) {
-                return $stamp->getCallableName() === HandledStamp::getNameFromCallable($handler) &&
-                    $stamp->getHandlerAlias() === $alias;
+            ->all(HandledStamp::class), function (HandledStamp $stamp) use ($handlerDescriptor) {
+                return $stamp->getHandlerName() === $handlerDescriptor->getName();
             });
 
         return \count($some) > 0;

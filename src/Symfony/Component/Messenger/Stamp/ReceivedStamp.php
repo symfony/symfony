@@ -27,4 +27,15 @@ use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
  */
 final class ReceivedStamp implements StampInterface
 {
+    private $transportName;
+
+    public function __construct(string $transportName)
+    {
+        $this->transportName = $transportName;
+    }
+
+    public function getTransportName(): string
+    {
+        return $this->transportName;
+    }
 }

@@ -195,7 +195,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testItSkipsReceivedMessages()
     {
-        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp());
+        $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('transport'));
 
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
 

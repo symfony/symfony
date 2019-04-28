@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 use Symfony\Component\Messenger\TraceableMessageBus;
@@ -94,32 +95,33 @@ class MessengerPass implements CompilerPassInterface
                 $message = null;
                 $handlerBuses = (array) ($tag['bus'] ?? $busIds);
 
-                foreach ($handles as $message => $method) {
+                foreach ($handles as $message => $options) {
                     $buses = $handlerBuses;
+
                     if (\is_int($message)) {
-                        $message = $method;
-                        $method = '__invoke';
+                        if (\is_string($options)) {
+                            $message = $options;
+                            $options = [];
+                        } else {
+                            throw new RuntimeException(sprintf('The handler configuration needs to return an array of messages or an associated array of message and configuration. Found value of type "%s" at position "%d" for service "%s".', \gettype($options), $message, $serviceId));
+                        }
                     }
 
-                    if (\is_array($message)) {
-                        list($message, $priority) = $message;
-                    } else {
-                        $priority = $tag['priority'] ?? 0;
+                    if (\is_string($options)) {
+                        $options = ['method' => $options];
                     }
 
-                    if (\is_array($method)) {
-                        if (isset($method['bus'])) {
-                            if (!\in_array($method['bus'], $busIds)) {
-                                $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
+                    $priority = $tag['priority'] ?? $options['priority'] ?? 0;
+                    $method = $options['method'] ?? '__invoke';
 
-                                throw new RuntimeException(sprintf('Invalid configuration %s for message "%s": bus "%s" does not exist.', $messageLocation, $message, $method['bus']));
-                            }
+                    if (isset($options['bus'])) {
+                        if (!\in_array($options['bus'], $busIds)) {
+                            $messageLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : ($r->implementsInterface(MessageSubscriberInterface::class) ? sprintf('returned by method "%s::getHandledMessages()"', $r->getName()) : sprintf('used as argument type in method "%s::%s()"', $r->getName(), $method));
 
-                            $buses = [$method['bus']];
+                            throw new RuntimeException(sprintf('Invalid configuration %s for message "%s": bus "%s" does not exist.', $messageLocation, $message, $options['bus']));
                         }
 
-                        $priority = $method['priority'] ?? $priority;
-                        $method = $method['method'] ?? '__invoke';
+                        $buses = [$options['bus']];
                     }
 
                     if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
@@ -141,7 +143,7 @@ class MessengerPass implements CompilerPassInterface
                     }
 
                     foreach ($buses as $handlerBus) {
-                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = $definitionId;
+                        $handlersByBusAndMessage[$handlerBus][$message][$priority][] = [$definitionId, $options];
                     }
                 }
 
@@ -154,15 +156,20 @@ class MessengerPass implements CompilerPassInterface
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlersByPriority) {
                 krsort($handlersByPriority);
-                $handlersByBusAndMessage[$bus][$message] = array_unique(array_merge(...$handlersByPriority));
+                $handlersByBusAndMessage[$bus][$message] = array_merge(...$handlersByPriority);
             }
         }
 
         $handlersLocatorMappingByBus = [];
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
-            foreach ($handlersByMessage as $message => $handlerIds) {
-                $handlers = array_map(function (string $handlerId) { return new Reference($handlerId); }, $handlerIds);
-                $handlersLocatorMappingByBus[$bus][$message] = new IteratorArgument($handlers);
+            foreach ($handlersByMessage as $message => $handlers) {
+                $handlerDescriptors = [];
+                foreach ($handlers as $handler) {
+                    $definitions[$definitionId = '.messenger.handler_descriptor.'.ContainerBuilder::hash($bus.':'.$message.':'.$handler[0])] = (new Definition(HandlerDescriptor::class))->setArguments([new Reference($handler[0]), $handler[1]]);
+                    $handlerDescriptors[] = new Reference($definitionId);
+                }
+
+                $handlersLocatorMappingByBus[$bus][$message] = new IteratorArgument($handlerDescriptors);
             }
         }
         $container->addDefinitions($definitions);

@@ -183,6 +183,37 @@ class XmlFileLoaderTest extends TestCase
 
         // Bad import throws no exception due to ignore_errors value.
         $loader->load('services4_bad_import.xml');
+
+        // Bad import with nonexistent file throws no exception due to ignore_errors: not_found value.
+        $loader->load('services4_bad_import_file_not_found.xml');
+
+        try {
+            $loader->load('services4_bad_import_with_errors.xml');
+            $this->fail('->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\LoaderLoadException', $e, '->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
+            $this->assertRegExp(sprintf('#^The file "%1$s" does not exist \(in: .+\) in %1$s \(which is being imported from ".+%2$s"\)\.$#', 'foo_fake\.xml', 'services4_bad_import_with_errors\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported xml file configuration does not exist');
+
+            $e = $e->getPrevious();
+            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\FileLocatorFileNotFoundException', $e, '->load() throws a FileLocatorFileNotFoundException if the imported xml file configuration does not exist');
+            $this->assertRegExp(sprintf('#^The file "%s" does not exist \(in: .+\)\.$#', 'foo_fake\.xml'), $e->getMessage(), '->load() throws a FileLocatorFileNotFoundException if the imported xml file configuration does not exist');
+        }
+
+        try {
+            $loader->load('services4_bad_import_nonvalid.xml');
+            $this->fail('->load() throws an LoaderLoadException if the imported configuration does not validate the XSD');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\\Component\\Config\\Exception\\LoaderLoadException', $e, '->load() throws a LoaderLoadException if the imported configuration does not validate the XSD');
+            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws a LoaderLoadException if the imported configuration does not validate the XSD');
+
+            $e = $e->getPrevious();
+            $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+            $this->assertRegExp(sprintf('#^Unable to parse file ".+%s": .+.$#', 'nonvalid\.xml'), $e->getMessage(), '->load() throws an InvalidArgumentException if the configuration does not validate the XSD');
+
+            $e = $e->getPrevious();
+            $this->assertInstanceOf('Symfony\\Component\\Config\\Util\\Exception\\XmlParsingException', $e, '->load() throws a XmlParsingException if the configuration does not validate the XSD');
+            $this->assertStringStartsWith('[ERROR 1845] Element \'nonvalid\': No matching global declaration available for the validation root. (in', $e->getMessage(), '->load() throws a XmlParsingException if the loaded file does not validate the XSD');
+        }
     }
 
     public function testLoadAnonymousServices()

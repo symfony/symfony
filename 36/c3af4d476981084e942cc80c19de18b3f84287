@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-27T15:16:27Z
+
+The bug can be observed like this:
+```
+./phpunit src/Symfony/Bundle/TwigBundle/
+#!/usr/bin/env php
+PHPUnit 6.5.14 by Sebastian Bergmann and contributors.
+
+Testing src/Symfony/Bundle/TwigBundle/
+.......................................................           55 / 55 (100%)
+
+Time: 733 ms, Memory: 26.00MB
+
+OK (55 tests, 190 assertions)
+
+Remaining direct deprecation notices (2)
+
+  2x: The "filter" tag is deprecated since Twig 2.9, use the "apply" tag instead.
+    1x in CacheWarmingTest::testCacheIsProperlyWarmedWhenTemplatingIsAvailable from Symfony\Bundle\TwigBundle\Tests\Functional
+    1x in CacheWarmingTest::testCacheIsProperlyWarmedWhenTemplatingIsDisabled from Symfony\Bundle\TwigBundle\Tests\Functional
+
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T15:24:20Z
+
+This deprecation is breaking our test suite on 3.4 https://travis-ci.org/symfony/symfony/jobs/525267589#L5408 (not master because the test is marked a legacy there).  Bumping the twig requirement to `2.9` is not possible on lower branches (even for master, twig 2.9 is not released yet).
+We need to use the `filter` tag when the `apply` one is not available
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-27T15:29:50Z
+
+I contributed it on that branch because I did not observe the deprecation on 3.4, but I must have forgotten to update my vendors. The fix will be harder on 3.4 indeed: is there a way to detect if a tag is available from Twig?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T15:35:03Z
+
+There is no AFAIK :/
+I thought about registering an internal twig function on 3.4 which would check the existence of a twig 2.9 class e.g. `ApplyTokenParser`, that could work. But @xabbuh told me that he will be able to look into this bug tonight so I suggest to wait here :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-27T15:38:22Z
+
+In case he does find a solution, what should we do with my PR? Close it and let his solution _apply_ :drum: ? Or is it best to bump the dependency?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-04-27T15:45:54Z
+
+I think we would better not bump it (in case Twig 2.9 is not ready in time for the Symfony 4.3 releases) but I don't know tbh :) Let's keep this open until we have more inputs
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-27T16:18:25Z
+
+You can bump the minimum version. I will release the new versions of Twig 1.x and 2.x in the next few days.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-27T16:18:39Z
+
+On 3.4 :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-27T18:56:31Z
+
+cc @xabbuh
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-04-27T19:00:31Z
+
+I added a warning above, cause I think this should not be merged yet, right?
+
+> ⚠ Note: don't merge until Twig 2.9 and 1.40 are released, or this will block symfony releases ⚠

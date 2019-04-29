@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-04-28T20:40:31Z
+
+Hi @OskarStark
+
+> Shouldn’t this only be added if the argument does not start with a „$“ ?
+
+You are right.  I adjusted the code accordingly.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-04-29T05:21:28Z
+
+Thank you, can you please add a testcase?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-04-29T09:36:01Z
+
+@OskarStark Unit test added.

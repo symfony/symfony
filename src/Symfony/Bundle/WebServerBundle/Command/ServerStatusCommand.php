@@ -30,6 +30,15 @@ class ServerStatusCommand extends Command
 {
     protected static $defaultName = 'server:status';
 
+    private $pidFileDirectory;
+
+    public function __construct(string $pidFileDirectory = null)
+    {
+        $this->pidFileDirectory = $pidFileDirectory;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -64,7 +73,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-        $server = new WebServer();
+        $server = new WebServer($this->pidFileDirectory);
         if ($filter = $input->getOption('filter')) {
             if ($server->isRunning($input->getOption('pidfile'))) {
                 list($host, $port) = explode(':', $address = $server->getAddress($input->getOption('pidfile')));

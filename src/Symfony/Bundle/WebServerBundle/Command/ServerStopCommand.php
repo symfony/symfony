@@ -28,6 +28,15 @@ class ServerStopCommand extends Command
 {
     protected static $defaultName = 'server:stop';
 
+    private $pidFileDirectory;
+
+    public function __construct(string $pidFileDirectory = null)
+    {
+        $this->pidFileDirectory = $pidFileDirectory;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -55,7 +64,7 @@ EOF
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         try {
-            $server = new WebServer();
+            $server = new WebServer($this->pidFileDirectory);
             $server->stop($input->getOption('pidfile'));
             $io->success('Stopped the web server.');
         } catch (\Exception $e) {

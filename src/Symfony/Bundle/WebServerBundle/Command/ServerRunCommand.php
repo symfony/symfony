@@ -31,13 +31,15 @@ class ServerRunCommand extends Command
 {
     private $documentRoot;
     private $environment;
+    private $pidFileDirectory;
 
     protected static $defaultName = 'server:run';
 
-    public function __construct(string $documentRoot = null, string $environment = null)
+    public function __construct(string $documentRoot = null, string $environment = null, string $pidFileDirectory = null)
     {
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
+        $this->pidFileDirectory = $pidFileDirectory;
 
         parent::__construct();
     }
@@ -129,7 +131,7 @@ EOF
         }
 
         try {
-            $server = new WebServer();
+            $server = new WebServer($this->pidFileDirectory);
             $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
 
             $message = sprintf('Server listening on http://%s', $config->getAddress());

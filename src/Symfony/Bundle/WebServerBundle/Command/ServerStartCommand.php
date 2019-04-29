@@ -31,13 +31,15 @@ class ServerStartCommand extends Command
 {
     private $documentRoot;
     private $environment;
+    private $pidFileDirectory;
 
     protected static $defaultName = 'server:start';
 
-    public function __construct(string $documentRoot = null, string $environment = null)
+    public function __construct(string $documentRoot = null, string $environment = null, string $pidFileDirectory = null)
     {
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
+        $this->pidFileDirectory = $pidFileDirectory;
 
         parent::__construct();
     }
@@ -133,7 +135,7 @@ EOF
         $this->getApplication()->setDispatcher(new EventDispatcher());
 
         try {
-            $server = new WebServer();
+            $server = new WebServer($this->pidFileDirectory);
             if ($server->isRunning($input->getOption('pidfile'))) {
                 $io->error(sprintf('The web server has already been started. It is currently listening on http://%s. Please stop the web server before you try to start it again.', $server->getAddress($input->getOption('pidfile'))));
 

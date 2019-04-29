@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-27T08:47:34Z
+
+I'm still on the side this should be somewhere in the `var` directory.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-04-28T09:43:58Z
+
+@nicolas-grekas
+> tests are failing
+
+Tests are fixed but the AppVeyor build is still failing... 😕
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-28T10:11:59Z
+
+> By the way, not sure it's a good idea to use the parent directory of the cache directory. It may not be writable.
+
+same issue with `getcwd()`, yet this is for dev, I'd guess it's because this is never an issue with dev?

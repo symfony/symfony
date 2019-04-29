@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2019-04-26T13:49:49Z
+
+Nice, I was waiting for the 3.4 merge to master.
+
+Make sure `intl-data` tests are passing please :) They're not being run on the CI.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-28T11:48:42Z
+
+this ones ready, see last commit for the added timezones which are missing currently (cc @fabpot)
+
+cc @sstok tests are passing :+1:
+
+The main change is we use `Country Time (Location)` instead of `Location Time` as a fallback.
+
+Also a fallback was missing for e.g. `zh_Hant_HK > zh_Hant > zh > root` instead of `zh_Hant_HK > root`. Given we build a timezone name from individual parts, we need the fallback chain as such during generation.
+
+I think this nails it, and im done with timezones for a while now :laughing:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-04-29T06:29:15Z
+
+@ro0NL Is it desired that we have a trailing white space in `src/Symfony/Component/Intl/Resources/data/timezones/*.json` files?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-29T06:56:24Z
+
+@fabpot not sure :) all json files (en.json, composer.json) have trailing EOL; there are no parsing issues AFAIK. Unless you meant a different whitespace?
+
+If it's about e.g. https://github.com/symfony/symfony/pull/31262/files#diff-5996b6b88384d2b755c17f069229882fR4 that's part of the localized interpunction; it's UTF :)

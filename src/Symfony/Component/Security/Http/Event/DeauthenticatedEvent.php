@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Deauthentication happens in case the user has changed when trying to refresh it.
+ * Deauthentication happens in case the user has changed when trying to refresh the token.
  *
  * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */

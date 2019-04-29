@@ -94,22 +94,9 @@ class TimezoneType extends AbstractType
                 continue;
             }
 
-            $parts = explode('/', $timezone);
-
-            if (\count($parts) > 2) {
-                $region = $parts[0];
-                $name = $parts[1].' - '.$parts[2];
-            } elseif (\count($parts) > 1) {
-                $region = $parts[0];
-                $name = $parts[1];
-            } else {
-                $region = 'Other';
-                $name = $parts[0];
-            }
-
-            $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
+            $timezones[str_replace(['/', '_'], [' / ', ' '], $timezone)] = $timezone;
         }
 
-        return 1 === \count($timezones) ? reset($timezones) : $timezones;
+        return $timezones;
     }
 }

@@ -22,11 +22,8 @@ class TimezoneTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
 
-        $this->assertArrayHasKey('Africa', $choices);
-        $this->assertContains(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Kinshasa'), $choices['Africa'], '', false, false);
-
-        $this->assertArrayHasKey('America', $choices);
-        $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'New York'), $choices['America'], '', false, false);
+        $this->assertContains(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Africa / Kinshasa'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'America / New York'), $choices, '', false, false);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -83,7 +80,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $choices = $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE])
             ->createView()->vars['choices'];
 
-        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Amsterdam'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Europe / Amsterdam'), $choices, '', false, false);
     }
 
     /**

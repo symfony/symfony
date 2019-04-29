@@ -28,7 +28,6 @@ class CurlHttpClientTest extends HttpClientTestCase
 
     /**
      * @requires PHP 7.2.17
-     * @requires extension curl 7.61
      */
     public function testHttp2Push()
     {
@@ -36,8 +35,8 @@ class CurlHttpClientTest extends HttpClientTestCase
             $this->markTestSkipped('PHP 7.3.0 to 7.3.3 don\'t support HTTP/2 PUSH');
         }
 
-        if (!\defined('CURLMOPT_PUSHFUNCTION') || !(CURL_VERSION_HTTP2 & curl_version()['features'])) {
-            $this->markTestSkipped('curl is not compiled with support for HTTP/2 PUSH');
+        if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073d00 > ($v = curl_version())['version_number'] || !(CURL_VERSION_HTTP2 & $v['features'])) {
+            $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
         }
 
         $logger = new class() extends AbstractLogger {

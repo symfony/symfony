@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-10T09:02:27Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-04-10T13:15:45Z
+
+I think it's a great step forward. But to me it should go even beyond this:
+- track exactly the path in the graph at which this occurs (the difficult part).
+- add it to the exception as a property, so it can be used programatically. Such exceptions are probably not supposed to produce 500 responses in an API for instance. When catching it, this would allow better generation of error responses.
+
+Nevertheless, this first step is already great for debugging.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-10T17:30:20Z
+
+@ogizanagi I think we could do that but in a second way, this is already nice to have.
+
+1. In the DateTimeNormalizer AFAIK we don't have the graph information.
+
+2. That's it, as we discussed with @stof, I think we should go in the object normalizer everytime, catch this and try to have the most information out of this in order to give the users all the information about what happen and what the error is, so no 500 for APIs.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-12T14:10:42Z
+
+@ogizanagi WDYT as merging this one as is, and creating an issues to follow this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-15T09:43:21Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-16T06:19:14Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-17T06:11:45Z
+
+done @ogizanagi
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-25T19:43:37Z
+
+@nicolas-grekas this is ready

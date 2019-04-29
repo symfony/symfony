@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Време во Чуук (Чук)",
         "Pacific\/Wake": "Време на островот Вејк",
         "Pacific\/Wallis": "Време во Валис и Футуна"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

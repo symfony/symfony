@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Amser Chuuk",
         "Pacific\/Wake": "Amser Ynys Wake",
         "Pacific\/Wallis": "Amser Wallis a Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

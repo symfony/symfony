@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Ora e Çukut",
         "Pacific\/Wake": "Ora e Ishullit Uejk",
         "Pacific\/Wallis": "Ora e Uollisit dhe Futunës"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

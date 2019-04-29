@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Çuuk Vaxtı",
         "Pacific\/Wake": "Ueyk Vaxtı (Veyk)",
         "Pacific\/Wallis": "Uollis və Futuna Vaxtı"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

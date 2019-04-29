@@ -435,5 +435,12 @@
         "Pacific\/Truk": "चूक वेळ",
         "Pacific\/Wake": "वेक बेट वेळ",
         "Pacific\/Wallis": "वॉलिस आणि फुटुना वेळ (वालिस)"
+    },
+    "Meta": {
+        "GmtFormat": "[GMT]%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

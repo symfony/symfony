@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Mikronezia (Chuuk)",
         "Pacific\/Wake": "Inizi diabell ar Stadoù-Unanet (Wake)",
         "Pacific\/Wallis": "eur Wallis ha Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

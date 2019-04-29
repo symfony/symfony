@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Saa za Chuuk",
         "Pacific\/Wake": "Saa za Kisiwa cha Wake",
         "Pacific\/Wallis": "Saa za Wallis na Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT %s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

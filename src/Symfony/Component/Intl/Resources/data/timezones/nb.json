@@ -435,5 +435,12 @@
         "Pacific\/Truk": "tidssone for Chuukøyene",
         "Pacific\/Wake": "tidssone for Wake Island",
         "Pacific\/Wallis": "tidssone for Wallis- og Futunaøyene"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Micronesia (Weno)",
         "Pacific\/Wake": "Inslas pitschnas perifericas dals Stadis Unids da l’America (Wake)",
         "Pacific\/Wallis": "Wallis e Futuna (Matāʻutu)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

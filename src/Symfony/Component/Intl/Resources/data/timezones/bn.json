@@ -435,5 +435,12 @@
         "Pacific\/Truk": "চুক সময়",
         "Pacific\/Wake": "ওয়েক দ্বীপ সময়",
         "Pacific\/Wallis": "ওয়ালিস এবং ফুটুনা সময় (ওলিস)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT %s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

@@ -435,5 +435,12 @@
         "Pacific\/Truk": "توقيت شوك (ترك)",
         "Pacific\/Wake": "توقيت جزيرة ويك (واك)",
         "Pacific\/Wallis": "توقيت واليس و فوتونا"
+    },
+    "Meta": {
+        "GmtFormat": "غرينتش%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

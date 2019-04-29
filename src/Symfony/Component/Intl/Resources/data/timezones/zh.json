@@ -435,5 +435,12 @@
         "Pacific\/Truk": "楚克时间（特鲁克群岛）",
         "Pacific\/Wake": "威克岛时间",
         "Pacific\/Wallis": "瓦利斯和富图纳时间"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

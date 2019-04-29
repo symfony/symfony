@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Horario de Chuuk",
         "Pacific\/Wake": "Horario da Illa Wake",
         "Pacific\/Wallis": "Horario de Wallis e Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

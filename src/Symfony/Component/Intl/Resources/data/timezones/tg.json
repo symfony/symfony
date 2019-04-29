@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Штатҳои Федеративии Микронезия (Chuuk)",
         "Pacific\/Wake": "Ҷазираҳои Хурди Дурдасти ИМА (Wake)",
         "Pacific\/Wallis": "Уоллис ва Футуна (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

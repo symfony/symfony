@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuuk tíð",
         "Pacific\/Wake": "Wakeoyggj tíð",
         "Pacific\/Wallis": "Wallis- og Futunaoyggjar tíð"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

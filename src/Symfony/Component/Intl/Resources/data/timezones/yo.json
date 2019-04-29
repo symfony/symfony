@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Orílẹ́ède Makoronesia (Chuuk)",
         "Pacific\/Wake": "U.S. Outlying Islands (Wake)",
         "Pacific\/Wallis": "Orílẹ́ède Wali ati futuna (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "WAT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

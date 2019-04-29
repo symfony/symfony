@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuuk Saati",
         "Pacific\/Wake": "Wake Adası Saati",
         "Pacific\/Wallis": "Wallis ve Futuna Saati"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

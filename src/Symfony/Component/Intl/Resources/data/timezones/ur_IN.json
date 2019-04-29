@@ -125,5 +125,8 @@
         "Pacific\/Auckland": "نیوزی لینڈ ٹائم (آکلینڈ)",
         "Pacific\/Easter": "ایسٹر آئلینڈ ٹائم",
         "Pacific\/Galapagos": "گالاپاگوز ٹائم (گیلاپیگوس)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s"
     }
 }

@@ -435,5 +435,12 @@
         "Pacific\/Truk": "ሚክሮኔዢያ (Chuuk)",
         "Pacific\/Wake": "ናይ ኣሜሪካ ፍንትት ዝበሉ ደሴታት (Wake)",
         "Pacific\/Wallis": "ዋሊስን ፉቱናን (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

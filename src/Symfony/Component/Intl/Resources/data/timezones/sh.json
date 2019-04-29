@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Čuuk vreme (Truk)",
         "Pacific\/Wake": "Vejk ostrvo vreme",
         "Pacific\/Wallis": "Valis i Futuna Ostrva vreme"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

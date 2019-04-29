@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuuk-tyd",
         "Pacific\/Wake": "Wake-eiland-tyd",
         "Pacific\/Wallis": "Wallis en Futuna-tyd (Mata-Utu)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

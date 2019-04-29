@@ -435,5 +435,12 @@
         "Pacific\/Truk": "houa fakatūke",
         "Pacific\/Wake": "houa fakamotuueke (Wake)",
         "Pacific\/Wallis": "houa fakaʻuvea mo futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

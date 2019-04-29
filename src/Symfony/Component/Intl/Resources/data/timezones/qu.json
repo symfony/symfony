@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Micronesia (Chuuk)",
         "Pacific\/Wake": "Islas menores alejadas de los EE.UU. (Wake)",
         "Pacific\/Wallis": "Wallis & Futuna Time"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

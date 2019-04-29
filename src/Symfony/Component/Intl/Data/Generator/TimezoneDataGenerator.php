@@ -86,6 +86,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             if ('root' !== $displayLocale) {
                 $localeBundles[] = $reader->read($tempDir, 'root');
             }
+            $metadata = [];
             $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => $this->generateZones(
@@ -93,13 +94,16 @@ class TimezoneDataGenerator extends AbstractDataGenerator
                     $reader->read($tempDir, 'timezoneTypes'),
                     $reader->read($tempDir, 'metaZones'),
                     $reader->read($tempDir, 'windowsZones'),
-                    ...$localeBundles
+                    $localeBundles,
+                    $metadata
                 ),
             ];
 
-            if (!$data['Names']) {
+            if (!$data['Names'] && !$metadata) {
                 return;
             }
+
+            $data['Meta'] = $metadata;
 
             $this->zoneIds = array_merge($this->zoneIds, array_keys($data['Names']));
 
@@ -136,7 +140,10 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         return $data;
     }
 
-    private function generateZones(string $locale, ArrayAccessibleResourceBundle $typeBundle, ArrayAccessibleResourceBundle $metaBundle, ArrayAccessibleResourceBundle $windowsZonesBundle, ArrayAccessibleResourceBundle ...$localeBundles): array
+    /**
+     * @param ArrayAccessibleResourceBundle[] $localeBundles
+     */
+    private function generateZones(string $locale, ArrayAccessibleResourceBundle $typeBundle, ArrayAccessibleResourceBundle $metaBundle, ArrayAccessibleResourceBundle $windowsZonesBundle, array $localeBundles, array &$metadata = []): array
     {
         $accessor = static function (ArrayAccessibleResourceBundle $resourceBundle, array $indices) {
             $result = $resourceBundle;
@@ -232,6 +239,16 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             }
 
             $zones[$id] = $name;
+        }
+
+        $gmtFormat = $accessor(['zoneStrings', 'gmtFormat'], $gmtFormatInherited) ?? 'GMT{0}';
+        if (!$gmtFormatInherited || $isBase) {
+            $metadata['GmtFormat'] = str_replace('{0}', '%s', $gmtFormat);
+        }
+
+        $hourFormat = $accessor(['zoneStrings', 'hourFormat'], $hourFormatInherited) ?? '+HH:mm;-HH:mm';
+        if (!$hourFormatInherited || $isBase) {
+            $metadata['HourFormat'] = explode(';', str_replace(['HH', 'mm', 'H', 'm'], ['%02d', '%02d', '%d', '%d'], $hourFormat), 2);
         }
 
         return $zones;

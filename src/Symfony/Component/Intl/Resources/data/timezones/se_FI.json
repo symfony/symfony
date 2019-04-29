@@ -425,5 +425,12 @@
         "Pacific\/Truk": "Chuuka áigi",
         "Pacific\/Wake": "Wakesullo áigi",
         "Pacific\/Wallis": "Wallis- ja Futuna áigi"
+    },
+    "Meta": {
+        "GmtFormat": "%s GMT",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

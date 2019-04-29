@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Чуук убактысы",
         "Pacific\/Wake": "Уейк аралдарынын убактысы",
         "Pacific\/Wallis": "Уолис жана Футуна убактысы"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

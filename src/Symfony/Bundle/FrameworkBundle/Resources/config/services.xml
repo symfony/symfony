@@ -70,13 +70,13 @@
         <service id="Symfony\Component\HttpFoundation\UrlHelper" alias="url_helper" />
 
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate" public="true">
-            <argument type="tagged" tag="kernel.cache_warmer" />
+            <argument type="tagged_iterator" tag="kernel.cache_warmer" />
             <argument>%kernel.debug%</argument>
             <argument>%kernel.cache_dir%/%kernel.container_class%Deprecations.log</argument>
         </service>
 
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer" public="true">
-            <argument type="tagged" tag="kernel.cache_clearer" />
+            <argument type="tagged_iterator" tag="kernel.cache_clearer" />
         </service>
 
         <service id="kernel" synthetic="true" public="true" />
@@ -99,7 +99,7 @@
         </service>
 
         <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory">
-            <argument type="tagged" tag="config_cache.resource_checker" />
+            <argument type="tagged_iterator" tag="config_cache.resource_checker" />
         </service>
 
         <service id="dependency_injection.config.container_parameters_resource_checker" class="Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker">

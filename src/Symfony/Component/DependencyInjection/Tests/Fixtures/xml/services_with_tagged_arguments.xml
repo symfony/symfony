@@ -6,7 +6,7 @@
       <tag name="foo_tag"/>
     </service>
     <service id="foo_tagged_iterator" class="Bar" public="true">
-      <argument type="tagged" tag="foo_tag" index-by="barfoo" default-index-method="foobar"/>
+      <argument type="tagged_iterator" tag="foo_tag" index-by="barfoo" default-index-method="foobar"/>
     </service>
     <service id="foo_tagged_locator" class="Bar" public="true">
       <argument type="tagged_locator" tag="foo_tag" index-by="barfoo" default-index-method="foobar"/>

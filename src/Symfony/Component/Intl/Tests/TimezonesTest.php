@@ -529,4 +529,18 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertTrue(Timezones::exists('Europe/Amsterdam'));
         $this->assertFalse(Timezones::exists('Etc/Unknown'));
     }
+
+    public function testGetRawOffset()
+    {
+        $this->assertSame(0, Timezones::getRawOffset('Etc/UTC'));
+        $this->assertSame(-10800, Timezones::getRawOffset('America/Buenos_Aires'));
+        $this->assertSame(20700, Timezones::getRawOffset('Asia/Katmandu'));
+    }
+
+    public function testGetGmtOffset()
+    {
+        $this->assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/UTC'));
+        $this->assertSame('GMT-03:00', Timezones::getGmtOffset('America/Buenos_Aires'));
+        $this->assertSame('GMT+05:45', Timezones::getGmtOffset('Asia/Katmandu'));
+    }
 }

@@ -167,10 +167,15 @@ class Parser
         $this->currentLine = '';
         $value = $this->cleanup($value);
         $this->lines = explode("\n", $value);
-        $this->locallySkippedLineNumbers = [];
 
+        $this->locallySkippedLineNumbers = [];
         if (null === $this->totalNumberOfLines) {
             $this->totalNumberOfLines = \count($this->lines);
+        }
+
+        // This a quoted string that spans multiple lines
+        if (false !== $pos = strpos($value, "'\n")) {
+            throw new ParseException(sprintf('A quoted string that spans multiple cannot be parsed at position %s', $pos), -1, $value);
         }
 
         if (!$this->moveToNextLine()) {
@@ -265,7 +270,6 @@ class Parser
                     if (isset($values['key'][0]) && '!' === $values['key'][0] && Yaml::PARSE_CONSTANT & $flags) {
                         $evaluateKey = true;
                     }
-
                     $key = Inline::parseScalar($values['key'], 0, null, $i, $evaluateKey);
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);

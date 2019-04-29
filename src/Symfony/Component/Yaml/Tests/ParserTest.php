@@ -2167,6 +2167,27 @@ YAML;
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage A quoted string that spans multiple cannot be parsed at position 44 (near "key:
+    fields:
+    title: 'bla. Users''
+    Guide'
+    ")
+     */
+    public function testQuotedStringMutlipleLines()
+    {
+        $data = <<<YAML
+key:
+    fields:
+        title: 'bla. Users''
+            Guide'
+
+YAML;
+        $parsed = Yaml::parse($data);
+        var_dump($parsed);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage Reference "foo" does not exist
      */
     public function testEvalRefException()

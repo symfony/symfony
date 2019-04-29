@@ -68,12 +68,12 @@ final class Timezones extends ResourceBundle
         return $transitions[0]['offset'];
     }
 
-    public static function getGmtOffset(string $timezone, int $timestamp = null): string
+    public static function getGmtOffset(string $timezone, int $timestamp = null, string $displayLocale = null): string
     {
         $offset = self::getRawOffset($timezone, $timestamp);
         $abs = abs($offset);
 
-        return sprintf('GMT%s%02d:%02d', 0 <= $offset ? '+' : '-', $abs / 3600, $abs / 60 % 60);
+        return sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), sprintf(self::readEntry(['Meta', 'HourFormat', 0 <= $offset ? 0 : 1], $displayLocale), $abs / 3600, $abs / 60 % 60));
     }
 
     public static function getCountryCode(string $timezone): string

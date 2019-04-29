@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Çuuk wagty",
         "Pacific\/Wake": "Weýk adasy wagty",
         "Pacific\/Wallis": "Uollis we Futuna wagty"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

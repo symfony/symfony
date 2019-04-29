@@ -435,5 +435,12 @@
         "Pacific\/Truk": "เวลาชุก (ทรัก)",
         "Pacific\/Wake": "เวลาเกาะเวก",
         "Pacific\/Wallis": "เวลาวาลลิสและฟุตูนา"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

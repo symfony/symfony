@@ -435,5 +435,12 @@
         "Pacific\/Truk": "சுக் நேரம்",
         "Pacific\/Wake": "வேக் தீவு நேரம்",
         "Pacific\/Wallis": "வாலிஸ் மற்றும் ஃப்யூடுனா நேரம்"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

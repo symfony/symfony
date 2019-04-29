@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Isikhathi sase-Chuuk (i-Chuuk)",
         "Pacific\/Wake": "Isikhathi sase-Wake Island (i-Wake)",
         "Pacific\/Wallis": "Isikhathi sase-Wallis nase-Futuna (i-Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

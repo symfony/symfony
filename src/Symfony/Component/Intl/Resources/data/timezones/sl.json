@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Čas: Otok Chuuk",
         "Pacific\/Wake": "Čas: Otok Wake",
         "Pacific\/Wallis": "Čas: Wallis in Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d.%02d",
+            "-%02d.%02d"
+        ]
     }
 }

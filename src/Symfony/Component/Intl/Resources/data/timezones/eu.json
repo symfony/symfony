@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuukeko ordua",
         "Pacific\/Wake": "Wake uharteko ordua",
         "Pacific\/Wallis": "Wallis eta Futunako ordutegia"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

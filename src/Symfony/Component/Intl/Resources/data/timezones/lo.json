@@ -435,5 +435,12 @@
         "Pacific\/Truk": "ເວລາຊຸກ (ຈັກ)",
         "Pacific\/Wake": "ເວລາເກາະເວກ",
         "Pacific\/Wallis": "ເວລາວາລລິສ ແລະ ຟູຕູນາ (ວາລິດ)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

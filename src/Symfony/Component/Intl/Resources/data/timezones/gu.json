@@ -435,5 +435,12 @@
         "Pacific\/Truk": "ચુઉક સમય (ચુક)",
         "Pacific\/Wake": "વૅક આઇલેન્ડ સમય (વેક)",
         "Pacific\/Wallis": "વૉલિસ અને ફ્યુચુના સમય (વાલિસ)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

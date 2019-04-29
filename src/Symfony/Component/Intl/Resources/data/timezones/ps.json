@@ -435,5 +435,12 @@
         "Pacific\/Truk": "د چوکو وخت (چکوک)",
         "Pacific\/Wake": "دک ټاپو وخت (ویک)",
         "Pacific\/Wallis": "والیس او فوتونا وخت (والس)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

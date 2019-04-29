@@ -435,5 +435,12 @@
         "Pacific\/Truk": "མའི་ཀྲོ་ནི་ཤི་ཡ། (Chuuk་)",
         "Pacific\/Wake": "ཡུ་ཨེས་གྱི་མཐའ་མཚམས་མཚོ་གླིང་། (Wake་)",
         "Pacific\/Wallis": "ཝལ་ལིས྄་ ཨེནཌ་ ཕུ་ཏུ་ན་། (Wallis་)"
+    },
+    "Meta": {
+        "GmtFormat": "ཇི་ཨེམ་ཏི་%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

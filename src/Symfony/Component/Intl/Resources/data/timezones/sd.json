@@ -435,5 +435,12 @@
         "Pacific\/Truk": "چيوڪ جو وقت",
         "Pacific\/Wake": "ويڪ آئي لينڊ جو وقت",
         "Pacific\/Wallis": "ويلس ۽ فتونا جو وقت"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

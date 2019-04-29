@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Čuko laikas (Čukas)",
         "Pacific\/Wake": "Veiko Salos laikas (Veiko sala)",
         "Pacific\/Wallis": "Voliso ir Futūnos laikas (Volisas)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "−%02d:%02d"
+        ]
     }
 }

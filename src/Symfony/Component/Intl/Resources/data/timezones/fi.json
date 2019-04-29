@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuukin aika",
         "Pacific\/Wake": "Waken aika",
         "Pacific\/Wallis": "Wallisin ja Futunan aika"
+    },
+    "Meta": {
+        "GmtFormat": "UTC%s",
+        "HourFormat": [
+            "+%d.%02d",
+            "-%d.%02d"
+        ]
     }
 }

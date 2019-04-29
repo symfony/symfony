@@ -435,5 +435,12 @@
         "Pacific\/Truk": "وقت چوئوک (چوک)",
         "Pacific\/Wake": "وقت جزیرهٔ ویک",
         "Pacific\/Wallis": "وقت والیس و فوتونا"
+    },
+    "Meta": {
+        "GmtFormat": "%s گرینویچ",
+        "HourFormat": [
+            "‎+%02d:%02d",
+            "‎−%02d:%02d"
+        ]
     }
 }

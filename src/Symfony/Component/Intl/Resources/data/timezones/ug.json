@@ -435,5 +435,12 @@
         "Pacific\/Truk": "چۇك ۋاقتى (Chuuk)",
         "Pacific\/Wake": "ۋېيك ئارىلى ۋاقتى (Wake)",
         "Pacific\/Wallis": "ۋاللىس ۋە فۇتۇنا ۋاقتى (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

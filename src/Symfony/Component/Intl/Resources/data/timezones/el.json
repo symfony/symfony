@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Ώρα Τσουκ",
         "Pacific\/Wake": "Ώρα Νήσου Γουέικ",
         "Pacific\/Wallis": "[Ώρα Ουάλις και Φουτούνα (Γουάλις)]"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

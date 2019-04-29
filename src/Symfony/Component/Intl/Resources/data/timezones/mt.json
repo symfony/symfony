@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Mikroneżja (Chuuk)",
         "Pacific\/Wake": "Il-Gżejjer Minuri Mbiegħda tal-Istati Uniti (Wake)",
         "Pacific\/Wallis": "Wallis u Futuna (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

@@ -435,5 +435,12 @@
         "Pacific\/Truk": "የቹክ ሰዓት",
         "Pacific\/Wake": "የዌክ ደሴት ሰዓት (ዋኬ)",
         "Pacific\/Wallis": "የዋሊስ እና ፉቱና ሰዓት"
+    },
+    "Meta": {
+        "GmtFormat": "ጂ ኤም ቲ%s",
+        "HourFormat": [
+            "+%02d%02d",
+            "-%02d%02d"
+        ]
     }
 }

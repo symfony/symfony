@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Чүүкийн цаг",
         "Pacific\/Wake": "Вейк арлын цаг (Уэйк)",
         "Pacific\/Wallis": "Уоллис ба Футунагийн цаг"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

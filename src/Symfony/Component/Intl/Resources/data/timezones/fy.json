@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Chuukse tiid",
         "Pacific\/Wake": "Wake-eilânske tiid",
         "Pacific\/Wallis": "Wallis en Futunase tiid"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

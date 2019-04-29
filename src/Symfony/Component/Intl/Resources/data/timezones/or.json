@@ -435,5 +435,12 @@
         "Pacific\/Truk": "ଚୂକ୍‌ ସମୟ",
         "Pacific\/Wake": "ୱେକ୍‌ ଦ୍ୱୀପ ସମୟ",
         "Pacific\/Wallis": "ୱାଲିସ୍‌ ଏବଂ ଫୁଟୁନା ସମୟ"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

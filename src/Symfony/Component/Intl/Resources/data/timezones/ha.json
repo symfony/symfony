@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Mikuronesiya (Chuuk)",
         "Pacific\/Wake": "U.S. Outlying Islands (Wake)",
         "Pacific\/Wallis": "Walis Da Futuna (Wallis)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

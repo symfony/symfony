@@ -435,5 +435,12 @@
         "Pacific\/Truk": "ချုခ် အချိန်",
         "Pacific\/Wake": "ဝိတ်ခ်ကျွန်း အချိန် (ဝိက်ခ်)",
         "Pacific\/Wallis": "ဝေါလီစ်နှင့် ဖူကျူနာ အချိန်"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

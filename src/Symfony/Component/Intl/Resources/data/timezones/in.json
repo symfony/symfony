@@ -435,5 +435,12 @@
         "Pacific\/Truk": "Waktu Chuuk",
         "Pacific\/Wake": "Waktu Kepulauan Wake",
         "Pacific\/Wallis": "Waktu Wallis dan Futuna"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d.%02d",
+            "-%02d.%02d"
+        ]
     }
 }

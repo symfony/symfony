@@ -435,5 +435,12 @@
         "Pacific\/Truk": "చక్ సమయం (చుక్)",
         "Pacific\/Wake": "వేక్ దీవి సమయం",
         "Pacific\/Wallis": "వాలీస్ మరియు ఫుటునా సమయం (వాల్లిస్)"
+    },
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormat": [
+            "+%02d:%02d",
+            "-%02d:%02d"
+        ]
     }
 }

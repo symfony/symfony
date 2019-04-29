@@ -1854,11 +1854,17 @@ class FrameworkExtension extends Extension
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
             }
 
-            $scope = $scopeConfig['scope'];
+            $scope = $scopeConfig['scope'] ?? null;
             unset($scopeConfig['scope']);
 
-            $container->register($name, ScopingHttpClient::class)
-                ->setArguments([new Reference('http_client'), [$scope => $scopeConfig], $scope]);
+            if (null === $scope) {
+                $container->register($name, ScopingHttpClient::class)
+                    ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
+                    ->setArguments([new Reference('http_client'), $scopeConfig['base_uri'], $scopeConfig]);
+            } else {
+                $container->register($name, ScopingHttpClient::class)
+                    ->setArguments([new Reference('http_client'), [$scope => $scopeConfig], $scope]);
+            }
 
             $container->registerAliasForArgument($name, HttpClientInterface::class);
 

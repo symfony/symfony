@@ -1,4 +1,6 @@
 {
     "Version": "2.1.49.14",
-    "Names": []
+    "Names": {
+        "Asia\/Rangoon": "Myanmar Time (Rangoon)"
+    }
 }

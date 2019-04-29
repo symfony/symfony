@@ -13,8 +13,11 @@ namespace Symfony\Component\Intl\Data\Generator;
 
 use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
+use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
+use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Locale;
 
 /**
  * The rule for compiling the zone bundle.
@@ -26,11 +29,19 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 class TimezoneDataGenerator extends AbstractDataGenerator
 {
     /**
-     * Collects all available zone codes.
+     * Collects all available zone IDs.
      *
      * @var string[]
      */
-    private $zoneCodes = [];
+    private $zoneIds = [];
+    private $regionDataProvider;
+
+    public function __construct(GenrbCompiler $compiler, string $dirName, RegionDataProvider $regionDataProvider)
+    {
+        parent::__construct($compiler, $dirName);
+
+        $this->regionDataProvider = $regionDataProvider;
+    }
 
     /**
      * {@inheritdoc}
@@ -48,6 +59,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         $compiler->compile($sourceDir.'/zone', $tempDir);
         $compiler->compile($sourceDir.'/misc/timezoneTypes.txt', $tempDir);
         $compiler->compile($sourceDir.'/misc/metaZones.txt', $tempDir);
+        $compiler->compile($sourceDir.'/misc/windowsZones.txt', $tempDir);
     }
 
     /**
@@ -55,7 +67,7 @@ class TimezoneDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->zoneCodes = [];
+        $this->zoneIds = [];
     }
 
     /**
@@ -66,17 +78,30 @@ class TimezoneDataGenerator extends AbstractDataGenerator
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         if (isset($localeBundle['zoneStrings']) && null !== $localeBundle['zoneStrings']) {
+            $localeBundles = [$localeBundle];
+            $fallback = $displayLocale;
+            while (null !== ($fallback = Locale::getFallback($fallback))) {
+                $localeBundles[] = $reader->read($tempDir, $fallback);
+            }
+            if ('root' !== $displayLocale) {
+                $localeBundles[] = $reader->read($tempDir, 'root');
+            }
             $data = [
                 'Version' => $localeBundle['Version'],
-                'Names' => self::generateZones(
+                'Names' => $this->generateZones(
+                    $displayLocale,
                     $reader->read($tempDir, 'timezoneTypes'),
                     $reader->read($tempDir, 'metaZones'),
-                    $reader->read($tempDir, 'root'),
-                    $localeBundle
+                    $reader->read($tempDir, 'windowsZones'),
+                    ...$localeBundles
                 ),
             ];
 
-            $this->zoneCodes = array_merge($this->zoneCodes, array_keys($data['Names']));
+            if (!$data['Names']) {
+                return;
+            }
+
+            $this->zoneIds = array_merge($this->zoneIds, array_keys($data['Names']));
 
             return $data;
         }
@@ -96,20 +121,63 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
-        $this->zoneCodes = array_unique($this->zoneCodes);
+        $this->zoneIds = array_unique($this->zoneIds);
 
-        sort($this->zoneCodes);
+        sort($this->zoneIds);
 
         $data = [
             'Version' => $rootBundle['Version'],
-            'Zones' => $this->zoneCodes,
+            'Zones' => $this->zoneIds,
+            'ZoneToCountry' => self::generateZoneToCountryMapping($reader->read($tempDir, 'windowsZones')),
         ];
+
+        $data['CountryToZone'] = self::generateCountryToZoneMapping($data['ZoneToCountry']);
 
         return $data;
     }
 
-    private static function generateZones(ArrayAccessibleResourceBundle $typeBundle, ArrayAccessibleResourceBundle $metaBundle, ArrayAccessibleResourceBundle $rootBundle, ArrayAccessibleResourceBundle $localeBundle): array
+    private function generateZones(string $locale, ArrayAccessibleResourceBundle $typeBundle, ArrayAccessibleResourceBundle $metaBundle, ArrayAccessibleResourceBundle $windowsZonesBundle, ArrayAccessibleResourceBundle ...$localeBundles): array
     {
+        $accessor = static function (ArrayAccessibleResourceBundle $resourceBundle, array $indices) {
+            $result = $resourceBundle;
+            foreach ($indices as $indice) {
+                $result = $result[$indice] ?? null;
+            }
+
+            return $result;
+        };
+        $accessor = static function (array $indices, &$inherited = false) use ($localeBundles, $accessor) {
+            $inherited = false;
+            foreach ($localeBundles as $i => $localeBundle) {
+                $nextLocaleBundle = $localeBundles[$i + 1] ?? null;
+                $result = $accessor($localeBundle, $indices);
+                if (null !== $result && (null === $nextLocaleBundle || $result !== $accessor($nextLocaleBundle, $indices))) {
+                    $inherited = 0 !== $i;
+
+                    return $result;
+                }
+            }
+
+            return null;
+        };
+        $regionFormat = $accessor(['zoneStrings', 'regionFormat']) ?? '{0}';
+        $fallbackFormat = $accessor(['zoneStrings', 'fallbackFormat']) ?? '{1} ({0})';
+        $zoneToCountry = self::generateZoneToCountryMapping($windowsZonesBundle);
+        $resolveName = function (string $id, string $city = null) use ($locale, $regionFormat, $fallbackFormat, $zoneToCountry): string {
+            if (isset($zoneToCountry[$id])) {
+                try {
+                    $country = $this->regionDataProvider->getName($zoneToCountry[$id], $locale);
+                } catch (MissingResourceException $e) {
+                    $country = $this->regionDataProvider->getName($zoneToCountry[$id], 'en');
+                }
+
+                return null === $city ? str_replace('{0}', $country, $regionFormat) : str_replace(['{0}', '{1}'], [$city, $country], $fallbackFormat);
+            } elseif (null !== $city) {
+                return str_replace('{0}', $city, $regionFormat);
+            } else {
+                return str_replace(['/', '_'], ' ', 0 === strrpos($id, 'Etc/') ? substr($id, 4) : $id);
+            }
+        };
         $available = [];
         foreach ($typeBundle['typeMap']['timezone'] as $zone => $_) {
             if ('Etc:Unknown' === $zone || preg_match('~^Etc:GMT[-+]\d+$~', $zone)) {
@@ -126,33 +194,77 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             }
         }
 
+        $isBase = false === strpos($locale, '_');
         $zones = [];
         foreach (array_keys($available) as $zone) {
             // lg: long generic, e.g. "Central European Time"
             // ls: long specific (not DST), e.g. "Central European Standard Time"
             // ld: long DST, e.g. "Central European Summer Time"
             // ec: example city, e.g. "Amsterdam"
-            $name = $localeBundle['zoneStrings'][$zone]['lg'] ?? $rootBundle['zoneStrings'][$zone]['lg'] ?? $localeBundle['zoneStrings'][$zone]['ls'] ?? $rootBundle['zoneStrings'][$zone]['ls'] ?? null;
-            $city = $localeBundle['zoneStrings'][$zone]['ec'] ?? $rootBundle['zoneStrings'][$zone]['ec'] ?? null;
+            $name = $accessor(['zoneStrings', $zone, 'lg'], $nameInherited) ?? $accessor(['zoneStrings', $zone, 'ls'], $nameInherited);
+            $city = $accessor(['zoneStrings', $zone, 'ec'], $cityInherited);
+            $id = str_replace(':', '/', $zone);
 
             if (null === $name && isset($metazones[$zone])) {
                 $meta = 'meta:'.$metazones[$zone];
-                $name = $localeBundle['zoneStrings'][$meta]['lg'] ?? $rootBundle['zoneStrings'][$meta]['lg'] ?? $localeBundle['zoneStrings'][$meta]['ls'] ?? $rootBundle['zoneStrings'][$meta]['ls'] ?? null;
+                $name = $accessor(['zoneStrings', $meta, 'lg'], $nameInherited) ?? $accessor(['zoneStrings', $meta, 'ls'], $nameInherited);
             }
             if (null === $city && 0 !== strrpos($zone, 'Etc:') && false !== $i = strrpos($zone, ':')) {
                 $city = str_replace('_', ' ', substr($zone, $i + 1));
+                $cityInherited = !$isBase;
             }
-            if (null === $name) {
+            if ($isBase && null === $name) {
+                $name = $resolveName($id, $city);
+                $city = null;
+            }
+            if (
+                ($nameInherited && $cityInherited)
+                || (null === $name && null === $city)
+                || ($nameInherited && null === $city)
+                || ($cityInherited && null === $name)
+            ) {
                 continue;
             }
-            if (null !== $city) {
-                $name .= ' ('.$city.')';
+            if (null === $name) {
+                $name = $resolveName($id, $city);
+            } elseif (null !== $city && false === mb_stripos(str_replace('-', ' ', $name), str_replace('-', ' ', $city))) {
+                $name = str_replace(['{0}', '{1}'], [$city, $name], $fallbackFormat);
             }
 
-            $id = str_replace(':', '/', $zone);
             $zones[$id] = $name;
         }
 
         return $zones;
+    }
+
+    private static function generateZoneToCountryMapping(ArrayAccessibleResourceBundle $windowsZoneBundle): array
+    {
+        $mapping = [];
+
+        foreach ($windowsZoneBundle['mapTimezones'] as $zoneInfo) {
+            foreach ($zoneInfo as $region => $zones) {
+                if (\in_array($region, ['001', 'ZZ'], true)) {
+                    continue;
+                }
+                $mapping += array_fill_keys(explode(' ', $zones), $region);
+            }
+        }
+
+        ksort($mapping);
+
+        return $mapping;
+    }
+
+    private static function generateCountryToZoneMapping(array $zoneToCountryMapping): array
+    {
+        $mapping = [];
+
+        foreach ($zoneToCountryMapping as $zone => $country) {
+            $mapping[$country][] = $zone;
+        }
+
+        ksort($mapping);
+
+        return $mapping;
     }
 }

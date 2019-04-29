@@ -260,7 +260,7 @@ $generator->generateData($config);
 
 echo "Generating zone data...\n";
 
-$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR);
+$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR, new RegionDataProvider($jsonDir.'/'.Intl::REGION_DIR, $reader));
 $generator->generateData($config);
 
 echo "Resource bundle compilation complete.\n";

@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Locale;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal to be removed in 5.0.
+ * @internal
  */
 class LanguageDataProvider
 {
@@ -38,11 +38,17 @@ class LanguageDataProvider
         $this->reader = $reader;
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getLanguages()
     {
         return $this->reader->readEntry($this->path, 'meta', ['Languages']);
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getAliases()
     {
         return $this->reader->readEntry($this->path, 'root', ['Aliases']);
@@ -57,6 +63,9 @@ class LanguageDataProvider
         return $this->reader->readEntry($this->path, $displayLocale, ['Names', $language]);
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getNames($displayLocale = null)
     {
         if (null === $displayLocale) {
@@ -75,6 +84,9 @@ class LanguageDataProvider
         return $languages;
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getAlpha3Code($language)
     {
         return $this->reader->readEntry($this->path, 'meta', ['Alpha2ToAlpha3', $language]);

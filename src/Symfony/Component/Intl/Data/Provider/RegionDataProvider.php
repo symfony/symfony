@@ -19,7 +19,7 @@ use Symfony\Component\Intl\Locale;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal to be removed in 5.0.
+ * @internal
  */
 class RegionDataProvider
 {
@@ -38,6 +38,9 @@ class RegionDataProvider
         $this->reader = $reader;
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getRegions()
     {
         return $this->reader->readEntry($this->path, 'meta', ['Regions']);
@@ -52,6 +55,9 @@ class RegionDataProvider
         return $this->reader->readEntry($this->path, $displayLocale, ['Names', $region]);
     }
 
+    /**
+     * @internal to be removed in 5.0.
+     */
     public function getNames($displayLocale = null)
     {
         if (null === $displayLocale) {

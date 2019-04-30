@@ -45,12 +45,12 @@ class TimezoneValidator extends ConstraintValidator
 
         // @see: https://bugs.php.net/bug.php?id=75928
         if ($constraint->countryCode) {
-            $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode);
+            $timezoneIds = @\DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode) ?: [];
         } else {
             $timezoneIds = \DateTimeZone::listIdentifiers($constraint->zone);
         }
 
-        if ($timezoneIds && \in_array($value, $timezoneIds, true)) {
+        if (\in_array($value, $timezoneIds, true)) {
             return;
         }
 

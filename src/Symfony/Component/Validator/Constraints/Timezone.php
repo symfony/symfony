@@ -44,8 +44,12 @@ class Timezone extends Constraint
     {
         parent::__construct($options);
 
-        if ($this->countryCode && \DateTimeZone::PER_COUNTRY !== $this->zone) {
-            throw new ConstraintDefinitionException('The option "countryCode" can only be used when "zone" option is configured with `\DateTimeZone::PER_COUNTRY`.');
+        if (null === $this->countryCode) {
+            if (0 >= $this->zone || \DateTimeZone::ALL_WITH_BC < $this->zone) {
+                throw new ConstraintDefinitionException('The option "zone" must be a valid range of "\DateTimeZone" constants.');
+            }
+        } elseif (\DateTimeZone::PER_COUNTRY !== (\DateTimeZone::PER_COUNTRY & $this->zone)) {
+            throw new ConstraintDefinitionException('The option "countryCode" can only be used when the "zone" option is configured with "\DateTimeZone::PER_COUNTRY".');
         }
     }
 }

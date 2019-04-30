@@ -189,19 +189,17 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Europe/Monaco', 'MC'];
         yield ['Indian/Christmas', 'CX'];
         yield ['Pacific/Kiritimati', 'KI'];
-        yield ['Pacific/Kiritimati', 'KI'];
-        yield ['Pacific/Kiritimati', 'KI'];
     }
 
     /**
      * @dataProvider getInvalidGroupedTimezonesByCountry
      */
-    public function testInvalidGroupedTimezonesByCountry(string $timezone, string $invalidCountryCode)
+    public function testInvalidGroupedTimezonesByCountry(string $timezone, string $countryCode)
     {
         $constraint = new Timezone([
             'message' => 'myMessage',
             'zone' => \DateTimeZone::PER_COUNTRY,
-            'countryCode' => $invalidCountryCode,
+            'countryCode' => $countryCode,
         ]);
 
         $this->validator->validate($timezone, $constraint);
@@ -217,6 +215,23 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['America/Argentina/Cordoba', 'FR'];
         yield ['America/Barbados', 'PT'];
         yield ['Europe/Bern', 'FR'];
+        yield ['Europe/Amsterdam', 'AC']; // "AC" has no timezones, but is a valid country code
+    }
+
+    public function testGroupedTimezonesWithInvalidCountry()
+    {
+        $constraint = new Timezone([
+            'message' => 'myMessage',
+            'zone' => \DateTimeZone::PER_COUNTRY,
+            'countryCode' => 'foobar',
+        ]);
+
+        $this->validator->validate('Europe/Amsterdam', $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"Europe/Amsterdam"')
+            ->setCode(Timezone::TIMEZONE_IDENTIFIER_IN_COUNTRY_ERROR)
+            ->assertRaised();
     }
 
     /**

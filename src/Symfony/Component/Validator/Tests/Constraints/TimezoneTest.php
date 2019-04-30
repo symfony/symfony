@@ -21,30 +21,23 @@ class TimezoneTest extends TestCase
 {
     public function testValidTimezoneConstraints()
     {
-        $constraint = new Timezone();
-
-        $constraint = new Timezone([
-            'message' => 'myMessage',
+        new Timezone();
+        new Timezone(['zone' => \DateTimeZone::ALL]);
+        new Timezone(['zone' => \DateTimeZone::ALL_WITH_BC]);
+        new Timezone([
             'zone' => \DateTimeZone::PER_COUNTRY,
             'countryCode' => 'AR',
         ]);
 
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-            'zone' => \DateTimeZone::ALL,
-        ]);
-
-        // Make an assertion in order to avoid this test to be marked as risky
-        $this->assertInstanceOf(Timezone::class, $constraint);
+        $this->addToAssertionCount(1);
     }
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testExceptionForGroupedTimezonesByCountryWithWrongTimezone()
+    public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
+        new Timezone([
             'zone' => \DateTimeZone::ALL,
             'countryCode' => 'AR',
         ]);
@@ -53,11 +46,24 @@ class TimezoneTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testExceptionForGroupedTimezonesByCountryWithoutTimezone()
+    public function testExceptionForGroupedTimezonesByCountryWithoutZone()
     {
-        $constraint = new Timezone([
-            'message' => 'myMessage',
-            'countryCode' => 'AR',
-        ]);
+        new Timezone(['countryCode' => 'AR']);
+    }
+
+    /**
+     * @dataProvider provideInvalidZones
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testExceptionForInvalidGroupedTimezones(int $zone)
+    {
+        new Timezone(['zone' => $zone]);
+    }
+
+    public function provideInvalidZones(): iterable
+    {
+        yield [-1];
+        yield [0];
+        yield [\DateTimeZone::ALL_WITH_BC + 1];
     }
 }

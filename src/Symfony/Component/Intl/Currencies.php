@@ -45,6 +45,9 @@ final class Currencies extends ResourceBundle
         }
     }
 
+    /**
+     * @throws MissingResourceException if the currency code does not exists
+     */
     public static function getName(string $currency, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $currency, self::INDEX_NAME], $displayLocale);
@@ -74,6 +77,9 @@ final class Currencies extends ResourceBundle
         return self::asort($names, $displayLocale);
     }
 
+    /**
+     * @throws MissingResourceException if the currency code does not exists
+     */
     public static function getSymbol(string $currency, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $currency, self::INDEX_SYMBOL], $displayLocale);
@@ -100,11 +106,17 @@ final class Currencies extends ResourceBundle
         }
     }
 
+    /**
+     * @throws MissingResourceException if the currency code has no numeric code
+     */
     public static function getNumericCode(string $currency): int
     {
         return self::readEntry(['Alpha3ToNumeric', $currency], 'meta');
     }
 
+    /**
+     * @throws MissingResourceException if the numeric code does not exists
+     */
     public static function forNumericCode(int $numericCode): array
     {
         return self::readEntry(['NumericToAlpha3', (string) $numericCode], 'meta');

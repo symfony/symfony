@@ -40,6 +40,9 @@ final class Scripts extends ResourceBundle
         }
     }
 
+    /**
+     * @throws MissingResourceException if the script code does not exists
+     */
     public static function getName(string $script, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $script], $displayLocale);

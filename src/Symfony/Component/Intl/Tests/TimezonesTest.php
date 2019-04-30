@@ -549,6 +549,15 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame(20700, Timezones::getRawOffset('Asia/Katmandu'));
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Unknown or bad timezone (foobar)
+     */
+    public function testGetRawOffsetWithUnknownTimezone()
+    {
+        Timezones::getRawOffset('foobar');
+    }
+
     public function testGetGmtOffset()
     {
         // timezones free from DST changes to avoid time-based variance
@@ -595,8 +604,11 @@ class TimezonesTest extends ResourceBundleTestCase
      */
     public function testGetGmtOffsetAvailability(string $timezone)
     {
-        $this->assertInternalType('int', Timezones::getRawOffset($timezone));
-        $this->assertInternalType('string', Timezones::getGmtOffset($timezone));
+        // ensure each timezone identifier has a corresponding GMT offset
+        Timezones::getRawOffset($timezone);
+        Timezones::getGmtOffset($timezone);
+
+        $this->addToAssertionCount(1);
     }
 
     /**
@@ -605,7 +617,10 @@ class TimezonesTest extends ResourceBundleTestCase
     public function testGetCountryCodeAvailability(string $timezone)
     {
         try {
-            $this->assertInternalType('string', Timezones::getCountryCode($timezone));
+            // ensure each timezone identifier has a corresponding country code
+            Timezones::getCountryCode($timezone);
+
+            $this->addToAssertionCount(1);
         } catch (MissingResourceException $e) {
             if (\in_array($timezone, self::$zonesNoCountry, true)) {
                 $this->markTestSkipped();
@@ -627,7 +642,10 @@ class TimezonesTest extends ResourceBundleTestCase
      */
     public function testForCountryCodeAvailability(string $country)
     {
-        $this->assertInternalType('array', Timezones::forCountryCode($country));
+        // ensure each country code has a list of timezone identifiers (possibly empty)
+        Timezones::forCountryCode($country);
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideCountries(): iterable

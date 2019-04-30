@@ -133,7 +133,9 @@ class ConsoleFormatter implements FormatterInterface
         }
 
         $formatted = strtr($this->options['format'], [
-            '%datetime%' => $record['datetime']->format($this->options['date_format']),
+            '%datetime%' => $record['datetime'] instanceof \DateTimeInterface
+                ? $record['datetime']->format($this->options['date_format'])
+                : $record['datetime'],
             '%start_tag%' => sprintf('<%s>', $levelColor),
             '%level_name%' => sprintf('%-9s', $record['level_name']),
             '%end_tag%' => '</>',

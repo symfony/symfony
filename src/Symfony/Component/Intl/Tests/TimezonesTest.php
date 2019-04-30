@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Regions;
 use Symfony\Component\Intl\Timezones;
 
 /**
@@ -456,6 +458,15 @@ class TimezonesTest extends ResourceBundleTestCase
         'Pacific/Wake',
         'Pacific/Wallis',
     ];
+    private static $zonesNoCountry = [
+        'Antarctica/Troll',
+        'CST6CDT',
+        'EST5EDT',
+        'MST7MDT',
+        'PST8PDT',
+        'Etc/GMT',
+        'Etc/UTC',
+    ];
 
     public function testGetTimezones()
     {
@@ -561,5 +572,68 @@ class TimezonesTest extends ResourceBundleTestCase
     {
         $this->assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
         $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testForCountryCodeWithUnknownCountry()
+    {
+        Timezones::forCountryCode('foobar');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     */
+    public function testGetCountryCodeWithUnknownTimezone()
+    {
+        Timezones::getCountryCode('foobar');
+    }
+
+    /**
+     * @dataProvider provideTimezones
+     */
+    public function testGetGmtOffsetAvailability(string $timezone)
+    {
+        $this->assertInternalType('int', Timezones::getRawOffset($timezone));
+        $this->assertInternalType('string', Timezones::getGmtOffset($timezone));
+    }
+
+    /**
+     * @dataProvider provideTimezones
+     */
+    public function testGetCountryCodeAvailability(string $timezone)
+    {
+        try {
+            $this->assertInternalType('string', Timezones::getCountryCode($timezone));
+        } catch (MissingResourceException $e) {
+            if (\in_array($timezone, self::$zonesNoCountry, true)) {
+                $this->markTestSkipped();
+            } else {
+                $this->fail();
+            }
+        }
+    }
+
+    public function provideTimezones(): iterable
+    {
+        return array_map(function ($timezone) {
+            return [$timezone];
+        }, self::$zones);
+    }
+
+    /**
+     * @dataProvider provideCountries
+     */
+    public function testForCountryCodeAvailability(string $country)
+    {
+        $this->assertInternalType('array', Timezones::forCountryCode($country));
+    }
+
+    public function provideCountries(): iterable
+    {
+        return array_map(function ($country) {
+            return [$country];
+        }, Regions::getRegionCodes());
     }
 }

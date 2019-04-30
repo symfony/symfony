@@ -83,7 +83,15 @@ final class Timezones extends ResourceBundle
 
     public static function forCountryCode(string $country): array
     {
-        return self::readEntry(['CountryToZone', $country], 'meta');
+        try {
+            return self::readEntry(['CountryToZone', $country], 'meta');
+        } catch (MissingResourceException $e) {
+            if (Regions::exists($country)) {
+                return [];
+            }
+
+            throw $e;
+        }
     }
 
     protected static function getPath(): string

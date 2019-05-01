@@ -17,6 +17,8 @@ class BaseUser
      */
     private $username;
 
+    private $enabled;
+
     /**
      * BaseUser constructor.
      *

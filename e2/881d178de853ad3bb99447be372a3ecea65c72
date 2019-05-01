@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-01T09:08:26Z
+
+Linking to Slack is like linking to an oral discussion: it will disappear from memories quite soon and won't allow others to get the arguments soon too.
+For 3.4?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-05-01T09:16:24Z
+
+> For 3.4?
+
+I changed the base. I assumed pedantic changes that are not bugfixes should go on master :P
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-05-01T09:20:45Z
+
+> Linking to Slack is like linking to an oral discussion: it will disappear from memories quite soon and won't allow others to get the arguments soon too.
+
+It was provided as a bonus, I replaced it with an anonymized screenshot.

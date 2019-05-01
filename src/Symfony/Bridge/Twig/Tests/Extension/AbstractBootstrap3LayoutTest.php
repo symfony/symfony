@@ -2551,13 +2551,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@name="name"]
     [@class="my&class form-control"]
     [not(@required)]
-<<<<<<< HEAD
     [./option[@value="Europe/Vienna"][@selected="selected"][.="Europe / Vienna"]]
-    [count(./option)>200]
-=======
-    [.//option[@value="Europe/Vienna"][@selected="selected"]]
     [count(.//option)>200]
->>>>>>> 4.2
 '
         );
     }
@@ -2573,11 +2568,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 '/select
     [@class="my&class form-control"]
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Timezone[/trans]"]]
-<<<<<<< HEAD
-    [count(./option)>201]
-=======
     [count(.//option)>201]
->>>>>>> 4.2
 '
         );
     }

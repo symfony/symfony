@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\Intl\Tests;
 
-use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Regions;
+use Symfony\Component\Intl\Countries;
 
 /**
  * @group intl-data
  */
-class RegionsTest extends ResourceBundleTestCase
+class CountriesTest extends ResourceBundleTestCase
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    private static $territories = [
+    private static $countries = [
         'AC',
         'AD',
         'AE',
@@ -279,9 +278,9 @@ class RegionsTest extends ResourceBundleTestCase
         'ZW',
     ];
 
-    public function testGetRegions()
+    public function testGetCountryCodes()
     {
-        $this->assertSame(self::$territories, Regions::getRegionCodes());
+        $this->assertSame(self::$countries, Countries::getCountryCodes());
     }
 
     /**
@@ -289,18 +288,18 @@ class RegionsTest extends ResourceBundleTestCase
      */
     public function testGetNames($displayLocale)
     {
-        $countries = array_keys(Regions::getNames($displayLocale));
+        $countries = array_keys(Countries::getNames($displayLocale));
 
         sort($countries);
 
-        $this->assertSame(self::$territories, $countries);
+        $this->assertSame(self::$countries, $countries);
     }
 
     public function testGetNamesDefaultLocale()
     {
-        Locale::setDefault('de_AT');
+        \Locale::setDefault('de_AT');
 
-        $this->assertSame(Regions::getNames('de_AT'), Regions::getNames());
+        $this->assertSame(Countries::getNames('de_AT'), Countries::getNames());
     }
 
     /**
@@ -311,7 +310,7 @@ class RegionsTest extends ResourceBundleTestCase
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
         // e.g. sr_Latn_ME => sr_ME
-        $this->assertEquals(Regions::getNames($ofLocale), Regions::getNames($alias));
+        $this->assertEquals(Countries::getNames($ofLocale), Countries::getNames($alias));
     }
 
     /**
@@ -319,10 +318,10 @@ class RegionsTest extends ResourceBundleTestCase
      */
     public function testGetName($displayLocale)
     {
-        $names = Regions::getNames($displayLocale);
+        $names = Countries::getNames($displayLocale);
 
         foreach ($names as $country => $name) {
-            $this->assertSame($name, Regions::getName($country, $displayLocale));
+            $this->assertSame($name, Countries::getName($country, $displayLocale));
         }
     }
 
@@ -332,13 +331,13 @@ class RegionsTest extends ResourceBundleTestCase
     public function testLocaleAliasesAreLoaded()
     {
         \Locale::setDefault('zh_TW');
-        $countryNameZhTw = Regions::getName('AD');
+        $countryNameZhTw = Countries::getName('AD');
 
         \Locale::setDefault('zh_Hant_TW');
-        $countryNameHantZhTw = Regions::getName('AD');
+        $countryNameHantZhTw = Countries::getName('AD');
 
         \Locale::setDefault('zh');
-        $countryNameZh = Regions::getName('AD');
+        $countryNameZh = Countries::getName('AD');
 
         $this->assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
         $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
@@ -347,14 +346,14 @@ class RegionsTest extends ResourceBundleTestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testGetNameWithInvalidRegionCode()
+    public function testGetNameWithInvalidCountryCode()
     {
-        Regions::getName('foo');
+        Countries::getName('foo');
     }
 
     public function testExists()
     {
-        $this->assertTrue(Regions::exists('NL'));
-        $this->assertFalse(Regions::exists('ZZ'));
+        $this->assertTrue(Countries::exists('NL'));
+        $this->assertFalse(Countries::exists('ZZ'));
     }
 }

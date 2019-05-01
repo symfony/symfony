@@ -99,7 +99,7 @@ final class Timezones extends ResourceBundle
         try {
             return self::readEntry(['CountryToZone', $country], 'meta');
         } catch (MissingResourceException $e) {
-            if (Regions::exists($country)) {
+            if (Countries::exists($country)) {
                 return [];
             }
 

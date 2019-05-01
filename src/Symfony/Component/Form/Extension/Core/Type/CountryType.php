@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
-use Symfony\Component\Intl\Regions;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -44,7 +44,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
                 $choiceTranslationLocale = $options['choice_translation_locale'];
 
                 return new IntlCallbackChoiceLoader(function () use ($choiceTranslationLocale) {
-                    return array_flip(Regions::getNames($choiceTranslationLocale));
+                    return array_flip(Countries::getNames($choiceTranslationLocale));
                 });
             },
             'choice_translation_domain' => false,
@@ -83,7 +83,7 @@ class CountryType extends AbstractType implements ChoiceLoaderInterface
             return $this->choiceList;
         }
 
-        return $this->choiceList = new ArrayChoiceList(array_flip(Regions::getNames()), $value);
+        return $this->choiceList = new ArrayChoiceList(array_flip(Countries::getNames()), $value);
     }
 
     /**

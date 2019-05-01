@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests;
 
 use Symfony\Component\Intl\Languages;
-use Symfony\Component\Intl\Locale;
 
 /**
  * @group intl-data
@@ -824,7 +823,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'zu' => 'zul',
     ];
 
-    public function testGetLanguages()
+    public function testGetLanguageCodes()
     {
         $this->assertEquals(self::$languages, Languages::getLanguageCodes());
     }
@@ -844,7 +843,7 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetNamesDefaultLocale()
     {
-        Locale::setDefault('de_AT');
+        \Locale::setDefault('de_AT');
 
         $this->assertSame(Languages::getNames('de_AT'), Languages::getNames());
     }
@@ -874,7 +873,7 @@ class LanguagesTest extends ResourceBundleTestCase
 
     public function testGetNameDefaultLocale()
     {
-        Locale::setDefault('de_AT');
+        \Locale::setDefault('de_AT');
 
         $names = Languages::getNames('de_AT');
 

@@ -108,7 +108,7 @@ Intl
  * Deprecated `Intl::getCurrencyBundle()`, use `Currencies` instead
  * Deprecated `Intl::getLanguageBundle()`, use `Languages` or `Scripts` instead
  * Deprecated `Intl::getLocaleBundle()`, use `Locales` instead
- * Deprecated `Intl::getRegionBundle()`, use `Regions` instead
+ * Deprecated `Intl::getRegionBundle()`, use `Countries` instead
 
 Messenger
 ---------

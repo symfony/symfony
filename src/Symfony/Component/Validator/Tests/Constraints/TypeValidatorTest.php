@@ -163,6 +163,52 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider getValidValuesMultipleTypes
+     */
+    public function testValidValuesMultipleTypes($value, array $types)
+    {
+        $constraint = new Type(['type' => $types]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidValuesMultipleTypes()
+    {
+        return [
+            ['12345', ['array', 'string']],
+            [[], ['array', 'string']],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidValuesMultipleTypes
+     */
+    public function testInvalidValuesMultipleTypes($value, $types, $valueAsString)
+    {
+        $constraint = new Type([
+            'type' => $types,
+            'message' => 'myMessage',
+        ]);
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $valueAsString)
+            ->setParameter('{{ type }}', implode('|', $types))
+            ->setCode(Type::INVALID_TYPE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidValuesMultipleTypes()
+    {
+        return [
+            ['12345', ['boolean', 'array'], '"12345"'],
+        ];
+    }
+
     protected function createFile()
     {
         if (!static::$file) {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added support for checking an array of types in `TypeValidator`
+
 4.3.0
 -----
 

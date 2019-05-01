@@ -193,9 +193,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function save()
     {
-        if ($this->isStarted()) {
-            $this->storage->save();
-        }
+        $this->storage->save();
     }
 
     /**

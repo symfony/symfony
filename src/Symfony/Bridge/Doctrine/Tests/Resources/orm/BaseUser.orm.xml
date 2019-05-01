@@ -6,6 +6,7 @@
 
     <mapped-superclass name="Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser">
         <field name="username" column="username" type="string" length="120" />
+        <field name="enabled" type="boolean" />
     </mapped-superclass>
 
 </doctrine-mapping>

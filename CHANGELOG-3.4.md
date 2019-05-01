@@ -7,6 +7,16 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.27 (2019-05-01)
+
+ * bug #31338 Revert "bug #30620 [FrameworkBundle][HttpFoundation] make session service resettable (dmaicher)" (nicolas-grekas)
+ * bug #31326 fix ConsoleFormatter - call to a member function format() on string (keksa)
+ * bug #31331 [Workflow] Fixed dumping when many transition with same name exist (lyrixx)
+ * bug #31302 [FramworkBundle] mark any env vars found in the ide setting as used (nicolas-grekas)
+ * bug #31290 [TwigBundle] Use the apply tag instead of the filter tag (greg0ire)
+ * bug #31275 [Translator] Preserve default domain when extracting strings from php files (Stadly)
+ * bug #31213 [WebProfilerBundle] Intercept redirections only for HTML format (javiereguiluz)
+
 * 3.4.26 (2019-04-17)
 
  * bug #31084 [HttpFoundation] Make MimeTypeExtensionGuesser case insensitive (vermeirentony)

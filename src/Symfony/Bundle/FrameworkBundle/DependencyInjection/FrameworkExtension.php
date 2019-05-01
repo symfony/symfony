@@ -1774,10 +1774,9 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
 
-        $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-            ->replaceArgument(1, $config['failure_transport']);
-
         if ($config['failure_transport']) {
+            $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
+                ->replaceArgument(1, $config['failure_transport']);
             $container->getDefinition('console.command.messenger_failed_messages_retry')
                 ->replaceArgument(0, $config['failure_transport'])
                 ->replaceArgument(4, $transportRetryReferences[$config['failure_transport']] ?? null);
@@ -1786,6 +1785,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('console.command.messenger_failed_messages_remove')
                 ->replaceArgument(0, $config['failure_transport']);
         } else {
+            $container->removeDefinition('messenger.failure.send_failed_message_to_failure_transport_listener');
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
             $container->removeDefinition('console.command.messenger_failed_messages_show');
             $container->removeDefinition('console.command.messenger_failed_messages_remove');

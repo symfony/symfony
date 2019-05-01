@@ -40,6 +40,9 @@ final class Regions extends ResourceBundle
         }
     }
 
+    /**
+     * @throws MissingResourceException if the region code does not exists
+     */
     public static function getName(string $region, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $region], $displayLocale);

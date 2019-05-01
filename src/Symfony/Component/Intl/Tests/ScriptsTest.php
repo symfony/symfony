@@ -287,5 +287,6 @@ class ScriptsTest extends ResourceBundleTestCase
     {
         $this->assertTrue(Scripts::exists('Hans'));
         $this->assertTrue(Scripts::exists('Zzzz'));
+        $this->assertFalse(Scripts::exists('foobar'));
     }
 }

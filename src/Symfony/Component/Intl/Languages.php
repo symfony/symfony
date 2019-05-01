@@ -49,6 +49,9 @@ final class Languages extends ResourceBundle
         }
     }
 
+    /**
+     * @throws MissingResourceException if the language code does not exists
+     */
     public static function getName(string $language, string $displayLocale = null): string
     {
         return self::readEntry(['Names', $language], $displayLocale);

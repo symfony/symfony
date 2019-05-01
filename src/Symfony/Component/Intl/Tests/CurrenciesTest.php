@@ -683,7 +683,10 @@ class CurrenciesTest extends ResourceBundleTestCase
      */
     public function testGetFractionDigits($currency)
     {
-        $this->assertInternalType('numeric', Currencies::getFractionDigits($currency));
+        // ensure each currency code has a corresponding fraction digit
+        Currencies::getFractionDigits($currency);
+
+        $this->addToAssertionCount(1);
     }
 
     /**

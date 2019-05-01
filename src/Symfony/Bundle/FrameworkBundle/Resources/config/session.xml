@@ -15,7 +15,6 @@
             <argument type="service" id="session.storage" />
             <argument type="service" id="session.attribute_bag" />
             <argument type="service" id="session.flash_bag" />
-            <tag name="kernel.reset" method="save" />
         </service>
 
         <service id="Symfony\Component\HttpFoundation\Session\SessionInterface" alias="session" />

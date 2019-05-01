@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-10T22:52:54Z
+
+This is ready! And it works *awesome*. Here are some technical notes:
+
+1) `SendersLocatorInterface` changed... because for the first time, we need to look up the sender with more logic than just the message class - we need to look up by a specific alias name
+
+2) Sender aliases are still optional... but the system is increasingly dependent on them being available - retry, failure transport, etc.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-23T17:28:59Z
+
+Comments handled! This is ready again!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-24T14:07:18Z
+
+Added a new `TransportMessageIdStamp` that can be applied by `SenderInterface::send()` and `ReceiverInterface::get()` when there is an idea of a "message id" within that system. This is used (and required) by receivers that implement `ListableReceiverInterface`.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-24T14:11:37Z
+
+Ready again!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-29T16:47:56Z
+
+Thanks for the review @chalasr!
+
+This is once again ready to go!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-30T12:38:53Z
+
+Comment addressed!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-04-30T13:59:36Z
+
+Test failures are unrelated. Ready for review!

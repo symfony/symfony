@@ -100,6 +100,6 @@ class SendersLocator implements SendersLocatorInterface
             return $this->sendersLocator->get($alias);
         }
 
-        throw new UnknownSenderException(sprintf('Unknown sender alias "%s"', $alias));
+        throw new UnknownSenderException(sprintf('Unknown sender alias "%s".', $alias));
     }
 }

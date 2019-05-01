@@ -7,6 +7,25 @@ in 4.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.2.0...v4.2.1
 
+* 4.2.8 (2019-05-01)
+
+ * bug #31338 Revert "bug #30620 [FrameworkBundle][HttpFoundation] make session service resettable (dmaicher)" (nicolas-grekas)
+ * bug #31326 fix ConsoleFormatter - call to a member function format() on string (keksa)
+ * bug #31331 [Workflow] Fixed dumping when many transition with same name exist (lyrixx)
+ * bug #31302 [FramworkBundle] mark any env vars found in the ide setting as used (nicolas-grekas)
+ * bug #31290 [TwigBundle] Use the apply tag instead of the filter tag (greg0ire)
+ * bug #31275 [Translator] Preserve default domain when extracting strings from php files (Stadly)
+ * bug #31240 Fix url matcher edge cases with trailing slash (arjenm)
+ * bug #31201 [Form] resolve class name parameters (xabbuh)
+ * bug #31213 [WebProfilerBundle] Intercept redirections only for HTML format (javiereguiluz)
+ * bug #31210 [PhpUnitBridge] fix reading phpunit.xml on bootstrap (nicolas-grekas)
+ * bug #31023 [Routing] Fix route URL generation in CLI context (X-Coder264)
+ * bug #31117 [FrameworkBundle] fix math depth handler configuration (Raulnet)
+ * bug #31182 [Routing] fix trailing slash matching with empty-matching trailing vars (nicolas-grekas)
+ * bug #31167 [Routing] fix matching trailing vars with defaults (nicolas-grekas)
+ * bug #31164 [Validator] fix LegacyTranslatorProxy (nicolas-grekas)
+ * bug #31156 [FrameworkBundle] call method with Translator component only (xabbuh)
+
 * 4.2.7 (2019-04-17)
 
  * bug #31107 [Routing] fix trailing slash redirection with non-greedy trailing vars (nicolas-grekas)

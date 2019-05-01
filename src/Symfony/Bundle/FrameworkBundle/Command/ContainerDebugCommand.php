@@ -237,6 +237,8 @@ EOF
 
     private function findProperServiceName(InputInterface $input, SymfonyStyle $io, ContainerBuilder $builder, string $name, bool $showHidden)
     {
+        $name = ltrim($name, '\\');
+
         if ($builder->has($name) || !$input->isInteractive()) {
             return $name;
         }

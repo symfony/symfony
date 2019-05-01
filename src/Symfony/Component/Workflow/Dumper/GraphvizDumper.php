@@ -149,8 +149,8 @@ class GraphvizDumper implements DumperInterface
     {
         $code = '';
 
-        foreach ($transitions as $place) {
-            $code .= sprintf("  transition_%s [label=\"%s\",%s];\n", $this->dotize($place['name']), $this->escape($place['name']), $this->addAttributes($place['attributes']));
+        foreach ($transitions as $i => $place) {
+            $code .= sprintf("  transition_%s [label=\"%s\",%s];\n", $this->dotize($i), $this->escape($place['name']), $this->addAttributes($place['attributes']));
         }
 
         return $code;
@@ -165,7 +165,7 @@ class GraphvizDumper implements DumperInterface
 
         $dotEdges = [];
 
-        foreach ($definition->getTransitions() as $transition) {
+        foreach ($definition->getTransitions() as $i => $transition) {
             $transitionName = $workflowMetadata->getMetadata('label', $transition) ?? $transition->getName();
 
             foreach ($transition->getFroms() as $from) {
@@ -173,6 +173,7 @@ class GraphvizDumper implements DumperInterface
                     'from' => $from,
                     'to' => $transitionName,
                     'direction' => 'from',
+                    'transition_number' => $i,
                 ];
             }
             foreach ($transition->getTos() as $to) {
@@ -180,6 +181,7 @@ class GraphvizDumper implements DumperInterface
                     'from' => $transitionName,
                     'to' => $to,
                     'direction' => 'to',
+                    'transition_number' => $i,
                 ];
             }
         }
@@ -195,12 +197,17 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($edges as $edge) {
-            $code .= sprintf("  %s_%s -> %s_%s [style=\"solid\"];\n",
-                'from' === $edge['direction'] ? 'place' : 'transition',
-                $this->dotize($edge['from']),
-                'from' === $edge['direction'] ? 'transition' : 'place',
-                $this->dotize($edge['to'])
-            );
+            if ('from' === $edge['direction']) {
+                $code .= sprintf("  place_%s -> transition_%s [style=\"solid\"];\n",
+                    $this->dotize($edge['from']),
+                    $this->dotize($edge['transition_number'])
+                );
+            } else {
+                $code .= sprintf("  transition_%s -> place_%s [style=\"solid\"];\n",
+                    $this->dotize($edge['transition_number']),
+                    $this->dotize($edge['to'])
+                );
+            }
         }
 
         return $code;

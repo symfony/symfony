@@ -154,6 +154,7 @@ TXT
         return [
             [BackslashClass::class],
             ['FixturesBackslashClass'],
+            ['\\'.BackslashClass::class],
         ];
     }
 }

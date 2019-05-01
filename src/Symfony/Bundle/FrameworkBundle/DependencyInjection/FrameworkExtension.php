@@ -208,6 +208,8 @@ class FrameworkExtension extends Extension
                     'vscode' => 'vscode://file/%%f:%%l',
                 ];
                 $ide = $config['ide'];
+                // mark any env vars found in the ide setting as used
+                $container->resolveEnvPlaceholders($ide);
 
                 $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
             }

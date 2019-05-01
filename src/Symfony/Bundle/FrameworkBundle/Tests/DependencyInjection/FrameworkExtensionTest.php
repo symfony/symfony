@@ -721,12 +721,16 @@ abstract class FrameworkExtensionTest extends TestCase
             '*' => false,
         ];
 
-        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(1));
+        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(2));
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals([
-            'amqp' => new Reference('messenger.transport.amqp'),
-            'audit' => new Reference('audit'),
-        ], $sendersMapping[DummyMessage::class]->getValues());
+            'amqp',
+            'audit',
+        ], $sendersMapping[DummyMessage::class]);
+        $sendersLocator = $container->getDefinition((string) $senderLocatorDefinition->getArgument(1));
+        $this->assertSame(['amqp', 'audit'], array_keys($sendersLocator->getArgument(0)));
+        $this->assertEquals(new Reference('messenger.transport.amqp'), $sendersLocator->getArgument(0)['amqp']->getValues()[0]);
+        $this->assertEquals(new Reference('audit'), $sendersLocator->getArgument(0)['audit']->getValues()[0]);
     }
 
     public function testMessengerTransportConfiguration()

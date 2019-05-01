@@ -12,6 +12,8 @@
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -21,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
  *
  * @experimental in 4.3
  */
-class DoctrineTransport implements TransportInterface, SetupableTransportInterface
+class DoctrineTransport implements TransportInterface, SetupableTransportInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private $connection;
     private $serializer;
@@ -57,6 +59,31 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     {
         ($this->receiver ?? $this->getReceiver())->reject($envelope);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMessageCount(): int
+    {
+        return ($this->receiver ?? $this->getReceiver())->getMessageCount();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all(int $limit = null): iterable
+    {
+        return ($this->receiver ?? $this->getReceiver())->all($limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function find($id): ?Envelope
+    {
+        return ($this->receiver ?? $this->getReceiver())->find($id);
+    }
+
 
     /**
      * {@inheritdoc}

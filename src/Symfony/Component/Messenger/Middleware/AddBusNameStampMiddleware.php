@@ -32,7 +32,9 @@ class AddBusNameStampMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $envelope = $envelope->with(new BusNameStamp($this->busName));
+        if (null === $envelope->last(BusNameStamp::class)) {
+            $envelope = $envelope->with(new BusNameStamp($this->busName));
+        }
 
         return $stack->next()->handle($envelope, $stack);
     }

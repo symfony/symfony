@@ -29,5 +29,9 @@ class AddBusNameStampMiddlewareTest extends MiddlewareTestCase
         $busNameStamp = $finalEnvelope->last(BusNameStamp::class);
         $this->assertNotNull($busNameStamp);
         $this->assertSame('the_bus_name', $busNameStamp->getBusName());
+
+        // the stamp should not be added over and over again
+        $finalEnvelope = $middleware->handle($finalEnvelope, $this->getStackMock());
+        $this->assertCount(1, $finalEnvelope->all(BusNameStamp::class));
     }
 }

@@ -35,6 +35,8 @@ interface ReceiverInterface
      * call to get() takes a long time, blocking other receivers from
      * being called.
      *
+     * If applicable, the Envelope should contain a TransportMessageIdStamp.
+     *
      * If a received message cannot be decoded, the message should not
      * be retried again (e.g. if there's a queue, it should be removed)
      * and a MessageDecodingFailedException should be thrown.

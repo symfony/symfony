@@ -16,6 +16,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -26,7 +28,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @experimental in 4.3
  */
-class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
+class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private $connection;
     private $serializer;
@@ -52,18 +54,7 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
             return [];
         }
 
-        try {
-            $envelope = $this->serializer->decode([
-                'body' => $doctrineEnvelope['body'],
-                'headers' => $doctrineEnvelope['headers'],
-            ]);
-        } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($doctrineEnvelope['id']);
-
-            throw $exception;
-        }
-
-        yield $envelope->with(new DoctrineReceivedStamp($doctrineEnvelope['id']));
+        yield $this->createEnvelopeFromData($doctrineEnvelope);
     }
 
     /**
@@ -71,7 +62,11 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function ack(Envelope $envelope): void
     {
-        $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
+        try {
+            $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     /**
@@ -79,7 +74,11 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function reject(Envelope $envelope): void
     {
-        $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+        try {
+            $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
     }
 
     /**
@@ -87,7 +86,45 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
      */
     public function getMessageCount(): int
     {
-        return $this->connection->getMessageCount();
+        try {
+            return $this->connection->getMessageCount();
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all(int $limit = null): iterable
+    {
+        try {
+            $doctrineEnvelopes = $this->connection->findAll($limit);
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        foreach ($doctrineEnvelopes as $doctrineEnvelope) {
+            yield $this->createEnvelopeFromData($doctrineEnvelope);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function find($id): ?Envelope
+    {
+        try {
+            $doctrineEnvelope = $this->connection->find($id);
+        } catch (DBALException $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        if (null === $doctrineEnvelope) {
+            return null;
+        }
+
+        return $this->createEnvelopeFromData($doctrineEnvelope);
     }
 
     private function findDoctrineReceivedStamp(Envelope $envelope): DoctrineReceivedStamp
@@ -100,5 +137,24 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
 
         return $doctrineReceivedStamp;
+    }
+
+    private function createEnvelopeFromData(array $data): Envelope
+    {
+        try {
+            $envelope = $this->serializer->decode([
+                'body' => $data['body'],
+                'headers' => $data['headers'],
+            ]);
+        } catch (MessageDecodingFailedException $exception) {
+            $this->connection->reject($data['id']);
+
+            throw $exception;
+        }
+
+        return $envelope->with(
+            new DoctrineReceivedStamp($data['id']),
+            new TransportMessageIdStamp($data['id'])
+        );
     }
 }

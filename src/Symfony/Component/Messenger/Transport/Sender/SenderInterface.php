@@ -25,6 +25,8 @@ interface SenderInterface
      *
      * The sender can read different stamps for transport configuration,
      * like delivery delay.
+     *
+     * If applicable, the returned Envelope should contain a TransportMessageIdStamp.
      */
     public function send(Envelope $envelope): Envelope;
 }

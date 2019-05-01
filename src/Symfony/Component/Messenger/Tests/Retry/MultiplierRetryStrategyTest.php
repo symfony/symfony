@@ -26,11 +26,28 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertTrue($strategy->isRetryable($envelope));
     }
 
+    public function testIsRetryableWithNullMax()
+    {
+        $strategy = new MultiplierRetryStrategy(null);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
+        $this->assertTrue($strategy->isRetryable($envelope));
+
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(1, 'sender_alias')]);
+        $this->assertTrue($strategy->isRetryable($envelope));
+    }
+
     public function testIsNotRetryable()
     {
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3, 'sender_alias')]);
 
+        $this->assertFalse($strategy->isRetryable($envelope));
+    }
+
+    public function testIsNotRetryableWithZeroMax()
+    {
+        $strategy = new MultiplierRetryStrategy(0);
+        $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0, 'sender_alias')]);
         $this->assertFalse($strategy->isRetryable($envelope));
     }
 

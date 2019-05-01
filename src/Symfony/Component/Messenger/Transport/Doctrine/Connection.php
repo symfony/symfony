@@ -102,9 +102,10 @@ class Connection
     /**
      * @param int $delay The delay in milliseconds
      *
+     * @return string The inserted id
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function send(string $body, array $headers, int $delay = 0): void
+    public function send(string $body, array $headers, int $delay = 0): string
     {
         $now = new \DateTime();
         $availableAt = (clone $now)->modify(sprintf('+%d seconds', $delay / 1000));
@@ -126,6 +127,8 @@ class Connection
             ':created_at' => self::formatDateTime($now),
             ':available_at' => self::formatDateTime($availableAt),
         ]);
+
+        return $this->driverConnection->lastInsertId();
     }
 
     public function get(): ?array
@@ -205,14 +208,42 @@ class Connection
         return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchColumn();
     }
 
+    public function findAll(int $limit = null): array
+    {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
+
+        $queryBuilder = $this->createAvailableMessagesQueryBuilder();
+        if (null !== $limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        return $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchAll();
+    }
+
+    public function find($id): ?array
+    {
+        if ($this->configuration['auto_setup']) {
+            $this->setup();
+        }
+
+        $queryBuilder = $this->createQueryBuilder()
+            ->where('m.id = :id');
+
+        $data = $this->executeQuery($queryBuilder->getSQL(), [
+            'id' => $id,
+        ])->fetch();
+
+        return false === $data ? null : $data;
+    }
+
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTime();
         $redeliverLimit = (clone $now)->modify(sprintf('-%d seconds', $this->configuration['redeliver_timeout']));
 
-        return $this->driverConnection->createQueryBuilder()
-            ->select('m.*')
-            ->from($this->configuration['table_name'], 'm')
+        return $this->createQueryBuilder()
             ->where('m.delivered_at is null OR m.delivered_at < :redeliver_limit')
             ->andWhere('m.available_at <= :now')
             ->andWhere('m.queue_name = :queue_name')
@@ -221,6 +252,13 @@ class Connection
                 ':queue_name' => $this->configuration['queue_name'],
                 ':redeliver_limit' => self::formatDateTime($redeliverLimit),
             ]);
+    }
+
+    private function createQueryBuilder(): QueryBuilder
+    {
+        return $this->driverConnection->createQueryBuilder()
+            ->select('m.*')
+            ->from($this->configuration['table_name'], 'm');
     }
 
     private function executeQuery(string $sql, array $parameters = [])

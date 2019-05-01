@@ -4,6 +4,13 @@ CHANGELOG
 4.3.0
 -----
 
+ * [BC BREAK] `SendersLocatorInterface` has an additional method:
+  `getSenderByAlias()`.
+ * A new `ListableReceiverInterface` was added, which a receiver
+   can implement (when applicable) to enable listing and fetching
+   individual messages by id (used in the new "Failed Messages" commands).
+ * Both `SenderInterface::send()` and `ReceiverInterface::get()`
+   should now (when applicable) add a `TransportMessageIdStamp`.
  * Added `WorkerStoppedEvent` dispatched when a worker is stopped.
  * Added optional `MessageCountAwareInterface` that receivers can implement
    to give information about how many messages are waiting to be processed.

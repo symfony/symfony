@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineSender;
@@ -29,13 +30,18 @@ class DoctrineSenderTest extends TestCase
         $connection = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers']);
+        $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'])->willReturn(15);
 
         $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
 
         $sender = new DoctrineSender($connection, $serializer);
-        $sender->send($envelope);
+        $actualEnvelope = $sender->send($envelope);
+
+        /** @var TransportMessageIdStamp $transportMessageIdStamp */
+        $transportMessageIdStamp = $actualEnvelope->last(TransportMessageIdStamp::class);
+        $this->assertNotNull($transportMessageIdStamp);
+        $this->assertSame('15', $transportMessageIdStamp->getId());
     }
 
     public function testSendWithDelay()

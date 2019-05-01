@@ -63,7 +63,7 @@ class RoutableMessageBusTest extends TestCase
     public function testItExceptionOnDefaultBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Bus name "%s" does not exists.', MessageBusInterface::class));
+        $this->expectExceptionMessage(sprintf('Bus named "%s" does not exist.', MessageBusInterface::class));
 
         $envelope = new Envelope(new \stdClass());
 
@@ -78,7 +78,7 @@ class RoutableMessageBusTest extends TestCase
     public function testItExceptionOnBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Bus name "%s" does not exists.', 'foo_bus'));
+        $this->expectExceptionMessage(sprintf('Bus named "%s" does not exist.', 'foo_bus'));
 
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('foo_bus')]);
 

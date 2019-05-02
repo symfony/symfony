@@ -79,7 +79,7 @@ class Connection
 
         $e = null;
         try {
-            $messages = $this->connection->xReadGroup(
+            $messages = $this->connection->xreadgroup(
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
@@ -119,7 +119,7 @@ class Connection
     {
         $e = null;
         try {
-            $acknowledged = $this->connection->xAck($this->stream, $this->group, [$id]);
+            $acknowledged = $this->connection->xack($this->stream, $this->group, [$id]);
         } catch (\RedisException $e) {
         }
 
@@ -132,7 +132,7 @@ class Connection
     {
         $e = null;
         try {
-            $deleted = $this->connection->xDel($this->stream, [$id]);
+            $deleted = $this->connection->xdel($this->stream, [$id]);
         } catch (\RedisException $e) {
         }
 
@@ -145,7 +145,7 @@ class Connection
     {
         $e = null;
         try {
-            $added = $this->connection->xAdd($this->stream, '*', ['message' => json_encode(
+            $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
                 ['body' => $body, 'headers' => $headers]
             )]);
         } catch (\RedisException $e) {
@@ -159,7 +159,7 @@ class Connection
     public function setup(): void
     {
         try {
-            $this->connection->xGroup('CREATE', $this->stream, $this->group, 0, true);
+            $this->connection->xgroup('CREATE', $this->stream, $this->group, 0, true);
         } catch (\RedisException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }

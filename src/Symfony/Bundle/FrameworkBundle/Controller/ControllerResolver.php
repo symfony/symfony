@@ -43,7 +43,14 @@ class ControllerResolver extends ContainerControllerResolver
             @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1. Use %s instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
         }
 
-        return parent::createController($controller);
+        if (\is_object($resolvedController) && method_exists($resolvedController, '__invoke')) {
+            $resolvedController = [
+                $this->configureController($resolvedController),
+                '__invoke',
+            ];
+        }
+
+        return $resolvedController;
     }
 
     /**

@@ -24,6 +24,24 @@ use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTes
 
 class ControllerResolverTest extends ContainerControllerResolverTest
 {
+    public function testGetControllerWithServiceWithoutMethod()
+    {
+        class_exists(AbstractControllerTest::class);
+
+        $dummyController = new DummyController();
+        $container = new Container();
+        $container->set('app.index_controller', $dummyController);
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'app.index_controller');
+
+        $controller = $resolver->getController($request);
+
+        $this->assertSame($container, $controller[0]->getContainer());
+        $this->assertSame('__invoke', $controller[1]);
+    }
+
     public function testGetControllerOnContainerAware()
     {
         $resolver = $this->createControllerResolver();
@@ -228,6 +246,10 @@ class DummyController extends AbstractController
     public function getContainer()
     {
         return $this->container;
+    }
+
+    public function __invoke()
+    {
     }
 
     public function fooAction()

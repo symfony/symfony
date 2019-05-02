@@ -232,7 +232,16 @@
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
-    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</button>
+    {%- if translation_domain is not same as(false) -%}
+        {%- set label = label|trans(label_translation_parameters, translation_domain) -%}
+    {%- endif -%}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>
+        {%- if label_raw|default(false) -%}
+            {{- label|raw -}}
+        {%- else -%}
+            {{- label -}}
+        {%- endif -%}
+    </button>
 {%- endblock button_widget -%}
 
 {%- block submit_widget -%}
@@ -275,11 +284,14 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
+        {%- if translation_domain is not same as(false) -%}
+            {%- set label = label|trans(label_translation_parameters, translation_domain) -%}
+        {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
-            {%- if translation_domain is same as(false) -%}
-                {{- label -}}
+            {%- if label_raw|default(false) -%}
+                {{- label|raw -}}
             {%- else -%}
-                {{- label|trans(label_translation_parameters, translation_domain) -}}
+                {{- label -}}
             {%- endif -%}
         </{{ element|default('label') }}>
     {%- endif -%}

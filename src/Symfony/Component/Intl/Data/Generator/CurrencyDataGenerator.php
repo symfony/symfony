@@ -25,37 +25,20 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class CurrencyDataGenerator extends AbstractDataGenerator
 {
-    const UNKNOWN_CURRENCY_ID = 'XXX';
-    const EUROPEAN_COMPOSITE_UNIT_ID = 'XBA';
-    const EUROPEAN_MONETARY_UNIT_ID = 'XBB';
-    const EUROPEAN_UNIT_OF_ACCOUNT_XBC_ID = 'XBC';
-    const EUROPEAN_UNIT_OF_ACCOUNT_XBD_ID = 'XBD';
-    const TESTING_CURRENCY_CODE_ID = 'XTS';
-    const ADB_UNIT_OF_ACCOUNT_ID = 'XUA';
-    const GOLD_ID = 'XAU';
-    const SILVER_ID = 'XAG';
-    const PLATINUM_ID = 'XPT';
-    const PALLADIUM_ID = 'XPD';
-    const SUCRE_ID = 'XSU';
-    const SPECIAL_DRAWING_RIGHTS_ID = 'XDR';
-
-    /**
-     * Monetary units excluded from generation.
-     */
     private static $blacklist = [
-        self::UNKNOWN_CURRENCY_ID => true,
-        self::EUROPEAN_COMPOSITE_UNIT_ID => true,
-        self::EUROPEAN_MONETARY_UNIT_ID => true,
-        self::EUROPEAN_UNIT_OF_ACCOUNT_XBC_ID => true,
-        self::EUROPEAN_UNIT_OF_ACCOUNT_XBD_ID => true,
-        self::TESTING_CURRENCY_CODE_ID => true,
-        self::ADB_UNIT_OF_ACCOUNT_ID => true,
-        self::GOLD_ID => true,
-        self::SILVER_ID => true,
-        self::PLATINUM_ID => true,
-        self::PALLADIUM_ID => true,
-        self::SUCRE_ID => true,
-        self::SPECIAL_DRAWING_RIGHTS_ID => true,
+        'XBA' => true, // European Composite Unit
+        'XBB' => true, // European Monetary Unit
+        'XBC' => true, // European Unit of Account (XBC)
+        'XBD' => true, // European Unit of Account (XBD)
+        'XUA' => true, // ADB Unit of Account
+        'XAU' => true, // Gold
+        'XAG' => true, // Silver
+        'XPT' => true, // Platinum
+        'XPD' => true, // Palladium
+        'XSU' => true, // Sucre
+        'XDR' => true, // Special Drawing Rights
+        'XTS' => true, // Testing Currency Code
+        'XXX' => true, // Unknown Currency
     ];
 
     /**

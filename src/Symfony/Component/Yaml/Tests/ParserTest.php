@@ -2167,11 +2167,11 @@ YAML;
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A quoted string that spans multiple cannot be parsed at position 44 (near "key:
+     * @expectedExceptionMessage A quoted string that spans multiple lines is not supported at position 44 (near "key:
     fields:
     title: 'bla. Users''
     Guide'
-    ")
+    ")'
      */
     public function testQuotedStringMutlipleLines()
     {
@@ -2182,8 +2182,7 @@ key:
             Guide'
 
 YAML;
-        $parsed = Yaml::parse($data);
-        var_dump($parsed);
+       Yaml::parse($data);
     }
 
     /**

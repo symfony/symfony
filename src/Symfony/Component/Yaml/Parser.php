@@ -172,10 +172,10 @@ class Parser
         if (null === $this->totalNumberOfLines) {
             $this->totalNumberOfLines = \count($this->lines);
         }
-
         // This a quoted string that spans multiple lines
-        if (false !== $pos = strpos($value, "'\n")) {
-            throw new ParseException(sprintf('A quoted string that spans multiple cannot be parsed at position %s', $pos), -1, $value);
+        $pos = strpos($value, "''\n");
+        if (false !== $pos && 1 === preg_match("/\s*[A-Za-z0-9]*/", substr($value, $pos))) {
+            throw new ParseException(sprintf('A quoted string that spans multiple lines is not supported at position %s', $pos), -1, $value);
         }
 
         if (!$this->moveToNextLine()) {

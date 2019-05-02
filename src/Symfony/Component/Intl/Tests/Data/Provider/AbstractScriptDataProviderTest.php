@@ -213,7 +213,6 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
         'Zsym',
         'Zxxx',
         'Zyyy',
-        'Zzzz',
     ];
 
     /**

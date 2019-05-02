@@ -24,6 +24,10 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class ScriptDataGenerator extends AbstractDataGenerator
 {
+    private static $blacklist = [
+        'Zzzz' => true, // Unknown Script
+    ];
+
     /**
      * Collects all available language codes.
      *
@@ -66,7 +70,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
         if (isset($localeBundle['Scripts']) && null !== $localeBundle['Scripts']) {
             $data = [
                 'Version' => $localeBundle['Version'],
-                'Names' => iterator_to_array($localeBundle['Scripts']),
+                'Names' => array_diff_key(iterator_to_array($localeBundle['Scripts']), self::$blacklist),
             ];
 
             $this->scriptCodes = array_merge($this->scriptCodes, array_keys($data['Names']));

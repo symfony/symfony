@@ -28,6 +28,7 @@ Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")
   label                         
   label_attr                    
   label_format                  
+  label_html                    
   label_translation_parameters  
   mapped                        
   method                        

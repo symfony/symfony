@@ -239,6 +239,7 @@ class QuestionHelper extends Helper
      */
     private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete)
     {
+        $fullChoice = '';
         $ret = '';
 
         $i = 0;
@@ -265,6 +266,7 @@ class QuestionHelper extends Helper
             } elseif ("\177" === $c) { // Backspace Character
                 if (0 === $numMatches && 0 !== $i) {
                     --$i;
+                    $fullChoice = substr($fullChoice, 0, -1);
                     // Move cursor backwards
                     $output->write("\033[1D");
                 }
@@ -301,8 +303,10 @@ class QuestionHelper extends Helper
                     if ($numMatches > 0 && -1 !== $ofs) {
                         $ret = $matches[$ofs];
                         // Echo out remaining chars for current match
-                        $output->write(substr($ret, $i));
-                        $i = \strlen($ret);
+                        $remainingCharacters = substr($ret, \strlen(trim($this->mostRecentlyEnteredValue($fullChoice))));
+                        $output->write($remainingCharacters);
+                        $fullChoice .= $remainingCharacters;
+                        $i = \strlen($fullChoice);
                     }
 
                     if ("\n" === $c) {
@@ -321,14 +325,21 @@ class QuestionHelper extends Helper
 
                 $output->write($c);
                 $ret .= $c;
+                $fullChoice .= $c;
                 ++$i;
+
+                $tempRet = $ret;
+
+                if ($question instanceof ChoiceQuestion && $question->isMultiselect()) {
+                    $tempRet = $this->mostRecentlyEnteredValue($fullChoice);
+                }
 
                 $numMatches = 0;
                 $ofs = 0;
 
                 foreach ($autocomplete as $value) {
                     // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (0 === strpos($value, $ret)) {
+                    if (0 === strpos($value, $tempRet)) {
                         $matches[$numMatches++] = $value;
                     }
                 }
@@ -340,8 +351,9 @@ class QuestionHelper extends Helper
             if ($numMatches > 0 && -1 !== $ofs) {
                 // Save cursor position
                 $output->write("\0337");
-                // Write highlighted text
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $i)).'</hl>');
+                // Write highlighted text, complete the partially entered response
+                $charactersEntered = \strlen(trim($this->mostRecentlyEnteredValue($fullChoice)));
+                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $charactersEntered)).'</hl>');
                 // Restore cursor position
                 $output->write("\0338");
             }
@@ -350,7 +362,24 @@ class QuestionHelper extends Helper
         // Reset stty so it behaves normally again
         shell_exec(sprintf('stty %s', $sttyMode));
 
-        return $ret;
+        return $fullChoice;
+    }
+
+    private function mostRecentlyEnteredValue($entered)
+    {
+        $tempEntered = $entered;
+
+        // Determine the most recent value that the user entered
+        if (false !== strpos($entered, ',')) {
+            $choices = explode(',', $entered);
+            $lastChoice = trim($choices[\count($choices) - 1]);
+
+            if (\strlen($lastChoice) > 0) {
+                $tempEntered = $lastChoice;
+            }
+        }
+
+        return $tempEntered;
     }
 
     /**

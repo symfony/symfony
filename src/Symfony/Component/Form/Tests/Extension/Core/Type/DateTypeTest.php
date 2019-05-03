@@ -1017,4 +1017,19 @@ class DateTypeTest extends BaseTypeTest
             'Compound choice fields' => ['choice', ['year' => '2018', 'month' => '11', 'day' => '11'], $expectedData],
         ];
     }
+
+    public function testSubmitDateBeforeBeginningOfGregorianCalendar()
+    {
+        if (PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Parsing three digits years requires a 64bit PHP.');
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'single_text',
+        ]);
+        $form->submit('950-12-19');
+
+        $this->assertSame('0950-12-19', $form->getData()->format('Y-m-d'));
+        $this->assertSame('0950-12-19', $form->getViewData());
+    }
 }

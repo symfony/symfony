@@ -82,7 +82,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
-        $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());
+        $timestamp = $this->getCalendarConvertingFormatter()->parse($dateTime->format('Y-m-d H:i:s'));
+        $value = $this->getIntlDateFormatter()->format($timestamp);
 
         if (0 != intl_get_error_code()) {
             throw new TransformationFailedException(intl_get_error_message());
@@ -134,7 +135,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         try {
             if ($dateOnly) {
                 // we only care about year-month-date, which has been delivered as a timestamp pointing to UTC midnight
-                $dateTime = new \DateTime(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
+                $dateTime = new \DateTime($this->getCalendarConvertingFormatter()->format($timestamp), new \DateTimeZone($this->outputTimezone));
             } else {
                 // read timestamp into DateTime object - the formatter delivers a timestamp
                 $dateTime = new \DateTime(sprintf('@%s', $timestamp));
@@ -195,5 +196,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         // check for the absence of time-related placeholders
         return 0 === preg_match('#[ahHkKmsSAzZOvVxX]#', $pattern);
+    }
+
+    private function getCalendarConvertingFormatter(): \IntlDateFormatter
+    {
+        $timezone = $this->isPatternDateOnly() ? 'UTC' : $this->inputTimezone;
+
+        return new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, new \DateTimeZone($timezone), \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd HH:mm:ss');
     }
 }

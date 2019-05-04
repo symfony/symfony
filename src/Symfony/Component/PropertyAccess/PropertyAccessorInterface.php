@@ -50,6 +50,21 @@ interface PropertyAccessorInterface
     public function setValue(&$objectOrArray, $propertyPath, $value);
 
     /**
+     * Returns the values at the end of the property path of the object graph of the objects given in the given $objects array.
+     *
+     * @param array                         $objects       The array of objects to traverse
+     * @param string|PropertyPathInterface  $propertyPath  The property path to read
+     *
+     * @return array The values at the end of the property path of each object in the given $objects array
+     *
+     * @throws Exception\InvalidArgumentException If the property path is invalid
+     * @throws Exception\AccessException          If a property/index does not exist or is not public
+     * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
+     *                                            nor array
+     */
+    public function getValues($objects, $propertyPath);
+
+    /**
      * Returns the value at the end of the property path of the object graph.
      *
      * Example:

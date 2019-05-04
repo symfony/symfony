@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassGetValues;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
@@ -761,5 +762,23 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'aircraft', ['aeroplane']);
 
         $this->assertEquals(['aeroplane'], $object->getAircraft());
+    }
+
+    public function testGetValuesOfArrayOfObjects()
+    {
+        $objects = [
+            $foo = new TestClassGetValues('foo', 1, new \DateTimeImmutable('today'), []),
+            $bar = new TestClassGetValues('bar', 2, new \DateTimeImmutable('yesterday'), []),
+        ];
+
+        $this->assertEquals([$foo->getStringValue(), $bar->getStringValue()], $this->propertyAccessor->getValues($objects, 'stringValue'));
+        $this->assertEquals([$foo->getIntValue(), $bar->getIntValue()], $this->propertyAccessor->getValues($objects, 'intValue'));
+        $this->assertEquals([$foo->getDateTimeValue(), $bar->getDateTimeValue()], $this->propertyAccessor->getValues($objects, 'dateTimeValue'));
+        $this->assertEquals([$foo->getArrayValue(), $bar->getArrayValue()], $this->propertyAccessor->getValues($objects, 'arrayValue'));
+
+        $objects = [
+            new TestClassGetValues('foo', 1, new \DateTimeImmutable('today'), ['foo' => 'bar']),
+        ];
+        $this->assertEquals(['bar'], $this->propertyAccessor->getValues($objects, 'arrayValue[foo]'));
     }
 }

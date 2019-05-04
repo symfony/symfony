@@ -79,6 +79,16 @@ class PropertyAccessor implements PropertyAccessorInterface
         $this->ignoreInvalidProperty = !$throwExceptionOnInvalidPropertyPath;
     }
 
+    public function getValues($objects, $propertyPath)
+    {
+        return array_map(
+            function ($object) use ($propertyPath) {
+                return $this->getValue($object, $propertyPath);
+            },
+            $objects
+        );
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -7,7 +7,7 @@
     <services>
         <service id="mailer" class="Symfony\Component\Mailer\Mailer">
             <argument type="service" id="mailer.transport" />
-            <argument type="service" id="message_bus" on-invalid="ignore" />
+            <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer" />
 

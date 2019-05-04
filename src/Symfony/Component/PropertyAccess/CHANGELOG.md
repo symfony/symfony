@@ -1,6 +1,52 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added `getValues($objects, $propertyPath)` to `PropertyAccessor` class
+   With:
+
+   ```php
+   class User
+   {
+       private $username;
+
+       public function __construct(string $username)
+       {
+           $this->username = $username;
+       }
+
+       public function getUsername(): string
+       {
+           return $this->username;
+       }
+   }
+
+   $users = [
+       new User('foo'),
+       new User('bar'),
+   ];
+   ```
+
+   you can now do this:
+
+   ```php
+   $propertyAccessor = PropertyAccess::createPropertyAccessor();
+   $usernames = $propertyAccessor->getValues($users, 'username');
+   ```
+
+   and will get:
+
+   ```
+   // print_r($usernames);
+   Array
+   (
+       [0] => foo
+       [1] => bar
+   )
+   ```
+
 4.3.0
 -----
 

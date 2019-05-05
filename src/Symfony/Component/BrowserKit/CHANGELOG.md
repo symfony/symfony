@@ -10,6 +10,7 @@ CHANGELOG
  * Marked `Response` final.
  * Deprecated `Response::buildHeader()`
  * Deprecated `Response::getStatus()`, use `Response::getStatusCode()` instead
+ * Allowed to always display container deprecations
 
 4.2.0
 -----

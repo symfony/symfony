@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * @internal
@@ -43,6 +44,11 @@ class Deprecation
      */
     private $self;
 
+    /**
+     * @var bool
+     */
+    private $isContainerDeprecation;
+
     /** @var string[] absolute paths to vendor directories */
     private static $vendors;
 
@@ -60,9 +66,14 @@ class Deprecation
         }
         $line = $trace[$i];
         $this->self = !$this->pathOriginatesFromVendor($file);
+        $this->isContainerDeprecation = false;
         if (isset($line['object']) || isset($line['class'])) {
-            if (isset($line['class']) && 0 === strpos($line['class'], SymfonyTestsListenerFor::class)) {
+            if (
+                isset($line['class'])
+                && ($this->isFromTestListeners($line) || ($fromKernelTestCase = $this->isFromKernelTestCase($line)))
+            ) {
                 $parsedMsg = unserialize($this->message);
+                $this->isContainerDeprecation = isset($fromKernelTestCase) && $fromKernelTestCase && $parsedMsg;
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];
@@ -70,14 +81,26 @@ class Deprecation
                 // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
                 // then we need to use the serialized information to determine
                 // if the error has been triggered from vendor code.
-                $this->self = isset($parsedMsg['triggering_file'])
-                    && $this->pathOriginatesFromVendor($parsedMsg['triggering_file']);
+                $this->self = !isset($parsedMsg['triggering_file'])
+                    || !$this->pathOriginatesFromVendor($parsedMsg['triggering_file']);
 
                 return;
             }
             $this->originClass = isset($line['object']) ? \get_class($line['object']) : $line['class'];
             $this->originMethod = $line['function'];
         }
+    }
+
+    private function isFromTestListeners(array $line): bool
+    {
+        return 0 === strpos($line['class'], SymfonyTestsListenerFor::class);
+    }
+
+    private function isFromKernelTestCase(array $line): bool
+    {
+        return 0 === strpos($line['class'], KernelTestCase::class)
+            && isset($line['function'])
+            && 'tearDownAfterClass' == $line['function'];
     }
 
     /**
@@ -133,6 +156,11 @@ class Deprecation
         return $this->originMethod;
     }
 
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
     /**
      * @param string $utilPrefix
      *
@@ -186,6 +214,11 @@ class Deprecation
         }
 
         return false;
+    }
+
+    public function isContainerDeprecation(): bool
+    {
+        return $this->isContainerDeprecation;
     }
 
     /**

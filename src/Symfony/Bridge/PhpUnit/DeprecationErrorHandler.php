@@ -133,6 +133,7 @@ class DeprecationErrorHandler
         if ($deprecation->originatesFromAnObject()) {
             $class = $deprecation->originatingClass();
             $method = $deprecation->originatingMethod();
+            $msg = $deprecation->getMessage();
 
             if (0 !== error_reporting()) {
                 $group = 'unsilenced';

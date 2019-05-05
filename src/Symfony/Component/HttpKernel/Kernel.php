@@ -483,6 +483,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
         $oldContainer = null;
+        $deprecationsFilename = $cacheDir.'/'.$class.'Deprecations.log';
         if ($fresh = $cache->isFresh()) {
             // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
             $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
@@ -501,13 +502,16 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if ($fresh) {
+            if ($this->debug) {
+                putenv("SYMFONY_COMPILER_DEPRECATIONS=$deprecationsFilename");
+            }
+
             return;
         }
 
         if ($this->debug) {
             $collectedLogs = [];
-            $previousHandler = \defined('PHPUNIT_COMPOSER_INSTALL');
-            $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+            $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                 if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
                     return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
                 }
@@ -518,27 +522,44 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     return;
                 }
 
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
-                // Clean the trace by removing first frames added by the error handler itself.
-                for ($i = 0; isset($backtrace[$i]); ++$i) {
-                    if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
-                        $backtrace = \array_slice($backtrace, 1 + $i);
-                        break;
+                if (\defined('PHPUNIT_COMPOSER_INSTALL')) {
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                    $i = \count($backtrace);
+                    while (1 < $i && (!isset($backtrace[--$i]['class']) || ('ReflectionMethod' === $backtrace[$i]['class'] || 0 === strpos($backtrace[$i]['class'], 'PHPUnit_') || 0 === strpos($backtrace[$i]['class'], 'PHPUnit\\')))) {
+                        // No-op
+                    }
+                    $backtrace = \array_slice($backtrace, $i);
+                } else {
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+                    // Clean the trace by removing first frames added by the error handler itself.
+                    for ($i = 0; isset($backtrace[$i]); ++$i) {
+                        if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
+                            $backtrace = \array_slice($backtrace, 1 + $i);
+                            break;
+                        }
+                    }
+
+                    // Remove frames added by DebugClassLoader.
+                    for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
+                        if (DebugClassLoader::class === ($backtrace[$i]['class'] ?? null)) {
+                            $backtrace = [$backtrace[$i + 1]];
+                            break;
+                        }
                     }
                 }
-                // Remove frames added by DebugClassLoader.
-                for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
-                    if (DebugClassLoader::class === ($backtrace[$i]['class'] ?? null)) {
-                        $backtrace = [$backtrace[$i + 1]];
-                        break;
-                    }
-                }
+
+                $class = $backtrace[0]['class'];
+                $function = $backtrace[0]['function'];
 
                 $collectedLogs[$message] = [
                     'type' => $type,
                     'message' => $message,
+                    'deprecation' => $message,
                     'file' => $file,
+                    'triggering_file' => $file,
                     'line' => $line,
+                    'class' => $class,
+                    'method' => $function,
                     'trace' => [$backtrace[0]],
                     'count' => 1,
                 ];
@@ -553,7 +574,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             if ($this->debug && true !== $previousHandler) {
                 restore_error_handler();
 
-                file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
+                file_put_contents($deprecationsFilename, serialize(array_values($collectedLogs)));
                 file_put_contents($cacheDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
             }
         }

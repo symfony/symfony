@@ -37,6 +37,8 @@ abstract class KernelTestCase extends TestCase
      */
     protected static $container;
 
+    private static $compilerDeprecationsTriggered = false;
+
     protected function doTearDown(): void
     {
         static::ensureKernelShutdown();
@@ -131,5 +133,19 @@ abstract class KernelTestCase extends TestCase
             }
         }
         static::$container = null;
+    }
+
+    public static function tearDownAfterClass()
+    {
+        if (!self::$compilerDeprecationsTriggered) {
+            $compilerDeprecated = getenv('SYMFONY_COMPILER_DEPRECATIONS');
+            if ($compilerDeprecated && file_exists($compilerDeprecated)) {
+                foreach (unserialize(file_get_contents($compilerDeprecated)) as $log) {
+                    @trigger_error(serialize($log), E_USER_DEPRECATED);
+                }
+                self::$compilerDeprecationsTriggered = true;
+            }
+        }
+        parent::tearDownAfterClass();
     }
 }

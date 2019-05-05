@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `ClassExistsMock`
  * bumped PHP version from 5.3.3 to 5.5.9 
+ * split simple-phpunit bin into php file with code and a shell script
 
 4.1.0
 -----

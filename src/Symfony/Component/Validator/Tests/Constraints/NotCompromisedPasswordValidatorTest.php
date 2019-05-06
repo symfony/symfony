@@ -62,9 +62,9 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidPasswordButDisabled()
     {
-        $r = new \ReflectionProperty($this->validator, 'disabled');
+        $r = new \ReflectionProperty($this->validator, 'enabled');
         $r->setAccessible(true);
-        $r->setValue($this->validator, true);
+        $r->setValue($this->validator, false);
 
         $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
 
@@ -128,6 +128,29 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testInvalidPasswordCustomEndpoint()
+    {
+        $endpoint = 'https://password-check.internal.example.com/range/%s';
+        // 50D74 - first 5 bytes of uppercase SHA1 hash of self::PASSWORD_LEAKED
+        $expectedEndpointUrl = 'https://password-check.internal.example.com/range/50D74';
+        $constraint = new NotCompromisedPassword();
+
+        $this->context = $this->createContext();
+
+        $validator = new NotCompromisedPasswordValidator(
+            $this->createHttpClientStubCustomEndpoint($expectedEndpointUrl),
+            'UTF-8',
+            true,
+            $endpoint
+        );
+        $validator->initialize($this->context);
+        $validator->validate(self::PASSWORD_LEAKED, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -173,6 +196,23 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                     };
                 }
 
+                $responseStub = $this->createMock(ResponseInterface::class);
+                $responseStub
+                    ->method('getContent')
+                    ->willReturn(implode("\r\n", self::RETURN));
+
+                return $responseStub;
+            })
+        );
+
+        return $httpClientStub;
+    }
+
+    private function createHttpClientStubCustomEndpoint($expectedEndpoint): HttpClientInterface
+    {
+        $httpClientStub = $this->createMock(HttpClientInterface::class);
+        $httpClientStub->method('request')->with('GET', $expectedEndpoint)->will(
+            $this->returnCallback(function (string $method, string $url): ResponseInterface {
                 $responseStub = $this->createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')

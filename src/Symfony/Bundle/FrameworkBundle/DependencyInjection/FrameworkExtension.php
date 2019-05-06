@@ -1262,7 +1262,8 @@ class FrameworkExtension extends Extension
 
         $container
             ->getDefinition('validator.not_compromised_password')
-            ->setArgument(2, $config['disable_not_compromised_password'])
+            ->setArgument(2, $config['not_compromised_password']['enabled'])
+            ->setArgument(3, $config['not_compromised_password']['endpoint'])
         ;
     }
 

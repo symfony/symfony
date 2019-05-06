@@ -1018,6 +1018,37 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
+    public function testTraversableMultiselectAutocomplete()
+    {
+        // <NEWLINE>
+        // F<TAB><NEWLINE>
+        // A<3x UP ARROW><TAB>,F<TAB><NEWLINE>
+        // F00<BACKSPACE><BACKSPACE>o<TAB>,A<DOWN ARROW>,<SPACE>SecurityBundle<NEWLINE>
+        // Acme<TAB>,<SPACE>As<TAB><29x BACKSPACE>S<TAB><NEWLINE>
+        // Ac<TAB>,As<TAB><3x BACKSPACE>d<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet([new FormatterHelper()]);
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion(
+            'Please select a bundle (defaults to AcmeDemoBundle and AsseticBundle)',
+            ['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle'],
+            '0,1'
+        );
+
+        // This tests that autocomplete works for all multiselect choices entered by the user
+        $question->setMultiselect(true);
+
+        $this->assertEquals(['AcmeDemoBundle', 'AsseticBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['FooBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['AsseticBundle', 'FooBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['FooBundle', 'AsseticBundle', 'SecurityBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['SecurityBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(['AcmeDemoBundle', 'AsseticBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

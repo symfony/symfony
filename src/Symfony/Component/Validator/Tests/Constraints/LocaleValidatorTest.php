@@ -111,7 +111,8 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ['pt', ['canonicalize' => true]],
             ['pt_PT', ['canonicalize' => true]],
             ['zh_Hans', ['canonicalize' => true]],
-            ['fil_PH', ['canonicalize' => true]],
+            ['tl_PH', ['canonicalize' => true]],
+            ['fil_PH', ['canonicalize' => true]], // alias for "tl_PH"
         ];
     }
 

@@ -54,19 +54,10 @@ class TimezoneValidator extends ConstraintValidator
             return;
         }
 
-        if ($constraint->countryCode) {
-            $phpTimezoneIds = @\DateTimeZone::listIdentifiers($constraint->zone, $constraint->countryCode) ?: [];
-            try {
-                $intlTimezoneIds = Timezones::forCountryCode($constraint->countryCode);
-            } catch (MissingResourceException $e) {
-                $intlTimezoneIds = [];
-            }
-        } else {
-            $phpTimezoneIds = \DateTimeZone::listIdentifiers($constraint->zone);
-            $intlTimezoneIds = self::getIntlTimezones($constraint->zone);
-        }
-
-        if (\in_array($value, $phpTimezoneIds, true) || \in_array($value, $intlTimezoneIds, true)) {
+        if (
+            \in_array($value, self::getPhpTimezones($constraint->zone, $constraint->countryCode), true) ||
+            \in_array($value, self::getIntlTimezones($constraint->zone, $constraint->countryCode), true)
+        ) {
             return;
         }
 
@@ -106,8 +97,29 @@ class TimezoneValidator extends ConstraintValidator
         return array_search($value, (new \ReflectionClass(\DateTimeZone::class))->getConstants(), true) ?: $value;
     }
 
-    private static function getIntlTimezones(int $zone): array
+    private static function getPhpTimezones(int $zone, string $countryCode = null): array
     {
+        if (null !== $countryCode) {
+            return @\DateTimeZone::listIdentifiers($zone, $countryCode) ?: [];
+        }
+
+        return \DateTimeZone::listIdentifiers($zone);
+    }
+
+    private static function getIntlTimezones(int $zone, string $countryCode = null): array
+    {
+        if (!class_exists(Timezones::class)) {
+            return [];
+        }
+
+        if (null !== $countryCode) {
+            try {
+                return Timezones::forCountryCode($countryCode);
+            } catch (MissingResourceException $e) {
+                return [];
+            }
+        }
+
         $timezones = Timezones::getIds();
 
         if (\DateTimeZone::ALL === (\DateTimeZone::ALL & $zone)) {

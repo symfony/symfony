@@ -92,9 +92,16 @@ class LocalesTest extends ResourceBundleTestCase
         Locales::getName('foo');
     }
 
+    public function testGetNameWithAliasLocale()
+    {
+        $this->assertSame(Locales::getName('tl_PH'), Locales::getName('fil_PH'));
+    }
+
     public function testExists()
     {
         $this->assertTrue(Locales::exists('nl_NL'));
+        $this->assertTrue(Locales::exists('tl_PH'));
+        $this->assertTrue(Locales::exists('fil_PH')); // alias for "tl_PH"
         $this->assertFalse(Locales::exists('zxx_ZZ'));
     }
 }

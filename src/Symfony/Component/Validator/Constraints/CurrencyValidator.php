@@ -49,7 +49,7 @@ class CurrencyValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!Currencies::exists($value))  {
+        if (!Currencies::exists($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Currency::NO_SUCH_CURRENCY_ERROR)

@@ -109,7 +109,7 @@ class BicValidator extends ConstraintValidator
             $validCountryCode = Countries::exists(substr($canonicalize, 4, 2));
         } else {
             $validCountryCode = ctype_alpha(substr($canonicalize, 4, 2));
-            // throw new LogicException('The "symfony/intl" component is required to use the Bic constraint.');
+            // throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');
         }
 
         if (!$validCountryCode) {

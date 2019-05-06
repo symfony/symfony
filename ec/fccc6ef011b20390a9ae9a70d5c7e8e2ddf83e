@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-10T14:32:43Z
+
+I'll create the Doc PR if the rest is ok.
+
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-10T15:20:04Z
+
+Thank you very much for your fast review and constructive feedback, @stof. I've integrated the changes you requested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-11T11:35:24Z
+
+What do you all think of `GenuinePasswordValidator` instead of `NotCompromisedPasswordValidator`?
+
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-11T15:05:05Z
+
+Would also be possible, however I think NotCompromisedPasswordValidator is better concerning the responsiblity of the validator. It uses a blacklist of hashes for known compromised passwords.
+
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-12T10:47:01Z
+
+An initial prototype of my HIBP-compatible password compromisation check server, based on a simple program to chunk the source data in buckets and some Apache 2.4 rewrite rules, is available here: https://github.com/xelan/sphynx
+
+Feedback is welcome :smile:
+
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-15T09:10:33Z
+
+The requested changes concerning constant naming and documentation are incorporated. I'm still not sure about the section configuration `canBeEnabled`/`canBeDisabled`. How would you prefer to have it, @nicolas-grekas and @ro0NL? The advantage of `canBeDisabled` is that the section is enabled by default and the `enabled` key is automatically added but without a description (aka `info()`), right?
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-15T09:14:27Z
+
+Well, I think in this case, having the info on the field is important to explain what will be the effect of disabling the validator (it won't prevent you to use the constraint, but will disable the validation)
+
+---------------------------------------------------------------------------
+
+by xelan at 2019-04-15T11:00:33Z
+
+Adapted, thanks for the feedback :smile:

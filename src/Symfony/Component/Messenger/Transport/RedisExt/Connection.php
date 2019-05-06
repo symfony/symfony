@@ -89,7 +89,7 @@ class Connection
         } catch (\RedisException $e) {
         }
 
-        if ($e || (false === $messages && !$this->couldHavePendingMessages)) {
+        if ($e || false === $messages) {
             throw new TransportException(
                 ($e ? $e->getMessage() : $this->connection->getLastError()) ?? 'Could not read messages from the redis stream.'
             );
@@ -132,7 +132,8 @@ class Connection
     {
         $e = null;
         try {
-            $deleted = $this->connection->xdel($this->stream, [$id]);
+            $deleted = $this->connection->xack($this->stream, $this->group, [$id]);
+            $deleted = $this->connection->xdel($this->stream, [$id]) && $deleted;
         } catch (\RedisException $e) {
         }
 

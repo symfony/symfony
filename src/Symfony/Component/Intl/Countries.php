@@ -19,20 +19,20 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class Regions extends ResourceBundle
+final class Countries extends ResourceBundle
 {
     /**
      * @return string[]
      */
-    public static function getRegionCodes(): array
+    public static function getCountryCodes(): array
     {
         return self::readEntry(['Regions'], 'meta');
     }
 
-    public static function exists(string $region): bool
+    public static function exists(string $country): bool
     {
         try {
-            self::readEntry(['Names', $region]);
+            self::readEntry(['Names', $country]);
 
             return true;
         } catch (MissingResourceException $e) {
@@ -41,11 +41,11 @@ final class Regions extends ResourceBundle
     }
 
     /**
-     * @throws MissingResourceException if the region code does not exists
+     * @throws MissingResourceException if the country code does not exists
      */
-    public static function getName(string $region, string $displayLocale = null): string
+    public static function getName(string $country, string $displayLocale = null): string
     {
-        return self::readEntry(['Names', $region], $displayLocale);
+        return self::readEntry(['Names', $country], $displayLocale);
     }
 
     /**

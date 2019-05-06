@@ -188,11 +188,11 @@ final class Intl
      *
      * @return RegionBundleInterface The region resource bundle
      *
-     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Regions} instead.
+     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Countries} instead.
      */
     public static function getRegionBundle()
     {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Regions::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Countries::class), E_USER_DEPRECATED);
 
         if (null === self::$regionBundle) {
             self::$regionBundle = new RegionBundle(

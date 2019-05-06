@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Regions;
 use Symfony\Component\Intl\Timezones;
 
 /**
@@ -468,7 +468,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'Etc/UTC',
     ];
 
-    public function testGetTimezones()
+    public function testGetIds()
     {
         $this->assertEquals(self::$zones, Timezones::getIds());
     }
@@ -652,6 +652,6 @@ class TimezonesTest extends ResourceBundleTestCase
     {
         return array_map(function ($country) {
             return [$country];
-        }, Regions::getRegionCodes());
+        }, Countries::getCountryCodes());
     }
 }

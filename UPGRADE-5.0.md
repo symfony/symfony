@@ -246,7 +246,7 @@ Intl
  * Removed `Intl::getLanguageBundle()`, use `Languages` or `Scripts` instead
  * Removed `Intl::getCurrencyBundle()`, use `Currencies` instead
  * Removed `Intl::getLocaleBundle()`, use `Locales` instead
- * Removed `Intl::getRegionBundle()`, use `Regions` instead
+ * Removed `Intl::getRegionBundle()`, use `Countries` instead
 
 Messenger
 ---------

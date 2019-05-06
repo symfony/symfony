@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by linaori at 2019-05-01T20:18:12Z
+
+Should this be done on 3.4 instead? Currently 3.4 shows 0 instead of X in the iterator. This PR can be seen as a bug fix imo
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-01T20:32:21Z
+
+We're too lax currently merging features as bug fixes, introducing regressions actually. Let's be a bit stricter, this is for master to me too.
+
+---------------------------------------------------------------------------
+
+by linaori at 2019-05-02T11:55:52Z
+
+@nicolas-grekas for the value display, I can agree. The fact that this iterator is showing 0 instead of the actual amount is the initial bug I reported. Perhaps the PR could be split up to put the count fix in 3.4 and the list of services in the master?
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-05-02T12:23:50Z
+
+@linaori The fact that this iterator is showing 0 in branch `3.4` is caused by the usage of a non compiled container in the ContainerDebugCommand (see: https://github.com/symfony/symfony/blob/3.4/src/Symfony/Bundle/FrameworkBundle/Command/ContainerDebugCommand.php#L184) as far as I can see it. Therefore the service definitions for the iterable arguments are not resolved and the `TaggedIteratorArgument::getValues()` is returning an empty array which leads to showing `0`.
+
+@nicolas-grekas Using a compiled container in the DebugContainerCommand was introduced in https://github.com/symfony/symfony/pull/27684 I think to fix this `0` issue, we need to do the same in the for `3.4`.

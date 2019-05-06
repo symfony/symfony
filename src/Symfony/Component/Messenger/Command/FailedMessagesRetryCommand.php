@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Failure\FailedMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
@@ -63,15 +64,24 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
             ->setDefinition([
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
+                new InputOption('resend', null, InputOption::VALUE_NONE, 'Resend messages to the original transport instead of retrying immediately'),
             ])
-            ->setDescription('Retries one or more messages from the failure transport.')
+            ->setDescription('Retries (or requeues) one or more messages from the failure transport.')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> retries message in the failure transport.
 
     <info>php %command.full_name%</info>
 
 The command will interactively ask if each message should be retried
-or discarded.
+or discarded. You can avoid the interactive by passing <info>--force</info>
+
+    <info>php %command.full_name% {id} --force</info>
+
+This will run into all failed messages are retried or until you
+quit the process. To re-send messages to their original transport
+(requeue) use the <info>--resend</info> flag:
+
+    <info>php %command.full_name% {id} --force --resend</info>
 
 Some transports support retrying a specific message id, which comes
 from the <info>messenger:failed:show</info> command.
@@ -101,25 +111,26 @@ EOF
         $receiver = $this->getReceiver();
         $this->printPendingMessagesMessage($receiver, $io);
 
-        $io->writeln(sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $this->getReceiverName()));
+        $io->writeln(sprintf('To redeliver each message back to its original transport, run <comment>messenger:consume %s</comment>', $this->getReceiverName()));
 
         $shouldForce = $input->getOption('force');
+        $shouldResend = $input->getOption('resend');
         $ids = $input->getArgument('id');
         if (0 === \count($ids)) {
             if (!$input->isInteractive()) {
                 throw new RuntimeException('Message id must be passed when in non-interactive mode.');
             }
 
-            $this->runInteractive($io, $shouldForce);
+            $this->runInteractive($io, $shouldForce, $shouldResend);
 
             return;
         }
 
-        $this->retrySpecificIds($ids, $io, $shouldForce);
+        $this->retrySpecificIds($ids, $io, $shouldForce, $shouldResend);
         $io->success('All done!');
     }
 
-    private function runInteractive(SymfonyStyle $io, bool $shouldForce)
+    private function runInteractive(SymfonyStyle $io, bool $shouldForce, bool $shouldResend)
     {
         $receiver = $this->getReceiver();
         $count = 0;
@@ -146,7 +157,7 @@ EOF
                     break;
                 }
 
-                $this->retrySpecificIds($ids, $io, $shouldForce);
+                $this->retrySpecificIds($ids, $io, $shouldForce, $shouldResend);
             }
         } else {
             // get() and ask messages one-by-one
@@ -159,21 +170,45 @@ EOF
         }
     }
 
-    private function runWorker(ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce): int
+    private function runWorker(ReceiverInterface $receiver, SymfonyStyle $io, bool $shouldForce, bool $shouldResend): int
     {
-        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $receiver, $shouldForce) {
+        $listener = function (WorkerMessageReceivedEvent $messageReceivedEvent) use ($io, $receiver, $shouldForce, $shouldResend) {
             $envelope = $messageReceivedEvent->getEnvelope();
+            $message = $envelope->getMessage();
+            if (!$message instanceof FailedMessage) {
+                $io->error('Message does not appear to be a failed message. Skipping.');
 
-            $this->displaySingleMessage($envelope, $io);
+                // don't handle it, but don't reject it either
+                $messageReceivedEvent->shouldHandle(false);
 
-            $shouldHandle = $shouldForce || $io->confirm('Do you want to retry (yes) or delete this message (no)?');
-
-            if ($shouldHandle) {
                 return;
             }
 
-            $messageReceivedEvent->shouldHandle(false);
-            $receiver->reject($envelope);
+            $this->displaySingleMessage($envelope, $io);
+
+            $defaultAction = $shouldResend ? 'resend' : 'retry';
+            if ($shouldForce) {
+                $action = $defaultAction;
+            } else {
+                $action = $io->choice(
+                    'Do you want to retry, resend or delete this message?',
+                    ['retry' => 'Retry now', 'resend' => 'Resend to original transport', 'delete' => 'Delete']
+                );
+            }
+
+            switch ($action) {
+                case 'retry':
+                    $message->setToRetryStrategy();
+                    break;
+                case 'resend':
+                    // do nothing: normal processing will resend
+                    $message->setToResendStrategy();
+                    break;
+                case 'delete':
+                    $messageReceivedEvent->shouldHandle(false);
+                    $receiver->reject($envelope);
+                    break;
+            }
         };
         $this->eventDispatcher->addListener(WorkerMessageReceivedEvent::class, $listener);
 
@@ -200,7 +235,7 @@ EOF
         return $count;
     }
 
-    private function retrySpecificIds(array $ids, SymfonyStyle $io, bool $shouldForce)
+    private function retrySpecificIds(array $ids, SymfonyStyle $io, bool $shouldForce, bool $shouldResend)
     {
         $receiver = $this->getReceiver();
 
@@ -215,7 +250,7 @@ EOF
             }
 
             $singleReceiver = new SingleMessageReceiver($receiver, $envelope);
-            $this->runWorker($singleReceiver, $io, $shouldForce);
+            $this->runWorker($singleReceiver, $io, $shouldForce, $shouldResend);
         }
     }
 }

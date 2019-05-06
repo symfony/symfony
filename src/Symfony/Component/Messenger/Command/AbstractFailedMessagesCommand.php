@@ -15,7 +15,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Failure\FailedMessage;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -59,27 +60,27 @@ abstract class AbstractFailedMessagesCommand extends Command
     {
         $io->title('Failed Message Details');
 
-        /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
-        $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
+        $message = $envelope->getMessage();
+        if (!$message instanceof FailedMessage) {
+            $io->warning('Message does not appear to have been sent to this transport after failing');
+
+            return;
+        }
 
         $rows = [
-            ['Class', \get_class($envelope->getMessage())],
+            ['Class', \get_class($message->getFailedEnvelope()->getMessage())],
         ];
 
         if (null !== $id = $this->getMessageId($envelope)) {
             $rows[] = ['Message Id', $id];
         }
 
-        if (null === $sentToFailureTransportStamp) {
-            $io->warning('Message does not appear to have been sent to this transport after failing');
-        } else {
-            $rows = array_merge($rows, [
-                ['Failed at', $sentToFailureTransportStamp->getSentAt()->format('Y-m-d H:i:s')],
-                ['Error', $sentToFailureTransportStamp->getExceptionMessage()],
-                ['Error Class', $sentToFailureTransportStamp->getFlattenException() ? $sentToFailureTransportStamp->getFlattenException()->getClass() : '(unknown)'],
-                ['Transport', $sentToFailureTransportStamp->getOriginalReceiverName()],
-            ]);
-        }
+        $rows = array_merge($rows, [
+            ['Failed at', $message->getFailedAt()->format('Y-m-d H:i:s')],
+            ['Error', $message->getExceptionMessage()],
+            ['Error Class', $message->getFlattenException() ? $message->getFlattenException()->getClass() : '(unknown)'],
+            ['Transport', $this->getOriginalTransportName($message->getFailedEnvelope())],
+        ]);
 
         $io->table([], $rows);
 
@@ -88,7 +89,7 @@ abstract class AbstractFailedMessagesCommand extends Command
             $dump = new Dumper($io);
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
-            $io->writeln($sentToFailureTransportStamp->getFlattenException()->getTraceAsString());
+            $io->writeln($message->getFlattenException()->getTraceAsString());
         } else {
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }
@@ -108,5 +109,13 @@ abstract class AbstractFailedMessagesCommand extends Command
     protected function getReceiver(): ReceiverInterface
     {
         return $this->receiver;
+    }
+
+    private function getOriginalTransportName(Envelope $envelope): ?string
+    {
+        /** @var ReceivedStamp $receivedStamp */
+        $receivedStamp = $envelope->last(ReceivedStamp::class);
+
+        return null === $receivedStamp ? null : $receivedStamp->getTransportName();
     }
 }

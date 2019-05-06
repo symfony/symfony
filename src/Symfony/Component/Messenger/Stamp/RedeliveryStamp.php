@@ -44,4 +44,16 @@ class RedeliveryStamp implements StampInterface
     {
         return $this->senderClassOrAlias;
     }
+
+    public function shouldRedeliverToSender(string $senderClass, ?string $senderAlias): bool
+    {
+        if (null !== $senderAlias && $senderAlias === $this->senderClassOrAlias) {
+            return true;
+        }
+        if ($senderClass === $this->senderClassOrAlias) {
+            return true;
+        }
+
+        return false;
+    }
 }

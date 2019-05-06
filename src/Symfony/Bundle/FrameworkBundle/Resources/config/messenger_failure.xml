@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\Failure\SendFailedMessageToFailureTransportListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument /> <!-- Failure transport name -->
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="messenger.failure.failed_message_handler" class="Symfony\Component\Messenger\Failure\FailedMessageHandler">
+            <tag name="messenger.message_handler" handles="Symfony\Component\Messenger\Failure\FailedMessage" method="__invoke" />
+            <tag name="monolog.logger" channel="messenger" />
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_retry" class="Symfony\Component\Messenger\Command\FailedMessagesRetryCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+            <argument type="service" id="messenger.routable_message_bus" />
+            <argument type="service" id="event_dispatcher" />
+            <argument /> <!-- Retry strategy -->
+            <argument type="service" id="logger" />
+
+            <tag name="console.command" command="messenger:failed:retry" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_show" class="Symfony\Component\Messenger\Command\FailedMessagesShowCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:show" />
+        </service>
+
+        <service id="console.command.messenger_failed_messages_remove" class="Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand">
+            <argument /> <!-- Receiver name -->
+            <argument /> <!-- Receiver locator -->
+
+            <tag name="console.command" command="messenger:failed:remove" />
+        </service>
+    </services>
+</container>

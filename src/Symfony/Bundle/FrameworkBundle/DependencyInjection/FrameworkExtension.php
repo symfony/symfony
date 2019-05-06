@@ -40,9 +40,9 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -74,6 +74,7 @@ use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Messenger\Failure\FailedMessage;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -286,9 +287,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_debug');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
-            $container->removeDefinition('console.command.messenger_failed_messages_retry');
-            $container->removeDefinition('console.command.messenger_failed_messages_show');
-            $container->removeDefinition('console.command.messenger_failed_messages_remove');
         }
 
         $propertyInfoEnabled = $this->isConfigEnabled($container, $config['property_info']);
@@ -1745,19 +1743,41 @@ class FrameworkExtension extends Extension
 
         $messageToSendersMapping = [];
         $messagesToSendAndHandle = [];
+        if ($config['failure_transport']) {
+            $failureTransport = $config['failure_transport'];
+
+            $loader->load('messenger_failure.xml');
+            $container->getDefinition('console.command.messenger_failed_messages_retry')
+                ->replaceArgument(0, $failureTransport)
+                ->replaceArgument(4, $transportRetryReferences[$failureTransport] ?? null);
+            $container->getDefinition('console.command.messenger_failed_messages_show')
+                ->replaceArgument(0, $failureTransport);
+            $container->getDefinition('console.command.messenger_failed_messages_remove')
+                ->replaceArgument(0, $failureTransport);
+
+            // push routing for FailedMessage to the failure transport
+            if (!isset($messageToSendersMapping[FailedMessage::class])) {
+                $messageToSendersMapping[FailedMessage::class] = [];
+            }
+            $messageToSendersMapping[FailedMessage::class][] = $failureTransport;
+
+            // in case this is a tagged sender, make sure it's in the aliases
+            if (!isset($senderAliases[$failureTransport])) {
+                $senderAliases[$failureTransport] = $failureTransport;
+            }
+        }
+
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
             }
+            $senders = [];
 
-            // make sure senderAliases contains all senders
             foreach ($messageConfiguration['senders'] as $sender) {
-                if (!isset($senderAliases[$sender])) {
-                    $senderAliases[$sender] = $sender;
-                }
+                $senders[$sender] = new Reference($senderAliases[$sender] ?? $sender);
             }
 
-            $messageToSendersMapping[$message] = $messageConfiguration['senders'];
+            $messageToSendersMapping[$message] = new IteratorArgument($senders);
             $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
@@ -1768,29 +1788,11 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
-            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
-            ->replaceArgument(2, $messagesToSendAndHandle)
+            ->replaceArgument(1, $messagesToSendAndHandle)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')
             ->replaceArgument(0, $transportRetryReferences);
-
-        if ($config['failure_transport']) {
-            $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')
-                ->replaceArgument(1, $config['failure_transport']);
-            $container->getDefinition('console.command.messenger_failed_messages_retry')
-                ->replaceArgument(0, $config['failure_transport'])
-                ->replaceArgument(4, $transportRetryReferences[$config['failure_transport']] ?? null);
-            $container->getDefinition('console.command.messenger_failed_messages_show')
-                ->replaceArgument(0, $config['failure_transport']);
-            $container->getDefinition('console.command.messenger_failed_messages_remove')
-                ->replaceArgument(0, $config['failure_transport']);
-        } else {
-            $container->removeDefinition('messenger.failure.send_failed_message_to_failure_transport_listener');
-            $container->removeDefinition('console.command.messenger_failed_messages_retry');
-            $container->removeDefinition('console.command.messenger_failed_messages_show');
-            $container->removeDefinition('console.command.messenger_failed_messages_remove');
-        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

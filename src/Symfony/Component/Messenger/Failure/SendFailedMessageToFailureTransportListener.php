@@ -8,19 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\EventListener;
+namespace Symfony\Component\Messenger\Failure;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\ReceivedStamp;
-use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
-use Symfony\Component\Messenger\Stamp\SentStamp;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
-use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 
 /**
  * Sends a rejected message to a "failure transport".
@@ -32,13 +29,11 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {
     private $messageBus;
-    private $failureSenderAlias;
     private $logger;
 
-    public function __construct(MessageBusInterface $messageBus, string $failureSenderAlias, LoggerInterface $logger = null)
+    public function __construct(MessageBusInterface $messageBus, LoggerInterface $logger = null)
     {
         $this->messageBus = $messageBus;
-        $this->failureSenderAlias = $failureSenderAlias;
         $this->logger = $logger;
     }
 
@@ -48,36 +43,27 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             return;
         }
 
-        $envelope = $event->getEnvelope();
-
-        // avoid re-sending to the failed sender
-        foreach ($envelope->all(SentStamp::class) as $sentStamp) {
-            /** @var SentStamp $sentStamp */
-            if ($sentStamp->getSenderAlias() === $this->failureSenderAlias) {
-                return;
-            }
-        }
-
-        // remove the received stamp so it's redelivered
         $throwable = $event->getThrowable();
         if ($throwable instanceof HandlerFailedException) {
             $throwable = $throwable->getNestedExceptions()[0];
         }
 
         $flattenedException = \class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
-        $envelope = $envelope->withoutAll(ReceivedStamp::class)
-            ->withoutAll(TransportMessageIdStamp::class)
-            ->with(new SentToFailureTransportStamp($throwable->getMessage(), $event->getReceiverName(), $flattenedException))
-            ->with(new RedeliveryStamp(0, $this->failureSenderAlias));
+        $failedMessage = new FailedMessage($event->getEnvelope(), $throwable->getMessage(), $flattenedException);
 
         if (null !== $this->logger) {
-            $this->logger->info('Rejected message {class} will be sent to the failure transport {transport}.', [
-                'class' => \get_class($envelope->getMessage()),
-                'transport' => $this->failureSenderAlias,
+            $this->logger->info('Rejected message {class} will be sent to the failure transport.', [
+                'class' => \get_class($event->getEnvelope()->getMessage()),
             ]);
         }
 
-        $this->messageBus->dispatch($envelope);
+        $failedMessageEnvelope = new Envelope($failedMessage);
+        // route this new message to the same bus as the original message
+        if (null !== $busName = $this->getBusName($event->getEnvelope())) {
+            $failedMessageEnvelope = $failedMessageEnvelope->with(new BusNameStamp($busName));
+        }
+
+        $this->messageBus->dispatch($failedMessageEnvelope);
     }
 
     public static function getSubscribedEvents()
@@ -85,5 +71,13 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         return [
             WorkerMessageFailedEvent::class => ['onMessageFailed', -100],
         ];
+    }
+
+    private function getBusName(Envelope $envelope): ?string
+    {
+        /** @var BusNameStamp $busNameStamp */
+        $busNameStamp = $envelope->last(BusNameStamp::class);
+
+        return null === $busNameStamp ? null : $busNameStamp->getBusName();
     }
 }

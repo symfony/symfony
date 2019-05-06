@@ -12,7 +12,6 @@
 namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\HandlerDescriptor;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
@@ -33,13 +32,10 @@ class RetryIntegrationTest extends TestCase
     {
         $senderAndReceiver = new DummySenderAndReceiver();
 
-        $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->method('has')->with('sender_alias')->willReturn(true);
-        $senderLocator->method('get')->with('sender_alias')->willReturn($senderAndReceiver);
-        $senderLocator = new SendersLocator([DummyMessage::class => ['sender_alias']], $senderLocator);
+        $senderLocator = new SendersLocator([DummyMessage::class => [$senderAndReceiver]]);
 
-        $handler = new DummyMessageHandlerFailingFirstTimes(0, 'A');
-        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1, 'B');
+        $handler = new DummyMessageHandlerFailingFirstTimes(0);
+        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
         $handlerLocator = new HandlersLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($handler, ['alias' => 'first']),

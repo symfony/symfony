@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Failure\FailedMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 /**
@@ -83,14 +83,16 @@ EOF
 
         $rows = [];
         foreach ($envelopes as $envelope) {
-            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
-            $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
+            $message = $envelope->getMessage();
+            if (!$message instanceof FailedMessage) {
+                $message = null;
+            }
 
             $rows[] = [
                 $this->getMessageId($envelope),
-                \get_class($envelope->getMessage()),
-                null === $sentToFailureTransportStamp ? '' : $sentToFailureTransportStamp->getSentAt()->format('Y-m-d H:i:s'),
-                null === $sentToFailureTransportStamp ? '' : $sentToFailureTransportStamp->getExceptionMessage(),
+                null === $message ? '(does not appear to be a failed message)' : \get_class($message->getFailedEnvelope()->getMessage()),
+                null === $message ? '' : $message->getFailedAt()->format('Y-m-d H:i:s'),
+                null === $message ? '' : $message->getExceptionMessage(),
             ];
         }
 

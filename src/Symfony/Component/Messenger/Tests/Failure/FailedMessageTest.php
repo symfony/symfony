@@ -9,25 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Tests\Stamp;
+namespace Symfony\Component\Messenger\Tests\Failure;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Failure\FailedMessage;
 
-class SentToFailureTransportStampTest extends TestCase
+class FailedMessageTest extends TestCase
 {
     public function testGetters()
     {
+        $envelope = new Envelope(new \stdClass());
         $flattenException = new FlattenException();
-        $stamp = new SentToFailureTransportStamp(
+        $stamp = new FailedMessage(
+            $envelope,
             'exception message',
-            'original_receiver',
             $flattenException
         );
+        $this->assertSame($envelope, $stamp->getFailedEnvelope());
         $this->assertSame('exception message', $stamp->getExceptionMessage());
-        $this->assertSame('original_receiver', $stamp->getOriginalReceiverName());
         $this->assertSame($flattenException, $stamp->getFlattenException());
-        $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getSentAt());
+        $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getFailedAt());
     }
 }

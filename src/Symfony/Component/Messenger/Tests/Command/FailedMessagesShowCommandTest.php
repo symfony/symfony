@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Failure\FailedMessage;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
@@ -26,10 +26,10 @@ class FailedMessagesShowCommandTest extends TestCase
 {
     public function testBasicRun()
     {
-        $sentToFailureStamp = new SentToFailureTransportStamp('Things are bad!', 'async');
-        $envelope = new Envelope(new \stdClass(), [
+        $originalEnvelope = new Envelope(new \stdClass());
+        $failedMessage = new FailedMessage($originalEnvelope, 'Things are bad!');
+        $envelope = new Envelope($failedMessage, [
             new TransportMessageIdStamp(15),
-            $sentToFailureStamp,
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);
@@ -51,7 +51,7 @@ class FailedMessagesShowCommandTest extends TestCase
   Error Class   (unknown)
 EOF
             ,
-            $sentToFailureStamp->getSentAt()->format('Y-m-d H:i:s')),
+            $failedMessage->getFailedAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
 }

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-05-02T17:59:37Z
+
+The region codes `XA` and `XB` in our region bundle don't look like countries. We should check them for mistakes.
+
+But otherwise, I agree about this renaming, as this class deals with a subset of ICU regions, not with all regions, and so is a different concept.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-02T18:23:33Z
+
+You're right, i suggest to consistently ignore all "non" valid codes, as done in #28833 for languages
+
+- Countries: http://unicode.org/reports/tr35/#unicode_region_subtag_validity
+  - exclude `XA, XB`
+  - ICU already excludes deprecated codes: https://github.com/unicode-org/icu/blob/release-64-2/icu4c/source/data/region/en.txt#L302
+- Scripts: http://unicode.org/reports/tr35/#unicode_script_subtag_validity
+  - exclude `Zzzz`
+
+See also http://unicode.org/reports/tr35/#Unknown_or_Invalid_Identifiers (we almost conform)
+
+Do we agree excluding data is a new feature still?

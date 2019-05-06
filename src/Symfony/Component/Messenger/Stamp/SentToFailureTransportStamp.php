@@ -32,7 +32,7 @@ class SentToFailureTransportStamp implements StampInterface
         $this->exceptionMessage = $exceptionMessage;
         $this->originalReceiverName = $originalReceiverName;
         $this->flattenException = $flattenException;
-        $this->sentAt = new \DateTime();
+        $this->sentAt = new \DateTimeImmutable();
     }
 
     public function getExceptionMessage(): string
@@ -50,7 +50,7 @@ class SentToFailureTransportStamp implements StampInterface
         return $this->flattenException;
     }
 
-    public function getSentAt(): \DateTime
+    public function getSentAt(): \DateTimeInterface
     {
         return $this->sentAt;
     }

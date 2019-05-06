@@ -46,7 +46,7 @@ class RedisTransportTest extends TestCase
         $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('get')->willReturn($redisEnvelope);
 
-        $envelopes = iterator_to_array($transport->get());
+        $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 

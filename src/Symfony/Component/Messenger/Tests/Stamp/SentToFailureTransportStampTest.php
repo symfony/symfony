@@ -28,6 +28,6 @@ class SentToFailureTransportStampTest extends TestCase
         $this->assertSame('exception message', $stamp->getExceptionMessage());
         $this->assertSame('original_receiver', $stamp->getOriginalReceiverName());
         $this->assertSame($flattenException, $stamp->getFlattenException());
-        $this->assertInstanceOf(\DateTime::class, $stamp->getSentAt());
+        $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getSentAt());
     }
 }

@@ -59,7 +59,7 @@ class StopWhenRestartSignalIsReceived implements WorkerInterface
         $this->decoratedWorker->stop();
     }
 
-    private function shouldRestart(float $workerStartedAt)
+    private function shouldRestart(float $workerStartedAt): bool
     {
         $cacheItem = $this->cachePool->getItem(self::RESTART_REQUESTED_TIMESTAMP_KEY);
 

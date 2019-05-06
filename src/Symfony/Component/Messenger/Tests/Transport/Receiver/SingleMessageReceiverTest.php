@@ -13,12 +13,8 @@ namespace Symfony\Component\Messenger\Tests\Transport\Sender;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
-use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
-use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SingleMessageReceiverTest extends TestCase
 {
@@ -28,11 +24,11 @@ class SingleMessageReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass());
 
         $receiver = new SingleMessageReceiver($innerReceiver, $envelope);
-        $received = \iterator_to_array($receiver->get());
+        $received = $receiver->get();
         $this->assertCount(1, $received);
         $this->assertSame($received[0], $envelope);
 
-        $this->assertEmpty(\iterator_to_array($receiver->get()));
+        $this->assertEmpty($receiver->get());
     }
 
     public function testCallsAreForwarded()

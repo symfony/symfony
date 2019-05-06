@@ -36,7 +36,7 @@ class DoctrineReceiverTest extends TestCase
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
-        $actualEnvelopes = iterator_to_array($receiver->get());
+        $actualEnvelopes = $receiver->get();
         $this->assertCount(1, $actualEnvelopes);
         /** @var Envelope $actualEnvelope */
         $actualEnvelope = $actualEnvelopes[0];
@@ -67,7 +67,7 @@ class DoctrineReceiverTest extends TestCase
         $connection->expects($this->once())->method('reject');
 
         $receiver = new DoctrineReceiver($connection, $serializer);
-        iterator_to_array($receiver->get());
+        $receiver->get();
     }
 
     public function testAll()

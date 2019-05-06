@@ -57,7 +57,7 @@ class RedisReceiver implements ReceiverInterface
             throw $exception;
         }
 
-        yield $envelope->with(new RedisReceivedStamp($redisEnvelope['id']));
+        return [$envelope->with(new RedisReceivedStamp($redisEnvelope['id']))];
     }
 
     /**

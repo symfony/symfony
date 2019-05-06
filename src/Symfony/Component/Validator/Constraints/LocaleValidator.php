@@ -43,7 +43,7 @@ class LocaleValidator extends ConstraintValidator
         }
 
         if (!class_exists(Locales::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Locale constraint.');
+            throw new LogicException('The Intl component is required to use the Locale constraint. Try running "composer require symfony/intl".');
         }
 
         $inputValue = (string) $value;

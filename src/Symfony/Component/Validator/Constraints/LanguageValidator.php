@@ -43,7 +43,7 @@ class LanguageValidator extends ConstraintValidator
         }
 
         if (!class_exists(Languages::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Language constraint.');
+            throw new LogicException('The Intl component is required to use the Language constraint. Try running "composer require symfony/intl".');
         }
 
         $value = (string) $value;

@@ -44,7 +44,7 @@ class CurrencyValidator extends ConstraintValidator
         }
 
         if (!class_exists(Currencies::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Currency constraint.');
+            throw new LogicException('The Intl component is required to use the Currency constraint. Try running "composer require symfony/intl".');
         }
 
         $value = (string) $value;

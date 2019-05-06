@@ -43,7 +43,7 @@ class CountryValidator extends ConstraintValidator
         }
 
         if (!class_exists(Countries::class)) {
-            throw new LogicException('The "symfony/intl" component is required to use the Country constraint.');
+            throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');
         }
 
         $value = (string) $value;

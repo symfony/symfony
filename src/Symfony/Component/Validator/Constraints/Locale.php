@@ -39,7 +39,7 @@ class Locale extends Constraint
         }
 
         if (!class_exists(Locales::class)) {
-            // throw new LogicException(sprintf('The "symfony/intl" component is required to use the "%s" constraint.', __CLASS__));
+            // throw new LogicException('The Intl component is required to use the Locale constraint. Try running "composer require symfony/intl".');
             @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
         }
 

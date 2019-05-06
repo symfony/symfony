@@ -70,8 +70,8 @@ class Deprecation
                 // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
                 // then we need to use the serialized information to determine
                 // if the error has been triggered from vendor code.
-                $this->self = isset($parsedMsg['triggering_file'])
-                    && $this->pathOriginatesFromVendor($parsedMsg['triggering_file']);
+                $this->self = !isset($parsedMsg['triggering_file'])
+                    || !$this->pathOriginatesFromVendor($parsedMsg['triggering_file']);
 
                 return;
             }

@@ -112,4 +112,22 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $connection->get();
     }
+
+    public function testGetAfterReject()
+    {
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
+        try {
+            $connection->setup();
+        } catch (TransportException $e) {
+        }
+
+        $connection->add('1', []);
+        $connection->add('2', []);
+
+        $failing = $connection->get();
+        $connection->reject($failing['id']);
+
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
+        $this->assertNotNull($connection->get());
+    }
 }

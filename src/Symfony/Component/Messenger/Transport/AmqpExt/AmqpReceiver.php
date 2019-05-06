@@ -57,7 +57,7 @@ class AmqpReceiver implements ReceiverInterface, MessageCountAwareInterface
         }
 
         if (null === $amqpEnvelope) {
-            return [];
+            return;
         }
 
         try {

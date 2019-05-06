@@ -76,12 +76,12 @@ class RedisTransport implements TransportInterface, SetupableTransportInterface
         $this->connection->setup();
     }
 
-    private function getReceiver()
+    private function getReceiver(): RedisReceiver
     {
         return $this->receiver = new RedisReceiver($this->connection, $this->serializer);
     }
 
-    private function getSender()
+    private function getSender(): RedisSender
     {
         return $this->sender = new RedisSender($this->connection, $this->serializer);
     }

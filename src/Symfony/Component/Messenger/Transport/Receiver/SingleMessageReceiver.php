@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Messenger\Transport\Receiver;
 
 use Symfony\Component\Messenger\Envelope;
@@ -32,7 +41,7 @@ class SingleMessageReceiver implements ReceiverInterface
 
         $this->hasReceived = true;
 
-        yield $this->envelope;
+        return [$this->envelope];
     }
 
     public function ack(Envelope $envelope): void

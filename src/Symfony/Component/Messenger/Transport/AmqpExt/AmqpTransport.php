@@ -84,12 +84,12 @@ class AmqpTransport implements TransportInterface, SetupableTransportInterface, 
         return ($this->receiver ?? $this->getReceiver())->getMessageCount();
     }
 
-    private function getReceiver()
+    private function getReceiver(): AmqpReceiver
     {
         return $this->receiver = new AmqpReceiver($this->connection, $this->serializer);
     }
 
-    private function getSender()
+    private function getSender(): AmqpSender
     {
         return $this->sender = new AmqpSender($this->connection, $this->serializer);
     }

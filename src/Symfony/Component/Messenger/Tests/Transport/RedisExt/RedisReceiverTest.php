@@ -33,7 +33,7 @@ class RedisReceiverTest extends TestCase
         $connection->method('get')->willReturn($redisEnvelop);
 
         $receiver = new RedisReceiver($connection, $serializer);
-        $actualEnvelopes = iterator_to_array($receiver->get());
+        $actualEnvelopes = $receiver->get();
         $this->assertCount(1, $actualEnvelopes);
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
@@ -51,7 +51,7 @@ class RedisReceiverTest extends TestCase
         $connection->expects($this->once())->method('reject');
 
         $receiver = new RedisReceiver($connection, $serializer);
-        iterator_to_array($receiver->get());
+        $receiver->get();
     }
 
     private function createRedisEnvelope()

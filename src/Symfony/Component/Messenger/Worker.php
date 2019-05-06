@@ -136,16 +136,11 @@ class Worker implements WorkerInterface
                 $envelope = $throwable->getEnvelope();
             }
 
-            $shouldRetry = $this->shouldRetry($throwable, $envelope, $retryStrategy);
+            $shouldRetry = $retryStrategy && $this->shouldRetry($throwable, $envelope, $retryStrategy);
 
             $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable, $shouldRetry));
 
             if ($shouldRetry) {
-                if (null === $retryStrategy) {
-                    // not logically allowed, but check just in case
-                    throw new LogicException('Retrying is not supported without a retry strategy.');
-                }
-
                 $retryCount = $this->getRetryCount($envelope) + 1;
                 if (null !== $this->logger) {
                     $this->logger->error('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
@@ -194,13 +189,9 @@ class Worker implements WorkerInterface
         $this->eventDispatcher->dispatch($event);
     }
 
-    private function shouldRetry(\Throwable $e, Envelope $envelope, ?RetryStrategyInterface $retryStrategy): bool
+    private function shouldRetry(\Throwable $e, Envelope $envelope, RetryStrategyInterface $retryStrategy): bool
     {
         if ($e instanceof UnrecoverableMessageHandlingException) {
-            return false;
-        }
-
-        if (null === $retryStrategy) {
             return false;
         }
 

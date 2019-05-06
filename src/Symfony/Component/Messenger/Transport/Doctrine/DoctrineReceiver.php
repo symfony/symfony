@@ -54,7 +54,7 @@ class DoctrineReceiver implements ReceiverInterface, MessageCountAwareInterface,
             return [];
         }
 
-        yield $this->createEnvelopeFromData($doctrineEnvelope);
+        return [$this->createEnvelopeFromData($doctrineEnvelope)];
     }
 
     /**

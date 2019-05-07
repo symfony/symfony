@@ -36,6 +36,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     private $regionDataProvider;
     private $locales;
     private $localeAliases;
+    private $localeParents;
     private $fallbackMapping;
     private $fallbackCache = [];
 
@@ -55,6 +56,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     {
         $this->locales = $scanner->scanLocales($sourceDir.'/locales');
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
+        $this->localeParents = $scanner->scanParents($sourceDir.'/locales');
         $this->fallbackMapping = $this->generateFallbackMapping(array_diff($this->locales, array_keys($this->localeAliases)), $this->localeAliases);
 
         return $this->locales;
@@ -76,6 +78,12 @@ class LocaleDataGenerator extends AbstractDataGenerator
     protected function preGenerate()
     {
         $this->fallbackCache = [];
+
+        // Write parents locale file for the Translation component
+        \file_put_contents(
+            __DIR__.'/../../../Translation/Resources/data/parents.json',
+            \json_encode($this->localeParents, \JSON_PRETTY_PRINT).\PHP_EOL
+        );
     }
 
     /**
@@ -133,12 +141,6 @@ class LocaleDataGenerator extends AbstractDataGenerator
         if ($localeNames) {
             return ['Names' => $localeNames];
         }
-
-        // Write parents locale file for the Translation component
-        \file_put_contents(
-            __DIR__.'/../../../Translation/Resources/data/parents.json',
-            \json_encode($parents, \JSON_PRETTY_PRINT).\PHP_EOL
-        );
     }
 
     /**

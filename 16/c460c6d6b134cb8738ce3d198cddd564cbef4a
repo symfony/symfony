@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-04T07:27:01Z
+
+@jakzal Are you ok to merge this one?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-06T12:22:56Z
+
+the sole purpose of the PR is to reduce merge conflicts, if it doesnt matter much we can close (but in master / #31365 we take a different apprach, as im really skeptical about maintaining the lists of consts :D)

@@ -1746,8 +1746,8 @@ class FrameworkExtension extends Extension
         $messageToSendersMapping = [];
         $messagesToSendAndHandle = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {
-            if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
-                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
+            if ('*' !== substr($message, -1) && !class_exists($message) && !interface_exists($message, false)) {
+                throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface or pattern "%s" not found.', $message));
             }
 
             // make sure senderAliases contains all senders

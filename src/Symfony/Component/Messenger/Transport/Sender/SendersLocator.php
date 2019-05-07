@@ -62,7 +62,7 @@ class SendersLocator implements SendersLocatorInterface
         $sender = null;
         $seen = [];
 
-        foreach (HandlersLocator::listTypes($envelope) as $type) {
+        foreach (self::listTypes($envelope) as $type) {
             // the old way of looking up senders
             if ($this->useLegacyLookup) {
                 foreach ($this->sendersMap[$type] ?? [] as $alias => $sender) {
@@ -92,6 +92,31 @@ class SendersLocator implements SendersLocatorInterface
         }
 
         $handle = $handle || null === $sender;
+    }
+
+    /**
+     * @internal
+     */
+    private static function listTypes(Envelope $envelope): array
+    {
+        $class = \get_class($envelope->getMessage());
+
+        $classes = [$class => $class]
+            + class_parents($class)
+            + class_implements($class);
+
+        $tmp = $class;
+        $pattern = '~\\\\[\w]+$~';
+        do {
+            $match = preg_match($pattern, $tmp);
+            if ($match) {
+                $classes[] = preg_replace($pattern, '\*', $tmp);
+                $tmp = preg_replace($pattern, '', $tmp);
+            }
+        } while($match);
+
+        return $classes
+            + ['*' => '*'];
     }
 
     public function getSenderByAlias(string $alias): SenderInterface

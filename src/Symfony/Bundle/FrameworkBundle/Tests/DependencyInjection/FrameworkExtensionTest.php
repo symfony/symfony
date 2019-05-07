@@ -733,6 +733,28 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(new Reference('audit'), $sendersLocator->getArgument(0)['audit']->getValues()[0]);
     }
 
+    public function testMessengerRoutingWithMask()
+    {
+        $container = $this->createContainerFromFile('messenger_routing_with_mask');
+        $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
+
+        $messageToSendAndHandleMapping = [
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => true,
+            '*' => false,
+        ];
+
+        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(2));
+        $sendersMapping = $senderLocatorDefinition->getArgument(0);
+        $this->assertEquals([
+            'amqp',
+            'audit',
+        ], $sendersMapping['Symfony\Component\Messenger\Tests\Fixtures\*']);
+        $sendersLocator = $container->getDefinition((string) $senderLocatorDefinition->getArgument(1));
+        $this->assertSame(['amqp', 'audit'], array_keys($sendersLocator->getArgument(0)));
+        $this->assertEquals(new Reference('messenger.transport.amqp'), $sendersLocator->getArgument(0)['amqp']->getValues()[0]);
+        $this->assertEquals(new Reference('audit'), $sendersLocator->getArgument(0)['audit']->getValues()[0]);
+    }
+
     public function testMessengerTransportConfiguration()
     {
         $container = $this->createContainerFromFile('messenger_transport');

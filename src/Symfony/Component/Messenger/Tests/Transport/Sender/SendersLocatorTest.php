@@ -106,4 +106,15 @@ class SendersLocatorTest extends TestCase
 
         return $container;
     }
+
+    public function testItReturnsTheSenderBasedOnTheMessageClassWithMask()
+    {
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $locator = new SendersLocator([
+            str_replace('DummyMessage', '*', DummyMessage::class) => [$sender],
+        ]);
+
+        $this->assertSame([$sender], iterator_to_array($locator->getSenders(new Envelope(new DummyMessage('a')))));
+        $this->assertSame([$sender], iterator_to_array($locator->getSenders(new Envelope(new SecondMessage()))));
+    }
 }

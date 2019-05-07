@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-06T10:45:40Z
+
+See https://github.com/symfony/symfony/pull/31350#issuecomment-489572060
+
+it seems there are a few more codes that should be excluded before we comply with ISO-3166
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-07T06:09:38Z
+
+@ro0NL Can you rebase this one please?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-07T06:52:22Z
+
+@fabpot  done.

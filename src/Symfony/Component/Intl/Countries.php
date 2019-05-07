@@ -22,7 +22,16 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
 final class Countries extends ResourceBundle
 {
     /**
-     * @return string[]
+     * Returns all available countries.
+     *
+     * Countries are returned as uppercase ISO 3166 two-letter country codes.
+     *
+     * A full table of ISO 3166 country codes can be found here:
+     * https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+     *
+     * This list only contains "officially assigned ISO 3166-1 alpha-2" country codes.
+     *
+     * @return string[] an array of canonical ISO 3166 country codes
      */
     public static function getCountryCodes(): array
     {

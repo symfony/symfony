@@ -210,7 +210,6 @@ class ScriptsTest extends ResourceBundleTestCase
         'Zsym',
         'Zxxx',
         'Zyyy',
-        'Zzzz',
     ];
 
     public function testGetScriptCodes()
@@ -285,7 +284,6 @@ class ScriptsTest extends ResourceBundleTestCase
     public function testExists()
     {
         $this->assertTrue(Scripts::exists('Hans'));
-        $this->assertTrue(Scripts::exists('Zzzz'));
-        $this->assertFalse(Scripts::exists('foobar'));
+        $this->assertFalse(Scripts::exists('Zzzz'));
     }
 }

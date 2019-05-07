@@ -28,15 +28,21 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 class RegionDataGenerator extends AbstractDataGenerator
 {
     private static $blacklist = [
-        // Look like countries, but are sub-continents
-        'QO' => true, // Outlying Oceania
+        // Exceptional reservations
+        'AC' => true, // Ascension Island
+        'CP' => true, // Clipperton Island
+        'DG' => true, // Diego Garcia
+        'EA' => true, // Ceuta & Melilla
         'EU' => true, // European Union
         'EZ' => true, // Eurozone
+        'IC' => true, // Canary Islands
+        'TA' => true, // Tristan da Cunha
         'UN' => true, // United Nations
-        // Uninhabited islands
-        'BV' => true, // Bouvet Island
-        'HM' => true, // Heard & McDonald Islands
-        'CP' => true, // Clipperton Island
+        // User-assigned
+        'QO' => true, // Outlying Oceania
+        'XA' => true, // Pseudo-Accents
+        'XB' => true, // Pseudo-Bidi
+        'XK' => true, // Kosovo
         // Misc
         'ZZ' => true, // Unknown Region
     ];

@@ -171,18 +171,10 @@ echo "Preparing resource bundle compilation (version $icuVersionInDownload)...\n
 
 $compiler = new GenrbCompiler($genrb, $genrbEnv);
 $config = new GeneratorConfig($sourceDir.'/data', $icuVersionInDownload);
+$jsonDir = dirname(__DIR__).'/data';
+$targetDirs = [$jsonDir];
+$workingDirs = [$jsonDir];
 
-$baseDir = dirname(__DIR__).'/data';
-
-//$txtDir = $baseDir.'/txt';
-$jsonDir = $baseDir;
-//$phpDir = $baseDir.'/'.Intl::PHP;
-//$resDir = $baseDir.'/'.Intl::RB_V2;
-
-$targetDirs = [$jsonDir/*, $resDir*/];
-$workingDirs = [$jsonDir/*, $txtDir, $resDir*/];
-
-//$config->addBundleWriter($txtDir, new TextBundleWriter());
 $config->addBundleWriter($jsonDir, new JsonBundleWriter());
 
 echo "Starting resource bundle compilation. This may take a while...\n";
@@ -208,55 +200,32 @@ echo "Generating language data...\n";
 $generator = new LanguageDataGenerator($compiler, Intl::LANGUAGE_DIR);
 $generator->generateData($config);
 
-//echo "Compiling...\n";
-//
-//$compiler->compile($txtDir.'/'.Intl::LANGUAGE_DIR, $resDir.'/'.Intl::LANGUAGE_DIR);
-
 echo "Generating script data...\n";
 
 $generator = new ScriptDataGenerator($compiler, Intl::SCRIPT_DIR);
 $generator->generateData($config);
-
-//echo "Compiling...\n";
-//
-//$compiler->compile($txtDir.'/'.Intl::SCRIPT_DIR, $resDir.'/'.Intl::SCRIPT_DIR);
 
 echo "Generating region data...\n";
 
 $generator = new RegionDataGenerator($compiler, Intl::REGION_DIR);
 $generator->generateData($config);
 
-//echo "Compiling...\n";
-//
-//$compiler->compile($txtDir.'/'.Intl::REGION_DIR, $resDir.'/'.Intl::REGION_DIR);
-
 echo "Generating currency data...\n";
 
 $generator = new CurrencyDataGenerator($compiler, Intl::CURRENCY_DIR);
 $generator->generateData($config);
 
-//echo "Compiling...\n";
-//
-//$compiler->compile($txtDir.'/'.Intl::CURRENCY_DIR, $resDir.'/'.Intl::CURRENCY_DIR);
-
 echo "Generating locale data...\n";
 
 $reader = new BundleEntryReader(new JsonBundleReader());
-
 $generator = new LocaleDataGenerator(
+    $compiler,
     Intl::LOCALE_DIR,
     new LanguageDataProvider($jsonDir.'/'.Intl::LANGUAGE_DIR, $reader),
     new ScriptDataProvider($jsonDir.'/'.Intl::SCRIPT_DIR, $reader),
     new RegionDataProvider($jsonDir.'/'.Intl::REGION_DIR, $reader)
 );
-
 $generator->generateData($config);
-
-//echo "Compiling...\n";
-//
-//$compiler->compile($txtDir.'/'.Intl::LOCALE_DIR, $resDir.'/'.Intl::LOCALE_DIR);
-//
-//$filesystem->remove($txtDir);
 
 echo "Generating zone data...\n";
 

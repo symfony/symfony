@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-01T10:16:53Z
+
+to obtain the `localeDisplayPattern` we need to get it from the region domain, as such we need to temporary cross compile it from the locale generator.
+
+To do so, i've refactored the LocaleDataGenerator to extend from AbstractDataGenerator, just like the other data generators. It's makes it a bit easier to follow IMHO, and a decent amount of logic was duplicated.
+
+cc @webmozart
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-01T10:45:39Z
+
+> Don't use the characters "(" and ")", since they will be confusing in combination with countries or scripts in more complex language names. If you have to use brackets, use square ones: [ and ].
+(http://cldr.unicode.org/translation/language-names)
+
+I think this is up to ICU to follow yes/no, they don't :)
+
+As such we can replace  the `()` in the primary language name with `[]` genericly. Im hesitant to remove it as a whole, as it clearly creates a difference with other locales (en, nl) who still include it, but use different/no interpunction. Then if a native speaker confirms the `[...]` is nonsense, we remove it per case.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-01T16:14:41Z
+
+Ready for me :+1: , i'll send a follow up PR for master, to patch the timezone generator.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-07T07:22:53Z
+
+This diff should be re-applied on 4.2: https://www.diffchecker.com/m77BMN8j Sorry if this is causing inconvenience :)
+
+The important change here is we expose `BundleEntryReaderInterface` to generators, this enables reading ICU data with fallback support, and helps us to get the correct display format or any other metadata needed.
+
+I realized i've effectively rebuild this in master when adding timezones: https://github.com/symfony/symfony/blob/7596da1cdcc2eb06bd15c967b43e9351de0a39c2/src/Symfony/Component/Intl/Data/Generator/TimezoneDataGenerator.php#L156
+
+This should leverage the BundleEntryReaderInterface instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-07T07:56:16Z
+
+@ro0NL Can you create a PR?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-07T08:27:19Z
+
+See #31402

@@ -200,9 +200,9 @@ echo "Generating locale data...\n";
 $generator = new LocaleDataGenerator($compiler, Intl::LOCALE_DIR);
 $generator->generateData($config);
 
-echo "Generating zone data...\n";
+echo "Generating timezone data...\n";
 
-$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR, new RegionDataProvider($jsonDir.'/'.Intl::REGION_DIR, $reader));
+$generator = new TimezoneDataGenerator($compiler, Intl::TIMEZONE_DIR);
 $generator->generateData($config);
 
 echo "Resource bundle compilation complete.\n";

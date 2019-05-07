@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Intl\Data\Generator;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
@@ -34,14 +34,6 @@ class TimezoneDataGenerator extends AbstractDataGenerator
      * @var string[]
      */
     private $zoneIds = [];
-    private $regionDataProvider;
-
-    public function __construct(BundleCompilerInterface $compiler, string $dirName, RegionDataProvider $regionDataProvider)
-    {
-        parent::__construct($compiler, $dirName);
-
-        $this->regionDataProvider = $regionDataProvider;
-    }
 
     /**
      * {@inheritdoc}
@@ -56,6 +48,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
      */
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
     {
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($tempDir.'/region');
+        $compiler->compile($sourceDir.'/region', $tempDir.'/region');
         $compiler->compile($sourceDir.'/zone', $tempDir);
         $compiler->compile($sourceDir.'/misc/timezoneTypes.txt', $tempDir);
         $compiler->compile($sourceDir.'/misc/metaZones.txt', $tempDir);
@@ -83,17 +78,13 @@ class TimezoneDataGenerator extends AbstractDataGenerator
             while (null !== ($fallback = Locale::getFallback($fallback))) {
                 $localeBundles[] = $reader->read($tempDir, $fallback);
             }
-            if ('root' !== $displayLocale) {
-                $localeBundles[] = $reader->read($tempDir, 'root');
-            }
             $metadata = [];
             $data = [
                 'Version' => $localeBundle['Version'],
                 'Names' => $this->generateZones(
+                    $reader,
+                    $tempDir,
                     $displayLocale,
-                    $reader->read($tempDir, 'timezoneTypes'),
-                    $reader->read($tempDir, 'metaZones'),
-                    $reader->read($tempDir, 'windowsZones'),
                     $localeBundles,
                     $metadata
                 ),
@@ -143,8 +134,11 @@ class TimezoneDataGenerator extends AbstractDataGenerator
     /**
      * @param ArrayAccessibleResourceBundle[] $localeBundles
      */
-    private function generateZones(string $locale, ArrayAccessibleResourceBundle $typeBundle, ArrayAccessibleResourceBundle $metaBundle, ArrayAccessibleResourceBundle $windowsZonesBundle, array $localeBundles, array &$metadata = []): array
+    private function generateZones(BundleEntryReaderInterface $reader, string $tempDir, string $locale, array $localeBundles, array &$metadata = []): array
     {
+        $typeBundle = $reader->read($tempDir, 'timezoneTypes');
+        $metaBundle = $reader->read($tempDir, 'metaZones');
+        $windowsZonesBundle = $reader->read($tempDir, 'windowsZones');
         $accessor = static function (ArrayAccessibleResourceBundle $resourceBundle, array $indices) {
             $result = $resourceBundle;
             foreach ($indices as $indice) {
@@ -167,15 +161,15 @@ class TimezoneDataGenerator extends AbstractDataGenerator
 
             return null;
         };
-        $regionFormat = $accessor(['zoneStrings', 'regionFormat']) ?? '{0}';
-        $fallbackFormat = $accessor(['zoneStrings', 'fallbackFormat']) ?? '{1} ({0})';
+        $regionFormat = $reader->readEntry($tempDir, $locale, ['zoneStrings', 'regionFormat']);
+        $fallbackFormat = $reader->readEntry($tempDir, $locale, ['zoneStrings', 'fallbackFormat']);
         $zoneToCountry = self::generateZoneToCountryMapping($windowsZonesBundle);
-        $resolveName = function (string $id, string $city = null) use ($locale, $regionFormat, $fallbackFormat, $zoneToCountry): string {
+        $resolveName = function (string $id, string $city = null) use ($reader, $tempDir, $locale, $regionFormat, $fallbackFormat, $zoneToCountry): ?string {
             if (isset($zoneToCountry[$id])) {
                 try {
-                    $country = $this->regionDataProvider->getName($zoneToCountry[$id], $locale);
+                    $country = $reader->readEntry($tempDir.'/region', $locale, ['Countries', $zoneToCountry[$id]]);
                 } catch (MissingResourceException $e) {
-                    $country = $this->regionDataProvider->getName($zoneToCountry[$id], 'en');
+                    return null;
                 }
 
                 return null === $city ? str_replace('{0}', $country, $regionFormat) : str_replace(['{0}', '{1}'], [$city, $country], $fallbackFormat);
@@ -260,10 +254,9 @@ class TimezoneDataGenerator extends AbstractDataGenerator
 
         foreach ($windowsZoneBundle['mapTimezones'] as $zoneInfo) {
             foreach ($zoneInfo as $region => $zones) {
-                if (\in_array($region, ['001', 'ZZ'], true)) {
-                    continue;
+                if (RegionDataGenerator::isValidCountryCode($region)) {
+                    $mapping += array_fill_keys(explode(' ', $zones), $region);
                 }
-                $mapping += array_fill_keys(explode(' ', $zones), $region);
             }
         }
 

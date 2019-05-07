@@ -73,6 +73,7 @@
 
         <service id="messenger.transport.sync.factory" class="Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory">
             <tag name="messenger.transport_factory" />
+            <argument type="service" id="messenger.routable_message_bus" />
         </service>
 
         <service id="messenger.transport.in_memory.factory" class="Symfony\Component\Messenger\Transport\InMemoryTransportFactory">

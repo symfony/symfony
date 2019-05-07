@@ -703,7 +703,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     protected function setUp()
     {
-        Locale::setDefault('en');
+        \Locale::setDefault('en');
         Locale::setDefaultFallback('en');
     }
 

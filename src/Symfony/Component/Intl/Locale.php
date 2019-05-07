@@ -70,7 +70,7 @@ final class Locale extends \Locale
         if (\function_exists('locale_parse')) {
             $localeSubTags = locale_parse($locale);
             if (1 === \count($localeSubTags)) {
-                if (self::$defaultFallback === $localeSubTags['language']) {
+                if ('root' !== self::$defaultFallback && self::$defaultFallback === $localeSubTags['language']) {
                     return 'root';
                 }
 
@@ -98,7 +98,7 @@ final class Locale extends \Locale
             return substr($locale, 0, $pos);
         }
 
-        if (self::$defaultFallback === $locale) {
+        if ('root' !== self::$defaultFallback && self::$defaultFallback === $locale) {
             return 'root';
         }
 

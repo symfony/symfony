@@ -431,4 +431,14 @@ class DotenvTest extends TestCase
         $dotenv = new Dotenv(false);
         $this->assertInstanceOf(Dotenv::class, $dotenv);
     }
+
+    public function testDoNotUsePutenv()
+    {
+        $dotenv = new Dotenv(false);
+        $dotenv->populate(['TEST_USE_PUTENV' => 'no']);
+
+        $this->assertSame('no', $_SERVER['TEST_USE_PUTENV']);
+        $this->assertSame('no', $_ENV['TEST_USE_PUTENV']);
+        $this->assertFalse(getenv('TEST_USE_PUTENV'));
+    }
 }

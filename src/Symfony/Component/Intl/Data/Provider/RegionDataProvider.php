@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Data\Provider;
 
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Locale;
 
 /**
  * Data provider for region-related ICU data.
@@ -49,7 +48,7 @@ class RegionDataProvider
     public function getName($region, $displayLocale = null)
     {
         if (null === $displayLocale) {
-            $displayLocale = Locale::getDefault();
+            $displayLocale = \Locale::getDefault();
         }
 
         return $this->reader->readEntry($this->path, $displayLocale, ['Names', $region]);
@@ -61,7 +60,7 @@ class RegionDataProvider
     public function getNames($displayLocale = null)
     {
         if (null === $displayLocale) {
-            $displayLocale = Locale::getDefault();
+            $displayLocale = \Locale::getDefault();
         }
 
         $names = $this->reader->readEntry($this->path, $displayLocale, ['Names']);

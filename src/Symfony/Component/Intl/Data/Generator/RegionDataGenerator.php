@@ -27,32 +27,18 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 class RegionDataGenerator extends AbstractDataGenerator
 {
-    const UNKNOWN_REGION_ID = 'ZZ';
-    const OUTLYING_OCEANIA_REGION_ID = 'QO';
-    const EUROPEAN_UNION_ID = 'EU';
-    const NETHERLANDS_ANTILLES_ID = 'AN';
-    const BOUVET_ISLAND_ID = 'BV';
-    const HEARD_MCDONALD_ISLANDS_ID = 'HM';
-    const CLIPPERTON_ISLAND_ID = 'CP';
-    const EUROZONE_ID = 'EZ';
-    const UNITED_NATIONS_ID = 'UN';
-
-    /**
-     * Regions excluded from generation.
-     */
     private static $blacklist = [
-        self::UNKNOWN_REGION_ID => true,
         // Look like countries, but are sub-continents
-        self::OUTLYING_OCEANIA_REGION_ID => true,
-        self::EUROPEAN_UNION_ID => true,
-        self::EUROZONE_ID => true,
-        self::UNITED_NATIONS_ID => true,
-        // No longer exists
-        self::NETHERLANDS_ANTILLES_ID => true,
+        'QO' => true, // Outlying Oceania
+        'EU' => true, // European Union
+        'EZ' => true, // Eurozone
+        'UN' => true, // United Nations
         // Uninhabited islands
-        self::BOUVET_ISLAND_ID => true,
-        self::HEARD_MCDONALD_ISLANDS_ID => true,
-        self::CLIPPERTON_ISLAND_ID => true,
+        'BV' => true, // Bouvet Island
+        'HM' => true, // Heard & McDonald Islands
+        'CP' => true, // Clipperton Island
+        // Misc
+        'ZZ' => true, // Unknown Region
     ];
 
     /**

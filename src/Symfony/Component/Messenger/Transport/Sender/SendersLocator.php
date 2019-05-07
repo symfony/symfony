@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Exception\UnknownSenderException;
-use Symfony\Component\Messenger\Handler\HandlersLocator;
 
 /**
  * Maps a message to a list of senders.
@@ -33,15 +32,15 @@ class SendersLocator implements SendersLocatorInterface
     private $sendAndHandle;
 
     /**
-     * @param string[][] $sendersMap An array, keyed by "type", set to an array of sender aliases
+     * @param string[][]         $sendersMap     An array, keyed by "type", set to an array of sender aliases
      * @param ContainerInterface $sendersLocator Locator of senders, keyed by sender alias
-     * @param bool[]     $sendAndHandle
+     * @param bool[]             $sendAndHandle
      */
     public function __construct(array $sendersMap, /*ContainerInterface*/ $sendersLocator = null, array $sendAndHandle = [])
     {
         $this->sendersMap = $sendersMap;
 
-        if (is_array($sendersLocator) || null === $sendersLocator) {
+        if (\is_array($sendersLocator) || null === $sendersLocator) {
             @trigger_error(sprintf('"%s::__construct()" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.', __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
             // "%s" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.'
             $this->sendersLocator = new ServiceLocator([]);
@@ -113,7 +112,7 @@ class SendersLocator implements SendersLocatorInterface
                 $classes[] = preg_replace($pattern, '\*', $tmp);
                 $tmp = preg_replace($pattern, '', $tmp);
             }
-        } while($match);
+        } while ($match);
 
         return $classes
             + ['*' => '*'];

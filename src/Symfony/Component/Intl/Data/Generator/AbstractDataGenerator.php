@@ -30,7 +30,7 @@ abstract class AbstractDataGenerator
     private $compiler;
     private $dirName;
 
-    public function __construct(BundleCompilerInterface $compiler, $dirName)
+    public function __construct(BundleCompilerInterface $compiler, string $dirName)
     {
         $this->compiler = $compiler;
         $this->dirName = $dirName;

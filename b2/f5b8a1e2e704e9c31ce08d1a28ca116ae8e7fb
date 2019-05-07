@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Stadly at 2019-04-25T15:00:58Z
+
+I don't understand why the test is failing on PHP7.3 I've tested with PHP7.3 locally, and it works fine. Can it have something to do with `deps=low`?
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-04-29T09:11:50Z
+
+I don't think the failing build has anything to do with this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-02T07:02:44Z
+
+@Stadly I see that yo merge a branch here. Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-05-02T07:24:53Z
+
+Haha. I'm messing up everything. I'll try to fix it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-02T07:44:47Z
+
+One last question about this PR: we set the filename as an absolute path. Is it useful? Wouldn't it be "better" to use a relative path? I'm not sure what the spec says about this.
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-05-02T08:12:42Z
+
+The path used when extracting is the one set as source, so whether it is absolute or relative depends on the user. `extract(__DIR__.'/../src/')` will give absolute paths, while `extract('../src/')` will give relative paths.
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-05-02T09:30:16Z
+
+Should I add a test using relative paths?

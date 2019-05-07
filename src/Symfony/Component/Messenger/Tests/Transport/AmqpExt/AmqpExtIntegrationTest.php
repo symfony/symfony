@@ -19,7 +19,9 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpReceiver;
 use Symfony\Component\Messenger\Transport\AmqpExt\AmqpSender;
+use Symfony\Component\Messenger\Transport\AmqpExt\AmqpStamp;
 use Symfony\Component\Messenger\Transport\AmqpExt\Connection;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Process\PhpProcess;
@@ -84,8 +86,10 @@ class AmqpExtIntegrationTest extends TestCase
         $sender = new AmqpSender($connection, $serializer);
         $receiver = new AmqpReceiver($connection, $serializer);
 
+        // send a first message
         $sender->send($first = new Envelope(new DummyMessage('First')));
 
+        // receive it immediately and imitate a redeliver with 2 second delay
         $envelopes = iterator_to_array($receiver->get());
         /** @var Envelope $envelope */
         $envelope = $envelopes[0];
@@ -95,25 +99,36 @@ class AmqpExtIntegrationTest extends TestCase
         $sender->send($newEnvelope);
         $receiver->ack($envelope);
 
-        $envelopes = [];
-        $startTime = time();
-        // wait for next message, but only for max 3 seconds
-        while (0 === \count($envelopes) && $startTime + 3 > time()) {
-            $envelopes = iterator_to_array($receiver->get());
-        }
+        // send a 2nd message with a shorter delay and custom routing key
+        $customRoutingKeyMessage = new DummyMessage('custom routing key');
+        $envelopeCustomRoutingKey = new Envelope($customRoutingKeyMessage, [
+            new DelayStamp(1000),
+            new AmqpStamp('my_custom_routing_key'),
+        ]);
+        $sender->send($envelopeCustomRoutingKey);
 
+        // wait for next message (but max at 3 seconds)
+        $startTime = microtime(true);
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+
+        // duration should be about 1 second
+        $this->assertApproximateDuration($startTime, 1);
+
+        // this should be the custom routing key message first
         $this->assertCount(1, $envelopes);
-        /** @var Envelope $envelope */
-        $envelope = $envelopes[0];
+        /* @var Envelope $envelope */
+        $receiver->ack($envelopes[0]);
+        $this->assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
 
-        // should have a 2 second delay
-        $this->assertGreaterThanOrEqual($startTime + 2, time());
-        // but only a 2 second delay
-        $this->assertLessThan($startTime + 4, time());
+        // wait for final message (but max at 3 seconds)
+        $envelopes = $this->receiveEnvelopes($receiver, 3);
+        // duration should be about 2 seconds
+        $this->assertApproximateDuration($startTime, 2);
 
-        /** @var RedeliveryStamp|null $retryStamp */
+        /* @var RedeliveryStamp|null $retryStamp */
         // verify the stamp still exists from the last send
-        $retryStamp = $envelope->last(RedeliveryStamp::class);
+        $this->assertCount(1, $envelopes);
+        $retryStamp = $envelopes[0]->last(RedeliveryStamp::class);
         $this->assertNotNull($retryStamp);
         $this->assertSame(1, $retryStamp->getRetryCount());
 
@@ -205,5 +220,30 @@ TXT
         return new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer(), new ArrayDenormalizer()], ['json' => new JsonEncoder()])
         );
+    }
+
+    private function assertApproximateDuration($startTime, int $expectedDuration)
+    {
+        $actualDuration = microtime(true) - $startTime;
+
+        if (\method_exists([$this, 'assertEqualsWithDelta'])) {
+            $this->assertEqualsWithDelta($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
+        } else {
+            $this->assertEquals($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
+        }
+    }
+
+    /**
+     * @return Envelope[]
+     */
+    private function receiveEnvelopes(ReceiverInterface $receiver, int $timeout): array
+    {
+        $envelopes = [];
+        $startTime = microtime(true);
+        while (0 === \count($envelopes) && $startTime + $timeout > time()) {
+            $envelopes = iterator_to_array($receiver->get());
+        }
+
+        return $envelopes;
     }
 }

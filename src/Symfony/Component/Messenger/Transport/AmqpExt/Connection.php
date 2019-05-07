@@ -79,8 +79,8 @@ class Connection
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * delay:
-     *     * routing_key_pattern: The pattern of the routing key (Default: "delay_%delay%")
-     *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_queue_%delay%")
+     *     * routing_key_pattern: The pattern of the routing key (Default: "delay_%routing_key%_%delay%")
+     *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_queue_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the retried messages (Default: "retry")
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * loop_sleep: Amount of micro-seconds to wait if no message are available (Default: 200000)
@@ -90,9 +90,9 @@ class Connection
     {
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
-                'routing_key_pattern' => 'delay_%delay%',
+                'routing_key_pattern' => 'delay_%routing_key%_%delay%',
                 'exchange_name' => 'delay',
-                'queue_name_pattern' => 'delay_queue_%delay%',
+                'queue_name_pattern' => 'delay_queue_%routing_key%_%delay%',
             ],
         ], $connectionOptions);
         $this->exchangeOptions = $exchangeOptions;
@@ -186,7 +186,7 @@ class Connection
         $this->publishOnExchange(
             $this->exchange(),
             $body,
-            (null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null) ?? $this->getDefaultPublishRoutingKey(),
+            $this->getRoutingKeyForMessage($amqpStamp),
             [
                 'headers' => $headers,
             ],
@@ -209,14 +209,16 @@ class Connection
      */
     private function publishWithDelay(string $body, array $headers, int $delay, AmqpStamp $amqpStamp = null)
     {
+        $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
+
         if ($this->shouldSetup()) {
-            $this->setupDelay($delay, null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null);
+            $this->setupDelay($delay, $routingKey);
         }
 
         $this->publishOnExchange(
             $this->getDelayExchange(),
             $body,
-            $this->getRoutingKeyForDelay($delay),
+            $this->getRoutingKeyForDelay($delay, $routingKey),
             [
                 'headers' => $headers,
             ],
@@ -245,7 +247,7 @@ class Connection
 
         $queue = $this->createDelayQueue($delay, $routingKey);
         $queue->declareQueue();
-        $queue->bind($exchange->getName(), $this->getRoutingKeyForDelay($delay));
+        $queue->bind($exchange->getName(), $this->getRoutingKeyForDelay($delay, $routingKey));
     }
 
     private function getDelayExchange(): \AMQPExchange
@@ -271,13 +273,16 @@ class Connection
     private function createDelayQueue(int $delay, ?string $routingKey)
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
-        $queue->setName(str_replace('%delay%', $delay, $this->connectionOptions['delay']['queue_name_pattern']));
+        $queue->setName(str_replace(
+            ['%delay%', '%routing_key%'],
+            [$delay, $routingKey ?: ''],
+            $this->connectionOptions['delay']['queue_name_pattern']
+    ));
         $queue->setArguments([
             'x-message-ttl' => $delay,
             'x-dead-letter-exchange' => $this->exchange()->getName(),
         ]);
 
-        $routingKey = $routingKey ?? $this->getDefaultPublishRoutingKey();
         if (null !== $routingKey) {
             // after being released from to DLX, this routing key will be used
             $queue->setArgument('x-dead-letter-routing-key', $routingKey);
@@ -286,9 +291,13 @@ class Connection
         return $queue;
     }
 
-    private function getRoutingKeyForDelay(int $delay): string
+    private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey): string
     {
-        return str_replace('%delay%', $delay, $this->connectionOptions['delay']['routing_key_pattern']);
+        return str_replace(
+            ['%delay%', '%routing_key%'],
+            [$delay, $finalRoutingKey ?: ''],
+            $this->connectionOptions['delay']['routing_key_pattern']
+        );
     }
 
     /**
@@ -443,5 +452,10 @@ class Connection
         foreach ($this->getQueueNames() as $queueName) {
             $this->queue($queueName)->purge();
         }
+    }
+
+    private function getRoutingKeyForMessage(?AmqpStamp $amqpStamp): ?string
+    {
+        return (null !== $amqpStamp ? $amqpStamp->getRoutingKey() : null) ?? $this->getDefaultPublishRoutingKey();
     }
 }

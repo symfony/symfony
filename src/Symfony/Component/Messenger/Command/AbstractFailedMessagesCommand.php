@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -59,8 +60,10 @@ abstract class AbstractFailedMessagesCommand extends Command
     {
         $io->title('Failed Message Details');
 
-        /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
+        /** @var SentToFailureTransportStamp|null $sentToFailureTransportStamp */
         $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
+        /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+        $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
         $rows = [
             ['Class', \get_class($envelope->getMessage())],
@@ -70,25 +73,34 @@ abstract class AbstractFailedMessagesCommand extends Command
             $rows[] = ['Message Id', $id];
         }
 
+        $flattenException = null === $lastRedeliveryStamp ? null : $lastRedeliveryStamp->getFlattenException();
         if (null === $sentToFailureTransportStamp) {
             $io->warning('Message does not appear to have been sent to this transport after failing');
         } else {
             $rows = array_merge($rows, [
-                ['Failed at', $sentToFailureTransportStamp->getSentAt()->format('Y-m-d H:i:s')],
-                ['Error', $sentToFailureTransportStamp->getExceptionMessage()],
-                ['Error Class', $sentToFailureTransportStamp->getFlattenException() ? $sentToFailureTransportStamp->getFlattenException()->getClass() : '(unknown)'],
+                ['Failed at', null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')],
+                ['Error', null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getExceptionMessage()],
+                ['Error Class', null === $flattenException ? '(unknown)' : $flattenException->getClass()],
                 ['Transport', $sentToFailureTransportStamp->getOriginalReceiverName()],
             ]);
         }
 
         $io->table([], $rows);
 
+        /** @var RedeliveryStamp[] $redeliveryStamps */
+        $redeliveryStamps = $envelope->all(RedeliveryStamp::class);
+        $io->writeln(' Message history:');
+        foreach ($redeliveryStamps as $redeliveryStamp) {
+            $io->writeln(sprintf('  * Message failed and redelivered to the <info>%s</info> transport at <info>%s</info>', $redeliveryStamp->getSenderClassOrAlias(), $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')));
+        }
+        $io->newLine();
+
         if ($io->isVeryVerbose()) {
             $io->title('Message:');
             $dump = new Dumper($io);
             $io->writeln($dump($envelope->getMessage()));
             $io->title('Exception:');
-            $io->writeln($sentToFailureTransportStamp->getFlattenException()->getTraceAsString());
+            $io->writeln(null === $flattenException ? '(no data)' : $flattenException->getTraceAsString());
         } else {
             $io->writeln(' Re-run command with <info>-vv</info> to see more message & error details.');
         }

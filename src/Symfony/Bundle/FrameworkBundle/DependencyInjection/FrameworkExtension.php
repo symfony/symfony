@@ -1659,6 +1659,7 @@ class FrameworkExtension extends Extension
             'before' => [
                 ['id' => 'add_bus_name_stamp_middleware'],
                 ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
             ],
             'after' => [
                 ['id' => 'send_message'],

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
-use Symfony\Component\Debug\Exception\FlattenException;
-
 /**
  * Stamp applied when a message is sent to the failure transport.
  *
@@ -22,36 +20,15 @@ use Symfony\Component\Debug\Exception\FlattenException;
  */
 class SentToFailureTransportStamp implements StampInterface
 {
-    private $exceptionMessage;
     private $originalReceiverName;
-    private $flattenException;
-    private $sentAt;
 
-    public function __construct(string $exceptionMessage, string $originalReceiverName, FlattenException $flattenException = null)
+    public function __construct(string $originalReceiverName)
     {
-        $this->exceptionMessage = $exceptionMessage;
         $this->originalReceiverName = $originalReceiverName;
-        $this->flattenException = $flattenException;
-        $this->sentAt = new \DateTimeImmutable();
-    }
-
-    public function getExceptionMessage(): string
-    {
-        return $this->exceptionMessage;
     }
 
     public function getOriginalReceiverName(): string
     {
         return $this->originalReceiverName;
-    }
-
-    public function getFlattenException(): ?FlattenException
-    {
-        return $this->flattenException;
-    }
-
-    public function getSentAt(): \DateTimeInterface
-    {
-        return $this->sentAt;
     }
 }

@@ -19,7 +19,6 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 
@@ -35,13 +34,13 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
             /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
             $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
             $this->assertNotNull($sentToFailureTransportStamp);
-            $this->assertSame('no!', $sentToFailureTransportStamp->getExceptionMessage());
             $this->assertSame('my_receiver', $sentToFailureTransportStamp->getOriginalReceiverName());
-            $this->assertSame('no!', $sentToFailureTransportStamp->getFlattenException()->getMessage());
 
             /** @var RedeliveryStamp $redeliveryStamp */
             $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
             $this->assertSame('failure_sender', $redeliveryStamp->getSenderClassOrAlias());
+            $this->assertSame('no!', $redeliveryStamp->getExceptionMessage());
+            $this->assertSame('no!', $redeliveryStamp->getFlattenException()->getMessage());
 
             $this->assertNull($envelope->last(ReceivedStamp::class));
             $this->assertNull($envelope->last(TransportMessageIdStamp::class));
@@ -65,11 +64,11 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())->method('dispatch')->with($this->callback(function ($envelope) {
             /** @var Envelope $envelope */
-            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
-            $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
-            $this->assertNotNull($sentToFailureTransportStamp);
-            $this->assertSame('I am inside!', $sentToFailureTransportStamp->getExceptionMessage());
-            $this->assertSame('Exception', $sentToFailureTransportStamp->getFlattenException()->getClass());
+            /** @var RedeliveryStamp $redeliveryStamp */
+            $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
+            $this->assertNotNull($redeliveryStamp);
+            $this->assertSame('I am inside!', $redeliveryStamp->getExceptionMessage());
+            $this->assertSame('Exception', $redeliveryStamp->getFlattenException()->getClass());
 
             return true;
         }))->willReturn(new Envelope(new \stdClass()));
@@ -112,7 +111,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         );
 
         $envelope = new Envelope(new \stdClass(), [
-            new SentStamp('MySender', 'failure_sender'),
+            new SentToFailureTransportStamp('my_receiver'),
         ]);
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', new \Exception(''), false);
 

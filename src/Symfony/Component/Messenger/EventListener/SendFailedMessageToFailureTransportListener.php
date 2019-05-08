@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 
@@ -51,11 +51,8 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $envelope = $event->getEnvelope();
 
         // avoid re-sending to the failed sender
-        foreach ($envelope->all(SentStamp::class) as $sentStamp) {
-            /** @var SentStamp $sentStamp */
-            if ($sentStamp->getSenderAlias() === $this->failureSenderAlias) {
-                return;
-            }
+        if (null !== $envelope->last(SentToFailureTransportStamp::class)) {
+            return;
         }
 
         // remove the received stamp so it's redelivered
@@ -67,8 +64,9 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $flattenedException = \class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
         $envelope = $envelope->withoutAll(ReceivedStamp::class)
             ->withoutAll(TransportMessageIdStamp::class)
-            ->with(new SentToFailureTransportStamp($throwable->getMessage(), $event->getReceiverName(), $flattenedException))
-            ->with(new RedeliveryStamp(0, $this->failureSenderAlias));
+            ->with(new SentToFailureTransportStamp($event->getReceiverName()))
+            ->with(new DelayStamp(0))
+            ->with(new RedeliveryStamp(0, $this->failureSenderAlias, $throwable->getMessage(), $flattenedException));
 
         if (null !== $this->logger) {
             $this->logger->info('Rejected message {class} will be sent to the failure transport {transport}.', [

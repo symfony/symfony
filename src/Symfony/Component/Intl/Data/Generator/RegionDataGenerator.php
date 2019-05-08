@@ -54,6 +54,20 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     private $regionCodes = [];
 
+    public static function isValidCountryCode($region)
+    {
+        if (isset(self::$blacklist[$region])) {
+            return false;
+        }
+
+        // WORLD/CONTINENT/SUBCONTINENT/GROUPING
+        if (ctype_digit($region) || \is_int($region)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -131,12 +145,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         $regionNames = [];
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
-            if (isset(self::$blacklist[$region])) {
-                continue;
-            }
-
-            // WORLD/CONTINENT/SUBCONTINENT/GROUPING
-            if (ctype_digit($region) || \is_int($region)) {
+            if (!self::isValidCountryCode($region)) {
                 continue;
             }
 

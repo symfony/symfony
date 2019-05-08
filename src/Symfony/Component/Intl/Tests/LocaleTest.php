@@ -46,4 +46,28 @@ class LocaleTest extends TestCase
     {
         $this->assertSame($expected, Locale::getFallback($locale));
     }
+
+    public function testNoDefaultFallback()
+    {
+        $prev = Locale::getDefaultFallback();
+        Locale::setDefaultFallback(null);
+
+        $this->assertSame('nl', Locale::getFallback('nl_NL'));
+        $this->assertNull(Locale::getFallback('nl'));
+        $this->assertNull(Locale::getFallback('root'));
+
+        Locale::setDefaultFallback($prev);
+    }
+
+    public function testDefaultRootFallback()
+    {
+        $prev = Locale::getDefaultFallback();
+        Locale::setDefaultFallback('root');
+
+        $this->assertSame('nl', Locale::getFallback('nl_NL'));
+        $this->assertSame('root', Locale::getFallback('nl'));
+        $this->assertNull(Locale::getFallback('root'));
+
+        Locale::setDefaultFallback($prev);
+    }
 }

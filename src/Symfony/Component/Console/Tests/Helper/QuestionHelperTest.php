@@ -718,7 +718,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // F00<BACKSPACE><BACKSPACE>o<TAB>,A<DOWN ARROW>,<SPACE>SecurityBundle<NEWLINE>
         // Acme<TAB>,<SPACE>As<TAB><29x BACKSPACE>S<TAB><NEWLINE>
         // Ac<TAB>,As<TAB><3x BACKSPACE>d<TAB><NEWLINE>
-        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
+        $inputStream = $this->getInputStream("\nF\t\nA\033[A\033[A\033[A\t,F\t\nF00\177\177o\t,A\033[B\t, SecurityBundle\nSecurityBundle\nAcme\t, As\t\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177\177S\t\nAc\t,As\t\177\177\177d\t\n");
 
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);

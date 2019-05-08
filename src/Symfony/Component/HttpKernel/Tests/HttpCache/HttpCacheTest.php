@@ -1537,15 +1537,15 @@ class HttpCacheTest extends HttpCacheTestCase
     }
 
     public function testTraceLevelShort()
-        {
-            $this->cacheConfig['trace_level'] = 'short';
+    {
+        $this->cacheConfig['trace_level'] = 'short';
 
-            $this->setNextResponse();
-            $this->request('GET', '/');
+        $this->setNextResponse();
+        $this->request('GET', '/');
 
-            $this->assertTrue($this->response->headers->has('X-Symfony-Cache'));
-            $this->assertEquals('miss', $this->response->headers->get('X-Symfony-Cache'));
-        }
+        $this->assertTrue($this->response->headers->has('X-Symfony-Cache'));
+        $this->assertEquals('miss', $this->response->headers->get('X-Symfony-Cache'));
+    }
 }
 
 class TestKernel implements HttpKernelInterface

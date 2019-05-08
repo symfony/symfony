@@ -103,6 +103,7 @@ class Connection
      * @param int $delay The delay in milliseconds
      *
      * @return string The inserted id
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function send(string $body, array $headers, int $delay = 0): string

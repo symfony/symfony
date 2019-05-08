@@ -84,7 +84,6 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
         return ($this->receiver ?? $this->getReceiver())->find($id);
     }
 
-
     /**
      * {@inheritdoc}
      */

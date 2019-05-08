@@ -1,6 +1,6 @@
 language: php
 
-dist: trusty
+dist: xenial
 
 git:
     depth: 2
@@ -13,6 +13,7 @@ addons:
         - slapd
         - zookeeperd
         - libzookeeper-mt-dev
+        - rabbitmq-server
 
 env:
     global:

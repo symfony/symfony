@@ -20,9 +20,6 @@ env:
 
 matrix:
     include:
-        - php: hhvm-3.18
-          sudo: required
-          group: edge
         - php: 5.5
           env: php_extra="5.6 7.0 7.1"
         - php: 7.2
@@ -181,12 +178,6 @@ before_install:
               [[ -e $ext_cache ]] || (tfold ext.symfony_debug "cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && mv modules/symfony_debug.so $ext_cache && phpize --clean")
               echo extension = $ext_cache >> $INI
           elif [[ $PHP = 7.* ]]; then
-              if ! php --ri sodium > /dev/null; then
-                  # install libsodium
-                  sudo apt-get install libsodium-dev -y
-                  tfold ext.libsodium tpecl libsodium sodium.so $INI
-              fi
-
               tfold ext.apcu tpecl apcu-5.1.16 apcu.so $INI
               tfold ext.mongodb tpecl mongodb-1.6.0alpha1 mongodb.so $INI
           fi

@@ -46,6 +46,8 @@ class Deprecation
     /** @var string[] absolute paths to vendor directories */
     private static $vendors;
 
+    private $originalFilesStack;
+
     /**
      * @param string $message
      * @param string $file
@@ -66,6 +68,7 @@ class Deprecation
                 $this->message = $parsedMsg['deprecation'];
                 $this->originClass = $parsedMsg['class'];
                 $this->originMethod = $parsedMsg['method'];
+                $this->originalFilesStack = $parsedMsg['files_stack'];
                 // If the deprecation has been triggered via
                 // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
                 // then we need to use the serialized information to determine
@@ -159,6 +162,24 @@ class Deprecation
             || \in_array('legacy', $test::getGroups($class, $method), true);
     }
 
+    private function getOriginalFilesStack(): array
+    {
+        if (null === $this->originalFilesStack) {
+            $this->originalFilesStack = [];
+            foreach ($this->trace as $line) {
+                if (\in_array($line['function'], ['require', 'require_once', 'include', 'include_once'], true)) {
+                    continue;
+                }
+                if (!isset($line['file'])) {
+                    continue;
+                }
+                $this->originalFilesStack[] = $line['file'];
+            }
+        }
+
+        return $this->originalFilesStack;
+    }
+
     /**
      * Tells whether both the calling package and the called package are vendor
      * packages.
@@ -168,14 +189,8 @@ class Deprecation
     public function isIndirect()
     {
         $erroringFile = $erroringPackage = null;
-        foreach ($this->trace as $line) {
-            if (\in_array($line['function'], ['require', 'require_once', 'include', 'include_once'], true)) {
-                continue;
-            }
-            if (!isset($line['file'])) {
-                continue;
-            }
-            $file = $line['file'];
+
+        foreach ($this->getOriginalFilesStack() as $file) {
             if ('-' === $file || 'Standard input code' === $file || !realpath($file)) {
                 continue;
             }

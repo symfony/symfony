@@ -333,19 +333,17 @@ class QuestionHelper extends Helper
 
     private function mostRecentlyEnteredValue($entered)
     {
-        $tempEntered = $entered;
-
         // Determine the most recent value that the user entered
-        if (false !== strpos($entered, ',')) {
-            $choices = explode(',', $entered);
-            $lastChoice = trim($choices[\count($choices) - 1]);
-
-            if (\strlen($lastChoice) > 0) {
-                $tempEntered = $lastChoice;
-            }
+        if (false === strpos($entered, ',')) {
+            return $entered;
         }
 
-        return $tempEntered;
+        $choices = explode(',', $entered);
+        if (\strlen($lastChoice = trim($choices[\count($choices) - 1])) > 0) {
+            return $lastChoice;
+        }
+
+        return $entered;
     }
 
     /**

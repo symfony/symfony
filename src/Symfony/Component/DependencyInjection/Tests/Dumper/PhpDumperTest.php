@@ -262,7 +262,7 @@ class PhpDumperTest extends TestCase
         $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';
         $container = new ContainerBuilder();
         $container->setParameter("'", 'oh-no');
-        $container->register("foo*/oh-no", 'FooClass')->setPublic(true);
+        $container->register('foo*/oh-no', 'FooClass')->setPublic(true);
         $container->register('bar$', 'FooClass')->setPublic(true);
         $container->register('bar$!', 'FooClass')->setPublic(true);
         $container->compile();

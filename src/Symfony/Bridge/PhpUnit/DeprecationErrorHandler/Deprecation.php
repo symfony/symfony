@@ -133,7 +133,10 @@ class Deprecation
         return $this->originMethod;
     }
 
-    public function getMessage(): string
+    /**
+     * @return string
+     */
+    public function getMessage()
     {
         return $this->message;
     }

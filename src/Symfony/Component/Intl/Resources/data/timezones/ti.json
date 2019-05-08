@@ -319,10 +319,6 @@
         "Australia\/Melbourne": "አውስትሬሊያ (Melbourne)",
         "Australia\/Perth": "አውስትሬሊያ (Perth)",
         "Australia\/Sydney": "አውስትሬሊያ (Sydney)",
-        "CST6CDT": "CST6CDT",
-        "EST5EDT": "EST5EDT",
-        "Etc\/GMT": "GMT",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "ኔዘርላንድስ (Amsterdam)",
         "Europe\/Andorra": "አንዶራ (Andorra)",
         "Europe\/Astrakhan": "ራሺያ (Astrakhan)",
@@ -394,8 +390,6 @@
         "Indian\/Mauritius": "ማሩሸስ (Mauritius)",
         "Indian\/Mayotte": "ሜይኦቴ (Mayotte)",
         "Indian\/Reunion": "ሪዩኒየን (Reunion)",
-        "MST7MDT": "MST7MDT",
-        "PST8PDT": "PST8PDT",
         "Pacific\/Apia": "ሳሞአ (Apia)",
         "Pacific\/Auckland": "ኒው ዚላንድ (Auckland)",
         "Pacific\/Bougainville": "ፓፑዋ ኒው ጊኒ (Bougainville)",
@@ -436,11 +430,5 @@
         "Pacific\/Wake": "ናይ ኣሜሪካ ፍንትት ዝበሉ ደሴታት (Wake)",
         "Pacific\/Wallis": "ዋሊስን ፉቱናን (Wallis)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

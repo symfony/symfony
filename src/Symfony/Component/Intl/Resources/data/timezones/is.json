@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Tími á Wake-eyju",
         "Pacific\/Wallis": "Tími á Wallis- og Fútúnaeyjum"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

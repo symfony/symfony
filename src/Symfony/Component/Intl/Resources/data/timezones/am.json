@@ -99,7 +99,7 @@
         "America\/Detroit": "ምስራቃዊ ሰዓት አቆጣጠር (ዲትሮይት)",
         "America\/Dominica": "የአትላንቲክ የሰዓት አቆጣጠር (ዶሜኒካ)",
         "America\/Edmonton": "የተራራ የሰዓት አቆጣጠር (ኤድመንተን)",
-        "America\/Eirunepe": "ብራዚል (ኢሩኔፕ)",
+        "America\/Eirunepe": "ብራዚል ጊዜ (ኢሩኔፕ)",
         "America\/El_Salvador": "የሰሜን አሜሪካ የመካከለኛ ሰዓት አቆጣጠር (ኤልሳልቫዶር)",
         "America\/Fort_Nelson": "የተራራ የሰዓት አቆጣጠር (ፎርት ኔልሰን)",
         "America\/Fortaleza": "የብራዚላዊ ሰዓት አቆጣጠር (ፎርታሌዛ)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "የአትላንቲክ የሰዓት አቆጣጠር (ሞንክቶን)",
         "America\/Monterrey": "የሰሜን አሜሪካ የመካከለኛ ሰዓት አቆጣጠር (ሞንተርሬይ)",
         "America\/Montevideo": "የኡራጓይ ሰዓት (ሞንቴቪድዮ)",
-        "America\/Montreal": "ካናዳ (Montreal)",
+        "America\/Montreal": "ካናዳ ጊዜ (Montreal)",
         "America\/Montserrat": "የአትላንቲክ የሰዓት አቆጣጠር (ሞንትሴራት)",
         "America\/Nassau": "ምስራቃዊ ሰዓት አቆጣጠር (ናሳው)",
         "America\/New_York": "ምስራቃዊ ሰዓት አቆጣጠር (ኒውዮርክ)",
@@ -176,7 +176,7 @@
         "America\/Recife": "የብራዚላዊ ሰዓት አቆጣጠር (ረሲፍ)",
         "America\/Regina": "የሰሜን አሜሪካ የመካከለኛ ሰዓት አቆጣጠር (ረጂና)",
         "America\/Resolute": "የሰሜን አሜሪካ የመካከለኛ ሰዓት አቆጣጠር (ሪዞሊዩት)",
-        "America\/Rio_Branco": "ብራዚል (ሪዮ ብራንኮ)",
+        "America\/Rio_Branco": "ብራዚል ጊዜ (ሪዮ ብራንኮ)",
         "America\/Santa_Isabel": "ሰሜናዊ ምእራብ የሜክሲኮ ሰዓት አቆጣጠር (ሳንታ ኢዛቤል)",
         "America\/Santarem": "የብራዚላዊ ሰዓት አቆጣጠር (ሳንታሬም)",
         "America\/Santiago": "የቺሊ ሰዓት (ሳንቲያጎ)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "የዓረቢያ ሰዓት (ባህሬን)",
         "Asia\/Baku": "የአዘርባጃን ሰዓት (ባኩ)",
         "Asia\/Bangkok": "የኢንዶቻይና ሰዓት (ባንኮክ)",
-        "Asia\/Barnaul": "ሩስያ (ባርናኡል)",
+        "Asia\/Barnaul": "ሩስያ ጊዜ (ባርናኡል)",
         "Asia\/Beirut": "የምስራቃዊ አውሮፓ ሰዓት (ቤሩት)",
         "Asia\/Bishkek": "የኪርጊስታን ሰዓት (ቢሽኬክ)",
         "Asia\/Brunei": "የብሩኔይ ዳሩሳላም ሰዓት (ብሩናይ)",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "የኢራን ሰዓት (ቴህራን)",
         "Asia\/Thimphu": "የቡታን ሰዓት (ቲምፉ)",
         "Asia\/Tokyo": "የጃፓን ሰዓት (ቶኪዮ)",
-        "Asia\/Tomsk": "ሩስያ (ቶምስክ)",
+        "Asia\/Tomsk": "ሩስያ ጊዜ (ቶምስክ)",
         "Asia\/Ulaanbaatar": "የኡላን ባቶር ጊዜ (ኡላአንባአታር)",
-        "Asia\/Urumqi": "ቻይና (ኡሩምኪ)",
+        "Asia\/Urumqi": "ቻይና ጊዜ (ኡሩምኪ)",
         "Asia\/Ust-Nera": "የቭላዲቮስቶክ የሰዓት አቆጣጠር (ኡስት-ኔራ)",
         "Asia\/Vientiane": "የኢንዶቻይና ሰዓት (ቬንቲአን)",
         "Asia\/Vladivostok": "የቭላዲቮስቶክ የሰዓት አቆጣጠር",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "ግሪንዊች ማዕከላዊ ሰዓት (ጉርነሲ)",
         "Europe\/Helsinki": "የምስራቃዊ አውሮፓ ሰዓት (ሄልሲንኪ)",
         "Europe\/Isle_of_Man": "ግሪንዊች ማዕከላዊ ሰዓት (አይስል ኦፍ ማን)",
-        "Europe\/Istanbul": "ቱርክ (ኢስታንቡል)",
+        "Europe\/Istanbul": "ቱርክ ጊዜ (ኢስታንቡል)",
         "Europe\/Jersey": "ግሪንዊች ማዕከላዊ ሰዓት (ጀርሲ)",
         "Europe\/Kaliningrad": "የምስራቃዊ አውሮፓ ሰዓት (ካሊኒንግራድ)",
         "Europe\/Kiev": "የምስራቃዊ አውሮፓ ሰዓት (ኪየቭ)",
-        "Europe\/Kirov": "ሩስያ (ኪሮቭ)",
+        "Europe\/Kirov": "ሩስያ ጊዜ (ኪሮቭ)",
         "Europe\/Lisbon": "የምዕራባዊ አውሮፓ ሰዓት (ሊዝበን)",
         "Europe\/Ljubljana": "የመካከለኛው አውሮፓ ሰዓት (ልጁብልጃና)",
         "Europe\/London": "ግሪንዊች ማዕከላዊ ሰዓት (ለንደን)",
@@ -438,9 +438,7 @@
     },
     "Meta": {
         "GmtFormat": "ጂ ኤም ቲ%s",
-        "HourFormat": [
-            "+%02d%02d",
-            "-%02d%02d"
-        ]
+        "HourFormatPos": "+%02d%02d",
+        "HourFormatNeg": "-%02d%02d"
     }
 }

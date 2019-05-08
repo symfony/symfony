@@ -430,11 +430,5 @@
         "Pacific\/Wake": "Duni Amerig Utar meer (Wake)",
         "Pacific\/Wallis": "Walis ak Futuna (Wallis)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

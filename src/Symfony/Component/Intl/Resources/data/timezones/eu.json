@@ -99,7 +99,7 @@
         "America\/Detroit": "Ipar Amerikako ekialdeko ordua (Detroit)",
         "America\/Dominica": "Ipar Amerikako Atlantikoko ordua (Dominika)",
         "America\/Edmonton": "Ipar Amerikako mendialdeko ordua (Edmonton)",
-        "America\/Eirunepe": "Brasil (Eirunepé)",
+        "America\/Eirunepe": "Brasil aldeko ordua (Eirunepé)",
         "America\/El_Salvador": "Ipar Amerikako erdialdeko ordua (El Salvador)",
         "America\/Fort_Nelson": "Ipar Amerikako mendialdeko ordua (Fort Nelson)",
         "America\/Fortaleza": "Brasiliako ordua (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Ipar Amerikako Atlantikoko ordua (Moncton)",
         "America\/Monterrey": "Ipar Amerikako erdialdeko ordua (Monterrey)",
         "America\/Montevideo": "Uruguaiko ordua (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada aldeko ordua (Montreal)",
         "America\/Montserrat": "Ipar Amerikako Atlantikoko ordua (Montserrat)",
         "America\/Nassau": "Ipar Amerikako ekialdeko ordua (Nassau)",
         "America\/New_York": "Ipar Amerikako ekialdeko ordua (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Brasiliako ordua (Recife)",
         "America\/Regina": "Ipar Amerikako erdialdeko ordua (Regina)",
         "America\/Resolute": "Ipar Amerikako erdialdeko ordua (Resolute)",
-        "America\/Rio_Branco": "Brasil (Rio Branco)",
+        "America\/Rio_Branco": "Brasil aldeko ordua (Rio Branco)",
         "America\/Santa_Isabel": "Mexikoko ipar-ekialdeko ordua (Santa Isabel)",
         "America\/Santarem": "Brasiliako ordua (Santarém)",
         "America\/Santiago": "Txileko ordua (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabiako ordua (Bahrain)",
         "Asia\/Baku": "Azerbaijango ordua (Baku)",
         "Asia\/Bangkok": "Indotxinako ordua (Bangkok)",
-        "Asia\/Barnaul": "Errusia (Barnaul)",
+        "Asia\/Barnaul": "Errusia aldeko ordua (Barnaul)",
         "Asia\/Beirut": "Europako ekialdeko ordua (Beirut)",
         "Asia\/Bishkek": "Kirgizistango ordua (Bixkek)",
         "Asia\/Brunei": "Brunei Darussalamgo ordua",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Irango ordua (Teheran)",
         "Asia\/Thimphu": "Bhutango ordua (Thimphu)",
         "Asia\/Tokyo": "Japoniako ordua (Tokio)",
-        "Asia\/Tomsk": "Errusia (Tomsk)",
+        "Asia\/Tomsk": "Errusia aldeko ordua (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulan Batorreko ordua",
-        "Asia\/Urumqi": "Txina (Ürümqi)",
+        "Asia\/Urumqi": "Txina aldeko ordua (Ürümqi)",
         "Asia\/Ust-Nera": "Vladivostokeko ordua (Ust-Nera)",
         "Asia\/Vientiane": "Indotxinako ordua (Vientian)",
         "Asia\/Vladivostok": "Vladivostokeko ordua",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwichko meridianoaren ordua (Guernesey)",
         "Europe\/Helsinki": "Europako ekialdeko ordua (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwichko meridianoaren ordua (Man uhartea)",
-        "Europe\/Istanbul": "Turkia (Istanbul)",
+        "Europe\/Istanbul": "Turkia aldeko ordua (Istanbul)",
         "Europe\/Jersey": "Greenwichko meridianoaren ordua (Jersey)",
         "Europe\/Kaliningrad": "Europako ekialdeko ordua (Kaliningrad)",
         "Europe\/Kiev": "Europako ekialdeko ordua (Kiev)",
-        "Europe\/Kirov": "Errusia (Kirov)",
+        "Europe\/Kirov": "Errusia aldeko ordua (Kirov)",
         "Europe\/Lisbon": "Europako mendebaldeko ordua (Lisboa)",
         "Europe\/Ljubljana": "Europako erdialdeko ordua (Ljubljana)",
         "Europe\/London": "Greenwichko meridianoaren ordua (Londres)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Wake uharteko ordua",
         "Pacific\/Wallis": "Wallis eta Futunako ordutegia"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

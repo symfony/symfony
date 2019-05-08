@@ -151,7 +151,7 @@
         "America\/Moncton": "atlanti-óceáni idő (Moncton)",
         "America\/Monterrey": "középső államokbeli idő (Monterrey)",
         "America\/Montevideo": "uruguayi idő (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada idő (Montreal)",
         "America\/Montserrat": "atlanti-óceáni idő (Montserrat)",
         "America\/Nassau": "keleti államokbeli idő (Nassau)",
         "America\/New_York": "keleti államokbeli idő (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "arab idő (Bahrein)",
         "Asia\/Baku": "azerbajdzsáni idő (Baku)",
         "Asia\/Bangkok": "indokínai idő (Bangkok)",
-        "Asia\/Barnaul": "Oroszország (Barnaul)",
+        "Asia\/Barnaul": "Oroszország idő (Barnaul)",
         "Asia\/Beirut": "kelet-európai időzóna (Bejrút)",
         "Asia\/Bishkek": "kirgizisztáni idő (Biskek)",
         "Asia\/Brunei": "Brunei Darussalam-i idő",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "iráni idő (Teherán)",
         "Asia\/Thimphu": "butáni idő (Thimphu)",
         "Asia\/Tokyo": "japán idő (Tokió)",
-        "Asia\/Tomsk": "Oroszország (Tomszk)",
+        "Asia\/Tomsk": "Oroszország idő (Tomszk)",
         "Asia\/Ulaanbaatar": "ulánbátori idő",
-        "Asia\/Urumqi": "Kína (Ürümqi)",
+        "Asia\/Urumqi": "Kína idő (Ürümqi)",
         "Asia\/Ust-Nera": "vlagyivosztoki idő (Uszty-Nyera)",
         "Asia\/Vientiane": "indokínai idő (Vientián)",
         "Asia\/Vladivostok": "vlagyivosztoki idő",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "greenwichi középidő, téli idő (Guernsey)",
         "Europe\/Helsinki": "kelet-európai időzóna (Helsinki)",
         "Europe\/Isle_of_Man": "greenwichi középidő, téli idő (Man-sziget)",
-        "Europe\/Istanbul": "Törökország (Isztanbul)",
+        "Europe\/Istanbul": "Törökország idő (Isztanbul)",
         "Europe\/Jersey": "greenwichi középidő, téli idő (Jersey)",
         "Europe\/Kaliningrad": "kelet-európai időzóna (Kalinyingrád)",
         "Europe\/Kiev": "kelet-európai időzóna (Kijev)",
-        "Europe\/Kirov": "Oroszország (Kirov)",
+        "Europe\/Kirov": "Oroszország idő (Kirov)",
         "Europe\/Lisbon": "nyugat-európai időzóna (Lisszabon)",
         "Europe\/Ljubljana": "közép-európai időzóna (Ljubljana)",
         "Europe\/London": "greenwichi középidő, téli idő (London)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "wake-szigeti idő",
         "Pacific\/Wallis": "Wallis és Futuna-i idő"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

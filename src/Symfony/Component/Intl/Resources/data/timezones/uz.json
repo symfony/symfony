@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Ueyk oroli vaqti",
         "Pacific\/Wallis": "Uollis va Futuna vaqti"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

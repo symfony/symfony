@@ -99,7 +99,7 @@
         "America\/Detroit": "Noord-Amerikaanse oostelike tyd (Detroit)",
         "America\/Dominica": "Atlantiese tyd (Dominica)",
         "America\/Edmonton": "Noord-Amerikaanse bergtyd (Edmonton)",
-        "America\/Eirunepe": "Brasilië (Eirunepe)",
+        "America\/Eirunepe": "Brasilië-tyd (Eirunepe)",
         "America\/El_Salvador": "Noord-Amerikaanse sentrale tyd (El Salvador)",
         "America\/Fort_Nelson": "Noord-Amerikaanse bergtyd (Fort Nelson)",
         "America\/Fortaleza": "Brasilia-tyd (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantiese tyd (Moncton)",
         "America\/Monterrey": "Noord-Amerikaanse sentrale tyd (Monterrey)",
         "America\/Montevideo": "Uruguay-tyd (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada-tyd (Montreal)",
         "America\/Montserrat": "Atlantiese tyd (Montserrat)",
         "America\/Nassau": "Noord-Amerikaanse oostelike tyd (Nassau)",
         "America\/New_York": "Noord-Amerikaanse oostelike tyd (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Brasilia-tyd (Recife)",
         "America\/Regina": "Noord-Amerikaanse sentrale tyd (Regina)",
         "America\/Resolute": "Noord-Amerikaanse sentrale tyd (Resolute)",
-        "America\/Rio_Branco": "Brasilië (Rio Branco)",
+        "America\/Rio_Branco": "Brasilië-tyd (Rio Branco)",
         "America\/Santa_Isabel": "Noordwes-Meksiko-tyd (Santa Isabel)",
         "America\/Santarem": "Brasilia-tyd (Santarem)",
         "America\/Santiago": "Chili-tyd (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabiese tyd (Bahrein)",
         "Asia\/Baku": "Aserbeidjan-tyd (Bakoe)",
         "Asia\/Bangkok": "Indosjina-tyd (Bangkok)",
-        "Asia\/Barnaul": "Rusland (Barnaul)",
+        "Asia\/Barnaul": "Rusland-tyd (Barnaul)",
         "Asia\/Beirut": "Oos-Europese tyd (Beiroet)",
         "Asia\/Bishkek": "Kirgistan-tyd (Bisjkek)",
         "Asia\/Brunei": "Broenei Darussalam-tyd",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iran-tyd (Tehran)",
         "Asia\/Thimphu": "Bhoetan-tyd (Thimphu)",
         "Asia\/Tokyo": "Japan-tyd (Tokio)",
-        "Asia\/Tomsk": "Rusland (Tomsk)",
+        "Asia\/Tomsk": "Rusland-tyd (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulaanbaatar-tyd",
-        "Asia\/Urumqi": "Sjina (Urumqi)",
+        "Asia\/Urumqi": "Sjina-tyd (Urumqi)",
         "Asia\/Ust-Nera": "Wladiwostok-tyd (Ust-Nera)",
         "Asia\/Vientiane": "Indosjina-tyd (Vientiane)",
         "Asia\/Vladivostok": "Wladiwostok-tyd",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwich-tyd (Guernsey)",
         "Europe\/Helsinki": "Oos-Europese tyd (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwich-tyd (Eiland Man)",
-        "Europe\/Istanbul": "Turkye (Istanbul)",
+        "Europe\/Istanbul": "Turkye-tyd (Istanbul)",
         "Europe\/Jersey": "Greenwich-tyd (Jersey)",
         "Europe\/Kaliningrad": "Oos-Europese tyd (Kaliningrad)",
         "Europe\/Kiev": "Oos-Europese tyd (Kiëf)",
-        "Europe\/Kirov": "Rusland (Kirov)",
+        "Europe\/Kirov": "Rusland-tyd (Kirov)",
         "Europe\/Lisbon": "Wes-Europese tyd (Lissabon)",
         "Europe\/Ljubljana": "Sentraal-Europese tyd (Ljubljana)",
         "Europe\/London": "Greenwich-tyd (Londen)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Wake-eiland-tyd",
         "Pacific\/Wallis": "Wallis en Futuna-tyd (Mata-Utu)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

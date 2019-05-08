@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantic Time (Moncton)",
         "America\/Monterrey": "Central Time (Monterrey)",
         "America\/Montevideo": "Uruguay Time (Montevideo)",
-        "America\/Montreal": "Canada (Montreal)",
+        "America\/Montreal": "Canada Time (Montreal)",
         "America\/Montserrat": "Atlantic Time (Montserrat)",
         "America\/Nassau": "Eastern Time (Nassau)",
         "America\/New_York": "Eastern Time (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabian Time (Bahrain)",
         "Asia\/Baku": "Azerbaijan Time (Baku)",
         "Asia\/Bangkok": "Indochina Time (Bangkok)",
-        "Asia\/Barnaul": "Russia (Barnaul)",
+        "Asia\/Barnaul": "Russia Time (Barnaul)",
         "Asia\/Beirut": "Eastern European Time (Beirut)",
         "Asia\/Bishkek": "Kyrgyzstan Time (Bishkek)",
         "Asia\/Brunei": "Brunei Darussalam Time",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iran Time (Tehran)",
         "Asia\/Thimphu": "Bhutan Time (Thimphu)",
         "Asia\/Tokyo": "Japan Time (Tokyo)",
-        "Asia\/Tomsk": "Russia (Tomsk)",
+        "Asia\/Tomsk": "Russia Time (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulaanbaatar Time",
-        "Asia\/Urumqi": "China (Urumqi)",
+        "Asia\/Urumqi": "China Time (Urumqi)",
         "Asia\/Ust-Nera": "Vladivostok Time (Ust-Nera)",
         "Asia\/Vientiane": "Indochina Time (Vientiane)",
         "Asia\/Vladivostok": "Vladivostok Time",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwich Mean Time (Guernsey)",
         "Europe\/Helsinki": "Eastern European Time (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwich Mean Time (Isle of Man)",
-        "Europe\/Istanbul": "Turkey (Istanbul)",
+        "Europe\/Istanbul": "Turkey Time (Istanbul)",
         "Europe\/Jersey": "Greenwich Mean Time (Jersey)",
         "Europe\/Kaliningrad": "Eastern European Time (Kaliningrad)",
         "Europe\/Kiev": "Eastern European Time (Kiev)",
-        "Europe\/Kirov": "Russia (Kirov)",
+        "Europe\/Kirov": "Russia Time (Kirov)",
         "Europe\/Lisbon": "Western European Time (Lisbon)",
         "Europe\/Ljubljana": "Central European Time (Ljubljana)",
         "Europe\/London": "Greenwich Mean Time (London)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Wake Island Time",
         "Pacific\/Wallis": "Wallis & Futuna Time"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

@@ -240,11 +240,5 @@
         "Pacific\/Chatham": "Aotearoa (Rēkohu)",
         "Pacific\/Honolulu": "Hononga o Amerika (Honolulu)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

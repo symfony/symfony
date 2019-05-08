@@ -151,7 +151,7 @@
         "America\/Moncton": "大西洋時間（モンクトン）",
         "America\/Monterrey": "アメリカ中部時間（モンテレイ）",
         "America\/Montevideo": "ウルグアイ時間（モンテビデオ）",
-        "America\/Montreal": "カナダ（Montreal）",
+        "America\/Montreal": "カナダ時間（Montreal）",
         "America\/Montserrat": "大西洋時間（モントセラト）",
         "America\/Nassau": "アメリカ東部時間（ナッソー）",
         "America\/New_York": "アメリカ東部時間（ニューヨーク）",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "アラビア時間（バーレーン）",
         "Asia\/Baku": "アゼルバイジャン時間（バクー）",
         "Asia\/Bangkok": "インドシナ時間（バンコク）",
-        "Asia\/Barnaul": "ロシア（バルナウル）",
+        "Asia\/Barnaul": "ロシア時間（バルナウル）",
         "Asia\/Beirut": "東ヨーロッパ時間（ベイルート）",
         "Asia\/Bishkek": "キルギス時間（ビシュケク）",
         "Asia\/Brunei": "ブルネイ・ダルサラーム時間",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "イラン時間（テヘラン）",
         "Asia\/Thimphu": "ブータン時間（ティンプー）",
         "Asia\/Tokyo": "日本時間（東京）",
-        "Asia\/Tomsk": "ロシア（トムスク）",
+        "Asia\/Tomsk": "ロシア時間（トムスク）",
         "Asia\/Ulaanbaatar": "ウランバートル時間",
-        "Asia\/Urumqi": "中国（ウルムチ）",
+        "Asia\/Urumqi": "中国時間（ウルムチ）",
         "Asia\/Ust-Nera": "ウラジオストク時間（ウスチネラ）",
         "Asia\/Vientiane": "インドシナ時間（ビエンチャン）",
         "Asia\/Vladivostok": "ウラジオストク時間",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "グリニッジ標準時（ガーンジー）",
         "Europe\/Helsinki": "東ヨーロッパ時間（ヘルシンキ）",
         "Europe\/Isle_of_Man": "グリニッジ標準時（マン島）",
-        "Europe\/Istanbul": "トルコ（イスタンブール）",
+        "Europe\/Istanbul": "トルコ時間（イスタンブール）",
         "Europe\/Jersey": "グリニッジ標準時（ジャージー）",
         "Europe\/Kaliningrad": "東ヨーロッパ時間（カリーニングラード）",
         "Europe\/Kiev": "東ヨーロッパ時間（キエフ）",
-        "Europe\/Kirov": "ロシア（キーロフ）",
+        "Europe\/Kirov": "ロシア時間（キーロフ）",
         "Europe\/Lisbon": "西ヨーロッパ時間（リスボン）",
         "Europe\/Ljubljana": "中央ヨーロッパ時間（リュブリャナ）",
         "Europe\/London": "グリニッジ標準時（ロンドン）",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "ウェーク島時間",
         "Pacific\/Wallis": "ウォリス・フツナ時間（ウォリス諸島）"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

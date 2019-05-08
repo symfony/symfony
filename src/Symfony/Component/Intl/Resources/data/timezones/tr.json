@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantik Saati (Moncton)",
         "America\/Monterrey": "Kuzey Amerika Merkezi Saati (Monterrey)",
         "America\/Montevideo": "Uruguay Saati (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada Saati (Montreal)",
         "America\/Montserrat": "Atlantik Saati (Montserrat)",
         "America\/Nassau": "Kuzey Amerika Doğu Saati (Nassau)",
         "America\/New_York": "Kuzey Amerika Doğu Saati (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabistan Saati (Bahreyn)",
         "Asia\/Baku": "Azerbaycan Saati (Bakü)",
         "Asia\/Bangkok": "Hindiçin Saati (Bangkok)",
-        "Asia\/Barnaul": "Rusya (Barnaul)",
+        "Asia\/Barnaul": "Rusya Saati (Barnaul)",
         "Asia\/Beirut": "Doğu Avrupa Saati (Beyrut)",
         "Asia\/Bishkek": "Kırgızistan Saati (Bişkek)",
         "Asia\/Brunei": "Brunei Darü’s-Selam Saati",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "İran Saati (Tahran)",
         "Asia\/Thimphu": "Butan Saati (Thimphu)",
         "Asia\/Tokyo": "Japonya Saati (Tokyo)",
-        "Asia\/Tomsk": "Rusya (Tomsk)",
+        "Asia\/Tomsk": "Rusya Saati (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulan Batur Saati",
-        "Asia\/Urumqi": "Çin (Urumçi)",
+        "Asia\/Urumqi": "Çin Saati (Urumçi)",
         "Asia\/Ust-Nera": "Vladivostok Saati (Ust-Nera)",
         "Asia\/Vientiane": "Hindiçin Saati (Vientiane)",
         "Asia\/Vladivostok": "Vladivostok Saati",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwich Ortalama Saati (Guernsey)",
         "Europe\/Helsinki": "Doğu Avrupa Saati (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwich Ortalama Saati (Man Adası)",
-        "Europe\/Istanbul": "Türkiye (İstanbul)",
+        "Europe\/Istanbul": "Türkiye Saati (İstanbul)",
         "Europe\/Jersey": "Greenwich Ortalama Saati (Jersey)",
         "Europe\/Kaliningrad": "Doğu Avrupa Saati (Kaliningrad)",
         "Europe\/Kiev": "Doğu Avrupa Saati (Kiev)",
-        "Europe\/Kirov": "Rusya (Kirov)",
+        "Europe\/Kirov": "Rusya Saati (Kirov)",
         "Europe\/Lisbon": "Batı Avrupa Saati (Lizbon)",
         "Europe\/Ljubljana": "Orta Avrupa Saati (Ljubljana)",
         "Europe\/London": "Greenwich Ortalama Saati (Londra)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Wake Adası Saati",
         "Pacific\/Wallis": "Wallis ve Futuna Saati"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

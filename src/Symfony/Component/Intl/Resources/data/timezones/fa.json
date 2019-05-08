@@ -99,7 +99,7 @@
         "America\/Detroit": "وقت شرق امریکا (دیترویت)",
         "America\/Dominica": "وقت آتلانتیک (دومینیکا)",
         "America\/Edmonton": "وقت کوهستانی امریکا (ادمونتون)",
-        "America\/Eirunepe": "برزیل (ایرونپه)",
+        "America\/Eirunepe": "وقت برزیل (ایرونپه)",
         "America\/El_Salvador": "وقت مرکز امریکا (السالوادور)",
         "America\/Fort_Nelson": "وقت کوهستانی امریکا (فورت نلسون)",
         "America\/Fortaleza": "وقت برازیلیا (فورتالزا)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "وقت آتلانتیک (مانکتون)",
         "America\/Monterrey": "وقت مرکز امریکا (مونتری)",
         "America\/Montevideo": "وقت اروگوئه (مونته‌ویدئو)",
-        "America\/Montreal": "کانادا (Montreal)",
+        "America\/Montreal": "وقت کانادا (Montreal)",
         "America\/Montserrat": "وقت آتلانتیک (مونتسرات)",
         "America\/Nassau": "وقت شرق امریکا (ناسائو)",
         "America\/New_York": "وقت شرق امریکا (نیویورک)",
@@ -176,7 +176,7 @@
         "America\/Recife": "وقت برازیلیا (ریسیفی)",
         "America\/Regina": "وقت مرکز امریکا (رجاینا)",
         "America\/Resolute": "وقت مرکز امریکا (رزولوت)",
-        "America\/Rio_Branco": "برزیل (ریوبرانکو)",
+        "America\/Rio_Branco": "وقت برزیل (ریوبرانکو)",
         "America\/Santa_Isabel": "وقت شمال غرب مکزیک (سانتا ایزابل)",
         "America\/Santarem": "وقت برازیلیا (سنتارم)",
         "America\/Santiago": "وقت شیلی (سانتیاگو)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "وقت عربستان (بحرین)",
         "Asia\/Baku": "وقت جمهوری آذربایجان (باکو)",
         "Asia\/Bangkok": "وقت هندوچین (بانکوک)",
-        "Asia\/Barnaul": "روسیه (بارنائول)",
+        "Asia\/Barnaul": "وقت روسیه (بارنائول)",
         "Asia\/Beirut": "وقت شرق اروپا (بیروت)",
         "Asia\/Bishkek": "وقت قرقیزستان (بیشکک)",
         "Asia\/Brunei": "وقت برونئی دارالسلام",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "وقت ایران (تهران)",
         "Asia\/Thimphu": "وقت بوتان (تیمفو)",
         "Asia\/Tokyo": "وقت ژاپن (توکیو)",
-        "Asia\/Tomsk": "روسیه (تومسک)",
+        "Asia\/Tomsk": "وقت روسیه (تومسک)",
         "Asia\/Ulaanbaatar": "وقت اولان‌باتور",
-        "Asia\/Urumqi": "چین (ارومچی)",
+        "Asia\/Urumqi": "وقت چین (ارومچی)",
         "Asia\/Ust-Nera": "وقت ولادی‌وستوک (اوست نرا)",
         "Asia\/Vientiane": "وقت هندوچین (وینتیان)",
         "Asia\/Vladivostok": "وقت ولادی‌وستوک",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "وقت گرینویچ (گرنزی)",
         "Europe\/Helsinki": "وقت شرق اروپا (هلسینکی)",
         "Europe\/Isle_of_Man": "وقت گرینویچ (جزیرهٔ من)",
-        "Europe\/Istanbul": "ترکیه (استانبول)",
+        "Europe\/Istanbul": "وقت ترکیه (استانبول)",
         "Europe\/Jersey": "وقت گرینویچ (جرزی)",
         "Europe\/Kaliningrad": "وقت شرق اروپا (کالینینگراد)",
         "Europe\/Kiev": "وقت شرق اروپا (کیف)",
-        "Europe\/Kirov": "روسیه (کیروف)",
+        "Europe\/Kirov": "وقت روسیه (کیروف)",
         "Europe\/Lisbon": "وقت غرب اروپا (لیسبون)",
         "Europe\/Ljubljana": "وقت مرکز اروپا (لیوبلیانا)",
         "Europe\/London": "وقت گرینویچ (لندن)",
@@ -438,9 +438,7 @@
     },
     "Meta": {
         "GmtFormat": "%s گرینویچ",
-        "HourFormat": [
-            "‎+%02d:%02d",
-            "‎−%02d:%02d"
-        ]
+        "HourFormatPos": "‎+%02d:%02d",
+        "HourFormatNeg": "‎−%02d:%02d"
     }
 }

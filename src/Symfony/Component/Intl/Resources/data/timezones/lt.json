@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlanto laikas (Monktonas)",
         "America\/Monterrey": "Šiaurės Amerikos centro laikas (Monterėjus)",
         "America\/Montevideo": "Urugvajaus laikas (Montevidėjas)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Laikas: Kanada (Montreal)",
         "America\/Montserrat": "Atlanto laikas (Montseratas)",
         "America\/Nassau": "Šiaurės Amerikos rytų laikas (Nasau)",
         "America\/New_York": "Šiaurės Amerikos rytų laikas (Niujorkas)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabijos laikas (Bahreinas)",
         "Asia\/Baku": "Azerbaidžano laikas (Baku)",
         "Asia\/Bangkok": "Indokinijos laikas (Bankokas)",
-        "Asia\/Barnaul": "Rusija (Barnaulas)",
+        "Asia\/Barnaul": "Laikas: Rusija (Barnaulas)",
         "Asia\/Beirut": "Rytų Europos laikas (Beirutas)",
         "Asia\/Bishkek": "Kirgistano laikas (Biškekas)",
         "Asia\/Brunei": "Brunėjaus Darusalamo laikas (Brunėjus)",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Irano laikas (Teheranas)",
         "Asia\/Thimphu": "Butano laikas (Timpu)",
         "Asia\/Tokyo": "Japonijos laikas (Tokijas)",
-        "Asia\/Tomsk": "Rusija (Tomskas)",
+        "Asia\/Tomsk": "Laikas: Rusija (Tomskas)",
         "Asia\/Ulaanbaatar": "Ulan Batoro laikas (Ulan Batoras)",
-        "Asia\/Urumqi": "Kinija (Urumči)",
+        "Asia\/Urumqi": "Laikas: Kinija (Urumči)",
         "Asia\/Ust-Nera": "Vladivostoko laikas (Ust Nera)",
         "Asia\/Vientiane": "Indokinijos laikas (Vientianas)",
         "Asia\/Vladivostok": "Vladivostoko laikas (Vladivostokas)",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Grinvičo laikas (Gernsis)",
         "Europe\/Helsinki": "Rytų Europos laikas (Helsinkis)",
         "Europe\/Isle_of_Man": "Grinvičo laikas (Meno sala)",
-        "Europe\/Istanbul": "Turkija (Stambulas)",
+        "Europe\/Istanbul": "Laikas: Turkija (Stambulas)",
         "Europe\/Jersey": "Grinvičo laikas (Džersis)",
         "Europe\/Kaliningrad": "Rytų Europos laikas (Kaliningradas)",
         "Europe\/Kiev": "Rytų Europos laikas (Kijevas)",
-        "Europe\/Kirov": "Rusija (Kirovas)",
+        "Europe\/Kirov": "Laikas: Rusija (Kirovas)",
         "Europe\/Lisbon": "Vakarų Europos laikas (Lisabona)",
         "Europe\/Ljubljana": "Vidurio Europos laikas (Liubliana)",
         "Europe\/London": "Grinvičo laikas (Londonas)",
@@ -437,10 +437,6 @@
         "Pacific\/Wallis": "Voliso ir Futūnos laikas (Volisas)"
     },
     "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "−%02d:%02d"
-        ]
+        "HourFormatNeg": "−%02d:%02d"
     }
 }

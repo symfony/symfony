@@ -326,16 +326,16 @@ class ConnectionTest extends TestCase
         $delayExchange->expects($this->once())->method('declareExchange');
         $delayExchange->method('getName')->willReturn('delay');
 
-        $delayQueue->expects($this->once())->method('setName')->with('delay_queue_5000');
+        $delayQueue->expects($this->once())->method('setName')->with('delay_queue__5000');
         $delayQueue->expects($this->once())->method('setArguments')->with([
             'x-message-ttl' => 5000,
             'x-dead-letter-exchange' => 'messages',
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_5000');
+        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay__5000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_5000', AMQP_NOPARAM, ['headers' => ['x-some-headers' => 'foo']]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay__5000', AMQP_NOPARAM, ['headers' => ['x-some-headers' => 'foo']]);
 
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages', [], $factory);
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
@@ -371,22 +371,22 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages', $connectionOptions, $factory);
 
-        $delayQueue->expects($this->once())->method('setName')->with('delay_queue_120000');
+        $delayQueue->expects($this->once())->method('setName')->with('delay_queue__120000');
         $delayQueue->expects($this->once())->method('setArguments')->with([
             'x-message-ttl' => 120000,
             'x-dead-letter-exchange' => 'messages',
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_120000');
+        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay__120000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_120000', AMQP_NOPARAM, ['headers' => []]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay__120000', AMQP_NOPARAM, ['headers' => []]);
         $connection->publish('{}', [], 120000);
     }
 
     /**
      * @expectedException \AMQPException
-     * @expectedExceptionMessage Could not connect to the AMQP server. Please verify the provided DSN. ({"delay":{"routing_key_pattern":"delay_%delay%","exchange_name":"delay","queue_name_pattern":"delay_queue_%delay%"},"host":"localhost","port":5672,"vhost":"\/","login":"user","password":"********"})
+     * @expectedExceptionMessage Could not connect to the AMQP server. Please verify the provided DSN. ({"delay":{"routing_key_pattern":"delay_%routing_key%_%delay%","exchange_name":"delay","queue_name_pattern":"delay_queue_%routing_key%_%delay%"},"host":"localhost","port":5672,"vhost":"\/","login":"user","password":"********"})
      */
     public function testObfuscatePasswordInDsn()
     {
@@ -465,7 +465,7 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('amqp://localhost/%2f/messages', $connectionOptions, $factory);
 
-        $delayQueue->expects($this->once())->method('setName')->with('delay_queue_120000');
+        $delayQueue->expects($this->once())->method('setName')->with('delay_queue_routing_key_120000');
         $delayQueue->expects($this->once())->method('setArguments')->with([
             'x-message-ttl' => 120000,
             'x-dead-letter-exchange' => 'messages',
@@ -476,9 +476,9 @@ class ConnectionTest extends TestCase
         );
 
         $delayQueue->expects($this->once())->method('declareQueue');
-        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_120000');
+        $delayQueue->expects($this->once())->method('bind')->with('delay', 'delay_routing_key_120000');
 
-        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_120000', AMQP_NOPARAM, ['headers' => []]);
+        $delayExchange->expects($this->once())->method('publish')->with('{}', 'delay_routing_key_120000', AMQP_NOPARAM, ['headers' => []]);
         $connection->publish('{}', [], 120000, new AmqpStamp('routing_key'));
     }
 

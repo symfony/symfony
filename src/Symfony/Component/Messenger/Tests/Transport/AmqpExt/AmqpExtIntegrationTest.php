@@ -227,7 +227,7 @@ TXT
         $actualDuration = microtime(true) - $startTime;
 
         if (\method_exists([$this, 'assertEqualsWithDelta'])) {
-            $this->assertEqualsWithDelta($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
+            $this->assertEqualsWithDelta($expectedDuration, $actualDuration, .5, 'Duration was not within expected range');
         } else {
             $this->assertEquals($expectedDuration, $actualDuration, 'Duration was not within expected range', .5);
         }

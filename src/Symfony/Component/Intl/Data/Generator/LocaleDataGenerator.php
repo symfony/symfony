@@ -14,9 +14,6 @@ namespace Symfony\Component\Intl\Data\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
-use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
-use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Locale;
@@ -31,22 +28,10 @@ use Symfony\Component\Intl\Locale;
  */
 class LocaleDataGenerator extends AbstractDataGenerator
 {
-    private $languageDataProvider;
-    private $scriptDataProvider;
-    private $regionDataProvider;
     private $locales;
     private $localeAliases;
     private $fallbackMapping;
     private $fallbackCache = [];
-
-    public function __construct(BundleCompilerInterface $compiler, $dirName, LanguageDataProvider $languageDataProvider, ScriptDataProvider $scriptDataProvider, RegionDataProvider $regionDataProvider)
-    {
-        parent::__construct($compiler, $dirName);
-
-        $this->languageDataProvider = $languageDataProvider;
-        $this->scriptDataProvider = $scriptDataProvider;
-        $this->regionDataProvider = $regionDataProvider;
-    }
 
     /**
      * {@inheritdoc}
@@ -66,8 +51,12 @@ class LocaleDataGenerator extends AbstractDataGenerator
     protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
     {
         $filesystem = new Filesystem();
-        $filesystem->mkdir($tempDir.'/lang');
+        $filesystem->mkdir([
+            $tempDir.'/lang',
+            $tempDir.'/region',
+        ]);
         $compiler->compile($sourceDir.'/lang', $tempDir.'/lang');
+        $compiler->compile($sourceDir.'/region', $tempDir.'/region');
     }
 
     /**
@@ -83,19 +72,14 @@ class LocaleDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
     {
-        // Generate aliases, needed to enable proper fallback from alias to its
-        // target
+        // Don't generate aliases, as they are resolved during runtime
         if (isset($this->localeAliases[$displayLocale])) {
-            return ['%%ALIAS' => $this->localeAliases[$displayLocale]];
+            return;
         }
 
         // Generate locale names for all locales that have translations in
         // at least the language or the region bundle
-        try {
-            $displayFormat = $reader->readEntry($tempDir.'/lang', $displayLocale, ['localeDisplayPattern']);
-        } catch (MissingResourceException $e) {
-            $displayFormat = $reader->readEntry($tempDir.'/lang', 'root', ['localeDisplayPattern']);
-        }
+        $displayFormat = $reader->readEntry($tempDir.'/lang', $displayLocale, ['localeDisplayPattern']);
         $pattern = $displayFormat['pattern'] ?? '{0} ({1})';
         $separator = $displayFormat['separator'] ?? '{0}, {1}';
         $localeNames = [];
@@ -110,7 +94,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
                 // Each locale name has the form: "Language (Script, Region, Variant1, ...)
                 // Script, Region and Variants are optional. If none of them is
                 // available, the braces are not printed.
-                $localeNames[$locale] = $this->generateLocaleName($locale, $displayLocale, $pattern, $separator);
+                $localeNames[$locale] = $this->generateLocaleName($reader, $tempDir, $locale, $displayLocale, $pattern, $separator);
             } catch (MissingResourceException $e) {
                 // Silently ignore incomplete locale names
                 // In this case one should configure at least one fallback locale that is complete (e.g. English) during
@@ -158,22 +142,26 @@ class LocaleDataGenerator extends AbstractDataGenerator
     /**
      * @return string
      */
-    private function generateLocaleName($locale, $displayLocale, $pattern, $separator)
+    private function generateLocaleName(BundleEntryReaderInterface $reader, $tempDir, $locale, $displayLocale, $pattern, $separator)
     {
         // Apply generic notation using square brackets as described per http://cldr.unicode.org/translation/language-names
-        $name = str_replace(['(', ')'], ['[', ']'], $this->languageDataProvider->getName(\Locale::getPrimaryLanguage($locale), $displayLocale));
+        $name = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Languages', \Locale::getPrimaryLanguage($locale)]));
         $extras = [];
 
         // Discover the name of the script part of the locale
         // i.e. in zh_Hans_MO, "Hans" is the script
         if ($script = \Locale::getScript($locale)) {
-            $extras[] = str_replace(['(', ')'], ['[', ']'], $this->scriptDataProvider->getName($script, $displayLocale));
+            $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/lang', $displayLocale, ['Scripts', $script]));
         }
 
         // Discover the name of the region part of the locale
         // i.e. in de_AT, "AT" is the region
         if ($region = \Locale::getRegion($locale)) {
-            $extras[] = str_replace(['(', ')'], ['[', ']'], $this->regionDataProvider->getName($region, $displayLocale));
+            if (!RegionDataGenerator::isValidCountryCode($region)) {
+                throw new MissingResourceException('Skipping "'.$locale.'" due an invalid country.');
+            }
+
+            $extras[] = str_replace(['(', ')'], ['[', ']'], $reader->readEntry($tempDir.'/region', $displayLocale, ['Countries', $region]));
         }
 
         if ($extras) {

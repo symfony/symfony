@@ -31,7 +31,7 @@ final class Locale extends \Locale
      * The default fallback locale is used as fallback for locales that have no
      * fallback otherwise.
      *
-     * @param string $locale The default fallback locale
+     * @param string|null $locale The default fallback locale
      *
      * @see getFallback()
      */
@@ -43,7 +43,7 @@ final class Locale extends \Locale
     /**
      * Returns the default fallback locale.
      *
-     * @return string The default fallback locale
+     * @return string|null The default fallback locale
      *
      * @see setDefaultFallback()
      * @see getFallback()
@@ -70,7 +70,7 @@ final class Locale extends \Locale
         if (\function_exists('locale_parse')) {
             $localeSubTags = locale_parse($locale);
             if (1 === \count($localeSubTags)) {
-                if (self::$defaultFallback === $localeSubTags['language']) {
+                if ('root' !== self::$defaultFallback && self::$defaultFallback === $localeSubTags['language']) {
                     return 'root';
                 }
 
@@ -98,7 +98,7 @@ final class Locale extends \Locale
             return substr($locale, 0, $pos);
         }
 
-        if (self::$defaultFallback === $locale) {
+        if ('root' !== self::$defaultFallback && self::$defaultFallback === $locale) {
             return 'root';
         }
 

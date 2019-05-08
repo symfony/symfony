@@ -690,7 +690,7 @@ EOF;
         $code .= $this->addServiceInclude($id, $definition);
 
         if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-            $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : "\$this->factories[%2\$s](false)") : '$this->%s(false)';
+            $factoryCode = $asFile ? ($definition->isShared() ? "\$this->load('%s.php', false)" : '$this->factories[%2$s](false)') : '$this->%s(false)';
             $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName, $this->doExport($id)));
         }
 
@@ -1386,14 +1386,14 @@ EOF;
             if (!$this->container->hasDefinition($service)) {
                 return 'false';
             }
-            $conditions[] = sprintf("isset(\$this->%s[%s])", $this->container->getDefinition($service)->isPublic() ? 'services' : 'privates', $this->doExport($service));
+            $conditions[] = sprintf('isset($this->%s[%s])', $this->container->getDefinition($service)->isPublic() ? 'services' : 'privates', $this->doExport($service));
         }
         foreach (ContainerBuilder::getServiceConditionals($value) as $service) {
             if ($this->container->hasDefinition($service) && !$this->container->getDefinition($service)->isPublic()) {
                 continue;
             }
 
-            $conditions[] = sprintf("\$this->has(%s)", $this->doExport($service));
+            $conditions[] = sprintf('$this->has(%s)', $this->doExport($service));
         }
 
         if (!$conditions) {

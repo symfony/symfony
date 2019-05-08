@@ -373,6 +373,21 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
+    public function testLoadingTranslationFilesWithDotsInMessageDomain()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = [
+            'en' => [
+                __DIR__.'/../Fixtures/Resources/translations/domain.with.dots.en.yml',
+            ],
+        ];
+
+        $translator = $this->getTranslator($loader, ['cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles], 'yml');
+        $translator->setLocale('en');
+        $translator->setFallbackLocales(['fr']);
+        $this->assertEquals('It works!', $translator->trans('message', [], 'domain.with.dots'));
+    }
+
     private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader', $defaultLocale = 'en')
     {
         if (null === $defaultLocale) {

@@ -205,7 +205,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         }
 
         // Po<TAB>Cr<TAB>P<DOWN ARROW><DOWN ARROW><NEWLINE>
-        $inputStream = $this->getInputStream("Pa\177\177o\tCr\t\033[A\033[A\033[A\n");
+        $inputStream = $this->getInputStream("Pa\177\177o\tCr\tP\033[A\033[A\n");
 
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);
@@ -223,21 +223,10 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         // No effort is made to avoid irrelevant suggestions, as this is handled
         // by the autocomplete function.
         $callback = function ($input) {
-            $knownWords = [
-                'Carrot',
-                'Creme',
-                'Curry',
-                'Parsnip',
-                'Pie',
-                'Potato',
-                'Tart',
-            ];
-
+            $knownWords = ['Carrot', 'Creme', 'Curry', 'Parsnip', 'Pie', 'Potato', 'Tart'];
             $inputWords = explode(' ', $input);
-            $lastInputWord = array_pop($inputWords);
-            $suggestionBase = $inputWords
-                ? implode(' ', $inputWords).' '
-                : '';
+            array_pop($inputWords);
+            $suggestionBase = $inputWords ? implode(' ', $inputWords).' ' : '';
 
             return array_map(
                 function ($word) use ($suggestionBase) {
@@ -249,14 +238,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         $question->setAutocompleterCallback($callback);
 
-        $this->assertSame(
-            'Potato Creme Pie',
-            $dialog->ask(
-                $this->createStreamableInputInterfaceMock($inputStream),
-                $this->createOutputInterface(),
-                $question
-            )
-        );
+        $this->assertSame('Potato Creme Pie', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
     public function testAskWithAutocompleteWithNonSequentialKeys()

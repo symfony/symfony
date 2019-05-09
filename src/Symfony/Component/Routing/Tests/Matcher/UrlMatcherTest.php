@@ -727,6 +727,7 @@ class UrlMatcherTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage No routes found for "/".
      */
     public function testSchemeAndMethodMismatch()
     {

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-05-07T06:31:05Z
+
+The approach completely makes sense to me. When you say "it's not quite working", what's the main remaining thing to crack? 🤔
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-07T14:09:17Z
+
+Ready for review! This indeed worked fine the whole time - I was "fooled" by an outdated cache - opened up a separate issue about that #31409
+
+Test failures are unrelated - fixed in #31410
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-09T01:25:07Z
+
+Tests passing - this is ready to go.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-09T11:24:34Z
+
+I was thinking the same thing :). That would remove an awkward option.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-05-09T12:03:08Z
+
+I'm looking into creating a PR.

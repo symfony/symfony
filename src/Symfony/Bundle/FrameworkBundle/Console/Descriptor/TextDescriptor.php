@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -347,9 +348,14 @@ class TextDescriptor extends Descriptor
                 if ($argument instanceof Reference) {
                     $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
                 } elseif ($argument instanceof IteratorArgument) {
-                    $argumentsInformation[] = sprintf('Iterator (%d element(s))', \count($argument->getValues()));
-                    foreach (array_map(function (Reference $value) {return (string) $value; }, $argument->getValues()) as $service) {
-                        $argumentsInformation[] = sprintf('- %s', $service);
+                    if ($argument instanceof TaggedIteratorArgument) {
+                        $argumentsInformation[] = sprintf('Tagged Iterator for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : sprintf(' (%d element(s))', \count($argument->getValues())));
+                    } else {
+                        $argumentsInformation[] = sprintf('Iterator (%d element(s))', \count($argument->getValues()));
+                    }
+
+                    foreach ($argument->getValues() as $ref) {
+                        $argumentsInformation[] = sprintf('- Service(%s)', $ref);
                     }
                 } elseif ($argument instanceof ServiceLocatorArgument) {
                     $argumentsInformation[] = sprintf('Service locator (%d element(s))', \count($argument->getValues()));
@@ -357,11 +363,6 @@ class TextDescriptor extends Descriptor
                     $argumentsInformation[] = 'Inlined Service';
                 } else {
                     $argumentsInformation[] = \is_array($argument) ? sprintf('Array (%d element(s))', \count($argument)) : $argument;
-                    if (\is_array($argument)) {
-                        foreach (array_keys($argument) as $service) {
-                            $argumentsInformation[] = sprintf('- %s', $service);
-                        }
-                    }
                 }
             }
 

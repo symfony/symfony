@@ -16,7 +16,6 @@ use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Locale;
 
 /**
  * The rule for compiling the locale bundle.
@@ -28,11 +27,11 @@ use Symfony\Component\Intl\Locale;
  */
 class LocaleDataGenerator extends AbstractDataGenerator
 {
-    private $locales;
-    private $localeAliases;
-    private $localeParents;
-    private $fallbackMapping;
-    private $fallbackCache = [];
+    use FallbackTrait;
+
+    private $locales = [];
+    private $localeAliases = [];
+    private $localeParents = [];
 
     /**
      * {@inheritdoc}
@@ -42,7 +41,6 @@ class LocaleDataGenerator extends AbstractDataGenerator
         $this->locales = $scanner->scanLocales($sourceDir.'/locales');
         $this->localeAliases = $scanner->scanAliases($sourceDir.'/locales');
         $this->localeParents = $scanner->scanParents($sourceDir.'/locales');
-        $this->fallbackMapping = $this->generateFallbackMapping(array_diff($this->locales, array_keys($this->localeAliases)), $this->localeAliases);
 
         return $this->locales;
     }
@@ -66,8 +64,6 @@ class LocaleDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->fallbackCache = [];
-
         // Write parents locale file for the Translation component
         \file_put_contents(
             __DIR__.'/../../../Translation/Resources/data/parents.json',
@@ -81,7 +77,8 @@ class LocaleDataGenerator extends AbstractDataGenerator
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
     {
         // Don't generate aliases, as they are resolved during runtime
-        if (isset($this->localeAliases[$displayLocale])) {
+        // Unless an alias is needed as fallback for de-duplication purposes
+        if (isset($this->localeAliases[$displayLocale]) && !$this->generatingFallback) {
             return;
         }
 
@@ -93,7 +90,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
         $localeNames = [];
         foreach ($this->locales as $locale) {
             // Ensure a normalized list of pure locales
-            if (isset($this->localeAliases[$displayLocale]) || \Locale::getAllVariants($locale)) {
+            if (\Locale::getAllVariants($locale)) {
                 continue;
             }
 
@@ -110,21 +107,27 @@ class LocaleDataGenerator extends AbstractDataGenerator
             }
         }
 
-        // Process again to de-duplicate locales and their fallback locales
-        // Only keep the differences
-        $fallback = $displayLocale;
-        while (isset($this->fallbackMapping[$fallback])) {
-            if (!isset($this->fallbackCache[$fallback = $this->fallbackMapping[$fallback]])) {
-                $this->fallbackCache[$fallback] = $this->generateDataForLocale($reader, $tempDir, $fallback) ?: [];
-            }
-            if (isset($this->fallbackCache[$fallback]['Names'])) {
-                $localeNames = array_diff($localeNames, $this->fallbackCache[$fallback]['Names']);
-            }
+        $data = [
+            'Names' => $localeNames,
+        ];
+
+        // Don't de-duplicate a fallback locale
+        // Ensures the display locale can be de-duplicated on itself
+        if ($this->generatingFallback) {
+            return $data;
         }
 
-        if ($localeNames) {
-            return ['Names' => $localeNames];
+        // Process again to de-duplicate locale and its fallback locales
+        // Only keep the differences
+        $fallbackData = $this->generateFallbackData($reader, $tempDir, $displayLocale);
+        if (isset($fallbackData['Names'])) {
+            $data['Names'] = array_diff($data['Names'], $fallbackData['Names']);
         }
+        if (!$data['Names']) {
+            return;
+        }
+
+        return $data;
     }
 
     /**
@@ -139,12 +142,10 @@ class LocaleDataGenerator extends AbstractDataGenerator
      */
     protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
     {
-        if ($this->locales || $this->localeAliases) {
-            return [
-                'Locales' => $this->locales,
-                'Aliases' => $this->localeAliases,
-            ];
-        }
+        return [
+            'Locales' => $this->locales,
+            'Aliases' => $this->localeAliases,
+        ];
     }
 
     /**
@@ -182,31 +183,5 @@ class LocaleDataGenerator extends AbstractDataGenerator
         }
 
         return $name;
-    }
-
-    private function generateFallbackMapping(array $displayLocales, array $aliases)
-    {
-        $displayLocales = array_flip($displayLocales);
-        $mapping = [];
-
-        foreach ($displayLocales as $displayLocale => $_) {
-            $mapping[$displayLocale] = null;
-            $fallback = $displayLocale;
-
-            // Recursively search for a fallback locale until one is found
-            while (null !== ($fallback = Locale::getFallback($fallback))) {
-                // Currently, no locale has an alias as fallback locale.
-                // If this starts to be the case, we need to add code here.
-                \assert(!isset($aliases[$fallback]));
-
-                // Check whether the fallback exists
-                if (isset($displayLocales[$fallback])) {
-                    $mapping[$displayLocale] = $fallback;
-                    break;
-                }
-            }
-        }
-
-        return $mapping;
     }
 }

@@ -89,7 +89,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return $ret;
         }
 
-        if ('/' === $pathinfo && !$this->allow) {
+        if ('/' === $pathinfo && !$this->allow && !$this->allowSchemes) {
             throw new NoConfigurationException();
         }
 
@@ -182,24 +182,16 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 if ($supportsTrailingSlash && (!$requiredMethods || \in_array('GET', $requiredMethods))) {
                     return $this->allow = $this->allowSchemes = [];
                 }
-
                 continue;
             }
 
-            $hasRequiredScheme = !$route->getSchemes() || $route->hasScheme($this->context->getScheme());
-            if ($requiredMethods) {
-                if (!\in_array($method, $requiredMethods)) {
-                    if ($hasRequiredScheme) {
-                        $this->allow = array_merge($this->allow, $requiredMethods);
-                    }
-
-                    continue;
-                }
+            if ($route->getSchemes() && !$route->hasScheme($this->context->getScheme())) {
+                $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
+                continue;
             }
 
-            if (!$hasRequiredScheme) {
-                $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
-
+            if ($requiredMethods && !\in_array($method, $requiredMethods)) {
+                $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;
             }
 

@@ -26,11 +26,11 @@
     "suggest": {
         "psr/cache": "When using the Cache contracts",
         "psr/container": "When using the Service contracts",
-        "symfony/cache-contracts-implementation": "",
+        "symfony/cache-implementation": "",
         "symfony/event-dispatcher-implementation": "",
-        "symfony/http-client-contracts-implementation": "",
-        "symfony/service-contracts-implementation": "",
-        "symfony/translation-contracts-implementation": ""
+        "symfony/http-client-implementation": "",
+        "symfony/service-implementation": "",
+        "symfony/translation-implementation": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Contracts\\": "" },

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-04-26T10:42:27Z
+
+I don't understand which issue you are trying to solve here.
+
+We cannot add content multiple time (as all nodes have to belong to the same document), and calling `->html()` before adding content does not make sense and will not reach this code anyway.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-05T17:09:40Z
+
+> I don't understand which issue you are trying to solve here.
+
+The code makes little sense either: one should not have to know how the overall class works to understand local details. I'm making the code have a better locality so one can reason about it in a simpler way.

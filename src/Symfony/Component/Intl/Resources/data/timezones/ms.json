@@ -99,7 +99,7 @@
         "America\/Detroit": "Waktu Timur (Detroit)",
         "America\/Dominica": "Waktu Atlantik (Dominica)",
         "America\/Edmonton": "Waktu Pergunungan (Edmonton)",
-        "America\/Eirunepe": "Brazil (Eirunepe)",
+        "America\/Eirunepe": "Waktu Brazil (Eirunepe)",
         "America\/El_Salvador": "Waktu Pusat (El Salvador)",
         "America\/Fort_Nelson": "Waktu Pergunungan (Fort Nelson)",
         "America\/Fortaleza": "Waktu Brasilia (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Waktu Atlantik (Moncton)",
         "America\/Monterrey": "Waktu Pusat (Monterrey)",
         "America\/Montevideo": "Waktu Uruguay (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Waktu Kanada (Montreal)",
         "America\/Montserrat": "Waktu Atlantik (Montserrat)",
         "America\/Nassau": "Waktu Timur (Nassau)",
         "America\/New_York": "Waktu Timur (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Waktu Brasilia (Recife)",
         "America\/Regina": "Waktu Pusat (Regina)",
         "America\/Resolute": "Waktu Pusat (Resolute)",
-        "America\/Rio_Branco": "Brazil (Rio Branco)",
+        "America\/Rio_Branco": "Waktu Brazil (Rio Branco)",
         "America\/Santa_Isabel": "Waktu Barat Laut Mexico (Santa Isabel)",
         "America\/Santarem": "Waktu Brasilia (Santarem)",
         "America\/Santiago": "Waktu Chile (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Waktu Arab (Bahrain)",
         "Asia\/Baku": "Waktu Azerbaijan (Baku)",
         "Asia\/Bangkok": "Waktu Indochina (Bangkok)",
-        "Asia\/Barnaul": "Rusia (Barnaul)",
+        "Asia\/Barnaul": "Waktu Rusia (Barnaul)",
         "Asia\/Beirut": "Waktu Eropah Timur (Beirut)",
         "Asia\/Bishkek": "Waktu Kyrgystan (Bishkek)",
         "Asia\/Brunei": "Waktu Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Waktu Iran (Tehran)",
         "Asia\/Thimphu": "Waktu Bhutan (Thimphu)",
         "Asia\/Tokyo": "Waktu Jepun (Tokyo)",
-        "Asia\/Tomsk": "Rusia (Tomsk)",
+        "Asia\/Tomsk": "Waktu Rusia (Tomsk)",
         "Asia\/Ulaanbaatar": "Waktu Ulan Bator (Ulaanbaatar)",
-        "Asia\/Urumqi": "China (Urumqi)",
+        "Asia\/Urumqi": "Waktu China (Urumqi)",
         "Asia\/Ust-Nera": "Waktu Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Waktu Indochina (Vientiane)",
         "Asia\/Vladivostok": "Waktu Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Waktu Min Greenwich (Guernsey)",
         "Europe\/Helsinki": "Waktu Eropah Timur (Helsinki)",
         "Europe\/Isle_of_Man": "Waktu Min Greenwich (Isle of Man)",
-        "Europe\/Istanbul": "Turki (Istanbul)",
+        "Europe\/Istanbul": "Waktu Turki (Istanbul)",
         "Europe\/Jersey": "Waktu Min Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Waktu Eropah Timur (Kaliningrad)",
         "Europe\/Kiev": "Waktu Eropah Timur (Kiev)",
-        "Europe\/Kirov": "Rusia (Kirov)",
+        "Europe\/Kirov": "Waktu Rusia (Kirov)",
         "Europe\/Lisbon": "Waktu Eropah Barat (Lisbon)",
         "Europe\/Ljubljana": "Waktu Eropah Tengah (Ljubljana)",
         "Europe\/London": "Waktu Min Greenwich (London)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Waktu Pulau Wake",
         "Pacific\/Wallis": "Waktu Wallis dan Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

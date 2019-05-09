@@ -151,7 +151,7 @@
         "America\/Moncton": "Ora e Atlantikut (Monkton)",
         "America\/Monterrey": "Ora e SHBA-së Qendrore (Monterrej)",
         "America\/Montevideo": "Ora e Uruguait (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Ora: Kanada (Montreal)",
         "America\/Montserrat": "Ora e Atlantikut (Montserat)",
         "America\/Nassau": "Ora e SHBA-së Lindore (Nasao)",
         "America\/New_York": "Ora e SHBA-së Lindore (Nju-Jork)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Ora arabe (Bahrejn)",
         "Asia\/Baku": "Ora e Azerbajxhanit (Baku)",
         "Asia\/Bangkok": "Ora e Indokinës (Bangkok)",
-        "Asia\/Barnaul": "Rusi (Barnaul)",
+        "Asia\/Barnaul": "Ora: Rusi (Barnaul)",
         "Asia\/Beirut": "Ora e Evropës Lindore (Bejrut)",
         "Asia\/Bishkek": "Ora e Kirgizisë (Bishkek)",
         "Asia\/Brunei": "Ora e Brunei-Durasalamit",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Ora e Iranit (Teheran)",
         "Asia\/Thimphu": "Ora e Butanit (Thimpu)",
         "Asia\/Tokyo": "Ora e Japonisë (Tokio)",
-        "Asia\/Tomsk": "Rusi (Tomsk)",
+        "Asia\/Tomsk": "Ora: Rusi (Tomsk)",
         "Asia\/Ulaanbaatar": "Ora e Ulan-Batorit (Ulanbatar)",
-        "Asia\/Urumqi": "Kinë (Urumqi)",
+        "Asia\/Urumqi": "Ora: Kinë (Urumqi)",
         "Asia\/Ust-Nera": "Ora e Vladivostokut (Ust-Nera)",
         "Asia\/Vientiane": "Ora e Indokinës (Vjentianë)",
         "Asia\/Vladivostok": "Ora e Vladivostokut",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Ora e Grinuiçit (Gernsej)",
         "Europe\/Helsinki": "Ora e Evropës Lindore (Helsinki)",
         "Europe\/Isle_of_Man": "Ora e Grinuiçit (Ishulli i Manit)",
-        "Europe\/Istanbul": "Turqi (Stamboll)",
+        "Europe\/Istanbul": "Ora: Turqi (Stamboll)",
         "Europe\/Jersey": "Ora e Grinuiçit (Xhersej)",
         "Europe\/Kaliningrad": "Ora e Evropës Lindore (Kaliningrad)",
         "Europe\/Kiev": "Ora e Evropës Lindore (Kiev)",
-        "Europe\/Kirov": "Rusi (Kirov)",
+        "Europe\/Kirov": "Ora: Rusi (Kirov)",
         "Europe\/Lisbon": "Ora e Evropës Perëndimore (Lisbonë)",
         "Europe\/Ljubljana": "Ora e Evropës Qendrore (Lubjanë)",
         "Europe\/London": "Ora e Grinuiçit (Londër)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Ora e Ishullit Uejk",
         "Pacific\/Wallis": "Ora e Uollisit dhe Futunës"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

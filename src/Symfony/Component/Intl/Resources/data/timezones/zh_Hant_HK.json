@@ -210,7 +210,6 @@
         "Pacific\/Fakaofo": "托克勞群島時間（法考福環礁）",
         "Pacific\/Funafuti": "圖瓦盧時間（富那富提）",
         "Pacific\/Galapagos": "加拉帕戈群島時間（加拉巴哥群島）",
-        "Pacific\/Gambier": "甘比爾群島時間",
         "Pacific\/Guadalcanal": "所羅門群島時間（瓜達爾卡納爾島）",
         "Pacific\/Johnston": "夏威夷-阿留申時間（約翰斯頓環礁）",
         "Pacific\/Kosrae": "科斯雷時間",
@@ -222,8 +221,7 @@
         "Pacific\/Pago_Pago": "薩摩亞時間（帕果帕果）",
         "Pacific\/Pitcairn": "皮特康時間（皮特康群島）",
         "Pacific\/Port_Moresby": "巴布亞新畿內亞時間（莫士比港）",
-        "Pacific\/Tongatapu": "湯加時間（湯加塔布島）",
-        "Pacific\/Wake": "威克島時間"
+        "Pacific\/Tongatapu": "湯加時間（湯加塔布島）"
     },
     "Meta": []
 }

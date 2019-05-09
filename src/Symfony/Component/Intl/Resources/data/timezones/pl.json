@@ -99,7 +99,7 @@
         "America\/Detroit": "czas wschodnioamerykański (Detroit)",
         "America\/Dominica": "czas atlantycki (Dominika)",
         "America\/Edmonton": "czas górski (Edmonton)",
-        "America\/Eirunepe": "Brazylia (Eirunepe)",
+        "America\/Eirunepe": "czas: Brazylia (Eirunepe)",
         "America\/El_Salvador": "czas środkowoamerykański (Salwador)",
         "America\/Fort_Nelson": "czas górski (Fort Nelson)",
         "America\/Fortaleza": "Brasília (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "czas atlantycki (Moncton)",
         "America\/Monterrey": "czas środkowoamerykański (Monterrey)",
         "America\/Montevideo": "Urugwaj (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "czas: Kanada (Montreal)",
         "America\/Montserrat": "czas atlantycki (Montserrat)",
         "America\/Nassau": "czas wschodnioamerykański (Nassau)",
         "America\/New_York": "czas wschodnioamerykański (Nowy Jork)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Brasília (Recife)",
         "America\/Regina": "czas środkowoamerykański (Regina)",
         "America\/Resolute": "czas środkowoamerykański (Resolute)",
-        "America\/Rio_Branco": "Brazylia (Rio Branco)",
+        "America\/Rio_Branco": "czas: Brazylia (Rio Branco)",
         "America\/Santa_Isabel": "Meksyk Północno-Zachodni (Santa Isabel)",
         "America\/Santarem": "Brasília (Santarem)",
         "America\/Santiago": "Chile (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Półwysep Arabski (Bahrajn)",
         "Asia\/Baku": "Azerbejdżan (Baku)",
         "Asia\/Bangkok": "czas indochiński (Bangkok)",
-        "Asia\/Barnaul": "Rosja (Barnauł)",
+        "Asia\/Barnaul": "czas: Rosja (Barnauł)",
         "Asia\/Beirut": "czas wschodnioeuropejski (Bejrut)",
         "Asia\/Bishkek": "Kirgistan (Biszkek)",
         "Asia\/Brunei": "Brunei",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iran (Teheran)",
         "Asia\/Thimphu": "Bhutan (Thimphu)",
         "Asia\/Tokyo": "Japonia (Tokio)",
-        "Asia\/Tomsk": "Rosja (Tomsk)",
+        "Asia\/Tomsk": "czas: Rosja (Tomsk)",
         "Asia\/Ulaanbaatar": "Ułan Bator",
-        "Asia\/Urumqi": "Chiny (Urumczi)",
+        "Asia\/Urumqi": "czas: Chiny (Urumczi)",
         "Asia\/Ust-Nera": "Władywostok (Ust-Niera)",
         "Asia\/Vientiane": "czas indochiński (Wientian)",
         "Asia\/Vladivostok": "Władywostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "czas uniwersalny (Guernsey)",
         "Europe\/Helsinki": "czas wschodnioeuropejski (Helsinki)",
         "Europe\/Isle_of_Man": "czas uniwersalny (Wyspa Man)",
-        "Europe\/Istanbul": "Turcja (Stambuł)",
+        "Europe\/Istanbul": "czas: Turcja (Stambuł)",
         "Europe\/Jersey": "czas uniwersalny (Jersey)",
         "Europe\/Kaliningrad": "czas wschodnioeuropejski (Kaliningrad)",
         "Europe\/Kiev": "czas wschodnioeuropejski (Kijów)",
-        "Europe\/Kirov": "Rosja (Kirow)",
+        "Europe\/Kirov": "czas: Rosja (Kirow)",
         "Europe\/Lisbon": "czas zachodnioeuropejski (Lizbona)",
         "Europe\/Ljubljana": "czas środkowoeuropejski (Lublana)",
         "Europe\/London": "czas uniwersalny (Londyn)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Wake",
         "Pacific\/Wallis": "Wallis i Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

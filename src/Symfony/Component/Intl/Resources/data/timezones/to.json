@@ -151,7 +151,7 @@
         "America\/Moncton": "houa fakaʻamelika-tokelau ʻatalanitiki (Moncton)",
         "America\/Monterrey": "houa fakaʻamelika-tokelau loto (Monterrey)",
         "America\/Montevideo": "houa fakaʻulukuai (Montevideo)",
-        "America\/Montreal": "Kānata (Montreal)",
+        "America\/Montreal": "Taimi Kānata (Montreal)",
         "America\/Montserrat": "houa fakaʻamelika-tokelau ʻatalanitiki (Montserrat)",
         "America\/Nassau": "houa fakaʻamelika-tokelau hahake (Nassau)",
         "America\/New_York": "houa fakaʻamelika-tokelau hahake (Niu ʻIoke)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "houa fakaʻalepea (Bahrain)",
         "Asia\/Baku": "houa fakaʻasapaisani (Baku)",
         "Asia\/Bangkok": "houa fakaʻinitosiaina (Bangkok)",
-        "Asia\/Barnaul": "Lūsia (Barnaul)",
+        "Asia\/Barnaul": "Taimi Lūsia (Barnaul)",
         "Asia\/Beirut": "houa fakaʻeulope-hahake (Beirut)",
         "Asia\/Bishkek": "houa fakakīkisitani (Bishkek)",
         "Asia\/Brunei": "houa fakapulunei (Brunei)",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "houa fakaʻilaani (Tehran)",
         "Asia\/Thimphu": "houa fakapūtani (Thimphu)",
         "Asia\/Tokyo": "houa fakasiapani (Tokyo)",
-        "Asia\/Tomsk": "Lūsia (Tomsk)",
+        "Asia\/Tomsk": "Taimi Lūsia (Tomsk)",
         "Asia\/Ulaanbaatar": "houa fakaʻulānipātā (Ulaanbaatar)",
-        "Asia\/Urumqi": "Siaina (Urumqi)",
+        "Asia\/Urumqi": "Taimi Siaina (Urumqi)",
         "Asia\/Ust-Nera": "houa fakalūsia-valativositoki (Ust-Nera)",
         "Asia\/Vientiane": "houa fakaʻinitosiaina (Vientiane)",
         "Asia\/Vladivostok": "houa fakalūsia-valativositoki (Vladivostok)",
@@ -322,7 +322,6 @@
         "CST6CDT": "houa fakaʻamelika-tokelau loto",
         "EST5EDT": "houa fakaʻamelika-tokelau hahake",
         "Etc\/GMT": "houa fakakiliniuisi mālie",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "houa fakaʻeulope-loto (Amsterdam)",
         "Europe\/Andorra": "houa fakaʻeulope-loto (Andorra)",
         "Europe\/Astrakhan": "houa fakalūsia-mosikou (Astrakhan)",
@@ -341,11 +340,11 @@
         "Europe\/Guernsey": "houa fakakiliniuisi mālie (Guernsey)",
         "Europe\/Helsinki": "houa fakaʻeulope-hahake (Helsinki)",
         "Europe\/Isle_of_Man": "houa fakakiliniuisi mālie (Isle of Man)",
-        "Europe\/Istanbul": "Toake (Istanbul)",
+        "Europe\/Istanbul": "Taimi Toake (Istanbul)",
         "Europe\/Jersey": "houa fakakiliniuisi mālie (Jersey)",
         "Europe\/Kaliningrad": "houa fakaʻeulope-hahake (Kaliningrad)",
         "Europe\/Kiev": "houa fakaʻeulope-hahake (Kiev)",
-        "Europe\/Kirov": "Lūsia (Kirov)",
+        "Europe\/Kirov": "Taimi Lūsia (Kirov)",
         "Europe\/Lisbon": "houa fakaʻeulope-hihifo (Lisbon)",
         "Europe\/Ljubljana": "houa fakaʻeulope-loto (Ljubljana)",
         "Europe\/London": "houa fakakiliniuisi mālie (Lonitoni)",
@@ -436,11 +435,5 @@
         "Pacific\/Wake": "houa fakamotuueke (Wake)",
         "Pacific\/Wallis": "houa fakaʻuvea mo futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

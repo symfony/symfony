@@ -151,7 +151,7 @@
         "America\/Moncton": "अटलांटिक वेळ (माँकटन)",
         "America\/Monterrey": "केंद्रीय वेळ (मॉन्टेरे)",
         "America\/Montevideo": "उरुग्वे वेळ (मोन्टेव्हिडियो)",
-        "America\/Montreal": "कॅनडा (Montreal)",
+        "America\/Montreal": "कॅनडा वेळ (Montreal)",
         "America\/Montserrat": "अटलांटिक वेळ (माँन्टसेरात)",
         "America\/Nassau": "पौर्वात्य वेळ (नसाऊ)",
         "America\/New_York": "पौर्वात्य वेळ (न्यूयॉर्क)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "अरेबियन वेळ (बेहरीन)",
         "Asia\/Baku": "अझरबैजान वेळ (बाकु)",
         "Asia\/Bangkok": "इंडोचायना वेळ (बँकॉक)",
-        "Asia\/Barnaul": "रशिया (बर्नौल)",
+        "Asia\/Barnaul": "रशिया वेळ (बर्नौल)",
         "Asia\/Beirut": "पूर्व युरोपियन वेळ (बैरुत)",
         "Asia\/Bishkek": "किरगिस्तान वेळ (बिश्केक)",
         "Asia\/Brunei": "ब्रुनेई दारूसलाम वेळ",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "इराण वेळ (तेहरान)",
         "Asia\/Thimphu": "भूतान वेळ (थिंफू)",
         "Asia\/Tokyo": "जपान वेळ (टोकियो)",
-        "Asia\/Tomsk": "रशिया (तोमसक)",
+        "Asia\/Tomsk": "रशिया वेळ (तोमसक)",
         "Asia\/Ulaanbaatar": "उलान बाटोर वेळ (उलानबातर)",
-        "Asia\/Urumqi": "चीन (उरुम्की)",
+        "Asia\/Urumqi": "चीन वेळ (उरुम्की)",
         "Asia\/Ust-Nera": "व्लादिवोस्तोक वेळ (उस्त-नेरा)",
         "Asia\/Vientiane": "इंडोचायना वेळ (व्हिएन्टाइन)",
         "Asia\/Vladivostok": "व्लादिवोस्तोक वेळ (व्लादिवोस्टोक)",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "ग्रीनिच प्रमाण वेळ (ग्वेर्नसे)",
         "Europe\/Helsinki": "पूर्व युरोपियन वेळ (हेलसिंकी)",
         "Europe\/Isle_of_Man": "ग्रीनिच प्रमाण वेळ (आइल ऑफ मॅन)",
-        "Europe\/Istanbul": "तुर्की (इस्तंबूल)",
+        "Europe\/Istanbul": "तुर्की वेळ (इस्तंबूल)",
         "Europe\/Jersey": "ग्रीनिच प्रमाण वेळ (जर्सी)",
         "Europe\/Kaliningrad": "पूर्व युरोपियन वेळ (कलिनिनग्राड)",
         "Europe\/Kiev": "पूर्व युरोपियन वेळ (कीव)",
-        "Europe\/Kirov": "रशिया (किरोव)",
+        "Europe\/Kirov": "रशिया वेळ (किरोव)",
         "Europe\/Lisbon": "पश्चिम युरोपियन वेळ (लिस्बन)",
         "Europe\/Ljubljana": "मध्‍य युरोपियन वेळ (लुब्लियाना)",
         "Europe\/London": "ग्रीनिच प्रमाण वेळ (लंडन)",
@@ -437,10 +437,6 @@
         "Pacific\/Wallis": "वॉलिस आणि फुटुना वेळ (वालिस)"
     },
     "Meta": {
-        "GmtFormat": "[GMT]%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
+        "GmtFormat": "[GMT]%s"
     }
 }

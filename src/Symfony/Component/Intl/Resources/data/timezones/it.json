@@ -99,7 +99,7 @@
         "America\/Detroit": "Ora orientale USA (Detroit)",
         "America\/Dominica": "Ora dell’Atlantico (Dominica)",
         "America\/Edmonton": "Ora Montagne Rocciose USA (Edmonton)",
-        "America\/Eirunepe": "Brasile (Eirunepe)",
+        "America\/Eirunepe": "Ora Brasile (Eirunepe)",
         "America\/El_Salvador": "Ora centrale USA (El Salvador)",
         "America\/Fort_Nelson": "Ora Montagne Rocciose USA (Fort Nelson)",
         "America\/Fortaleza": "Ora di Brasilia (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Ora dell’Atlantico (Moncton)",
         "America\/Monterrey": "Ora centrale USA (Monterrey)",
         "America\/Montevideo": "Ora dell’Uruguay (Montevideo)",
-        "America\/Montreal": "Canada (Montreal)",
+        "America\/Montreal": "Ora Canada (Montreal)",
         "America\/Montserrat": "Ora dell’Atlantico (Montserrat)",
         "America\/Nassau": "Ora orientale USA (Nassau)",
         "America\/New_York": "Ora orientale USA (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Ora di Brasilia (Recife)",
         "America\/Regina": "Ora centrale USA (Regina)",
         "America\/Resolute": "Ora centrale USA (Resolute)",
-        "America\/Rio_Branco": "Brasile (Rio Branco)",
+        "America\/Rio_Branco": "Ora Brasile (Rio Branco)",
         "America\/Santa_Isabel": "Ora del Messico nord-occidentale (Santa Isabel)",
         "America\/Santarem": "Ora di Brasilia (Santarém)",
         "America\/Santiago": "Ora del Cile (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Ora araba (Bahrein)",
         "Asia\/Baku": "Ora dell’Azerbaigian (Baku)",
         "Asia\/Bangkok": "Ora dell’Indocina (Bangkok)",
-        "Asia\/Barnaul": "Russia (Barnaul)",
+        "Asia\/Barnaul": "Ora Russia (Barnaul)",
         "Asia\/Beirut": "Ora dell’Europa orientale (Beirut)",
         "Asia\/Bishkek": "Ora del Kirghizistan (Bishkek)",
         "Asia\/Brunei": "Ora del Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Ora dell’Iran (Teheran)",
         "Asia\/Thimphu": "Ora del Bhutan (Thimphu)",
         "Asia\/Tokyo": "Ora del Giappone (Tokyo)",
-        "Asia\/Tomsk": "Russia (Tomsk)",
+        "Asia\/Tomsk": "Ora Russia (Tomsk)",
         "Asia\/Ulaanbaatar": "Ora di Ulan Bator (Ulaanbaatar)",
-        "Asia\/Urumqi": "Cina (Urumqi)",
+        "Asia\/Urumqi": "Ora Cina (Urumqi)",
         "Asia\/Ust-Nera": "Ora di Vladivostok (Ust’-Nera)",
         "Asia\/Vientiane": "Ora dell’Indocina (Vientiane)",
         "Asia\/Vladivostok": "Ora di Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Ora del meridiano di Greenwich (Guernsey)",
         "Europe\/Helsinki": "Ora dell’Europa orientale (Helsinki)",
         "Europe\/Isle_of_Man": "Ora del meridiano di Greenwich (Isola di Man)",
-        "Europe\/Istanbul": "Turchia (Istanbul)",
+        "Europe\/Istanbul": "Ora Turchia (Istanbul)",
         "Europe\/Jersey": "Ora del meridiano di Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Ora dell’Europa orientale (Kaliningrad)",
         "Europe\/Kiev": "Ora dell’Europa orientale (Kiev)",
-        "Europe\/Kirov": "Russia (Kirov)",
+        "Europe\/Kirov": "Ora Russia (Kirov)",
         "Europe\/Lisbon": "Ora dell’Europa occidentale (Lisbona)",
         "Europe\/Ljubljana": "Ora dell’Europa centrale (Lubiana)",
         "Europe\/London": "Ora del meridiano di Greenwich (Londra)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Ora dell’Isola di Wake",
         "Pacific\/Wallis": "Ora di Wallis e Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

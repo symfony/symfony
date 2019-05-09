@@ -151,7 +151,7 @@
         "America\/Moncton": "Ora zonei Atlantic nord-americane (Moncton)",
         "America\/Monterrey": "Ora centrală nord-americană (Monterrey)",
         "America\/Montevideo": "Ora Uruguayului (Montevideo)",
-        "America\/Montreal": "Canada (Montreal)",
+        "America\/Montreal": "Ora din Canada (Montreal)",
         "America\/Montserrat": "Ora zonei Atlantic nord-americane (Montserrat)",
         "America\/Nassau": "Ora orientală nord-americană (Nassau)",
         "America\/New_York": "Ora orientală nord-americană (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Ora arabă (Bahrain)",
         "Asia\/Baku": "Ora Azerbaidjanului (Baku)",
         "Asia\/Bangkok": "Ora Indochinei (Bangkok)",
-        "Asia\/Barnaul": "Rusia (Barnaul)",
+        "Asia\/Barnaul": "Ora din Rusia (Barnaul)",
         "Asia\/Beirut": "Ora Europei de Est (Beirut)",
         "Asia\/Bishkek": "Ora din Kârgâzstan (Bișkek)",
         "Asia\/Brunei": "Ora din Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Ora Iranului (Teheran)",
         "Asia\/Thimphu": "Ora Bhutanului (Thimphu)",
         "Asia\/Tokyo": "Ora Japoniei (Tokyo)",
-        "Asia\/Tomsk": "Rusia (Tomsk)",
+        "Asia\/Tomsk": "Ora din Rusia (Tomsk)",
         "Asia\/Ulaanbaatar": "Ora din Ulan Bator",
-        "Asia\/Urumqi": "China (Urumqi)",
+        "Asia\/Urumqi": "Ora din China (Urumqi)",
         "Asia\/Ust-Nera": "Ora din Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Ora Indochinei (Vientiane)",
         "Asia\/Vladivostok": "Ora din Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Ora de Greenwhich (Guernsey)",
         "Europe\/Helsinki": "Ora Europei de Est (Helsinki)",
         "Europe\/Isle_of_Man": "Ora de Greenwhich (Insula Man)",
-        "Europe\/Istanbul": "Turcia (Istanbul)",
+        "Europe\/Istanbul": "Ora din Turcia (Istanbul)",
         "Europe\/Jersey": "Ora de Greenwhich (Jersey)",
         "Europe\/Kaliningrad": "Ora Europei de Est (Kaliningrad)",
         "Europe\/Kiev": "Ora Europei de Est (Kiev)",
-        "Europe\/Kirov": "Rusia (Kirov)",
+        "Europe\/Kirov": "Ora din Rusia (Kirov)",
         "Europe\/Lisbon": "Ora Europei de Vest (Lisabona)",
         "Europe\/Ljubljana": "Ora Europei Centrale (Ljubljana)",
         "Europe\/London": "Ora de Greenwhich (Londra)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Ora Insulei Wake",
         "Pacific\/Wallis": "Ora din Wallis și Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

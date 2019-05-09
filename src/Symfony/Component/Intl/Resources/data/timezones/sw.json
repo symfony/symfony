@@ -99,7 +99,7 @@
         "America\/Detroit": "Saa za Mashariki (Detroit)",
         "America\/Dominica": "Saa za Atlantiki (Dominica)",
         "America\/Edmonton": "Saa za Mountain (Edmonton)",
-        "America\/Eirunepe": "Brazil (Eirunepe)",
+        "America\/Eirunepe": "Saa za Brazil (Eirunepe)",
         "America\/El_Salvador": "Saa za Kati (El Salvador)",
         "America\/Fort_Nelson": "Saa za Mountain (Fort Nelson)",
         "America\/Fortaleza": "Saa za Brasilia (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Saa za Atlantiki (Moncton)",
         "America\/Monterrey": "Saa za Kati (Monterrey)",
         "America\/Montevideo": "Saa za Uruguay (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Saa za Kanada (Montreal)",
         "America\/Montserrat": "Saa za Atlantiki (Montserrat)",
         "America\/Nassau": "Saa za Mashariki (Nassau)",
         "America\/New_York": "Saa za Mashariki (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Saa za Brasilia (Recife)",
         "America\/Regina": "Saa za Kati (Regina)",
         "America\/Resolute": "Saa za Kati (Resolute)",
-        "America\/Rio_Branco": "Brazil (Rio Branco)",
+        "America\/Rio_Branco": "Saa za Brazil (Rio Branco)",
         "America\/Santa_Isabel": "Saa za Mexico Kaskazini Magharibi (Santa Isabel)",
         "America\/Santarem": "Saa za Brasilia (Santarem)",
         "America\/Santiago": "Saa za Chile (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Saa za Uarabuni (Bahrain)",
         "Asia\/Baku": "Saa za Azerbaijan (Baku)",
         "Asia\/Bangkok": "Saa za Indochina (Bangkok)",
-        "Asia\/Barnaul": "Urusi (Barnaul)",
+        "Asia\/Barnaul": "Saa za Urusi (Barnaul)",
         "Asia\/Beirut": "Saa za Mashariki mwa Ulaya (Beirut)",
         "Asia\/Bishkek": "Saa za Kyrgystan (Bishkek)",
         "Asia\/Brunei": "Saa za Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Saa za Iran (Tehran)",
         "Asia\/Thimphu": "Saa za Bhutan (Thimphu)",
         "Asia\/Tokyo": "Saa za Japan (Tokyo)",
-        "Asia\/Tomsk": "Urusi (Tomsk)",
+        "Asia\/Tomsk": "Saa za Urusi (Tomsk)",
         "Asia\/Ulaanbaatar": "Saa za Ulan Bator (Ulaanbaatar)",
-        "Asia\/Urumqi": "Uchina (Urumqi)",
+        "Asia\/Urumqi": "Saa za Uchina (Urumqi)",
         "Asia\/Ust-Nera": "Saa za Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Saa za Indochina (Vientiane)",
         "Asia\/Vladivostok": "Saa za Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Saa za Greenwich (Guernsey)",
         "Europe\/Helsinki": "Saa za Mashariki mwa Ulaya (Helsinki)",
         "Europe\/Isle_of_Man": "Saa za Greenwich (Isle of Man)",
-        "Europe\/Istanbul": "Uturuki (Istanbul)",
+        "Europe\/Istanbul": "Saa za Uturuki (Istanbul)",
         "Europe\/Jersey": "Saa za Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Saa za Mashariki mwa Ulaya (Kaliningrad)",
         "Europe\/Kiev": "Saa za Mashariki mwa Ulaya (Kiev)",
-        "Europe\/Kirov": "Urusi (Kirov)",
+        "Europe\/Kirov": "Saa za Urusi (Kirov)",
         "Europe\/Lisbon": "Saa za Magharibi mwa Ulaya (Lisbon)",
         "Europe\/Ljubljana": "Saa za Ulaya ya Kati (Ljubljana)",
         "Europe\/London": "Saa za Greenwich (London)",
@@ -437,10 +437,6 @@
         "Pacific\/Wallis": "Saa za Wallis na Futuna"
     },
     "Meta": {
-        "GmtFormat": "GMT %s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
+        "GmtFormat": "GMT %s"
     }
 }

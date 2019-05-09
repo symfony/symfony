@@ -322,7 +322,6 @@
         "CST6CDT": "Юккъера Америка",
         "EST5EDT": "Малхбален Америка",
         "Etc\/GMT": "Гринвичица юкъара хан",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "Юккъера Европа (Амстердам)",
         "Europe\/Andorra": "Юккъера Европа (Андорра)",
         "Europe\/Astrakhan": "Москва (Аштаркхне)",
@@ -436,11 +435,5 @@
         "Pacific\/Wake": "Уэйк, гӀ-е",
         "Pacific\/Wallis": "Уоллис а, Футуна а"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

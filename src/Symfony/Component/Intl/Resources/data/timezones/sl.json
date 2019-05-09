@@ -99,7 +99,7 @@
         "America\/Detroit": "Vzhodni čas (Detroit)",
         "America\/Dominica": "Atlantski čas (Dominika)",
         "America\/Edmonton": "Gorski čas (Edmonton)",
-        "America\/Eirunepe": "Brazilija (Eirunepe)",
+        "America\/Eirunepe": "Brazilija čas (Eirunepe)",
         "America\/El_Salvador": "Centralni čas (Salvador)",
         "America\/Fort_Nelson": "Gorski čas (Fort Nelson)",
         "America\/Fortaleza": "Brasilski čas (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantski čas (Moncton)",
         "America\/Monterrey": "Centralni čas (Monterrey)",
         "America\/Montevideo": "Urugvajski čas (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada čas (Montreal)",
         "America\/Montserrat": "Atlantski čas (Montserrat)",
         "America\/Nassau": "Vzhodni čas (Nassau)",
         "America\/New_York": "Vzhodni čas (New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Brasilski čas (Recife)",
         "America\/Regina": "Centralni čas (Regina)",
         "America\/Resolute": "Centralni čas (Resolute)",
-        "America\/Rio_Branco": "Brazilija (Rio Branco)",
+        "America\/Rio_Branco": "Brazilija čas (Rio Branco)",
         "America\/Santa_Isabel": "Mehiški severozahodni čas (Santa Isabel)",
         "America\/Santarem": "Brasilski čas (Santarem)",
         "America\/Santiago": "Čilski čas (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabski čas (Bahrajn)",
         "Asia\/Baku": "Azerbajdžanski čas (Baku)",
         "Asia\/Bangkok": "Indokitajski čas (Bangkok)",
-        "Asia\/Barnaul": "Rusija (Barnaul)",
+        "Asia\/Barnaul": "Rusija čas (Barnaul)",
         "Asia\/Beirut": "Vzhodnoevropski čas (Bejrut)",
         "Asia\/Bishkek": "Kirgizistanski čas (Biškek)",
         "Asia\/Brunei": "Brunejski čas",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iranski čas (Teheran)",
         "Asia\/Thimphu": "Butanski čas (Timpu)",
         "Asia\/Tokyo": "Japonski čas (Tokio)",
-        "Asia\/Tomsk": "Rusija (Tomsk)",
+        "Asia\/Tomsk": "Rusija čas (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulanbatorski čas (Ulan Bator)",
-        "Asia\/Urumqi": "Kitajska (Urumči)",
+        "Asia\/Urumqi": "Kitajska čas (Urumči)",
         "Asia\/Ust-Nera": "Vladivostoški čas (Ust-Nera)",
         "Asia\/Vientiane": "Indokitajski čas (Vientiane)",
         "Asia\/Vladivostok": "Vladivostoški čas (Vladivostok)",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwiški srednji čas (Guernsey)",
         "Europe\/Helsinki": "Vzhodnoevropski čas (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwiški srednji čas (Otok Man)",
-        "Europe\/Istanbul": "Turčija (Istanbul)",
+        "Europe\/Istanbul": "Turčija čas (Istanbul)",
         "Europe\/Jersey": "Greenwiški srednji čas (Jersey)",
         "Europe\/Kaliningrad": "Vzhodnoevropski čas (Kaliningrad)",
         "Europe\/Kiev": "Vzhodnoevropski čas (Kijev)",
-        "Europe\/Kirov": "Rusija (Kirov)",
+        "Europe\/Kirov": "Rusija čas (Kirov)",
         "Europe\/Lisbon": "Zahodnoevropski čas (Lizbona)",
         "Europe\/Ljubljana": "Srednjeevropski čas (Ljubljana)",
         "Europe\/London": "Greenwiški srednji čas (London)",
@@ -437,10 +437,7 @@
         "Pacific\/Wallis": "Čas: Wallis in Futuna"
     },
     "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d.%02d",
-            "-%02d.%02d"
-        ]
+        "HourFormatPos": "+%02d.%02d",
+        "HourFormatNeg": "-%02d.%02d"
     }
 }

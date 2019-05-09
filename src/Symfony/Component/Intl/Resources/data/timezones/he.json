@@ -99,7 +99,7 @@
         "America\/Detroit": "שעון החוף המזרחי (דטרויט)",
         "America\/Dominica": "שעון האוקיינוס האטלנטי (דומיניקה)",
         "America\/Edmonton": "שעון אזור ההרים בארה״ב (אדמונטון)",
-        "America\/Eirunepe": "ברזיל (אירונפי)",
+        "America\/Eirunepe": "שעון ברזיל (אירונפי)",
         "America\/El_Salvador": "שעון מרכז ארה״ב (אל סלבדור)",
         "America\/Fort_Nelson": "שעון אזור ההרים בארה״ב (פורט נלסון)",
         "America\/Fortaleza": "שעון ברזיליה (פורטאלזה)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "שעון האוקיינוס האטלנטי (מונקטון)",
         "America\/Monterrey": "שעון מרכז ארה״ב (מונטריי)",
         "America\/Montevideo": "שעון אורוגוואי (מונטווידאו)",
-        "America\/Montreal": "קנדה (Montreal)",
+        "America\/Montreal": "שעון קנדה (Montreal)",
         "America\/Montserrat": "שעון האוקיינוס האטלנטי (מונסראט)",
         "America\/Nassau": "שעון החוף המזרחי (נסאו)",
         "America\/New_York": "שעון החוף המזרחי (ניו יורק)",
@@ -176,7 +176,7 @@
         "America\/Recife": "שעון ברזיליה (רסיפה)",
         "America\/Regina": "שעון מרכז ארה״ב (רג׳ינה)",
         "America\/Resolute": "שעון מרכז ארה״ב (רזולוט)",
-        "America\/Rio_Branco": "ברזיל (ריו ברנקו)",
+        "America\/Rio_Branco": "שעון ברזיל (ריו ברנקו)",
         "America\/Santa_Isabel": "שעון צפון-מערב מקסיקו (סנטה איזבל)",
         "America\/Santarem": "שעון ברזיליה (סנטרם)",
         "America\/Santiago": "שעון צ׳ילה (סנטיאגו)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "שעון חצי האי ערב (בחריין)",
         "Asia\/Baku": "שעון אזרבייג׳אן (באקו)",
         "Asia\/Bangkok": "שעון הודו-סין (בנגקוק)",
-        "Asia\/Barnaul": "רוסיה (ברנאול)",
+        "Asia\/Barnaul": "שעון רוסיה (ברנאול)",
         "Asia\/Beirut": "שעון מזרח אירופה (ביירות)",
         "Asia\/Bishkek": "שעון קירגיזסטן (בישקק)",
         "Asia\/Brunei": "שעון ברוניי דארוסלאם",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "שעון איראן (טהרן)",
         "Asia\/Thimphu": "שעון בהוטן (טהימפהו)",
         "Asia\/Tokyo": "שעון יפן (טוקיו)",
-        "Asia\/Tomsk": "רוסיה (טומסק)",
+        "Asia\/Tomsk": "שעון רוסיה (טומסק)",
         "Asia\/Ulaanbaatar": "שעון אולן בטור (אולאאנבטאר)",
-        "Asia\/Urumqi": "סין (אורומקי)",
+        "Asia\/Urumqi": "שעון סין (אורומקי)",
         "Asia\/Ust-Nera": "שעון ולדיווסטוק (אוסט-נרה)",
         "Asia\/Vientiane": "שעון הודו-סין (האנוי)",
         "Asia\/Vladivostok": "שעון ולדיווסטוק",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "שעון גריניץ׳‏ (גרנזי)",
         "Europe\/Helsinki": "שעון מזרח אירופה (הלסינקי)",
         "Europe\/Isle_of_Man": "שעון גריניץ׳‏ (האי מאן)",
-        "Europe\/Istanbul": "טורקיה (איסטנבול)",
+        "Europe\/Istanbul": "שעון טורקיה (איסטנבול)",
         "Europe\/Jersey": "שעון גריניץ׳‏ (ג׳רזי)",
         "Europe\/Kaliningrad": "שעון מזרח אירופה (קלינינגרד)",
         "Europe\/Kiev": "שעון מזרח אירופה (קייב)",
-        "Europe\/Kirov": "רוסיה (קירוב)",
+        "Europe\/Kirov": "שעון רוסיה (קירוב)",
         "Europe\/Lisbon": "שעון מערב אירופה (ליסבון)",
         "Europe\/Ljubljana": "שעון מרכז אירופה (לובליאנה)",
         "Europe\/London": "שעון גריניץ׳‏ (לונדון)",
@@ -438,9 +438,7 @@
     },
     "Meta": {
         "GmtFormat": "GMT%s‎",
-        "HourFormat": [
-            "‎+%02d:%02d",
-            "-%02d:%02d‎"
-        ]
+        "HourFormatPos": "‎+%02d:%02d",
+        "HourFormatNeg": "-%02d:%02d‎"
     }
 }

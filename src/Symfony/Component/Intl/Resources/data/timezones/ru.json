@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Уэйк",
         "Pacific\/Wallis": "Уоллис и Футуна"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

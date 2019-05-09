@@ -151,7 +151,7 @@
         "America\/Moncton": "nordamerikansk atlanttid (Moncton)",
         "America\/Monterrey": "centralnordamerikansk tid (Monterrey)",
         "America\/Montevideo": "uruguayansk tid (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanadatid (Montreal)",
         "America\/Montserrat": "nordamerikansk atlanttid (Montserrat)",
         "America\/Nassau": "östnordamerikansk tid (Nassau)",
         "America\/New_York": "östnordamerikansk tid (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "saudiarabisk tid (Bahrain)",
         "Asia\/Baku": "azerbajdzjansk tid (Baku)",
         "Asia\/Bangkok": "indokinesisk tid (Bangkok)",
-        "Asia\/Barnaul": "Ryssland (Barnaul)",
+        "Asia\/Barnaul": "Rysslandtid (Barnaul)",
         "Asia\/Beirut": "östeuropeisk tid (Beirut)",
         "Asia\/Bishkek": "kirgizisk tid (Bisjkek)",
         "Asia\/Brunei": "Bruneitid",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "iransk tid (Teheran)",
         "Asia\/Thimphu": "bhutansk tid (Thimphu)",
         "Asia\/Tokyo": "japansk tid (Tokyo)",
-        "Asia\/Tomsk": "Ryssland (Tomsk)",
+        "Asia\/Tomsk": "Rysslandtid (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulaanbaatartid",
-        "Asia\/Urumqi": "Kina (Ürümqi)",
+        "Asia\/Urumqi": "Kinatid (Ürümqi)",
         "Asia\/Ust-Nera": "Vladivostoktid (Ust-Nera)",
         "Asia\/Vientiane": "indokinesisk tid (Vientiane)",
         "Asia\/Vladivostok": "Vladivostoktid",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwichtid (Guernsey)",
         "Europe\/Helsinki": "östeuropeisk tid (Helsingfors)",
         "Europe\/Isle_of_Man": "Greenwichtid (Isle of Man)",
-        "Europe\/Istanbul": "Turkiet (Istanbul)",
+        "Europe\/Istanbul": "Turkiettid (Istanbul)",
         "Europe\/Jersey": "Greenwichtid (Jersey)",
         "Europe\/Kaliningrad": "östeuropeisk tid (Kaliningrad)",
         "Europe\/Kiev": "östeuropeisk tid (Kiev)",
-        "Europe\/Kirov": "Ryssland (Kirov)",
+        "Europe\/Kirov": "Rysslandtid (Kirov)",
         "Europe\/Lisbon": "västeuropeisk tid (Lissabon)",
         "Europe\/Ljubljana": "centraleuropeisk tid (Ljubljana)",
         "Europe\/London": "Greenwichtid (London)",
@@ -437,10 +437,6 @@
         "Pacific\/Wallis": "Wallis- och Futunaöarnas tid (Wallisön)"
     },
     "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "−%02d:%02d"
-        ]
+        "HourFormatNeg": "−%02d:%02d"
     }
 }

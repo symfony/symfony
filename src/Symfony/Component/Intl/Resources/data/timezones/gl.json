@@ -99,7 +99,7 @@
         "America\/Detroit": "Horario do leste, Norteamérica (Detroit)",
         "America\/Dominica": "Horario do Atlántico (Dominica)",
         "America\/Edmonton": "Horario da montaña, Norteamérica (Edmonton)",
-        "America\/Eirunepe": "O Brasil (Eirunepé)",
+        "America\/Eirunepe": "Horario de: O Brasil (Eirunepé)",
         "America\/El_Salvador": "Horario central, Norteamérica (O Salvador)",
         "America\/Fort_Nelson": "Horario da montaña, Norteamérica (Fort Nelson)",
         "America\/Fortaleza": "Horario de Brasilia (Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Horario do Atlántico (Moncton)",
         "America\/Monterrey": "Horario central, Norteamérica (Monterrey)",
         "America\/Montevideo": "Horario do Uruguai (Montevideo)",
-        "America\/Montreal": "O Canadá (Montreal)",
+        "America\/Montreal": "Horario de: O Canadá (Montreal)",
         "America\/Montserrat": "Horario do Atlántico (Montserrat)",
         "America\/Nassau": "Horario do leste, Norteamérica (Nassau)",
         "America\/New_York": "Horario do leste, Norteamérica (Nova York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Horario de Brasilia (Recife)",
         "America\/Regina": "Horario central, Norteamérica (Regina)",
         "America\/Resolute": "Horario central, Norteamérica (Resolute)",
-        "America\/Rio_Branco": "O Brasil (Río Branco)",
+        "America\/Rio_Branco": "Horario de: O Brasil (Río Branco)",
         "America\/Santa_Isabel": "Horario do noroeste de México (Santa Isabel)",
         "America\/Santarem": "Horario de Brasilia (Santarém)",
         "America\/Santiago": "Horario de Chile (Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Horario árabe (Bahrain)",
         "Asia\/Baku": "Horario de Acerbaixán (Bacú)",
         "Asia\/Bangkok": "Horario de Indochina (Bangkok)",
-        "Asia\/Barnaul": "Rusia (Barnaul)",
+        "Asia\/Barnaul": "Horario de: Rusia (Barnaul)",
         "Asia\/Beirut": "Horario de Europa Oriental (Beirut)",
         "Asia\/Bishkek": "Horario de Kirguizistán (Bishkek)",
         "Asia\/Brunei": "Horario de Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Horario de Irán (Teherán)",
         "Asia\/Thimphu": "Horario de Bután (Thimbu)",
         "Asia\/Tokyo": "Horario do Xapón (Tokyo)",
-        "Asia\/Tomsk": "Rusia (Tomsk)",
+        "Asia\/Tomsk": "Horario de: Rusia (Tomsk)",
         "Asia\/Ulaanbaatar": "Horario de Ulaanbaatar",
-        "Asia\/Urumqi": "A China (Urumqi)",
+        "Asia\/Urumqi": "Horario de: A China (Urumqi)",
         "Asia\/Ust-Nera": "Horario de Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Horario de Indochina (Vientiane)",
         "Asia\/Vladivostok": "Horario de Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Horario do meridiano de Greenwich (Guernsey)",
         "Europe\/Helsinki": "Horario de Europa Oriental (Helsinqui)",
         "Europe\/Isle_of_Man": "Horario do meridiano de Greenwich (Illa de Man)",
-        "Europe\/Istanbul": "Turquía (Istanbul)",
+        "Europe\/Istanbul": "Horario de: Turquía (Istanbul)",
         "Europe\/Jersey": "Horario do meridiano de Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Horario de Europa Oriental (Kaliningrado)",
         "Europe\/Kiev": "Horario de Europa Oriental (Kiev)",
-        "Europe\/Kirov": "Rusia (Kirov)",
+        "Europe\/Kirov": "Horario de: Rusia (Kirov)",
         "Europe\/Lisbon": "Horario de Europa Occidental (Lisboa)",
         "Europe\/Ljubljana": "Horario de Europa Central (Liubliana)",
         "Europe\/London": "Horario do meridiano de Greenwich (Londres)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Horario da Illa Wake",
         "Pacific\/Wallis": "Horario de Wallis e Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

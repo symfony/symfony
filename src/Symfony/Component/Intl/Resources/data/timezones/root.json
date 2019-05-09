@@ -1,0 +1,8 @@
+{
+    "Version": "2.1.49.82",
+    "Meta": {
+        "GmtFormat": "GMT%s",
+        "HourFormatPos": "+%02d:%02d",
+        "HourFormatNeg": "-%02d:%02d"
+    }
+}

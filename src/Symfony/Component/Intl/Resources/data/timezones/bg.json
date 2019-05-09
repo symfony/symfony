@@ -437,10 +437,6 @@
         "Pacific\/Wallis": "Уолис и Футуна"
     },
     "Meta": {
-        "GmtFormat": "Гринуич%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
+        "GmtFormat": "Гринуич%s"
     }
 }

@@ -151,7 +151,7 @@
         "America\/Moncton": "Kanadan Atlantin aika (Moncton)",
         "America\/Monterrey": "Yhdysvaltain keskinen aika (Monterrey)",
         "America\/Montevideo": "Uruguayn aika (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "aikavyöhyke: Kanada (Montreal)",
         "America\/Montserrat": "Kanadan Atlantin aika (Montserrat)",
         "America\/Nassau": "Yhdysvaltain itäinen aika (Nassau)",
         "America\/New_York": "Yhdysvaltain itäinen aika (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Saudi-Arabian aika (Bahrain)",
         "Asia\/Baku": "Azerbaidžanin aika (Baku)",
         "Asia\/Bangkok": "Indokiinan aika (Bangkok)",
-        "Asia\/Barnaul": "Venäjä (Barnaul)",
+        "Asia\/Barnaul": "aikavyöhyke: Venäjä (Barnaul)",
         "Asia\/Beirut": "Itä-Euroopan aika (Beirut)",
         "Asia\/Bishkek": "Kirgisian aika (Biškek)",
         "Asia\/Brunei": "Brunein aika",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iranin aika (Teheran)",
         "Asia\/Thimphu": "Bhutanin aika (Thimphu)",
         "Asia\/Tokyo": "Japanin aika (Tokio)",
-        "Asia\/Tomsk": "Venäjä (Tomsk)",
+        "Asia\/Tomsk": "aikavyöhyke: Venäjä (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulan Batorin aika",
-        "Asia\/Urumqi": "Kiina (Ürümqi)",
+        "Asia\/Urumqi": "aikavyöhyke: Kiina (Ürümqi)",
         "Asia\/Ust-Nera": "Vladivostokin aika (Ust-Nera)",
         "Asia\/Vientiane": "Indokiinan aika (Vientiane)",
         "Asia\/Vladivostok": "Vladivostokin aika",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwichin normaaliaika (Guernsey)",
         "Europe\/Helsinki": "Itä-Euroopan aika (Helsinki)",
         "Europe\/Isle_of_Man": "Greenwichin normaaliaika (Mansaari)",
-        "Europe\/Istanbul": "Turkki (Istanbul)",
+        "Europe\/Istanbul": "aikavyöhyke: Turkki (Istanbul)",
         "Europe\/Jersey": "Greenwichin normaaliaika (Jersey)",
         "Europe\/Kaliningrad": "Itä-Euroopan aika (Kaliningrad)",
         "Europe\/Kiev": "Itä-Euroopan aika (Kiova)",
-        "Europe\/Kirov": "Venäjä (Kirov)",
+        "Europe\/Kirov": "aikavyöhyke: Venäjä (Kirov)",
         "Europe\/Lisbon": "Länsi-Euroopan aika (Lissabon)",
         "Europe\/Ljubljana": "Keski-Euroopan aika (Ljubljana)",
         "Europe\/London": "Greenwichin normaaliaika (Lontoo)",
@@ -438,9 +438,7 @@
     },
     "Meta": {
         "GmtFormat": "UTC%s",
-        "HourFormat": [
-            "+%d.%02d",
-            "-%d.%02d"
-        ]
+        "HourFormatPos": "+%d.%02d",
+        "HourFormatNeg": "-%d.%02d"
     }
 }

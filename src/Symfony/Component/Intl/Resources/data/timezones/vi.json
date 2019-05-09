@@ -151,7 +151,7 @@
         "America\/Moncton": "Giờ Đại Tây Dương (Moncton)",
         "America\/Monterrey": "Giờ miền Trung (Monterrey)",
         "America\/Montevideo": "Giờ Uruguay (Montevideo)",
-        "America\/Montreal": "Canada (Montreal)",
+        "America\/Montreal": "Giờ Canada (Montreal)",
         "America\/Montserrat": "Giờ Đại Tây Dương (Montserrat)",
         "America\/Nassau": "Giờ miền Đông (Nassau)",
         "America\/New_York": "Giờ miền Đông (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Giờ Ả Rập (Bahrain)",
         "Asia\/Baku": "Giờ Azerbaijan (Baku)",
         "Asia\/Bangkok": "Giờ Đông Dương (Bangkok)",
-        "Asia\/Barnaul": "Nga (Barnaul)",
+        "Asia\/Barnaul": "Giờ Nga (Barnaul)",
         "Asia\/Beirut": "Giờ Đông Âu (Beirut)",
         "Asia\/Bishkek": "Giờ Kyrgystan (Bishkek)",
         "Asia\/Brunei": "Giờ Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Giờ Iran (Tehran)",
         "Asia\/Thimphu": "Giờ Bhutan (Thimphu)",
         "Asia\/Tokyo": "Giờ Nhật Bản (Tokyo)",
-        "Asia\/Tomsk": "Nga (Tomsk)",
+        "Asia\/Tomsk": "Giờ Nga (Tomsk)",
         "Asia\/Ulaanbaatar": "Giờ Ulan Bator (Ulaanbaatar)",
-        "Asia\/Urumqi": "Trung Quốc (Urumqi)",
+        "Asia\/Urumqi": "Giờ Trung Quốc (Urumqi)",
         "Asia\/Ust-Nera": "Giờ Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Giờ Đông Dương (Viêng Chăn)",
         "Asia\/Vladivostok": "Giờ Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Giờ Trung bình Greenwich (Guernsey)",
         "Europe\/Helsinki": "Giờ Đông Âu (Helsinki)",
         "Europe\/Isle_of_Man": "Giờ Trung bình Greenwich (Đảo Man)",
-        "Europe\/Istanbul": "Thổ Nhĩ Kỳ (Istanbul)",
+        "Europe\/Istanbul": "Giờ Thổ Nhĩ Kỳ (Istanbul)",
         "Europe\/Jersey": "Giờ Trung bình Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Giờ Đông Âu (Kaliningrad)",
         "Europe\/Kiev": "Giờ Đông Âu (Kiev)",
-        "Europe\/Kirov": "Nga (Kirov)",
+        "Europe\/Kirov": "Giờ Nga (Kirov)",
         "Europe\/Lisbon": "Giờ Tây Âu (Lisbon)",
         "Europe\/Ljubljana": "Giờ Trung Âu (Ljubljana)",
         "Europe\/London": "Giờ Trung bình Greenwich (London)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Giờ Đảo Wake",
         "Pacific\/Wallis": "Giờ Wallis và Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

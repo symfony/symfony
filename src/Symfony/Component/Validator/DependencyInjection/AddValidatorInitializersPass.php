@@ -62,7 +62,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
                 }
 
                 while (!($class = $translator->getClass()) && $translator instanceof ChildDefinition) {
-                    $translator = $translator->getParent();
+                    $translator = $container->findDefinition($translator->getParent());
                 }
 
                 if (!is_subclass_of($class, LegacyTranslatorInterface::class)) {

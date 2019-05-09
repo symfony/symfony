@@ -178,7 +178,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                     $ok = false;
                     $v = $values[$id];
                     $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                    CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null]);
+                    $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
+                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -201,7 +202,8 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 }
                 $ok = false;
                 $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', ['key' => substr($id, \strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null]);
+                $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
+                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
             }
         }
 

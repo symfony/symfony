@@ -99,7 +99,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
-use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1505,18 +1504,8 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
-        if (!$container->getParameter('kernel.debug')) {
-            $cacheMetadataFactory = new Definition(
-                CacheClassMetadataFactory::class,
-                [
-                    new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
-                    new Reference('serializer.mapping.cache.symfony'),
-                ]
-            );
-            $cacheMetadataFactory->setPublic(false);
-            $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
-
-            $container->setDefinition('serializer.mapping.cache_class_metadata_factory', $cacheMetadataFactory);
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
         }
 
         if (isset($config['name_converter']) && $config['name_converter']) {
@@ -1550,6 +1539,10 @@ class FrameworkExtension extends Extension
             $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('property_info.cache');
         }
     }
 

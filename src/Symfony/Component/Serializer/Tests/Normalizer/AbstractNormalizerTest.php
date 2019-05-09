@@ -8,11 +8,15 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\NullableConstructorArgumentDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ProxyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
+use Symfony\Component\Serializer\Tests\Fixtures\VariadicConstructorTypedArgsDummy;
 
 /**
  * Provides a dummy Normalizer which extends the AbstractNormalizer.
@@ -127,5 +131,22 @@ class AbstractNormalizerTest extends TestCase
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
 
         $this->assertNull($dummy->getFoo());
+    }
+
+    /**
+     * @requires PHP 5.6
+     */
+    public function testObjectWithVariadicConstructorTypedArguments()
+    {
+        $normalizer = new PropertyNormalizer();
+        $normalizer->setSerializer(new Serializer([$normalizer]));
+        $data = ['foo' => [['foo' => 'Foo', 'bar' => 'Bar', 'baz' => 'Baz', 'qux' => 'Qux'], ['foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ', 'qux' => 'QUX']]];
+        $dummy = $normalizer->denormalize($data, VariadicConstructorTypedArgsDummy::class);
+
+        $this->assertInstanceOf(VariadicConstructorTypedArgsDummy::class, $dummy);
+        $this->assertCount(2, $dummy->getFoo());
+        foreach ($dummy->getFoo() as $foo) {
+            $this->assertInstanceOf(Dummy::class, $foo);
+        }
     }
 }

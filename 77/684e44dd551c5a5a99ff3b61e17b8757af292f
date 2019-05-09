@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-23T14:03:00Z
+
+(Travis failures are unrelated)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-06T16:46:34Z
+
+For 3.4 we need to collect `allowSchemes` in a different way (also different places) because the code as of 4.2 has been completely refactored. I still haven't found the right way to do it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-08T23:12:46Z
+
+@nicolas-grekas I just rebased to make tests pass, but I lost your changes, I'm sorry :( please, feel free to push them again, thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-09T09:05:52Z
+
+> For 3.4 we need to collect allowSchemes in a different way
+
+Or we can forget about it - 4.2 has new features that allow making the difference - 3.4 doesn't. Makes sense?
+
+I added back my changes.

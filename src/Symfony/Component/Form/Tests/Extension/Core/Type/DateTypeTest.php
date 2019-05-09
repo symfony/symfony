@@ -20,17 +20,19 @@ class DateTypeTest extends BaseTypeTest
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateType';
 
     private $defaultTimezone;
+    private $defaultLocale;
 
     protected function setUp()
     {
         parent::setUp();
         $this->defaultTimezone = date_default_timezone_get();
+        $this->defaultLocale = \Locale::getDefault();
     }
 
     protected function tearDown()
     {
         date_default_timezone_set($this->defaultTimezone);
-        \Locale::setDefault('en');
+        \Locale::setDefault($this->defaultLocale);
     }
 
     /**

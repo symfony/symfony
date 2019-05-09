@@ -437,10 +437,7 @@
         "Pacific\/Wallis": "Wallis og Futuna-tid"
     },
     "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d.%02d",
-            "-%02d.%02d"
-        ]
+        "HourFormatPos": "+%02d.%02d",
+        "HourFormatNeg": "-%02d.%02d"
     }
 }

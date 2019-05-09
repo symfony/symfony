@@ -3,20 +3,8 @@
     "Names": {
         "Africa\/Kigali": "U Rwanda (Kigali)",
         "Antarctica\/Troll": "Troll",
-        "CST6CDT": "CST6CDT",
-        "EST5EDT": "EST5EDT",
-        "Etc\/GMT": "GMT",
-        "Etc\/UTC": "UTC",
         "Europe\/Skopje": "Masedoniya y'Amajyaruguru (Skopje)",
-        "MST7MDT": "MST7MDT",
-        "PST8PDT": "PST8PDT",
         "Pacific\/Tongatapu": "Tonga (Tongatapu)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

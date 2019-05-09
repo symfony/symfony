@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantický čas (Moncton)",
         "America\/Monterrey": "Severoamerický centrální čas (Monterrey)",
         "America\/Montevideo": "Uruguayský čas (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Časové pásmo Kanada (Montreal)",
         "America\/Montserrat": "Atlantický čas (Montserrat)",
         "America\/Nassau": "Severoamerický východní čas (Nassau)",
         "America\/New_York": "Severoamerický východní čas (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabský čas (Bahrajn)",
         "Asia\/Baku": "Ázerbájdžánský čas (Baku)",
         "Asia\/Bangkok": "Indočínský čas (Bangkok)",
-        "Asia\/Barnaul": "Rusko (Barnaul)",
+        "Asia\/Barnaul": "Časové pásmo Rusko (Barnaul)",
         "Asia\/Beirut": "Východoevropský čas (Bejrút)",
         "Asia\/Bishkek": "Kyrgyzský čas (Biškek)",
         "Asia\/Brunei": "Brunejský čas",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Íránský čas (Teherán)",
         "Asia\/Thimphu": "Bhútánský čas (Thimbú)",
         "Asia\/Tokyo": "Japonský čas (Tokio)",
-        "Asia\/Tomsk": "Rusko (Tomsk)",
+        "Asia\/Tomsk": "Časové pásmo Rusko (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulánbátarský čas",
-        "Asia\/Urumqi": "Čína (Urumči)",
+        "Asia\/Urumqi": "Časové pásmo Čína (Urumči)",
         "Asia\/Ust-Nera": "Vladivostocký čas (Ust-Nera)",
         "Asia\/Vientiane": "Indočínský čas (Vientiane)",
         "Asia\/Vladivostok": "Vladivostocký čas (Vladivostok)",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwichský střední čas (Guernsey)",
         "Europe\/Helsinki": "Východoevropský čas (Helsinky)",
         "Europe\/Isle_of_Man": "Greenwichský střední čas (Ostrov Man)",
-        "Europe\/Istanbul": "Turecko (Istanbul)",
+        "Europe\/Istanbul": "Časové pásmo Turecko (Istanbul)",
         "Europe\/Jersey": "Greenwichský střední čas (Jersey)",
         "Europe\/Kaliningrad": "Východoevropský čas (Kaliningrad)",
         "Europe\/Kiev": "Východoevropský čas (Kyjev)",
-        "Europe\/Kirov": "Rusko (Kirov)",
+        "Europe\/Kirov": "Časové pásmo Rusko (Kirov)",
         "Europe\/Lisbon": "Západoevropský čas (Lisabon)",
         "Europe\/Ljubljana": "Středoevropský čas (Lublaň)",
         "Europe\/London": "Greenwichský střední čas (Londýn)",
@@ -437,10 +437,7 @@
         "Pacific\/Wallis": "Čas ostrovů Wallis a Futuna"
     },
     "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%d:%02d",
-            "-%d:%02d"
-        ]
+        "HourFormatPos": "+%d:%02d",
+        "HourFormatNeg": "-%d:%02d"
     }
 }

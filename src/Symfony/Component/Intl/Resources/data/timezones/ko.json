@@ -151,7 +151,7 @@
         "America\/Moncton": "대서양 시간(몽턴)",
         "America\/Monterrey": "미 중부 시간(몬테레이)",
         "America\/Montevideo": "우루과이 시간(몬테비데오)",
-        "America\/Montreal": "캐나다(Montreal)",
+        "America\/Montreal": "캐나다 시간(Montreal)",
         "America\/Montserrat": "대서양 시간(몬세라트)",
         "America\/Nassau": "미 동부 시간(나소)",
         "America\/New_York": "미 동부 시간(뉴욕)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "아라비아 시간(바레인)",
         "Asia\/Baku": "아제르바이잔 시간(바쿠)",
         "Asia\/Bangkok": "인도차이나 시간(방콕)",
-        "Asia\/Barnaul": "러시아(바르나울)",
+        "Asia\/Barnaul": "러시아 시간(바르나울)",
         "Asia\/Beirut": "동유럽 시간(베이루트)",
         "Asia\/Bishkek": "키르기스스탄 시간(비슈케크)",
         "Asia\/Brunei": "브루나이 시간",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "이란 시간(테헤란)",
         "Asia\/Thimphu": "부탄 시간(팀부)",
         "Asia\/Tokyo": "일본 시간(도쿄)",
-        "Asia\/Tomsk": "러시아(톰스크)",
+        "Asia\/Tomsk": "러시아 시간(톰스크)",
         "Asia\/Ulaanbaatar": "울란바토르 시간",
-        "Asia\/Urumqi": "중국(우루무치)",
+        "Asia\/Urumqi": "중국 시간(우루무치)",
         "Asia\/Ust-Nera": "블라디보스토크 시간(우스티네라)",
         "Asia\/Vientiane": "인도차이나 시간(비엔티안)",
         "Asia\/Vladivostok": "블라디보스토크 시간",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "그리니치 표준시(건지)",
         "Europe\/Helsinki": "동유럽 시간(헬싱키)",
         "Europe\/Isle_of_Man": "그리니치 표준시(맨섬)",
-        "Europe\/Istanbul": "터키(이스탄불)",
+        "Europe\/Istanbul": "터키 시간(이스탄불)",
         "Europe\/Jersey": "그리니치 표준시(저지)",
         "Europe\/Kaliningrad": "동유럽 시간(칼리닌그라드)",
         "Europe\/Kiev": "동유럽 시간(키예프)",
-        "Europe\/Kirov": "러시아(키로프)",
+        "Europe\/Kirov": "러시아 시간(키로프)",
         "Europe\/Lisbon": "서유럽 시간(리스본)",
         "Europe\/Ljubljana": "중부 유럽 시간(류블랴나)",
         "Europe\/London": "그리니치 표준시(런던)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "웨이크섬 시간",
         "Pacific\/Wallis": "월리스푸투나 제도 시간"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

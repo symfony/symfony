@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlantik-Zäit (Moncton)",
         "America\/Monterrey": "Nordamerikanesch Inlandzäit (Monterrey)",
         "America\/Montevideo": "Uruguayanesch Zäit (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "Kanada Zäit (Montreal)",
         "America\/Montserrat": "Atlantik-Zäit (Montserrat)",
         "America\/Nassau": "Nordamerikanesch Ostküstenzäit (Nassau)",
         "America\/New_York": "Nordamerikanesch Ostküstenzäit (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Arabesch Zäit (Bahrain)",
         "Asia\/Baku": "Aserbaidschanesch Zäit (Baku)",
         "Asia\/Bangkok": "Indochina-Zäit (Bangkok)",
-        "Asia\/Barnaul": "Russland (Barnaul)",
+        "Asia\/Barnaul": "Russland Zäit (Barnaul)",
         "Asia\/Beirut": "Osteuropäesch Zäit (Beirut)",
         "Asia\/Bishkek": "Kirgisistan-Zäit (Bischkek)",
         "Asia\/Brunei": "Brunei-Zäit",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iranesch Zäit (Teheran)",
         "Asia\/Thimphu": "Bhutan-Zäit (Thimphu)",
         "Asia\/Tokyo": "Japanesch Zäit (Tokio)",
-        "Asia\/Tomsk": "Russland (Tomsk)",
+        "Asia\/Tomsk": "Russland Zäit (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulaanbaatar-Zäit",
-        "Asia\/Urumqi": "China (Urumqi)",
+        "Asia\/Urumqi": "China Zäit (Urumqi)",
         "Asia\/Ust-Nera": "Wladiwostok-Zäit (Ust-Nera)",
         "Asia\/Vientiane": "Indochina-Zäit (Vientiane)",
         "Asia\/Vladivostok": "Wladiwostok-Zäit",
@@ -322,7 +322,6 @@
         "CST6CDT": "Nordamerikanesch Inlandzäit",
         "EST5EDT": "Nordamerikanesch Ostküstenzäit",
         "Etc\/GMT": "Mëttler Greenwich-Zäit",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "Mëtteleuropäesch Zäit (Amsterdam)",
         "Europe\/Andorra": "Mëtteleuropäesch Zäit (Andorra)",
         "Europe\/Astrakhan": "Moskauer Zäit (Astrakhan)",
@@ -341,11 +340,11 @@
         "Europe\/Guernsey": "Mëttler Greenwich-Zäit (Guernsey)",
         "Europe\/Helsinki": "Osteuropäesch Zäit (Helsinki)",
         "Europe\/Isle_of_Man": "Mëttler Greenwich-Zäit (Isle of Man)",
-        "Europe\/Istanbul": "Tierkei (Istanbul)",
+        "Europe\/Istanbul": "Tierkei Zäit (Istanbul)",
         "Europe\/Jersey": "Mëttler Greenwich-Zäit (Jersey)",
         "Europe\/Kaliningrad": "Osteuropäesch Zäit (Kaliningrad)",
         "Europe\/Kiev": "Osteuropäesch Zäit (Kiew)",
-        "Europe\/Kirov": "Russland (Kirov)",
+        "Europe\/Kirov": "Russland Zäit (Kirov)",
         "Europe\/Lisbon": "Westeuropäesch Zäit (Lissabon)",
         "Europe\/Ljubljana": "Mëtteleuropäesch Zäit (Ljubljana)",
         "Europe\/London": "Mëttler Greenwich-Zäit (London)",
@@ -396,7 +395,7 @@
         "Indian\/Reunion": "Réunion-Zäit",
         "MST7MDT": "Rocky-Mountain-Zäit",
         "PST8PDT": "Nordamerikanesch Westküstenzäit",
-        "Pacific\/Apia": "Samoa (Apia)",
+        "Pacific\/Apia": "Samoa Zäit (Apia)",
         "Pacific\/Auckland": "Neiséiland-Zäit (Auckland)",
         "Pacific\/Bougainville": "Papua-Neiguinea-Zäit (Bougainville)",
         "Pacific\/Chatham": "Chatham-Zäit",
@@ -436,11 +435,5 @@
         "Pacific\/Wake": "Wake-Insel-Zäit",
         "Pacific\/Wallis": "Wallis-a-Futuna-Zäit"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

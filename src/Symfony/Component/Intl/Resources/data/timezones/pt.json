@@ -151,7 +151,7 @@
         "America\/Moncton": "Horário do Atlântico (Moncton)",
         "America\/Monterrey": "Horário Central (Monterrey)",
         "America\/Montevideo": "Horário do Uruguai (Montevidéu)",
-        "America\/Montreal": "Canadá (Montreal)",
+        "America\/Montreal": "Horário Canadá (Montreal)",
         "America\/Montserrat": "Horário do Atlântico (Montserrat)",
         "America\/Nassau": "Horário do Leste (Nassau)",
         "America\/New_York": "Horário do Leste (Nova York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Horário da Arábia (Bahrein)",
         "Asia\/Baku": "Horário do Arzeibaijão (Baku)",
         "Asia\/Bangkok": "Horário da Indochina (Bangkok)",
-        "Asia\/Barnaul": "Rússia (Barnaul)",
+        "Asia\/Barnaul": "Horário Rússia (Barnaul)",
         "Asia\/Beirut": "Horário da Europa Oriental (Beirute)",
         "Asia\/Bishkek": "Horário do Quirguistão (Bishkek)",
         "Asia\/Brunei": "Horário de Brunei Darussalam",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Horário do Irã (Teerã)",
         "Asia\/Thimphu": "Horário do Butão (Timphu)",
         "Asia\/Tokyo": "Horário do Japão (Tóquio)",
-        "Asia\/Tomsk": "Rússia (Tomsk)",
+        "Asia\/Tomsk": "Horário Rússia (Tomsk)",
         "Asia\/Ulaanbaatar": "Horário de Ulan Bator",
-        "Asia\/Urumqi": "China (Urumqi)",
+        "Asia\/Urumqi": "Horário China (Urumqi)",
         "Asia\/Ust-Nera": "Horário de Vladivostok (Ust-Nera)",
         "Asia\/Vientiane": "Horário da Indochina (Vientiane)",
         "Asia\/Vladivostok": "Horário de Vladivostok",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Horário do Meridiano de Greenwich (Guernsey)",
         "Europe\/Helsinki": "Horário da Europa Oriental (Helsinque)",
         "Europe\/Isle_of_Man": "Horário do Meridiano de Greenwich (Ilha de Man)",
-        "Europe\/Istanbul": "Turquia (Istambul)",
+        "Europe\/Istanbul": "Horário Turquia (Istambul)",
         "Europe\/Jersey": "Horário do Meridiano de Greenwich (Jersey)",
         "Europe\/Kaliningrad": "Horário da Europa Oriental (Kaliningrado)",
         "Europe\/Kiev": "Horário da Europa Oriental (Kiev)",
-        "Europe\/Kirov": "Rússia (Kirov)",
+        "Europe\/Kirov": "Horário Rússia (Kirov)",
         "Europe\/Lisbon": "Horário da Europa Ocidental (Lisboa)",
         "Europe\/Ljubljana": "Horário da Europa Central (Liubliana)",
         "Europe\/London": "Horário do Meridiano de Greenwich (Londres)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Horário das Ilhas Wake",
         "Pacific\/Wallis": "Horário de Wallis e Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

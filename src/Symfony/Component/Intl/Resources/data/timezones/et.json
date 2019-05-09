@@ -151,7 +151,7 @@
         "America\/Moncton": "Atlandi aeg (Moncton)",
         "America\/Monterrey": "Kesk-Ameerika aeg (Monterrey)",
         "America\/Montevideo": "Uruguay aeg (Montevideo)",
-        "America\/Montreal": "Kanada (Montreal)",
+        "America\/Montreal": "(Kanada) (Montreal)",
         "America\/Montserrat": "Atlandi aeg (Montserrat)",
         "America\/Nassau": "Idaranniku aeg (Nassau)",
         "America\/New_York": "Idaranniku aeg (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Araabia aeg (Bahrein)",
         "Asia\/Baku": "Aserbaidžaani aeg (Bakuu)",
         "Asia\/Bangkok": "Indohiina aeg (Bangkok)",
-        "Asia\/Barnaul": "Venemaa (Barnaul)",
+        "Asia\/Barnaul": "(Venemaa) (Barnaul)",
         "Asia\/Beirut": "Ida-Euroopa aeg (Beirut)",
         "Asia\/Bishkek": "Kõrgõzstani aeg (Biškek)",
         "Asia\/Brunei": "Brunei aeg",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Iraani aeg (Teheran)",
         "Asia\/Thimphu": "Bhutani aeg (Thimphu)",
         "Asia\/Tokyo": "Jaapani aeg (Tōkyō)",
-        "Asia\/Tomsk": "Venemaa (Tomsk)",
+        "Asia\/Tomsk": "(Venemaa) (Tomsk)",
         "Asia\/Ulaanbaatar": "Ulaanbaatari aeg",
-        "Asia\/Urumqi": "Hiina (Ürümqi)",
+        "Asia\/Urumqi": "(Hiina) (Ürümqi)",
         "Asia\/Ust-Nera": "Vladivostoki aeg (Ust-Nera)",
         "Asia\/Vientiane": "Indohiina aeg (Vientiane)",
         "Asia\/Vladivostok": "Vladivostoki aeg",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Greenwichi aeg (Guernsey)",
         "Europe\/Helsinki": "Ida-Euroopa aeg (Helsingi)",
         "Europe\/Isle_of_Man": "Greenwichi aeg (Mani saar)",
-        "Europe\/Istanbul": "Türgi (İstanbul)",
+        "Europe\/Istanbul": "(Türgi) (İstanbul)",
         "Europe\/Jersey": "Greenwichi aeg (Jersey)",
         "Europe\/Kaliningrad": "Ida-Euroopa aeg (Kaliningrad)",
         "Europe\/Kiev": "Ida-Euroopa aeg (Kiiev)",
-        "Europe\/Kirov": "Venemaa (Kirov)",
+        "Europe\/Kirov": "(Venemaa) (Kirov)",
         "Europe\/Lisbon": "Lääne-Euroopa aeg (Lissabon)",
         "Europe\/Ljubljana": "Kesk-Euroopa aeg (Ljubljana)",
         "Europe\/London": "Greenwichi aeg (London)",
@@ -438,9 +438,6 @@
     },
     "Meta": {
         "GmtFormat": "GMT %s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "−%02d:%02d"
-        ]
+        "HourFormatNeg": "−%02d:%02d"
     }
 }

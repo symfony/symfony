@@ -248,10 +248,6 @@
         "Australia\/Melbourne": "Australia (Melbourne)",
         "Australia\/Perth": "Australia (Perth)",
         "Australia\/Sydney": "Australia (Sydney)",
-        "CST6CDT": "CST6CDT",
-        "EST5EDT": "EST5EDT",
-        "Etc\/GMT": "GMT",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "Países Bajos (Amsterdam)",
         "Europe\/Andorra": "Andorra (Andorra)",
         "Europe\/Astrakhan": "Rusia (Astrakhan)",
@@ -308,8 +304,6 @@
         "Indian\/Maldives": "Maldives Time",
         "Indian\/Mauritius": "Mauritius Time",
         "Indian\/Reunion": "Reunion Time",
-        "MST7MDT": "MST7MDT",
-        "PST8PDT": "PST8PDT",
         "Pacific\/Apia": "Samoa (Apia)",
         "Pacific\/Auckland": "New Zealand Time (Auckland)",
         "Pacific\/Bougainville": "Papua New Guinea Time (Bougainville)",
@@ -349,11 +343,5 @@
         "Pacific\/Wake": "Islas menores alejadas de los EE.UU. (Wake)",
         "Pacific\/Wallis": "Wallis & Futuna Time"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

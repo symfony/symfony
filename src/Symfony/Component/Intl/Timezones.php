@@ -86,7 +86,7 @@ final class Timezones extends ResourceBundle
         $offset = self::getRawOffset($timezone, $timestamp);
         $abs = abs($offset);
 
-        return sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), sprintf(self::readEntry(['Meta', 'HourFormat', 0 <= $offset ? 0 : 1], $displayLocale), $abs / 3600, $abs / 60 % 60));
+        return sprintf(self::readEntry(['Meta', 'GmtFormat'], $displayLocale), sprintf(self::readEntry(['Meta', 'HourFormat'.(0 <= $offset ? 'Pos' : 'Neg')], $displayLocale), $abs / 3600, $abs / 60 % 60));
     }
 
     /**

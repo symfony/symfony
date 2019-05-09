@@ -322,7 +322,6 @@
         "CST6CDT": "مرکزی ٹایِم",
         "EST5EDT": "مشرقی ٹایِم",
         "Etc\/GMT": "گریٖن وِچ میٖن ٹایِم",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "مرکزی یوٗرپی ٹایِم (ایمسٹَرڈیم)",
         "Europe\/Andorra": "مرکزی یوٗرپی ٹایِم (اَنڑورا)",
         "Europe\/Astrakhan": "ماسکَو ٹایِم (Astrakhan)",
@@ -436,11 +435,5 @@
         "Pacific\/Wake": "ویک ججیٖرُک ٹایِم",
         "Pacific\/Wallis": "والِس تہٕ فیوٗٹیوٗنا ٹایِم (ویلِس)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Àm Eilean Wake",
         "Pacific\/Wallis": "Àm Uallas agus Futuna"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

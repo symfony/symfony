@@ -151,7 +151,7 @@
         "America\/Moncton": "ئاتلانتىك ئوكيان ۋاقتى (Moncton)",
         "America\/Monterrey": "ئوتتۇرا قىسىم ۋاقتى (Monterrey)",
         "America\/Montevideo": "ئۇرۇگۋاي ۋاقتى (Montevideo)",
-        "America\/Montreal": "كانادا (Montreal)",
+        "America\/Montreal": "كانادا ۋاقتى (Montreal)",
         "America\/Montserrat": "ئاتلانتىك ئوكيان ۋاقتى (Montserrat)",
         "America\/Nassau": "شەرقىي قىسىم ۋاقتى (Nassau)",
         "America\/New_York": "شەرقىي قىسىم ۋاقتى (New York)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "ئەرەب ۋاقتى (Bahrain)",
         "Asia\/Baku": "ئەزەربەيجان ۋاقتى (Baku)",
         "Asia\/Bangkok": "ھىندى چىنى ۋاقتى (Bangkok)",
-        "Asia\/Barnaul": "رۇسىيە (Barnaul)",
+        "Asia\/Barnaul": "رۇسىيە ۋاقتى (Barnaul)",
         "Asia\/Beirut": "شەرقىي ياۋروپا ۋاقتى (Beirut)",
         "Asia\/Bishkek": "قىرغىزىستان ۋاقتى (Bishkek)",
         "Asia\/Brunei": "بىرۇنىي دارۇسسالام ۋاقتى (Brunei)",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "ئىران ۋاقتى (Tehran)",
         "Asia\/Thimphu": "بۇتان ۋاقتى (Thimphu)",
         "Asia\/Tokyo": "ياپونىيە ۋاقتى (Tokyo)",
-        "Asia\/Tomsk": "رۇسىيە (Tomsk)",
+        "Asia\/Tomsk": "رۇسىيە ۋاقتى (Tomsk)",
         "Asia\/Ulaanbaatar": "ئۇلانباتور ۋاقتى (Ulaanbaatar)",
-        "Asia\/Urumqi": "جۇڭگو (Urumqi)",
+        "Asia\/Urumqi": "جۇڭگو ۋاقتى (Urumqi)",
         "Asia\/Ust-Nera": "ۋىلادىۋوستوك ۋاقتى (Ust-Nera)",
         "Asia\/Vientiane": "ھىندى چىنى ۋاقتى (Vientiane)",
         "Asia\/Vladivostok": "ۋىلادىۋوستوك ۋاقتى (Vladivostok)",
@@ -322,7 +322,6 @@
         "CST6CDT": "ئوتتۇرا قىسىم ۋاقتى",
         "EST5EDT": "شەرقىي قىسىم ۋاقتى",
         "Etc\/GMT": "گىرىنۋىچ ۋاقتى",
-        "Etc\/UTC": "UTC",
         "Europe\/Amsterdam": "ئوتتۇرا ياۋروپا ۋاقتى (Amsterdam)",
         "Europe\/Andorra": "ئوتتۇرا ياۋروپا ۋاقتى (Andorra)",
         "Europe\/Astrakhan": "موسكۋا ۋاقتى (Astrakhan)",
@@ -341,11 +340,11 @@
         "Europe\/Guernsey": "گىرىنۋىچ ۋاقتى (Guernsey)",
         "Europe\/Helsinki": "شەرقىي ياۋروپا ۋاقتى (Helsinki)",
         "Europe\/Isle_of_Man": "گىرىنۋىچ ۋاقتى (Isle of Man)",
-        "Europe\/Istanbul": "تۈركىيە (Istanbul)",
+        "Europe\/Istanbul": "تۈركىيە ۋاقتى (Istanbul)",
         "Europe\/Jersey": "گىرىنۋىچ ۋاقتى (Jersey)",
         "Europe\/Kaliningrad": "شەرقىي ياۋروپا ۋاقتى (Kaliningrad)",
         "Europe\/Kiev": "شەرقىي ياۋروپا ۋاقتى (Kiev)",
-        "Europe\/Kirov": "رۇسىيە (Kirov)",
+        "Europe\/Kirov": "رۇسىيە ۋاقتى (Kirov)",
         "Europe\/Lisbon": "غەربىي ياۋروپا ۋاقتى (Lisbon)",
         "Europe\/Ljubljana": "ئوتتۇرا ياۋروپا ۋاقتى (Ljubljana)",
         "Europe\/London": "گىرىنۋىچ ۋاقتى (London)",
@@ -396,7 +395,7 @@
         "Indian\/Reunion": "رېئونىيون ۋاقتى",
         "MST7MDT": "تاغ ۋاقتى",
         "PST8PDT": "تىنچ ئوكيان ۋاقتى",
-        "Pacific\/Apia": "ساموئا (Apia)",
+        "Pacific\/Apia": "ساموئا ۋاقتى (Apia)",
         "Pacific\/Auckland": "يېڭى زېلاندىيە ۋاقتى (Auckland)",
         "Pacific\/Bougainville": "پاپۇئا يېڭى گىۋىنېيەسى ۋاقتى (Bougainville)",
         "Pacific\/Chatham": "چاتام ۋاقتى (Chatham)",
@@ -436,11 +435,5 @@
         "Pacific\/Wake": "ۋېيك ئارىلى ۋاقتى (Wake)",
         "Pacific\/Wallis": "ۋاللىس ۋە فۇتۇنا ۋاقتى (Wallis)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

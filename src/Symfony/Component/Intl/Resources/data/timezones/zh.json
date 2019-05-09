@@ -151,7 +151,7 @@
         "America\/Moncton": "大西洋时间（蒙克顿）",
         "America\/Monterrey": "北美中部时间（蒙特雷）",
         "America\/Montevideo": "乌拉圭时间（蒙得维的亚）",
-        "America\/Montreal": "加拿大（Montreal）",
+        "America\/Montreal": "加拿大时间（Montreal）",
         "America\/Montserrat": "大西洋时间（蒙特塞拉特）",
         "America\/Nassau": "北美东部时间（拿骚）",
         "America\/New_York": "北美东部时间（纽约）",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "阿拉伯时间（巴林）",
         "Asia\/Baku": "阿塞拜疆时间（巴库）",
         "Asia\/Bangkok": "印度支那时间（曼谷）",
-        "Asia\/Barnaul": "俄罗斯（巴尔瑙尔）",
+        "Asia\/Barnaul": "俄罗斯时间（巴尔瑙尔）",
         "Asia\/Beirut": "东欧时间（贝鲁特）",
         "Asia\/Bishkek": "吉尔吉斯斯坦时间（比什凯克）",
         "Asia\/Brunei": "文莱达鲁萨兰时间",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "伊朗时间（德黑兰）",
         "Asia\/Thimphu": "不丹时间（廷布）",
         "Asia\/Tokyo": "日本时间（东京）",
-        "Asia\/Tomsk": "俄罗斯（托木斯克）",
+        "Asia\/Tomsk": "俄罗斯时间（托木斯克）",
         "Asia\/Ulaanbaatar": "乌兰巴托时间",
-        "Asia\/Urumqi": "中国（乌鲁木齐）",
+        "Asia\/Urumqi": "中国时间（乌鲁木齐）",
         "Asia\/Ust-Nera": "海参崴时间（乌斯内拉）",
         "Asia\/Vientiane": "印度支那时间（万象）",
         "Asia\/Vladivostok": "海参崴时间（符拉迪沃斯托克）",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "格林尼治标准时间（根西岛）",
         "Europe\/Helsinki": "东欧时间（赫尔辛基）",
         "Europe\/Isle_of_Man": "格林尼治标准时间（曼岛）",
-        "Europe\/Istanbul": "土耳其（伊斯坦布尔）",
+        "Europe\/Istanbul": "土耳其时间（伊斯坦布尔）",
         "Europe\/Jersey": "格林尼治标准时间（泽西岛）",
         "Europe\/Kaliningrad": "东欧时间（加里宁格勒）",
         "Europe\/Kiev": "东欧时间（基辅）",
-        "Europe\/Kirov": "俄罗斯（基洛夫）",
+        "Europe\/Kirov": "俄罗斯时间（基洛夫）",
         "Europe\/Lisbon": "西欧时间（里斯本）",
         "Europe\/Ljubljana": "中欧时间（卢布尔雅那）",
         "Europe\/London": "格林尼治标准时间（伦敦）",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "威克岛时间",
         "Pacific\/Wallis": "瓦利斯和富图纳时间"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

@@ -70,10 +70,6 @@
         "Asia\/Vladivostok": "Russia (Vladivostok)",
         "Asia\/Yakutsk": "Russia (Yakutsk)",
         "Asia\/Yekaterinburg": "Russia (Yekaterinburg)",
-        "CST6CDT": "CST6CDT",
-        "EST5EDT": "EST5EDT",
-        "Etc\/GMT": "GMT",
-        "Etc\/UTC": "UTC",
         "Europe\/Astrakhan": "Russia (Astrakhan)",
         "Europe\/Berlin": "Germany (Berlin)",
         "Europe\/Busingen": "Germany (Busingen)",
@@ -87,15 +83,7 @@
         "Europe\/Saratov": "Russia (Saratov)",
         "Europe\/Ulyanovsk": "Russia (Ulyanovsk)",
         "Europe\/Volgograd": "Russia (Volgograd)",
-        "MST7MDT": "MST7MDT",
-        "PST8PDT": "PST8PDT",
         "Pacific\/Honolulu": "United States (Honolulu)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

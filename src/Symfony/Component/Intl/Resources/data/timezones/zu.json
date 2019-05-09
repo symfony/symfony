@@ -99,7 +99,7 @@
         "America\/Detroit": "Isikhathi sase-North American East (i-Detroit)",
         "America\/Dominica": "Isikhathi sase-Atlantic (i-Dominica)",
         "America\/Edmonton": "Isikhathi sase-North American Mountain (i-Edmonton)",
-        "America\/Eirunepe": "i-Brazil (i-Eirunepe)",
+        "America\/Eirunepe": "Isikhathi sase-i-Brazil (i-Eirunepe)",
         "America\/El_Salvador": "Isikhathi sase-North American Central (i-El Salvador)",
         "America\/Fort_Nelson": "Isikhathi sase-North American Mountain (i-Fort Nelson)",
         "America\/Fortaleza": "Isikhathi sase-Brasilia (i-Fortaleza)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Isikhathi sase-Atlantic (i-Moncton)",
         "America\/Monterrey": "Isikhathi sase-North American Central (i-Monterrey)",
         "America\/Montevideo": "Isikhathi sase-Uruguay (i-Montevideo)",
-        "America\/Montreal": "i-Canada (Montreal)",
+        "America\/Montreal": "Isikhathi sase-i-Canada (Montreal)",
         "America\/Montserrat": "Isikhathi sase-Atlantic (i-Montserrat)",
         "America\/Nassau": "Isikhathi sase-North American East (i-Nassau)",
         "America\/New_York": "Isikhathi sase-North American East (i-New York)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Isikhathi sase-Brasilia (i-Recife)",
         "America\/Regina": "Isikhathi sase-North American Central (i-Regina)",
         "America\/Resolute": "Isikhathi sase-North American Central (i-Resolute)",
-        "America\/Rio_Branco": "i-Brazil (i-Rio Branco)",
+        "America\/Rio_Branco": "Isikhathi sase-i-Brazil (i-Rio Branco)",
         "America\/Santa_Isabel": "Isikhathi sase-Northwest Mexico (i-Santa Isabel)",
         "America\/Santarem": "Isikhathi sase-Brasilia (i-Santarem)",
         "America\/Santiago": "Isikhathi sase-Chile (i-Santiago)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Isikhathi sase-Arabian (i-Bahrain)",
         "Asia\/Baku": "Isikhathi sase-Azerbaijan (i-Baku)",
         "Asia\/Bangkok": "Isikhathi sase-Indochina (i-Bangkok)",
-        "Asia\/Barnaul": "i-Russia (i-Barnaul)",
+        "Asia\/Barnaul": "Isikhathi sase-i-Russia (i-Barnaul)",
         "Asia\/Beirut": "Isikhathi sase-Eastern Europe (i-Beirut)",
         "Asia\/Bishkek": "Isikhathi sase-Kyrgystan (i-Bishkek)",
         "Asia\/Brunei": "Isikhathi sase-Brunei Darussalam (i-Brunei)",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Isikhathi sase-Iran (i-Tehran)",
         "Asia\/Thimphu": "Isikhathi sase-Bhutan (i-Thimphu)",
         "Asia\/Tokyo": "Isikhathi sase-Japan (i-Tokyo)",
-        "Asia\/Tomsk": "i-Russia (i-Tomsk)",
+        "Asia\/Tomsk": "Isikhathi sase-i-Russia (i-Tomsk)",
         "Asia\/Ulaanbaatar": "Isikhathi sase-Ulan Bator (i-Ulaanbaatar)",
-        "Asia\/Urumqi": "i-China (i-Urumqi)",
+        "Asia\/Urumqi": "Isikhathi sase-i-China (i-Urumqi)",
         "Asia\/Ust-Nera": "Isikhathi sase-Vladivostok (i-Ust-Nera)",
         "Asia\/Vientiane": "Isikhathi sase-Indochina (i-Vientiane)",
         "Asia\/Vladivostok": "Isikhathi sase-Vladivostok (i-Vladivostok)",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Isikhathi sase-Greenwich Mean (i-Guernsey)",
         "Europe\/Helsinki": "Isikhathi sase-Eastern Europe (i-Helsinki)",
         "Europe\/Isle_of_Man": "Isikhathi sase-Greenwich Mean (i-Isle of Man)",
-        "Europe\/Istanbul": "i-Turkey (i-Istanbul)",
+        "Europe\/Istanbul": "Isikhathi sase-i-Turkey (i-Istanbul)",
         "Europe\/Jersey": "Isikhathi sase-Greenwich Mean (i-Jersey)",
         "Europe\/Kaliningrad": "Isikhathi sase-Eastern Europe (i-Kaliningrad)",
         "Europe\/Kiev": "Isikhathi sase-Eastern Europe (i-Kiev)",
-        "Europe\/Kirov": "i-Russia (i-Kirov)",
+        "Europe\/Kirov": "Isikhathi sase-i-Russia (i-Kirov)",
         "Europe\/Lisbon": "Isikhathi sase-Western Europe (i-Lisbon)",
         "Europe\/Ljubljana": "Isikhathi sase-Central Europe (i-Ljubljana)",
         "Europe\/London": "Isikhathi sase-Greenwich Mean (i-London)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Isikhathi sase-Wake Island (i-Wake)",
         "Pacific\/Wallis": "Isikhathi sase-Wallis nase-Futuna (i-Wallis)"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

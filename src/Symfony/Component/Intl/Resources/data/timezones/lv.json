@@ -99,7 +99,7 @@
         "America\/Detroit": "Detroita (Austrumu laiks)",
         "America\/Dominica": "Dominika (Atlantijas laiks)",
         "America\/Edmonton": "Edmontona (Kalnu laiks)",
-        "America\/Eirunepe": "Eirunepe (Brazīlija)",
+        "America\/Eirunepe": "Eirunepe (Laika josla: Brazīlija)",
         "America\/El_Salvador": "Salvadora (Centrālais laiks)",
         "America\/Fort_Nelson": "Fortnelsona (Kalnu laiks)",
         "America\/Fortaleza": "Fortaleza (Brazīlijas laiks)",
@@ -151,7 +151,7 @@
         "America\/Moncton": "Monktona (Atlantijas laiks)",
         "America\/Monterrey": "Monterreja (Centrālais laiks)",
         "America\/Montevideo": "Montevideo (Urugvajas laiks)",
-        "America\/Montreal": "Montreal (Kanāda)",
+        "America\/Montreal": "Montreal (Laika josla: Kanāda)",
         "America\/Montserrat": "Montserrata (Atlantijas laiks)",
         "America\/Nassau": "Naso (Austrumu laiks)",
         "America\/New_York": "Ņujorka (Austrumu laiks)",
@@ -176,7 +176,7 @@
         "America\/Recife": "Resifi (Brazīlijas laiks)",
         "America\/Regina": "Ridžaina (Centrālais laiks)",
         "America\/Resolute": "Rezolūta (Centrālais laiks)",
-        "America\/Rio_Branco": "Riobranko (Brazīlija)",
+        "America\/Rio_Branco": "Riobranko (Laika josla: Brazīlija)",
         "America\/Santa_Isabel": "Santaisabela (Ziemeļrietumu Meksikas laiks)",
         "America\/Santarem": "Santarena (Brazīlijas laiks)",
         "America\/Santiago": "Santjago (Čīles laiks)",
@@ -226,7 +226,7 @@
         "Asia\/Bahrain": "Bahreina (Arābijas pussalas laiks)",
         "Asia\/Baku": "Baku (Azerbaidžānas laiks)",
         "Asia\/Bangkok": "Bangkoka (Indoķīnas laiks)",
-        "Asia\/Barnaul": "Barnaula (Krievija)",
+        "Asia\/Barnaul": "Barnaula (Laika josla: Krievija)",
         "Asia\/Beirut": "Beirūta (Austrumeiropas laiks)",
         "Asia\/Bishkek": "Biškeka (Kirgizstānas laiks)",
         "Asia\/Brunei": "Brunejas Darusalamas laiks",
@@ -288,9 +288,9 @@
         "Asia\/Tehran": "Teherāna (Irānas laiks)",
         "Asia\/Thimphu": "Thimphu (Butānas laiks)",
         "Asia\/Tokyo": "Tokija (Japānas laiks)",
-        "Asia\/Tomsk": "Tomska (Krievija)",
+        "Asia\/Tomsk": "Tomska (Laika josla: Krievija)",
         "Asia\/Ulaanbaatar": "Ulanbatoras laiks",
-        "Asia\/Urumqi": "Urumči (Ķīna)",
+        "Asia\/Urumqi": "Urumči (Laika josla: Ķīna)",
         "Asia\/Ust-Nera": "Ustjņera (Vladivostokas laiks)",
         "Asia\/Vientiane": "Vjenčana (Indoķīnas laiks)",
         "Asia\/Vladivostok": "Vladivostokas laiks",
@@ -341,11 +341,11 @@
         "Europe\/Guernsey": "Gērnsija (Griničas laiks)",
         "Europe\/Helsinki": "Helsinki (Austrumeiropas laiks)",
         "Europe\/Isle_of_Man": "Menas sala (Griničas laiks)",
-        "Europe\/Istanbul": "Stambula (Turcija)",
+        "Europe\/Istanbul": "Stambula (Laika josla: Turcija)",
         "Europe\/Jersey": "Džērsija (Griničas laiks)",
         "Europe\/Kaliningrad": "Kaļiņingrada (Austrumeiropas laiks)",
         "Europe\/Kiev": "Kijeva (Austrumeiropas laiks)",
-        "Europe\/Kirov": "Kirova (Krievija)",
+        "Europe\/Kirov": "Kirova (Laika josla: Krievija)",
         "Europe\/Lisbon": "Lisabona (Rietumeiropas laiks)",
         "Europe\/Ljubljana": "Ļubļana (Centrāleiropas laiks)",
         "Europe\/London": "Londona (Griničas laiks)",
@@ -436,11 +436,5 @@
         "Pacific\/Wake": "Veika salas laiks",
         "Pacific\/Wallis": "Volisas un Futunas laiks"
     },
-    "Meta": {
-        "GmtFormat": "GMT%s",
-        "HourFormat": [
-            "+%02d:%02d",
-            "-%02d:%02d"
-        ]
-    }
+    "Meta": []
 }

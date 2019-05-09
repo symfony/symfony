@@ -15,7 +15,6 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
-use Symfony\Component\Messenger\Stamp\ForceCallHandlersStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -88,8 +87,6 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
     public function testItSendsToOnlyOneSenderOnRedelivery()
     {
         $envelope = new Envelope(new DummyMessage('Hey'), [new RedeliveryStamp(5, 'bar')]);
-        // even with a ForceCallHandlersStamp, the next middleware won't be called
-        $envelope = $envelope->with(new ForceCallHandlersStamp());
         $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $sender2 = $this->getMockBuilder(SenderInterface::class)->getMock();
 
@@ -268,21 +265,6 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware = new SendMessageMiddleware($sendersLocator, $dispatcher);
 
         $middleware->handle($envelope, $this->getStackMock(false));
-    }
-
-    public function testItHandlesWithForceCallHandlersStamp()
-    {
-        $envelope = new Envelope(new DummyMessage('original envelope'));
-        $envelope = $envelope->with(new ForceCallHandlersStamp());
-
-        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
-        $sender->expects($this->once())->method('send')->willReturn($envelope);
-
-        $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['foo']], ['foo' => $sender]);
-        $middleware = new SendMessageMiddleware($sendersLocator);
-
-        // next handler *should* be called
-        $middleware->handle($envelope, $this->getStackMock(true));
     }
 
     private function createSendersLocator(array $sendersMap, array $senders, array $sendAndHandle = [])

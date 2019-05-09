@@ -24,8 +24,7 @@ CHANGELOG
    to stop all `messenger:consume` workers.
  * [BC BREAK] The `TransportFactoryInterface::createTransport()` signature
    changed: a required 3rd `SerializerInterface` argument was added.
- * Added a new `SyncTransport` along with `ForceCallHandlersStamp` to
-   explicitly handle messages synchronously.
+ * Added a new `SyncTransport` to explicitly handle messages synchronously.
  * Added `AmqpStamp` allowing to provide a routing key, flags and attributes on message publishing.
  * [BC BREAK] Removed publishing with a `routing_key` option from queue configuration, for
    AMQP. Use exchange `default_publish_routing_key` or `AmqpStamp` instead.

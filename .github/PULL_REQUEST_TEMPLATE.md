@@ -1,20 +1,21 @@
 | Q             | A
 | ------------- | ---
-| Branch?       | master for features / 3.4 up to 4.2 for bug fixes <!-- see below -->
+| Branch?       | master for features / 3.4, 4.2 or 4.3 for bug fixes <!-- see below -->
 | Bug fix?      | yes/no
-| New feature?  | yes/no <!-- don't forget to update src/**/CHANGELOG.md files -->
+| New feature?  | yes/no <!-- please update src/**/CHANGELOG.md files -->
 | BC breaks?    | no     <!-- see https://symfony.com/bc -->
-| Deprecations? | yes/no <!-- don't forget to update UPGRADE-*.md and src/**/CHANGELOG.md files -->
+| Deprecations? | yes/no <!-- please update UPGRADE-*.md and src/**/CHANGELOG.md files -->
 | Tests pass?   | yes    <!-- please add some, will be required by reviewers -->
 | Fixed tickets | #...   <!-- #-prefixed issue number(s), if any -->
 | License       | MIT
 | Doc PR        | symfony/symfony-docs#... <!-- required for new features -->
 
 <!--
-Write a short README entry for your feature/bugfix here (replace this comment block.)
-This will help people understand your PR and can be used as a start of the Doc PR.
-Additionally:
- - Bug fixes must be submitted against the lowest branch where they apply
+Replace this notice by a short README for your feature/bugfix. This will help people
+understand your PR and can be used as a start for the documentation.
+
+Additionally (see https://symfony.com/roadmap):
+ - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too).
  - Features and deprecations must be submitted against the master branch.
 -->

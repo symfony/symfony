@@ -145,6 +145,7 @@ EOF
         $options['show_hidden'] = $input->getOption('show-hidden');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
+        $options['is_debug'] = $this->getApplication()->getKernel()->isDebug();
 
         try {
             $helper->describe($io, $object, $options);

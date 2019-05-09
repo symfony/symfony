@@ -24,6 +24,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
+        "symfony/messenger": "~4.1",
         "symfony/yaml": "~3.4|~4.0"
     },
     "conflict": {

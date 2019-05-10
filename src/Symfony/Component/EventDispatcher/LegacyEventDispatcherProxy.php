@@ -13,7 +13,7 @@ namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 /**
  * An helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
@@ -26,7 +26,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
 {
     private $dispatcher;
 
-    public static function decorate(?EventDispatcherInterface $dispatcher): ?EventDispatcherInterface
+    public static function decorate(?ContractsEventDispatcherInterface $dispatcher): ?ContractsEventDispatcherInterface
     {
         if (null === $dispatcher) {
             return null;

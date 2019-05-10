@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added support for callables as lazy options
+
 4.3.0
 -----
 

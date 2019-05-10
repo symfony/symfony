@@ -121,6 +121,34 @@ class OptionsResolverTest extends TestCase
         $this->assertEquals(['foo' => 'lazy'], $this->resolver->resolve());
     }
 
+    public function testSetLazyFromCallable()
+    {
+        $object = new class() {
+            public function resolve(Options $options): string
+            {
+                return 'lazy';
+            }
+        };
+
+        $this->resolver->setDefault('foo', [$object, 'resolve']);
+
+        $this->assertEquals(['foo' => 'lazy'], $this->resolver->resolve());
+    }
+
+    public function testSetLazyFromCallableObject()
+    {
+        $object = new class() {
+            public function __invoke(Options $options): string
+            {
+                return 'lazy';
+            }
+        };
+
+        $this->resolver->setDefault('foo', $object);
+
+        $this->assertEquals(['foo' => 'lazy'], $this->resolver->resolve());
+    }
+
     public function testClosureWithoutTypeHintNotInvoked()
     {
         $closure = function ($options) {
@@ -141,6 +169,34 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefault('foo', $closure);
 
         $this->assertSame(['foo' => $closure], $this->resolver->resolve());
+    }
+
+    public function testCallableWithoutTypeHintNotInvoked()
+    {
+        $object = new class() {
+            public function __invoke($options): void
+            {
+                Assert::fail('Should not be called');
+            }
+        };
+
+        $this->resolver->setDefault('foo', $object);
+
+        $this->assertSame(['foo' => $object], $this->resolver->resolve());
+    }
+
+    public function testCallableWithoutParametersNotInvoked()
+    {
+        $object = new class() {
+            public function __invoke(): void
+            {
+                Assert::fail('Should not be called');
+            }
+        };
+
+        $this->resolver->setDefault('foo', $object);
+
+        $this->assertSame(['foo' => $object], $this->resolver->resolve());
     }
 
     public function testAccessPreviousDefaultValue()

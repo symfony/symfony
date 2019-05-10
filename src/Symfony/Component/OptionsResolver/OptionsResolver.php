@@ -174,8 +174,9 @@ class OptionsResolver implements Options
 
         // If an option is a closure that should be evaluated lazily, store it
         // in the "lazy" property.
-        if ($value instanceof \Closure) {
-            $reflClosure = new \ReflectionFunction($value);
+        if ($value instanceof \Closure || \is_callable($value)) {
+            $closure = $value instanceof \Closure ? $value : \Closure::fromCallable($value);
+            $reflClosure = new \ReflectionFunction($closure);
             $params = $reflClosure->getParameters();
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
@@ -190,7 +191,7 @@ class OptionsResolver implements Options
                 }
 
                 // Store closure for later evaluation
-                $this->lazy[$option][] = $value;
+                $this->lazy[$option][] = $closure;
                 $this->defined[$option] = true;
 
                 // Make sure the option is processed and is not nested anymore
@@ -201,7 +202,7 @@ class OptionsResolver implements Options
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && self::class === $class->name && (!isset($params[1]) || (null !== ($class = $params[1]->getClass()) && Options::class === $class->name))) {
                 // Store closure for later evaluation
-                $this->nested[$option][] = $value;
+                $this->nested[$option][] = $closure;
                 $this->defaults[$option] = [];
                 $this->defined[$option] = true;
 

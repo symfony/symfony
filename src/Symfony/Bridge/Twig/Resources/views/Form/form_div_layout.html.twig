@@ -407,7 +407,7 @@
 {# Support #}
 
 {%- block form_rows -%}
-    {% for child in form if not child.rendered %}
+    {% for child in form|filter(child => not child.rendered) %}
         {{- form_row(child) -}}
     {% endfor %}
 {%- endblock form_rows -%}

@@ -50,41 +50,34 @@ class RoutableMessageBusTest extends TestCase
             ->willReturn($envelope);
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with(MessageBusInterface::class)
-            ->willReturn(true);
-        $container->expects($this->once())->method('get')->with(MessageBusInterface::class)
-            ->willReturn($defaultBus);
 
-        $routableBus = new RoutableMessageBus($container);
+        $routableBus = new RoutableMessageBus($container, $defaultBus);
 
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
-    }
-
-    public function testItExceptionOnDefaultBusNotFound()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Bus named "%s" does not exist.', MessageBusInterface::class));
-
-        $envelope = new Envelope(new \stdClass());
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->with(MessageBusInterface::class)
-            ->willReturn(false);
-
-        $routableBus = new RoutableMessageBus($container);
-        $routableBus->dispatch($envelope);
     }
 
     public function testItExceptionOnBusNotFound()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Bus named "%s" does not exist.', 'foo_bus'));
+        $this->expectExceptionMessage('Bus named "my_cool_bus" does not exist.');
 
-        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('foo_bus')]);
+        $envelope = new Envelope(new \stdClass(), [
+            new BusNameStamp('my_cool_bus'),
+        ]);
 
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->once())->method('has')->willReturn(false);
+        $routableBus = new RoutableMessageBus($container);
+        $routableBus->dispatch($envelope);
+    }
 
+    public function testItExceptionOnDefaultBusNotFound()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.');
+
+        $envelope = new Envelope(new \stdClass());
+
+        $container = $this->createMock(ContainerInterface::class);
         $routableBus = new RoutableMessageBus($container);
         $routableBus->dispatch($envelope);
     }

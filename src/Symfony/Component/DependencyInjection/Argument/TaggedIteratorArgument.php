@@ -21,22 +21,26 @@ class TaggedIteratorArgument extends IteratorArgument
     private $tag;
     private $indexAttribute;
     private $defaultIndexMethod;
-    private $useFqcnAsFallback = false;
+    private $needsIndexes = false;
 
     /**
      * @param string      $tag                The name of the tag identifying the target services
      * @param string|null $indexAttribute     The name of the attribute that defines the key referencing each service in the tagged collection
      * @param string|null $defaultIndexMethod The static method that should be called to get each service's key when their tag doesn't define the previous attribute
-     * @param bool        $useFqcnAsFallback  Whether the FQCN of the service should be used as index when neither the attribute nor the method are defined
+     * @param bool        $needsIndexes       Whether indexes are required and should be generated when computing the map
      */
-    public function __construct(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $useFqcnAsFallback = false)
+    public function __construct(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false)
     {
         parent::__construct([]);
+
+        if (null === $indexAttribute && $needsIndexes) {
+            $indexAttribute = preg_match('/[^.]++$/', $tag, $m) ? $m[0] : $tag;
+        }
 
         $this->tag = $tag;
         $this->indexAttribute = $indexAttribute;
         $this->defaultIndexMethod = $defaultIndexMethod ?: ('getDefault'.str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $indexAttribute ?? ''))).'Name');
-        $this->useFqcnAsFallback = $useFqcnAsFallback;
+        $this->needsIndexes = $needsIndexes;
     }
 
     public function getTag()
@@ -54,8 +58,8 @@ class TaggedIteratorArgument extends IteratorArgument
         return $this->defaultIndexMethod;
     }
 
-    public function useFqcnAsFallback(): bool
+    public function needsIndexes(): bool
     {
-        return $this->useFqcnAsFallback;
+        return $this->needsIndexes;
     }
 }

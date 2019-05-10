@@ -14,6 +14,7 @@ $container->loadFromExtension('framework', [
                 'serializer' => 'messenger.transport.native_php_serializer',
             ],
             'redis' => 'redis://127.0.0.1:6379/messages',
+            'doctrine' => 'doctrine://default',
         ],
     ],
 ]);

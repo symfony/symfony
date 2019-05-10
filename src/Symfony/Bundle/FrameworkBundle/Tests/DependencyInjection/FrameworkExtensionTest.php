@@ -674,6 +674,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
         $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
         $this->assertFalse($container->hasDefinition('messenger.transport.redis.factory'));
+        $this->assertFalse($container->hasDefinition('messenger.transport.doctrine.factory'));
         $this->assertTrue($container->hasDefinition('messenger.transport_factory'));
         $this->assertSame(TransportFactory::class, $container->getDefinition('messenger.transport_factory')->getClass());
     }
@@ -708,6 +709,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('redis://127.0.0.1:6379/messages', $transportArguments[0]);
 
         $this->assertTrue($container->hasDefinition('messenger.transport.redis.factory'));
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.doctrine'));
+        $transportFactory = $container->getDefinition('messenger.transport.doctrine')->getFactory();
+        $transportArguments = $container->getDefinition('messenger.transport.doctrine')->getArguments();
+
+        $this->assertEquals([new Reference('messenger.transport_factory'), 'createTransport'], $transportFactory);
+        $this->assertCount(3, $transportArguments);
+        $this->assertSame('doctrine://default', $transportArguments[0]);
+
+        $this->assertTrue($container->hasDefinition('messenger.transport.doctrine.factory'));
     }
 
     public function testMessengerRouting()

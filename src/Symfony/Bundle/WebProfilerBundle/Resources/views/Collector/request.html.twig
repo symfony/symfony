@@ -259,7 +259,7 @@
 
                 <h4>Defined as regular env variables</h4>
                 {% set requestserver = [] %}
-                {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
+                {% for key, value in collector.requestserver|filter((_, key) => key not in collector.dotenvvars.keys) %}
                     {% set requestserver = requestserver|merge({(key): value}) %}
                 {% endfor %}
                 {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}

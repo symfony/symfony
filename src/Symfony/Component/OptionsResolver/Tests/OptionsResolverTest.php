@@ -751,7 +751,7 @@ class OptionsResolverTest extends TestCase
             0,
         ];
 
-        yield 'It explicitly ignores a depreciation' => [
+        yield 'It explicitly ignores a deprecation' => [
             function (OptionsResolver $resolver) {
                 $resolver
                     ->setDefault('baz', function (Options $options) {

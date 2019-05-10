@@ -41,7 +41,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * How to track the current depth in the context.
      */
-    private const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+    public const DEPTH_KEY_PATTERN = 'depth_%s::%s';
 
     /**
      * While denormalizing, we can verify that types match.

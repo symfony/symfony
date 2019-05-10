@@ -111,4 +111,9 @@ class GreaterThanValidatorWithPositiveConstraintTest extends GreaterThanValidato
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
+
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    {
+        $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
+    }
 }

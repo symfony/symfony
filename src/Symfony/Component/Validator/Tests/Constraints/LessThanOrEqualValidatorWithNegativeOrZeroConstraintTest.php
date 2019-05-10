@@ -111,4 +111,9 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends LessThanO
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }
+
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    {
+        $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
+    }
 }

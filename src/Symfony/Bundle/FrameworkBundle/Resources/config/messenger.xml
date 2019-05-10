@@ -11,7 +11,6 @@
         <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
             <argument type="collection" /> <!-- Per message senders map -->
             <argument /> <!-- senders locator -->
-            <argument type="collection" /> <!-- Messages to send and handle -->
         </service>
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <tag name="monolog.logger" channel="messenger" />

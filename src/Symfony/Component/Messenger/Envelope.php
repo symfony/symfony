@@ -80,6 +80,22 @@ final class Envelope
         return $cloned;
     }
 
+    /**
+     * Removes all stamps that implement the given type.
+     */
+    public function withoutStampsOfType(string $type): self
+    {
+        $cloned = clone $this;
+
+        foreach ($cloned->stamps as $class => $stamps) {
+            if ($class === $type || \is_subclass_of($class, $type)) {
+                unset($cloned->stamps[$class]);
+            }
+        }
+
+        return $cloned;
+    }
+
     public function last(string $stampFqcn): ?StampInterface
     {
         return isset($this->stamps[$stampFqcn]) ? end($this->stamps[$stampFqcn]) : null;

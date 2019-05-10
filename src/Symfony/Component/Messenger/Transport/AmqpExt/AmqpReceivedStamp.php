@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
-use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * Stamp applied when a message is received from Amqp.
  *
  * @experimental in 4.3
  */
-class AmqpReceivedStamp implements StampInterface
+class AmqpReceivedStamp implements NonSendableStampInterface
 {
     private $amqpEnvelope;
     private $queueName;

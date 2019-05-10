@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Ryan Weaver<ryan@symfonycasts.com>
@@ -40,6 +41,8 @@ class PhpSerializer implements SerializerInterface
      */
     public function encode(Envelope $envelope): array
     {
+        $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
+
         $body = addslashes(serialize($envelope));
 
         return [

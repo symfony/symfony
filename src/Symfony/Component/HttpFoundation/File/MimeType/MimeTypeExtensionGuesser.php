@@ -642,6 +642,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'audio/vnd.rip' => 'rip',
         'audio/webm' => 'weba',
         'audio/x-aac' => 'aac',
+        'audio/x-hx-aac-adts' => 'aac',
         'audio/x-aiff' => 'aif',
         'audio/x-caf' => 'caf',
         'audio/x-flac' => 'flac',

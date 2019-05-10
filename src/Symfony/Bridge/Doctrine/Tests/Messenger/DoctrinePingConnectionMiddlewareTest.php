@@ -16,6 +16,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
@@ -70,5 +71,20 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         ;
 
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
+    }
+
+    public function testInvalidEntityManagerThrowsException()
+    {
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry
+            ->method('getManager')
+            ->with('unknown_manager')
+            ->will($this->throwException(new \InvalidArgumentException()));
+
+        $middleware = new DoctrinePingConnectionMiddleware($managerRegistry, 'unknown_manager');
+
+        $this->expectException(UnrecoverableMessageHandlingException::class);
+
+        $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }
 }

@@ -6,8 +6,9 @@
 
     <services>
         <service id="twig.mailer.message_listener" class="Symfony\Component\Mailer\EventListener\MessageListener">
-            <argument />
+            <argument>null</argument>
             <argument type="service" id="twig.mime_body_renderer" />
+            <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="twig.mime_body_renderer" class="Symfony\Bridge\Twig\Mime\BodyRenderer">

@@ -1,0 +1,286 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-07T18:37:10Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T07:59:20Z
+
+Hm, looking at the dumped XML.. i see:
+
+```xml
+<parameter key="templating.helper.code.file_link_format">subl://%f:%l</parameter>
+<parameter key="debug.file_link_format">subl://%f:%l</parameter>
+```
+
+if i escape `%` manually, it's solved.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T08:06:11Z
+
+https://github.com/symfony/symfony/blob/f539932899a82514f26581037a16e69293bb86c4/src/Symfony/Component/DependencyInjection/Dumper/XmlDumper.php#L70-L72
+
+shouldnt we always escape at the output level? :thinking:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-04-08T10:43:11Z
+
+@ro0NL Unfortunately, the dumped container does not really work. It contains escaped values, and un-escaped values. This is really not simple. IMHO, the simplest (and a bit dirty) solution is to continue in the way I started this PR :/ We should not try to recompile a compiled container, instead we should grep the dumped container, and extract all env var. This PR is almost done, but I'm not able to get the real default value. But I did not get enough time to work on it
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T10:59:38Z
+
+> We should not try to recompile a compiled container
+
+but the xml is not compiled yet, at most it's an optimized dump from a compiled source. But IIUC we should be able to compile it again (and get the same result).
+
+from `ContainerDebugCommand::getContainerBuilder()` is at least weird we compile the container conditionally.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T11:02:53Z
+
+i mean if we cant load a dumped XML and compile it as such.. that's another bug no?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T11:29:45Z
+
+I don't think it's a bug, there are tests making it pretty clear it's on purpose: if you dump a compiled container, you should not compile it again. That's the root of the issue here. If you dumped a non-compiled container, then the dumped file should keep references to parameters - thus encode `%`.
+We should build with these constraints in mind - not against them.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T12:41:14Z
+
+>  if you dump a compiled container, you should not compile it again
+
+This leaves the container(builder) in PHP  uncompiled though (i.e. `isCompiled() = false`). It feels like a weird discrepancy, where XmlFileLoader should mark the container compiled if it loads a compiled container.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T13:18:36Z
+
+> XmlFileLoader should mark the container compiled if it loads a compiled container.
+
+I agree, would you mind having a look?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-04-08T19:11:00Z
+
+Hm this is hard :) in XML we could consider differentiating based on e.g. `compiled="true"` .. but what about YAML? This also implies a new feature, as such i think the current dumps are intended to be uncompiled.
+
+If so, we need to find another way to track `getEnvCounters()` which is perhaps easier :/ (edit: ah i see the current approach is updated already).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-08T19:15:30Z
+
+preg_match_all() to the rescue, that's way enough to me for the targeted feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-09T17:14:02Z
+
+@lyrixx can you check this diff I just push-forced? https://github.com/symfony/symfony/compare/f682985882cd36351c55b9da27a16d02e58a6216..f1941605b3d1dc4a8010431b934b0a1d2a5d3fd6
+What's missing here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-09T17:15:55Z
+
+@ro0NL I would appreciate your thoughts here too, since this builds on a PR of yours :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-09T17:19:49Z
+
+OH, I was working on it ATM !
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-09T17:21:25Z
+
+@nicolas-grekas your patch did not work, it did not use the real default value. See my patch, I pushed force too (after you)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-09T17:22:49Z
+
+Looks like everything is OK:
+```
+>…/dev/labs/symfony/website-skeleton(4.3-percent *) git di
+diff --git a/config/packages/doctrine.yaml b/config/packages/doctrine.yaml
+index 9521fad..fc592a8 100644
+--- a/config/packages/doctrine.yaml
++++ b/config/packages/doctrine.yaml
+@@ -3,7 +3,7 @@ parameters:
+     # This allows you to run cache:warmup even if your
+     # environment variables are not available yet.
+     # You should not need to change this value.
+-    env(DATABASE_URL): ''
++    env(DATABASE_URL): 'THE DEFAULT VALUEEEE'
+
+ doctrine:
+     dbal:
+>…/dev/labs/symfony/website-skeleton(4.3-percent *) bin/console  debug:cont --env-vars -v
+
+Symfony Container Environment Variables
+=======================================
+
+ ------------------- ------------------------ ------------------------------------------------------
+  Name                Default value            Real value
+ ------------------- ------------------------ ------------------------------------------------------
+  APP_SECRET          n/a                      "48a7a9817123a382c84981b98d8748f1"
+  DATABASE_URL        "THE DEFAULT VALUEEEE"   "mysql://db_user:db_password@127.0.0.1:3306/db_name"
+  MAILER_URL          n/a                      "null://localhost"
+  VAR_DUMPER_SERVER   "127.0.0.1:9912"         n/a
+ ------------------- ------------------------ ------------------------------------------------------
+
+ // Note real values might be different between web and CLI.
+
+>…/dev/labs/symfony/website-skeleton(4.3-percent *) DATABASE_URL=HELLO bin/console  debug:cont --env-vars -v
+
+Symfony Container Environment Variables
+=======================================
+
+ ------------------- ------------------------ ------------------------------------
+  Name                Default value            Real value
+ ------------------- ------------------------ ------------------------------------
+  APP_SECRET          n/a                      "48a7a9817123a382c84981b98d8748f1"
+  DATABASE_URL        "THE DEFAULT VALUEEEE"   "HELLO"
+  MAILER_URL          n/a                      "null://localhost"
+  VAR_DUMPER_SERVER   "127.0.0.1:9912"         n/a
+ ------------------- ------------------------ ------------------------------------
+
+ // Note real values might be different between web and CLI.
+
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-09T17:47:02Z
+
+> You have requested a non-existent parameter "debug.container.dump"
+
+seems now the other case is failing :) not sure if both cases are tested actually. in general the regex approach works for me :+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-09T18:09:53Z
+
+>seems now the other case is failing :) not sure if both cases are tested actually. in general the regex approach works for me 👍
+
+How did you get this error? I saw this is thrown is the CI but did you get it locally?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-09T18:44:27Z
+
+also looking at CI :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-10T08:48:59Z
+
+I'm fixing some issues, but I don't get why your regex is better. With
+```
+        preg_match_all('{([%"])env\(((?:\w++:)*+\w++)\)\1}', $file, $envVars);
+        dump($envVars);die;
+```
+I got:
+
+```
+array:3 [
+  0 => array:8 [
+    0 => ""env(DATABASE_URL)""
+    1 => "%env(APP_SECRET)%"
+    2 => ""env(VAR_DUMPER_SERVER)""
+    3 => "%env(APP_SECRET)%"
+    4 => "%env(resolve:DATABASE_URL)%"
+    5 => "%env(MAILER_URL)%"
+    6 => "%env(VAR_DUMPER_SERVER)%"
+    7 => "%env(VAR_DUMPER_SERVER)%"
+  ]
+  1 => array:8 [
+    0 => """
+    1 => "%"
+    2 => """
+    3 => "%"
+    4 => "%"
+    5 => "%"
+    6 => "%"
+    7 => "%"
+  ]
+  2 => array:8 [
+    0 => "DATABASE_URL"
+    1 => "APP_SECRET"
+    2 => "VAR_DUMPER_SERVER"
+    3 => "APP_SECRET"
+    4 => "resolve:DATABASE_URL"
+    5 => "MAILER_URL"
+    6 => "VAR_DUMPER_SERVER"
+    7 => "VAR_DUMPER_SERVER"
+  ]
+]
+```
+
+Where I got before:
+```
+array:2 [
+  0 => array:6 [
+    0 => "%env(APP_SECRET)%"
+    1 => "%env(APP_SECRET)%"
+    2 => "%env(resolve:DATABASE_URL)%"
+    3 => "%env(MAILER_URL)%"
+    4 => "%env(VAR_DUMPER_SERVER)%"
+    5 => "%env(VAR_DUMPER_SERVER)%"
+  ]
+  1 => array:6 [
+    0 => "APP_SECRET"
+    1 => "APP_SECRET"
+    2 => "resolve:DATABASE_URL"
+    3 => "MAILER_URL"
+    4 => "VAR_DUMPER_SERVER"
+    5 => "VAR_DUMPER_SERVER"
+  ]
+]
+```
+
+---
+
+Could you give me some example of what I need to match
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-10T08:55:21Z
+
+i thought it was nessecary to include default envs, in order to obtain the default values. But now you obtain them directly from the parameter bag, so it's not needed anymore.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-10T09:49:22Z
+
+Here we go ...
+I had to move a test because trailing spaces are so boring ...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-10T09:49:37Z
+
+> I don't get why your regex is better
+
+because mine is more specific: `.*` vs `(?:\w++:)*+\w++`, which matches how EnvParameterBar works.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-10T09:51:58Z
+
+It should be OK. Tests pass locally and I guess it's the expected behavior on a regular app :)
+@ro0NL Is it OK for you?

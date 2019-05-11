@@ -106,6 +106,7 @@
         <!-- routable message bus -->
         <service id="messenger.routable_message_bus" class="Symfony\Component\Messenger\RoutableMessageBus">
             <argument /> <!-- Message bus locator -->
+            <argument type="service" id="messenger.default_bus" />
         </service>
     </services>
 </container>

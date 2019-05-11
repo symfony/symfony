@@ -37,11 +37,8 @@ class DoctrineIntegrationTest extends TestCase
      */
     public function createConnection()
     {
-        if ($dsn = getenv('MESSENGER_DOCTRINE_DSN')) {
-            $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
-        } else {
-            $this->driverConnection = DriverManager::getConnection(['pdo' => new \PDO('sqlite:'.sys_get_temp_dir().'/symfony.messenger.sqlite')]);
-        }
+        $dsn = getenv('MESSENGER_DOCTRINE_DSN') ?: 'sqlite:///'.sys_get_temp_dir().'/symfony.messenger.sqlite';
+        $this->driverConnection = DriverManager::getConnection(['url' => $dsn]);
         $this->connection = new Connection([], $this->driverConnection);
         // call send to auto-setup the table
         $this->connection->setup();

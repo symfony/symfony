@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-09T01:20:36Z
+
+This should be ready - tests passing - ready for review!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-10T15:24:03Z
+
+Ready to go again. This is mostly a small fix + some refactoring based on @Tobion's recommendations. The vast majority of the added lines are in a robust new integration test.

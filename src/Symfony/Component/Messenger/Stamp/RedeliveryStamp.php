@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+use Symfony\Component\Debug\Exception\FlattenException;
+
 /**
  * Stamp applied when a messages needs to be redelivered.
  *
@@ -20,14 +22,20 @@ class RedeliveryStamp implements StampInterface
 {
     private $retryCount;
     private $senderClassOrAlias;
+    private $redeliveredAt;
+    private $exceptionMessage;
+    private $flattenException;
 
     /**
      * @param string $senderClassOrAlias Alias from SendersLocator or just the class name
      */
-    public function __construct(int $retryCount, string $senderClassOrAlias)
+    public function __construct(int $retryCount, string $senderClassOrAlias, string $exceptionMessage = null, FlattenException $flattenException = null)
     {
         $this->retryCount = $retryCount;
         $this->senderClassOrAlias = $senderClassOrAlias;
+        $this->exceptionMessage = $exceptionMessage;
+        $this->flattenException = $flattenException;
+        $this->redeliveredAt = new \DateTimeImmutable();
     }
 
     public function getRetryCount(): int
@@ -36,12 +44,27 @@ class RedeliveryStamp implements StampInterface
     }
 
     /**
-     * Needed for this class to serialize through Symfony's serializer.
+     * The target sender this should be redelivered to.
      *
      * @internal
      */
     public function getSenderClassOrAlias(): string
     {
         return $this->senderClassOrAlias;
+    }
+
+    public function getExceptionMessage(): ?string
+    {
+        return $this->exceptionMessage;
+    }
+
+    public function getFlattenException(): ?FlattenException
+    {
+        return $this->flattenException;
+    }
+
+    public function getRedeliveredAt(): \DateTimeInterface
+    {
+        return $this->redeliveredAt;
     }
 }

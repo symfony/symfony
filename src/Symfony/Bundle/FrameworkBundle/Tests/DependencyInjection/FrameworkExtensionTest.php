@@ -753,6 +753,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals([
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],
         ], $container->getParameter('messenger.bus.commands.middleware'));
@@ -761,6 +762,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals([
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],

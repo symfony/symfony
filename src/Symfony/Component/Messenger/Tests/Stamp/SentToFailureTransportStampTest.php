@@ -12,22 +12,13 @@
 namespace Symfony\Component\Messenger\Tests\Stamp;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 class SentToFailureTransportStampTest extends TestCase
 {
-    public function testGetters()
+    public function testGetOriginalReceiverName()
     {
-        $flattenException = new FlattenException();
-        $stamp = new SentToFailureTransportStamp(
-            'exception message',
-            'original_receiver',
-            $flattenException
-        );
-        $this->assertSame('exception message', $stamp->getExceptionMessage());
+        $stamp = new SentToFailureTransportStamp('original_receiver');
         $this->assertSame('original_receiver', $stamp->getOriginalReceiverName());
-        $this->assertSame($flattenException, $stamp->getFlattenException());
-        $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getSentAt());
     }
 }

@@ -38,8 +38,8 @@ class RetryIntegrationTest extends TestCase
         $senderLocator->method('get')->with('sender_alias')->willReturn($senderAndReceiver);
         $senderLocator = new SendersLocator([DummyMessage::class => ['sender_alias']], $senderLocator);
 
-        $handler = new DummyMessageHandlerFailingFirstTimes(0, 'A');
-        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1, 'B');
+        $handler = new DummyMessageHandlerFailingFirstTimes(0);
+        $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
         $handlerLocator = new HandlersLocator([
             DummyMessage::class => [
                 new HandlerDescriptor($handler, ['alias' => 'first']),

@@ -40,7 +40,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -715,13 +714,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger_routing');
         $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
 
-        $messageToSendAndHandleMapping = [
-            DummyMessage::class => false,
-            SecondMessage::class => true,
-            '*' => false,
-        ];
-
-        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(2));
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals([
             'amqp',

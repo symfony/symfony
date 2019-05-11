@@ -1745,7 +1745,6 @@ class FrameworkExtension extends Extension
         }
 
         $messageToSendersMapping = [];
-        $messagesToSendAndHandle = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
@@ -1759,7 +1758,6 @@ class FrameworkExtension extends Extension
             }
 
             $messageToSendersMapping[$message] = $messageConfiguration['senders'];
-            $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
         $senderReferences = [];
@@ -1770,7 +1768,6 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
-            ->replaceArgument(2, $messagesToSendAndHandle)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')

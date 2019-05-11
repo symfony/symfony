@@ -434,7 +434,6 @@
             <xsd:element name="sender" type="messenger_routing_sender" />
         </xsd:choice>
         <xsd:attribute name="message-class" type="xsd:string" use="required"/>
-        <xsd:attribute name="send-and-handle" type="xsd:boolean" default="false"/>
     </xsd:complexType>
 
     <xsd:complexType name="messenger_routing_sender">

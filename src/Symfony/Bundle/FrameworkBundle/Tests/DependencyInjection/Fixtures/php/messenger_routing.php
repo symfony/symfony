@@ -10,7 +10,6 @@ $container->loadFromExtension('framework', [
             'Symfony\Component\Messenger\Tests\Fixtures\DummyMessage' => ['amqp', 'audit'],
             'Symfony\Component\Messenger\Tests\Fixtures\SecondMessage' => [
                 'senders' => ['amqp', 'audit'],
-                'send_and_handle' => true,
             ],
             '*' => 'amqp',
         ],

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-05-06T14:03:25Z
+
+this is not logging the exception anymore.
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2019-05-06T14:45:40Z
+
+Travis failure is not related.
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2019-05-08T09:06:38Z
+
+Tests failures on AppVeyor are not related: they seem to be related to changes made on other components, whereas I only reworded warning-level log messages on the Cache component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-08T09:49:04Z
+
+I'm sorry but I don't see why this improves the state of things.
+The message is essentially the same, with a hint ("incompatible type") that might be wrong - as this place doesn't know why the failure happened (could be the type, but something else)
+Also, logging the $id instead of the $key doesn't provide useful info (the $id is internal)
+
+The brackets are not explicit enough thought.
+I'd suggest something like this instead:
+`'Failed to save key "{key}" of type %s: '.$e->getMessage()` (last part removed when there is no $e)
+
+---------------------------------------------------------------------------
+
+by Deuchnord at 2019-05-09T08:04:38Z
+
+Thanks @nicolas-grekas, sorry, looks like I didn't understand the original issue like this, I'll fix my PR ASAP :)

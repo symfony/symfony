@@ -282,6 +282,8 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $host = isset($firewall['host']) ? $firewall['host'] : null;
             $methods = isset($firewall['methods']) ? $firewall['methods'] : [];
             $matcher = $this->createRequestMatcher($container, $pattern, $host, null, $methods);
+        } elseif (!empty($firewall['route_params'])) {
+            $matcher = $this->createRouteParamsMatcher($container, $firewall['route_params']);
         }
 
         $config->replaceArgument(2, $matcher ? (string) $matcher : null);
@@ -733,6 +735,23 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->register($id, 'Symfony\Component\HttpFoundation\RequestMatcher')
             ->setPublic(false)
             ->setArguments($arguments)
+        ;
+
+        return $this->requestMatchers[$id] = new Reference($id);
+    }
+
+    private function createRouteParamsMatcher(ContainerBuilder $container, array $parameters)
+    {
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([$parameters]);
+
+        if (isset($this->requestMatchers[$id])) {
+            return $this->requestMatchers[$id];
+        }
+
+        $container
+            ->register($id, 'Symfony\Bundle\SecurityBundle\RouteParamsMatcher')
+            ->setPublic(false)
+            ->setArguments([$parameters])
         ;
 
         return $this->requestMatchers[$id] = new Reference($id);

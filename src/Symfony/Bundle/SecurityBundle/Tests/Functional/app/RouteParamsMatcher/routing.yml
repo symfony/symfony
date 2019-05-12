@@ -1,0 +1,7 @@
+home:
+    path: /
+    defaults:
+        _firewall: default
+
+open:
+    path: /open

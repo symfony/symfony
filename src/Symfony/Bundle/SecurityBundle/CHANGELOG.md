@@ -15,6 +15,7 @@ CHANGELOG
  * Removed the `threads` encoder option
  * Removed the `security.authentication.trust_resolver.anonymous_class` parameter
  * Removed the `security.authentication.trust_resolver.rememberme_class` parameter
+ * Added a `route_params` option for firewalls to match a request against a set of routes
 
 4.4.0
 -----

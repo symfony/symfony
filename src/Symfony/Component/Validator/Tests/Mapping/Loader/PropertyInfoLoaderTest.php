@@ -45,6 +45,7 @@ class PropertyInfoLoaderTest extends TestCase
                 'alreadyMappedNotNull',
                 'alreadyMappedNotBlank',
                 'alreadyPartiallyMappedCollection',
+                'readOnly',
             ])
         ;
         $propertyInfoStub
@@ -58,11 +59,27 @@ class PropertyInfoLoaderTest extends TestCase
                 [new Type(Type::BUILTIN_TYPE_FLOAT, true)], // The existing constraint is float
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
                 [new Type(Type::BUILTIN_TYPE_STRING, true)],
-                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))]
+                [new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, null, new Type(Type::BUILTIN_TYPE_FLOAT))],
+                [new Type(Type::BUILTIN_TYPE_STRING)]
+            ))
+        ;
+        $propertyInfoStub
+            ->method('isWritable')
+            ->will($this->onConsecutiveCalls(
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
             ))
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
 
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
@@ -137,6 +154,9 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertSame('string', $alreadyPartiallyMappedCollectionConstraints[0]->constraints[0]->type);
         $this->assertInstanceOf(Iban::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[1]);
         $this->assertInstanceOf(NotNull::class, $alreadyPartiallyMappedCollectionConstraints[0]->constraints[2]);
+
+        $readOnlyMetadata = $classMetadata->getPropertyMetadata('readOnly');
+        $this->assertEmpty($readOnlyMetadata);
     }
 
     /**
@@ -154,7 +174,7 @@ class PropertyInfoLoaderTest extends TestCase
             ->willReturn([new Type(Type::BUILTIN_TYPE_STRING)])
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $classValidatorRegexp);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, $classValidatorRegexp);
 
         $classMetadata = new ClassMetadata(PropertyInfoLoaderEntity::class);
         $this->assertSame($expected, $propertyInfoLoader->loadClassMetadata($classMetadata));

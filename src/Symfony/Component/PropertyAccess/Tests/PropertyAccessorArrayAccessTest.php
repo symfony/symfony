@@ -82,4 +82,28 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     {
         $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }
+
+    public function getValidPropertyPathsForGetValues()
+    {
+        return [
+            [
+                [$this->getContainer(['firstName' => 'Bernhard']), $this->getContainer(['firstName' => 'Fabien'])],
+                '[firstName]',
+                ['Bernhard', 'Fabien'],
+            ],
+            [
+                [['person' => $this->getContainer(['firstName' => 'Bernhard'])], ['person' => $this->getContainer(['firstName' => 'Fabien'])]],
+                '[person][firstName]',
+                ['Bernhard', 'Fabien'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getValidPropertyPathsForGetValues
+     */
+    public function testGetValues($collection, $path, $value)
+    {
+        $this->assertSame($value, $this->propertyAccessor->getValues($collection, $path));
+    }
 }

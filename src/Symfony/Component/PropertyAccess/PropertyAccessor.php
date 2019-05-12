@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -179,6 +180,29 @@ class PropertyAccessor implements PropertyAccessorInterface
             // It wasn't thrown in this class so rethrow it
             throw $e;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValues(array $array, $propertyPath): array
+    {
+        $values = [];
+        foreach ($array as $item) {
+            try {
+                $value = $this->getValue($item, $propertyPath);
+
+                if (null === $value) {
+                    continue;
+                }
+
+                $values[] = $value;
+            } catch (ExceptionInterface $e) {
+                // if was thrown continue
+            }
+        }
+
+        return $values;
     }
 
     private static function throwInvalidArgumentException(string $message, array $trace, int $i, string $propertyPath): void

@@ -111,4 +111,11 @@ interface PropertyAccessorInterface
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
     public function isReadable($objectOrArray, $propertyPath);
+
+    /**
+     * Returns the list of values from an array of data and/or objects.
+     *
+     * @param string|PropertyPathInterface $propertyPath
+     */
+    public function getValues(array $array, $propertyPath): array;
 }

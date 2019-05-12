@@ -702,7 +702,7 @@ class Request
      */
     public function getSession()
     {
-        /** @var callable $session */
+        /** @var callable|null $session */
         $session = $this->session;
         if (!$session instanceof SessionInterface && null !== $session) {
             $this->setSession($session = $session());

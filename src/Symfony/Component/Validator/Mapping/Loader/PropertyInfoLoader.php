@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
+use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
@@ -29,12 +30,14 @@ final class PropertyInfoLoader implements LoaderInterface
 {
     private $listExtractor;
     private $typeExtractor;
+    private $accessExtractor;
     private $classValidatorRegexp;
 
-    public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, string $classValidatorRegexp = null)
+    public function __construct(PropertyListExtractorInterface $listExtractor, PropertyTypeExtractorInterface $typeExtractor, PropertyAccessExtractorInterface $accessExtractor, string $classValidatorRegexp = null)
     {
         $this->listExtractor = $listExtractor;
         $this->typeExtractor = $typeExtractor;
+        $this->accessExtractor = $accessExtractor;
         $this->classValidatorRegexp = $classValidatorRegexp;
     }
 
@@ -53,6 +56,10 @@ final class PropertyInfoLoader implements LoaderInterface
         }
 
         foreach ($properties as $property) {
+            if (false === $this->accessExtractor->isWritable($className, $property)) {
+                continue;
+            }
+
             $types = $this->typeExtractor->getTypes($className, $property);
             if (null === $types) {
                 continue;

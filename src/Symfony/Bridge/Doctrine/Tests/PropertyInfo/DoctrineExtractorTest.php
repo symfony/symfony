@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineGeneratedValue;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -222,5 +223,14 @@ class DoctrineExtractorTest extends TestCase
     private function doTestGetTypesCatchException(bool $legacy)
     {
         $this->assertNull($this->createExtractor($legacy)->getTypes('Not\Exist', 'baz'));
+    }
+
+    public function testGeneratedValueNotWritable()
+    {
+        $extractor = $this->createExtractor();
+        $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
+        $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
+        $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 }

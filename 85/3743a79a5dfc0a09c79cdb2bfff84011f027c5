@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-12T11:00:55Z
+
+Thanks, good catch.
+For mailer I think it would make sense to list it.
+~For the bridges I think we prefer keeping them separate.~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-12T17:53:27Z
+
+Thinking twice, bridges should be in the replace section too, so that flex can apply its extra.symfony.require constraints on them!
+
+---------------------------------------------------------------------------
+
+by DavidPrevot at 2019-05-13T03:23:11Z
+
+Updated according to @nicolas-grekas advice, thanks.

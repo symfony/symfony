@@ -21,6 +21,11 @@
         <service id="Symfony\Component\PropertyInfo\PropertyListExtractorInterface" alias="property_info" />
         <service id="Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface" alias="property_info" />
 
+        <service id="property_info.cache" decorates="property_info" class="Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor">
+            <argument type="service" id="property_info.cache.inner" />
+            <argument type="service" id="cache.property_info" />
+        </service>
+
         <!-- Extractor -->
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor">
             <tag name="property_info.list_extractor" priority="-1000" />

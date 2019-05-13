@@ -1357,6 +1357,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info'));
     }
 
+    public function testPropertyInfoCacheActivated()
+    {
+        $container = $this->createContainerFromFile('property_info');
+
+        $this->assertTrue($container->hasDefinition('property_info.cache'));
+
+        $cache = $container->getDefinition('property_info.cache')->getArgument(1);
+        $this->assertEquals(new Reference('cache.property_info'), $cache);
+    }
+
+    public function testPropertyInfoCacheDisabled()
+    {
+        $container = $this->createContainerFromFile('property_info', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+        $this->assertFalse($container->hasDefinition('property_info.cache'));
+    }
+
     public function testEventDispatcherService()
     {
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret']);

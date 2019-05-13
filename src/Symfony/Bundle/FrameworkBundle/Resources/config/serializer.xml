@@ -104,6 +104,11 @@
             <argument type="service" id="cache.serializer" />
         </service>
 
+        <service id="serializer.mapping.cache_class_metadata_factory" decorates="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory">
+            <argument type="service" id="serializer.mapping.cache_class_metadata_factory.inner" />
+            <argument type="service" id="serializer.mapping.cache.symfony" />
+        </service>
+
         <!-- Encoders -->
         <service id="serializer.encoder.xml" class="Symfony\Component\Serializer\Encoder\XmlEncoder">
             <tag name="serializer.encoder" />

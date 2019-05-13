@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-05-10T06:17:09Z
+
+Usually, we don't accept performance improvements (even huge ones like this) as bug fixes. Maybe could it be included in the next 4.3 beta (it's already late, but it's a huge improvement ; ping @symfony/deciders), but definitely not in 4.2.
+
+It looks like a introduced this class a while ago... and forgot to open the follow up PR with the FrameworkBundle wiring 😕. Thanks for finding this.
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-05-10T08:51:00Z
+
+The test failures seem unrelated.
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-05-11T10:33:37Z
+
+Rebased for 4.3.
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-05-11T11:37:53Z
+
+Should I take account of @dunglas's comment:
+> IIRC, it's preferred to use XML for the service definition and to remove it in the extension is appropriate, to allow IDEs like PHPStorm to detect the services. Not sure if it's really matter here has it's the same interface that is implemented, it's more for consistency.
+
+And do the same for `ClassMetadataFactory` (I don't think it's a BC break)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T11:38:33Z
+
+Yes please.
+
+---------------------------------------------------------------------------
+
+by alanpoulain at 2019-05-11T13:42:40Z
+
+Changes done.

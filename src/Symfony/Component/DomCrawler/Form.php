@@ -333,8 +333,8 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets the value of a field.
      *
-     * @param string       $name  The field name
-     * @param string|array $value The value of the field
+     * @param string $name  The field name
+     * @param mixed  $value The value of the field
      *
      * @throws \InvalidArgumentException if the field does not exist
      */

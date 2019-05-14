@@ -623,6 +623,10 @@ class Application
             }
         }
 
+        if ($this->has($name)) {
+            return $this->get($name);
+        }
+
         $allCommands = $this->commandLoader ? array_merge($this->commandLoader->getNames(), array_keys($this->commands)) : array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
@@ -663,8 +667,7 @@ class Application
             }));
         }
 
-        $exact = \in_array($name, $commands, true) || isset($aliases[$name]);
-        if (\count($commands) > 1 && !$exact) {
+        if (\count($commands) > 1) {
             $usableWidth = $this->terminal->getWidth() - 10;
             $abbrevs = array_values($commands);
             $maxLen = 0;
@@ -684,7 +687,7 @@ class Application
             throw new CommandNotFoundException(sprintf("Command \"%s\" is ambiguous.\nDid you mean one of these?\n%s", $name, $suggestions), array_values($commands));
         }
 
-        return $this->get($exact ? $name : reset($commands));
+        return $this->get(reset($commands));
     }
 
     /**

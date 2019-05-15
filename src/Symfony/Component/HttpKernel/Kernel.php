@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use ProxyManager\Configuration;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\Config\ConfigCache;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
@@ -729,8 +731,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')) {
-            $dumper->setProxyDumper(new ProxyDumper());
+        if (null !== $proxyDumper = $this->getProxyDumper()) {
+            $dumper->setProxyDumper($proxyDumper);
         }
 
         $content = $dumper->dump([
@@ -756,6 +758,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $cache->write($rootCode, $container->getResources());
+    }
+
+    protected function getProxyDumper(): ?DumperInterface
+    {
+        if (class_exists(Configuration::class) && class_exists(ProxyDumper::class)) {
+            return new ProxyDumper();
+        }
+
+        return null;
     }
 
     /**

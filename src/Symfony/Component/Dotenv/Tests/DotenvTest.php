@@ -306,6 +306,30 @@ class DotenvTest extends TestCase
     }
 
     /**
+     * If ini_get('variables_order') does not contain 'E' then $_ENV is not set.
+     * Nevertheless, $_ENV should be filled with populated variables.
+     */
+    public function testLoadWithMissingEnvSuperglobal()
+    {
+        $preserveEnvSuperglobal = $_ENV;
+        $preserveVariablesOrderSetting = ini_get('variables_order');
+
+        unset($_ENV);
+        ini_set('variables_order', 'GPCS');
+
+        putenv('TEST_ENV_VAR=original_value');
+        $_SERVER['TEST_ENV_VAR'] = 'original_value';
+
+        $dotenv = new Dotenv(true);
+        $dotenv->populate(['TEST_ENV_VAR' => 'new_value']);
+
+        $this->assertSame('original_value', $_ENV['TEST_ENV_VAR']);
+
+        $_ENV = $preserveEnvSuperglobal;
+        ini_set('variables_order', $preserveVariablesOrderSetting);
+    }
+
+    /**
      * @expectedException \Symfony\Component\Dotenv\Exception\PathException
      */
     public function testLoadDirectory()

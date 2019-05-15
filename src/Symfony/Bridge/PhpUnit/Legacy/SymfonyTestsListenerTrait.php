@@ -289,11 +289,7 @@ class SymfonyTestsListenerTrait
                     'triggering_file' => isset($deprecation[2]) ? $deprecation[2] : null,
                     'files_stack' => $deprecation[3],
                 ]);
-                if ($deprecation[0]) {
-                    @trigger_error($error, E_USER_DEPRECATED);
-                } else {
-                    @trigger_error($error, E_USER_DEPRECATED);
-                }
+                @trigger_error($error, E_USER_DEPRECATED);
             }
             $this->runsInSeparateProcess = false;
         }

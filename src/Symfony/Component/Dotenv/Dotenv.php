@@ -132,12 +132,16 @@ final class Dotenv
     public function populate(array $values, bool $overrideExistingVars = false): void
     {
         $updateLoadedVars = false;
+        $alwaysSetEnvSuperglobal = (false === strpos(ini_get('variables_order'), 'E')) ? true : false;
         $loadedVars = array_flip(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
 
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
             // don't check existence with getenv() because of thread safety issues
             if (!isset($loadedVars[$name]) && (!$overrideExistingVars && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName)))) {
+                if ($alwaysSetEnvSuperglobal) {
+                    $_ENV[$name] = $_SERVER[$name];
+                }
                 continue;
             }
 

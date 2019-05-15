@@ -296,19 +296,4 @@ class Deprecation
         "\n".str_replace(' '.getcwd().\DIRECTORY_SEPARATOR, ' ', $exception->getTraceAsString()).
         "\n";
     }
-
-    private function getPackageFromLine(array $line)
-    {
-        if (!isset($line['file'])) {
-            return 'internal function';
-        }
-        if (!$this->pathOriginatesFromVendor($line['file'])) {
-            return 'source code';
-        }
-        try {
-            return $this->getPackage($line['file']);
-        } catch (\RuntimeException $e) {
-            return 'unknown';
-        }
-    }
 }

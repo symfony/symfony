@@ -1,9 +1,17 @@
 {% use "form_div_layout.html.twig" %}
 
 {%- block form_row -%}
-    {%- set widget_attr = {} -%}
+    {%- set describedby = '' -%}
+    {%- if errors|length > 0 -%}
+        {%- set describedby = (describedby~" form-error-"~id) | trim -%}
+    {%- endif -%}
     {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+        {%- set describedby = (describedby~" "~id~"_help") | trim -%}
+    {%- endif -%}
+    {%- if describedby is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': describedby}} -%}
+    {%- else -%}
+        {%- set widget_attr = {} -%}
     {%- endif -%}
     <tr{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
         <td>

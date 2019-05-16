@@ -2513,6 +2513,17 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, '//*[@role="alert"]');
     }
 
+    public function testAriaDescribedByAlsoContainsIdForErrorMessages()
+    {
+        $form = $this->factory->createNamed('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form->addError(new FormError('[trans]Error 1[/trans]'));
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html, '//*[@id="form-error-myfield"]');
+        $this->assertMatchesXpath($html, '//*[@aria-describedby="form-error-myfield"]');
+    }
+
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [

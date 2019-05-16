@@ -23,9 +23,17 @@ col-sm-2
 {# Rows #}
 
 {% block form_row -%}
-    {%- set widget_attr = {} -%}
+    {%- set describedby = '' -%}
+    {%- if errors|length > 0 -%}
+        {%- set describedby = (describedby~" form-error-"~id) | trim -%}
+    {%- endif -%}
     {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+        {%- set describedby = (describedby~" "~id~"_help") | trim -%}
+    {%- endif -%}
+    {%- if describedby is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': describedby}} -%}
+    {%- else -%}
+        {%- set widget_attr = {} -%}
     {%- endif -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group' ~ ((not compound or force_error|default(false)) and not valid ? ' has-error'))|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}

@@ -285,9 +285,17 @@
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
     {%- endif -%}
-    {%- set widget_attr = {} -%}
+    {%- set describedby = '' -%}
+    {%- if errors|length > 0 -%}
+        {%- set describedby = (describedby~" form-error-"~id) | trim -%}
+    {%- endif -%}
     {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+        {%- set describedby = (describedby~" "~id~"_help") | trim -%}
+    {%- endif -%}
+    {%- if describedby is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': describedby}} -%}
+    {%- else -%}
+        {%- set widget_attr = {} -%}
     {%- endif -%}
     <{{ element|default('div') }}{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
@@ -300,7 +308,7 @@
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-        <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block" role="alert">
+        <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block" role="alert" id="form-error-{{ form.vars.id }}">
             {%- for error in errors -%}
                 <span class="d-block">
                     <span class="form-error-icon badge badge-danger text-uppercase">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>

@@ -2501,6 +2501,18 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, '//input[@aria-invalid="true"]');
     }
 
+    public function testAriaRoleAlertShowsUpWhenFormHasErrors()
+    {
+        // Rather a smoke test - make sure role="alert" shows up *somewhere*, so this is generic enough for all layouts
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form->addError(new FormError('[trans]Error 1[/trans]'));
+        $form->addError(new FormError('[trans]Error 2[/trans]'));
+        $view = $form->createView();
+        $html = $this->renderErrors($view);
+
+        $this->assertMatchesXpath($html, '//*[@role="alert"]');
+    }
+
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [

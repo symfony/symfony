@@ -385,7 +385,7 @@
 
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
-    <ul>
+    <ul role="alert">
         {%- for error in errors -%}
             <li>{{ error.message }}</li>
         {%- endfor -%}

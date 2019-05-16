@@ -333,7 +333,7 @@
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}
-        {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
+        {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert" role="alert">{% endif %}
         {%- for error in errors -%}
             {{ error.message }}
             {% if not loop.last %}, {% endif %}

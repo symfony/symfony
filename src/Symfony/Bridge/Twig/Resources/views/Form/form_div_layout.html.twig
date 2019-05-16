@@ -424,6 +424,9 @@
 {%- endblock form_rows -%}
 
 {%- block widget_attributes -%}
+    {%- if not valid %}
+        {% set attr = {'aria-invalid': 'true'}|merge(attr) %}
+    {% endif -%}
     id="{{ id }}" name="{{ full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}

@@ -2476,6 +2476,31 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
     }
 
+    public function testAriaInvalidIfGivenIsNotChanged()
+    {
+        $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
+            'attr' => ['aria-invalid' => 'whatever'],
+        ]);
+
+        $view = $form->createView();
+        $view->vars['valid'] = false;
+        $html = $this->renderWidget($view);
+
+        // compare plain HTML to check the whitespace
+        $this->assertMatchesXpath($html, '//input[@aria-invalid="whatever"]');
+    }
+
+    public function testAriaInvalidAttributeIfFormIsNotValid()
+    {
+        $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value');
+        $view = $form->createView();
+        $view->vars['valid'] = false;
+        $html = $this->renderWidget($view);
+
+        // compare plain HTML to check the whitespace
+        $this->assertMatchesXpath($html, '//input[@aria-invalid="true"]');
+    }
+
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [

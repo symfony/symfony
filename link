@@ -23,14 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 
-if (2 !== $argc) {
-    echo 'Link dependencies to components to a local clone of the main symfony/symfony GitHub repository.'.PHP_EOL.PHP_EOL;
-    echo "Usage: $argv[0] /path/to/the/project".PHP_EOL;
-    exit(1);
-}
+$pathToProject = $argv[1] ?? getcwd();
 
-if (!is_dir("$argv[1]/vendor/symfony")) {
-    echo "The directory \"$argv[1]\" does not exist or the dependencies are not installed, did you forget to run \"composer install\" in your project?".PHP_EOL;
+if (!is_dir("$pathToProject/vendor/symfony")) {
+    echo 'Link dependencies to components to a local clone of the main symfony/symfony GitHub repository.'.PHP_EOL.PHP_EOL;
+    echo "Usage: $argv[0] /path/to/the/project".PHP_EOL.PHP_EOL;
+    echo "The directory \"$pathToProject\" does not exist or the dependencies are not installed, did you forget to run \"composer install\" in your project?".PHP_EOL;
     exit(1);
 }
 
@@ -48,7 +46,7 @@ foreach ($directories as $dir) {
     }
 }
 
-foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+foreach (glob("$pathToProject/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
     $package = 'symfony/'.basename($dir);
     if (is_link($dir)) {
         echo "\"$package\" is already a symlink, skipping.".PHP_EOL;
@@ -66,6 +64,6 @@ foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) 
     echo "\"$package\" has been linked to \"$sfPackages[$package]\".".PHP_EOL;
 }
 
-foreach (glob("$argv[1]/var/cache/*") as $cacheDir) {
+foreach (glob("$pathToProject/var/cache/*") as $cacheDir) {
     $filesystem->remove($cacheDir);
 }

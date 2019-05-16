@@ -99,7 +99,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
-use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1505,18 +1504,8 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
-        if (!$container->getParameter('kernel.debug')) {
-            $cacheMetadataFactory = new Definition(
-                CacheClassMetadataFactory::class,
-                [
-                    new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
-                    new Reference('serializer.mapping.cache.symfony'),
-                ]
-            );
-            $cacheMetadataFactory->setPublic(false);
-            $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
-
-            $container->setDefinition('serializer.mapping.cache_class_metadata_factory', $cacheMetadataFactory);
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('serializer.mapping.cache_class_metadata_factory');
         }
 
         if (isset($config['name_converter']) && $config['name_converter']) {
@@ -1550,6 +1539,10 @@ class FrameworkExtension extends Extension
             $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', ['priority' => -1000]);
             $definition->addTag('property_info.type_extractor', ['priority' => -1001]);
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('property_info.cache');
         }
     }
 
@@ -1659,6 +1652,7 @@ class FrameworkExtension extends Extension
             'before' => [
                 ['id' => 'add_bus_name_stamp_middleware'],
                 ['id' => 'dispatch_after_current_bus'],
+                ['id' => 'failed_message_processing_middleware'],
             ],
             'after' => [
                 ['id' => 'send_message'],
@@ -1744,7 +1738,6 @@ class FrameworkExtension extends Extension
         }
 
         $messageToSendersMapping = [];
-        $messagesToSendAndHandle = [];
         foreach ($config['routing'] as $message => $messageConfiguration) {
             if ('*' !== $message && !class_exists($message) && !interface_exists($message, false)) {
                 throw new LogicException(sprintf('Invalid Messenger routing configuration: class or interface "%s" not found.', $message));
@@ -1758,7 +1751,6 @@ class FrameworkExtension extends Extension
             }
 
             $messageToSendersMapping[$message] = $messageConfiguration['senders'];
-            $messagesToSendAndHandle[$message] = $messageConfiguration['send_and_handle'];
         }
 
         $senderReferences = [];
@@ -1769,7 +1761,6 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.senders_locator')
             ->replaceArgument(0, $messageToSendersMapping)
             ->replaceArgument(1, ServiceLocatorTagPass::register($container, $senderReferences))
-            ->replaceArgument(2, $messagesToSendAndHandle)
         ;
 
         $container->getDefinition('messenger.retry_strategy_locator')

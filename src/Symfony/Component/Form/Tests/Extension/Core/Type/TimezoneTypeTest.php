@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class TimezoneTypeTest extends BaseTypeTest
 {
@@ -84,6 +85,17 @@ class TimezoneTypeTest extends BaseTypeTest
     }
 
     /**
+     * @group legacy
+     * @expectedDeprecation The option "regions" is deprecated since Symfony 4.2.
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     * @expectedExceptionMessage The "regions" option can only be used if the "intl" option is set to false.
+     */
+    public function testFilterByRegionsWithIntl()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE, 'intl' => true]);
+    }
+
+    /**
      * @requires extension intl
      */
     public function testIntlTimeZoneInput()
@@ -115,5 +127,55 @@ class TimezoneTypeTest extends BaseTypeTest
 
         $this->assertNull($form->getData());
         $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testIntlTimeZoneInputWithBcAndIntl()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone', 'intl' => true]);
+        $form->submit('Europe/Saratov');
+
+        $this->assertNull($form->getData());
+        $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+    }
+
+    public function testTimezonesAreSelectableWithIntl()
+    {
+        IntlTestHelper::requireIntl($this, false);
+
+        $choices = $this->factory->create(static::TESTED_TYPE, null, ['intl' => true])
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'Central European Time (Amsterdam)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'Coordinated Universal Time'), $choices, '', false, false);
+    }
+
+    /**
+     * @requires extension intl
+     */
+    public function testChoiceTranslationLocaleOptionWithIntl()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'intl' => true,
+                'choice_translation_locale' => 'uk',
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContains(new ChoiceView('Europe/Amsterdam', 'Europe/Amsterdam', 'за центральноєвропейським часом (Амстердам)'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices, '', false, false);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     * @expectedExceptionMessage The "choice_translation_locale" option can only be used if the "intl" option is set to true.
+     */
+    public function testChoiceTranslationLocaleOptionWithoutIntl()
+    {
+        $this->factory->create(static::TESTED_TYPE, null, [
+            'choice_translation_locale' => 'uk',
+        ]);
     }
 }

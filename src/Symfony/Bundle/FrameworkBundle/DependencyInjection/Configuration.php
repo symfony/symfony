@@ -1125,7 +1125,6 @@ class Configuration implements ConfigurationInterface
                                         if (!\is_int($k)) {
                                             $newConfig[$k] = [
                                                 'senders' => $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]),
-                                                'send_and_handle' => $v['send_and_handle'] ?? false,
                                             ];
                                         } else {
                                             $newConfig[$v['message-class']]['senders'] = array_map(
@@ -1134,7 +1133,6 @@ class Configuration implements ConfigurationInterface
                                                 },
                                                 array_values($v['sender'])
                                             );
-                                            $newConfig[$v['message-class']]['send-and-handle'] = $v['send-and-handle'] ?? false;
                                         }
                                     }
 
@@ -1147,7 +1145,6 @@ class Configuration implements ConfigurationInterface
                                         ->requiresAtLeastOneElement()
                                         ->prototype('scalar')->end()
                                     ->end()
-                                    ->booleanNode('send_and_handle')->defaultFalse()->end()
                                 ->end()
                             ->end()
                         ->end()

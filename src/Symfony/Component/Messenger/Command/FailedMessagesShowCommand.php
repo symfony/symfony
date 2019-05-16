@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 /**
@@ -83,14 +83,14 @@ EOF
 
         $rows = [];
         foreach ($envelopes as $envelope) {
-            /** @var SentToFailureTransportStamp $sentToFailureTransportStamp */
-            $sentToFailureTransportStamp = $envelope->last(SentToFailureTransportStamp::class);
+            /** @var RedeliveryStamp|null $lastRedeliveryStamp */
+            $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
             $rows[] = [
                 $this->getMessageId($envelope),
                 \get_class($envelope->getMessage()),
-                null === $sentToFailureTransportStamp ? '' : $sentToFailureTransportStamp->getSentAt()->format('Y-m-d H:i:s'),
-                null === $sentToFailureTransportStamp ? '' : $sentToFailureTransportStamp->getExceptionMessage(),
+                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s'),
+                null === $lastRedeliveryStamp ? '' : $lastRedeliveryStamp->getExceptionMessage(),
             ];
         }
 

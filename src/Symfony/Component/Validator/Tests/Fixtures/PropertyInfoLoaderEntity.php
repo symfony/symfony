@@ -46,4 +46,6 @@ class PropertyInfoLoaderEntity
      * })
      */
     public $alreadyPartiallyMappedCollection;
+
+    public $readOnly;
 }

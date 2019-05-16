@@ -71,6 +71,7 @@
         <service id="validator.property_info_loader" class="Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader">
             <argument type="service" id="property_info" />
             <argument type="service" id="property_info" />
+            <argument type="service" id="property_info" />
 
             <tag name="validator.auto_mapper" />
         </service>

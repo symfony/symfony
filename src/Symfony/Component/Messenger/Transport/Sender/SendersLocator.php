@@ -30,14 +30,12 @@ class SendersLocator implements SendersLocatorInterface
     private $sendersMap;
     private $sendersLocator;
     private $useLegacyLookup = false;
-    private $sendAndHandle;
 
     /**
      * @param string[][]         $sendersMap     An array, keyed by "type", set to an array of sender aliases
      * @param ContainerInterface $sendersLocator Locator of senders, keyed by sender alias
-     * @param bool[]             $sendAndHandle
      */
-    public function __construct(array $sendersMap, /*ContainerInterface*/ $sendersLocator = null, array $sendAndHandle = [])
+    public function __construct(array $sendersMap, /*ContainerInterface*/ $sendersLocator = null)
     {
         $this->sendersMap = $sendersMap;
 
@@ -45,21 +43,17 @@ class SendersLocator implements SendersLocatorInterface
             @trigger_error(sprintf('"%s::__construct()" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.', __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
             // "%s" requires a "%s" as 2nd argument. Not doing so is deprecated since Symfony 4.3 and will be required in 5.0.'
             $this->sendersLocator = new ServiceLocator([]);
-            $this->sendAndHandle = $sendersLocator;
             $this->useLegacyLookup = true;
         } else {
             $this->sendersLocator = $sendersLocator;
-            $this->sendAndHandle = $sendAndHandle;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSenders(Envelope $envelope, ?bool &$handle = false): iterable
+    public function getSenders(Envelope $envelope): iterable
     {
-        $handle = false;
-        $sender = null;
         $seen = [];
 
         foreach (HandlersLocator::listTypes($envelope) as $type) {
@@ -70,8 +64,6 @@ class SendersLocator implements SendersLocatorInterface
                         yield $alias => $seen[] = $sender;
                     }
                 }
-
-                $handle = $handle ?: $this->sendAndHandle[$type] ?? false;
 
                 continue;
             }
@@ -87,11 +79,7 @@ class SendersLocator implements SendersLocatorInterface
                     yield $senderAlias => $sender;
                 }
             }
-
-            $handle = $handle ?: $this->sendAndHandle[$type] ?? false;
         }
-
-        $handle = $handle || null === $sender;
     }
 
     public function getSenderByAlias(string $alias): SenderInterface

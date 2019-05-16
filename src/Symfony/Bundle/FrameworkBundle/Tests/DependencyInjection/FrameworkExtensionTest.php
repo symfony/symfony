@@ -40,7 +40,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
-use Symfony\Component\Messenger\Tests\Fixtures\SecondMessage;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -715,13 +714,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('messenger_routing');
         $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
 
-        $messageToSendAndHandleMapping = [
-            DummyMessage::class => false,
-            SecondMessage::class => true,
-            '*' => false,
-        ];
-
-        $this->assertSame($messageToSendAndHandleMapping, $senderLocatorDefinition->getArgument(2));
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals([
             'amqp',
@@ -753,6 +745,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals([
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],
         ], $container->getParameter('messenger.bus.commands.middleware'));
@@ -761,6 +754,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals([
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message'],
             ['id' => 'handle_message'],
@@ -1361,6 +1355,22 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('property_info');
         $this->assertTrue($container->has('property_info'));
+    }
+
+    public function testPropertyInfoCacheActivated()
+    {
+        $container = $this->createContainerFromFile('property_info');
+
+        $this->assertTrue($container->hasDefinition('property_info.cache'));
+
+        $cache = $container->getDefinition('property_info.cache')->getArgument(1);
+        $this->assertEquals(new Reference('cache.property_info'), $cache);
+    }
+
+    public function testPropertyInfoCacheDisabled()
+    {
+        $container = $this->createContainerFromFile('property_info', ['kernel.debug' => true, 'kernel.container_class' => __CLASS__]);
+        $this->assertFalse($container->hasDefinition('property_info.cache'));
     }
 
     public function testEventDispatcherService()

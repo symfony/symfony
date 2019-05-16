@@ -11,7 +11,6 @@
         <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
             <argument type="collection" /> <!-- Per message senders map -->
             <argument /> <!-- senders locator -->
-            <argument type="collection" /> <!-- Messages to send and handle -->
         </service>
         <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware">
             <tag name="monolog.logger" channel="messenger" />
@@ -47,6 +46,8 @@
         <service id="messenger.middleware.validation" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
             <argument type="service" id="validator" />
         </service>
+
+        <service id="messenger.middleware.failed_message_processing_middleware" class="Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware" />
 
         <service id="messenger.middleware.traceable" class="Symfony\Component\Messenger\Middleware\TraceableMiddleware" abstract="true">
             <argument type="service" id="debug.stopwatch" />
@@ -106,6 +107,7 @@
         <!-- routable message bus -->
         <service id="messenger.routable_message_bus" class="Symfony\Component\Messenger\RoutableMessageBus">
             <argument /> <!-- Message bus locator -->
+            <argument type="service" id="messenger.default_bus" />
         </service>
     </services>
 </container>

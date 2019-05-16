@@ -41,7 +41,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * How to track the current depth in the context.
      */
-    private const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+    public const DEPTH_KEY_PATTERN = 'depth_%s::%s';
 
     /**
      * While denormalizing, we can verify that types match.
@@ -559,18 +559,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * We must not mix up the attribute cache between parent and children.
      *
      * {@inheritdoc}
+     *
+     * @param string|null $format
      */
-    protected function createChildContext(array $parentContext, $attribute/*, string $format = null */)
+    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
     {
         if (\func_num_args() >= 3) {
             $format = \func_get_arg(2);
         } else {
-            // will be deprecated in version 4
+            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
             $format = null;
         }
 
         $context = parent::createChildContext($parentContext, $attribute, $format);
-        // format is already included in the cache_key of the parent.
         $context['cache_key'] = $this->getCacheKey($format, $context);
 
         return $context;

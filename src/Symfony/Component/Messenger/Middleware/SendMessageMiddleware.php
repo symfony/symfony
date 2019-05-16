@@ -52,7 +52,6 @@ class SendMessageMiddleware implements MiddlewareInterface
             'class' => \get_class($envelope->getMessage()),
         ];
 
-        $handle = false;
         $sender = null;
 
         try {
@@ -65,7 +64,7 @@ class SendMessageMiddleware implements MiddlewareInterface
 
                 // dispatch event unless this is a redelivery
                 $shouldDispatchEvent = null === $redeliveryStamp;
-                foreach ($this->getSenders($envelope, $handle, $redeliveryStamp) as $alias => $sender) {
+                foreach ($this->getSenders($envelope, $redeliveryStamp) as $alias => $sender) {
                     if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
                         $event = new SendMessageToTransportsEvent($envelope);
                         $this->eventDispatcher->dispatch($event);
@@ -76,14 +75,9 @@ class SendMessageMiddleware implements MiddlewareInterface
                     $this->logger->info('Sending message "{class}" with "{sender}"', $context + ['sender' => \get_class($sender)]);
                     $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
                 }
-
-                // on a redelivery, only send back to queue: never call local handlers
-                if (null !== $redeliveryStamp) {
-                    $handle = false;
-                }
             }
 
-            if (null === $sender || $handle) {
+            if (null === $sender) {
                 return $stack->next()->handle($envelope, $stack);
             }
         } catch (\Throwable $e) {
@@ -100,7 +94,7 @@ class SendMessageMiddleware implements MiddlewareInterface
     /**
      * * @return iterable|SenderInterface[]
      */
-    private function getSenders(Envelope $envelope, &$handle, ?RedeliveryStamp $redeliveryStamp): iterable
+    private function getSenders(Envelope $envelope, ?RedeliveryStamp $redeliveryStamp): iterable
     {
         if (null !== $redeliveryStamp) {
             return [
@@ -108,6 +102,6 @@ class SendMessageMiddleware implements MiddlewareInterface
             ];
         }
 
-        return $this->sendersLocator->getSenders($envelope, $handle);
+        return $this->sendersLocator->getSenders($envelope);
     }
 }

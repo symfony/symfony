@@ -22,6 +22,8 @@ CHANGELOG
    `framework.messenger.default_serializer`, which holds the string service
    id and `framework.messenger.symfony_serializer`, which configures the
    options if you're using Symfony's serializer.
+ * [BC Break] Removed the `framework.messenger.routing.send_and_handle` configuration.
+   Instead of setting it to true, configure a `SyncTransport` and route messages to it.
  * Added information about deprecated aliases in `debug:autowiring` 
  * Added php ini session options `sid_length` and `sid_bits_per_character` 
    to the `session` section of the configuration

@@ -28,13 +28,15 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 class RoutableMessageBus implements MessageBusInterface
 {
     private $busLocator;
+    private $fallbackBus;
 
     /**
      * @param ContainerInterface $busLocator A locator full of MessageBusInterface objects
      */
-    public function __construct(ContainerInterface $busLocator)
+    public function __construct(ContainerInterface $busLocator, MessageBusInterface $fallbackBus = null)
     {
         $this->busLocator = $busLocator;
+        $this->fallbackBus = $fallbackBus;
     }
 
     public function dispatch($envelope, array $stamps = []): Envelope
@@ -43,14 +45,28 @@ class RoutableMessageBus implements MessageBusInterface
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
         }
 
-        /** @var BusNameStamp $busNameStamp */
+        return $this->getMessageBus($envelope)->dispatch($envelope, $stamps);
+    }
+
+    private function getMessageBus(Envelope $envelope): MessageBusInterface
+    {
+        /** @var BusNameStamp|null $busNameStamp */
         $busNameStamp = $envelope->last(BusNameStamp::class);
-        $busName = null !== $busNameStamp ? $busNameStamp->getBusName() : MessageBusInterface::class;
+
+        if (null === $busNameStamp) {
+            if (null === $this->fallbackBus) {
+                throw new InvalidArgumentException(sprintf('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.'));
+            }
+
+            return $this->fallbackBus;
+        }
+
+        $busName = $busNameStamp->getBusName();
 
         if (!$this->busLocator->has($busName)) {
             throw new InvalidArgumentException(sprintf('Bus named "%s" does not exist.', $busName));
         }
 
-        return $this->busLocator->get($busName)->dispatch($envelope, $stamps);
+        return $this->busLocator->get($busName);
     }
 }

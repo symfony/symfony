@@ -41,12 +41,12 @@ trait PriorityTaggedServiceTrait
      */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
-        $indexAttribute = $defaultIndexMethod = $useFqcnAsFallback = null;
+        $indexAttribute = $defaultIndexMethod = $needsIndexes = null;
 
         if ($tagName instanceof TaggedIteratorArgument) {
             $indexAttribute = $tagName->getIndexAttribute();
             $defaultIndexMethod = $tagName->getDefaultIndexMethod();
-            $useFqcnAsFallback = $tagName->useFqcnAsFallback();
+            $needsIndexes = $tagName->needsIndexes();
             $tagName = $tagName->getTag();
         }
 
@@ -55,7 +55,7 @@ trait PriorityTaggedServiceTrait
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
 
-            if (null === $indexAttribute && !$useFqcnAsFallback) {
+            if (null === $indexAttribute && !$needsIndexes) {
                 $services[$priority][] = new Reference($serviceId);
 
                 continue;
@@ -77,8 +77,8 @@ trait PriorityTaggedServiceTrait
             $class = $r->name;
 
             if (!$r->hasMethod($defaultIndexMethod)) {
-                if ($useFqcnAsFallback) {
-                    $services[$priority][$class] = new TypedReference($serviceId, $class);
+                if ($needsIndexes) {
+                    $services[$priority][$serviceId] = new TypedReference($serviceId, $class);
 
                     continue;
                 }

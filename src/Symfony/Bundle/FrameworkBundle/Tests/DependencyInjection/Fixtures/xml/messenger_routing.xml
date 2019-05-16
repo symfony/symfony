@@ -13,7 +13,7 @@
                 <framework:sender service="amqp" />
                 <framework:sender service="audit" />
             </framework:routing>
-            <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\SecondMessage" send-and-handle="true">
+            <framework:routing message-class="Symfony\Component\Messenger\Tests\Fixtures\SecondMessage">
                 <framework:sender service="amqp" />
                 <framework:sender service="audit" />
             </framework:routing>

@@ -154,7 +154,7 @@ EOF
         }
 
         // avoid success message if nothing was processed
-        if (1 < $count) {
+        if (1 <= $count) {
             $io->success('All failed messages have been handled or removed!');
         }
     }

@@ -83,10 +83,12 @@ class ContainerDebugCommandTest extends WebTestCase
     public function testDescribeEnvVars()
     {
         putenv('REAL=value');
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
+
+        @unlink(static::$container->getParameter('debug.container.dump'));
 
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-vars' => true], ['decorated' => false]);
@@ -96,13 +98,13 @@ class ContainerDebugCommandTest extends WebTestCase
 Symfony Container Environment Variables
 =======================================
 
- --------- ----------------- ------------ 
-  Name      Default value     Real value  
- --------- ----------------- ------------ 
-  JSON      "[1, "2.5", 3]"   n/a         
-  REAL      n/a               "value"     
-  UNKNOWN   n/a               n/a         
- --------- ----------------- ------------ 
+ --------- ----------------- ------------%w
+  Name      Default value     Real value%w
+ --------- ----------------- ------------%w
+  JSON      "[1, "2.5", 3]"   n/a%w
+  REAL      n/a               "value"%w
+  UNKNOWN   n/a               n/a%w
+ --------- ----------------- ------------%w
 
  // Note real values might be different between web and CLI.%w
 
@@ -118,35 +120,17 @@ TXT
 
     public function testDescribeEnvVar()
     {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
+        @unlink(static::$container->getParameter('debug.container.dump'));
+
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-var' => 'js'], ['decorated' => false]);
 
-        $this->assertContains(<<<'TXT'
-%env(float:key:2:json:JSON)%
-----------------------------
-
- ----------------- ----------------- 
-  Default value     "[1, "2.5", 3]"  
-  Real value        n/a              
-  Processed value   3.0              
- ----------------- ----------------- 
-
-%env(int:key:2:json:JSON)%
---------------------------
-
- ----------------- ----------------- 
-  Default value     "[1, "2.5", 3]"  
-  Real value        n/a              
-  Processed value   3                
- ----------------- ----------------- 
-
-TXT
-        , $tester->getDisplay(true));
+        $this->assertContains(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
     }
 
     public function provideIgnoreBackslashWhenFindingService()

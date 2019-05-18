@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-18T14:37:54Z
+
+:+1: for this PR. but IMHO this does **not** fix #29603
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-05-18T14:47:34Z
+
+@lyrixx You should re-read the thread :) The issue is not about `get()`'ing services from the test env, it's a different feature request.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-18T15:32:29Z
+
+Indeed 👍

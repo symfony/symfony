@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-05-08T15:05:55Z
+
+I don't see why the `Ä` got scrambled. strtolower should just not lowercase it but keep it as-is. See https://3v4l.org/scUGN
+Also this fix could be considered a BC break because it might change the route names of existing apps.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-08T15:34:58Z
+
+> I don't see why the Ä got scrambled
+
+I'd suspect because strtolower is locale-sensitive.
+
+We could have something like:
+```php
+$name = str_replace('\\', '_', $class->name).'_'.$method->name;
+$name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
+```
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-05-08T18:29:10Z
+
+@Tobion That's very interesting. From my experience, `strtolower` breaks a string with unicode characters. I guess it indeed depends on locale.
+
+As for the BC break - keeping in mind that each bug fix can be considered a BC break -  this method is used only when a route has no name. So, it could potentially be a problem for someone, who uses routing but does not name the routes.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-05-08T19:55:37Z
+
+@nicolas-grekas As I understand, you want to check if the string contains a unicode character? `preg_match('//u', $name)` returns `true` even on an empty string - [https://3v4l.org/VLNrp](https://3v4l.org/VLNrp). In my experience, comparing `strlen` to `mb_strlen` is a good way to do it. But couldn't we just check if `mb_strtolower` exists and apply it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-09T08:30:16Z
+
+>  But couldn't we just check if mb_strtolower exists and apply it?
+
+that would break if any other encoding is used - mb requires knowing the charset before using it.
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-05-09T11:25:52Z
+
+`preg_match('//u', $name)` as a way to validate encoding - I haven't thought about that one. Motto for this week: 'Learning while contributing'.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T10:06:59Z
+
+LGTM, could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-13T13:23:13Z
+
+The tests are failing on appveyor. Windows doesn't like unicode names... We should find a test case that doesn't rely on the filesystem willingness :)
+
+---------------------------------------------------------------------------
+
+by przemyslaw-bogusz at 2019-05-13T22:48:33Z
+
+I've changed the name of the fixture class and now all tests pass. By the way, I think there might be a few more similar unicode issues hidden inside the Symfony code, e.g. method `underscore` of [Container](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Container.php).

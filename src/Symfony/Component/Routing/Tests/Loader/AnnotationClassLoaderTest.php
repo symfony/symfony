@@ -324,6 +324,27 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals(array_merge($classRouteData['methods'], $methodRouteData['methods']), $route->getMethods(), '->load merges class and method route methods');
     }
 
+    /**
+     * @requires function mb_strtolower
+     */
+    public function testDefaultRouteName()
+    {
+        $methodRouteData = [
+            'name' => null,
+        ];
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue([$this->getAnnotatedRoute($methodRouteData)]))
+        ;
+
+        $routeCollection = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\EncodingClass');
+        $defaultName = array_keys($routeCollection->all())[0];
+
+        $this->assertSame($defaultName, 'symfony_component_routing_tests_fixtures_annotatedclasses_encodingclass_routeàction');
+    }
+
     private function getAnnotatedRoute($data)
     {
         return new Route($data);

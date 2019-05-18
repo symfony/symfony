@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-16T16:00:36Z
+
+> I don't know how you work on symfony
+
+1) goto my project
+2) goto my fork; `cd var/sf-src`
+3) `link ../..`
+4) optionally go back to project; `cd -`
+
+i think this change is fine. Perhaps check if we exec `link` in the symfony clone, then using the current working dir is unexpected, as it will link to itself (at least this part changes)
+
+edit: not sure we have to care about that actually

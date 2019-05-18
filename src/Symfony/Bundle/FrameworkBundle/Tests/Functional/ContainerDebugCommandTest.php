@@ -63,6 +63,9 @@ class ContainerDebugCommandTest extends WebTestCase
         $tester->run(['command' => 'debug:container']);
         $this->assertContains('public', $tester->getDisplay());
         $this->assertContains('private_alias', $tester->getDisplay());
+
+        $tester->run(['command' => 'debug:container', 'name' => 'private_alias']);
+        $this->assertContains('The "private_alias" service or alias has been removed', $tester->getDisplay());
     }
 
     /**

@@ -37,51 +37,49 @@ class ContainerAwareEventManager extends EventManager
     }
 
     /**
-     * Dispatches an event to all registered listeners.
-     *
-     * @param string    $eventName The name of the event to dispatch. The name of the event is
-     *                             the name of the method that is invoked on listeners.
-     * @param EventArgs $eventArgs The event arguments to pass to the event handlers/listeners.
-     *                             If not supplied, the single empty EventArgs instance is used.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function dispatchEvent($eventName, EventArgs $eventArgs = null)
     {
-        if (isset($this->listeners[$eventName])) {
-            $eventArgs = null === $eventArgs ? EventArgs::getEmptyInstance() : $eventArgs;
+        if (!isset($this->listeners[$eventName])) {
+            return;
+        }
 
-            $initialized = isset($this->initialized[$eventName]);
+        $eventArgs = null === $eventArgs ? EventArgs::getEmptyInstance() : $eventArgs;
 
-            foreach ($this->listeners[$eventName] as $hash => $listener) {
-                if (!$initialized && \is_string($listener)) {
-                    $this->listeners[$eventName][$hash] = $listener = $this->container->get($listener);
-                }
+        if (!isset($this->initialized[$eventName])) {
+            $this->initializeListeners($eventName);
+        }
 
-                $listener->$eventName($eventArgs);
-            }
-            $this->initialized[$eventName] = true;
+        foreach ($this->listeners[$eventName] as $hash => $listener) {
+            $listener->$eventName($eventArgs);
         }
     }
 
     /**
-     * Gets the listeners of a specific event or all listeners.
-     *
-     * @param string $event The name of the event
-     *
-     * @return array The event listeners for the specified event, or all event listeners
+     * {@inheritdoc}
      */
     public function getListeners($event = null)
     {
-        return $event ? $this->listeners[$event] : $this->listeners;
+        if (null !== $event) {
+            if (!isset($this->initialized[$event])) {
+                $this->initializeListeners($event);
+            }
+
+            return $this->listeners[$event];
+        }
+
+        foreach ($this->listeners as $event => $listeners) {
+            if (!isset($this->initialized[$event])) {
+                $this->initializeListeners($event);
+            }
+        }
+
+        return $this->listeners;
     }
 
     /**
-     * Checks whether an event has any registered listeners.
-     *
-     * @param string $event
-     *
-     * @return bool TRUE if the specified event has any listeners, FALSE otherwise
+     * {@inheritdoc}
      */
     public function hasListeners($event)
     {
@@ -89,20 +87,11 @@ class ContainerAwareEventManager extends EventManager
     }
 
     /**
-     * Adds an event listener that listens on the specified events.
-     *
-     * @param string|array  $events   The event(s) to listen on
-     * @param object|string $listener The listener object
-     *
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
     public function addEventListener($events, $listener)
     {
         if (\is_string($listener)) {
-            if ($this->initialized) {
-                throw new \RuntimeException('Adding lazy-loading listeners after construction is not supported.');
-            }
-
             $hash = '_service_'.$listener;
         } else {
             // Picks the hash code related to that listener
@@ -113,14 +102,15 @@ class ContainerAwareEventManager extends EventManager
             // Overrides listener if a previous one was associated already
             // Prevents duplicate listeners on same event (same instance only)
             $this->listeners[$event][$hash] = $listener;
+
+            if (\is_string($listener)) {
+                unset($this->initialized[$event]);
+            }
         }
     }
 
     /**
-     * Removes an event listener from the specified events.
-     *
-     * @param string|array  $events
-     * @param object|string $listener
+     * {@inheritdoc}
      */
     public function removeEventListener($events, $listener)
     {
@@ -137,5 +127,18 @@ class ContainerAwareEventManager extends EventManager
                 unset($this->listeners[$event][$hash]);
             }
         }
+    }
+
+    /**
+     * @param string $eventName
+     */
+    private function initializeListeners($eventName)
+    {
+        foreach ($this->listeners[$eventName] as $hash => $listener) {
+            if (\is_string($listener)) {
+                $this->listeners[$eventName][$hash] = $this->container->get($listener);
+            }
+        }
+        $this->initialized[$eventName] = true;
     }
 }

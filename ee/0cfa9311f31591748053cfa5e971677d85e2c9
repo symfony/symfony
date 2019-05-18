@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-15T07:01:45Z
+
+What about fixing the constraints between the Form component and WebProfileBundle instead?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-15T07:17:26Z
+
+@fabpot What will happen on the existing application requiring already theses versions (so with the bug) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-15T07:25:12Z
+
+The bug will still be there I suppose... but that's the same with your fix... you need to update to get it. I prefer to avoid having too many specific code to support different versions, bumping min versions is usually what we do.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-05-15T07:28:44Z
+
+What is the version we would have to require to not have to use this code?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-15T07:29:49Z
+
+That's what I'm looking into, need to search @xabbuh
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-15T18:21:51Z
+
+@fabpot I've added a conflict in the WebProfilerBundle to avoid using the Form component below 4.3 since there are no real dependencies between the two, WDYT ?

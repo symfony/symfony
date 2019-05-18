@@ -184,6 +184,7 @@
             <argument /> <!-- uid key -->
             <argument /> <!-- filter -->
             <argument /> <!-- password_attribute -->
+            <argument /> <!-- extra_fields (email etc) -->
         </service>
 
         <service id="security.user.provider.chain" class="Symfony\Component\Security\Core\User\ChainUserProvider" abstract="true" />

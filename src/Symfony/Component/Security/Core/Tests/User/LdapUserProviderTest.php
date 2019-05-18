@@ -334,6 +334,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue(new Entry('foo', [
                     'sAMAccountName' => ['foo'],
                     'userpassword' => ['bar'],
+                    'email' => ['elsa@symfony.com'],
                 ]
             )))
         ;
@@ -353,7 +354,7 @@ class LdapUserProviderTest extends TestCase
             ->will($this->returnValue($query))
         ;
 
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword', ['email']);
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')

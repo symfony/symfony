@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* Added the "extra_fields" option, an array of custom fields to pull from the LDAP server
+
 4.3.0
 -----
 

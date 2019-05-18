@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-05-13T12:34:30Z
+
+Wouldn't it make more sense to let the compiler pass throw a meaningful error when such a listener is registered?
+
+---------------------------------------------------------------------------
+
+by wskorodecki at 2019-05-14T08:29:30Z
+
+@xabbuh Yes, you're right. After a bit of thinking, I realized that my first solution was just a hotfix, but you suggested a much better approach, which not only solves the problem, but also does not force the removal of the _callable_ type hint, which should remain.
+I've updated the _RegisterListenersPass_ and _RegisterListenersPassTest_.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-14T09:21:25Z
+
+We prefer avoiding such compile time validation, because it slows down the compilation, thus DX.
+I know we added more of it in recent months but I'm not sure it's for the best.
+Let's think twice here please.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-16T05:24:24Z
+
+We ran into this issue as well. In our case, the fix was to delete the corresponding `addListener()` calls because the arrays that were passed referenced classes that have been deleted a while ago. This of course was a mistake on our side that was uncovered during the Symfony upgrade.
+
+However, what I found problematic was that this issue broke the profiler for us and it was not really obvious why. The bar just displayed "An error occurred while loading the web debug toolbar." and no profile was logged for the corresponding request. The only evidence was an entry in the server's error log.
+
+```
+PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Argument 1 passed to Symfony\Component\EventDispatcher\Debug\WrappedListener::__construct() must be callable, array given, called in /path/to/project/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php on line 244 in /path/to/project/vendor/symfony/event-dispatcher/Debug/WrappedListener.php:41
+Stack trace:
+#0 /path/to/project/vendor/symfony/event-dispatcher/Debug/TraceableEventDispatcher.php(244): Symfony\Component\EventDispatcher\Debug\WrappedListener->__construct(Array, NULL, Object(Symfony\Component\Stopwatch\Stopwatch), Object(Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher))
+#1 /path/to/project/vendor/symfony/http-kernel/DataCollector/EventDataCollector.php(65): Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher->getNotCalledListeners(Object(Symfony\Component\HttpFoundation\Request))
+#2 /path/to/project/vendor/symfony/http-kernel/Profile in /path/to/project/vendor/symfony/event-dispatcher/Debug/WrappedListener.php on line 41
+```
+
+I had to add breakpoints to `WrappedListener` to find the broken listener registrations. Since forgetting to remove a listener registration is a mistake that might happen from time to time, we should make it easier to debug this.
+
+Until Symfony 4.2 it was apparently possible to register an event listener that is not (yet) callable. So the question is: Do we want to keep this "feature"? If we do, removing the type-hint would be the correct solution. If not, we should fail nicer than we currently do.
+
+Either way, adding compile-time checks would not solve the issue for us since the broken listeners were added during runtime in our case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-16T07:22:57Z
+
+> compile-time checks would not solve the issue for us since the broken listeners were added during runtime in our case.
+
+Let's go back to the initial patch, isn't it?
+Did anyone check why we added the type btw?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-16T10:37:14Z
+
+> Did anyone check why we added the type btw?
+
+@nicolas-grekas: You did this in #29245 because you wanted to use `Closure::fromCallable()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-16T16:00:40Z
+
+OK thanks - If the error message that is thrown when removing the type hint is more informative, we should definitely go with it and remove the type hint.
+
+---------------------------------------------------------------------------
+
+by wskorodecki at 2019-05-18T12:42:43Z
+
+I've updated the patch.

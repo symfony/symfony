@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Marking;
  * This store deals with a "single state" or "multiple state" Marking.
  *
  * "single state" Marking means a subject can be in one and only one state at
- * the same time. Use it with state machine or specific workflow.
+ * the same time. Use it with state machine.
  *
  * "multiple state" Marking means a subject can be in many states at the same
  * time. Use it with workflow.

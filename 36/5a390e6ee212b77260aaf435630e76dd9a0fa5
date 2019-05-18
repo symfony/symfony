@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-01T06:36:26Z
+
+Doesn't this change break some desired laziness?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-01T07:51:08Z
+
+> now it returns array of strings of listener service names
+
+any link to what "now" means? is that recent behavior change? any bug you experienced or did this come out by reviewing?
+
+context needed please :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-01T08:48:53Z
+
+I've found this problem when try to inject Serializer service into custom DBAL Type using [this article](http://emanueleminotto.github.io/blog/service-injection-doctrine-dbal-type) . I was surprised that `getListeners('custom_event')` returns array of strings instead of listeners objects.
+
+Also there is related issue with ContainerAwareEventManager  #31051 , I will try to fix it in this PR.
+
+> Doesn't this change break some desired laziness?
+
+only if you call `getListeners` without any argument
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-05-06T15:31:34Z
+
+@nicolas-grekas this would also fix my #31051 so I'll allow myself to comment :) For me this came up during update from Sf 4.1 to 4.2 where all Doctrine listeners became lazy by default thanks to #27661. Biggest issue is that Doctrine's getListeners method promises to return `object[]|object[][]` while Symfony implementation is returning strings if listeners were not initialized. So even if this change breaks some desired laziness, it's fixing broken contract. IMO if laziness is to stay as it is, it should use real proxying.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-06T15:38:22Z
+
+ping @dmaicher then for review :)
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-06T20:09:47Z
+
+@malarzm can you look at the tests? Looks like this PR should fix your issue
+
+---------------------------------------------------------------------------
+
+by malarzm at 2019-05-06T21:56:26Z
+
+@Koc looking at the tests your PR will fix my issue, thanks a lot! 🍻
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2019-05-07T19:27:26Z
+
+I just tested this change on my big monolith work project and its all good except one test fail:
+
+```php
+public function testListenerIsRegistered(): void
+{
+    $doctrineEventManager = $this->em->getConnection()->getEventManager();
+    $preUpdateListeners = $doctrineEventManager->getListeners(Events::preUpdate);
+    // this obviously fails now
+    $this->assertContains('some_service_id', $preUpdateListeners);
+}
+```
+
+So we are actually relying on the current behavior before this fix :yum: I bet there are other people out there relying on it. This change looks correct to me but we should expect some issues being reported when this is merged & released.
+
+@nicolas-grekas actually laziness is not affected on my project. `getListeners()` is never called anywhere. So it would only break laziness for people calling it or using bundles/libraries that are calling this somewhere.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-09T12:39:25Z
+
+@nicolas-grekas comments fixed, Travis is happy

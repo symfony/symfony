@@ -141,7 +141,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(
                 '@WebProfiler/Profiler/toolbar_error.html.twig',
                 [
-                    'error_message' => 'An error occured while loading the debug toolbar. Did you forget to close the <body> tag?',
+                    'error_message' => 'An error occurred while loading the debug toolbar. Did you forget to close the <body> tag?',
                 ]
             ))."\n";
 

@@ -205,6 +205,22 @@ class WebDebugToolbarListenerTest extends TestCase
     /**
      * @depends testToolbarIsInjected
      */
+    public function testErrorToolbarIsInjectedOnHtmlResponseWithoutClosingBodyTag()
+    {
+        $response = new Response('<html><body><div>Some content</div></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><body>\nWDT\n<div>Some content</div></html>", $response->getContent());
+    }
+
+    /**
+     * @depends testToolbarIsInjected
+     */
     public function testToolbarIsNotInjectedOnXmlHttpRequests()
     {
         $response = new Response('<html><head></head><body></body></html>');

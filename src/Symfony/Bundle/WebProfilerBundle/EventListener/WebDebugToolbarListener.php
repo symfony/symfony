@@ -131,6 +131,20 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
                 ]
             ))."\n";
+
+            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
+            $response->setContent($content);
+        } elseif (false !== $pos = strripos($content, '<body>')) {
+            // We want the debug bar to be after the <body> tag, not before.
+            $pos += 6;
+
+            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+                '@WebProfiler/Profiler/toolbar_error.html.twig',
+                [
+                    'error_message' => 'An error occured while loading the debug toolbar. Did you forget to close the <body> tag?',
+                ]
+            ))."\n";
+
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
         }

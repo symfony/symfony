@@ -102,7 +102,7 @@ class Connection
             return $this->get();
         }
 
-        foreach ($messages[$this->stream] as $key => $message) {
+        foreach ($messages[$this->stream] ?? [] as $key => $message) {
             $redisEnvelope = \json_decode($message['message'], true);
 
             return [

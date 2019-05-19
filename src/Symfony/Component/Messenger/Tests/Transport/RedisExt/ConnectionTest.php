@@ -115,7 +115,8 @@ class ConnectionTest extends TestCase
 
     public function testGetAfterReject()
     {
-        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', [], $redis);
         try {
             $connection->setup();
         } catch (TransportException $e) {
@@ -129,5 +130,20 @@ class ConnectionTest extends TestCase
 
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget');
         $this->assertNotNull($connection->get());
+
+        $redis->del('messenger-rejectthenget');
+    }
+
+    public function testBlockingTimeout()
+    {
+        $redis = new \Redis();
+        $connection = Connection::fromDsn('redis://localhost/messenger-blockingtimeout', ['blocking_timeout' => 1], $redis);
+        try {
+            $connection->setup();
+        } catch (TransportException $e) {
+        }
+
+        $this->assertNull($connection->get());
+        $redis->del('messenger-blockingtimeout');
     }
 }

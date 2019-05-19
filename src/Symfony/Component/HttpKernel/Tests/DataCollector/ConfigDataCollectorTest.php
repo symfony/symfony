@@ -36,6 +36,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
+        $this->assertSame(4 === Kernel::MINOR_VERSION, $c->isSymfonyLts());
         $this->assertNull($c->getToken());
         $this->assertSame(\extension_loaded('xdebug'), $c->hasXDebug());
         $this->assertSame(\extension_loaded('Zend OPcache') && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN), $c->hasZendOpcache());

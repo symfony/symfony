@@ -427,6 +427,7 @@ final class Dotenv
             (?!\()                             # no opening parenthesis
             (?P<opening_brace>\{)?             # optional brace
             (?P<name>'.self::VARNAME_REGEX.')? # var name
+            (?P<default_value>:-[^\}]++)?      # optional default value
             (?P<closing_brace>\})?             # optional closing brace
         /x';
 
@@ -454,6 +455,15 @@ final class Dotenv
                 $value = $_ENV[$name];
             } else {
                 $value = (string) getenv($name);
+            }
+
+            if ('' === $value && isset($matches['default_value'])) {
+                $unsupportedChars = strpbrk($matches['default_value'], '\'"{$');
+                if (false !== $unsupportedChars) {
+                    throw $this->createFormatException(sprintf('Unsupported character "%s" found in the default value of variable "$%s".', $unsupportedChars[0], $name));
+                }
+
+                $value = substr($matches['default_value'], 2);
             }
 
             if (!$matches['opening_brace'] && isset($matches['closing_brace'])) {

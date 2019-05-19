@@ -376,6 +376,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     unset($data[$key]);
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
+                } elseif ($constructorParameter->allowsNull()) {
+                    $params[] = null;
                 } else {
                     throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.', $class, $constructorParameter->name));
                 }

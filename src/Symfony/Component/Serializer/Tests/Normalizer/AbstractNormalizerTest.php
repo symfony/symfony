@@ -149,4 +149,15 @@ class AbstractNormalizerTest extends TestCase
             $this->assertInstanceOf(Dummy::class, $foo);
         }
     }
+
+    /**
+     * @requires PHP 7.1
+     */
+    public function testObjectWithNullableConstructorArgumentNotProvided()
+    {
+        $normalizer = new ObjectNormalizer();
+        $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
+
+        $this->assertNull($dummy->getFoo());
+    }
 }

@@ -22,7 +22,7 @@ class NullableConstructorArgumentDummy
 
     public function setFoo($foo)
     {
-        $this->foo = 'this setter should not be called when using the constructor argument';
+        throw new \RuntimeException('this setter should not be called when using the constructor argument');
     }
 
     public function getFoo()

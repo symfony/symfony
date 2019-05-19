@@ -15,6 +15,7 @@ use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Collection;
 use Symfony\Component\Ldap\Adapter\ExtLdap\UpdateOperation;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\AlreadyExistsException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
@@ -72,6 +73,26 @@ class LdapManagerTest extends LdapTestCase
         ]);
 
         $em = $this->adapter->getEntryManager();
+        $em->add($entry);
+    }
+
+    /**
+     * @group functional
+     */
+    public function testLdapAddDouble()
+    {
+        $this->expectException(AlreadyExistsException::class);
+        $this->executeSearchQuery(1);
+
+        $entry = new Entry('cn=Elsa Amrouche,dc=symfony,dc=com', [
+            'sn' => ['eamrouche'],
+            'objectclass' => [
+                'inetOrgPerson',
+            ],
+        ]);
+
+        $em = $this->adapter->getEntryManager();
+        $em->add($entry);
         $em->add($entry);
     }
 

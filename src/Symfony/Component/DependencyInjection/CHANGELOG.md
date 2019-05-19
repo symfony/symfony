@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * deprecated support for short factories and short configurators in Yaml
+
 4.3.0
 -----
 

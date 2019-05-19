@@ -69,6 +69,22 @@ DependencyInjection
         env(NAME): '1.5'
    ```
 
+ * Removed support for short factories and short configurators in Yaml
+
+   Before:
+   ```yaml
+   services:
+     my_service:
+       factory: factory_service:method
+   ```
+
+   After:
+   ```yaml
+   services:
+     my_service:
+       factory: ['@factory_service', method]
+   ```
+
 DoctrineBridge
 --------------
 

@@ -191,6 +191,9 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLoadFactoryShortSyntax()
     {
         $container = new ContainerBuilder();
@@ -208,10 +211,13 @@ class YamlFileLoaderTest extends TestCase
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method").');
+        $this->expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method"');
         $loader->load('bad_factory_syntax.yml');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLoadConfiguratorShortSyntax()
     {
         $container = new ContainerBuilder();

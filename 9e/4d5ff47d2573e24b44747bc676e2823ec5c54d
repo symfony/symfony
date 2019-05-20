@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-20T13:42:33Z
+
+@Simperfit If possible, I would prefer to have only 1 PR with tests for the LDAP component, it makes review much more efficient.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-05-20T13:44:55Z
+
+@fabpot I've done that because I was asked to use the lowest branch, and the test added in #31553 cannot be in the 3.4 because it uses ->move() which is new.

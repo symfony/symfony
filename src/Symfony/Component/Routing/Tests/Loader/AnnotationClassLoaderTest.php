@@ -278,6 +278,34 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
     }
 
+    /**
+     * @requires function mb_strtolower
+     */
+    public function testDefaultRouteName()
+    {
+        $methodRouteData = [
+            'name' => null,
+        ];
+
+        $reader = $this->getReader();
+        $reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue([new RouteAnnotation($methodRouteData)]))
+        ;
+
+        $loader = new class($reader) extends AnnotationClassLoader {
+            protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, $annot)
+            {
+            }
+        };
+        $routeCollection = $loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\EncodingClass');
+
+        $defaultName = array_keys($routeCollection->all())[0];
+
+        $this->assertSame($defaultName, 'symfony_component_routing_tests_fixtures_annotatedclasses_encodingclass_routeàction');
+    }
+
     public function testLoadingRouteWithPrefix()
     {
         $routes = $this->loader->load(RouteWithPrefixController::class);

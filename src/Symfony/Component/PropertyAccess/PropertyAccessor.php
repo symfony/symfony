@@ -63,6 +63,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private $cacheItemPool;
 
+    private $propertyPathCache = [];
     private $readPropertyCache = [];
     private $writePropertyCache = [];
     private static $resultProto = [self::VALUE => null];
@@ -823,7 +824,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return AdapterInterface
      *
-     * @throws RuntimeException When the Cache Component isn't available
+     * @throws \LogicException When the Cache Component isn't available
      */
     public static function createCache($namespace, $defaultLifetime, $version, LoggerInterface $logger = null)
     {

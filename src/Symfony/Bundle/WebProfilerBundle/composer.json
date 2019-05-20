@@ -32,7 +32,8 @@
     "conflict": {
         "symfony/dependency-injection": "<3.4",
         "symfony/messenger": "<4.2",
-        "symfony/var-dumper": "<3.4"
+        "symfony/var-dumper": "<3.4",
+        "symfony/form": "<4.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

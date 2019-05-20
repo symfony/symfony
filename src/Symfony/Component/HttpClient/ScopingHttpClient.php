@@ -36,6 +36,10 @@ class ScopingHttpClient implements HttpClientInterface
         $this->client = $client;
         $this->defaultOptionsByRegexp = $defaultOptionsByRegexp;
         $this->defaultRegexp = $defaultRegexp;
+
+        if (null !== $defaultRegexp && !isset($defaultOptionsByRegexp[$defaultRegexp])) {
+            throw new InvalidArgumentException(sprintf('No options are mapped to the provided "%s" default regexp.', $defaultRegexp));
+        }
     }
 
     public static function forBaseUri(HttpClientInterface $client, string $baseUri, array $defaultOptions = [], $regexp = null): self

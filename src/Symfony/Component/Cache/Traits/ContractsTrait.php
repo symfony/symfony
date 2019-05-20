@@ -32,6 +32,7 @@ trait ContractsTrait
     }
 
     private $callbackWrapper = [LockRegistry::class, 'compute'];
+    private $computing = [];
 
     /**
      * Wraps the callback passed to ->get() in a callable.
@@ -69,26 +70,27 @@ trait ContractsTrait
             CacheItem::class
         );
 
-        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata) {
+        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key) {
             // don't wrap nor save recursive calls
-            if (null === $callbackWrapper = $this->callbackWrapper) {
+            if (isset($this->computing[$key])) {
                 $value = $callback($item, $save);
                 $save = false;
 
                 return $value;
             }
-            $this->callbackWrapper = null;
+
+            $this->computing[$key] = $key;
             $startTime = microtime(true);
 
             try {
-                $value = $callbackWrapper($callback, $item, $save, $pool, function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
+                $value = ($this->callbackWrapper)($callback, $item, $save, $pool, function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
                     $setMetadata($item, $startTime, $metadata);
                 }, $this->logger ?? null);
                 $setMetadata($item, $startTime, $metadata);
 
                 return $value;
             } finally {
-                $this->callbackWrapper = $callbackWrapper;
+                unset($this->computing[$key]);
             }
         }, $beta, $metadata, $this->logger ?? null);
     }

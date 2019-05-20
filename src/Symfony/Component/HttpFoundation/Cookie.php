@@ -29,6 +29,7 @@ class Cookie
     private $sameSite;
     private $secureDefault = false;
 
+    const SAMESITE_NONE = 'none';
     const SAMESITE_LAX = 'lax';
     const SAMESITE_STRICT = 'strict';
 
@@ -126,7 +127,7 @@ class Cookie
             $sameSite = strtolower($sameSite);
         }
 
-        if (!\in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, null], true)) {
+        if (!\in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, self::SAMESITE_NONE, null], true)) {
             throw new \InvalidArgumentException('The "sameSite" parameter value is not valid.');
         }
 

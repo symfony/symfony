@@ -83,6 +83,10 @@ final class Locale extends \Locale
                 return null;
             }
 
+            if (0 === \count($localSubTags)) {
+                return null;
+            }
+
             array_pop($localeSubTags);
 
             $fallback = locale_compose($localeSubTags);

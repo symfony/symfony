@@ -34,9 +34,14 @@ class FormLoginLdapFactory extends FormLoginFactory
             ->replaceArgument(2, $id)
             ->replaceArgument(3, new Reference($config['service']))
             ->replaceArgument(4, $config['dn_string'])
+            ->replaceArgument(5, $config['search_dn'])
+            ->replaceArgument(6, $config['search_password'])
         ;
 
         if (!empty($config['query_string'])) {
+            if ('' === $config['search_dn'] || '' === $config['search_password']) {
+                @trigger_error('Using the "query_string" config without using a "search_dn" and a "search_password" is deprecated since Symfony 4.4 and will throw in Symfony 5.0.', E_USER_DEPRECATED);
+            }
             $definition->addMethodCall('setQueryString', [$config['query_string']]);
         }
 
@@ -52,6 +57,8 @@ class FormLoginLdapFactory extends FormLoginFactory
                 ->scalarNode('service')->defaultValue('ldap')->end()
                 ->scalarNode('dn_string')->defaultValue('{username}')->end()
                 ->scalarNode('query_string')->end()
+                ->scalarNode('search_dn')->defaultValue('')->end()
+                ->scalarNode('search_password')->defaultValue('')->end()
             ->end()
         ;
     }

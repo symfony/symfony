@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by sroze at 2019-05-12T15:19:45Z
+
+Well.. it is actually recoverable because if this happens: 1) you see the errors somewhere (Sentry, Bugsnag, etc...), 2) you will fix it and 3) you will redeploy. At no point in this you expect the infrastructure to destroy these messages (which is what it means to have an unrecoverable error).
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-12T17:26:19Z
+
+I've opened this PR because @Tobion suggested make this change in related PR https://github.com/symfony/symfony/pull/31334#discussion_r281516409 .
+
+Not sure that developer will have enough time to fix problem and redeploy before messages goes to failed transport after N retries. And there is possibility to retry message from failed transport since Symfony 4.3.
+
+But in any case `getManager()` doesn't return null and check should be reworked.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-05-13T07:44:00Z
+
+Recoverable to me means that it is a temporary problem that might fix itself by just retrying. If it's a coding problem auto-retrying does not make sense. If you argue it's recoverable because you can fix it manually, then where is the difference between recoverable and unrecoverable? Everything is recoverable then if you change code...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-21T04:54:06Z
+
+Tests are broken and should be fixed before merging (looks like a constraint should be changed in the Doctrine bridge).
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-21T06:55:13Z
+
+@fabpot thank you for suggestion, now fixed.

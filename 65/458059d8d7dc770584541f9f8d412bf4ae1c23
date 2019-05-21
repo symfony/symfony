@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-13T13:52:33Z
+
+Moved implementation to a new `Envelope` method.
+
+I've only added the new "non-sendable stamp interface" to 3 transport-specific "received" stamps. Generally speaking, I *think* that stamps *should* be sent, unless there is a clear reason otherwise. Allowing stamps to be sendable (the default) *can* make the messages bigger when being retried after failure. But they also allow for a really beautiful "history" as you can look at an Envelope and see exactly what happened to it over time.
+
+Anyways, this is ready to go!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-20T19:17:27Z
+
+This is still ready to go.

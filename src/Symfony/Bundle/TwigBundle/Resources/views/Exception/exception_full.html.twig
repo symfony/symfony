@@ -137,6 +137,14 @@
     {{ exception.message }} ({{ status_code }} {{ status_text }})
 {% endblock %}
 
+{% block before_html %}
+<!-- {{ exception.message }} ({{ status_code }} {{ status_text }}) -->
+{% endblock %}
+
+{% block after_html %}
+<!-- {{ exception.message }} ({{ status_code }} {{ status_text }}) -->
+{% endblock %}
+
 {% block body %}
     {% include '@Twig/Exception/exception.html.twig' %}
 {% endblock %}

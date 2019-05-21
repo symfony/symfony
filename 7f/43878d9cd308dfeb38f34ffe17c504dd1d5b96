@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by sleepyboy at 2019-04-30T13:25:55Z
+
+Nicolas, I tried to address all the issues mentioned in your comments in the last commits. The AppVeyor and Travic CI builds failed but the errors are not HttpClient related though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-01T08:59:04Z
+
+Thanks @sleepyboy
+I pushed a 6th commit on your branch to show what I mean. TL;DR: we shouldn't make the logic specific to the way PHP parses URLs. There is nothing standard there. See updated tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-05T17:07:19Z
+
+@sleepyboy if you're OK, we should now squash all commits in one, please advise :)
+
+---------------------------------------------------------------------------
+
+by sleepyboy at 2019-05-05T18:56:04Z
+
+> @sleepyboy if you're OK, we should now squash all commits in one, please advise :)
+
+I added missing query array validation — we lost it along the way.
+Also, should we try to cast objects to string before raising an exception? For instance, if they implement __toString() method?
+
+Here's an example:
+```
+class Post
+{
+    protected $title;
+
+    public function __toString(): string
+    {
+        return $this->title;
+    }
+}
+
+$queryArray = ['title' => $post];
+```
+
+Without proper check http_build_query will try to cast objects to array and will omit non-valid query parameters without raising an exception.
+
+```
+class Post
+{
+    public $title = 'Test';
+    public $description = 'Test2';
+}
+$post = new Post();
+$queryString = http_build_query(['post' => $post], '', '&', PHP_QUERY_RFC3986);
+```
+
+will produce "post[title]=Test&post[description]=Test2
+
+We may raise an exception though and leave it up to developers to cast their objects.
+
+---------------------------------------------------------------------------
+
+by sleepyboy at 2019-05-05T19:22:26Z
+
+> @sleepyboy if you're OK, we should now squash all commits in one, please advise :)
+
+If you're okay with the last change and don't need casting objects to string, go ahead and squash the commits.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T10:22:03Z
+
+I don't think the validation is needed actually. I would prefer following what `http_build_query` does. All these are PHP idiomatisms anyway.
+
+---------------------------------------------------------------------------
+
+by sleepyboy at 2019-05-11T14:12:18Z
+
+> I don't think the validation is needed actually. I would prefer following what `http_build_query` does. All these are PHP idiomatisms anyway.
+
+Okay, I'll fix it this weekend then.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-05-11T23:58:08Z
+
+I cannot recommend this approach. There are alot of different ways to serialize list of values in a query, e.g. comma separated or repeating the query param.
+So I would instead provide a query builder where you can configure the behavior and not build it into the http client directly.

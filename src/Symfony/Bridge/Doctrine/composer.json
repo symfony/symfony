@@ -29,7 +29,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/form": "~4.3",
         "symfony/http-kernel": "~3.4|~4.0",
-        "symfony/messenger": "~4.2",
+        "symfony/messenger": "~4.3",
         "symfony/property-access": "~3.4|~4.0",
         "symfony/property-info": "~3.4|~4.0",
         "symfony/proxy-manager-bridge": "~3.4|~4.0",
@@ -49,7 +49,7 @@
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
         "symfony/dependency-injection": "<3.4",
         "symfony/form": "<4.3",
-        "symfony/messenger": "<4.2"
+        "symfony/messenger": "<4.3"
     },
     "suggest": {
         "symfony/form": "",

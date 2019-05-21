@@ -427,6 +427,7 @@ class Process implements \IteratorAggregate
         } while ($running);
 
         while ($this->isRunning()) {
+            $this->checkTimeout();
             usleep(1000);
         }
 

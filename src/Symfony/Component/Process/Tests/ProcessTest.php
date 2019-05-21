@@ -1551,6 +1551,15 @@ EOTXT;
         $this->assertSame($env, $p->getEnv());
     }
 
+    public function testWaitStoppedDeadProcess()
+    {
+        $process = $this->getProcess(self::$phpBin.' '.__DIR__.'/ErrorProcessInitiator.php -e '.self::$phpBin);
+        $process->start();
+        $process->setTimeout(2);
+        $process->wait();
+        $this->assertFalse($process->isRunning());
+    }
+
     /**
      * @param string      $commandline
      * @param string|null $cwd

@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Messenger\Transport\RedisExt;
 
-use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Alexander Schranz <alexander@sulu.io>
  *
  * @experimental in 4.3
  */
-class RedisReceivedStamp implements StampInterface
+class RedisReceivedStamp implements NonSendableStampInterface
 {
     private $id;
 

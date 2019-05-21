@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\Messenger\Transport\Doctrine;
 
-use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  *
  * @experimental in 4.3
  */
-class DoctrineReceivedStamp implements StampInterface
+class DoctrineReceivedStamp implements NonSendableStampInterface
 {
     private $id;
 

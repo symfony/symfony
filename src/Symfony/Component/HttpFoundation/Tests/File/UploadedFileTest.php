@@ -189,7 +189,7 @@ class UploadedFileTest extends TestCase
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
-            '../../original.gif',
+            '..'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'original.gif',
             'image/gif',
             filesize(__DIR__.'/Fixtures/test.gif'),
             null

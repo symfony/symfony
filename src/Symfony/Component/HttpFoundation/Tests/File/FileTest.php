@@ -112,11 +112,9 @@ class FileTest extends TestCase
     {
         return [
             ['original.gif', 'original.gif'],
-            ['..\\..\\original.gif', 'original.gif'],
-            ['../../original.gif', 'original.gif'],
+            ['..'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'original.gif', 'original.gif'],
             ['файлfile.gif', 'файлfile.gif'],
-            ['..\\..\\файлfile.gif', 'файлfile.gif'],
-            ['../../файлfile.gif', 'файлfile.gif'],
+            ['..'.\DIRECTORY_SEPARATOR.'..'.\DIRECTORY_SEPARATOR.'файлfile.gif', 'файлfile.gif'],
         ];
     }
 
@@ -134,6 +132,30 @@ class FileTest extends TestCase
 
         $file = new File($path);
         $movedFile = $file->move($targetDir, $filename);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
+
+        $this->assertFileExists($targetPath);
+        $this->assertFileNotExists($path);
+        $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
+
+        @unlink($targetPath);
+    }
+
+    public function testMoveWithBackslashOnUnix()
+    {
+        if (\DIRECTORY_SEPARATOR == '\\') {
+            return;
+        }
+
+        $path = __DIR__.'/Fixtures/test\\copy.gif';
+        $targetDir = __DIR__.'/Fixtures/directory';
+        $targetPath = $targetDir.'/test\\copy.gif';
+        @unlink($path);
+        @unlink($targetPath);
+        copy(__DIR__.'/Fixtures/test.gif', $path);
+
+        $file = new File($path);
+        $movedFile = $file->move($targetDir);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
 
         $this->assertFileExists($targetPath);

@@ -481,17 +481,20 @@ trait HttpClientTrait
             }
         }
 
-        foreach ($queryArray as $k => $v) {
-            if (is_scalar($v)) {
-                $queryArray[$k] = rawurlencode($k).'='.rawurlencode($v);
-            } elseif (null === $v) {
-                unset($queryArray[$k]);
-
-                if ($replace) {
+        if ($replace) {
+            foreach ($queryArray as $k => $v) {
+                if (null === $v) {
                     unset($query[$k]);
                 }
-            } else {
-                throw new InvalidArgumentException(sprintf('Unsupported value for query parameter "%s": scalar or null expected, %s given.', $k, \gettype($v)));
+            }
+        }
+
+        $queryString = http_build_query($queryArray, '', '&', PHP_QUERY_RFC3986);
+        $queryArray = [];
+
+        if ($queryString) {
+            foreach (explode('&', $queryString) as $v) {
+                $queryArray[rawurldecode(explode('=', $v, 2)[0])] = $v;
             }
         }
 

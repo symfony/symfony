@@ -11,10 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Messenger;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
-use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
@@ -24,28 +22,10 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  *
  * @experimental in 4.3
  */
-class DoctrineTransactionMiddleware implements MiddlewareInterface
+class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
 {
-    private $managerRegistry;
-    private $entityManagerName;
-
-    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null)
+    protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
-        $this->managerRegistry = $managerRegistry;
-        $this->entityManagerName = $entityManagerName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Envelope $envelope, StackInterface $stack): Envelope
-    {
-        try {
-            $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
-        } catch (\InvalidArgumentException $e) {
-            throw new UnrecoverableMessageHandlingException($e->getMessage(), 0, $e);
-        }
-
         $entityManager->getConnection()->beginTransaction();
         try {
             $envelope = $stack->next()->handle($envelope, $stack);

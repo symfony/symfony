@@ -70,7 +70,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         if (\defined('CURLPIPE_MULTIPLEX')) {
             curl_multi_setopt($this->multi->handle, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
         }
-        curl_multi_setopt($this->multi->handle, CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX);
+        if (\defined('CURLMOPT_MAX_HOST_CONNECTIONS')) {
+            curl_multi_setopt($this->multi->handle, CURLMOPT_MAX_HOST_CONNECTIONS, 0 < $maxHostConnections ? $maxHostConnections : PHP_INT_MAX);
+        }
 
         // Skip configuring HTTP/2 push when it's unsupported or buggy, see https://bugs.php.net/bug.php?id=77535
         if (0 >= $maxPendingPushes || \PHP_VERSION_ID < 70217 || (\PHP_VERSION_ID >= 70300 && \PHP_VERSION_ID < 70304)) {
@@ -188,7 +190,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_0;
         } elseif (1.1 === (float) $options['http_version'] || 'https:' !== $scheme) {
             $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
-        } elseif (CURL_VERSION_HTTP2 & curl_version()['features']) {
+        } elseif (\defined('CURL_VERSION_HTTP2') && CURL_VERSION_HTTP2 & curl_version()['features']) {
             $curlopts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_2_0;
         }
 

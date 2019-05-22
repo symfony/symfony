@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-05-07T11:50:59Z
+
+Can you give more details about how this solves your need to have different subdomains ? I don't think this is true here (most URLs generated in the controller are for redirections from a profiler controller to another one, and so they are already in the right subdomain anyway AFAICT)
+
+---------------------------------------------------------------------------
+
+by martijnhartlief at 2019-05-07T12:16:22Z
+
+Well perhaps my fixes are totally wrong. What I noticed is that the profiler doesn't follow it's own host configuration. It generates links relative to itself, which makes sense, but when you "include" the profiler in that page it uses a different host, it will link to the parent host, and not the profiler's host. If your host is example.domain.com and the profiler's host is domain.com it generates the link /_profiler/token. But when you actually click it the page uses example.domain.com/_profiler/token. Which result's in a 404 if you don't have a route listening to that path.
+
+Bear in mind I only tried to fix the probably unintended result of the profiler controller assuming it's running under the same host.
+
+So to "force" the profiler to generate the correct link for the profiler, no matter where you requested from I added "Route::ABSOLUTE_URL" in the controller that generates it.
+
+Then i found out that value is never read in the template because it will always generate the path in the template. There is probably a reason for this, but it resulted that the template generates the route again. Which also assumes it's already under the correct host. The controller passes the generated url, but is never used.
+
+Maybe just changing to absolute_url() in twig is the correct way, and the actual controller doesn't need any modifications.
+
+I know this is probably an edge case, but i would love to have all profiler links go to the same host instead of "wild-carding" it to all hosts, which is currently not possible.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-05-09T15:50:55Z
+
+hmm, as the toolbar is loaded asynchronously in an AJAX request, the host requirements indeed don't allow solving things properly for links generated in the toolbar items (the router will consider that the toolbar is already on a domain matching the requirement and so does not need to force an absolute URL, but the toolbar then gets injected into the page and relative links are resolved there).
+
+The solution to your problem is to use ` url()` instead of `path()` in the item template, and keeping only the change on line 167 of ProfilerController in your patch (the redirections don't need this change to work fine).
+
+---------------------------------------------------------------------------
+
+by martijnhartlief at 2019-05-09T16:30:55Z
+
+I made the suggested changes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-21T17:22:01Z
+
+@martijnhartlief Can you squash the commits before I merge? Thank you.

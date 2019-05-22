@@ -1671,7 +1671,7 @@ class FrameworkExtension extends Extension
             }
 
             if ($pool['tags']) {
-                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
                 }
                 $container->register($name, TagAwareAdapter::class)

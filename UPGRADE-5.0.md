@@ -27,6 +27,7 @@ Config
  * Removed `FileLoaderLoadException`, use `LoaderLoadException` instead.
  * Using environment variables with `cannotBeEmpty()` if the value is validated with `validate()` will throw an exception.
  * Removed the `root()` method in `TreeBuilder`, pass the root node information to the constructor instead
+ * The `FilerLoader::import()` method has a new `$exclude` argument.
 
 Console
 -------
@@ -411,6 +412,7 @@ Routing
    with the new serialization methods in PHP 7.4.
  * Removed `ServiceRouterLoader` and `ObjectRouteLoader`.
  * Service route loaders must be tagged with `routing.route_loader`.
+ * The `RoutingConfigurator::import()` method has a new optional `$exclude` argument.
 
 Security
 --------

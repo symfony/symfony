@@ -56,7 +56,7 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
                 return $value;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch key "{key}"', ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch key "{key}": '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
         }
 
         return $default;
@@ -90,7 +90,7 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
         try {
             $values = $this->doFetch($ids);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested values', ['keys' => $keys, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch values: '.$e->getMessage(), ['keys' => $keys, 'exception' => $e]);
             $values = [];
         }
         $ids = array_combine($ids, $keys);
@@ -129,7 +129,8 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
         foreach (\is_array($e) ? $e : array_keys($valuesById) as $id) {
             $keys[] = substr($id, \strlen($this->namespace));
         }
-        CacheItem::log($this->logger, 'Failed to save values', ['keys' => $keys, 'exception' => $e instanceof \Exception ? $e : null]);
+        $message = 'Failed to save values'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
+        CacheItem::log($this->logger, $message, ['keys' => $keys, 'exception' => $e instanceof \Exception ? $e : null]);
 
         return false;
     }
@@ -175,7 +176,7 @@ abstract class AbstractCache implements Psr16CacheInterface, LoggerAwareInterfac
                 yield $key => $value;
             }
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to fetch requested values', ['keys' => array_values($keys), 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to fetch values: '.$e->getMessage(), ['keys' => array_values($keys), 'exception' => $e]);
         }
 
         foreach ($keys as $key) {

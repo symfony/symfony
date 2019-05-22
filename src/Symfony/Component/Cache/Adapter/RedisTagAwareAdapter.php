@@ -198,7 +198,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             $info = $host->info('Server');
             $info = isset($info['Server']) ? $info['Server'] : $info;
             if (version_compare($info['redis_version'], '3.2', '<')) {
-                CacheItem::log($this->logger, 'Redis server needs to be version 3.2 or higher, your Redis server was detected as {version}', ['version' => $info['redis_version']]);
+                CacheItem::log($this->logger, 'Redis server needs to be version 3.2 or higher, your Redis server was detected as '.$info['redis_version']);
 
                 return $this->redisServerSupportSPOP = false;
             }

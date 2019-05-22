@@ -94,7 +94,7 @@ trait AbstractTrait
         try {
             return $this->doHave($id);
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached', ['key' => $key, 'exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to check if key "{key}" is cached: '.$e->getMessage(), ['key' => $key, 'exception' => $e]);
 
             return false;
         }
@@ -122,7 +122,7 @@ trait AbstractTrait
         try {
             return $this->doClear($this->namespace) || $cleared;
         } catch (\Exception $e) {
-            CacheItem::log($this->logger, 'Failed to clear the cache', ['exception' => $e]);
+            CacheItem::log($this->logger, 'Failed to clear the cache: '.$e->getMessage(), ['exception' => $e]);
 
             return false;
         }
@@ -166,7 +166,8 @@ trait AbstractTrait
                 }
             } catch (\Exception $e) {
             }
-            CacheItem::log($this->logger, 'Failed to delete key "{key}"', ['key' => $key, 'exception' => $e]);
+            $message = 'Failed to delete key "{key}"'.($e instanceof \Exception ? ': '.$e->getMessage() : '.');
+            CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
             $ok = false;
         }
 

@@ -304,6 +304,45 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
+    public function testApplyDoesNotTriggerExtraGuardWithEventDispatcher()
+    {
+        $transitions[] = new Transition('a-b', 'a', 'b');
+        $transitions[] = new Transition('a-c', 'a', 'c');
+        $definition = new Definition(['a', 'b', 'c'], $transitions);
+
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $eventNameExpected = [
+            'workflow.guard',
+            'workflow.workflow_name.guard',
+            'workflow.workflow_name.guard.a-b',
+            'workflow.leave',
+            'workflow.workflow_name.leave',
+            'workflow.workflow_name.leave.a',
+            'workflow.transition',
+            'workflow.workflow_name.transition',
+            'workflow.workflow_name.transition.a-b',
+            'workflow.enter',
+            'workflow.workflow_name.enter',
+            'workflow.workflow_name.enter.b',
+            'workflow.entered',
+            'workflow.workflow_name.entered',
+            'workflow.workflow_name.entered.b',
+            'workflow.completed',
+            'workflow.workflow_name.completed',
+            'workflow.workflow_name.completed.a-b',
+            'workflow.announce',
+            'workflow.workflow_name.announce',
+        ];
+
+        $marking = $workflow->apply($subject, 'a-b');
+
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+    }
+
     public function testEventName()
     {
         $definition = $this->createComplexWorkflowDefinition();

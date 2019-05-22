@@ -8,6 +8,7 @@ CHANGELOG
  * added the `compared_value_path` parameter in violations when using any 
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`
+ * added a new `allowEmptyString` option to the `Length` constraint to allow rejecting empty strings when `min` is set, by setting it to `false`.
 
 4.3.0
 -----

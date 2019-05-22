@@ -21,7 +21,7 @@ class LengthTest extends TestCase
 {
     public function testNormalizerCanBeSet()
     {
-        $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim']);
+        $length = new Length(['min' => 0, 'max' => 10, 'normalizer' => 'trim', 'allowEmptyString' => false]);
 
         $this->assertEquals('trim', $length->normalizer);
     }
@@ -32,7 +32,7 @@ class LengthTest extends TestCase
      */
     public function testInvalidNormalizerThrowsException()
     {
-        new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
+        new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable', 'allowEmptyString' => false]);
     }
 
     /**
@@ -41,6 +41,6 @@ class LengthTest extends TestCase
      */
     public function testInvalidNormalizerObjectThrowsException()
     {
-        new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
+        new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass(), 'allowEmptyString' => false]);
     }
 }

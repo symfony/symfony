@@ -38,6 +38,7 @@ trait RedisTrait
         'tcp_keepalive' => 0,
         'lazy' => null,
         'redis_cluster' => false,
+        'redis_sentinel' => null,
         'dbindex' => 0,
         'failover' => 'none',
     ];
@@ -146,9 +147,13 @@ trait RedisTrait
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
         }
 
+        if (isset($params['redis_sentinel']) && !class_exists(\Predis\Client::class)) {
+            throw new CacheException(sprintf('Redis Sentinel support requires the "predis/predis" package: %s', $dsn));
+        }
+
         $params += $query + $options + self::$defaultConnectionOptions;
 
-        if (null === $params['class'] && \extension_loaded('redis')) {
+        if (null === $params['class'] && !isset($params['redis_sentinel']) && \extension_loaded('redis')) {
             $class = $params['redis_cluster'] ? \RedisCluster::class : (1 < \count($hosts) ? \RedisArray::class : \Redis::class);
         } else {
             $class = null === $params['class'] ? \Predis\Client::class : $params['class'];
@@ -246,6 +251,12 @@ trait RedisTrait
         } elseif (is_a($class, \Predis\Client::class, true)) {
             if ($params['redis_cluster']) {
                 $params['cluster'] = 'redis';
+                if (isset($params['redis_sentinel'])) {
+                    throw new InvalidArgumentException(sprintf('Cannot use both "redis_cluster" and "redis_sentinel" at the same time: %s', $dsn));
+                }
+            } elseif (isset($params['redis_sentinel'])) {
+                $params['replication'] = 'sentinel';
+                $params['service'] = $params['redis_sentinel'];
             }
             $params += ['parameters' => []];
             $params['parameters'] += [
@@ -268,6 +279,9 @@ trait RedisTrait
             }
 
             $redis = new $class($hosts, array_diff_key($params, self::$defaultConnectionOptions));
+            if (isset($params['redis_sentinel'])) {
+                $redis->getConnection()->setSentinelTimeout($params['timeout']);
+            }
         } elseif (class_exists($class, false)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis", "RedisArray", "RedisCluster" nor "Predis\Client".', $class));
         } else {

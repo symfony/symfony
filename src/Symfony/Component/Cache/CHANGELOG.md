@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added support for connecting to Redis Sentinel clusters
+
 4.3.0
 -----
 

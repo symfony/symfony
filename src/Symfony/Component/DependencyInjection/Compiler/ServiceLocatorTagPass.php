@@ -48,6 +48,12 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             if (!$v instanceof Reference) {
                 throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, \is_object($v) ? \get_class($v) : \gettype($v), $k));
             }
+
+            if (\is_int($k)) {
+                unset($arguments[0][$k]);
+
+                $k = (string) $v;
+            }
             $arguments[0][$k] = new ServiceClosureArgument($v);
         }
         ksort($arguments[0]);
@@ -91,7 +97,11 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             ->setPublic(false)
             ->addTag('container.service_locator');
 
-        if (!$container->has($id = 'service_locator.'.ContainerBuilder::hash($locator))) {
+        if (null !== $callerId && $container->hasDefinition($callerId)) {
+            $locator->setBindings($container->getDefinition($callerId)->getBindings());
+        }
+
+        if (!$container->hasDefinition($id = 'service_locator.'.ContainerBuilder::hash($locator))) {
             $container->setDefinition($id, $locator);
         }
 

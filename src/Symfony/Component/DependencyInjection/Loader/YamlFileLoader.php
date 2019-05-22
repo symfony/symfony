@@ -574,27 +574,28 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a callable.
      *
-     * @param string|array $callable  A callable
-     * @param string       $parameter A parameter (e.g. 'factory' or 'configurator')
-     * @param string       $id        A service identifier
-     * @param string       $file      A parsed file
+     * @param string|array $callable  A callable reference
+     * @param string       $parameter The type of callable (e.g. 'factory' or 'configurator')
      *
      * @throws InvalidArgumentException When errors occur
      *
      * @return string|array|Reference A parsed callable
      */
-    private function parseCallable($callable, $parameter, $id, $file)
+    private function parseCallable($callable, string $parameter, string $id, string $file)
     {
         if (\is_string($callable)) {
             if ('' !== $callable && '@' === $callable[0]) {
                 if (false === strpos($callable, ':')) {
                     return [$this->resolveServices($callable, $file), '__invoke'];
                 }
-                throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $parameter, $id, $callable, substr($callable, 1)));
+
+                throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s" in "%s").', $parameter, $id, $callable, substr($callable, 1), $file));
             }
 
             if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
                 $parts = explode(':', $callable);
+
+                @trigger_error(sprintf('Using short %s syntax for service "%s" is deprecated since Symfony 4.4, use "[\'@%s\', \'%s\']" instead.', $parameter, $id, ...$parts), E_USER_DEPRECATED);
 
                 return [$this->resolveServices('@'.$parts[0], $file), $parts[1]];
             }

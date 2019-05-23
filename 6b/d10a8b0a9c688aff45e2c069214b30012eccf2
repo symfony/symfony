@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-21T16:56:27Z
+
+Shouldn't we contribute that change upstream? Because it will be lost next time we sync with the Apache list.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-21T17:40:37Z
+
+I agree, @ifaridjalilov here are the two files we use as a source
+https://github.com/minad/mimemagic/blob/master/script/freedesktop.org.xml
+and
+https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
+Could you submit this update there please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-22T13:17:19Z
+
+@fabpot I just ran the `update_mime_types.php` and the additions were not removed, so this is safe.

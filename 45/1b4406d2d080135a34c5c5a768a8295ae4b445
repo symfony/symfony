@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-05-23T14:44:47Z
+
+Looks good indeed, but this should go to 4.2 where the bug was introduced (https://github.com/symfony/symfony/pull/28375)

@@ -738,7 +738,7 @@ class FrameworkExtension extends Extension
                 }
 
                 if (!class_exists(Security::class)) {
-                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
+                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security-core".');
                 }
 
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);

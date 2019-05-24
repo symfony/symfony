@@ -61,14 +61,14 @@ class CurlHttpClientTest extends HttpClientTestCase
         $js->getHeaders();
 
         $expected = [
-            'Request: GET https://http2-push.io/',
-            'Queueing pushed response: https://http2-push.io/css/style.css',
-            'Queueing pushed response: https://http2-push.io/js/http2-push.js',
-            'Response: 200 https://http2-push.io/',
-            'Connecting request to pushed response: GET https://http2-push.io/css/style.css',
-            'Connecting request to pushed response: GET https://http2-push.io/js/http2-push.js',
-            'Response: 200 https://http2-push.io/css/style.css',
-            'Response: 200 https://http2-push.io/js/http2-push.js',
+            'Request: "GET https://http2-push.io/"',
+            'Queueing pushed response: "https://http2-push.io/css/style.css"',
+            'Queueing pushed response: "https://http2-push.io/js/http2-push.js"',
+            'Response: "200 https://http2-push.io/"',
+            'Connecting request to pushed response: "GET https://http2-push.io/css/style.css"',
+            'Connecting request to pushed response: "GET https://http2-push.io/js/http2-push.js"',
+            'Response: "200 https://http2-push.io/css/style.css"',
+            'Response: "200 https://http2-push.io/js/http2-push.js"',
         ];
         $this->assertSame($expected, $logger->logs);
     }

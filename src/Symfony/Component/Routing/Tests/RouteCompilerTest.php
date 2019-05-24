@@ -84,7 +84,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with several variables but some of them have no default values',
                 ['/foo/{bar}/{foobar}', ['bar' => 'bar']],
-                '/foo', '#^/foo/(?P<bar>[^/]++)/(?P<foobar>[^/]++)$#sD', ['bar', 'foobar'], [
+                '/foo', '#^/foo(?:/(?P<bar>[^/]++)(?:/(?P<foobar>[^/]++))?)?$#sD', ['bar', 'foobar'], [
                     ['variable', '/', '[^/]++', 'foobar'],
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
@@ -94,7 +94,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an optional variable as the first segment',
                 ['/{bar}', ['bar' => 'bar']],
-                '', '#^/(?P<bar>[^/]++)?$#sD', ['bar'], [
+                '', '#^(?:/(?P<bar>[^/]++))?$#sD', ['bar'], [
                     ['variable', '/', '[^/]++', 'bar'],
                 ],
             ],
@@ -102,7 +102,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with a requirement of 0',
                 ['/{bar}', ['bar' => null], ['bar' => '0']],
-                '', '#^/(?P<bar>0)?$#sD', ['bar'], [
+                '', '#^(?:/(?P<bar>0))?$#sD', ['bar'], [
                     ['variable', '/', '0', 'bar'],
                 ],
             ],
@@ -110,7 +110,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an optional variable as the first segment with requirements',
                 ['/{bar}', ['bar' => 'bar'], ['bar' => '(foo|bar)']],
-                '', '#^/(?P<bar>(?:foo|bar))?$#sD', ['bar'], [
+                '', '#^(?:/(?P<bar>(?:foo|bar)))?$#sD', ['bar'], [
                     ['variable', '/', '(?:foo|bar)', 'bar'],
                 ],
             ],
@@ -118,7 +118,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with only optional variables',
                 ['/{foo}/{bar}', ['foo' => 'foo', 'bar' => 'bar']],
-                '', '#^/(?P<foo>[^/]++)?(?:/(?P<bar>[^/]++))?$#sD', ['foo', 'bar'], [
+                '', '#^(?:/(?P<foo>[^/]++))?(?:/(?P<bar>[^/]++))?$#sD', ['foo', 'bar'], [
                     ['variable', '/', '[^/]++', 'bar'],
                     ['variable', '/', '[^/]++', 'foo'],
                 ],
@@ -176,10 +176,22 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an explicit UTF-8 requirement',
                 ['/{bar}', ['bar' => null], ['bar' => '.'], ['utf8' => true]],
-                '', '#^/(?P<bar>.)?$#sDu', ['bar'], [
+                '', '#^(?:/(?P<bar>.))?$#sDu', ['bar'], [
                     ['variable', '/', '.', 'bar', true],
                 ],
             ],
+
+            [// $name, $arguments, $prefix, $regex, $variables, $tokens
+                'Route with an optional variable as the first segment with extra segments',
+                ['/{foo}/bar', ['foo' => 'footest']],
+                '',
+                '#^(?:/(?P<foo>[^/]++))?/bar$#sD',
+                ['foo'],
+                [
+                    ['text', '/bar'],
+                    ['variable', '/', '[^/]++', 'foo'],
+                ],
+            ]
         ];
     }
 

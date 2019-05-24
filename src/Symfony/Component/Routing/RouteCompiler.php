@@ -207,7 +207,7 @@ class RouteCompiler implements RouteCompilerInterface
                 if ('variable' === $token[0] && !($token[5] ?? false) && $route->hasDefault($token[3])) {
                     $firstOptional = $i;
                 } else {
-                    break;
+                    continue;
                 }
             }
         }
@@ -292,25 +292,21 @@ class RouteCompiler implements RouteCompilerInterface
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
             // Variable tokens
-            if (0 === $index && 0 === $firstOptional) {
-                // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
-            } else {
-                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
-                if ($index >= $firstOptional) {
-                    // Enclose each optional token in a subpattern to make it optional.
-                    // "?:" means it is non-capturing, i.e. the portion of the subject string that
-                    // matched the optional subpattern is not passed back.
-                    $regexp = "(?:$regexp";
-                    $nbTokens = \count($tokens);
-                    if ($nbTokens - 1 == $index) {
-                        // Close the optional subpatterns
-                        $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
-                    }
+            $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+            if ($index >= $firstOptional) {
+                // Enclose each optional token in a subpattern to make it optional.
+                // "?:" means it is non-capturing, i.e. the portion of the subject string that
+                // matched the optional subpattern is not passed back.
+                $regexp = "(?:$regexp";
+                $nbTokens = \count($tokens);
+                if ($nbTokens - 1 == $index || $firstOptional === 0) {
+                    // Close the optional subpatterns
+                    $repeat = $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0);
+                    $regexp .= str_repeat(')?', $repeat === 0 ? 1 : $repeat);
                 }
-
-                return $regexp;
             }
+
+            return $regexp;
         }
     }
 

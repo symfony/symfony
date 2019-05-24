@@ -198,32 +198,22 @@ class RouteCompiler implements RouteCompilerInterface
             $tokens[] = ['text', substr($pattern, $pos)];
         }
 
-        // find the first & rest of the optional tokens
-        $firstOptional = null;
+        // find all of the optional tokens
         $optionalParameters = [];
         if (!$isHost) {
             for ($i = \count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
                 // variable is optional when it is not important and has a default value
                 if ('variable' === $token[0] && !($token[5] ?? false) && $route->hasDefault($token[3])) {
-                    if (is_null($firstOptional)) {
-                        $firstOptional = $i;
-                    }
-
                     $optionalParameters[] = $i;
                 }
             }
         }
 
-        // If there were no first optionals then set to max
-        if (is_null($firstOptional)) {
-            $firstOptional = PHP_INT_MAX;
-        }
-
         // compute the matching regexp
         $regexp = '';
         for ($i = 0, $nbToken = \count($tokens); $i < $nbToken; ++$i) {
-            $regexp .= self::computeRegexp($tokens, $i, in_array($i, $optionalParameters));
+            $regexp .= self::computeRegexp($tokens, $i, \in_array($i, $optionalParameters));
         }
         $regexp = self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'sD'.($isHost ? 'i' : '');
 
@@ -288,7 +278,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @param array $tokens        The route tokens
      * @param int   $index         The index of the current token
-     * @param bool   $isOptional Whether the index is optional or not
+     * @param bool  $isOptional    Whether the index is optional or not
      *
      * @return string The regexp pattern for a single token
      */
@@ -300,7 +290,7 @@ class RouteCompiler implements RouteCompilerInterface
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
             // Variable tokens
-            if ($index === 0 && $isOptional && \count($tokens) === 1) {
+            if (0 === $index && $isOptional && 1 === \count($tokens)) {
                 // When the only token is an optional variable token, the separator is required
                 return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
             }

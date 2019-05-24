@@ -338,6 +338,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         return [
             ['/var/www/var/www/files/foo.txt', '/var/www/=/files/', '/files/var/www/files/foo.txt'],
             ['/home/foo/bar.txt', '/var/www/=/files/,/home/foo/=/baz/', '/baz/bar.txt'],
+            ['/tmp/bar.txt', '"/var/www/"="/files/", "/home/Foo/"="/baz/"', null],
         ];
     }
 

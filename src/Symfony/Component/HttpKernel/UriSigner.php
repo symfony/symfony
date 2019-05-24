@@ -75,7 +75,7 @@ class UriSigner
         $hash = urlencode($params['_hash']);
         unset($params['_hash']);
 
-        return $this->computeHash($this->buildUrl($url, $params)) === $hash;
+        return hash_equals($this->computeHash($this->buildUrl($url, $params)), $hash);
     }
 
     private function computeHash($uri)

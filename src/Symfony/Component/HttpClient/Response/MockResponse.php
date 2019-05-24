@@ -25,7 +25,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 class MockResponse implements ResponseInterface
 {
-    use ResponseTrait;
+    use ResponseTrait {
+        doDestruct as public __destruct;
+    }
 
     private $body;
     private $requestOptions = [];
@@ -162,8 +164,8 @@ class MockResponse implements ResponseInterface
                     $offset = 0;
                     $chunk[1]->getStatusCode();
                     $response->headers = $chunk[1]->getHeaders(false);
-                    $multi->handlesActivity[$id][] = new FirstChunk();
                     self::readResponse($response, $chunk[0], $chunk[1], $offset);
+                    $multi->handlesActivity[$id][] = new FirstChunk();
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[$id][] = null;
                     $multi->handlesActivity[$id][] = $e;

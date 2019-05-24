@@ -34,69 +34,74 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $parameters = $container->getParameterBag()->all();
+        $parameterBag = $container->getParameterBag();
+        $parameters = $parameterBag->all();
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
         $exprLangProviders = $container->getExpressionLanguageProviders();
         $configAvailable = class_exists(BaseNode::class);
 
-        foreach ($container->getExtensions() as $extension) {
-            if ($extension instanceof PrependExtensionInterface) {
-                $extension->prepend($container);
-            }
+        if ($configAvailable && $parameterBag instanceof EnvPlaceholderParameterBag) {
+            BaseNode::setPlaceholderUniquePrefix($parameterBag->getEnvPlaceholderUniquePrefix());
         }
 
-        foreach ($container->getExtensions() as $name => $extension) {
-            if (!$config = $container->getExtensionConfig($name)) {
-                // this extension was not called
-                continue;
-            }
-            $resolvingBag = $container->getParameterBag();
-            if ($resolvingBag instanceof EnvPlaceholderParameterBag && $extension instanceof Extension) {
-                // create a dedicated bag so that we can track env vars per-extension
-                $resolvingBag = new MergeExtensionConfigurationParameterBag($resolvingBag);
-                if ($configAvailable) {
-                    BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
+        try {
+            foreach ($container->getExtensions() as $extension) {
+                if ($extension instanceof PrependExtensionInterface) {
+                    $extension->prepend($container);
                 }
             }
-            $config = $resolvingBag->resolveValue($config);
 
-            try {
-                $tmpContainer = new MergeExtensionConfigurationContainerBuilder($extension, $resolvingBag);
-                $tmpContainer->setResourceTracking($container->isTrackingResources());
-                $tmpContainer->addObjectResource($extension);
-                if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
-                    $tmpContainer->addObjectResource($configuration);
+            foreach ($container->getExtensions() as $name => $extension) {
+                if (!$config = $container->getExtensionConfig($name)) {
+                    // this extension was not called
+                    continue;
+                }
+                if ($parameterBag instanceof EnvPlaceholderParameterBag && $extension instanceof Extension) {
+                    // create a dedicated bag so that we can track env vars per-extension
+                    $resolvingBag = new MergeExtensionConfigurationParameterBag($parameterBag);
+                } else {
+                    $resolvingBag = $parameterBag;
+                }
+                $config = $parameterBag->resolveValue($config);
+
+                try {
+                    $tmpContainer = new MergeExtensionConfigurationContainerBuilder($extension, $resolvingBag);
+                    $tmpContainer->setResourceTracking($container->isTrackingResources());
+                    $tmpContainer->addObjectResource($extension);
+                    if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
+                        $tmpContainer->addObjectResource($configuration);
+                    }
+
+                    foreach ($exprLangProviders as $provider) {
+                        $tmpContainer->addExpressionLanguageProvider($provider);
+                    }
+
+                    $extension->load($config, $tmpContainer);
+                } catch (\Exception $e) {
+                    if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
+                        $parameterBag->mergeEnvPlaceholders($resolvingBag);
+                    }
+
+                    throw $e;
                 }
 
-                foreach ($exprLangProviders as $provider) {
-                    $tmpContainer->addExpressionLanguageProvider($provider);
-                }
-
-                $extension->load($config, $tmpContainer);
-            } catch (\Exception $e) {
                 if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
-                    $container->getParameterBag()->mergeEnvPlaceholders($resolvingBag);
+                    // don't keep track of env vars that are *overridden* when configs are merged
+                    $resolvingBag->freezeAfterProcessing($extension, $tmpContainer);
                 }
 
-                throw $e;
-            } finally {
-                if ($configAvailable) {
-                    BaseNode::resetPlaceholders();
-                }
+                $container->merge($tmpContainer);
+                $parameterBag->add($parameters);
             }
 
-            if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
-                // don't keep track of env vars that are *overridden* when configs are merged
-                $resolvingBag->freezeAfterProcessing($extension, $tmpContainer);
+            $container->addDefinitions($definitions);
+            $container->addAliases($aliases);
+        } finally {
+            if ($configAvailable) {
+                BaseNode::resetPlaceholders();
             }
-
-            $container->merge($tmpContainer);
-            $container->getParameterBag()->add($parameters);
         }
-
-        $container->addDefinitions($definitions);
-        $container->addAliases($aliases);
     }
 }
 

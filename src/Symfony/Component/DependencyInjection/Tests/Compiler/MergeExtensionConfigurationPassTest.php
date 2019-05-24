@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationCo
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class MergeExtensionConfigurationPassTest extends TestCase
@@ -74,7 +75,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     public function testExtensionConfigurationIsTrackedByDefault()
     {
         $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
-        $extension->expects($this->exactly(2))
+        $extension->expects($this->exactly(3))
             ->method('getConfiguration')
             ->will($this->returnValue(new FooConfiguration()));
 
@@ -98,8 +99,8 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass = new MergeExtensionConfigurationPass();
         $pass->process($container);
 
-        $this->assertSame(['BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
-        $this->assertSame(['BAZ' => 1, 'FOO' => 0], $container->getEnvCounters());
+        $this->assertSame(['BAR', 'BAZ', 'FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
+        $this->assertSame(['BAZ' => 1, 'BAR' => 0, 'FOO' => 0], $container->getEnvCounters());
     }
 
     /**
@@ -130,6 +131,17 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $this->assertSame(['FOO'], array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
+
+    public function testEnvPlaceholdersAreSetDuringPrepend()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new FooExtension());
+        $container->prependExtensionConfig('foo', ['int' => '%env(int:FOOBAR)%']);
+
+        (new MergeExtensionConfigurationPass())->process($container);
+
+        $this->addToAssertionCount(1);
+    }
 }
 
 class FooConfiguration implements ConfigurationInterface
@@ -141,13 +153,14 @@ class FooConfiguration implements ConfigurationInterface
             ->children()
                 ->scalarNode('bar')->end()
                 ->scalarNode('baz')->end()
+                ->integerNode('int')->end()
             ->end();
 
         return $treeBuilder;
     }
 }
 
-class FooExtension extends Extension
+class FooExtension extends Extension implements PrependExtensionInterface
 {
     public function getAlias()
     {
@@ -168,6 +181,15 @@ class FooExtension extends Extension
             $container->getParameterBag()->get('env(BOZ)');
             $container->resolveEnvPlaceholders($config['baz']);
         }
+    }
+
+    public function prepend(ContainerBuilder $container)
+    {
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $configs = $container->getParameterBag()->resolveValue($configs);
+        $configuration = $this->getConfiguration($configs, $container);
+
+        $this->processConfiguration($configuration, $configs);
     }
 }
 

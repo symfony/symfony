@@ -198,24 +198,32 @@ class RouteCompiler implements RouteCompilerInterface
             $tokens[] = ['text', substr($pattern, $pos)];
         }
 
-        // find the first optional token
-        $firstOptional = PHP_INT_MAX;
+        // find the first & rest of the optional tokens
+        $firstOptional = null;
+        $optionalParameters = [];
         if (!$isHost) {
             for ($i = \count($tokens) - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
                 // variable is optional when it is not important and has a default value
                 if ('variable' === $token[0] && !($token[5] ?? false) && $route->hasDefault($token[3])) {
-                    $firstOptional = $i;
-                } else {
-                    continue;
+                    if (is_null($firstOptional)) {
+                        $firstOptional = $i;
+                    }
+
+                    $optionalParameters[] = $i;
                 }
             }
+        }
+
+        // If there were no first optionals then set to max
+        if (is_null($firstOptional)) {
+            $firstOptional = PHP_INT_MAX;
         }
 
         // compute the matching regexp
         $regexp = '';
         for ($i = 0, $nbToken = \count($tokens); $i < $nbToken; ++$i) {
-            $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
+            $regexp .= self::computeRegexp($tokens, $i, in_array($i, $optionalParameters));
         }
         $regexp = self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'sD'.($isHost ? 'i' : '');
 
@@ -280,11 +288,11 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @param array $tokens        The route tokens
      * @param int   $index         The index of the current token
-     * @param int   $firstOptional The index of the first optional token
+     * @param bool   $isOptional Whether the index is optional or not
      *
      * @return string The regexp pattern for a single token
      */
-    private static function computeRegexp(array $tokens, int $index, int $firstOptional): string
+    private static function computeRegexp(array $tokens, int $index, bool $isOptional): string
     {
         $token = $tokens[$index];
         if ('text' === $token[0]) {
@@ -292,18 +300,20 @@ class RouteCompiler implements RouteCompilerInterface
             return preg_quote($token[1], self::REGEX_DELIMITER);
         } else {
             // Variable tokens
+            if ($index === 0 && $isOptional && \count($tokens) === 1) {
+                // When the only token is an optional variable token, the separator is required
+                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
+            }
+
             $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
-            if ($index >= $firstOptional) {
+
+            if ($isOptional) {
                 // Enclose each optional token in a subpattern to make it optional.
                 // "?:" means it is non-capturing, i.e. the portion of the subject string that
                 // matched the optional subpattern is not passed back.
                 $regexp = "(?:$regexp";
-                $nbTokens = \count($tokens);
-                if ($nbTokens - 1 == $index || $firstOptional === 0) {
-                    // Close the optional subpatterns
-                    $repeat = $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0);
-                    $regexp .= str_repeat(')?', $repeat === 0 ? 1 : $repeat);
-                }
+                // Close the optional subpatterns
+                $regexp .= ')?';
             }
 
             return $regexp;

@@ -74,7 +74,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with several variables that have default values',
                 ['/foo/{bar}/{foobar}', ['bar' => 'bar', 'foobar' => '']],
-                '/foo', '#^/foo(?:/(?P<bar>[^/]++)(?:/(?P<foobar>[^/]++))?)?$#sD', ['bar', 'foobar'], [
+                '/foo', '#^/foo(?:/(?P<bar>[^/]++))?(?:/(?P<foobar>[^/]++))?$#sD', ['bar', 'foobar'], [
                     ['variable', '/', '[^/]++', 'foobar'],
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
@@ -84,7 +84,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with several variables but some of them have no default values',
                 ['/foo/{bar}/{foobar}', ['bar' => 'bar']],
-                '/foo', '#^/foo(?:/(?P<bar>[^/]++)(?:/(?P<foobar>[^/]++))?)?$#sD', ['bar', 'foobar'], [
+                '/foo', '#^/foo(?:/(?P<bar>[^/]++))?/(?P<foobar>[^/]++)$#sD', ['bar', 'foobar'], [
                     ['variable', '/', '[^/]++', 'foobar'],
                     ['variable', '/', '[^/]++', 'bar'],
                     ['text', '/foo'],
@@ -94,7 +94,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an optional variable as the first segment',
                 ['/{bar}', ['bar' => 'bar']],
-                '', '#^(?:/(?P<bar>[^/]++))?$#sD', ['bar'], [
+                '', '#^/(?P<bar>[^/]++)?$#sD', ['bar'], [
                     ['variable', '/', '[^/]++', 'bar'],
                 ],
             ],
@@ -102,7 +102,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with a requirement of 0',
                 ['/{bar}', ['bar' => null], ['bar' => '0']],
-                '', '#^(?:/(?P<bar>0))?$#sD', ['bar'], [
+                '', '#^/(?P<bar>0)?$#sD', ['bar'], [
                     ['variable', '/', '0', 'bar'],
                 ],
             ],
@@ -110,7 +110,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an optional variable as the first segment with requirements',
                 ['/{bar}', ['bar' => 'bar'], ['bar' => '(foo|bar)']],
-                '', '#^(?:/(?P<bar>(?:foo|bar)))?$#sD', ['bar'], [
+                '', '#^/(?P<bar>(?:foo|bar))?$#sD', ['bar'], [
                     ['variable', '/', '(?:foo|bar)', 'bar'],
                 ],
             ],
@@ -146,7 +146,7 @@ class RouteCompilerTest extends TestCase
             [
                 'Route without separator between variables',
                 ['/{w}{x}{y}{z}.{_format}', ['z' => 'default-z', '_format' => 'html'], ['y' => '(y|Y)']],
-                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(?:y|Y))(?:(?P<z>[^/\.]++)(?:\.(?P<_format>[^/]++))?)?$#sD', ['w', 'x', 'y', 'z', '_format'], [
+                '', '#^/(?P<w>[^/\.]+)(?P<x>[^/\.]+)(?P<y>(?:y|Y))(?:(?P<z>[^/\.]++))?(?:\.(?P<_format>[^/]++))?$#sD', ['w', 'x', 'y', 'z', '_format'], [
                     ['variable', '.', '[^/]++', '_format'],
                     ['variable', '', '[^/\.]++', 'z'],
                     ['variable', '', '(?:y|Y)', 'y'],
@@ -176,12 +176,12 @@ class RouteCompilerTest extends TestCase
             [
                 'Route with an explicit UTF-8 requirement',
                 ['/{bar}', ['bar' => null], ['bar' => '.'], ['utf8' => true]],
-                '', '#^(?:/(?P<bar>.))?$#sDu', ['bar'], [
+                '', '#^/(?P<bar>.)?$#sDu', ['bar'], [
                     ['variable', '/', '.', 'bar', true],
                 ],
             ],
 
-            [// $name, $arguments, $prefix, $regex, $variables, $tokens
+            [
                 'Route with an optional variable as the first segment with extra segments',
                 ['/{foo}/bar', ['foo' => 'footest']],
                 '',
@@ -191,7 +191,20 @@ class RouteCompilerTest extends TestCase
                     ['text', '/bar'],
                     ['variable', '/', '[^/]++', 'foo'],
                 ],
-            ]
+            ],
+
+            [
+                'Route with an optional variable as the first segment with extra segments and more placeholder segments',
+                ['/{foo}/bar/{another}', ['foo' => 'footest']],
+                '',
+                '#^(?:/(?P<foo>[^/]++))?/bar/(?P<another>[^/]++)$#sD',
+                ['foo', 'another'],
+                [
+                    ['variable', '/', '[^/]++', 'another'],
+                    ['text', '/bar'],
+                    ['variable', '/', '[^/]++', 'foo'],
+                ],
+            ],
         ];
     }
 

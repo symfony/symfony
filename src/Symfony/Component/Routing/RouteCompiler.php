@@ -276,9 +276,9 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * Computes the regexp used to match a specific token. It can be static text or a subpattern.
      *
-     * @param array $tokens        The route tokens
-     * @param int   $index         The index of the current token
-     * @param bool  $isOptional    Whether the index is optional or not
+     * @param array $tokens     The route tokens
+     * @param int   $index      The index of the current token
+     * @param bool  $isOptional Whether the index is optional or not
      *
      * @return string The regexp pattern for a single token
      */

@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-05-24T06:43:12Z
+
+Thanks for contributing this! I like the idea. I just think we should summarize the current document to only display the important info: how to report vulnerabilities and what happens next.
+
+About reporting security issues, we'll need to decide if we keep using "the Symfony way" or use the new "GitHub way" explained in https://help.github.com/en/articles/creating-a-maintainer-security-advisory
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-24T07:16:45Z
+
+I don't think we want to maintain the same document at two different places. So, what about just adding a link to our documentation about security?
+
+Also, I don't want to become more tied to Github for our security releases. So, I don't think we want to use the Github way.
+
+---------------------------------------------------------------------------
+
+by ricknox at 2019-05-24T07:20:18Z
+
+> Thanks for contributing this! I like the idea. I just think we should summarize the current document to only display the important info: how to report vulnerabilities and what happens next.
+
+Yes, this should be a dummy file. That is why I propose to remove a lot of steps and instead only refer to the documentation (symfony/symfony-docs contributing/code/security.rst) or a link to the live version: https://symfony.com/doc/current/contributing/code/security.html.
+
+> About reporting security issues, we'll need to decide if we keep using "the Symfony way" or use the new "GitHub way" explained in https://help.github.com/en/articles/creating-a-maintainer-security-advisory
+
+Unfortunately I cannot decide on that. WDYT @fabpot?
+Edit: Relaying too much on Github will have irreversible consequences in the future. I agree we should not use the Github methods.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-24T09:23:34Z
+
+I would add one more line at the beginning, e.g.:
+
+```
+If you found any issues that might have security implications,
+please send a report to security[at]symfony.com
+DO NOT PUBLISH SECURITY REPORTS PUBLICLY
+```
+
+---------------------------------------------------------------------------
+
+by ricknox at 2019-05-24T09:57:19Z
+
+@nicolas-grekas Done in b7d8245aab4b0275d752becd4d8a821c75eb5011.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-24T09:59:57Z
+
+Content looks good now.
+
+But, do we really need that? It is one more file at the top of the file hierarchy... and we need to duplicate it for all subtree-splits. Not convinced we want to go down this route.
+
+---------------------------------------------------------------------------
+
+by ricknox at 2019-05-24T10:13:35Z
+
+> But, do we really need that? It is one more file at the top of the file hierarchy... and we need to duplicate it for all subtree-splits. Not convinced we want to go down this route.
+
+Like I said on Slack yesterday; It is a well-intended suggested addition. It's not up to me to decide that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-24T10:13:50Z
+
+> we need to duplicate it for all subtree-splits
+
+actually, maybe not, since the "issues" tab is disabled on splits, and their readme point to this repo.
+If we don't add that file, it will come up regularly...
+
+Can we add this file to the .github directory instead?
+
+---------------------------------------------------------------------------
+
+by ricknox at 2019-05-24T10:18:36Z
+
+> Can we add this file to the .github directory instead?
+
+>> [..] To give people instructions for responsibly reporting security vulnerabilities in your project, you can add a SECURITY.md file to your repository's root, docs, or .github folder. [..].
+
+I just read their FAQ and yes, we could and should move this to the `.github` folder.
+Edit: done in caef84214fa0bb71750f0c96ff4065cc7a0df5d4.

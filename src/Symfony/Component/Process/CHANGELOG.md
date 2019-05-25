@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * deprecated returning a validated input from `Process::getInput()`
+ * added `Process::getValidatedInput()`
+ * added `Process::getOriginalInput()` to be able to get the original input and deprecated in favor or `Process::getInput` in Symfony 5.0
+
 4.2.0
 -----
 

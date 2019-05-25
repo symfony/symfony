@@ -55,6 +55,7 @@ class Process implements \IteratorAggregate
     private $cwd;
     private $env;
     private $input;
+    private $originalInput;
     private $starttime;
     private $lastOutputTime;
     private $timeout;
@@ -1175,6 +1176,18 @@ class Process implements \IteratorAggregate
      */
     public function getInput()
     {
+        @trigger_error(sprintf('The %s::getInput will return the given input in Symfony 5.0, use %s::getValidatedInput() instead.', __CLASS__, __CLASS__), E_USER_DEPRECATED);
+
+        return $this->input;
+    }
+
+    public function getOriginalInput()
+    {
+        return $this->originalInput;
+    }
+
+    public function getValidatedInput()
+    {
         return $this->input;
     }
 
@@ -1194,6 +1207,8 @@ class Process implements \IteratorAggregate
         if ($this->isRunning()) {
             throw new LogicException('Input can not be set while the process is running.');
         }
+
+        $this->originalInput = $input;
 
         $this->input = ProcessUtils::validateInput(__METHOD__, $input);
 

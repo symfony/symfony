@@ -322,7 +322,26 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('foo');
         $process->setInput($value);
-        $this->assertSame($expected, $process->getInput());
+        $this->assertSame($expected, $process->getValidatedInput());
+    }
+
+    public function testSetAndGetOriginalInput()
+    {
+        $process = $this->getProcess('foo');
+        $process->setInput('test');
+        $this->assertSame('test', $process->getOriginalInput());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\Process\Process::getInput will return the given input in Symfony 5.0, use Symfony\Component\Process\Process::getValidatedInput() instead.
+     */
+    public function testGetInput()
+    {
+        $process = $this->getProcess('foo');
+        $inputStream = new InputStream();
+        $process->setInput($inputStream);
+        $this->assertNotSame($inputStream, $process->getInput());
     }
 
     public function provideInputValues()

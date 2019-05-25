@@ -146,6 +146,9 @@
             <tr>
                 <td class="font-normal">
                     <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
+                    {% if collector.symfonylts %}
+                        &nbsp; <span class="label status-success">Long-Term Support</span>
+                    {% endif %}
                 </td>
                 <td class="font-normal">{{ collector.symfonyeom }}</td>
                 <td class="font-normal">{{ collector.symfonyeol }}</td>

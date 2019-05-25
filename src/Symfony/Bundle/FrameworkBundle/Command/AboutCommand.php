@@ -65,6 +65,7 @@ EOT
             ['<info>Symfony</>'],
             new TableSeparator(),
             ['Version', Kernel::VERSION],
+            ['Long-Term Support', 4 === Kernel::MINOR_VERSION ? 'Yes' : 'No'],
             ['End of maintenance', Kernel::END_OF_MAINTENANCE.(self::isExpired(Kernel::END_OF_MAINTENANCE) ? ' <error>Expired</>' : '')],
             ['End of life', Kernel::END_OF_LIFE.(self::isExpired(Kernel::END_OF_LIFE) ? ' <error>Expired</>' : '')],
             new TableSeparator(),

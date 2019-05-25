@@ -83,6 +83,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
 
             $this->data['symfony_state'] = $this->determineSymfonyState();
             $this->data['symfony_minor_version'] = sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION);
+            $this->data['symfony_lts'] = 4 === Kernel::MINOR_VERSION;
             $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE);
             $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE);
             $this->data['symfony_eom'] = $eom->format('F Y');
@@ -167,6 +168,14 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function getSymfonyMinorVersion()
     {
         return $this->data['symfony_minor_version'];
+    }
+
+    /**
+     * Returns if the current Symfony version is a Long-Term Support one.
+     */
+    public function isSymfonyLts(): bool
+    {
+        return $this->data['symfony_lts'];
     }
 
     /**

@@ -274,4 +274,24 @@ class Question
     {
         return (bool) \count(array_filter(array_keys($array), 'is_string'));
     }
+
+    /**
+     * @return $this
+     */
+    public function setQuestion(string $question): Question
+    {
+        $this->question = $question;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setDefault($default = null): Question
+    {
+        $this->default = $default;
+
+        return $this;
+    }
 }

@@ -301,4 +301,14 @@ class QuestionTest extends TestCase
     {
         self::assertNull($this->question->getNormalizer());
     }
+
+    public function testSetQuestion()
+    {
+        self::assertSame($this->question->setQuestion('test')->getQuestion(), 'test');
+    }
+
+    public function testSetDefault()
+    {
+        self::assertSame($this->question->setDefault('test')->getDefault(), 'test');
+    }
 }

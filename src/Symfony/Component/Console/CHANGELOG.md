@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added `Question::setQuestion` and `Question::setDefault` to be able to set them directly
+ 
 4.3.0
 -----
 

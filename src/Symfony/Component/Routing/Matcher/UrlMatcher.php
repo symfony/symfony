@@ -256,7 +256,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function mergeDefaults($params, $defaults)
     {
         foreach ($params as $key => $value) {
-            if (!\is_int($key) && null !== $value) {
+            if (!\is_int($key) && null !== $value && '' !== $value) {
                 $defaults[$key] = $value;
             }
         }

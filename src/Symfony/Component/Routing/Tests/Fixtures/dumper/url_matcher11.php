@@ -16,51 +16,51 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $this->context = $context;
         $this->regexpList = [
             0 => '{^(?'
-                    .'|/(en|fr)/(?'
+                    .'|(?:/(en|fr))?/(?'
                         .'|admin/post(?'
-                            .'|(*:32)'
+                            .'|(*:37)'
                             .'|/(?'
-                                .'|new(*:46)'
-                                .'|(\\d+)(*:58)'
-                                .'|(\\d+)/edit(*:75)'
-                                .'|(\\d+)/delete(*:94)'
+                                .'|new(*:51)'
+                                .'|(\\d+)(*:63)'
+                                .'|(\\d+)/edit(*:80)'
+                                .'|(\\d+)/delete(*:99)'
                             .')'
                         .')'
                         .'|blog(?'
-                            .'|(*:110)'
+                            .'|(*:115)'
                             .'|/(?'
-                                .'|rss\\.xml(*:130)'
+                                .'|rss\\.xml(*:135)'
                                 .'|p(?'
-                                    .'|age/([^/]++)(*:154)'
-                                    .'|osts/([^/]++)(*:175)'
+                                    .'|age/([^/]++)(*:159)'
+                                    .'|osts/([^/]++)(*:180)'
                                 .')'
-                                .'|comments/(\\d+)/new(*:202)'
-                                .'|search(*:216)'
+                                .'|comments/(\\d+)/new(*:207)'
+                                .'|search(*:221)'
                             .')'
                         .')'
                         .'|log(?'
-                            .'|in(*:234)'
-                            .'|out(*:245)'
+                            .'|in(*:239)'
+                            .'|out(*:250)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:264)'
+                    .'|/(en|fr)?(*:269)'
                 .')/?$}sD',
         ];
         $this->dynamicRoutes = [
-            32 => [[['_route' => 'a', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
-            46 => [[['_route' => 'b', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
-            58 => [[['_route' => 'c', '_locale' => 'en'], ['_locale', 'id'], null, null, false, true, null]],
-            75 => [[['_route' => 'd', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
-            94 => [[['_route' => 'e', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
-            110 => [[['_route' => 'f', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
-            130 => [[['_route' => 'g', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
-            154 => [[['_route' => 'h', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
-            175 => [[['_route' => 'i', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
-            202 => [[['_route' => 'j', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
-            216 => [[['_route' => 'k', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
-            234 => [[['_route' => 'l', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
-            245 => [[['_route' => 'm', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
-            264 => [
+            37 => [[['_route' => 'a', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
+            51 => [[['_route' => 'b', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            63 => [[['_route' => 'c', '_locale' => 'en'], ['_locale', 'id'], null, null, false, true, null]],
+            80 => [[['_route' => 'd', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            99 => [[['_route' => 'e', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            115 => [[['_route' => 'f', '_locale' => 'en'], ['_locale'], null, null, true, false, null]],
+            135 => [[['_route' => 'g', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            159 => [[['_route' => 'h', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
+            180 => [[['_route' => 'i', '_locale' => 'en'], ['_locale', 'page'], null, null, false, true, null]],
+            207 => [[['_route' => 'j', '_locale' => 'en'], ['_locale', 'id'], null, null, false, false, null]],
+            221 => [[['_route' => 'k', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            239 => [[['_route' => 'l', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            250 => [[['_route' => 'm', '_locale' => 'en'], ['_locale'], null, null, false, false, null]],
+            269 => [
                 [['_route' => 'n', '_locale' => 'en'], ['_locale'], null, null, false, true, null],
                 [null, null, null, null, false, false, 0],
             ],

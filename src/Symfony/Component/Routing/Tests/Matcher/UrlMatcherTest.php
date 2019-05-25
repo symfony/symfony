@@ -321,8 +321,8 @@ class UrlMatcherTest extends TestCase
         // z and _format are optional.
         $this->assertEquals(['w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z', '_format' => 'html', '_route' => 'test'], $matcher->match('/wwwwwxy'));
 
-        $this->expectException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
-        $matcher->match('/wxy.html');
+        // The route compiler allowed multiple optionals within a route
+        $this->assertEquals(['w' => 'w', 'x' => 'x', 'y' => 'y', 'z' => 'default-z', '_format' => 'xml', '_route' => 'test'], $matcher->match('/wxy.xml'));
     }
 
     public function testOptionalVariableWithNoRealSeparator()
@@ -955,7 +955,7 @@ class UrlMatcherTest extends TestCase
 
         $matcher = $this->getUrlMatcher($coll);
 
-        $this->assertEquals(['_route' => 'b', 'b' => ''], $matcher->match('/en-en/'));
+        $this->assertEquals(['_route' => 'b', 'b' => 'bbb'], $matcher->match('/en-en'));
     }
 
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)

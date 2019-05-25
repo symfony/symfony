@@ -24,6 +24,7 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -472,6 +473,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('session'), '->registerSessionConfiguration() loads session.xml');
         $this->assertNull($container->getDefinition('session.storage.native')->getArgument(1));
         $this->assertNull($container->getDefinition('session.storage.php_bridge')->getArgument(0));
+    }
+
+    public function testNullSessionHandlerWithSavePath()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->createContainerFromFile('session_savepath');
     }
 
     public function testRequest()

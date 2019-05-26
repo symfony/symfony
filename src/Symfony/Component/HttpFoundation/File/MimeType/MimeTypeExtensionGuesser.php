@@ -645,6 +645,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'audio/x-aiff' => 'aif',
         'audio/x-caf' => 'caf',
         'audio/x-flac' => 'flac',
+        'audio/x-hx-aac-adts' => 'aac',
         'audio/x-matroska' => 'mka',
         'audio/x-mpegurl' => 'm3u',
         'audio/x-ms-wax' => 'wax',

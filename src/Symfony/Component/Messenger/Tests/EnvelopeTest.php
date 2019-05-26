@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
@@ -48,6 +49,30 @@ class EnvelopeTest extends TestCase
 
         $this->assertEmpty($envelope->all(ReceivedStamp::class));
         $this->assertCount(1, $envelope->all(DelayStamp::class));
+    }
+
+    public function testWithoutStampsOfType()
+    {
+        $envelope = new Envelope(new DummyMessage('dummy'), [
+            new ReceivedStamp('transport1'),
+            new DelayStamp(5000),
+            new DummyExtendsDelayStamp(5000),
+            new DummyImplementsFooBarStampInterface(),
+        ]);
+
+        $envelope2 = $envelope->withoutStampsOfType(DummyNothingImplementsMeStampInterface::class);
+        $this->assertEquals($envelope, $envelope2);
+
+        $envelope3 = $envelope2->withoutStampsOfType(ReceivedStamp::class);
+        $this->assertEmpty($envelope3->all(ReceivedStamp::class));
+
+        $envelope4 = $envelope3->withoutStampsOfType(DelayStamp::class);
+        $this->assertEmpty($envelope4->all(DelayStamp::class));
+        $this->assertEmpty($envelope4->all(DummyExtendsDelayStamp::class));
+
+        $envelope5 = $envelope4->withoutStampsOfType(DummyFooBarStampInterface::class);
+        $this->assertEmpty($envelope5->all(DummyImplementsFooBarStampInterface::class));
+        $this->assertEmpty($envelope5->all());
     }
 
     public function testLast()
@@ -91,4 +116,17 @@ class EnvelopeTest extends TestCase
         $this->assertCount(1, $envelope->all(DelayStamp::class));
         $this->assertCount(1, $envelope->all(ReceivedStamp::class));
     }
+}
+
+class DummyExtendsDelayStamp extends DelayStamp
+{
+}
+interface DummyFooBarStampInterface extends StampInterface
+{
+}
+interface DummyNothingImplementsMeStampInterface extends StampInterface
+{
+}
+class DummyImplementsFooBarStampInterface implements DummyFooBarStampInterface
+{
 }

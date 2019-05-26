@@ -39,6 +39,9 @@ interface SerializerInterface
      * Encodes an envelope content (message & stamps) to a common format understandable by transports.
      * The encoded array should only contain scalars and arrays.
      *
+     * Stamps that implement NonSendableStampInterface should
+     * not be encoded.
+     *
      * The most common keys of the encoded array are:
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers

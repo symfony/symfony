@@ -31,7 +31,6 @@ class Connection
     private $stream;
     private $group;
     private $consumer;
-    private $blockingTimeout;
     private $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
@@ -42,7 +41,6 @@ class Connection
         $this->stream = $configuration['stream'] ?? '' ?: 'messages';
         $this->group = $configuration['group'] ?? '' ?: 'symfony';
         $this->consumer = $configuration['consumer'] ?? '' ?: 'consumer';
-        $this->blockingTimeout = $redisOptions['blocking_timeout'] ?? null;
     }
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
@@ -83,8 +81,7 @@ class Connection
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
-                1,
-                $this->blockingTimeout
+                1
             );
         } catch (\RedisException $e) {
         }
@@ -142,7 +139,7 @@ class Connection
         }
     }
 
-    public function add(string $body, array $headers)
+    public function add(string $body, array $headers): void
     {
         $e = null;
         try {

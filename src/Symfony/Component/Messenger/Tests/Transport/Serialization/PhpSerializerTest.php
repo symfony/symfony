@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
@@ -63,4 +64,20 @@ class PhpSerializerTest extends TestCase
             'body' => 'O:13:"ReceivedSt0mp":0:{}',
         ]);
     }
+
+    public function testEncodedSkipsNonEncodeableStamps()
+    {
+        $serializer = new PhpSerializer();
+
+        $envelope = new Envelope(new DummyMessage('Hello'), [
+            new DummyPhpSerializerNonSendableStamp(),
+        ]);
+
+        $encoded = $serializer->encode($envelope);
+        $this->assertNotContains('DummyPhpSerializerNonSendableStamp', $encoded['body']);
+    }
+}
+
+class DummyPhpSerializerNonSendableStamp implements NonSendableStampInterface
+{
 }

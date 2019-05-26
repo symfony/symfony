@@ -117,6 +117,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -737,7 +738,7 @@ class FrameworkExtension extends Extension
                 }
 
                 if (!class_exists(Security::class)) {
-                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security".');
+                    throw new LogicException('Cannot guard workflows as the Security component is not installed. Try running "composer require symfony/security-core".');
                 }
 
                 $guard = new Definition(Workflow\EventListener\GuardListener::class);
@@ -1819,13 +1820,9 @@ class FrameworkExtension extends Extension
                 $pool['adapter'] = '.'.$pool['adapter'].'.inner';
             }
             $definition = new ChildDefinition($pool['adapter']);
-            if (!\in_array($name, ['cache.app', 'cache.system'], true)) {
-                $container->registerAliasForArgument($name, CacheInterface::class);
-                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
-            }
 
             if ($pool['tags']) {
-                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
                 }
                 $container->register($name, TagAwareAdapter::class)
@@ -1837,7 +1834,21 @@ class FrameworkExtension extends Extension
                 $pool['name'] = $name;
                 $pool['public'] = false;
                 $name = '.'.$name.'.inner';
+
+                if (!\in_array($pool['name'], ['cache.app', 'cache.system'], true)) {
+                    $container->registerAliasForArgument($pool['name'], TagAwareCacheInterface::class);
+                    $container->registerAliasForArgument($name, CacheInterface::class, $pool['name']);
+                    $container->registerAliasForArgument($name, CacheItemPoolInterface::class, $pool['name']);
+                }
+            } elseif (!\in_array($name, ['cache.app', 'cache.system'], true)) {
+                $container->register('.'.$name.'.taggable', TagAwareAdapter::class)
+                    ->addArgument(new Reference($name))
+                ;
+                $container->registerAliasForArgument('.'.$name.'.taggable', TagAwareCacheInterface::class, $name);
+                $container->registerAliasForArgument($name, CacheInterface::class);
+                $container->registerAliasForArgument($name, CacheItemPoolInterface::class);
             }
+
             $definition->setPublic($pool['public']);
             unset($pool['adapter'], $pool['public'], $pool['tags']);
 

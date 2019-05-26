@@ -199,7 +199,15 @@ abstract class AbstractToken implements TokenInterface
      */
     public function __unserialize(array $data): void
     {
-        [$this->user, $this->authenticated, $this->roles, $this->attributes, $this->roleNames] = $data;
+        [$this->user, $this->authenticated, $this->roles, $this->attributes] = $data;
+
+        // migration path to 4.3+
+        if (null === $this->roleNames = $data[4] ?? null) {
+            $this->roleNames = [];
+            foreach ($this->roles as $role) {
+                $this->roleNames[] = (string) $role;
+            }
+        }
     }
 
     /**

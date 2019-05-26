@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -47,7 +48,7 @@ class Serializer implements SerializerInterface
     public static function create(): self
     {
         if (!class_exists(SymfonySerializer::class)) {
-            throw new LogicException(sprintf('The default Messenger Serializer requires Symfony\'s Serializer component. Try running "composer require symfony/serializer".'));
+            throw new LogicException(sprintf('The "%s" class requires Symfony\'s Serializer component. Try running "composer require symfony/serializer" or use "%s" instead.', __CLASS__, PhpSerializer::class));
         }
 
         $encoders = [new XmlEncoder(), new JsonEncoder()];
@@ -97,6 +98,8 @@ class Serializer implements SerializerInterface
         if ($serializerStamp = $envelope->last(SerializerStamp::class)) {
             $context = $serializerStamp->getContext() + $context;
         }
+
+        $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
         $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope);
 

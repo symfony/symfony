@@ -24,7 +24,7 @@
         "symfony/security-core": "~4.3",
         "symfony/security-csrf": "~4.2",
         "symfony/security-guard": "~4.2",
-        "symfony/security-http": "^4.3"
+        "symfony/security-http": "^4.3.8"
     },
     "require-dev": {
         "symfony/asset": "~3.4|~4.0",

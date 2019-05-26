@@ -1,5 +1,5 @@
 <div class="sf-toolbar-block sf-toolbar-block-{{ name }} sf-toolbar-status-{{ status|default('normal') }} {{ additional_classes|default('') }}" {{ block_attrs|default('')|raw }}>
-    {% if link is not defined or link %}<a href="{{ path('_profiler', { token: token, panel: name }) }}">{% endif %}
+    {% if link is not defined or link %}<a href="{{ url('_profiler', { token: token, panel: name }) }}">{% endif %}
         <div class="sf-toolbar-icon">{{ icon|default('') }}</div>
     {% if link|default(false) %}</a>{% endif %}
         <div class="sf-toolbar-info">{{ text|default('') }}</div>

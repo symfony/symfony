@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -127,5 +128,20 @@ class ServiceLocatorTagPassTest extends TestCase
         $locator = $container->get('foo');
 
         $this->assertSame(TestDefinition1::class, \get_class($locator('bar')));
+    }
+
+    public function testBindingsAreCopied()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo')
+            ->setBindings(['foo' => 'foo']);
+
+        $locator = ServiceLocatorTagPass::register($container, ['foo' => new Reference('foo')], 'foo');
+        $locator = $container->getDefinition($locator);
+        $locator = $container->getDefinition($locator->getFactory()[0]);
+
+        $this->assertSame(['foo'], array_keys($locator->getBindings()));
+        $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
     }
 }

@@ -37,7 +37,7 @@ class ControllerResolver implements ControllerResolverInterface
     {
         if (!$controller = $request->attributes->get('_controller')) {
             if (null !== $this->logger) {
-                $this->logger->warning('Unable to look for the controller as the "_controller" parameter is missing.');
+                $this->logger->warning('Unable to look for the controller as the "_controller" attribute is missing.');
             }
 
             return false;

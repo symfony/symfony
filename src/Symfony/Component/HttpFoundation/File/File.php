@@ -33,7 +33,9 @@ class File extends \SplFileInfo
      */
     public function __construct($path, $checkPath = true)
     {
-        if ($checkPath && !is_file($path)) {
+        // Remove `fopen()` / `fclose()` calls when this bug is resolved on the required PHP version(s)
+        // @see https://bugs.php.net/bug.php?id=78042
+        if ($checkPath && !is_file($path) && !(($fp = @fopen($path, 'r')) && fclose($fp))) {
             throw new FileNotFoundException($path);
         }
 
@@ -103,6 +105,53 @@ class File extends \SplFileInfo
         @chmod($target, 0666 & ~umask());
 
         return $target;
+    }
+
+    /**
+     * This method is overridden in order to skip the issues around "php://" streams.
+     * It must be removed when this bug is resolved on the required PHP version(s).
+     *
+     * @see https://bugs.php.net/bug.php?id=78042
+     */
+    public function isReadable()
+    {
+        $isReadable = parent::isReadable();
+
+        if (!$isReadable) {
+            $path = $this->getPathname();
+            if ($fp = @fopen($path, 'r')) {
+                $isReadable = true;
+
+                fclose($fp);
+            }
+        }
+
+        return $isReadable;
+    }
+
+    /**
+     * This method is overridden in order to skip the issues around "php://" streams.
+     * It must be removed when this bug is resolved on the required PHP version(s).
+     *
+     * @see https://bugs.php.net/bug.php?id=78042
+     */
+    public function getMTime()
+    {
+        try {
+            $mtime = parent::getMTime();
+        } catch (\RuntimeException $e) {
+            $path = $this->getPathname();
+            if (!$fp = @fopen($path, 'r')) {
+                throw $e;
+            }
+
+            $stats = fstat($fp);
+            $mtime = $stats['mtime'];
+
+            fclose($fp);
+        }
+
+        return $mtime;
     }
 
     protected function getTargetFile($directory, $name = null)

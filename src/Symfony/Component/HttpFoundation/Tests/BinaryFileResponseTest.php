@@ -350,6 +350,18 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Content-Length'));
     }
 
+    public function testSplTempFileObject()
+    {
+        $file = new \SplTempFileObject(-1);
+        $file->fwrite('some content');
+        $file->fflush();
+        $file->rewind();
+
+        $response = new BinaryFileResponse($file);
+
+        $this->assertSame($response->getFile()->getFileInfo()->getPathname(), $file->getFileInfo()->getPathname());
+    }
+
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);

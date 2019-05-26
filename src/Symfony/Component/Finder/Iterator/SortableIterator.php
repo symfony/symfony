@@ -42,7 +42,7 @@ class SortableIterator implements \IteratorAggregate
 
         if (self::SORT_BY_NAME === $sort) {
             $this->sort = function ($a, $b) use ($order) {
-                return $order * strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
+                return $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_NAME_NATURAL === $sort) {
             $this->sort = function ($a, $b) use ($order) {
@@ -56,7 +56,7 @@ class SortableIterator implements \IteratorAggregate
                     return $order;
                 }
 
-                return $order * strcmp($a->getRealpath() ?: $a->getPathname(), $b->getRealpath() ?: $b->getPathname());
+                return $order * strcmp($a->getRealPath() ?: $a->getPathname(), $b->getRealPath() ?: $b->getPathname());
             };
         } elseif (self::SORT_BY_ACCESSED_TIME === $sort) {
             $this->sort = function ($a, $b) use ($order) {

@@ -1822,7 +1822,7 @@ class FrameworkExtension extends Extension
             $definition = new ChildDefinition($pool['adapter']);
 
             if ($pool['tags']) {
-                if ($config['pools'][$pool['tags']]['tags'] ?? false) {
+                if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
                     $pool['tags'] = '.'.$pool['tags'].'.inner';
                 }
                 $container->register($name, TagAwareAdapter::class)

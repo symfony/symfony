@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.30
+------
+
+ * added `Question::setTrimmable` default to true to allow the answer to be trimmed or not
+
 3.4.0
 -----
 

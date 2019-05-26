@@ -108,7 +108,10 @@ class ConnectionTest extends TestCase
         $platform = $this->getMockBuilder(AbstractPlatform::class)
             ->getMock();
         $platform->method('getWriteLockSQL')->willReturn('FOR UPDATE');
+        $configuration = $this->getMockBuilder(\Doctrine\DBAL\Configuration::class)
+            ->getMock();
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('getConfiguration')->willReturn($configuration);
 
         return $driverConnection;
     }

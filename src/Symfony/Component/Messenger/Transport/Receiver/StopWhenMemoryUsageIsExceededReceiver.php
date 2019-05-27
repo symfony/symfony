@@ -32,7 +32,7 @@ class StopWhenMemoryUsageIsExceededReceiver implements ReceiverInterface
         $this->memoryLimit = $memoryLimit;
         $this->logger = $logger;
         $this->memoryResolver = $memoryResolver ?: function () {
-            return \memory_get_usage();
+            return \memory_get_usage(true);
         };
     }
 

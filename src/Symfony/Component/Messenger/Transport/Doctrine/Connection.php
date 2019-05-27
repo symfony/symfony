@@ -197,7 +197,25 @@ class Connection
 
     public function setup(): void
     {
+        $configuration = $this->driverConnection->getConfiguration();
+        // Since Doctrine 2.9 the getFilterSchemaAssetsExpression is deprecated
+        $hasFilterCallback = method_exists($configuration, 'getSchemaAssetsFilter');
+
+        if ($hasFilterCallback) {
+            $assetFilter = $this->driverConnection->getConfiguration()->getSchemaAssetsFilter();
+            $this->driverConnection->getConfiguration()->setSchemaAssetsFilter(null);
+        } else {
+            $assetFilter = $this->driverConnection->getConfiguration()->getFilterSchemaAssetsExpression();
+            $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression(null);
+        }
+
         $this->schemaSynchronizer->updateSchema($this->getSchema(), true);
+
+        if ($hasFilterCallback) {
+            $this->driverConnection->getConfiguration()->setSchemaAssetsFilter($assetFilter);
+        } else {
+            $this->driverConnection->getConfiguration()->setFilterSchemaAssetsExpression($assetFilter);
+        }
     }
 
     public function getMessageCount(): int

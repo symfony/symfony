@@ -1,7 +1,7 @@
 {
     "name": "symfony/service-contracts",
     "type": "library",
-    "description": "Generic abstractions related to writting services",
+    "description": "Generic abstractions related to writing services",
     "keywords": ["abstractions", "contracts", "decoupling", "interfaces", "interoperability", "standards"],
     "homepage": "https://symfony.com",
     "license": "MIT",

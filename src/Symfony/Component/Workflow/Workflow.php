@@ -125,22 +125,20 @@ class Workflow
      */
     public function apply($subject, $transitionName)
     {
-        $transitions = $this->getEnabledTransitions($subject);
+        $marking = $this->getMarking($subject);
+        $transitions = [];
 
-        // We can shortcut the getMarking method in order to boost performance,
-        // since the "getEnabledTransitions" method already checks the Marking
-        // state
-        $marking = $this->markingStore->getMarking($subject);
+        foreach ($this->definition->getTransitions() as $transition) {
+            if ($transitionName === $transition->getName() && $this->doCan($subject, $marking, $transition)) {
+                $transitions[] = $transition;
+            }
+        }
 
-        $applied = false;
+        if (!$transitions) {
+            throw new LogicException(sprintf('Unable to apply transition "%s" for workflow "%s".', $transitionName, $this->name));
+        }
 
         foreach ($transitions as $transition) {
-            if ($transitionName !== $transition->getName()) {
-                continue;
-            }
-
-            $applied = true;
-
             $this->leave($subject, $transition, $marking);
 
             $this->transition($subject, $transition, $marking);
@@ -154,10 +152,6 @@ class Workflow
             $this->completed($subject, $transition, $marking);
 
             $this->announce($subject, $transition, $marking);
-        }
-
-        if (!$applied) {
-            throw new LogicException(sprintf('Unable to apply transition "%s" for workflow "%s".', $transitionName, $this->name));
         }
 
         return $marking;

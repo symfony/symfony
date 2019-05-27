@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-05-26T14:39:31Z
+
+Tests seem broken
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-05-26T14:44:36Z
+
+> Tests seem broken
+
+Yes I'm on it :wink:
+
+---------------------------------------------------------------------------
+
+by vincenttouzet at 2019-05-26T15:45:25Z
+
+Well the fix is uglier than I thought :thinking:
+
+As of Doctrine 2.9 the method to configure the assets filter has changed : https://github.com/doctrine/dbal/commit/111e42dfb43d1ea0853a449c254df20df2cced37
+
+doctrine-dbal 2.9 introduce the new methods `getSchemaAssetsFilter` / `setSchemaAssetsFilter`. Before it was `getFilterSchemaAssetsExpression` / `getFilterSchemaAssetsExpression`
+
+So I need to try if the method exists before
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-26T17:47:56Z
+
+Quick work - thanks! Yea, that got ugly :). I can't think of another way either - can anyone else? If not, I think we need this - without it, it's an even uglier situation for the user.

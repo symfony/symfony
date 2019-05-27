@@ -23,9 +23,17 @@
         "psr/container": "^1.0",
         "symfony/polyfill-intl-idn": "^1.10"
     },
+    "replace": {
+        "symfony/cache-contracts": "self.version",
+        "symfony/event-dispatcher-contracts": "self.version",
+        "symfony/http-client-contracts": "self.version",
+        "symfony/service-contracts": "self.version",
+        "symfony/translation-contracts": "self.version"
+    },
     "suggest": {
         "psr/cache": "When using the Cache contracts",
         "psr/container": "When using the Service contracts",
+        "psr/event-dispatcher": "When using the EventDispatcher contracts",
         "symfony/cache-implementation": "",
         "symfony/event-dispatcher-implementation": "",
         "symfony/http-client-implementation": "",

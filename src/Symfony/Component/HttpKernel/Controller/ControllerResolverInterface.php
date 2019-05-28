@@ -29,7 +29,7 @@ interface ControllerResolverInterface
      * As several resolvers can exist for a single application, a resolver must
      * return false when it is not able to determine the controller.
      *
-     * The resolver must only throw an exception when it should be able to load
+     * The resolver must only throw an exception when it should be able to load a
      * controller but cannot because of some errors made by the developer.
      *
      * @return callable|false A PHP callable representing the Controller,

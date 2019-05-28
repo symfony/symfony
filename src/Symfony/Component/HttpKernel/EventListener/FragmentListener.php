@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\UriSigner;
  * All URL paths starting with /_fragment are handled as
  * content fragments by this listener.
  *
- * If throws an AccessDeniedHttpException exception if the request
+ * Throws an AccessDeniedHttpException exception if the request
  * is not signed or if it is not an internal sub-request.
  *
  * @author Fabien Potencier <fabien@symfony.com>

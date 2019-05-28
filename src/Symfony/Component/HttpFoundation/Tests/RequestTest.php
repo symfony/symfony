@@ -2115,7 +2115,7 @@ class RequestTest extends TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($safe, $request->isMethodSafe(false));
+        $this->assertEquals($safe, $request->isMethodSafe());
     }
 
     public function methodSafeProvider()
@@ -2132,16 +2132,6 @@ class RequestTest extends TestCase
             ['TRACE', true],
             ['CONNECT', false],
         ];
-    }
-
-    /**
-     * @expectedException \BadMethodCallException
-     */
-    public function testMethodSafeChecksCacheable()
-    {
-        $request = new Request();
-        $request->setMethod('OPTIONS');
-        $request->isMethodSafe();
     }
 
     /**

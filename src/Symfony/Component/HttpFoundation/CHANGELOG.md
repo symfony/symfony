@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * passing arguments to `Request::isMethodSafe()` is deprecated.
+
 4.3.0
 -----
 

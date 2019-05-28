@@ -67,7 +67,7 @@ class StoreFactory
                 return new SemaphoreStore();
             case \class_exists(AbstractAdapter::class) && preg_match('#^[a-z]++://#', $connection):
                 return static::createStore(AbstractAdapter::createConnection($connection));
-            case \class_exists(\PDO::class) && array_key_exists('scheme', parse_url($connection)):
+            case \class_exists(\PDO::class) && \array_key_exists('scheme', parse_url($connection)):
                 return new PdoStore($connection);
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));

@@ -7,6 +7,26 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.28 (2019-05-28)
+
+ * bug #31584 [Workflow] Do not trigger extra guards (lyrixx)
+ * bug #31349 [WebProfilerBundle] Use absolute URL for profiler links (Alumbrados)
+ * bug #31541 [DI] fix using bindings with locators of service subscribers (nicolas-grekas)
+ * bug #31568 [Process] Fix infinite waiting for stopped process (mshavliuk)
+ * bug #31551 [ProxyManager] isProxyCandidate() does not take into account interfaces (andrerom)
+ * bug #31335 [Doctrine] Respect parent class contract in ContainerAwareEventManager (Koc)
+ * bug #31421 [Routing][AnnotationClassLoader] fix utf-8 encoding in default route name (przemyslaw-bogusz)
+ * bug #31510 Use the current working dir as default first arg in 'link' binary (lyrixx)
+ * bug #31535 [Debug] Wrap call to require_once in a try/catch (lyrixx)
+ * bug #31438 [Serializer] Fix denormalization of object with variadic constructor typed argument  (ajgarlag)
+ * bug #31475 [HttpFoundation] Allow set 'None' on samesite cookie flag (markitosgv)
+ * bug #31261 [Console] Commands with an alias should not be recognized as ambiguous when using register (Simperfit)
+ * bug #31371 [DI] Removes number of elements information in debug mode (jschaedl)
+ * bug #31418 [FrameworkBundle] clarify the possible class/interface of the cache (xabbuh)
+ * bug #31411 [Intl] Fix root fallback locale (ro0NL)
+ * bug #31377 [Console] Fix auto-complete for ChoiceQuestion (multi-select answers) (battye)
+ * bug #31380 [WebProfilerBundle] Don't filter submitted IP values (javiereguiluz)
+
 * 3.4.27 (2019-05-01)
 
  * bug #31338 Revert "bug #30620 [FrameworkBundle][HttpFoundation] make session service resettable (dmaicher)" (nicolas-grekas)

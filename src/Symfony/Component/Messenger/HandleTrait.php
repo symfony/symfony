@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 trait HandleTrait
 {

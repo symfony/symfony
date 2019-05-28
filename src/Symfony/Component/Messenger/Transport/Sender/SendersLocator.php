@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Handler\HandlersLocator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class SendersLocator implements SendersLocatorInterface
 {

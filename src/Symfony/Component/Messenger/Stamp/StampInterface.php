@@ -18,7 +18,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 interface StampInterface
 {

@@ -30,7 +30,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  *
  * @final
  */

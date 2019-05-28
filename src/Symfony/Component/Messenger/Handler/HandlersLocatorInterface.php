@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Envelope;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 interface HandlersLocatorInterface
 {

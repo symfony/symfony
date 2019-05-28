@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  *
  * @final
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class Connection
 {

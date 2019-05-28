@@ -13,10 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Http;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -26,20 +25,18 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @experimental in 4.3
  */
-class MailgunTransport extends AbstractTransport
+class MailgunTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://api.mailgun.net/v3/%domain%/messages.mime';
     private $key;
     private $domain;
-    private $client;
 
     public function __construct(string $key, string $domain, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
         $this->domain = $domain;
-        $this->client = $client ?? HttpClient::create();
 
-        parent::__construct($dispatcher, $logger);
+        parent::__construct($client, $dispatcher, $logger);
     }
 
     protected function doSend(SentMessage $message): void

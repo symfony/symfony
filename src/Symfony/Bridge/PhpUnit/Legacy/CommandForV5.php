@@ -41,7 +41,7 @@ class CommandForV5 extends \PHPUnit_TextUI_Command
                 $configuration = \PHPUnit_Util_Configuration::getInstance($this->arguments['configuration']);
             }
             foreach ($configuration->getListenerConfiguration() as $registeredListener) {
-                if (ltrim($registeredListener['class'], '\\') === ltrim(SymfonyTestsListenerForV5::class, '\\')) {
+                if (ltrim($registeredListener['class'], '\\') === 'Symfony\Bridge\PhpUnit\SymfonyTestsListener') {
                     $registeredLocally = true;
                     break;
                 }

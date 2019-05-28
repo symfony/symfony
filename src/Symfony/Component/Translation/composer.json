@@ -26,6 +26,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/intl": "~3.4|~4.0",
+        "symfony/service-contracts": "^1.1.2",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",

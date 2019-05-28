@@ -29,9 +29,7 @@ class TwigExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-        ]);
+        $container->loadFromExtension('twig');
         $this->compileContainer($container);
 
         $this->assertEquals('Twig\Environment', $container->getDefinition('twig')->getClass(), '->load() loads the twig.xml file');
@@ -155,7 +153,6 @@ class TwigExtensionTest extends TestCase
         $container->registerExtension(new TwigExtension());
         $container->loadFromExtension('twig', [
             'globals' => $globals,
-            'strict_variables' => false, // // to be removed in 5.0 relying on default
         ]);
         $this->compileContainer($container);
 
@@ -257,9 +254,7 @@ class TwigExtensionTest extends TestCase
             $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
         }
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-        ]);
+        $container->loadFromExtension('twig');
         $container->setAlias('test.twig.extension.debug.stopwatch', 'twig.extension.debug.stopwatch')->setPublic(true);
         $this->compileContainer($container);
 
@@ -287,9 +282,7 @@ class TwigExtensionTest extends TestCase
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
-        $container->loadFromExtension('twig', [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
-        ]);
+        $container->loadFromExtension('twig');
         $container->setParameter('kernel.environment', 'test');
         $container->setParameter('debug.file_link_format', 'test');
         $container->setParameter('foo', 'FooClass');

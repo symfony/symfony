@@ -97,9 +97,6 @@ class CacheWarmingKernel extends Kernel
                     'secret' => '$ecret',
                     'form' => ['enabled' => false],
                 ])
-                ->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
-                    'strict_variables' => false,
-                ])
             ;
         });
 

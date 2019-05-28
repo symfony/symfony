@@ -20,7 +20,6 @@ class ConfigurationTest extends TestCase
     public function testDoNoDuplicateDefaultFormResources()
     {
         $input = [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
             'form_themes' => ['form_div_layout.html.twig'],
         ];
 
@@ -30,22 +29,9 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Relying on the default value ("false") of the "twig.strict_variables" configuration option is deprecated since Symfony 4.1. You should use "%kernel.debug%" explicitly instead, which will be the new default in 5.0.
-     */
-    public function testGetStrictVariablesDefaultFalse()
-    {
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), [[]]);
-
-        $this->assertFalse($config['strict_variables']);
-    }
-
     public function testGlobalsAreNotNormalized()
     {
         $input = [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
             'globals' => ['some-global' => true],
         ];
 
@@ -58,7 +44,6 @@ class ConfigurationTest extends TestCase
     public function testArrayKeysInGlobalsAreNotNormalized()
     {
         $input = [
-            'strict_variables' => false, // to be removed in 5.0 relying on default
             'globals' => ['global' => ['some-key' => 'some-value']],
         ];
 

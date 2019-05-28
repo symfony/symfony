@@ -37,13 +37,6 @@ class EmptyAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load(function ($container) {
-            $container
-                ->loadFromExtension('twig', [ // to be removed in 5.0 relying on default
-                    'strict_variables' => false,
-                ])
-            ;
-        });
     }
 
     public function getCacheDir()

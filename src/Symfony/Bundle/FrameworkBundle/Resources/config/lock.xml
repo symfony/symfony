@@ -19,6 +19,10 @@
             <argument /> <!-- Redis connection service -->
         </service>
 
+        <service id="lock.store.pdo.abstract" class="Symfony\Component\Lock\Store\PdoStore" abstract="true">
+            <argument /> <!-- PDO connection service -->
+        </service>
+
         <service id="lock.store.combined.abstract" class="Symfony\Component\Lock\Store\CombinedStore" abstract="true">
             <argument /> <!-- List of stores -->
             <argument type="service" id="lock.strategy.majority" /> <!-- Strategy -->

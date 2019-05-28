@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Traits\RedisClusterProxy;
 use Symfony\Component\Cache\Traits\RedisProxy;
@@ -25,7 +26,7 @@ use Symfony\Component\Lock\StoreInterface;
 class StoreFactory
 {
     /**
-     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper|string $connection Connection or DSN or Store short name
+     * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client|\Memcached|\Zookeeper|\PDO|Connection|string $connection Connection or DSN or Store short name
      *
      * @return StoreInterface
      */
@@ -47,6 +48,12 @@ class StoreFactory
         if ($connection instanceof \Zookeeper) {
             return new ZookeeperStore($connection);
         }
+        if (
+            $connection instanceof \PDO ||
+            $connection instanceof Connection
+        ) {
+            return new PdoStore($connection);
+        }
         if (!\is_string($connection)) {
             throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', \get_class($connection)));
         }
@@ -60,6 +67,8 @@ class StoreFactory
                 return new SemaphoreStore();
             case \class_exists(AbstractAdapter::class) && preg_match('#^[a-z]++://#', $connection):
                 return static::createStore(AbstractAdapter::createConnection($connection));
+            case \class_exists(\PDO::class) && array_key_exists('scheme', parse_url($connection)):
+                return new PdoStore($connection);
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported Connection: %s.', $connection));
         }

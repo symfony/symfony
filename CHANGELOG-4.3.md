@@ -7,6 +7,26 @@ in 4.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.3.0...v4.3.1
 
+* 4.3.0-RC1 (2019-05-28)
+
+ * bug #31650 Create an abstract HTTP transport and extend it in all HTTP transports (bocharsky-bw)
+ * feature #31641 [HttpClient] make $response->getInfo('debug') return extended logs about the HTTP transaction (nicolas-grekas)
+ * feature #31571 [Contracts] split in one package per sub-contracts (nicolas-grekas)
+ * bug #31625 [Messenger] Disable the SchemaAssetsFilter when setup the transport (vincenttouzet)
+ * bug #31621 [Messenger] Fix missing auto_setup for RedisTransport (chalasr)
+ * bug #31584 [Workflow] Do not trigger extra guards (lyrixx)
+ * bug #31632 [Messenger] Use "real" memory usage to honor --memory-limit (chalasr)
+ * bug #31610 [HttpClient] fix handling exceptions thrown before first mock chunk (nicolas-grekas)
+ * bug #31615 Allow WrappedListener to describe uncallable listeners (derrabus)
+ * bug #31599 [Translation] Fixed issue with new vs old TranslatorInterface in TranslationDataCollector (althaus)
+ * bug #31565 [Mime][HttpFoundation] Added mime type audio/x-hx-aac-adts (ifaridjalilov)
+ * bug #31591 [FrameworkBundle] fix named autowiring aliases for TagAwareCacheInterface (nicolas-grekas)
+ * bug #31590 [Cache] improve logged messages (nicolas-grekas)
+ * bug #31586 [HttpClient] display proper error message on TransportException when curl is used (nicolas-grekas)
+ * bug #31349 [WebProfilerBundle] Use absolute URL for profiler links (Alumbrados)
+ * bug #31541 [DI] fix using bindings with locators of service subscribers (nicolas-grekas)
+ * bug #31568 [Process] Fix infinite waiting for stopped process (mshavliuk)
+
 * 4.3.0-BETA2 (2019-05-22)
 
  * bug #31569 [HttpClient] Only use CURLMOPT_MAX_HOST_CONNECTIONS & CURL_VERSION_HTTP2 if defined (GawainLynch)

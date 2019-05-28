@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Composer\Autoload\ClassLoader;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * @group legacy
@@ -105,11 +104,6 @@ class ControllerNameParserTest extends TestCase
         $bundles = [
             ['FooBundle:Fake:index'],
         ];
-
-        // a bundle with children
-        if (Kernel::VERSION_ID < 40000) {
-            $bundles[] = ['SensioFooBundle:Fake:index'];
-        }
 
         return $bundles;
     }

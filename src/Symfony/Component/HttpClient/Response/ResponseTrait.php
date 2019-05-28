@@ -189,18 +189,24 @@ trait ResponseTrait
      */
     abstract protected static function select(ClientState $multi, float $timeout): int;
 
-    private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers): void
+    private static function addResponseHeaders(array $responseHeaders, array &$info, array &$headers, string &$debug = ''): void
     {
         foreach ($responseHeaders as $h) {
             if (11 <= \strlen($h) && '/' === $h[4] && preg_match('#^HTTP/\d+(?:\.\d+)? ([12345]\d\d) .*#', $h, $m)) {
-                $headers = [];
+                if ($headers) {
+                    $debug .= "< \r\n";
+                    $headers = [];
+                }
                 $info['http_code'] = (int) $m[1];
             } elseif (2 === \count($m = explode(':', $h, 2))) {
                 $headers[strtolower($m[0])][] = ltrim($m[1]);
             }
 
+            $debug .= "< {$h}\r\n";
             $info['response_headers'][] = $h;
         }
+
+        $debug .= "< \r\n";
 
         if (!$info['http_code']) {
             throw new TransportException('Invalid or missing HTTP status line.');

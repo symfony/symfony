@@ -108,6 +108,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             'size_body' => \strlen($options['body']),
             'primary_ip' => '',
             'primary_port' => 'http:' === $url['scheme'] ? 80 : 443,
+            'debug' => \extension_loaded('curl') ? '' : "* Enable the curl extension for better performance\n",
         ];
 
         if ($onProgress = $options['on_progress']) {
@@ -139,6 +140,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $info['size_download'] = $dlNow;
             } elseif (STREAM_NOTIFY_CONNECT === $code) {
                 $info['connect_time'] += $now - $info['fopen_time'];
+                $info['debug'] .= $info['request_header'];
+                unset($info['request_header']);
             } else {
                 return;
             }
@@ -160,13 +163,16 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $options['request_headers'][] = 'host: '.$host.$port;
         }
 
+        if (!isset($options['headers']['user-agent'])) {
+            $options['request_headers'][] = 'user-agent: Symfony HttpClient/Native';
+        }
+
         $context = [
             'http' => [
                 'protocol_version' => $options['http_version'] ?: '1.1',
                 'method' => $method,
                 'content' => $options['body'],
                 'ignore_errors' => true,
-                'user_agent' => 'Symfony HttpClient/Native',
                 'curl_verify_ssl_peer' => $options['verify_peer'],
                 'curl_verify_ssl_host' => $options['verify_host'],
                 'auto_decode' => false, // Disable dechunk filter, it's incompatible with stream_select()
@@ -296,6 +302,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $host = parse_url($url['authority'], PHP_URL_HOST);
 
         if (null === $ip = $multi->dnsCache[$host] ?? null) {
+            $info['debug'] .= "* Hostname was NOT found in DNS cache\n";
             $now = microtime(true);
 
             if (!$ip = gethostbynamel($host)) {
@@ -304,6 +311,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
             $info['namelookup_time'] += microtime(true) - $now;
             $multi->dnsCache[$host] = $ip = $ip[0];
+            $info['debug'] .= "* Added {$host}:0:{$ip} to DNS cache\n";
+        } else {
+            $info['debug'] .= "* Hostname was found in DNS cache\n";
         }
 
         $info['primary_ip'] = $ip;

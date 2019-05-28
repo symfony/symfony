@@ -12,6 +12,7 @@ CHANGELOG
  * added `Timezones`
  * made country codes ISO 3166 compliant
  * excluded script code `Zzzz`
+ * allow lowercase country code `forCountryCode`
 
 4.2.0
 -----

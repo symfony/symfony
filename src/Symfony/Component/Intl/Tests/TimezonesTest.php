@@ -592,6 +592,7 @@ class TimezonesTest extends ResourceBundleTestCase
     public function testForCountryCode()
     {
         $this->assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
+        $this->assertSame(['Europe/Paris'], Timezones::forCountryCode('fr'));
         $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
     }
 

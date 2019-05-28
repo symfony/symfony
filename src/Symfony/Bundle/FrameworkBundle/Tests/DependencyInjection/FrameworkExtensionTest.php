@@ -56,7 +56,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
-use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -840,20 +839,6 @@ abstract class FrameworkExtensionTest extends TestCase
                 $this->assertNotContains('translations', $resource->getResource());
             }
         }
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Translations directory "%s/Resources/translations" is deprecated since Symfony 4.2, use "%s/translations" instead.
-     */
-    public function testLegacyTranslationsDirectory()
-    {
-        $container = $this->createContainerFromFile('full', ['kernel.root_dir' => __DIR__.'/Fixtures']);
-        $options = $container->getDefinition('translator.default')->getArgument(4);
-        $files = array_map('realpath', $options['resource_files']['en']);
-
-        $dir = str_replace('/', \DIRECTORY_SEPARATOR, __DIR__.'/Fixtures/Resources/translations/test_default.en.xlf');
-        $this->assertContains($dir, $files, '->registerTranslatorConfiguration() finds translation resources in legacy directory');
     }
 
     public function testTranslatorMultipleFallbacks()

@@ -1116,15 +1116,8 @@ class FrameworkExtension extends Extension
             $dirs[] = $transPaths[] = \dirname(\dirname($r->getFileName())).'/Resources/translations';
         }
         $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
-        $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if (\is_dir($dir = $bundle['path'].'/Resources/translations')) {
-                $dirs[] = $dir;
-            } else {
-                $nonExistingDirs[] = $dir;
-            }
-            if (\is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
-                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
                 $dirs[] = $dir;
             } else {
                 $nonExistingDirs[] = $dir;
@@ -1151,16 +1144,6 @@ class FrameworkExtension extends Extension
             $dirs[] = $defaultDir;
         } else {
             $nonExistingDirs[] = $defaultDir;
-        }
-
-        if (\is_dir($dir = $rootDir.'/Resources/translations')) {
-            if ($dir !== $defaultDir) {
-                @trigger_error(sprintf('Translations directory "%s" is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultDir), E_USER_DEPRECATED);
-            }
-
-            $dirs[] = $dir;
-        } else {
-            $nonExistingDirs[] = $dir;
         }
 
         // Register translation resources

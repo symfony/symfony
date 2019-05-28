@@ -34,6 +34,7 @@ final class NativeResponse implements ResponseInterface
     private $buffer;
     private $inflate;
     private $multi;
+    private $debugBuffer;
 
     /**
      * @internal
@@ -76,12 +77,19 @@ final class NativeResponse implements ResponseInterface
     {
         if (!$info = $this->finalInfo) {
             self::perform($this->multi);
+
+            if ('debug' === $type) {
+                return $this->info['debug'];
+            }
+
             $info = $this->info;
             $info['url'] = implode('', $info['url']);
-            unset($info['fopen_time'], $info['size_body']);
+            unset($info['fopen_time'], $info['size_body'], $info['request_header']);
 
             if (null === $this->buffer) {
                 $this->finalInfo = $info;
+            } else {
+                unset($info['debug']);
             }
         }
 
@@ -112,10 +120,23 @@ final class NativeResponse implements ResponseInterface
             $url = $this->url;
 
             while (true) {
+                $context = stream_context_get_options($this->context);
+
+                if ($proxy = $context['http']['proxy'] ?? null) {
+                    $this->info['debug'] .= "* Establish HTTP proxy tunnel to {$proxy}\n";
+                    $this->info['request_header'] = $url;
+                } else {
+                    $this->info['debug'] .= "*   Trying {$this->info['primary_ip']}...\n";
+                    $this->info['request_header'] = $this->info['url']['path'].$this->info['url']['query'];
+                }
+
+                $this->info['request_header'] = sprintf("> %s %s HTTP/%s \r\n", $context['http']['method'], $this->info['request_header'], $context['http']['protocol_version']);
+                $this->info['request_header'] .= implode("\r\n", $context['http']['header'])."\r\n\r\n";
+
                 // Send request and follow redirects when needed
                 $this->info['fopen_time'] = microtime(true);
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
-                self::addResponseHeaders($http_response_header, $this->info, $this->headers);
+                self::addResponseHeaders($http_response_header, $this->info, $this->headers, $this->info['debug']);
                 $url = ($this->resolveRedirect)($this->multi, $this->headers['location'][0] ?? null, $this->context);
 
                 if (null === $url) {
@@ -136,7 +157,6 @@ final class NativeResponse implements ResponseInterface
         }
 
         stream_set_blocking($h, false);
-        $context = stream_context_get_options($this->context);
         $this->context = $this->resolveRedirect = null;
 
         if (isset($context['ssl']['peer_certificate_chain'])) {

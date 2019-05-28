@@ -15,6 +15,7 @@
     <testsuites>
         <testsuite name="Symfony Contracts Test Suite">
             <directory>./Tests/</directory>
+            <directory>./Service/Test/</directory>
             <directory>./Translation/Test/</directory>
         </testsuite>
     </testsuites>
@@ -24,6 +25,7 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Tests</directory>
+                <directory>./Service/Test/</directory>
                 <directory>./Translation/Test/</directory>
                 <directory>./vendor</directory>
             </exclude>

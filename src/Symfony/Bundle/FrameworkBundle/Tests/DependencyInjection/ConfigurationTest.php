@@ -188,6 +188,31 @@ class ConfigurationTest extends TestCase
         yield [$createPackageConfig($config), 'You cannot use both "version" and "json_manifest_path" at the same time under "assets" packages.'];
     }
 
+    public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
+    {
+        $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(InvalidConfigurationException::class);
+            $this->expectExceptionMessage($expectedMessage);
+        } else {
+            $this->setExpectedException(InvalidConfigurationException::class, $expectedMessage);
+        }
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processor->processConfiguration($configuration, [
+            'framework' => [
+                'messenger' => [
+                    'default_bus' => null,
+                    'buses' => [
+                        'first_bus' => [],
+                        'second_bus' => [],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return [

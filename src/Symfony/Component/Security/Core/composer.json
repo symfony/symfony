@@ -22,16 +22,12 @@
     },
     "require-dev": {
         "psr/container": "^1.0",
-        "symfony/event-dispatcher": "^4.3|^5.0",
-        "symfony/expression-language": "^3.4|^4.0|^5.0",
-        "symfony/http-foundation": "^3.4|^4.0|^5.0",
-        "symfony/ldap": "^3.4|^4.0|^5.0",
-        "symfony/validator": "^3.4|^4.0|^5.0",
+        "symfony/event-dispatcher": "^4.4|^5.0",
+        "symfony/expression-language": "^4.4|^5.0",
+        "symfony/http-foundation": "^4.4|^5.0",
+        "symfony/ldap": "^4.4|^5.0",
+        "symfony/validator": "^4.4|^5.0",
         "psr/log": "~1.0"
-    },
-    "conflict": {
-        "symfony/event-dispatcher": "<4.3",
-        "symfony/security-guard": "<4.3"
     },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",

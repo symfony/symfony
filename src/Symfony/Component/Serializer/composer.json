@@ -20,15 +20,15 @@
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/yaml": "~3.4|~4.0",
-        "symfony/config": "~3.4|~4.0",
-        "symfony/property-access": "~3.4|~4.0",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/cache": "~3.4|~4.0",
-        "symfony/property-info": "^3.4.13|~4.0",
-        "symfony/validator": "~3.4|~4.0",
+        "symfony/yaml": "^3.4|^4.0|^5.0",
+        "symfony/config": "^3.4|^4.0|^5.0",
+        "symfony/property-access": "^3.4|^4.0|^5.0",
+        "symfony/http-foundation": "^3.4|^4.0|^5.0",
+        "symfony/cache": "^3.4|^4.0|^5.0",
+        "symfony/property-info": "^3.4.13|~4.0|^5.0",
+        "symfony/validator": "^3.4|^4.0|^5.0",
         "doctrine/annotations": "~1.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "^3.4|^4.0|^5.0",
         "doctrine/cache": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },

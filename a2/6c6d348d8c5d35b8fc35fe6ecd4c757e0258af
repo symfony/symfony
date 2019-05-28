@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by stof at 2019-05-24T18:03:09Z
+
+But we precisely want to assert the string body of the response in these tests.
+
+---------------------------------------------------------------------------
+
+by ralt at 2019-05-24T19:15:31Z
+
+@stof it looks like a `ini_set()` is needed to ensure this test always works then?
+
+---------------------------------------------------------------------------
+
+by ralt at 2019-05-25T14:55:52Z
+
+Alternatively, does it mean that the code that is being tested is broken, if its behavior depends on an ini setting?
+
+---------------------------------------------------------------------------
+
+by mmokhi at 2019-05-25T21:59:03Z
+
+> But we precisely want to assert the string body of the response in these tests.
+
+Well, by `AssertSame` here you'll assert something that doesn't only depend on your code (as @ralt mentioned, it also depends on configs on PHP settings)...
+However if you use `AssertEquals` _here_, it'll change the string AND your value into internal representation, so at least your test will be config-agnostic (which is most probably closer to what you want by this specific test IMHO).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-27T09:56:32Z
+
+I'm good with this if we also add an `assertInternalType('string'...` check.
+
+---------------------------------------------------------------------------
+
+by mmokhi at 2019-05-27T10:13:12Z
+
+@nicolas-grekas :+1:
+Just to confirm, since `string` is an internal type, it'd be `assertInternalType` rather than `assertInstanceOf`, right?

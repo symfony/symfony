@@ -13,10 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Http;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,11 +23,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @experimental in 4.3
  */
-class SesTransport extends AbstractTransport
+class SesTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://email.%region%.amazonaws.com';
 
-    private $client;
     private $accessKey;
     private $secretKey;
     private $region;
@@ -38,12 +36,11 @@ class SesTransport extends AbstractTransport
      */
     public function __construct(string $accessKey, string $secretKey, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
-        $this->client = $client ?? HttpClient::create();
         $this->accessKey = $accessKey;
         $this->secretKey = $secretKey;
         $this->region = $region ?: 'eu-west-1';
 
-        parent::__construct($dispatcher, $logger);
+        parent::__construct($client, $dispatcher, $logger);
     }
 
     protected function doSend(SentMessage $message): void

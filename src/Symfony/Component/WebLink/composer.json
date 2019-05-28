@@ -24,8 +24,8 @@
         "symfony/http-kernel": ""
     },
     "require-dev": {
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "^4.3"
+        "symfony/http-foundation": "^3.4|^4.0|^5.0",
+        "symfony/http-kernel": "^4.3|^5.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.3"

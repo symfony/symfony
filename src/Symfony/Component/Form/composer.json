@@ -17,24 +17,24 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "symfony/event-dispatcher": "^4.3",
-        "symfony/intl": "^4.3",
-        "symfony/options-resolver": "~4.3",
+        "symfony/event-dispatcher": "^4.3|^5.0",
+        "symfony/intl": "^4.3|^5.0",
+        "symfony/options-resolver": "~4.3|^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/property-access": "~3.4|~4.0"
+        "symfony/property-access": "^3.4|^4.0|^5.0"
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/config": "~3.4|~4.0",
-        "symfony/console": "^4.3",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~4.3",
-        "symfony/security-csrf": "~3.4|~4.0",
-        "symfony/translation": "~4.2",
-        "symfony/var-dumper": "^4.3"
+        "symfony/validator": "^3.4|^4.0|^5.0",
+        "symfony/dependency-injection": "^3.4|^4.0|^5.0",
+        "symfony/config": "^3.4|^4.0|^5.0",
+        "symfony/console": "^4.3|^5.0",
+        "symfony/http-foundation": "^3.4|^4.0|^5.0",
+        "symfony/http-kernel": "^4.3|^5.0",
+        "symfony/security-csrf": "^3.4|^4.0|^5.0",
+        "symfony/translation": "^4.2|^5.0",
+        "symfony/var-dumper": "^4.3|^5.0"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",

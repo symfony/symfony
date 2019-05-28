@@ -19,7 +19,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class TraceableMiddleware implements MiddlewareInterface
 {

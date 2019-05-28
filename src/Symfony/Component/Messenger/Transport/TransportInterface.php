@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 interface TransportInterface extends ReceiverInterface, SenderInterface
 {

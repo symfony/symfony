@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 final class Envelope
 {

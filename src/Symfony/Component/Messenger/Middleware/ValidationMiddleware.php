@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class ValidationMiddleware implements MiddlewareInterface
 {

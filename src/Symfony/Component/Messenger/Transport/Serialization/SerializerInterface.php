@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 interface SerializerInterface
 {

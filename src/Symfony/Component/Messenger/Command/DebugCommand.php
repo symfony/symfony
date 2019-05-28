@@ -23,7 +23,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class DebugCommand extends Command
 {

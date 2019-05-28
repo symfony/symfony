@@ -14,7 +14,7 @@ namespace Symfony\Component\Messenger\Exception;
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  *
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {

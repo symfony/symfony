@@ -13,10 +13,9 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Http;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
-use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -24,18 +23,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * @experimental in 4.3
  */
-class MandrillTransport extends AbstractTransport
+class MandrillTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://mandrillapp.com/api/1.0/messages/send-raw.json';
-    private $client;
     private $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
-        $this->client = $client ?? HttpClient::create();
 
-        parent::__construct($dispatcher, $logger);
+        parent::__construct($client, $dispatcher, $logger);
     }
 
     protected function doSend(SentMessage $message): void

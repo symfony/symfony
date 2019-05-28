@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\AmqpExt;
 
 /**
- * @experimental in 4.2
+ * @experimental in 4.3
  */
 class AmqpFactory
 {

@@ -123,10 +123,10 @@ class TimezoneTypeTest extends BaseTypeTest
     public function testIntlTimeZoneInputWithBc()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone']);
-        $form->submit('Europe/Saratov');
+        $form->submit('Europe/Unknown');
 
         $this->assertNull($form->getData());
-        $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+        $this->assertNotContains('Europe/Unknown', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
     /**
@@ -135,10 +135,10 @@ class TimezoneTypeTest extends BaseTypeTest
     public function testIntlTimeZoneInputWithBcAndIntl()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'intltimezone', 'intl' => true]);
-        $form->submit('Europe/Saratov');
+        $form->submit('Europe/Unknown');
 
         $this->assertNull($form->getData());
-        $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
+        $this->assertNotContains('Europe/Unknown', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
     public function testTimezonesAreSelectableWithIntl()

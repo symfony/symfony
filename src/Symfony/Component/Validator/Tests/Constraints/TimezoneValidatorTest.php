@@ -321,10 +321,10 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             'intlCompatible' => true,
         ]);
 
-        $this->validator->validate('Europe/Saratov', $constraint);
+        $this->validator->validate('Europe/Unknown', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"Europe/Saratov"')
+            ->setParameter('{{ value }}', '"Europe/Unknown"')
             ->setCode(Timezone::TIMEZONE_IDENTIFIER_INTL_ERROR)
             ->assertRaised();
     }

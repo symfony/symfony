@@ -33,12 +33,6 @@ use Twig\TwigFilter;
  */
 class TranslationExtension extends AbstractExtension
 {
-    use TranslatorTrait {
-        getLocale as private;
-        setLocale as private;
-        trans as private doTrans;
-    }
-
     private $translator;
     private $translationNodeVisitor;
 
@@ -115,7 +109,9 @@ class TranslationExtension extends AbstractExtension
             $arguments['%count%'] = $count;
         }
         if (null === $this->translator) {
-            return $this->doTrans($message, $arguments, $domain, $locale);
+            $this->translator = new class() implements TranslatorInterface {
+                use TranslatorTrait;
+            };
         }
 
         return $this->translator->trans($message, $arguments, $domain, $locale);
@@ -127,8 +123,11 @@ class TranslationExtension extends AbstractExtension
     public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return $this->doTrans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
+            $this->translator = new class() implements TranslatorInterface {
+                use TranslatorTrait;
+            };
         }
+
         if ($this->translator instanceof TranslatorInterface) {
             return $this->translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
         }

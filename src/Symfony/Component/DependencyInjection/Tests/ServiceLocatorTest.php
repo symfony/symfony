@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Symfony\Contracts\Tests\Service\ServiceLocatorTest as BaseServiceLocatorTest;
+use Symfony\Contracts\Service\Test\ServiceLocatorTest as BaseServiceLocatorTest;
 
 class ServiceLocatorTest extends BaseServiceLocatorTest
 {

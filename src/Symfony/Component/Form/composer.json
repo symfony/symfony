@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "symfony/event-dispatcher": "^4.3|^5.0",
         "symfony/intl": "^4.3|^5.0",
         "symfony/options-resolver": "~4.3|^5.0",

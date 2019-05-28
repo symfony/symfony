@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2.9",
         "ext-xml": "*",
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "~1.0",
@@ -31,7 +31,6 @@
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php72": "~1.5",
         "symfony/polyfill-php73": "^1.11"
     },
     "replace": {

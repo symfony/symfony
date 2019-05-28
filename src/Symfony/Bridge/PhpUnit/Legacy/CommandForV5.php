@@ -45,7 +45,6 @@ class CommandForV5 extends \PHPUnit_TextUI_Command
                     $registeredLocally = true;
                     break;
                 }
-
             }
         }
 

@@ -25,6 +25,7 @@
     "require-dev": {
         "symfony/amazon-mailer": "^4.3",
         "symfony/google-mailer": "^4.3",
+        "symfony/http-client-contracts": "^1.1",
         "symfony/mailgun-mailer": "^4.3",
         "symfony/mailchimp-mailer": "^4.3",
         "symfony/postmark-mailer": "^4.3",

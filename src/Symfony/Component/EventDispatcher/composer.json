@@ -24,6 +24,7 @@
         "symfony/expression-language": "~3.4|~4.0",
         "symfony/config": "~3.4|~4.0",
         "symfony/http-foundation": "^3.4|^4.0",
+        "symfony/service-contracts": "^1.1",
         "symfony/stopwatch": "~3.4|~4.0",
         "psr/log": "~1.0"
     },

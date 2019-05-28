@@ -31,6 +31,7 @@
         "symfony/process": "~3.4|~4.0",
         "symfony/property-access": "~3.4|~4.0",
         "symfony/serializer": "~3.4|~4.0",
+        "symfony/service-contracts": "^1.1",
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0"

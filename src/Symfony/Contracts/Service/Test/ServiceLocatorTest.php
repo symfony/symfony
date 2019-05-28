@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Contracts\Tests\Service;
+namespace Symfony\Contracts\Service\Test;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;

@@ -31,7 +31,7 @@
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
-        "symfony/translation": "~4.2",
+        "symfony/translation": "^4.2.1",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
         "symfony/security-csrf": "~3.4|~4.0",

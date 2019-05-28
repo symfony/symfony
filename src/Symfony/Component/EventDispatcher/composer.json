@@ -20,16 +20,13 @@
         "symfony/event-dispatcher-contracts": "^1.1"
     },
     "require-dev": {
-        "symfony/dependency-injection": "^3.4|^4.0|^5.0",
-        "symfony/expression-language": "^3.4|^4.0|^5.0",
-        "symfony/config": "^3.4|^4.0|^5.0",
-        "symfony/http-foundation": "^3.4|^4.0|^5.0",
+        "symfony/dependency-injection": "^4.4|^5.0",
+        "symfony/expression-language": "^4.4|^5.0",
+        "symfony/config": "^4.4|^5.0",
+        "symfony/http-foundation": "^4.4|^5.0",
         "symfony/service-contracts": "^1.1",
-        "symfony/stopwatch": "^3.4|^4.0|^5.0",
+        "symfony/stopwatch": "^4.4|^5.0",
         "psr/log": "~1.0"
-    },
-    "conflict": {
-        "symfony/dependency-injection": "<3.4"
     },
     "provide": {
         "psr/event-dispatcher-implementation": "1.0",

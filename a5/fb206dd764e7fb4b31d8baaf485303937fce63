@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-05-28T13:34:16Z
+
+Why not `7.3`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-28T13:40:01Z
+
+The question is more: why 7.3?
+7.2 is better for adoption.
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2019-05-28T13:40:48Z
+
+~Typed private properties would be a good driver for 7.3 I think?~
+
+edit: d'oh that's 7.4
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-28T13:42:47Z
+
+@ciaranmcnulty don't you talk about 7.4? See https://www.php.net/releases/7_3_0.php
+
+---------------------------------------------------------------------------
+
+by jmsche at 2019-05-28T13:44:45Z
+
+I'd be in favor of PHP 7.3 too as 7.2 active support ends on November, 30 2019, so at the same time Symfony 5.0 will be released.
+
+---------------------------------------------------------------------------
+
+by kunicmarko20 at 2019-05-28T13:45:37Z
+
+Since 7.4 will happen at the same time as sf5, it is probably too early to make that a minimal?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-28T13:47:11Z
+
+7.2 is all we need to start working on Symfony 5.0.
+
+---------------------------------------------------------------------------
+
+by ciaranmcnulty at 2019-05-28T13:47:26Z
+
+@nicolas-grekas you are of course right. I forgot 7.3 had so few compelling features (some nice stuff but nothing that would require it over 7.2)
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2019-05-28T13:52:55Z
+
+Okay, I agree that as a **minimum** version `7.2` is good.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-05-28T14:20:23Z
+
+I'm for 7.2 too. 7.3 does not bring so much nice features. 7.2 seems better for adoption.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-05-28T15:00:31Z
+
+👍 7.2 for now. Ref. #24283
+Maybe bump to 7.4 later if released in time. Then we would use the latest PHP version like done with SF 4.

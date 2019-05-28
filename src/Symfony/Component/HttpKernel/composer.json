@@ -38,6 +38,7 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
         "symfony/translation": "~4.2",
+        "symfony/translation-contracts": "^1.1",
         "symfony/var-dumper": "^4.1.1",
         "psr/cache": "~1.0",
         "twig/twig": "^1.34|^2.4"

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * updated default value for the `strict_variables` option to `%kernel.debug%` parameter
+ * removed support to load templates from the legacy directories `src/Resources/views/` and `src/Resources/<BundleName>/views/`
 
 4.2.0
 -----

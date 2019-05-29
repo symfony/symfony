@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -229,13 +230,15 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     }
 
     /**
-     * NOT LEGACY (test exception in 5.0).
-     *
-     * @group legacy
-     * @expectedDeprecation Setting path "env_extension.scalar_node_not_empty_validated" to an environment variable is deprecated since Symfony 4.3. Remove "cannotBeEmpty()", "validate()" or include a prefix/suffix value instead.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.
      */
     public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
     {
+        if (!method_exists(ParentNodeDefinitionInterface::class, 'getChildNodeDefinitions')) {
+            $this->markTestSkipped('symfony/config >=5.0 is required.');
+        }
+
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', $expected = [
@@ -243,8 +246,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         ]);
 
         $this->doProcess($container);
-
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void

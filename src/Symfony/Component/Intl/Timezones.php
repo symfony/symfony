@@ -109,6 +109,10 @@ final class Timezones extends ResourceBundle
                 return [];
             }
 
+            if (Countries::exists(strtoupper($country))) {
+                throw new MissingResourceException(sprintf('Country codes must be in uppercase, but "%s" was passed. Try with "%s" country code instead.', $country, strtoupper($country)));
+            }
+
             throw $e;
         }
     }

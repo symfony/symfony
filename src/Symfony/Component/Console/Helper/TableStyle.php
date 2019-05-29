@@ -102,36 +102,6 @@ class TableStyle
     }
 
     /**
-     * Sets horizontal border character.
-     *
-     * @param string $horizontalBorderChar
-     *
-     * @return $this
-     *
-     * @deprecated since Symfony 4.1, use {@link setHorizontalBorderChars()} instead.
-     */
-    public function setHorizontalBorderChar($horizontalBorderChar)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use setHorizontalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->setHorizontalBorderChars($horizontalBorderChar, $horizontalBorderChar);
-    }
-
-    /**
-     * Gets horizontal border character.
-     *
-     * @return string
-     *
-     * @deprecated since Symfony 4.1, use {@link getBorderChars()} instead.
-     */
-    public function getHorizontalBorderChar()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->horizontalOutsideBorderChar;
-    }
-
-    /**
      * Sets vertical border characters.
      *
      * <code>
@@ -155,36 +125,6 @@ class TableStyle
         $this->verticalInsideBorderChar = $inside ?? $outside;
 
         return $this;
-    }
-
-    /**
-     * Sets vertical border character.
-     *
-     * @param string $verticalBorderChar
-     *
-     * @return $this
-     *
-     * @deprecated since Symfony 4.1, use {@link setVerticalBorderChars()} instead.
-     */
-    public function setVerticalBorderChar($verticalBorderChar)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use setVerticalBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->setVerticalBorderChars($verticalBorderChar, $verticalBorderChar);
-    }
-
-    /**
-     * Gets vertical border character.
-     *
-     * @return string
-     *
-     * @deprecated since Symfony 4.1, use {@link getBorderChars()} instead.
-     */
-    public function getVerticalBorderChar()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1, use getBorderChars() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->verticalOutsideBorderChar;
     }
 
     /**
@@ -257,22 +197,6 @@ class TableStyle
     public function setDefaultCrossingChar(string $char): self
     {
         return $this->setCrossingChars($char, $char, $char, $char, $char, $char, $char, $char, $char);
-    }
-
-    /**
-     * Sets crossing character.
-     *
-     * @param string $crossingChar
-     *
-     * @return $this
-     *
-     * @deprecated since Symfony 4.1. Use {@link setDefaultCrossingChar()} instead.
-     */
-    public function setCrossingChar($crossingChar)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use setDefaultCrossingChar() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->setDefaultCrossingChar($crossingChar);
     }
 
     /**

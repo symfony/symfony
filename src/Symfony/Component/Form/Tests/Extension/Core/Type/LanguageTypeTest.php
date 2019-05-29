@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class LanguageTypeTest extends BaseTypeTest
@@ -72,15 +71,5 @@ class LanguageTypeTest extends BaseTypeTest
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidChoiceValuesAreDropped()
-    {
-        $type = new LanguageType();
-
-        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

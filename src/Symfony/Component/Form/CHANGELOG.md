@@ -4,6 +4,8 @@ CHANGELOG
 5.0.0
 -----
 
+ * Using names for buttons that do not start with a letter, a digit, or an underscore throw an exception
+ * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons throw an exception.
  * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
 
 4.3.0

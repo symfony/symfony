@@ -12,6 +12,7 @@
 namespace Symfony\Component\ErrorCatcher;
 
 use Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorCatcher\Exception\FatalThrowableError;
 use Symfony\Component\ErrorCatcher\Exception\FlattenException;
 use Symfony\Component\ErrorCatcher\Exception\OutOfMemoryException;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
@@ -101,8 +102,12 @@ class ExceptionHandler
      * The latter takes precedence and any output from the former is cancelled,
      * if and only if nothing bad happens in this handling path.
      */
-    public function handle(\Exception $exception)
+    public function handle(\Throwable $exception)
     {
+        if (!$exception instanceof \Exception) {
+            $exception = new FatalThrowableError($exception);
+        }
+
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
             $this->sendPhpResponse($exception);
 

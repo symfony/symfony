@@ -11,21 +11,6 @@
 
 namespace Symfony\Component\Intl;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
-use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
-use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
-use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
-use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\LanguageBundle;
-use Symfony\Component\Intl\ResourceBundle\LanguageBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\LocaleBundle;
-use Symfony\Component\Intl\ResourceBundle\LocaleBundleInterface;
-use Symfony\Component\Intl\ResourceBundle\RegionBundle;
-use Symfony\Component\Intl\ResourceBundle\RegionBundleInterface;
-
 /**
  * Gives access to internationalization data.
  *
@@ -70,26 +55,6 @@ final class Intl
     public const TIMEZONE_DIR = 'timezones';
 
     /**
-     * @var ResourceBundle\CurrencyBundleInterface
-     */
-    private static $currencyBundle;
-
-    /**
-     * @var ResourceBundle\LanguageBundleInterface
-     */
-    private static $languageBundle;
-
-    /**
-     * @var ResourceBundle\LocaleBundleInterface
-     */
-    private static $localeBundle;
-
-    /**
-     * @var ResourceBundle\RegionBundleInterface
-     */
-    private static $regionBundle;
-
-    /**
      * @var string|bool|null
      */
     private static $icuVersion = false;
@@ -100,11 +65,6 @@ final class Intl
     private static $icuDataVersion = false;
 
     /**
-     * @var BundleEntryReaderInterface
-     */
-    private static $entryReader;
-
-    /**
      * Returns whether the intl extension is installed.
      *
      * @return bool Returns true if the intl extension is installed, false otherwise
@@ -112,97 +72,6 @@ final class Intl
     public static function isExtensionLoaded()
     {
         return class_exists('\ResourceBundle');
-    }
-
-    /**
-     * Returns the bundle containing currency information.
-     *
-     * @return CurrencyBundleInterface The currency resource bundle
-     *
-     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Currencies} instead.
-     */
-    public static function getCurrencyBundle()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Currencies::class), E_USER_DEPRECATED);
-
-        if (null === self::$currencyBundle) {
-            self::$currencyBundle = new CurrencyBundle(
-                self::getDataDirectory().'/'.self::CURRENCY_DIR,
-                self::getEntryReader(),
-                self::$localeBundle ?? self::$localeBundle = new LocaleBundle(self::getDataDirectory().'/'.self::LOCALE_DIR, self::getEntryReader())
-            );
-        }
-
-        return self::$currencyBundle;
-    }
-
-    /**
-     * Returns the bundle containing language information.
-     *
-     * @return LanguageBundleInterface The language resource bundle
-     *
-     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Languages} or {@see Scripts} instead.
-     */
-    public static function getLanguageBundle()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" or "%s" instead.', __METHOD__, Languages::class, Scripts::class), E_USER_DEPRECATED);
-
-        if (null === self::$languageBundle) {
-            self::$languageBundle = new LanguageBundle(
-                self::getDataDirectory().'/'.self::LANGUAGE_DIR,
-                self::getEntryReader(),
-                self::$localeBundle ?? self::$localeBundle = new LocaleBundle(self::getDataDirectory().'/'.self::LOCALE_DIR, self::getEntryReader()),
-                new ScriptDataProvider(
-                    self::getDataDirectory().'/'.self::SCRIPT_DIR,
-                    self::getEntryReader()
-                )
-            );
-        }
-
-        return self::$languageBundle;
-    }
-
-    /**
-     * Returns the bundle containing locale information.
-     *
-     * @return LocaleBundleInterface The locale resource bundle
-     *
-     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Locales} instead.
-     */
-    public static function getLocaleBundle()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Locales::class), E_USER_DEPRECATED);
-
-        if (null === self::$localeBundle) {
-            self::$localeBundle = new LocaleBundle(
-                self::getDataDirectory().'/'.self::LOCALE_DIR,
-                self::getEntryReader()
-            );
-        }
-
-        return self::$localeBundle;
-    }
-
-    /**
-     * Returns the bundle containing region information.
-     *
-     * @return RegionBundleInterface The region resource bundle
-     *
-     * @deprecated since Symfony 4.3, to be removed in 5.0. Use {@see Countries} instead.
-     */
-    public static function getRegionBundle()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.3, use "%s" instead.', __METHOD__, Countries::class), E_USER_DEPRECATED);
-
-        if (null === self::$regionBundle) {
-            self::$regionBundle = new RegionBundle(
-                self::getDataDirectory().'/'.self::REGION_DIR,
-                self::getEntryReader(),
-                self::$localeBundle ?? self::$localeBundle = new LocaleBundle(self::getDataDirectory().'/'.self::LOCALE_DIR, self::getEntryReader())
-            );
-        }
-
-        return self::$regionBundle;
     }
 
     /**
@@ -267,28 +136,6 @@ final class Intl
     public static function getDataDirectory()
     {
         return __DIR__.'/Resources/data';
-    }
-
-    /**
-     * Returns the cached bundle entry reader.
-     *
-     * @return BundleEntryReaderInterface The bundle entry reader
-     */
-    private static function getEntryReader()
-    {
-        if (null === self::$entryReader) {
-            self::$entryReader = new BundleEntryReader(new BufferedBundleReader(
-                new JsonBundleReader(),
-                self::BUFFER_SIZE
-            ));
-            $localeDataProvider = new LocaleDataProvider(
-                self::getDataDirectory().'/'.self::LOCALE_DIR,
-                self::$entryReader
-            );
-            self::$entryReader->setLocaleAliases($localeDataProvider->getAliases());
-        }
-
-        return self::$entryReader;
     }
 
     /**

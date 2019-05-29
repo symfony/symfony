@@ -37,8 +37,7 @@ class Expression extends Constraint
     public function __construct($options = null)
     {
         if (!class_exists(ExpressionLanguage::class)) {
-            // throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));
-            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/expression-language" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            throw new LogicException(sprintf('The "symfony/expression-language" component is required to use the "%s" constraint.', __CLASS__));
         }
 
         parent::__construct($options);

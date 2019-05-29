@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+
 4.3.0
 -----
 

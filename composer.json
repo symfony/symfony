@@ -120,7 +120,7 @@
     },
     "conflict": {
         "masterminds/html5": "<2.6",
-        "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+        "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",
         "phpunit/phpunit": "<5.4.3"
     },

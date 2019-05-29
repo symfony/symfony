@@ -32,9 +32,13 @@ class DumperTest extends TestCase
             'bar' => [1, 'foo'],
             'foobar' => [
                 'foo' => 'bar',
-                'bar' => [1, 'foo'],
+                'bar' => [1, 'foo', ['foo' => 'bar']],
             ],
         ],
+        'barfoo' => [
+            ['foo' => 'bar'],
+            ['bar', 'foo']
+        ]
     ];
 
     protected function setUp()
@@ -72,6 +76,10 @@ foobar:
               bar:
                      - 1
                      - foo
+                     - { foo: bar }
+barfoo:
+       - { foo: bar }
+       - [bar, foo]
 
 EOF;
         $this->assertEquals($expected, $dumper->dump($this->array, 4, 0));
@@ -101,6 +109,10 @@ foobar:
               bar:
                      - 1
                      - foo
+                     - { foo: bar }
+barfoo:
+       - { foo: bar }
+       - [bar, foo]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 4, 0));
@@ -134,7 +146,7 @@ EOF;
     public function testInlineLevel()
     {
         $expected = <<<'EOF'
-{ '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
+{ '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo, { foo: bar }] } }, barfoo: [{ foo: bar }, [bar, foo]] }
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
         $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
@@ -144,7 +156,8 @@ EOF;
 foo: '#bar'
 'foo''bar': {  }
 bar: [1, foo]
-foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } }
+foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo, { foo: bar }] } }
+barfoo: [{ foo: bar }, [bar, foo]]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 1), '->dump() takes an inline level argument');
@@ -159,7 +172,10 @@ bar:
 foobar:
     foo: bar
     bar: [1, foo]
-    foobar: { foo: bar, bar: [1, foo] }
+    foobar: { foo: bar, bar: [1, foo, { foo: bar }] }
+barfoo:
+    - { foo: bar }
+    - [bar, foo]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 2), '->dump() takes an inline level argument');
@@ -178,7 +194,10 @@ foobar:
         - foo
     foobar:
         foo: bar
-        bar: [1, foo]
+        bar: [1, foo, { foo: bar }]
+barfoo:
+    - { foo: bar }
+    - [bar, foo]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 3), '->dump() takes an inline level argument');
@@ -200,6 +219,10 @@ foobar:
         bar:
             - 1
             - foo
+            - { foo: bar }
+barfoo:
+    - { foo: bar }
+    - [bar, foo]
 
 EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 4), '->dump() takes an inline level argument');

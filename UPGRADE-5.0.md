@@ -404,6 +404,7 @@ TwigBundle
 TwigBridge
 ----------
 
+ * Removed argument `$rootDir` from the `DebugCommand::__construct()` method and the 5th argument must be an instance of `FileLinkFormatter`
  * removed the `$requestStack` and `$requestContext` arguments of the 
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead

@@ -11,6 +11,7 @@ CHANGELOG
  * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
  * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
  * removed the `regions` option of the `TimezoneType`
+ * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
 
 4.3.0
 -----

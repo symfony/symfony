@@ -8,6 +8,7 @@ CHANGELOG
  * removed `getExtendedType()` method of the `FormTypeExtensionInterface`
  * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
  * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
+ * removed the `regions` option of the `TimezoneType`
 
 4.3.0
 -----

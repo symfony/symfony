@@ -327,21 +327,6 @@ CSV
         $this->assertFalse($this->encoder->supportsDecoding('foo'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.
-     */
-    public function testDecodeLegacy()
-    {
-        $expected = ['foo' => 'a', 'bar' => 'b'];
-
-        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
-foo,bar
-a,b
-CSV
-        , 'csv'));
-    }
-
     public function testDecodeAsSingle()
     {
         $expected = ['foo' => 'a', 'bar' => 'b'];
@@ -382,9 +367,7 @@ foo
 a
 
 CSV
-        , 'csv', [
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
-        ]));
+        , 'csv'));
     }
 
     public function testDecodeToManyRelation()
@@ -449,9 +432,7 @@ CSV
 a;bar-baz
 'hell''o';b;c
 CSV
-        , 'csv', [
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
-        ]));
+        , 'csv'));
     }
 
     public function testDecodeCustomSettingsPassedInContext()
@@ -466,7 +447,6 @@ CSV
             CsvEncoder::ENCLOSURE_KEY => "'",
             CsvEncoder::ESCAPE_CHAR_KEY => '|',
             CsvEncoder::KEY_SEPARATOR_KEY => '-',
-            CsvEncoder::AS_COLLECTION_KEY => true, // Can be removed in 5.0
         ]));
     }
 

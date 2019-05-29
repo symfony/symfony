@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -31,7 +30,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
@@ -93,7 +91,7 @@ class GetSetMethodNormalizerTest extends TestCase
             ->expects($this->once())
             ->method('normalize')
             ->with($object, 'any')
-            ->will($this->returnValue('string_object'))
+            ->willReturn('string_object')
         ;
 
         $this->assertEquals(
@@ -233,20 +231,6 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
     }
 
-    /**
-     * @dataProvider provideCallbacks
-     */
-    public function testLegacyCallbacks($callbacks, $value, $result)
-    {
-        $this->normalizer->setCallbacks($callbacks);
-
-        $obj = new CallbacksObject($value);
-        $this->assertEquals(
-            $result,
-            $this->normalizer->normalize($obj, 'any')
-        );
-    }
-
     protected function getNormalizerForCircularReference(): GetSetMethodNormalizer
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -259,34 +243,6 @@ class GetSetMethodNormalizerTest extends TestCase
     protected function getSelfReferencingModel()
     {
         return new CircularReferenceDummy();
-    }
-
-    public function testLegacyUnableToNormalizeCircularReference()
-    {
-        $this->normalizer->setCircularReferenceLimit(2);
-        $this->serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($this->serializer);
-
-        $obj = new CircularReferenceDummy();
-
-        $this->expectException(CircularReferenceException::class);
-        $this->normalizer->normalize($obj);
-    }
-
-    public function testLegacyCircularReferenceHandler()
-    {
-        $handler = function ($obj) {
-            return \get_class($obj);
-        };
-
-        $this->normalizer->setCircularReferenceHandler($handler);
-        $this->serializer = new Serializer([$this->normalizer]);
-        $this->normalizer->setSerializer($this->serializer);
-
-        $obj = new CircularReferenceDummy();
-
-        $expected = ['me' => CircularReferenceDummy::class];
-        $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
 
     protected function getDenormalizerForConstructArguments(): GetSetMethodNormalizer
@@ -404,22 +360,6 @@ class GetSetMethodNormalizerTest extends TestCase
         new Serializer([$normalizer]);
 
         return $normalizer;
-    }
-
-    public function testLegacyIgnoredAttributes()
-    {
-        $ignoredAttributes = ['foo', 'bar', 'baz', 'camelCase', 'object'];
-        $this->normalizer->setIgnoredAttributes($ignoredAttributes);
-
-        $obj = new GetSetDummy();
-        $obj->setFoo('foo');
-        $obj->setBar('bar');
-        $obj->setBaz(true);
-
-        $this->assertEquals(
-            ['fooBar' => 'foobar'],
-            $this->normalizer->normalize($obj, 'any')
-        );
     }
 
     /**
@@ -684,43 +624,6 @@ class GetConstructorArgsWithDefaultValueDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
-    }
-}
-
-class GetCamelizedDummy
-{
-    private $kevinDunglas;
-    private $fooBar;
-    private $bar_foo;
-
-    public function __construct($kevinDunglas = null)
-    {
-        $this->kevinDunglas = $kevinDunglas;
-    }
-
-    public function getKevinDunglas()
-    {
-        return $this->kevinDunglas;
-    }
-
-    public function setFooBar($fooBar)
-    {
-        $this->fooBar = $fooBar;
-    }
-
-    public function getFooBar()
-    {
-        return $this->fooBar;
-    }
-
-    public function setBar_foo($bar_foo)
-    {
-        $this->bar_foo = $bar_foo;
-    }
-
-    public function getBar_foo()
-    {
-        return $this->bar_foo;
     }
 }
 

@@ -25,7 +25,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
-    private $defaultContext;
+    private $defaultContext = [
+        self::FORMAT_KEY => \DateTime::RFC3339,
+        self::TIMEZONE_KEY => null,
+    ];
 
     private static $supportedTypes = [
         \DateTimeInterface::class => true,
@@ -33,23 +36,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         \DateTime::class => true,
     ];
 
-    /**
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [], \DateTimeZone $timezone = null)
+    public function __construct(array $defaultContext = [])
     {
-        $this->defaultContext = [
-            self::FORMAT_KEY => \DateTime::RFC3339,
-            self::TIMEZONE_KEY => null,
-        ];
-
-        if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
-
-            $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
-            $defaultContext[self::TIMEZONE_KEY] = $timezone;
-        }
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

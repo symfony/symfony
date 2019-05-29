@@ -100,26 +100,12 @@ CSV
 
     public function testEncodeCustomSettings()
     {
-        $this->doTestEncodeCustomSettings();
-    }
-
-    public function testLegacyEncodeCustomSettings()
-    {
-        $this->doTestEncodeCustomSettings(true);
-    }
-
-    private function doTestEncodeCustomSettings(bool $legacy = false)
-    {
-        if ($legacy) {
-            $this->encoder = new CsvEncoder(';', "'", '|', '-');
-        } else {
-            $this->encoder = new CsvEncoder([
-                CsvEncoder::DELIMITER_KEY => ';',
-                CsvEncoder::ENCLOSURE_KEY => "'",
-                CsvEncoder::ESCAPE_CHAR_KEY => '|',
-                CsvEncoder::KEY_SEPARATOR_KEY => '-',
-            ]);
-        }
+        $this->encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+        ]);
 
         $value = ['a' => 'he\'llo', 'c' => ['d' => 'foo']];
 
@@ -194,21 +180,7 @@ CSV;
 
     public function testEncodeFormulas()
     {
-        $this->doTestEncodeFormulas();
-    }
-
-    public function testLegacyEncodeFormulas()
-    {
-        $this->doTestEncodeFormulas(true);
-    }
-
-    private function doTestEncodeFormulas(bool $legacy = false)
-    {
-        if ($legacy) {
-            $this->encoder = new CsvEncoder(',', '"', '\\', '.', true);
-        } else {
-            $this->encoder = new CsvEncoder([CsvEncoder::ESCAPE_FORMULAS_KEY => true]);
-        }
+        $this->encoder = new CsvEncoder([CsvEncoder::ESCAPE_FORMULAS_KEY => true]);
 
         $this->assertSame(<<<'CSV'
 0
@@ -406,26 +378,12 @@ CSV
 
     public function testDecodeCustomSettings()
     {
-        $this->doTestDecodeCustomSettings();
-    }
-
-    public function testLegacyDecodeCustomSettings()
-    {
-        $this->doTestDecodeCustomSettings(true);
-    }
-
-    private function doTestDecodeCustomSettings(bool $legacy = false)
-    {
-        if ($legacy) {
-            $this->encoder = new CsvEncoder(';', "'", '|', '-');
-        } else {
-            $this->encoder = new CsvEncoder([
-                CsvEncoder::DELIMITER_KEY => ';',
-                CsvEncoder::ENCLOSURE_KEY => "'",
-                CsvEncoder::ESCAPE_CHAR_KEY => '|',
-                CsvEncoder::KEY_SEPARATOR_KEY => '-',
-            ]);
-        }
+        $this->encoder = new CsvEncoder([
+            CsvEncoder::DELIMITER_KEY => ';',
+            CsvEncoder::ENCLOSURE_KEY => "'",
+            CsvEncoder::ESCAPE_CHAR_KEY => '|',
+            CsvEncoder::KEY_SEPARATOR_KEY => '-',
+        ]);
 
         $expected = [['a' => 'hell\'o', 'bar' => ['baz' => 'b']]];
         $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'

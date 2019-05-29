@@ -106,13 +106,6 @@ class EncoderFactory implements EncoderFactoryInterface
                     ],
                 ];
 
-            /* @deprecated since Symfony 4.3 */
-            case 'bcrypt':
-                return [
-                    'class' => BCryptPasswordEncoder::class,
-                    'arguments' => [$config['cost']],
-                ];
-
             case 'native':
                 return [
                     'class' => NativePasswordEncoder::class,
@@ -129,17 +122,6 @@ class EncoderFactory implements EncoderFactoryInterface
                     'arguments' => [
                         $config['time_cost'] ?? null,
                         (($config['memory_cost'] ?? 0) << 10) ?: null,
-                    ],
-                ];
-
-            /* @deprecated since Symfony 4.3 */
-            case 'argon2i':
-                return [
-                    'class' => Argon2iPasswordEncoder::class,
-                    'arguments' => [
-                        $config['memory_cost'],
-                        $config['time_cost'],
-                        $config['threads'],
                     ],
                 ];
         }

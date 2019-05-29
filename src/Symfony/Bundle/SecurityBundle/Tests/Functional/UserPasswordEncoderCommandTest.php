@@ -15,8 +15,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
@@ -53,51 +51,6 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
         $this->assertContains('[ERROR] The password must not be empty.', $this->passwordEncoderCommandTester->getDisplay());
         $this->assertEquals($statusCode, 1);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodePasswordBcrypt()
-    {
-        $this->setupBcrypt();
-        $this->passwordEncoderCommandTester->execute([
-            'command' => 'security:encode-password',
-            'password' => 'password',
-            'user-class' => 'Custom\Class\Bcrypt\User',
-        ], ['interactive' => false]);
-
-        $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
-
-        $encoder = new BCryptPasswordEncoder(17);
-        preg_match('# Encoded password\s{1,}([\w+\/$.]+={0,2})\s+#', $output, $matches);
-        $hash = $matches[1];
-        $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodePasswordArgon2i()
-    {
-        if (!Argon2iPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
-        }
-        $this->setupArgon2i();
-        $this->passwordEncoderCommandTester->execute([
-            'command' => 'security:encode-password',
-            'password' => 'password',
-            'user-class' => 'Custom\Class\Argon2i\User',
-        ], ['interactive' => false]);
-
-        $output = $this->passwordEncoderCommandTester->getDisplay();
-        $this->assertContains('Password encoding succeeded', $output);
-
-        $encoder = new Argon2iPasswordEncoder();
-        preg_match('#  Encoded password\s+(\$argon2id?\$[\w,=\$+\/]+={0,2})\s+#', $output, $matches);
-        $hash = $matches[1];
-        $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }
 
     public function testEncodePasswordNative()
@@ -190,25 +143,6 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'p@ssw0rd',
             'user-class' => 'Custom\Class\Native\User',
-        ], ['interactive' => false]);
-
-        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testEncodePasswordArgon2iOutput()
-    {
-        if (!Argon2iPasswordEncoder::isSupported()) {
-            $this->markTestSkipped('Argon2i algorithm not available.');
-        }
-
-        $this->setupArgon2i();
-        $this->passwordEncoderCommandTester->execute([
-            'command' => 'security:encode-password',
-            'password' => 'p@ssw0rd',
-            'user-class' => 'Custom\Class\Argon2i\User',
         ], ['interactive' => false]);
 
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
@@ -308,32 +242,6 @@ EOTXT
     protected function tearDown()
     {
         $this->passwordEncoderCommandTester = null;
-    }
-
-    private function setupArgon2i()
-    {
-        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
-        $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'argon2i.yml']);
-        $kernel->boot();
-
-        $application = new Application($kernel);
-
-        $passwordEncoderCommand = $application->get('security:encode-password');
-
-        $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
-    }
-
-    private function setupBcrypt()
-    {
-        putenv('COLUMNS='.(119 + \strlen(PHP_EOL)));
-        $kernel = $this->createKernel(['test_case' => 'PasswordEncode', 'root_config' => 'bcrypt.yml']);
-        $kernel->boot();
-
-        $application = new Application($kernel);
-
-        $passwordEncoderCommand = $application->get('security:encode-password');
-
-        $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }
 
     private function setupSodium()

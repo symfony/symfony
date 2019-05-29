@@ -29,7 +29,6 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -552,38 +551,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     $config['encode_as_base64'],
                     $config['iterations'],
                     $config['key_length'],
-                ],
-            ];
-        }
-
-        // bcrypt encoder
-        if ('bcrypt' === $config['algorithm']) {
-            @trigger_error('Configuring an encoder with "bcrypt" as algorithm is deprecated since Symfony 4.3, use "auto" instead.', E_USER_DEPRECATED);
-
-            return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
-                'arguments' => [$config['cost'] ?? 13],
-            ];
-        }
-
-        // Argon2i encoder
-        if ('argon2i' === $config['algorithm']) {
-            @trigger_error('Configuring an encoder with "argon2i" as algorithm is deprecated since Symfony 4.3, use "auto" instead.', E_USER_DEPRECATED);
-
-            if (!Argon2iPasswordEncoder::isSupported()) {
-                if (\extension_loaded('sodium') && !\defined('SODIUM_CRYPTO_PWHASH_SALTBYTES')) {
-                    throw new InvalidConfigurationException('The installed libsodium version does not have support for Argon2i. Use "auto" instead.');
-                }
-
-                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use "auto" instead.');
-            }
-
-            return [
-                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => [
-                    $config['memory_cost'],
-                    $config['time_cost'],
-                    $config['threads'],
                 ],
             ];
         }

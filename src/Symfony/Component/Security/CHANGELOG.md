@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Removed `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
+* Removed `BcryptPasswordEncoder`, use `NativePasswordEncoder` instead
+
 4.3.0
 -----
 

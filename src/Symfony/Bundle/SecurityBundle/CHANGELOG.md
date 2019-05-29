@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* Deprecated configuring encoders using `argon2i` or `bcrypt` as algorithm, use `auto` instead
+
 4.3.0
 -----
 

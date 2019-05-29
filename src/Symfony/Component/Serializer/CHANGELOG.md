@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * throw an exception when creating a `Serializer` with normalizers which neither implement `NormalizerInterface` nor `DenormalizerInterface`
+ * throw an exception when creating a `Serializer` with encoders which neither implement `EncoderInterface` nor `DecoderInterface`
+
 4.3.0
 -----
 

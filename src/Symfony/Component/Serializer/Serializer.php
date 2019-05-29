@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -84,8 +85,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($normalizer instanceof NormalizerInterface || $normalizer instanceof DenormalizerInterface)) {
-                @trigger_error(\sprintf('Passing normalizers ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class), E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(\sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($normalizer), NormalizerInterface::class, DenormalizerInterface::class));
             }
         }
         $this->normalizers = $normalizers;
@@ -104,8 +104,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             }
 
             if (!($encoder instanceof EncoderInterface || $encoder instanceof DecoderInterface)) {
-                @trigger_error(\sprintf('Passing encoders ("%s") which do not implement either "%s" or "%s" has been deprecated since Symfony 4.2.', \get_class($encoder), EncoderInterface::class, DecoderInterface::class), E_USER_DEPRECATED);
-                // throw new \InvalidArgumentException(\sprintf('The class "%s" does not implement "%s" or "%s".', \get_class($normalizer), EncoderInterface::class, DecoderInterface::class));
+                throw new InvalidArgumentException(\sprintf('The class "%s" neither implements "%s" nor "%s".', \get_class($encoder), EncoderInterface::class, DecoderInterface::class));
             }
         }
         $this->encoder = new ChainEncoder($realEncoders);

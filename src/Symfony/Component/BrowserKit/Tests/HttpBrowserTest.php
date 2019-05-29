@@ -20,10 +20,6 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-class SpecialHttpResponse extends Response
-{
-}
-
 class TestHttpClient extends HttpBrowser
 {
     protected $nextResponse = null;
@@ -60,10 +56,6 @@ class TestHttpClient extends HttpBrowser
 
     protected function filterResponse($response)
     {
-        if ($response instanceof SpecialHttpResponse) {
-            return new Response($response->getContent(), $response->getStatusCode(), $response->getHeaders());
-        }
-
         return $response;
     }
 
@@ -102,17 +94,6 @@ class HttpBrowserTest extends AbstractBrowserTest
     public function getBrowser(array $server = [], History $history = null, CookieJar $cookieJar = null)
     {
         return new TestHttpClient($server, $history, $cookieJar);
-    }
-
-    public function testGetInternalResponse()
-    {
-        $client = $this->getBrowser();
-        $client->setNextResponse(new SpecialHttpResponse('foo'));
-        $client->request('GET', 'http://example.com/');
-
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
-        $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialHttpResponse', $client->getInternalResponse());
-        $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialHttpResponse', $client->getResponse());
     }
 
     /**

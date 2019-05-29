@@ -30,6 +30,9 @@
         "symfony/stopwatch": "^4.4|^5.0"
     },
     "conflict": {
+        "symfony/dependency-injection": "<4.4",
+        "symfony/messenger": "<4.4",
+        "symfony/var-dumper": "<4.4",
         "symfony/form": "<4.4"
     },
     "autoload": {

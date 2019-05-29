@@ -33,7 +33,11 @@
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
-        "phpdocumentor/type-resolver": "<0.2.1"
+        "phpdocumentor/type-resolver": "<0.2.1",
+        "symfony/dependency-injection": "<4.4",
+        "symfony/property-access": "<4.4",
+        "symfony/property-info": "<4.4",
+        "symfony/yaml": "<4.4"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

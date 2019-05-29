@@ -33,7 +33,10 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "conflict": {
-        "symfony/config": "<4.4"
+        "symfony/config": "<4.4",
+        "symfony/finder": "<4.4",
+        "symfony/proxy-manager-bridge": "<4.4",
+        "symfony/yaml": "<4.4"
     },
     "provide": {
         "psr/container-implementation": "1.0",

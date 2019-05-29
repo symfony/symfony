@@ -44,8 +44,11 @@
         "symfony/workflow": "^4.4|^5.0"
     },
     "conflict": {
+        "symfony/console": "<4.4",
         "symfony/form": "<4.4",
-        "symfony/http-foundation": "<4.4"
+        "symfony/http-foundation": "<4.4",
+        "symfony/translation": "<4.4",
+        "symfony/workflow": "<4.4"
     },
     "suggest": {
         "symfony/finder": "",

@@ -27,6 +27,9 @@
         "symfony/security-csrf": "^4.4|^5.0",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/security-csrf": "<4.4"
+    },
     "suggest": {
         "symfony/security-csrf": "For using tokens to protect authentication/logout attempts",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"

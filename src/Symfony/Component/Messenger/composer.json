@@ -37,7 +37,8 @@
         "symfony/var-dumper": "^4.4|^5.0"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.4"
+        "symfony/event-dispatcher": "<4.4",
+        "symfony/debug": "<4.4"
     },
     "suggest": {
         "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."

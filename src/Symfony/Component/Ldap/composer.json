@@ -20,6 +20,9 @@
         "symfony/options-resolver": "^4.4|^5.0",
         "ext-ldap": "*"
     },
+    "conflict": {
+        "symfony/options-resolver": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },
         "exclude-from-classmap": [

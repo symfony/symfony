@@ -46,6 +46,13 @@
         "doctrine/doctrine-bundle": "~1.5",
         "twig/twig": "~1.34|~2.4"
     },
+    "conflict": {
+        "symfony/browser-kit": "<4.4",
+        "symfony/twig-bundle": "<4.4",
+        "symfony/var-dumper": "<4.4",
+        "symfony/framework-bundle": "<4.4",
+        "symfony/console": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },
         "exclude-from-classmap": [

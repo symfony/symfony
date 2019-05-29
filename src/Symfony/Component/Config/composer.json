@@ -27,6 +27,9 @@
         "symfony/messenger": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/finder": "<4.4"
+    },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"
     },

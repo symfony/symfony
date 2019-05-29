@@ -39,8 +39,13 @@
     "conflict": {
         "phpunit/phpunit": "<5.4.3",
         "symfony/console": "<4.4",
+        "symfony/dependency-injection": "<4.4",
+        "symfony/doctrine-bridge": "<4.4",
+        "symfony/framework-bundle": "<4.4",
         "symfony/http-kernel": "<4.4",
-        "symfony/intl": "<4.4"
+        "symfony/intl": "<4.4",
+        "symfony/translation": "<4.4",
+        "symfony/twig-bridge": "<4.4"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

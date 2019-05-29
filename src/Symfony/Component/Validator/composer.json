@@ -41,7 +41,11 @@
     },
     "conflict": {
         "phpunit/phpunit": "<5.4.3",
-        "symfony/intl": "<4.4"
+        "symfony/dependency-injection": "<4.4",
+        "symfony/http-kernel": "<4.4",
+        "symfony/intl": "<4.4",
+        "symfony/translation": "<4.4",
+        "symfony/yaml": "<4.4"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

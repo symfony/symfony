@@ -19,6 +19,9 @@
         "php": "^7.2.9",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/http-kernel": "<4.4"
+    },
     "require-dev": {
         "symfony/http-kernel": "^4.4|^5.0"
     },

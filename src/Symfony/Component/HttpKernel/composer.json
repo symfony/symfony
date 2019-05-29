@@ -48,7 +48,10 @@
     },
     "conflict": {
         "symfony/browser-kit": "<4.4",
+        "symfony/config": "<4.4",
         "symfony/dependency-injection": "<4.4",
+        "symfony/translation": "<4.4",
+        "symfony/var-dumper": "<4.4",
         "twig/twig": "<1.34|<2.4,>=2"
     },
     "suggest": {

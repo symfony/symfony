@@ -35,7 +35,8 @@
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.2.2",
-        "phpdocumentor/type-resolver": "<0.3.0"
+        "phpdocumentor/type-resolver": "<0.3.0",
+        "symfony/dependency-injection": "<4.4"
     },
     "suggest": {
         "psr/cache-implementation": "To cache results",

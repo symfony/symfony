@@ -47,6 +47,7 @@
     },
     "conflict": {
         "phpunit/phpunit": "<5.4.3",
+        "symfony/dependency-injection": "<4.4",
         "symfony/form": "<4.4",
         "symfony/messenger": "<4.4"
     },

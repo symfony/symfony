@@ -40,7 +40,9 @@
         "psr/log": "For using the console logger"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.4"
+        "symfony/dependency-injection": "<4.4",
+        "symfony/event-dispatcher": "<4.4",
+        "symfony/process": "<4.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },

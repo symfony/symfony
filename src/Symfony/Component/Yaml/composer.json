@@ -22,6 +22,9 @@
     "require-dev": {
         "symfony/console": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/console": "<4.4"
+    },
     "suggest": {
         "symfony/console": "For validating YAML files using the lint command"
     },

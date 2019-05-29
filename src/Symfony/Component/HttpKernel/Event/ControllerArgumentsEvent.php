@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+
 /**
  * Allows filtering of controller arguments.
  *
@@ -23,6 +26,27 @@ namespace Symfony\Component\HttpKernel\Event;
  *
  * @author Christophe Coevoet <stof@notk.org>
  */
-class ControllerArgumentsEvent extends FilterControllerArgumentsEvent
+class ControllerArgumentsEvent extends ControllerEvent
 {
+    private $arguments;
+
+    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
+    {
+        parent::__construct($kernel, $controller, $request, $requestType);
+
+        $this->arguments = $arguments;
+    }
+
+    /**
+     * @return array
+     */
+    public function getArguments()
+    {
+        return $this->arguments;
+    }
+
+    public function setArguments(array $arguments)
+    {
+        $this->arguments = $arguments;
+    }
 }

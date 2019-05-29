@@ -8,7 +8,15 @@ CHANGELOG
  * removed `ConfigDataCollector::getApplicationName()` 
  * removed `ConfigDataCollector::getApplicationVersion()`
  * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
- * removed `TranslatorListener`
+ * removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * removed `FilterControllerArgumentsEvent`, use `ControllerArgumentsEvent` instead
+ * removed `FilterControllerEvent`, use `ControllerEvent` instead
+ * removed `FilterResponseEvent`, use `ResponseEvent` instead
+ * removed `GetResponseEvent`, use `RequestEvent` instead
+ * removed `GetResponseForControllerResultEvent`, use `ViewEvent` instead
+ * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
+ * removed `PostResponseEvent`, use `TerminateEvent` instead
+ * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
 
 4.3.0
 -----

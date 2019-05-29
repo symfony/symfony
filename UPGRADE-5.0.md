@@ -266,6 +266,7 @@ HttpKernel
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
  * The `DebugHandlersListener` class has been made `final`
+ * Removed `SaveSessionListener` in favor of `AbstractSessionListener` 
 
 Intl
 ----

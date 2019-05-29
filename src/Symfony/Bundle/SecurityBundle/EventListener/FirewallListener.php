@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\EventListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
@@ -41,7 +41,7 @@ class FirewallListener extends Firewall
     /**
      * @internal
      */
-    public function configureLogoutUrlGenerator(GetResponseEvent $event)
+    public function configureLogoutUrlGenerator(RequestEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;

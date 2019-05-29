@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed the first and second constructor argument of `ConfigDataCollector` 
+ * removed `ConfigDataCollector::getApplicationName()` 
+ * removed `ConfigDataCollector::getApplicationVersion()`
+
 4.3.0
 -----
 

@@ -64,23 +64,6 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Storing translations in the "%ssf_translation%s/Resources/translations" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/translations" directory instead.
-     * @expectedDeprecation Loading Twig templates from the "%ssf_translation%s/Resources/views" directory is deprecated since Symfony 4.2, use the "%ssf_translation%s/templates" directory instead.
-     */
-    public function testDebugLegacyDefaultDirectory()
-    {
-        $this->fs->mkdir($this->translationDir.'/Resources/translations');
-        $this->fs->mkdir($this->translationDir.'/Resources/views');
-
-        $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
-        $tester->execute(['locale' => 'en']);
-
-        $this->assertRegExp('/missing/', $tester->getDisplay());
-        $this->assertRegExp('/unused/', $tester->getDisplay());
-    }
-
     public function testDebugDefaultRootDirectory()
     {
         $this->fs->remove($this->translationDir);

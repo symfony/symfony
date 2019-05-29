@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -28,28 +27,11 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
-    /**
-     * @deprecated since Symfony 4.4
-     */
-    protected $parser;
     private $loading = false;
     private $defaultOptions;
 
-    /**
-     * @param LoaderResolverInterface $resolver
-     * @param array                   $defaultOptions
-     */
-    public function __construct($resolver, $defaultOptions = [])
+    public function __construct(LoaderResolverInterface $resolver, array $defaultOptions = [])
     {
-        if ($resolver instanceof ControllerNameParser) {
-            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ControllerNameParser::class, __METHOD__, LoaderResolverInterface::class), E_USER_DEPRECATED);
-            $this->parser = $resolver;
-            $resolver = $defaultOptions;
-            $defaultOptions = 2 < \func_num_args() ? func_get_arg(2) : [];
-        } elseif (2 < \func_num_args() && func_get_arg(2) instanceof ControllerNameParser) {
-            $this->parser = func_get_arg(2);
-        }
-
         $this->defaultOptions = $defaultOptions;
 
         parent::__construct($resolver);
@@ -97,18 +79,6 @@ class DelegatingLoader extends BaseDelegatingLoader
 
             if (false !== strpos($controller, '::')) {
                 continue;
-            }
-
-            if ($this->parser && 2 === substr_count($controller, ':')) {
-                $deprecatedNotation = $controller;
-
-                try {
-                    $controller = $this->parser->parse($controller, false);
-
-                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1, use "%s" instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
-                } catch (\InvalidArgumentException $e) {
-                    // unable to optimize unknown notation
-                }
             }
 
             if (1 === substr_count($controller, ':')) {

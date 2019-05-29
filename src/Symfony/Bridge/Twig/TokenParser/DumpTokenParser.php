@@ -21,8 +21,11 @@ use Twig\TokenParser\AbstractTokenParser;
  * Dump variables with:
  *
  *     {% dump %}
+ *     {% dump() %}
  *     {% dump foo %}
+ *     {% dump(foo) %}
  *     {% dump foo, bar %}
+ *     {% dump(foo, bar) %}
  *
  * @author Julien Galenski <julien.galenski@gmail.com>
  */
@@ -34,10 +37,18 @@ class DumpTokenParser extends AbstractTokenParser
     public function parse(Token $token)
     {
         $values = null;
-        if (!$this->parser->getStream()->test(Token::BLOCK_END_TYPE)) {
-            $values = $this->parser->getExpressionParser()->parseMultitargetExpression();
+
+        $stream = $this->parser->getStream();
+        if (!$stream->test(Token::BLOCK_END_TYPE)) {
+            if ($stream->test(Token::PUNCTUATION_TYPE, '(') && $stream->look()->test(Token::PUNCTUATION_TYPE, ')')) {
+                $stream->next();
+                $stream->next();
+            } else {
+                $values = $this->parser->getExpressionParser()->parseMultitargetExpression();
+            }
         }
-        $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
+
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         return new DumpNode($this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
     }

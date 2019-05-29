@@ -31,6 +31,9 @@
         "symfony/security-core": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/event-dispatcher": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }
     },

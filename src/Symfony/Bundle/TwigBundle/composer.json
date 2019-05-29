@@ -40,6 +40,9 @@
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
+    "conflict": {
+        "symfony/framework-bundle": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },
         "exclude-from-classmap": [

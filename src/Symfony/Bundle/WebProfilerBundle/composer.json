@@ -29,6 +29,9 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/form": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },
         "exclude-from-classmap": [

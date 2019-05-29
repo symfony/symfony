@@ -34,7 +34,8 @@
         "doctrine/annotations": "~1.0"
     },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.2.2"
+        "phpdocumentor/reflection-docblock": "<3.2.2",
+        "phpdocumentor/type-resolver": "<0.3.0"
     },
     "suggest": {
         "psr/cache-implementation": "To cache results",

@@ -46,7 +46,9 @@
         "doctrine/reflection": "~1.0"
     },
     "conflict": {
-        "phpunit/phpunit": "<5.4.3"
+        "phpunit/phpunit": "<5.4.3",
+        "symfony/form": "<4.4",
+        "symfony/messenger": "<4.4"
     },
     "suggest": {
         "symfony/form": "",

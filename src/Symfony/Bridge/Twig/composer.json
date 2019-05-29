@@ -43,6 +43,10 @@
         "symfony/web-link": "^4.4|^5.0",
         "symfony/workflow": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/form": "<4.4",
+        "symfony/http-foundation": "<4.4"
+    },
     "suggest": {
         "symfony/finder": "",
         "symfony/asset": "For using the AssetExtension",

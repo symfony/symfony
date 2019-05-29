@@ -39,6 +39,9 @@
         "symfony/process": "",
         "psr/log": "For using the console logger"
     },
+    "conflict": {
+        "symfony/event-dispatcher": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },
         "exclude-from-classmap": [

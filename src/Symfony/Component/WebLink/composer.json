@@ -27,6 +27,9 @@
         "symfony/http-foundation": "^4.4|^5.0",
         "symfony/http-kernel": "^4.4|^5.0"
     },
+    "conflict": {
+        "symfony/http-kernel": "<4.4"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\WebLink\\": "" },
         "exclude-from-classmap": [

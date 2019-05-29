@@ -40,6 +40,9 @@
         "symfony/ldap": "^3.4|^4.0|^5.0",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/event-dispatcher": ">=5"
+    },
     "suggest": {
         "psr/container-implementation": "To instantiate the Security class",
         "symfony/form": "",

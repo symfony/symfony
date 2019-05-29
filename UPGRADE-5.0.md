@@ -382,6 +382,7 @@ SecurityBundle
 Serializer
 ----------
 
+ * The default value of the `CsvEncoder` "as_collection" option was changed to `true`.
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
 
 Translation

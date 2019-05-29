@@ -33,6 +33,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     private $formulasStartCharacters = ['=', '-', '+', '@'];
     private $defaultContext = [
+        self::AS_COLLECTION_KEY => true,
         self::DELIMITER_KEY => ',',
         self::ENCLOSURE_KEY => '"',
         self::ESCAPE_CHAR_KEY => '\\',
@@ -135,7 +136,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $headerCount = [];
         $result = [];
 
-        list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
+        list($delimiter, $enclosure, $escapeChar, $keySeparator, , , $asCollection) = $this->getCsvOptions($context);
 
         while (false !== ($cols = fgetcsv($handle, 0, $delimiter, $enclosure, $escapeChar))) {
             $nbCols = \count($cols);
@@ -183,16 +184,12 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
-        if ($context[self::AS_COLLECTION_KEY] ?? false) {
+        if ($asCollection) {
             return $result;
         }
 
         if (empty($result) || isset($result[1])) {
             return $result;
-        }
-
-        if (!isset($context['as_collection'])) {
-            @trigger_error('Relying on the default value (false) of the "as_collection" option is deprecated since 4.2. You should set it to false explicitly instead as true will be the default value in 5.0.', E_USER_DEPRECATED);
         }
 
         // If there is only one data line in the document, return it (the line), the result is not considered as a collection
@@ -233,12 +230,13 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $keySeparator = $context[self::KEY_SEPARATOR_KEY] ?? $this->defaultContext[self::KEY_SEPARATOR_KEY];
         $headers = $context[self::HEADERS_KEY] ?? $this->defaultContext[self::HEADERS_KEY];
         $escapeFormulas = $context[self::ESCAPE_FORMULAS_KEY] ?? $this->defaultContext[self::ESCAPE_FORMULAS_KEY];
+        $asCollection = $context[self::AS_COLLECTION_KEY] ?? $this->defaultContext[self::AS_COLLECTION_KEY];
 
         if (!\is_array($headers)) {
             throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, \gettype($headers)));
         }
 
-        return [$delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas];
+        return [$delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas, $asCollection];
     }
 
     /**

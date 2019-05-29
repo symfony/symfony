@@ -6,6 +6,7 @@ CHANGELOG
 
  * throw an exception when creating a `Serializer` with normalizers which neither implement `NormalizerInterface` nor `DenormalizerInterface`
  * throw an exception when creating a `Serializer` with encoders which neither implement `EncoderInterface` nor `DecoderInterface`
+ * changed the default value of the `CsvEncoder` "as_collection" option to `true`
 
 4.3.0
 -----

@@ -54,16 +54,13 @@ class TimezoneType extends AbstractType
                     });
                 }
 
-                $regions = $options->offsetGet('regions', false);
-
-                return new CallbackChoiceLoader(function () use ($regions, $input) {
-                    return self::getPhpTimezones($regions, $input);
+                return new CallbackChoiceLoader(function () use ($input) {
+                    return self::getPhpTimezones($input);
                 });
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
             'input' => 'string',
-            'regions' => \DateTimeZone::ALL,
         ]);
 
         $resolver->setAllowedTypes('intl', ['bool']);
@@ -81,16 +78,6 @@ class TimezoneType extends AbstractType
         $resolver->setNormalizer('input', function (Options $options, $value) {
             if ('intltimezone' === $value && !class_exists(\IntlTimeZone::class)) {
                 throw new LogicException('Cannot use "intltimezone" input because the PHP intl extension is not available.');
-            }
-
-            return $value;
-        });
-
-        $resolver->setAllowedTypes('regions', 'int');
-        $resolver->setDeprecated('regions', 'The option "%name%" is deprecated since Symfony 4.2.');
-        $resolver->setNormalizer('regions', function (Options $options, $value) {
-            if ($options['intl'] && \DateTimeZone::ALL !== (\DateTimeZone::ALL & $value)) {
-                throw new LogicException('The "regions" option can only be used if the "intl" option is set to false.');
             }
 
             return $value;
@@ -113,11 +100,11 @@ class TimezoneType extends AbstractType
         return 'timezone';
     }
 
-    private static function getPhpTimezones(int $regions, string $input): array
+    private static function getPhpTimezones(string $input): array
     {
         $timezones = [];
 
-        foreach (\DateTimeZone::listIdentifiers($regions) as $timezone) {
+        foreach (\DateTimeZone::listIdentifiers(\DateTimeZone::ALL) as $timezone) {
             if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
                 continue;
             }

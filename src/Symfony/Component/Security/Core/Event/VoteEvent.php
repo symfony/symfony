@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is dispatched on voter vote.

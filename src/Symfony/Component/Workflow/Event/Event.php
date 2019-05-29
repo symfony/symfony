@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Workflow\Event;
 
-use Symfony\Component\EventDispatcher\Event as BaseEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
+use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

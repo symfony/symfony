@@ -26,21 +26,10 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      * @var KernelInterface
      */
     private $kernel;
-    private $name;
-    private $version;
     private $hasVarDumper;
 
-    public function __construct(string $name = null, string $version = null)
+    public function __construct()
     {
-        if (1 <= \func_num_args()) {
-            @trigger_error(sprintf('The "$name" argument in method "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-        if (2 <= \func_num_args()) {
-            @trigger_error(sprintf('The "$version" argument in method "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $this->name = $name;
-        $this->version = $version;
         $this->hasVarDumper = class_exists(LinkStub::class);
     }
 
@@ -58,8 +47,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = [
-            'app_name' => $this->name,
-            'app_version' => $this->version,
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
             'symfony_state' => 'unknown',
@@ -107,26 +94,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     public function lateCollect()
     {
         $this->data = $this->cloneVar($this->data);
-    }
-
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    public function getApplicationName()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->data['app_name'];
-    }
-
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    public function getApplicationVersion()
-    {
-        @trigger_error(sprintf('The method "%s()" is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->data['app_version'];
     }
 
     /**

@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel;
 
 class TranslationDebugCommandTest extends TestCase
 {
@@ -181,12 +180,6 @@ class TranslationDebugCommandTest extends TestCase
                 ['foo', $this->getBundle($this->translationDir)],
                 ['test', $this->getBundle('test')],
             ];
-            if (HttpKernel\Kernel::VERSION_ID < 40000) {
-                $returnValues = [
-                    ['foo', true, $this->getBundle($this->translationDir)],
-                    ['test', true, $this->getBundle('test')],
-                ];
-            }
             $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
             $kernel
                 ->expects($this->any())

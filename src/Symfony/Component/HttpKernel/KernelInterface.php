@@ -97,15 +97,6 @@ interface KernelInterface extends HttpKernelInterface
     public function locateResource($name, $dir = null, $first = true);
 
     /**
-     * Gets the name of the kernel.
-     *
-     * @return string The kernel name
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getName();
-
-    /**
      * Gets the environment.
      *
      * @return string The current environment
@@ -118,15 +109,6 @@ interface KernelInterface extends HttpKernelInterface
      * @return bool true if debug mode is enabled, false otherwise
      */
     public function isDebug();
-
-    /**
-     * Gets the application root dir (path of the project's Kernel class).
-     *
-     * @return string The Kernel root dir
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getRootDir();
 
     /**
      * Gets the project dir (path of the project's composer file).

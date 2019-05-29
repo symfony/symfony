@@ -34,8 +34,7 @@ class Country extends Constraint
     public function __construct($options = null)
     {
         if (!class_exists(Countries::class)) {
-            // throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');
-            @trigger_error(sprintf('Using the "%s" constraint without the "symfony/intl" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+            throw new LogicException('The Intl component is required to use the Country constraint. Try running "composer require symfony/intl".');
         }
 
         parent::__construct($options);

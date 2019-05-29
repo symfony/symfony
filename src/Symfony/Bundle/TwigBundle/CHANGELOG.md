@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * updated default value for the `strict_variables` option to `%kernel.debug%` parameter
+
 4.2.0
 -----
 

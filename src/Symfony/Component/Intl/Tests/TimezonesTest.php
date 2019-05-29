@@ -605,6 +605,15 @@ class TimezonesTest extends ResourceBundleTestCase
 
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
+     * @expectedExceptionMessage Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.
+     */
+    public function testForCountryCodeWithWrongCountryCode()
+    {
+        Timezones::forCountryCode('nl');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testGetCountryCodeWithUnknownTimezone()
     {

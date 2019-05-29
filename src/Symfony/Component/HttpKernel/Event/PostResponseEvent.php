@@ -32,6 +32,8 @@ class PostResponseEvent extends KernelEvent
     /**
      * Returns the response for which this event was thrown.
      *
+     * @final since Symfony 4.4
+     *
      * @return Response
      */
     public function getResponse()

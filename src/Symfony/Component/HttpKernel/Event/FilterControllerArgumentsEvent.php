@@ -29,6 +29,8 @@ class FilterControllerArgumentsEvent extends ControllerEvent
     }
 
     /**
+     * @final since Symfony 4.4
+     *
      * @return array
      */
     public function getArguments()

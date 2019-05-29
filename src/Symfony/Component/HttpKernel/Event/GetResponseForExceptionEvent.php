@@ -41,6 +41,8 @@ class GetResponseForExceptionEvent extends RequestEvent
     /**
      * Returns the thrown exception.
      *
+     * @final since Symfony 4.4
+     *
      * @return \Exception The thrown exception
      */
     public function getException()

@@ -32,6 +32,8 @@ class FilterResponseEvent extends KernelEvent
     /**
      * Returns the current response object.
      *
+     * @final since Symfony 4.4
+     *
      * @return Response
      */
     public function getResponse()

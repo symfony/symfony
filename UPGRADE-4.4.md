@@ -19,3 +19,12 @@ DependencyInjection
      my_service:
        factory: ['@factory_service', method]
    ```
+
+HttpKernel
+----------
+
+* The method `FilterControllerArgumentsEvent::getArguments()` marked final.
+* The method `FilterControllerEvent::getController()` marked final.
+* The method `FilterResponseEvent::getResponse()` marked final.
+* The method `GetResponseForExceptionEvent::getException()` marked final.
+* The method `PostResponseEvent::getResponse()` marked final.

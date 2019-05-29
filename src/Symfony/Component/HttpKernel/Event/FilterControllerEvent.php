@@ -31,6 +31,8 @@ class FilterControllerEvent extends KernelEvent
     /**
      * Returns the current controller.
      *
+     * @final since Symfony 4.4
+     *
      * @return callable
      */
     public function getController()

@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* The method `FilterControllerArgumentsEvent::getArguments()` has been made final
+* The method `FilterControllerEvent::getController()` has been made final
+* The method `FilterResponseEvent::getResponse()` has been made final
+* The method `GetResponseForExceptionEvent::getException()` has been made final
+* The method `PostResponseEvent::getResponse()` has been made final
+
 4.3.0
 -----
 

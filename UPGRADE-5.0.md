@@ -275,6 +275,11 @@ Monolog
 
  * The methods `DebugProcessor::getLogs()`, `DebugProcessor::countErrors()`, `Logger::getLogs()` and `Logger::countErrors()` have a new `$request` argument.
 
+MonologBridge
+--------------
+
+* The `RouteProcessor` class is final.
+
 Process
 -------
 

@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`
+ * removed `getExtendedType()` method of the `FormTypeExtensionInterface`
+ * added static `getExtendedTypes()` method to the `FormTypeExtensionInterface`
 
 4.3.0
 -----

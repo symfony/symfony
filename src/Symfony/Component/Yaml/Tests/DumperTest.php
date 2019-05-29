@@ -37,8 +37,8 @@ class DumperTest extends TestCase
         ],
         'barfoo' => [
             ['foo' => 'bar'],
-            ['bar', 'foo']
-        ]
+            ['bar', 'foo'],
+        ],
     ];
 
     protected function setUp()

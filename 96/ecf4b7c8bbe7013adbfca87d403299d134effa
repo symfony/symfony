@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-29T10:36:25Z
+
+AH :D `Europe/Saratov` is included as of `TZ DB 2017`.
+
+Appveyor runs v2018, and travis v2015. This explains the failures. (cc @mmokhi i figure you're on >=2017 also).
+
+I'll think of way to fix tests, but it's relies very much on environment. Not sure what TZ/version combination to test is best now :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-29T11:31:24Z
+
+But this means the test are not future proof right? As time passes, it will become more and more skipped.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-29T11:40:19Z
+
+Eventually yes, im not sure if travis plans TZ updates regularly (looks like they dont :D). For the time being it's sufficient IMHO.
+
+Today, using TZ DB 2019 all timezone IDs can  be used with `IntlTimeZone`. So there's no real better fixture.
+
+The weird thing is the expiry date is stilled listed: https://github.com/unicode-org/icu/blob/c8c3fbca284351ff259dbd7e983ba61f964fd80f/icu4c/source/data/misc/metaZones.txt#L3886-L3892. Perhaps ICU will update it later in time...

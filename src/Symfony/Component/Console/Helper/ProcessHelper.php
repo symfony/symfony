@@ -21,7 +21,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.2
+ * @final
  */
 class ProcessHelper extends Helper
 {
@@ -50,8 +50,7 @@ class ProcessHelper extends Helper
         }
 
         if (!\is_array($cmd)) {
-            @trigger_error(sprintf('Passing a command as a string to "%s()" is deprecated since Symfony 4.2, pass it the command as an array of arguments instead.', __METHOD__), E_USER_DEPRECATED);
-            $cmd = [\method_exists(Process::class, 'fromShellCommandline') ? Process::fromShellCommandline($cmd) : new Process($cmd)];
+            throw new \TypeError(sprintf('The "command" argument of "%s()" must be an array or a "%s" instance, "%s" given.', __METHOD__, Process::class, \is_object($cmd) ? \get_class($cmd) : \gettype($cmd)));
         }
 
         if (\is_string($cmd[0] ?? null)) {

@@ -43,8 +43,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * An Application is the container for a collection of commands.
@@ -92,11 +91,11 @@ class Application
     }
 
     /**
-     * @final since Symfony 4.3, the type-hint will be updated to the interface from symfony/contracts in 5.0
+     * @final
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
     }
 
     public function setCommandLoader(CommandLoaderInterface $commandLoader)

@@ -17,7 +17,6 @@ use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -65,7 +64,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * Configures the error handler.
      */
-    public function configure(Event $event = null)
+    public function configure(object $event = null)
     {
         if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMasterRequest()) {
             return;

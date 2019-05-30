@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
+
 4.4.0
 -----
 

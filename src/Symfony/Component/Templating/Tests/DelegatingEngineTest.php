@@ -26,7 +26,7 @@ class DelegatingEngineTest extends TestCase
         $secondEngine->expects($this->once())
             ->method('render')
             ->with('template.php', ['foo' => 'bar'])
-            ->will($this->returnValue('<html />'));
+            ->willReturn('<html />');
 
         $delegatingEngine = new DelegatingEngine([$firstEngine, $secondEngine]);
         $result = $delegatingEngine->render('template.php', ['foo' => 'bar']);
@@ -53,7 +53,7 @@ class DelegatingEngineTest extends TestCase
         $streamingEngine->expects($this->once())
             ->method('stream')
             ->with('template.php', ['foo' => 'bar'])
-            ->will($this->returnValue('<html />'));
+            ->willReturn('<html />');
 
         $delegatingEngine = new DelegatingEngine([$streamingEngine]);
         $result = $delegatingEngine->stream('template.php', ['foo' => 'bar']);
@@ -77,7 +77,7 @@ class DelegatingEngineTest extends TestCase
         $engine->expects($this->once())
             ->method('exists')
             ->with('template.php')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $delegatingEngine = new DelegatingEngine([$engine]);
 
@@ -132,7 +132,7 @@ class DelegatingEngineTest extends TestCase
         $engine->expects($this->once())
             ->method('supports')
             ->with($template)
-            ->will($this->returnValue($supports));
+            ->willReturn($supports);
 
         return $engine;
     }
@@ -144,7 +144,7 @@ class DelegatingEngineTest extends TestCase
         $engine->expects($this->once())
             ->method('supports')
             ->with($template)
-            ->will($this->returnValue($supports));
+            ->willReturn($supports);
 
         return $engine;
     }

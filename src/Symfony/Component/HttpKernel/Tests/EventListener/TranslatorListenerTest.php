@@ -113,6 +113,6 @@ class TranslatorListenerTest extends TestCase
         $this->requestStack
             ->expects($this->any())
             ->method('getParentRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
     }
 }

@@ -39,12 +39,12 @@ class ArrayDenormalizerTest extends TestCase
         $this->serializer->expects($this->at(0))
             ->method('denormalize')
             ->with(['foo' => 'one', 'bar' => 'two'])
-            ->will($this->returnValue(new ArrayDummy('one', 'two')));
+            ->willReturn(new ArrayDummy('one', 'two'));
 
         $this->serializer->expects($this->at(1))
             ->method('denormalize')
             ->with(['foo' => 'three', 'bar' => 'four'])
-            ->will($this->returnValue(new ArrayDummy('three', 'four')));
+            ->willReturn(new ArrayDummy('three', 'four'));
 
         $result = $this->denormalizer->denormalize(
             [
@@ -68,7 +68,7 @@ class ArrayDenormalizerTest extends TestCase
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
             ->with($this->anything(), __NAMESPACE__.'\ArrayDummy', $this->anything())
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue(
             $this->denormalizer->supportsDenormalization(
@@ -85,7 +85,7 @@ class ArrayDenormalizerTest extends TestCase
     {
         $this->serializer->expects($this->any())
             ->method('supportsDenormalization')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(

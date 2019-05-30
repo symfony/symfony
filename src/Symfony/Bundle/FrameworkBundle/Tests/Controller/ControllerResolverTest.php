@@ -55,7 +55,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $parser->expects($this->once())
             ->method('parse')
             ->with($shortName)
-            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction'))
+            ->willReturn('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction')
         ;
 
         $resolver = $this->createControllerResolver(null, null, $parser);

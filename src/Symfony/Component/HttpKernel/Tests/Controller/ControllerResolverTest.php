@@ -226,7 +226,7 @@ class ControllerResolverTest extends TestCase
     public function testCreateControllerCanReturnAnyCallable()
     {
         $mock = $this->getMockBuilder('Symfony\Component\HttpKernel\Controller\ControllerResolver')->setMethods(['createController'])->getMock();
-        $mock->expects($this->once())->method('createController')->will($this->returnValue('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function'));
+        $mock->expects($this->once())->method('createController')->willReturn('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function');
 
         $request = Request::create('/');
         $request->attributes->set('_controller', 'foobar');

@@ -31,13 +31,13 @@ class AutowireExceptionPassTest extends TestCase
         $autowireException = new AutowiringFailedException('foo_service_id', 'An autowiring exception message');
         $autowirePass->expects($this->any())
             ->method('getAutowiringExceptions')
-            ->will($this->returnValue([$autowireException]));
+            ->willReturn([$autowireException]);
 
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
             ->method('getInlinedServiceIds')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $container = new ContainerBuilder();
         $container->register('foo_service_id');
@@ -60,18 +60,18 @@ class AutowireExceptionPassTest extends TestCase
         $autowireException = new AutowiringFailedException('a_service', 'An autowiring exception message');
         $autowirePass->expects($this->any())
             ->method('getAutowiringExceptions')
-            ->will($this->returnValue([$autowireException]));
+            ->willReturn([$autowireException]);
 
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
             ->method('getInlinedServiceIds')
-            ->will($this->returnValue([
+            ->willReturn([
                 // a_service inlined into b_service
                 'a_service' => ['b_service'],
                 // b_service inlined into c_service
                 'b_service' => ['c_service'],
-            ]));
+            ]);
 
         $container = new ContainerBuilder();
         // ONLY register c_service in the final container
@@ -95,18 +95,18 @@ class AutowireExceptionPassTest extends TestCase
         $autowireException = new AutowiringFailedException('a_service', 'An autowiring exception message');
         $autowirePass->expects($this->any())
             ->method('getAutowiringExceptions')
-            ->will($this->returnValue([$autowireException]));
+            ->willReturn([$autowireException]);
 
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
             ->method('getInlinedServiceIds')
-            ->will($this->returnValue([
+            ->willReturn([
                 // a_service inlined into b_service
                 'a_service' => ['b_service'],
                 // b_service inlined into c_service
                 'b_service' => ['c_service'],
-            ]));
+            ]);
 
         // do NOT register c_service in the container
         $container = new ContainerBuilder();
@@ -126,13 +126,13 @@ class AutowireExceptionPassTest extends TestCase
         $autowireException = new AutowiringFailedException('non_existent_service');
         $autowirePass->expects($this->any())
             ->method('getAutowiringExceptions')
-            ->will($this->returnValue([$autowireException]));
+            ->willReturn([$autowireException]);
 
         $inlinePass = $this->getMockBuilder(InlineServiceDefinitionsPass::class)
             ->getMock();
         $inlinePass->expects($this->any())
             ->method('getInlinedServiceIds')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $container = new ContainerBuilder();
 

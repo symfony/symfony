@@ -56,7 +56,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $form = $this->createBuilder('name')
             ->setType($type)
@@ -77,7 +77,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $options = [
             'b' => 'foo',
@@ -111,7 +111,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $options = [
             'b' => 'foo',
@@ -142,7 +142,7 @@ class FormDataExtractorTest extends TestCase
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
             ->method('getInnerType')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $grandParent = $this->createBuilder('grandParent')
             ->setCompound(true)

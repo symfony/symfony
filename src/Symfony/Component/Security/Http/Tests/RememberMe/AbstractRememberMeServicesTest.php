@@ -51,7 +51,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $service
             ->expects($this->once())
             ->method('processAutoLoginCookie')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $service->autoLogin($request);
@@ -67,13 +67,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $service
             ->expects($this->once())
             ->method('processAutoLoginCookie')
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         $returnedToken = $service->autoLogin($request);
@@ -131,7 +131,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
 
         $service
@@ -154,13 +154,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->never())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $this->assertFalse($request->request->has('foo'));
@@ -178,13 +178,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -205,13 +205,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -232,13 +232,13 @@ class AbstractRememberMeServicesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($account))
+            ->willReturn($account)
         ;
 
         $service
             ->expects($this->once())
             ->method('onLoginSuccess')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $service->loginSuccess($request, $response, $token);
@@ -296,7 +296,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $provider
             ->expects($this->any())
             ->method('supportsClass')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         return $provider;

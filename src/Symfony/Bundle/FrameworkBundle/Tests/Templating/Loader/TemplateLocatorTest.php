@@ -27,7 +27,7 @@ class TemplateLocatorTest extends TestCase
             ->expects($this->once())
             ->method('locate')
             ->with($template->getPath())
-            ->will($this->returnValue('/path/to/template'))
+            ->willReturn('/path/to/template')
         ;
 
         $locator = new TemplateLocator($fileLocator);

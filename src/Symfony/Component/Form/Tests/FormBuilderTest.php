@@ -91,7 +91,7 @@ class FormBuilderTest extends TestCase
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
+            ->willReturn(new FormBuilder('foo', null, $this->dispatcher, $this->factory));
 
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
@@ -186,7 +186,7 @@ class FormBuilderTest extends TestCase
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
             ->with($expectedName, $expectedType, null, $expectedOptions)
-            ->will($this->returnValue($this->getFormBuilder()));
+            ->willReturn($this->getFormBuilder());
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
         $builder = $this->builder->get($expectedName);
@@ -202,7 +202,7 @@ class FormBuilderTest extends TestCase
         $this->factory->expects($this->once())
             ->method('createBuilderForProperty')
             ->with('stdClass', $expectedName, null, $expectedOptions)
-            ->will($this->returnValue($this->getFormBuilder()));
+            ->willReturn($this->getFormBuilder());
 
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
         $this->builder->add($expectedName, null, $expectedOptions);
@@ -236,7 +236,7 @@ class FormBuilderTest extends TestCase
 
         $mock->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $mock;
     }

@@ -26,13 +26,13 @@ class TemplateNameParserTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundle')
-            ->will($this->returnCallback(function ($bundle) {
+            ->willReturnCallback(function ($bundle) {
                 if (\in_array($bundle, ['SensioFooBundle', 'SensioCmsFooBundle', 'FooBundle'])) {
                     return true;
                 }
 
                 throw new \InvalidArgumentException();
-            }))
+            })
         ;
         $this->parser = new TemplateNameParser($kernel);
     }

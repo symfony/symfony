@@ -20,6 +20,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ResolveControllerNameSubscriberTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testReplacesControllerAttribute()
     {
         $parser = $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();

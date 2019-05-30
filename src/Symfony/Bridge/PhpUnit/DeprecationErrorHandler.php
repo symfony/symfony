@@ -228,9 +228,9 @@ class DeprecationErrorHandler
             return $this->configuration = Configuration::inWeakMode();
         }
         if (self::MODE_WEAK_VENDORS === $mode) {
-            ++$this->deprecations['remaining selfCount'];
+            ++$this->deprecations['remaining directCount'];
             $msg = sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode);
-            $ref = &$this->deprecations['remaining self'][$msg]['count'];
+            $ref = &$this->deprecations['remaining direct'][$msg]['count'];
             ++$ref;
             $mode = 'max[self]=0';
         }

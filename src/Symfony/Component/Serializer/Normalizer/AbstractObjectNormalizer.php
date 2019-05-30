@@ -92,12 +92,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private $typesCache = [];
     private $attributesCache = [];
 
-    /**
-     * @deprecated since Symfony 4.2
-     *
-     * @var callable|null
-     */
-    private $maxDepthHandler;
     private $objectClassResolver;
 
     /**
@@ -168,8 +162,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new InvalidArgumentException(sprintf('The "%s" given in the context is not callable.', self::MAX_DEPTH_HANDLER));
             }
         } else {
-            // already validated in constructor resp by type declaration of setMaxDepthHandler
-            $maxDepthHandler = $this->defaultContext[self::MAX_DEPTH_HANDLER] ?? $this->maxDepthHandler;
+            $maxDepthHandler = null;
         }
 
         foreach ($attributes as $attribute) {
@@ -186,7 +179,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             /**
              * @var callable|null
              */
-            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? $this->callbacks[$attribute] ?? null;
+            $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
             if ($callback) {
                 $attributeValue = $callback($attributeValue, $object, $attribute, $format, $context);
             }
@@ -294,18 +287,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @return mixed
      */
     abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = []);
-
-    /**
-     * Sets a handler function that will be called when the max depth is reached.
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function setMaxDepthHandler(?callable $handler): void
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "max_depth_handler" key of the context instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->maxDepthHandler = $handler;
-    }
 
     /**
      * {@inheritdoc}
@@ -595,8 +576,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         try {
             return md5($format.serialize([
                 'context' => $context,
-                'ignored' => $this->ignoredAttributes,
-                'camelized' => $this->camelizedAttributes,
+                'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache

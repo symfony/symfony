@@ -383,6 +383,24 @@ Serializer
 ----------
 
  * The default value of the `CsvEncoder` "as_collection" option was changed to `true`.
+ * Individual encoders & normalizers options as constructor arguments were removed. 
+   Use the default context instead.
+ * The following method and properties:
+     - `AbstractNormalizer::$circularReferenceLimit`
+     - `AbstractNormalizer::$circularReferenceHandler`
+     - `AbstractNormalizer::$callbacks`
+     - `AbstractNormalizer::$ignoredAttributes`
+     - `AbstractNormalizer::$camelizedAttributes` 
+     - `AbstractNormalizer::setCircularReferenceLimit()`
+     - `AbstractNormalizer::setCircularReferenceHandler()` 
+     - `AbstractNormalizer::setCallbacks()`
+     - `AbstractNormalizer::setIgnoredAttributes()`
+     - `AbstractObjectNormalizer::$maxDepthHandler`
+     - `AbstractObjectNormalizer::setMaxDepthHandler()`
+     - `XmlEncoder::setRootNodeName()`
+     - `XmlEncoder::getRootNodeName()`
+
+   were removed, use the default context instead.
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
 
 Translation

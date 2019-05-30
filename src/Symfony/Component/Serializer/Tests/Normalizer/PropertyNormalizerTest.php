@@ -16,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -31,7 +29,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
-use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ConstructorArgumentsTestTrait;
@@ -152,31 +149,6 @@ class PropertyNormalizerTest extends TestCase
         return new PropertyNormalizer();
     }
 
-    /**
-     * @dataProvider provideCallbacks
-     */
-    public function testLegacyCallbacks($callbacks, $value, $result)
-    {
-        $this->normalizer->setCallbacks($callbacks);
-
-        $obj = new CallbacksObject($value);
-
-        $this->assertEquals(
-            $result,
-            $this->normalizer->normalize($obj, 'any')
-        );
-    }
-
-    /**
-     * @dataProvider provideInvalidCallbacks
-     */
-    public function testLegacyUncallableCallbacks($callbacks)
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->normalizer->setCallbacks($callbacks);
-    }
-
     protected function getNormalizerForCircularReference(): PropertyNormalizer
     {
         $normalizer = new PropertyNormalizer();
@@ -188,17 +160,6 @@ class PropertyNormalizerTest extends TestCase
     protected function getSelfReferencingModel()
     {
         return new PropertyCircularReferenceDummy();
-    }
-
-    public function testLegacyUnableToNormalizeCircularReference()
-    {
-        $this->normalizer->setCircularReferenceLimit(2);
-        new Serializer([$this->normalizer]);
-
-        $obj = new PropertyCircularReferenceDummy();
-
-        $this->expectException(CircularReferenceException::class);
-        $this->normalizer->normalize($obj);
     }
 
     public function testSiblingReference()
@@ -214,20 +175,6 @@ class PropertyNormalizerTest extends TestCase
             'sibling2' => ['coopTilleuls' => 'Les-Tilleuls.coop'],
         ];
         $this->assertEquals($expected, $this->normalizer->normalize($siblingHolder));
-    }
-
-    public function testLegacyCircularReferenceHandler()
-    {
-        $this->normalizer->setCircularReferenceHandler(function ($obj) {
-            return \get_class($obj);
-        });
-
-        new Serializer([$this->normalizer]);
-
-        $obj = new PropertyCircularReferenceDummy();
-
-        $expected = ['me' => PropertyCircularReferenceDummy::class];
-        $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
 
     protected function getDenormalizerForConstructArguments(): PropertyNormalizer
@@ -317,21 +264,6 @@ class PropertyNormalizerTest extends TestCase
     public function testIgnoredAttributesContextDenormalizeInherit()
     {
         $this->markTestSkipped('This has not been tested previously - did not manage to make the test work');
-    }
-
-    public function testLegacyIgnoredAttributes()
-    {
-        $ignoredAttributes = ['foo', 'bar', 'camelCase'];
-        $this->normalizer->setIgnoredAttributes($ignoredAttributes);
-
-        $obj = new PropertyDummy();
-        $obj->foo = 'foo';
-        $obj->setBar('bar');
-
-        $this->assertEquals(
-            [],
-            $this->normalizer->normalize($obj, 'any')
-        );
     }
 
     protected function getNormalizerForMaxDepth(): PropertyNormalizer
@@ -458,18 +390,6 @@ class PropertyConstructorDummy
     public function getBar()
     {
         return $this->bar;
-    }
-}
-
-class PropertyCamelizedDummy
-{
-    private $kevinDunglas;
-    public $fooBar;
-    public $bar_foo;
-
-    public function __construct($kevinDunglas = null)
-    {
-        $this->kevinDunglas = $kevinDunglas;
     }
 }
 

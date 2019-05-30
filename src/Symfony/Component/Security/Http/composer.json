@@ -28,6 +28,7 @@
         "psr/log": "~1.0"
     },
     "conflict": {
+        "symfony/event-dispatcher": ">=5",
         "symfony/security-csrf": "<3.4.11|~4.0,<4.0.11"
     },
     "suggest": {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
-use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class AbstractTokenTest extends TestCase
@@ -47,7 +45,7 @@ class AbstractTokenTest extends TestCase
 
     public function testSerialize()
     {
-        $token = new ConcreteToken(['ROLE_FOO', new Role('ROLE_BAR', false)]);
+        $token = new ConcreteToken(['ROLE_FOO', 'ROLE_BAR']);
         $token->setAttributes(['foo' => 'bar']);
 
         $uToken = unserialize(serialize($token));
@@ -56,53 +54,10 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($token->getAttributes(), $uToken->getAttributes());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSerializeWithRoleObjects()
-    {
-        $user = new User('name', 'password', [new Role('ROLE_FOO'), new Role('ROLE_BAR')]);
-        $token = new ConcreteToken($user->getRoles(), $user);
-
-        $serialized = serialize($token);
-        $unserialized = unserialize($serialized);
-
-        $roles = $unserialized->getRoles();
-
-        $this->assertEquals($roles, $user->getRoles());
-    }
-
     public function testConstructor()
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testConstructorWithRoleObjects()
-    {
-        $token = new ConcreteToken([new Role('ROLE_FOO')]);
-        $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
-
-        $token = new ConcreteToken([new Role('ROLE_FOO'), 'ROLE_BAR']);
-        $this->assertEquals(['ROLE_FOO', 'ROLE_BAR'], $token->getRoleNames());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGetRoles()
-    {
-        $token = new ConcreteToken(['ROLE_FOO']);
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
-
-        $token = new ConcreteToken([new Role('ROLE_FOO')]);
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
-
-        $token = new ConcreteToken([new Role('ROLE_FOO'), 'ROLE_BAR']);
-        $this->assertEquals([new Role('ROLE_FOO'), new Role('ROLE_BAR')], $token->getRoles());
     }
 
     public function testAuthenticatedFlag()

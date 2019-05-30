@@ -25,7 +25,6 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
@@ -197,13 +196,6 @@ class ContextListener implements ListenerInterface
 
                     if ($token instanceof SwitchUserToken) {
                         $context['impersonator_username'] = $token->getOriginalToken()->getUsername();
-                    } else {
-                        foreach ($token->getRoles(false) as $role) {
-                            if ($role instanceof SwitchUserRole) {
-                                $context['impersonator_username'] = $role->getSource(false)->getUsername();
-                                break;
-                            }
-                        }
                     }
 
                     $this->logger->debug('User was reloaded from a user provider.', $context);

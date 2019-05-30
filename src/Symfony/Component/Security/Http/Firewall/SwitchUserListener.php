@@ -23,7 +23,6 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -151,7 +150,6 @@ class SwitchUserListener implements ListenerInterface
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken(), false);
 
         $token = new SwitchUserToken($user, $user->getPassword(), $this->providerKey, $roles, $token);
 
@@ -192,12 +190,6 @@ class SwitchUserListener implements ListenerInterface
     {
         if ($token instanceof SwitchUserToken) {
             return $token->getOriginalToken();
-        }
-
-        foreach ($token->getRoles(false) as $role) {
-            if ($role instanceof SwitchUserRole) {
-                return $role->getSource();
-            }
         }
 
         return null;

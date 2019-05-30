@@ -28,9 +28,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
-use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -94,36 +92,6 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertTrue($collector->supportsRoleHierarchy());
         $this->assertSame($normalizedRoles, $collector->getRoles()->getValue(true));
         $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getValue(true));
-        $this->assertSame('hhamon', $collector->getUser());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCollectImpersonatedToken()
-    {
-        $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', ['ROLE_ADMIN']);
-
-        $userRoles = [
-            'ROLE_USER',
-            new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $adminToken),
-        ];
-
-        $tokenStorage = new TokenStorage();
-        $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $userRoles));
-
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
-        $collector->collect(new Request(), new Response());
-        $collector->lateCollect();
-
-        $this->assertTrue($collector->isEnabled());
-        $this->assertTrue($collector->isAuthenticated());
-        $this->assertTrue($collector->isImpersonated());
-        $this->assertSame('yceruto', $collector->getImpersonatorUser());
-        $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass()->getValue());
-        $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame(['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $collector->getRoles()->getValue(true));
-        $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
     }
 
@@ -391,19 +359,9 @@ class SecurityDataCollectorTest extends TestCase
                 ['ROLE_USER'],
                 [],
             ],
-            [
-                [new Role('ROLE_USER', false)],
-                ['ROLE_USER'],
-                [],
-            ],
             // Inherited roles
             [
                 ['ROLE_ADMIN'],
-                ['ROLE_ADMIN'],
-                ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
-            ],
-            [
-                [new Role('ROLE_ADMIN', false)],
                 ['ROLE_ADMIN'],
                 ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
             ],

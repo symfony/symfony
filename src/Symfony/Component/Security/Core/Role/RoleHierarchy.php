@@ -34,31 +34,6 @@ class RoleHierarchy implements RoleHierarchyInterface
     /**
      * {@inheritdoc}
      */
-    public function getReachableRoles(array $roles)
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.3 and will be removed in 5.0. Use roles as strings and the getReachableRoleNames() method instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $reachableRoles = $roles;
-        foreach ($roles as $role) {
-            if (!isset($this->map[$role->getRole()])) {
-                continue;
-            }
-
-            foreach ($this->map[$role->getRole()] as $r) {
-                $reachableRoles[] = new Role($r);
-            }
-        }
-
-        return $reachableRoles;
-    }
-
-    /**
-     * @param string[] $roles
-     *
-     * @return string[]
-     */
     public function getReachableRoleNames(array $roles): array
     {
         $reachableRoles = $roles;

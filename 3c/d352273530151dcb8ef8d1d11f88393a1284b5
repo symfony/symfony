@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T15:25:49Z
+
+Conflicts with https://github.com/symfony/symfony/pull/31737, not possible because these methods don't exist on phpunit 4.8, which we need for testing with PHP 5.5.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T15:26:27Z
+
+(unless I'm mistaken)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T15:45:26Z
+
+PHPUnit 4.8.36 depends on MockObjects 2.3: https://github.com/sebastianbergmann/phpunit/blob/4.8.36/composer.json#L28
+
+MockObjects 2.3 seems to have all the `willReturn*` shortcuts: https://github.com/sebastianbergmann/phpunit-mock-objects/blob/2.3/src/Framework/MockObject/Builder/InvocationMocker.php#L81
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T15:45:54Z
+
+Also: The Travis build is green. 🙃
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T15:46:44Z
+
+Great :) Can you then update the php_cs file?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T15:48:12Z
+
+Done.

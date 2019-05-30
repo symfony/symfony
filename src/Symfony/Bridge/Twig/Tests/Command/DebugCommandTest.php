@@ -342,7 +342,7 @@ TXT
         }
 
         $application = new Application();
-        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, $rootDir));
+        $application->add(new DebugCommand($environment, $projectDir, $bundleMetadata, $defaultPath, null, $rootDir));
         $command = $application->find('debug:twig');
 
         return new CommandTester($command);

@@ -254,6 +254,7 @@ HttpKernel
  * Removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * The `DebugHandlersListener` class has been made `final`
 
 Intl
 ----
@@ -423,6 +424,7 @@ TwigBundle
 TwigBridge
 ----------
 
+ * Removed argument `$rootDir` from the `DebugCommand::__construct()` method and the 5th argument must be an instance of `FileLinkFormatter`
  * removed the `$requestStack` and `$requestContext` arguments of the 
    `HttpFoundationExtension`, pass a `Symfony\Component\HttpFoundation\UrlHelper`
    instance as the only argument instead

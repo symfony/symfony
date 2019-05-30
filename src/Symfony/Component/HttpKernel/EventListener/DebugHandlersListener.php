@@ -27,6 +27,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Configures errors and exceptions handlers.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @final since Symfony 4.4
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {

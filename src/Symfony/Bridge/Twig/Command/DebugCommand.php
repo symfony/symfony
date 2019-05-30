@@ -42,7 +42,11 @@ class DebugCommand extends Command
     private $filesystemLoaders;
     private $fileLinkFormatter;
 
-    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, string $rootDir = null, FileLinkFormatter $fileLinkFormatter = null)
+    /**
+     * @param FileLinkFormatter|null $fileLinkFormatter
+     * @param string|null            $rootDir
+     */
+    public function __construct(Environment $twig, string $projectDir = null, array $bundlesMetadata = [], string $twigDefaultPath = null, $fileLinkFormatter = null, $rootDir = null)
     {
         parent::__construct();
 
@@ -50,8 +54,16 @@ class DebugCommand extends Command
         $this->projectDir = $projectDir;
         $this->bundlesMetadata = $bundlesMetadata;
         $this->twigDefaultPath = $twigDefaultPath;
-        $this->rootDir = $rootDir;
-        $this->fileLinkFormatter = $fileLinkFormatter;
+
+        if (\is_string($fileLinkFormatter) || $rootDir instanceof FileLinkFormatter) {
+            @trigger_error(sprintf('Passing a string as "$fileLinkFormatter" 5th argument or an instance of FileLinkFormatter as "$rootDir" 6th argument of the "%s()" method is deprecated since Symfony 4.4, swap the variables position.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->rootDir = $fileLinkFormatter;
+            $this->fileLinkFormatter = $rootDir;
+        } else {
+            $this->fileLinkFormatter = $fileLinkFormatter;
+            $this->rootDir = $rootDir;
+        }
     }
 
     protected function configure()

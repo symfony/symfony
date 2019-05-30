@@ -410,7 +410,7 @@ final class Inflector
      * If the method can't determine the form with certainty, an array of the
      * possible plurals is returned.
      *
-     * @param string $singular A word in plural form
+     * @param string $singular A word in singular form
      *
      * @return string|array The plural form or an array of possible plural forms
      */

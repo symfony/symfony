@@ -260,7 +260,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container
             ->register('lockable.command', LockableCommand::class)
             ->setPublic(false)
-            ->addTag('console.command')
+            ->addTag('console.command', ['command' => 'lockable'])
         ;
 
         $pass = new AddConsoleCommandPass();
@@ -289,6 +289,4 @@ class NamedCommand extends Command
 class LockableCommand extends Command
 {
     use LockableTrait;
-
-    protected static $defaultName = 'lockable';
 }

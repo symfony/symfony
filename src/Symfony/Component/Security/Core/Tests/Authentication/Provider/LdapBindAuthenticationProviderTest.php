@@ -113,7 +113,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $query
             ->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue($collection))
+            ->willReturn($collection)
         ;
 
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
@@ -121,13 +121,13 @@ class LdapBindAuthenticationProviderTest extends TestCase
             ->expects($this->once())
             ->method('escape')
             ->with('foo', '')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
         $ldap
             ->expects($this->once())
             ->method('query')
             ->with('{username}', 'foobar')
-            ->will($this->returnValue($query))
+            ->willReturn($query)
         ;
         $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 
@@ -153,14 +153,14 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $query
             ->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue($collection))
+            ->willReturn($collection)
         ;
 
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
             ->expects($this->once())
             ->method('query')
-            ->will($this->returnValue($query))
+            ->willReturn($query)
         ;
         $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
 

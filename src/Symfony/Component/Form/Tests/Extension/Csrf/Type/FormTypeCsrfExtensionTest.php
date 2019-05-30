@@ -124,7 +124,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('getToken')
             ->with('TOKEN_ID')
-            ->will($this->returnValue(new CsrfToken('TOKEN_ID', 'token')));
+            ->willReturn(new CsrfToken('TOKEN_ID', 'token'));
 
         $view = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -143,7 +143,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('getToken')
             ->with('FORM_NAME')
-            ->will($this->returnValue('token'));
+            ->willReturn('token');
 
         $view = $this->factory
             ->createNamed('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -161,7 +161,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('getToken')
             ->with('Symfony\Component\Form\Extension\Core\Type\FormType')
-            ->will($this->returnValue('token'));
+            ->willReturn('token');
 
         $view = $this->factory
             ->createNamed('', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -190,7 +190,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('TOKEN_ID', 'token'))
-            ->will($this->returnValue($valid));
+            ->willReturn($valid);
 
         $form = $this->factory
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -222,7 +222,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('FORM_NAME', 'token'))
-            ->will($this->returnValue($valid));
+            ->willReturn($valid);
 
         $form = $this->factory
             ->createNamedBuilder('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -253,7 +253,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('Symfony\Component\Form\Extension\Core\Type\FormType', 'token'))
-            ->will($this->returnValue($valid));
+            ->willReturn($valid);
 
         $form = $this->factory
             ->createNamedBuilder('', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -369,12 +369,12 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
             ->with($csrfToken)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->translator->expects($this->once())
              ->method('trans')
              ->with('Foobar')
-             ->will($this->returnValue('[trans]Foobar[/trans]'));
+             ->willReturn('[trans]Foobar[/trans]');
 
         $form = $this->factory
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [

@@ -238,7 +238,7 @@ class WebTestCaseTest extends TestCase
     private function getResponseTester(Response $response): WebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getResponse')->will($this->returnValue($response));
+        $client->expects($this->any())->method('getResponse')->willReturn($response);
 
         return $this->getTester($client);
     }
@@ -246,7 +246,7 @@ class WebTestCaseTest extends TestCase
     private function getCrawlerTester(Crawler $crawler): WebTestCase
     {
         $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getCrawler')->will($this->returnValue($crawler));
+        $client->expects($this->any())->method('getCrawler')->willReturn($crawler);
 
         return $this->getTester($client);
     }
@@ -256,7 +256,7 @@ class WebTestCaseTest extends TestCase
         $client = $this->createMock(KernelBrowser::class);
         $jar = new CookieJar();
         $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $client->expects($this->any())->method('getCookieJar')->will($this->returnValue($jar));
+        $client->expects($this->any())->method('getCookieJar')->willReturn($jar);
 
         return $this->getTester($client);
     }
@@ -267,7 +267,7 @@ class WebTestCaseTest extends TestCase
         $request = new Request();
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'homepage');
-        $client->expects($this->any())->method('getRequest')->will($this->returnValue($request));
+        $client->expects($this->any())->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }

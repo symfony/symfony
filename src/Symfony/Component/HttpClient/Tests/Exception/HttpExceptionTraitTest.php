@@ -35,14 +35,14 @@ class HttpExceptionTraitTest extends TestCase
         $response = $this->createMock(ResponseInterface::class);
         $response
             ->method('getInfo')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['http_code', 400],
                 ['url', 'http://example.com'],
                 ['response_headers', [
                     'HTTP/1.1 400 Bad Request',
                     'Content-Type: '.$mimeType,
                 ]],
-            ]));
+            ]);
         $response->method('getContent')->willReturn($json);
 
         $e = new TestException($response);

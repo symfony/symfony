@@ -177,13 +177,13 @@ class AuthenticationProviderManagerTest extends TestCase
         $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
         $provider->expects($this->once())
                  ->method('supports')
-                 ->will($this->returnValue($supports))
+                 ->willReturn($supports)
         ;
 
         if (null !== $token) {
             $provider->expects($this->once())
                      ->method('authenticate')
-                     ->will($this->returnValue($token))
+                     ->willReturn($token)
             ;
         } elseif (null !== $exception) {
             $provider->expects($this->once())

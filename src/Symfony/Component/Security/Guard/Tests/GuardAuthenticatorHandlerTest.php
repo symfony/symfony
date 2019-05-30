@@ -58,7 +58,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->request, $this->token, $providerKey)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationSuccess($this->token, $this->request, $this->guardAuthenticator, $providerKey);
@@ -77,7 +77,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, 'firewall_provider_key');
@@ -94,7 +94,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
             ->getMock();
         $token->expects($this->any())
             ->method('getProviderKey')
-            ->will($this->returnValue($tokenProviderKey));
+            ->willReturn($tokenProviderKey);
 
         $this->tokenStorage->expects($this->never())
             ->method('setToken')
@@ -105,7 +105,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($this->request, $authException)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new GuardAuthenticatorHandler($this->tokenStorage, $this->dispatcher);
         $actualResponse = $handler->handleAuthenticationFailure($authException, $this->request, $this->guardAuthenticator, $actualProviderKey);

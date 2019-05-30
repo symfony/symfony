@@ -36,18 +36,18 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
-            }))
+            })
         ;
 
         $cacheItemMock
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $parsedExpression;
-            }))
+            })
         ;
 
         $cacheMock
@@ -172,18 +172,18 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
-            }))
+            })
         ;
 
         $cacheItemMock
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $parsedExpression;
-            }))
+            })
         ;
 
         $cacheMock

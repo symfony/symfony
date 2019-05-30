@@ -27,11 +27,11 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with('foo')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $container->expects($this->once())
             ->method('get')
             ->with('foo')
-            ->will($this->returnValue($service))
+            ->willReturn($service)
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -52,11 +52,11 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with('foo')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $container->expects($this->once())
             ->method('get')
             ->with('foo')
-            ->will($this->returnValue($service))
+            ->willReturn($service)
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -77,12 +77,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with('foo')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $container->expects($this->once())
             ->method('get')
             ->with('foo')
-            ->will($this->returnValue($service))
+            ->willReturn($service)
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -102,12 +102,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with(InvokableControllerService::class)
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $container->expects($this->once())
             ->method('get')
             ->with(InvokableControllerService::class)
-            ->will($this->returnValue($service))
+            ->willReturn($service)
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -131,13 +131,13 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with(ControllerTestService::class)
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue([ControllerTestService::class => true]))
+            ->willReturn([ControllerTestService::class => true])
         ;
 
         $resolver = $this->createControllerResolver(null, $container);
@@ -159,13 +159,13 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $container->expects($this->once())
             ->method('has')
             ->with('app.my_controller')
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $container->expects($this->atLeastOnce())
             ->method('getRemovedIds')
             ->with()
-            ->will($this->returnValue(['app.my_controller' => true]))
+            ->willReturn(['app.my_controller' => true])
         ;
 
         $resolver = $this->createControllerResolver(null, $container);

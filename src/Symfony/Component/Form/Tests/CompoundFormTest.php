@@ -179,7 +179,7 @@ class CompoundFormTest extends AbstractFormTest
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ])
-            ->will($this->returnValue($child));
+            ->willReturn($child);
 
         $this->form->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['bar' => 'baz']);
 
@@ -198,7 +198,7 @@ class CompoundFormTest extends AbstractFormTest
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ])
-            ->will($this->returnValue($child));
+            ->willReturn($child);
 
         // in order to make casting unnecessary
         $this->form->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType', ['bar' => 'baz']);
@@ -215,7 +215,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->factory->expects($this->once())
             ->method('createNamed')
             ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->will($this->returnValue($child));
+            ->willReturn($child);
 
         $this->form->add('foo');
 
@@ -236,7 +236,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->factory->expects($this->once())
             ->method('createForProperty')
             ->with('\stdClass', 'foo')
-            ->will($this->returnValue($child));
+            ->willReturn($child);
 
         $this->form->add('foo');
 
@@ -260,7 +260,7 @@ class CompoundFormTest extends AbstractFormTest
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ])
-            ->will($this->returnValue($child));
+            ->willReturn($child);
 
         $this->form->add('foo', null, ['bar' => 'baz']);
 
@@ -352,10 +352,10 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapDataToForms')
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
-            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child) {
+            ->willReturnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame([$child->getName() => $child], iterator_to_array($iterator));
-            }));
+            });
 
         $form->initialize();
         $form->add($child);
@@ -442,10 +442,10 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapDataToForms')
             ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
-            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
+            ->willReturnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(['firstName' => $child1, 'lastName' => $child2], iterator_to_array($iterator));
-            }));
+            });
 
         $form->setData('foo');
     }
@@ -517,12 +517,12 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapFormsToData')
             ->with($this->isInstanceOf('\RecursiveIteratorIterator'), 'bar')
-            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2) {
+            ->willReturnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(['firstName' => $child1, 'lastName' => $child2], iterator_to_array($iterator));
                 $this->assertEquals('Bernhard', $child1->getData());
                 $this->assertEquals('Schussek', $child2->getData());
-            }));
+            });
 
         $form->submit([
             'firstName' => 'Bernhard',
@@ -589,10 +589,10 @@ class CompoundFormTest extends AbstractFormTest
         $mapper->expects($this->once())
             ->method('mapFormsToData')
             ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
-            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
+            ->willReturnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
                 $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
                 $this->assertSame(['name' => $child], iterator_to_array($iterator));
-            }));
+            });
 
         $form->submit([
             'name' => 'Bernhard',
@@ -957,11 +957,11 @@ class CompoundFormTest extends AbstractFormTest
         $field1View = new FormView();
         $type1
             ->method('createView')
-            ->will($this->returnValue($field1View));
+            ->willReturn($field1View);
         $field2View = new FormView();
         $type2
             ->method('createView')
-            ->will($this->returnValue($field2View));
+            ->willReturn($field2View);
 
         $this->form = $this->getBuilder('form', null, null, $options)
             ->setCompound(true)
@@ -980,13 +980,13 @@ class CompoundFormTest extends AbstractFormTest
         // First create the view
         $type->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($view));
+            ->willReturn($view);
 
         // Then build it for the form itself
         $type->expects($this->once())
             ->method('buildView')
             ->with($view, $this->form, $options)
-            ->will($this->returnCallback($assertChildViewsEqual([])));
+            ->willReturnCallback($assertChildViewsEqual([]));
 
         $this->assertSame($view, $this->form->createView());
         $this->assertSame(['foo' => $field1View, 'bar' => $field2View], $view->children);
@@ -1006,7 +1006,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $button->expects($this->any())
             ->method('isClicked')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $parentForm = $this->getBuilder('parent')->getForm();
         $nestedForm = $this->getBuilder('nested')->getForm();
@@ -1028,7 +1028,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $button->expects($this->any())
             ->method('isClicked')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->form->add($button);
         $this->form->submit([]);
@@ -1047,7 +1047,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $nestedForm->expects($this->any())
             ->method('getClickedButton')
-            ->will($this->returnValue($button));
+            ->willReturn($button);
 
         $this->form->add($nestedForm);
         $this->form->submit([]);
@@ -1066,7 +1066,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $parentForm->expects($this->any())
             ->method('getClickedButton')
-            ->will($this->returnValue($button));
+            ->willReturn($button);
 
         $this->form->setParent($parentForm);
         $this->form->submit([]);

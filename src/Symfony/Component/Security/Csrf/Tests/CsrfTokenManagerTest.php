@@ -30,11 +30,11 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('hasToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $generator->expects($this->once())
             ->method('generateToken')
-            ->will($this->returnValue('TOKEN'));
+            ->willReturn('TOKEN');
 
         $storage->expects($this->once())
             ->method('setToken')
@@ -55,12 +55,12 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('hasToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $storage->expects($this->once())
             ->method('getToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue('TOKEN'));
+            ->willReturn('TOKEN');
 
         $token = $manager->getToken('token_id');
 
@@ -79,7 +79,7 @@ class CsrfTokenManagerTest extends TestCase
 
         $generator->expects($this->once())
             ->method('generateToken')
-            ->will($this->returnValue('TOKEN'));
+            ->willReturn('TOKEN');
 
         $storage->expects($this->once())
             ->method('setToken')
@@ -100,12 +100,12 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('hasToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $storage->expects($this->once())
             ->method('getToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue('TOKEN'));
+            ->willReturn('TOKEN');
 
         $this->assertTrue($manager->isTokenValid(new CsrfToken('token_id', 'TOKEN')));
     }
@@ -118,12 +118,12 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('hasToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $storage->expects($this->once())
             ->method('getToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue('TOKEN'));
+            ->willReturn('TOKEN');
 
         $this->assertFalse($manager->isTokenValid(new CsrfToken('token_id', 'FOOBAR')));
     }
@@ -136,7 +136,7 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('hasToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $storage->expects($this->never())
             ->method('getToken');
@@ -152,7 +152,7 @@ class CsrfTokenManagerTest extends TestCase
         $storage->expects($this->once())
             ->method('removeToken')
             ->with($namespace.'token_id')
-            ->will($this->returnValue('REMOVED_TOKEN'));
+            ->willReturn('REMOVED_TOKEN');
 
         $this->assertSame('REMOVED_TOKEN', $manager->removeToken('token_id'));
     }

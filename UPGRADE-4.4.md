@@ -1,6 +1,11 @@
 UPGRADE FROM 4.3 to 4.4
 =======================
 
+HttpKernel
+----------
+
+* The `DebugHandlersListener` class has been marked as `final`
+
 DependencyInjection
 -------------------
 

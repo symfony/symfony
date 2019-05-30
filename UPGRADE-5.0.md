@@ -254,6 +254,7 @@ HttpKernel
  * Removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * Removed `PostResponseEvent`, use `TerminateEvent` instead
  * Removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * The `DebugHandlersListener` class has been made `final`
 
 Intl
 ----

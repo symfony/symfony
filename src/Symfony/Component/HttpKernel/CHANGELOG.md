@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* The `DebugHandlersListener` class has been marked as `final`
+
 4.3.0
 -----
 

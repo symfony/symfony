@@ -219,6 +219,11 @@ FrameworkBundle
  * Removed support for legacy translations directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`, use `translations/` instead.
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
+ * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+   has been removed.
+ * The `ControllerResolver` and `DelegatingLoader` classes have been made `final`.
+ * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been removed.
+
 
 HttpFoundation
 --------------

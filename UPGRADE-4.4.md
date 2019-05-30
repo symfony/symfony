@@ -25,6 +25,14 @@ DependencyInjection
        factory: ['@factory_service', method]
    ```
 
+FrameworkBundle
+---------------
+
+* The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+  has been deprecated.
+* The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`.
+* The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
+
 Messenger
 ---------
 

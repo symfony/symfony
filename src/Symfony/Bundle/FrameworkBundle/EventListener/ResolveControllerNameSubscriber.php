@@ -27,8 +27,12 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
 {
     private $parser;
 
-    public function __construct(ControllerNameParser $parser)
+    public function __construct(ControllerNameParser $parser, bool $triggerDeprecation = true)
     {
+        if ($triggerDeprecation) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         $this->parser = $parser;
     }
 

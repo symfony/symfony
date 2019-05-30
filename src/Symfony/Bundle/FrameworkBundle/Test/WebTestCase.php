@@ -23,7 +23,7 @@ abstract class WebTestCase extends KernelTestCase
 {
     use WebTestAssertionsTrait;
 
-    /** @var Client|null */
+    /** @var KernelBrowser|null */
     protected static $client;
 
     protected function doTearDown(): void

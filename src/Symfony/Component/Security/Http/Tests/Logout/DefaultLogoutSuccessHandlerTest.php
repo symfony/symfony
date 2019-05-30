@@ -26,7 +26,7 @@ class DefaultLogoutSuccessHandlerTest extends TestCase
         $httpUtils->expects($this->once())
             ->method('createRedirectResponse')
             ->with($request, '/dashboard')
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new DefaultLogoutSuccessHandler($httpUtils, '/dashboard');
         $result = $handler->onLogoutSuccess($request);

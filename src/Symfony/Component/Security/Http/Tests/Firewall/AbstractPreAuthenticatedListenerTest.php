@@ -32,7 +32,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
         $tokenStorage
             ->expects($this->once())
@@ -45,7 +45,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
             ->expects($this->once())
             ->method('authenticate')
             ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken'))
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
 
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', [
@@ -56,13 +56,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener($event);
@@ -78,7 +78,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue(null))
+            ->willReturn(null)
         ;
         $tokenStorage
             ->expects($this->never())
@@ -102,13 +102,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener($event);
@@ -126,7 +126,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
         $tokenStorage
             ->expects($this->never())
@@ -150,13 +150,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener($event);
@@ -174,7 +174,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
@@ -191,13 +191,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener($event);
@@ -215,7 +215,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $tokenStorage
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
         $tokenStorage
             ->expects($this->once())
@@ -240,13 +240,13 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener
             ->expects($this->once())
             ->method('getPreAuthenticatedData')
-            ->will($this->returnValue($userCredentials));
+            ->willReturn($userCredentials);
 
         $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener($event);

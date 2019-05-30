@@ -37,7 +37,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $sendersLocator = $this->createSendersLocator([DummyMessage::class => ['my_sender']], ['my_sender' => $sender]);
         $middleware = new SendMessageMiddleware($sendersLocator);
 
-        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'my_sender')))->will($this->returnArgument(0));
+        $sender->expects($this->once())->method('send')->with($envelope->with(new SentStamp(\get_class($sender), 'my_sender')))->willReturnArgument(0);
 
         $envelope = $middleware->handle($envelope, $this->getStackMock(false));
 
@@ -65,7 +65,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
                 // last SentStamp should be the "foo" alias
                 return null !== $lastSentStamp && 'foo' === $lastSentStamp->getSenderAlias();
             }))
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
         $sender2->expects($this->once())
             ->method('send')
             ->with($this->callback(function (Envelope $envelope) {
@@ -75,7 +75,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
                 // last SentStamp should be the "bar" alias
                 return null !== $lastSentStamp && 'bar' === $lastSentStamp->getSenderAlias();
             }))
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $envelope = $middleware->handle($envelope, $this->getStackMock(false));
 
@@ -102,7 +102,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         ;
         $sender2->expects($this->once())
             ->method('send')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $mockStack = $this->getStackMock(false); // false because next should not be called
         $envelope = $middleware->handle($envelope, $mockStack);

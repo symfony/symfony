@@ -34,7 +34,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $this->request->expects($this->any())->method('getSession')->will($this->returnValue($this->session));
+        $this->request->expects($this->any())->method('getSession')->willReturn($this->session);
         $this->exception = $this->getMockBuilder('Symfony\Component\Security\Core\Exception\AuthenticationException')->setMethods(['getMessage'])->getMock();
     }
 
@@ -47,12 +47,12 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
             ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
-            ->will($this->returnValue($subRequest));
+            ->willReturn($subRequest);
 
         $response = new Response();
         $this->httpKernel->expects($this->once())
             ->method('handle')->with($subRequest, HttpKernelInterface::SUB_REQUEST)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -65,7 +65,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $response = new Response();
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/login')
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, [], $this->logger);
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -92,7 +92,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
-            ->will($this->returnValue($subRequest));
+            ->willReturn($subRequest);
 
         $this->session->expects($this->never())->method('set');
 
@@ -117,7 +117,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
-            ->will($this->returnValue($this->getRequest()));
+            ->willReturn($this->getRequest());
 
         $this->logger
             ->expects($this->once())
@@ -143,7 +143,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $this->request->expects($this->once())
             ->method('get')->with('_failure_path')
-            ->will($this->returnValue('/auth/login'));
+            ->willReturn('/auth/login');
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');
@@ -156,7 +156,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $this->request->expects($this->once())
             ->method('get')->with('_failure_path')
-            ->will($this->returnValue(['value' => '/auth/login']));
+            ->willReturn(['value' => '/auth/login']);
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');
@@ -171,7 +171,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
         $this->request->expects($this->once())
             ->method('get')->with('_my_failure_path')
-            ->will($this->returnValue('/auth/login'));
+            ->willReturn('/auth/login');
 
         $this->httpUtils->expects($this->once())
             ->method('createRedirectResponse')->with($this->request, '/auth/login');

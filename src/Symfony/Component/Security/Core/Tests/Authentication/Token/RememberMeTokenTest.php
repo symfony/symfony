@@ -46,7 +46,7 @@ class RememberMeTokenTest extends TestCase
         $user
             ->expects($this->any())
             ->method('getRoles')
-            ->will($this->returnValue($roles))
+            ->willReturn($roles)
         ;
 
         return $user;

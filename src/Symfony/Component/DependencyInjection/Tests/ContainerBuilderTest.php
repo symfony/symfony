@@ -1066,7 +1066,7 @@ class ContainerBuilderTest extends TestCase
     public function testRegisteredButNotLoadedExtension()
     {
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
-        $extension->expects($this->once())->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->once())->method('getAlias')->willReturn('project');
         $extension->expects($this->never())->method('load');
 
         $container = new ContainerBuilder();
@@ -1078,7 +1078,7 @@ class ContainerBuilderTest extends TestCase
     public function testRegisteredAndLoadedExtension()
     {
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
-        $extension->expects($this->exactly(2))->method('getAlias')->will($this->returnValue('project'));
+        $extension->expects($this->exactly(2))->method('getAlias')->willReturn('project');
         $extension->expects($this->once())->method('load')->with([['foo' => 'bar']]);
 
         $container = new ContainerBuilder();

@@ -62,11 +62,11 @@ class RouterMatchCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection));
+            ->willReturn($routeCollection);
         $router
             ->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($requestContext));
+            ->willReturn($requestContext);
 
         return $router;
     }
@@ -77,9 +77,9 @@ class RouterMatchCommandTest extends TestCase
         $container
             ->expects($this->atLeastOnce())
             ->method('has')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 return 'console.command_loader' !== $id;
-            }))
+            })
         ;
         $container
             ->expects($this->any())

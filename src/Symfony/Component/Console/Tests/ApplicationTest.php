@@ -709,7 +709,7 @@ class ApplicationTest extends TestCase
         $application = $this->getMockBuilder('Symfony\Component\Console\Application')->setMethods(['getNamespaces'])->getMock();
         $application->expects($this->once())
             ->method('getNamespaces')
-            ->will($this->returnValue(['foo:sublong', 'bar:sub']));
+            ->willReturn(['foo:sublong', 'bar:sub']);
 
         $this->assertEquals('foo:sublong', $application->findNamespace('f:sub'));
     }
@@ -853,7 +853,7 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $application->expects($this->any())
             ->method('getTerminalWidth')
-            ->will($this->returnValue(120));
+            ->willReturn(120);
         $application->register('foo')->setCode(function () {
             throw new \InvalidArgumentException("\n\nline 1 with extra spaces        \nline 2\n\nline 4\n");
         });

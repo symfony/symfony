@@ -185,8 +185,8 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     private function createHttpClientStub(): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
-        $httpClientStub->method('request')->will(
-            $this->returnCallback(function (string $method, string $url): ResponseInterface {
+        $httpClientStub->method('request')->willReturnCallback(
+            function (string $method, string $url): ResponseInterface {
                 if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL === $url) {
                     throw new class('Problem contacting the Have I been Pwned API.') extends \Exception implements ServerExceptionInterface {
                         public function getResponse(): ResponseInterface
@@ -202,7 +202,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
                     ->willReturn(implode("\r\n", self::RETURN));
 
                 return $responseStub;
-            })
+            }
         );
 
         return $httpClientStub;
@@ -211,15 +211,15 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     private function createHttpClientStubCustomEndpoint($expectedEndpoint): HttpClientInterface
     {
         $httpClientStub = $this->createMock(HttpClientInterface::class);
-        $httpClientStub->method('request')->with('GET', $expectedEndpoint)->will(
-            $this->returnCallback(function (string $method, string $url): ResponseInterface {
+        $httpClientStub->method('request')->with('GET', $expectedEndpoint)->willReturnCallback(
+            function (string $method, string $url): ResponseInterface {
                 $responseStub = $this->createMock(ResponseInterface::class);
                 $responseStub
                     ->method('getContent')
                     ->willReturn(implode("\r\n", self::RETURN));
 
                 return $responseStub;
-            })
+            }
         );
 
         return $httpClientStub;

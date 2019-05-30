@@ -31,7 +31,7 @@ class RoutableMessageBusTest extends TestCase
 
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())->method('has')->with('foo_bus')->willReturn(true);
-        $container->expects($this->once())->method('get')->will($this->returnValue($bus2));
+        $container->expects($this->once())->method('get')->willReturn($bus2);
 
         $stamp = new DelayStamp(5);
         $bus1->expects($this->never())->method('dispatch');

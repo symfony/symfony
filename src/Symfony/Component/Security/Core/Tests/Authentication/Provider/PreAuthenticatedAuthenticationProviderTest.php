@@ -31,7 +31,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getProviderKey')
-            ->will($this->returnValue('foo'))
+            ->willReturn('foo')
         ;
         $this->assertFalse($provider->supports($token));
     }
@@ -62,7 +62,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
         $provider = $this->getProvider($user);
 
@@ -99,20 +99,20 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         if (false !== $user) {
             $token->expects($this->once())
                   ->method('getUser')
-                  ->will($this->returnValue($user))
+                  ->willReturn($user)
             ;
         }
         if (false !== $credentials) {
             $token->expects($this->once())
                   ->method('getCredentials')
-                  ->will($this->returnValue($credentials))
+                  ->willReturn($credentials)
             ;
         }
 
         $token
             ->expects($this->any())
             ->method('getProviderKey')
-            ->will($this->returnValue('key'))
+            ->willReturn('key')
         ;
 
         $token->setAttributes(['foo' => 'bar']);
@@ -126,7 +126,7 @@ class PreAuthenticatedAuthenticationProviderTest extends TestCase
         if (null !== $user) {
             $userProvider->expects($this->once())
                          ->method('loadUserByUsername')
-                         ->will($this->returnValue($user))
+                         ->willReturn($user)
             ;
         }
 

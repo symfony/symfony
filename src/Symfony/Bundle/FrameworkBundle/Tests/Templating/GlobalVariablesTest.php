@@ -50,7 +50,7 @@ class GlobalVariablesTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue('token'));
+            ->willReturn('token');
 
         $this->assertSame('token', $this->globals->getToken());
     }
@@ -80,12 +80,12 @@ class GlobalVariablesTest extends TestCase
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $this->assertSame($expectedUser, $this->globals->getUser());
     }

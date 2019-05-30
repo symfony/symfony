@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
+* removed support for non-string default env() parameters
 
 4.4.0
 -----

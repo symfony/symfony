@@ -59,8 +59,8 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation A non-string default value of an env() parameter is deprecated since 4.3, cast "env(FLOATISH)" to string instead.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The default value of an env() parameter must be a string or null, but "double" given to "env(FLOATISH)".
      */
     public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
     {
@@ -72,8 +72,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         ]);
 
         $this->doProcess($container);
-
-        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
     /**

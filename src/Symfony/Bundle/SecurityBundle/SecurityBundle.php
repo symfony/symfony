@@ -24,8 +24,6 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLogin
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUserFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimpleFormFactory;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SimplePreAuthenticationFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\InMemoryFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\LdapFactory;
@@ -54,8 +52,6 @@ class SecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new RememberMeFactory());
         $extension->addSecurityListenerFactory(new X509Factory());
         $extension->addSecurityListenerFactory(new RemoteUserFactory());
-        $extension->addSecurityListenerFactory(new SimplePreAuthenticationFactory(false));
-        $extension->addSecurityListenerFactory(new SimpleFormFactory(false));
         $extension->addSecurityListenerFactory(new GuardAuthenticationFactory());
 
         $extension->addUserProviderFactory(new InMemoryFactory());

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +38,7 @@ class CachingHttpClient implements HttpClientInterface
     private $cache;
     private $defaultOptions = self::OPTIONS_DEFAULTS;
 
-    public function __construct(HttpClientInterface $client, StoreInterface $store, array $defaultOptions = [], LoggerInterface $logger = null)
+    public function __construct(HttpClientInterface $client, StoreInterface $store, array $defaultOptions = [])
     {
         if (!class_exists(HttpClientKernel::class)) {
             throw new \LogicException(sprintf('Using "%s" requires that the HttpKernel component version 4.3 or higher is installed, try running "composer require symfony/http-kernel:^4.3".', __CLASS__));

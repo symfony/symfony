@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T13:11:43Z
+
+Would it make more sense to do this on the console component? Reading your description, that's what I was expecting.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T13:12:28Z
+
+Hum ok, no, console doesn't know about http-kernel.

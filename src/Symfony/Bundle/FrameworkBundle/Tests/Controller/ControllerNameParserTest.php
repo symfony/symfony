@@ -155,13 +155,13 @@ class ControllerNameParserTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundle')
-            ->will($this->returnCallback(function ($bundle) use ($bundles) {
+            ->willReturnCallback(function ($bundle) use ($bundles) {
                 if (!isset($bundles[$bundle])) {
                     throw new \InvalidArgumentException(sprintf('Invalid bundle name "%s"', $bundle));
                 }
 
                 return $bundles[$bundle];
-            }))
+            })
         ;
 
         $bundles = [
@@ -172,7 +172,7 @@ class ControllerNameParserTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->will($this->returnValue($bundles))
+            ->willReturn($bundles)
         ;
 
         return new ControllerNameParser($kernel);
@@ -181,8 +181,8 @@ class ControllerNameParserTest extends TestCase
     private function getBundle($namespace, $name)
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
-        $bundle->expects($this->any())->method('getName')->will($this->returnValue($name));
-        $bundle->expects($this->any())->method('getNamespace')->will($this->returnValue($namespace));
+        $bundle->expects($this->any())->method('getName')->willReturn($name);
+        $bundle->expects($this->any())->method('getNamespace')->willReturn($namespace);
 
         return $bundle;
     }

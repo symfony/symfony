@@ -92,10 +92,10 @@ class WebProcessorTest extends TestCase
             ->getMock();
         $event->expects($this->any())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         return [$event, $server];
     }

@@ -116,9 +116,9 @@ class ExceptionListenerTest extends TestCase
         $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
-        }));
+        });
 
         $request = Request::create('/');
         $request->setRequestFormat('xml');
@@ -134,9 +134,9 @@ class ExceptionListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
-        }));
+        });
 
         $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), true);
 
@@ -160,11 +160,11 @@ class ExceptionListenerTest extends TestCase
     {
         $listener = new ExceptionListener(null);
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
             $controller = $request->attributes->get('_controller');
 
             return $controller();
-        }));
+        });
         $request = Request::create('/');
         $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
 

@@ -354,13 +354,13 @@ class HttpKernelTest extends TestCase
         $controllerResolver
             ->expects($this->any())
             ->method('getController')
-            ->will($this->returnValue($controller));
+            ->willReturn($controller);
 
         $argumentResolver = $this->getMockBuilder(ArgumentResolverInterface::class)->getMock();
         $argumentResolver
             ->expects($this->any())
             ->method('getArguments')
-            ->will($this->returnValue($arguments));
+            ->willReturn($arguments);
 
         return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver);
     }

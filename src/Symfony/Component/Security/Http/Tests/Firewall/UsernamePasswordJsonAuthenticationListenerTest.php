@@ -43,7 +43,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $httpUtils
             ->expects($this->any())
             ->method('checkRequestPath')
-            ->will($this->returnValue($matchCheckPath))
+            ->willReturn($matchCheckPath)
         ;
         $authenticationManager = $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock();
 

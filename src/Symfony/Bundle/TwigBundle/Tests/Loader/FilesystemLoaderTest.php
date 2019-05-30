@@ -24,7 +24,7 @@ class FilesystemLoaderTest extends TestCase
         $locator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->returnValue(__DIR__.'/../DependencyInjection/Fixtures/templates/layout.html.twig'))
+            ->willReturn(__DIR__.'/../DependencyInjection/Fixtures/templates/layout.html.twig')
         ;
         $loader = new FilesystemLoader($locator, $parser);
         $loader->addPath(__DIR__.'/../DependencyInjection/Fixtures/templates', 'namespace');
@@ -44,7 +44,7 @@ class FilesystemLoaderTest extends TestCase
         $locator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->returnValue($template = __DIR__.'/../DependencyInjection/Fixtures/templates/layout.html.twig'))
+            ->willReturn($template = __DIR__.'/../DependencyInjection/Fixtures/templates/layout.html.twig')
         ;
         $loader = new FilesystemLoader($locator, $parser);
 
@@ -61,7 +61,7 @@ class FilesystemLoaderTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('name.format.engine')
-            ->will($this->returnValue(new TemplateReference('', '', 'name', 'format', 'engine')))
+            ->willReturn(new TemplateReference('', '', 'name', 'format', 'engine'))
         ;
 
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
@@ -85,14 +85,14 @@ class FilesystemLoaderTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('name.format.engine')
-            ->will($this->returnValue(new TemplateReference('', '', 'name', 'format', 'engine')))
+            ->willReturn(new TemplateReference('', '', 'name', 'format', 'engine'))
         ;
 
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $locator
             ->expects($this->once())
             ->method('locate')
-            ->will($this->returnValue(false))
+            ->willReturn(false)
         ;
 
         $loader = new FilesystemLoader($locator, $parser);

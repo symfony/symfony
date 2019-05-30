@@ -89,7 +89,7 @@ class PathPackageTest extends TestCase
     private function getContext($basePath)
     {
         $context = $this->getMockBuilder('Symfony\Component\Asset\Context\ContextInterface')->getMock();
-        $context->expects($this->any())->method('getBasePath')->will($this->returnValue($basePath));
+        $context->expects($this->any())->method('getBasePath')->willReturn($basePath);
 
         return $context;
     }

@@ -172,7 +172,7 @@ class FileTest extends TestCase
             ->expects($this->once())
             ->method('guess')
             ->with($this->equalTo($path))
-            ->will($this->returnValue($mimeType))
+            ->willReturn($mimeType)
         ;
 
         return $guesser;

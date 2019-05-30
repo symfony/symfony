@@ -118,18 +118,18 @@ class InlineFragmentRendererTest extends TestCase
         $controllerResolver
             ->expects($this->once())
             ->method('getController')
-            ->will($this->returnValue(function () {
+            ->willReturn(function () {
                 ob_start();
                 echo 'bar';
                 throw new \RuntimeException();
-            }))
+            })
         ;
 
         $argumentResolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolverInterface')->getMock();
         $argumentResolver
             ->expects($this->once())
             ->method('getArguments')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
 
         $kernel = new HttpKernel(new EventDispatcher(), $controllerResolver, new RequestStack(), $argumentResolver);

@@ -488,7 +488,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
@@ -496,7 +496,7 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
@@ -509,7 +509,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder(ContainerInterface::class)->getMock();
@@ -517,7 +517,7 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;
@@ -529,9 +529,9 @@ class RouterTest extends TestCase
         $bag
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnCallback(function ($key) use ($params) {
+            ->willReturnCallback(function ($key) use ($params) {
                 return isset($params[$key]) ? $params[$key] : null;
-            }))
+            })
         ;
 
         return $bag;

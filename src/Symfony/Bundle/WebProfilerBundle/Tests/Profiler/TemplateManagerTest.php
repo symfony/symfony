@@ -69,7 +69,7 @@ class TemplateManagerTest extends TestCase
         $this->profiler->expects($this->any())
             ->method('has')
             ->withAnyParameters()
-            ->will($this->returnCallback([$this, 'profilerHasCallback']));
+            ->willReturnCallback([$this, 'profilerHasCallback']);
 
         $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
     }
@@ -107,14 +107,14 @@ class TemplateManagerTest extends TestCase
 
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')
-            ->will($this->returnValue('loadedTemplate'));
+            ->willReturn('loadedTemplate');
 
         if (interface_exists('Twig\Loader\SourceContextLoaderInterface')) {
             $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
         } else {
             $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
         }
-        $this->twigEnvironment->expects($this->any())->method('getLoader')->will($this->returnValue($loader));
+        $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
 
         return $this->twigEnvironment;
     }

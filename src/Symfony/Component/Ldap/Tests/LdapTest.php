@@ -42,7 +42,7 @@ class LdapTest extends TestCase
         $this->adapter
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
+            ->willReturn($connection)
         ;
         $this->ldap->bind('foo', 'bar');
     }

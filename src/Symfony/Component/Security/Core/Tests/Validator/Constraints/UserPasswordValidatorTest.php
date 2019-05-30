@@ -65,7 +65,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->validator->validate('secret', $constraint);
 
@@ -81,7 +81,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->validator->validate('secret', $constraint);
 
@@ -133,13 +133,13 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $mock
             ->expects($this->any())
             ->method('getPassword')
-            ->will($this->returnValue(static::PASSWORD))
+            ->willReturn(static::PASSWORD)
         ;
 
         $mock
             ->expects($this->any())
             ->method('getSalt')
-            ->will($this->returnValue(static::SALT))
+            ->willReturn(static::SALT)
         ;
 
         return $mock;
@@ -157,7 +157,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $mock
             ->expects($this->any())
             ->method('getEncoder')
-            ->will($this->returnValue($encoder))
+            ->willReturn($encoder)
         ;
 
         return $mock;
@@ -171,7 +171,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $mock
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token))
+            ->willReturn($token)
         ;
 
         return $mock;
@@ -183,7 +183,7 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
         $mock
             ->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user))
+            ->willReturn($user)
         ;
 
         return $mock;

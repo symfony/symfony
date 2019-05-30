@@ -50,7 +50,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->atLeastOnce())
             ->method('getVerbosity')
-            ->will($this->returnValue($verbosity))
+            ->willReturn($verbosity)
         ;
         $handler = new ConsoleHandler($output, true, $map);
         $this->assertSame($isHandling, $handler->isHandling(['level' => $level]),
@@ -114,12 +114,12 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->at(0))
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_QUIET))
+            ->willReturn(OutputInterface::VERBOSITY_QUIET)
         ;
         $output
             ->expects($this->at(1))
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG)
         ;
         $handler = new ConsoleHandler($output);
         $this->assertFalse($handler->isHandling(['level' => Logger::NOTICE]),
@@ -144,7 +144,7 @@ class ConsoleHandlerTest extends TestCase
         $output
             ->expects($this->any())
             ->method('getVerbosity')
-            ->will($this->returnValue(OutputInterface::VERBOSITY_DEBUG))
+            ->willReturn(OutputInterface::VERBOSITY_DEBUG)
         ;
         $output
             ->expects($this->once())

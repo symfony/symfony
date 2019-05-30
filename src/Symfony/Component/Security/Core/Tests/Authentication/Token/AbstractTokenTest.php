@@ -76,7 +76,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals('fabien', $token->getUsername());
 
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $user->expects($this->once())->method('getUsername')->will($this->returnValue('fabien'));
+        $user->expects($this->once())->method('getUsername')->willReturn('fabien');
         $token->setUser($user);
         $this->assertEquals('fabien', $token->getUsername());
     }

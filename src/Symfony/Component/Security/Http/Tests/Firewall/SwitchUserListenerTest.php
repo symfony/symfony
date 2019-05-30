@@ -167,7 +167,7 @@ class SwitchUserListenerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
@@ -183,11 +183,11 @@ class SwitchUserListenerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')->with('kuba')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 
@@ -213,11 +213,11 @@ class SwitchUserListenerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')->with('kuba')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 
@@ -241,11 +241,11 @@ class SwitchUserListenerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->any())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->userProvider->expects($this->any())
             ->method('loadUserByUsername')->with('kuba')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher
@@ -288,11 +288,11 @@ class SwitchUserListenerTest extends TestCase
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'], $user)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->userProvider->expects($this->once())
             ->method('loadUserByUsername')->with('kuba')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
 

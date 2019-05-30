@@ -61,7 +61,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
         if (null !== $session) {
-            $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
+            $request->expects($this->any())->method('getSession')->willReturn($session);
         }
 
         return $request;

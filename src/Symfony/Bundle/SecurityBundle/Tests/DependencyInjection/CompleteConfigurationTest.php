@@ -476,50 +476,6 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "simple_form" security listener is deprecated Symfony 4.2, use Guard instead.
-     */
-    public function testSimpleAuth()
-    {
-        $container = $this->getContainer('simple_auth');
-        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = [];
-        $configs = [];
-        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
-            $contextDef = $container->getDefinition($contextId);
-            $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
-
-            $configDef = $container->getDefinition((string) $arguments['index_3']);
-            $configs[] = array_values($configDef->getArguments());
-        }
-
-        $this->assertSame([[
-            'simple_auth',
-            'security.user_checker',
-            null,
-            true,
-            false,
-            'security.user.provider.concrete.default',
-            'simple_auth',
-            'security.authentication.form_entry_point.simple_auth',
-            null,
-            null,
-            ['simple_form', 'anonymous',
-            ],
-            null,
-        ]], $configs);
-
-        $this->assertSame([[
-            'security.channel_listener',
-            'security.context_listener.0',
-            'security.authentication.listener.simple_form.simple_auth',
-            'security.authentication.listener.anonymous.simple_auth',
-            'security.access_listener',
-        ]], $listeners);
-    }
-
-    /**
-     * @group legacy
      * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie1-name" cookie configured in "logout.delete_cookies" will delete the "cookie1-name" cookie instead of the "cookie1_name" cookie.
      * @expectedDeprecation Normalization of cookie names is deprecated since Symfony 4.3. Starting from Symfony 5.0, the "cookie3-long_name" cookie configured in "logout.delete_cookies" will delete the "cookie3-long_name" cookie instead of the "cookie3_long_name" cookie.
      */

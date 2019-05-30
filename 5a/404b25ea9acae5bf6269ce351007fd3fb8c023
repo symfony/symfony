@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-05-30T11:43:09Z
+
+Rebase needed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-05-30T19:40:26Z
+
+The build failure means that security-http needs a conflict for symfony/security-core >= 5.0 on branch 4.4, right?

@@ -56,7 +56,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $route = new Route(['path' => '/path/to/{id}']);
         $this->reader->expects($this->once())->method('getClassAnnotation');
         $this->reader->expects($this->once())->method('getMethodAnnotations')
-            ->will($this->returnValue([$route]));
+            ->willReturn([$route]);
 
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php');
     }

@@ -44,7 +44,7 @@ class PreviewErrorControllerTest extends TestCase
                 }),
                 $this->equalTo(HttpKernelInterface::SUB_REQUEST)
             )
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $controller = new PreviewErrorController($kernel, $logicalControllerName);
 

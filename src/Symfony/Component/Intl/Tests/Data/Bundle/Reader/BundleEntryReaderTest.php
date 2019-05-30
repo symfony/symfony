@@ -72,7 +72,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->assertSame(self::$data, $this->reader->read(self::RES_DIR, 'root'));
     }
@@ -82,12 +82,12 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$fallbackData));
+            ->willReturn(self::$fallbackData);
 
         $this->assertSame(self::$mergedData, $this->reader->readEntry(self::RES_DIR, 'en', []));
     }
@@ -97,7 +97,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->assertSame('Bar', $this->reader->readEntry(self::RES_DIR, 'root', ['Entries', 'Foo']));
     }
@@ -110,7 +110,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->reader->readEntry(self::RES_DIR, 'root', ['Entries', 'NonExisting']);
     }
@@ -120,12 +120,12 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$fallbackData));
+            ->willReturn(self::$fallbackData);
 
         $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
@@ -138,7 +138,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(self::$data));
+            ->willReturn(self::$data);
 
         $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam'], false);
     }
@@ -153,7 +153,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$fallbackData));
+            ->willReturn(self::$fallbackData);
 
         $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
@@ -193,17 +193,17 @@ class BundleEntryReaderTest extends TestCase
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue($childData));
+                ->willReturn($childData);
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
                 ->with(self::RES_DIR, 'root')
-                ->will($this->returnValue($parentData));
+                ->willReturn($parentData);
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue($childData));
+                ->willReturn($childData);
         }
 
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', [], true));
@@ -217,7 +217,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue($childData));
+            ->willReturn($childData);
 
         $this->assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', [], false));
     }
@@ -231,17 +231,17 @@ class BundleEntryReaderTest extends TestCase
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
                 ->with(self::RES_DIR, 'root')
-                ->will($this->returnValue(['Foo' => ['Bar' => $parentData]]));
+                ->willReturn(['Foo' => ['Bar' => $parentData]]);
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en', ['Foo', 'Bar'], true));
@@ -255,12 +255,12 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(['Foo' => 'Baz']));
+            ->willReturn(['Foo' => 'Baz']);
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(['Foo' => ['Bar' => $parentData]]));
+            ->willReturn(['Foo' => ['Bar' => $parentData]]);
 
         $this->assertSame($parentData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
@@ -274,17 +274,17 @@ class BundleEntryReaderTest extends TestCase
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue(['Foo' => 'Bar']));
+                ->willReturn(['Foo' => 'Bar']);
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
         $this->assertSame($childData, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
@@ -298,12 +298,12 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(['Foo' => 'Baz']));
+            ->willReturn(['Foo' => 'Baz']);
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(['Foo' => 'Bar']));
+            ->willReturn(['Foo' => 'Bar']);
 
         $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true);
     }
@@ -320,17 +320,17 @@ class BundleEntryReaderTest extends TestCase
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
 
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
                 ->with(self::RES_DIR, 'en')
-                ->will($this->returnValue(['Foo' => ['Bar' => $parentData]]));
+                ->willReturn(['Foo' => ['Bar' => $parentData]]);
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
                 ->with(self::RES_DIR, 'en_GB')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
@@ -347,18 +347,18 @@ class BundleEntryReaderTest extends TestCase
             $this->readerImpl->expects($this->at(0))
                 ->method('read')
                 ->with(self::RES_DIR, 'ro_MD')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
 
             // Read fallback locale of aliased locale ("ro_MD" -> "ro")
             $this->readerImpl->expects($this->at(1))
                 ->method('read')
                 ->with(self::RES_DIR, 'ro')
-                ->will($this->returnValue(['Foo' => ['Bar' => $parentData]]));
+                ->willReturn(['Foo' => ['Bar' => $parentData]]);
         } else {
             $this->readerImpl->expects($this->once())
                 ->method('read')
                 ->with(self::RES_DIR, 'ro_MD')
-                ->will($this->returnValue(['Foo' => ['Bar' => $childData]]));
+                ->willReturn(['Foo' => ['Bar' => $childData]]);
         }
 
         $this->assertSame($result, $this->reader->readEntry(self::RES_DIR, 'mo', ['Foo', 'Bar'], true));

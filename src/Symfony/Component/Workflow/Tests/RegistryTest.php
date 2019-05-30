@@ -115,9 +115,9 @@ class RegistryTest extends TestCase
     {
         $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
-            ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
+            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;
-            }));
+            });
 
         return $strategy;
     }
@@ -129,9 +129,9 @@ class RegistryTest extends TestCase
     {
         $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
-            ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
+            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;
-            }));
+            });
 
         return $strategy;
     }

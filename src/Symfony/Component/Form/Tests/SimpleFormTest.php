@@ -722,7 +722,7 @@ class SimpleFormTest extends AbstractFormTest
         $type->expects($this->once())
             ->method('createView')
             ->with($form)
-            ->will($this->returnValue($view));
+            ->willReturn($view);
 
         $this->assertSame($view, $form->createView());
     }
@@ -739,12 +739,12 @@ class SimpleFormTest extends AbstractFormTest
 
         $parentType->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($parentView));
+            ->willReturn($parentView);
 
         $type->expects($this->once())
             ->method('createView')
             ->with($form, $parentView)
-            ->will($this->returnValue($view));
+            ->willReturn($view);
 
         $this->assertSame($view, $form->createView());
     }
@@ -759,7 +759,7 @@ class SimpleFormTest extends AbstractFormTest
         $type->expects($this->once())
             ->method('createView')
             ->with($form, $parentView)
-            ->will($this->returnValue($view));
+            ->willReturn($view);
 
         $this->assertSame($view, $form->createView($parentView));
     }

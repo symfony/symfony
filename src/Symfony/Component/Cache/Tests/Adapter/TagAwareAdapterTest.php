@@ -76,7 +76,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pruneable
             ->expects($this->atLeastOnce())
             ->method('prune')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         return $pruneable;
     }
@@ -93,7 +93,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pruneable
             ->expects($this->atLeastOnce())
             ->method('prune')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         return $pruneable;
     }

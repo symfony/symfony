@@ -58,9 +58,9 @@ class DoctrineTransportFactoryTest extends TestCase
         $registry = $this->getMockBuilder(RegistryInterface::class)->getMock();
         $registry->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnCallback(function () {
+            ->willReturnCallback(function () {
                 throw new \InvalidArgumentException();
-            }));
+            });
 
         $factory = new DoctrineTransportFactory($registry);
         $factory->createTransport('doctrine://default', [], $this->createMock(SerializerInterface::class));

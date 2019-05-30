@@ -339,7 +339,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $this->csrfTokenManager->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue(new CsrfToken('token_id', 'foo&bar')));
+            ->willReturn(new CsrfToken('token_id', 'foo&bar'));
 
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add($this->factory

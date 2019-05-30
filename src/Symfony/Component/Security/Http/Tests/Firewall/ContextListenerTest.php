@@ -153,17 +153,17 @@ class ContextListenerTest extends TestCase
 
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
         $request->expects($this->any())
             ->method('hasPreviousSession')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $request->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session));
+            ->willReturn($session);
         $session->expects($this->any())
             ->method('get')
             ->with('_security_key123')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
         $tokenStorage->expects($this->once())
             ->method('setToken')
             ->with(null);
@@ -195,10 +195,10 @@ class ContextListenerTest extends TestCase
 
         $event->expects($this->any())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock()));
+            ->willReturn($this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock());
 
         $dispatcher->expects($this->once())
             ->method('addListener')
@@ -220,14 +220,14 @@ class ContextListenerTest extends TestCase
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event->expects($this->any())
             ->method('isMasterRequest')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $event->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         $dispatcher->expects($this->once())
             ->method('removeListener')
@@ -239,12 +239,12 @@ class ContextListenerTest extends TestCase
     public function testHandleRemovesTokenIfNoPreviousSessionWasFound()
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request->expects($this->any())->method('hasPreviousSession')->will($this->returnValue(false));
+        $request->expects($this->any())->method('hasPreviousSession')->willReturn(false);
 
         $event = $this->getMockBuilder(RequestEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
+        $event->expects($this->any())->method('getRequest')->willReturn($request);
 
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $tokenStorage->expects($this->once())->method('setToken')->with(null);

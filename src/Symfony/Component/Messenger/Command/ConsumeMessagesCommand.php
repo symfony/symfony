@@ -40,7 +40,7 @@ class ConsumeMessagesCommand extends Command
 {
     protected static $defaultName = 'messenger:consume';
 
-    private $busLocator;
+    private $routableBus;
     private $receiverLocator;
     private $logger;
     private $receiverNames;
@@ -49,15 +49,23 @@ class ConsumeMessagesCommand extends Command
     /** @var CacheItemPoolInterface|null */
     private $restartSignalCachePool;
 
-    public function __construct(ContainerInterface $busLocator, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* ContainerInterface */ $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
+    /**
+     * @param RoutableMessageBus $routableBus
+     */
+    public function __construct($routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* ContainerInterface */ $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
+        // to be deprecated in 4.4
+        if ($routableBus instanceof ContainerInterface) {
+            $routableBus = new RoutableMessageBus($routableBus);
+        }
+
         if (\is_array($retryStrategyLocator)) {
             @trigger_error(sprintf('The 5th argument of the class "%s" should be a retry-strategy locator, an array of bus names as a value is deprecated since Symfony 4.3.', __CLASS__), E_USER_DEPRECATED);
 
             $retryStrategyLocator = null;
         }
 
-        $this->busLocator = $busLocator;
+        $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
         $this->receiverNames = $receiverNames;
@@ -177,11 +185,7 @@ EOF
             $retryStrategies[$receiverName] = null !== $this->retryStrategyLocator ? $this->retryStrategyLocator->get($receiverName) : null;
         }
 
-        if (null !== $input->getOption('bus')) {
-            $bus = $this->busLocator->get($input->getOption('bus'));
-        } else {
-            $bus = new RoutableMessageBus($this->busLocator);
-        }
+        $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
         $worker = new Worker($receivers, $bus, $retryStrategies, $this->eventDispatcher, $this->logger);
         $stopsWhen = [];

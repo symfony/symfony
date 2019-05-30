@@ -13,9 +13,10 @@ namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Lock\Factory;
-use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Lock\StoreInterface;
 
 /**
  * Basic lock feature for commands.
@@ -24,8 +25,15 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
  */
 trait LockableTrait
 {
-    /** @var Lock */
+    /**
+     * @var LockInterface
+     */
     private $lock;
+
+    /**
+     * @var StoreInterface
+     */
+    private $store;
 
     /**
      * Locks a command.
@@ -42,13 +50,15 @@ trait LockableTrait
             throw new LogicException('A lock is already in place.');
         }
 
-        if (SemaphoreStore::isSupported()) {
-            $store = new SemaphoreStore();
-        } else {
-            $store = new FlockStore();
+        if (null === $this->store) {
+            if (SemaphoreStore::isSupported()) {
+                $this->store = new SemaphoreStore();
+            } else {
+                $this->store = new FlockStore();
+            }
         }
 
-        $this->lock = (new Factory($store))->createLock($name ?: $this->getName());
+        $this->lock = (new Factory($this->store))->createLock($name ?: $this->getName());
         if (!$this->lock->acquire($blocking)) {
             $this->lock = null;
 
@@ -67,5 +77,15 @@ trait LockableTrait
             $this->lock->release();
             $this->lock = null;
         }
+    }
+
+    /**
+     * Sets the internal store for the command to be used.
+     *
+     * @param StoreInterface $store
+     */
+    public function setStore(StoreInterface $store)
+    {
+        $this->store = $store;
     }
 }

@@ -1594,7 +1594,7 @@ class Request
 
         $preferredLanguages = array_values(array_intersect($extendedPreferredLanguages, $locales));
 
-        return isset($preferredLanguages[0]) ? $preferredLanguages[0] : $locales[0];
+        return $preferredLanguages[0] ?? $locales[0];
     }
 
     /**

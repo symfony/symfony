@@ -33,25 +33,8 @@ class ExpressionVoter implements VoterInterface
     private $authChecker;
     private $roleHierarchy;
 
-    /**
-     * @param AuthorizationCheckerInterface $authChecker
-     */
-    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, $authChecker = null, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, AuthorizationCheckerInterface $authChecker, RoleHierarchyInterface $roleHierarchy = null)
     {
-        if ($authChecker instanceof RoleHierarchyInterface) {
-            @trigger_error(sprintf('Passing a RoleHierarchyInterface to "%s()" is deprecated since Symfony 4.2. Pass an AuthorizationCheckerInterface instead.', __METHOD__), E_USER_DEPRECATED);
-            $roleHierarchy = $authChecker;
-            $authChecker = null;
-
-            if (!method_exists($roleHierarchy, 'getReachableRoleNames')) {
-                @trigger_error(sprintf('Not implementing the getReachableRoleNames() method in %s which implements %s is deprecated since Symfony 4.3.', \get_class($this->roleHierarchy), RoleHierarchyInterface::class), E_USER_DEPRECATED);
-            }
-        } elseif (null === $authChecker) {
-            @trigger_error(sprintf('Argument 3 passed to "%s()" should be an instance of AuthorizationCheckerInterface, not passing it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        } elseif (!$authChecker instanceof AuthorizationCheckerInterface) {
-            throw new \TypeError(sprintf('Argument 3 passed to %s() must be an instance of %s or null, %s given.', __METHOD__, AuthorizationCheckerInterface::class, \is_object($authChecker) ? \get_class($authChecker) : \gettype($authChecker)));
-        }
-
         $this->expressionLanguage = $expressionLanguage;
         $this->trustResolver = $trustResolver;
         $this->authChecker = $authChecker;

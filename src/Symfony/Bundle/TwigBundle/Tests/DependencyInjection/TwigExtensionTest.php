@@ -197,43 +197,6 @@ class TwigExtensionTest extends TestCase
         ], $paths);
     }
 
-    /**
-     * @group legacy
-     * @dataProvider getFormats
-     * @expectedDeprecation Loading Twig templates for "TwigBundle" from the "%s/Resources/TwigBundle/views" directory is deprecated since Symfony 4.2, use "%s/templates/bundles/TwigBundle" instead.
-     * @expectedDeprecation Loading Twig templates from the "%s/Resources/views" directory is deprecated since Symfony 4.2, use "%s/templates" instead.
-     */
-    public function testLegacyTwigLoaderPaths($format)
-    {
-        $container = $this->createContainer(__DIR__.'/../Fixtures/templates');
-        $container->registerExtension(new TwigExtension());
-        $this->loadFromFile($container, 'full', $format);
-        $this->loadFromFile($container, 'extra', $format);
-        $this->compileContainer($container);
-
-        $def = $container->getDefinition('twig.loader.native_filesystem');
-        $paths = [];
-        foreach ($def->getMethodCalls() as $call) {
-            if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
-                $paths[] = $call[1];
-            }
-        }
-
-        $this->assertEquals([
-            ['path1'],
-            ['path2'],
-            ['namespaced_path1', 'namespace1'],
-            ['namespaced_path2', 'namespace2'],
-            ['namespaced_path3', 'namespace3'],
-            [__DIR__.'/../Fixtures/templates/Resources/TwigBundle/views', 'Twig'],
-            [__DIR__.'/Fixtures/templates/bundles/TwigBundle', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', 'Twig'],
-            [realpath(__DIR__.'/../..').'/Resources/views', '!Twig'],
-            [__DIR__.'/../Fixtures/templates/Resources/views'],
-            [__DIR__.'/Fixtures/templates'],
-        ], $paths);
-    }
-
     public function getFormats()
     {
         return [

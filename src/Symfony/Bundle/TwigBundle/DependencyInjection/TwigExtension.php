@@ -120,15 +120,6 @@ class TwigExtension extends Extension
             }
         }
 
-        if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
-            if ($dir !== $defaultTwigPath) {
-                @trigger_error(sprintf('Loading Twig templates from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $dir, $defaultTwigPath), E_USER_DEPRECATED);
-            }
-
-            $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$dir]);
-        }
-        $container->addResource(new FileExistenceResource($dir));
-
         if (file_exists($defaultTwigPath)) {
             $twigFilesystemLoaderDefinition->addMethodCall('addPath', [$defaultTwigPath]);
         }
@@ -175,13 +166,6 @@ class TwigExtension extends Extension
         $bundleHierarchy = [];
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             $defaultOverrideBundlePath = $container->getParameterBag()->resolveValue($config['default_path']).'/bundles/'.$name;
-
-            if (file_exists($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
-                @trigger_error(sprintf('Loading Twig templates for "%s" from the "%s" directory is deprecated since Symfony 4.2, use "%s" instead.', $name, $dir, $defaultOverrideBundlePath), E_USER_DEPRECATED);
-
-                $bundleHierarchy[$name][] = $dir;
-            }
-            $container->addResource(new FileExistenceResource($dir));
 
             if (file_exists($defaultOverrideBundlePath)) {
                 $bundleHierarchy[$name][] = $defaultOverrideBundlePath;

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -223,6 +224,34 @@ class MessengerPassTest extends TestCase
         $secondHandlerReference = $secondHandlerDescriptorDefinition->getArgument(0);
         $secondHandlerDefinition = $container->getDefinition($secondHandlerReference);
         $this->assertSame(PrioritizedHandler::class, $secondHandlerDefinition->getClass());
+    }
+
+    public function testRegisterAbstractHandler()
+    {
+        $container = $this->getContainerBuilder($messageBusId = 'message_bus');
+        $container->register($messageBusId, MessageBusInterface::class)->addTag('messenger.bus')->setArgument(0, []);
+
+        $container
+            ->register(DummyHandler::class, DummyHandler::class)
+            ->setAbstract(true);
+
+        $container
+            ->setDefinition($abstractDirectChildId = 'direct_child', new ChildDefinition(DummyHandler::class))
+            ->setAbstract(true);
+
+        $container
+            ->setDefinition($abstractHandlerId = 'child', new ChildDefinition($abstractDirectChildId))
+            ->addTag('messenger.message_handler');
+
+        (new MessengerPass())->process($container);
+
+        $messageHandlerMapping = $container->getDefinition($messageBusId.'.messenger.handlers_locator')->getArgument(0);
+        $this->assertHandlerDescriptor(
+            $container,
+            $messageHandlerMapping,
+            DummyMessage::class,
+            [$abstractHandlerId]
+        );
     }
 
     public function testThrowsExceptionIfTheHandlerClassDoesNotExist()

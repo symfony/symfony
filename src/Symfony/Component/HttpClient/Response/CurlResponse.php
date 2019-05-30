@@ -260,7 +260,7 @@ final class CurlResponse implements ResponseInterface
 
             while ($info = curl_multi_info_read($multi->handle)) {
                 $multi->handlesActivity[(int) $info['handle']][] = null;
-                $multi->handlesActivity[(int) $info['handle']][] = \in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || (\CURLE_WRITE_ERROR === $info['result'] && 'destruct' === @curl_getinfo($info['handle'], CURLINFO_PRIVATE)) ? null : new TransportException(sprintf('%s for"%s".', curl_strerror($info['result']), curl_getinfo($info['handle'], CURLINFO_EFFECTIVE_URL)));
+                $multi->handlesActivity[(int) $info['handle']][] = \in_array($info['result'], [\CURLE_OK, \CURLE_TOO_MANY_REDIRECTS], true) || (\CURLE_WRITE_ERROR === $info['result'] && 'destruct' === @curl_getinfo($info['handle'], CURLINFO_PRIVATE)) ? null : new TransportException(sprintf('%s for "%s".', curl_strerror($info['result']), curl_getinfo($info['handle'], CURLINFO_EFFECTIVE_URL)));
             }
         } finally {
             self::$performing = false;

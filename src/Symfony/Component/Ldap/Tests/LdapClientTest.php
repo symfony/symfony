@@ -70,7 +70,7 @@ class LdapClientTest extends LdapTestCase
         $collection
             ->expects($this->once())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator([
+            ->willReturn(new \ArrayIterator([
                 new Entry('cn=qux,dc=foo,dc=com', [
                     'cn' => ['qux'],
                     'dc' => ['com', 'foo'],
@@ -81,13 +81,13 @@ class LdapClientTest extends LdapTestCase
                     'dc' => ['com', 'foo'],
                     'givenName' => ['Baz'],
                 ]),
-            ])))
+            ]))
         ;
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue($collection))
+            ->willReturn($collection)
         ;
         $this->ldap
             ->expects($this->once())

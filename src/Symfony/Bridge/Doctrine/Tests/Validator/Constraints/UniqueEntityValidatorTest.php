@@ -82,7 +82,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $registry->expects($this->any())
                  ->method('getManager')
                  ->with($this->equalTo(self::EM_NAME))
-                 ->will($this->returnValue($em));
+                 ->willReturn($em);
 
         return $registry;
     }
@@ -104,14 +104,14 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         ;
         $em->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($repositoryMock))
+            ->willReturn($repositoryMock)
         ;
 
         $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')->getMock();
         $classMetadata
             ->expects($this->any())
             ->method('hasField')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
             ->disableOriginalConstructor()
@@ -125,12 +125,12 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $refl
             ->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
         $classMetadata->reflFields = ['name' => $refl];
         $em->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValue($classMetadata))
+            ->willReturn($classMetadata)
         ;
 
         return $em;
@@ -366,7 +366,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $repository = $this->createRepositoryMock();
         $repository->expects($this->once())
             ->method('findByCustom')
-            ->will($this->returnValue([]))
+            ->willReturn([])
         ;
         $this->em = $this->createEntityManagerMock($repository);
         $this->registry = $this->createRegistryMock($this->em);
@@ -394,15 +394,15 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $repository = $this->createRepositoryMock();
         $repository->expects($this->once())
             ->method('findByCustom')
-            ->will(
-                $this->returnCallback(function () use ($entity) {
+            ->willReturnCallback(
+                function () use ($entity) {
                     $returnValue = [
                         $entity,
                     ];
                     next($returnValue);
 
                     return $returnValue;
-                })
+                }
             )
         ;
         $this->em = $this->createEntityManagerMock($repository);
@@ -430,7 +430,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $repository = $this->createRepositoryMock();
         $repository->expects($this->once())
             ->method('findByCustom')
-            ->will($this->returnValue($result))
+            ->willReturn($result)
         ;
         $this->em = $this->createEntityManagerMock($repository);
         $this->registry = $this->createRegistryMock($this->em);
@@ -564,7 +564,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 
         $repository->expects($this->once())
             ->method('findByCustom')
-            ->will($this->returnValue([$entity1]))
+            ->willReturn([$entity1])
         ;
 
         $this->em->persist($entity1);
@@ -635,7 +635,7 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $repository = $this->createRepositoryMock();
         $repository
              ->method('find')
-             ->will($this->returnValue(null))
+             ->willReturn(null)
         ;
 
         $this->em = $this->createEntityManagerMock($repository);

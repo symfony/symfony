@@ -29,7 +29,7 @@ class FormAuthenticationEntryPointTest extends TestCase
             ->expects($this->once())
             ->method('createRedirectResponse')
             ->with($this->equalTo($request), $this->equalTo('/the/login/path'))
-            ->will($this->returnValue($response))
+            ->willReturn($response)
         ;
 
         $entryPoint = new FormAuthenticationEntryPoint($httpKernel, $httpUtils, '/the/login/path', false);
@@ -48,7 +48,7 @@ class FormAuthenticationEntryPointTest extends TestCase
             ->expects($this->once())
             ->method('createRequest')
             ->with($this->equalTo($request), $this->equalTo('/the/login/path'))
-            ->will($this->returnValue($subRequest))
+            ->willReturn($subRequest)
         ;
 
         $httpKernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
@@ -56,7 +56,7 @@ class FormAuthenticationEntryPointTest extends TestCase
             ->expects($this->once())
             ->method('handle')
             ->with($this->equalTo($subRequest), $this->equalTo(HttpKernelInterface::SUB_REQUEST))
-            ->will($this->returnValue($response))
+            ->willReturn($response)
         ;
 
         $entryPoint = new FormAuthenticationEntryPoint($httpKernel, $httpUtils, '/the/login/path', true);

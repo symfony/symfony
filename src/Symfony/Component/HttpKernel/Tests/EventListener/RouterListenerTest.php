@@ -49,7 +49,7 @@ class RouterListenerTest extends TestCase
         $context->setHttpsPort($defaultHttpsPort);
         $urlMatcher->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
         $listener = new RouterListener($urlMatcher, $this->requestStack);
         $event = $this->createGetResponseEventForUri($uri);
@@ -102,7 +102,7 @@ class RouterListenerTest extends TestCase
         $requestMatcher->expects($this->once())
                        ->method('matchRequest')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
-                       ->will($this->returnValue([]));
+                       ->willReturn([]);
 
         $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
@@ -118,7 +118,7 @@ class RouterListenerTest extends TestCase
         $requestMatcher->expects($this->any())
                        ->method('matchRequest')
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
-                       ->will($this->returnValue([]));
+                       ->willReturn([]);
 
         $context = new RequestContext();
 
@@ -143,7 +143,7 @@ class RouterListenerTest extends TestCase
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
             ->method('matchRequest')
-            ->will($this->returnValue($parameter));
+            ->willReturn($parameter);
 
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())

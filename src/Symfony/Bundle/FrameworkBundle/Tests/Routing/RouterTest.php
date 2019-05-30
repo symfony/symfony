@@ -248,7 +248,7 @@ class RouterTest extends TestCase
         $loader
             ->expects($this->any())
             ->method('load')
-            ->will($this->returnValue($routes))
+            ->willReturn($routes)
         ;
 
         $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
@@ -256,7 +256,7 @@ class RouterTest extends TestCase
         $sc
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($loader))
+            ->willReturn($loader)
         ;
 
         return $sc;

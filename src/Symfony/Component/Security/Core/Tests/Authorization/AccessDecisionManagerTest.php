@@ -72,10 +72,10 @@ class AccessDecisionManagerTest extends TestCase
         $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
         $voter->expects($this->any())
               ->method('vote')
-              ->will($this->returnValueMap([
+              ->willReturnMap([
                   [$token, null, ['ROLE_FOO'], $vote1],
                   [$token, null, ['ROLE_BAR'], $vote2],
-              ]))
+              ])
         ;
 
         return $voter;
@@ -137,7 +137,7 @@ class AccessDecisionManagerTest extends TestCase
         $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
         $voter->expects($this->any())
               ->method('vote')
-              ->will($this->returnValue($vote));
+              ->willReturn($vote);
 
         return $voter;
     }

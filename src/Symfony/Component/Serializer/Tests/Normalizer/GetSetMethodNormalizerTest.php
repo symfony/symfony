@@ -63,7 +63,7 @@ class GetSetMethodNormalizerTest extends TestCase
             ->expects($this->once())
             ->method('normalize')
             ->with($object, 'any')
-            ->will($this->returnValue('string_object'))
+            ->willReturn('string_object')
         ;
 
         $this->assertEquals(

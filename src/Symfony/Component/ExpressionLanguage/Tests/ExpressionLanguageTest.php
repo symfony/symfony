@@ -36,18 +36,18 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
-            }))
+            })
         ;
 
         $cacheItemMock
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $parsedExpression;
-            }))
+            })
         ;
 
         $cacheMock
@@ -85,9 +85,9 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('save')
             ->with('1%20%2B%201%2F%2F', $this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($key, $expression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($key, $expression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $expression;
-            }))
+            })
         ;
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
@@ -213,18 +213,18 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
-            }))
+            })
         ;
 
         $cacheItemMock
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $parsedExpression;
-            }))
+            })
         ;
 
         $cacheMock

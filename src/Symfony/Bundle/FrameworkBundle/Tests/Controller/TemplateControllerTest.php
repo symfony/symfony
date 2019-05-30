@@ -49,9 +49,9 @@ class TemplateControllerTest extends TestCase
         $twig->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container->expects($this->at(0))->method('has')->will($this->returnValue(false));
-        $container->expects($this->at(1))->method('has')->will($this->returnValue(true));
-        $container->expects($this->at(2))->method('get')->will($this->returnValue($twig));
+        $container->expects($this->at(0))->method('has')->willReturn(false);
+        $container->expects($this->at(1))->method('has')->willReturn(true);
+        $container->expects($this->at(2))->method('get')->willReturn($twig);
 
         $controller = new TemplateController();
         $controller->setContainer($container);
@@ -69,7 +69,7 @@ class TemplateControllerTest extends TestCase
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->at(0))->method('has')->willReturn(true);
-        $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
+        $container->expects($this->at(1))->method('get')->willReturn($templating);
 
         $controller = new TemplateController();
         $controller->setContainer($container);

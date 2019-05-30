@@ -32,12 +32,12 @@ class ChainDecoderTest extends TestCase
 
         $this->decoder1
             ->method('supportsDecoding')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [self::FORMAT_1, [], true],
                 [self::FORMAT_2, [], false],
                 [self::FORMAT_3, [], false],
                 [self::FORMAT_3, ['foo' => 'bar'], true],
-            ]));
+            ]);
 
         $this->decoder2 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\DecoderInterface')
@@ -45,11 +45,11 @@ class ChainDecoderTest extends TestCase
 
         $this->decoder2
             ->method('supportsDecoding')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [self::FORMAT_1, [], false],
                 [self::FORMAT_2, [], true],
                 [self::FORMAT_3, [], false],
-            ]));
+            ]);
 
         $this->chainDecoder = new ChainDecoder([$this->decoder1, $this->decoder2]);
     }

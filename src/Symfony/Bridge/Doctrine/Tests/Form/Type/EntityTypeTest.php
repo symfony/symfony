@@ -1087,7 +1087,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->emRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::SINGLE_IDENT_CLASS)
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => self::SINGLE_IDENT_CLASS,
@@ -1237,7 +1237,7 @@ class EntityTypeTest extends BaseTypeTest
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         return $registry;
     }

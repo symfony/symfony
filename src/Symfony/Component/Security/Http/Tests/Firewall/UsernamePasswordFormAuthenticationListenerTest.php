@@ -38,21 +38,21 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         $httpUtils
             ->expects($this->any())
             ->method('checkRequestPath')
-            ->will($this->returnValue(true))
+            ->willReturn(true)
         ;
 
         $failureHandler = $this->getMockBuilder('Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface')->getMock();
         $failureHandler
             ->expects($ok ? $this->never() : $this->once())
             ->method('onAuthenticationFailure')
-            ->will($this->returnValue(new Response()))
+            ->willReturn(new Response())
         ;
 
         $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')->disableOriginalConstructor()->getMock();
         $authenticationManager
             ->expects($ok ? $this->once() : $this->never())
             ->method('authenticate')
-            ->will($this->returnValue(new Response()))
+            ->willReturn(new Response())
         ;
 
         $listener = new UsernamePasswordFormAuthenticationListener(
@@ -70,7 +70,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
+            ->willReturn($request)
         ;
 
         $listener->handle($event);
@@ -154,7 +154,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
         $usernameClass
             ->expects($this->atLeastOnce())
             ->method('__toString')
-            ->will($this->returnValue('someUsername'));
+            ->willReturn('someUsername');
 
         $request = Request::create('/login_check', 'POST', ['_username' => $usernameClass]);
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());

@@ -43,9 +43,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($choices, $callback) {
+            ->willReturnCallback(function ($choices, $callback) {
                 return array_map($callback, $choices);
-            }));
+            });
 
         $this->assertSame(['value'], $this->factory->createListFromChoices($choices, 'property'));
     }
@@ -57,9 +57,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($choices, $callback) {
+            ->willReturnCallback(function ($choices, $callback) {
                 return array_map($callback, $choices);
-            }));
+            });
 
         $this->assertSame(['value'], $this->factory->createListFromChoices($choices, new PropertyPath('property')));
     }
@@ -86,9 +86,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($loader, $callback) {
+            ->willReturnCallback(function ($loader, $callback) {
                 return $callback((object) ['property' => 'value']);
-            }));
+            });
 
         $this->assertSame('value', $this->factory->createListFromLoader($loader, 'property'));
     }
@@ -116,9 +116,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromChoices')
             ->with($choices, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($choices, $callback) {
+            ->willReturnCallback(function ($choices, $callback) {
                 return array_map($callback, $choices);
-            }));
+            });
 
         $this->assertSame([null], $this->factory->createListFromChoices($choices, 'property'));
     }
@@ -131,9 +131,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($loader, $callback) {
+            ->willReturnCallback(function ($loader, $callback) {
                 return $callback(null);
-            }));
+            });
 
         $this->assertNull($this->factory->createListFromLoader($loader, 'property'));
     }
@@ -145,9 +145,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
             ->with($loader, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($loader, $callback) {
+            ->willReturnCallback(function ($loader, $callback) {
                 return $callback((object) ['property' => 'value']);
-            }));
+            });
 
         $this->assertSame('value', $this->factory->createListFromLoader($loader, new PropertyPath('property')));
     }
@@ -159,9 +159,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred) {
+            ->willReturnCallback(function ($list, $preferred) {
                 return $preferred((object) ['property' => true]);
-            }));
+            });
 
         $this->assertTrue($this->factory->createView(
             $list,
@@ -194,9 +194,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred) {
+            ->willReturnCallback(function ($list, $preferred) {
                 return $preferred((object) ['property' => true]);
-            }));
+            });
 
         $this->assertTrue($this->factory->createView(
             $list,
@@ -212,9 +212,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred) {
+            ->willReturnCallback(function ($list, $preferred) {
                 return $preferred((object) ['category' => null]);
-            }));
+            });
 
         $this->assertFalse($this->factory->createView(
             $list,
@@ -229,9 +229,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label) {
+            ->willReturnCallback(function ($list, $preferred, $label) {
                 return $label((object) ['property' => 'label']);
-            }));
+            });
 
         $this->assertSame('label', $this->factory->createView(
             $list,
@@ -266,9 +266,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label) {
+            ->willReturnCallback(function ($list, $preferred, $label) {
                 return $label((object) ['property' => 'label']);
-            }));
+            });
 
         $this->assertSame('label', $this->factory->createView(
             $list,
@@ -284,9 +284,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index) {
                 return $index((object) ['property' => 'index']);
-            }));
+            });
 
         $this->assertSame('index', $this->factory->createView(
             $list,
@@ -323,9 +323,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index) {
                 return $index((object) ['property' => 'index']);
-            }));
+            });
 
         $this->assertSame('index', $this->factory->createView(
             $list,
@@ -342,9 +342,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return $groupBy((object) ['property' => 'group']);
-            }));
+            });
 
         $this->assertSame('group', $this->factory->createView(
             $list,
@@ -383,9 +383,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return $groupBy((object) ['property' => 'group']);
-            }));
+            });
 
         $this->assertSame('group', $this->factory->createView(
             $list,
@@ -404,9 +404,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy) {
                 return $groupBy((object) ['group' => null]);
-            }));
+            });
 
         $this->assertNull($this->factory->createView(
             $list,
@@ -424,9 +424,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
                 return $attr((object) ['property' => 'attr']);
-            }));
+            });
 
         $this->assertSame('attr', $this->factory->createView(
             $list,
@@ -467,9 +467,9 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
             ->with($list, null, null, null, null, $this->isInstanceOf('\Closure'))
-            ->will($this->returnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
+            ->willReturnCallback(function ($list, $preferred, $label, $index, $groupBy, $attr) {
                 return $attr((object) ['property' => 'attr']);
-            }));
+            });
 
         $this->assertSame('attr', $this->factory->createView(
             $list,

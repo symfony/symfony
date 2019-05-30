@@ -157,7 +157,7 @@ class ClientTest extends TestCase
 
         $file->expects($this->once())
             ->method('getSize')
-            ->will($this->returnValue(INF))
+            ->willReturn(INF)
         ;
 
         $client->request('POST', '/', [], [$file]);

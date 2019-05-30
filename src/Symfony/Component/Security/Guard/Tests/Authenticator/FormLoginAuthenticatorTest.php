@@ -77,7 +77,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->requestWithSession->getSession()
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $redirectResponse = $this->authenticator->onAuthenticationSuccess($this->requestWithSession, $token, 'providerkey');
 
@@ -96,7 +96,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->requestWithSession->getSession()
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(self::CUSTOM_SUCCESS_URL));
+            ->willReturn(self::CUSTOM_SUCCESS_URL);
 
         $redirectResponse = $this->authenticator->onAuthenticationSuccess($this->requestWithSession, $token, 'providerkey');
 

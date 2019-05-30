@@ -30,18 +30,18 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
         $extension->expects($this->any())
             ->method('getXsdValidationBasePath')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $extension->expects($this->any())
             ->method('getNamespace')
-            ->will($this->returnValue('http://example.org/schema/dic/foo'));
+            ->willReturn('http://example.org/schema/dic/foo');
         $extension->expects($this->any())
             ->method('getAlias')
-            ->will($this->returnValue('foo'));
+            ->willReturn('foo');
         $extension->expects($this->once())
             ->method('load')
-            ->will($this->returnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
+            ->willReturnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
                 $tmpProviders = $container->getExpressionLanguageProviders();
-            }));
+            });
 
         $provider = $this->getMockBuilder('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface')->getMock();
         $container = new ContainerBuilder(new ParameterBag());
@@ -76,7 +76,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $extension = $this->getMockBuilder(FooExtension::class)->setMethods(['getConfiguration'])->getMock();
         $extension->expects($this->exactly(2))
             ->method('getConfiguration')
-            ->will($this->returnValue(new FooConfiguration()));
+            ->willReturn(new FooConfiguration());
 
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);

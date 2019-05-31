@@ -141,20 +141,6 @@ final class CacheItem implements ItemInterface
     }
 
     /**
-     * Returns the list of tags bound to the value coming from the pool storage if any.
-     *
-     * @return array
-     *
-     * @deprecated since Symfony 4.2, use the "getMetadata()" method instead.
-     */
-    public function getPreviousTags()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use the "getMetadata()" method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->metadata[self::METADATA_TAGS] ?? [];
-    }
-
-    /**
      * Validates a cache key according to PSR-6.
      *
      * @param string $key The key to validate

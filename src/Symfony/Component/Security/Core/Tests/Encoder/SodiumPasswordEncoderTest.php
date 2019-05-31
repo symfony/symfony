@@ -31,6 +31,12 @@ class SodiumPasswordEncoderTest extends TestCase
         $this->assertFalse($encoder->isPasswordValid($result, 'anotherPassword', null));
     }
 
+    public function testBCryptValidation()
+    {
+        $encoder = new SodiumPasswordEncoder();
+        $this->assertTrue($encoder->isPasswordValid('$2y$04$M8GDODMoGQLQRpkYCdoJh.lbiZPee3SZI32RcYK49XYTolDGwoRMm', 'abc', null));
+    }
+
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */

@@ -36,7 +36,7 @@ class DoctrineLoaderTest extends TestCase
 
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
-            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager()))
+            ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoaderEntity$}'))
             ->getValidator()
         ;
 
@@ -111,7 +111,7 @@ class DoctrineLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [true, null],
+            [false, null],
             [true, '{^'.preg_quote(DoctrineLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];

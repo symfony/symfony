@@ -267,9 +267,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
      */
     public function testDeprecatedTimezonesAreValidWithBC(string $timezone)
     {
-        $constraint = new Timezone([
-            'zone' => \DateTimeZone::ALL_WITH_BC,
-        ]);
+        $constraint = new Timezone(\DateTimeZone::ALL_WITH_BC);
 
         $this->validator->validate($timezone, $constraint);
 

@@ -11,6 +11,11 @@ CHANGELOG
 * `SimpleAuthenticatorInterface`, `SimpleFormAuthenticatorInterface`, `SimplePreAuthenticatorInterface`,
   `SimpleAuthenticationProvider`, `SimpleAuthenticationHandler`, `SimpleFormAuthenticationListener` and
   `SimplePreAuthenticationListener` have been removed. Use Guard instead.
+* Removed the `Role` and `SwitchUserRole` classes. Use strings for roles instead.
+* Removed the `getReachableRoles()` method from the `RoleHierarchyInterface`. Role hierarchies must implement
+  the `getReachableRoleNames()` method instead and return roles as strings.
+* Removed the `getRoles()` method from the `TokenInterface`. Tokens must implement the `getRoleNames()` method
+  instead and return roles as strings.
 
 4.3.0
 -----

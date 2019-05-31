@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+* Removed the `AdvancedUserInterface`, use a custom user checker instead.
 * Removed `Argon2iPasswordEncoder`, use `SodiumPasswordEncoder` instead
 * Removed `BcryptPasswordEncoder`, use `NativePasswordEncoder` instead
 * Removed the `has_role()` function from security expressions, use `is_granted()` instead.

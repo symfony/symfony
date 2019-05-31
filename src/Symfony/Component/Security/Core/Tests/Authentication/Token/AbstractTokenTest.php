@@ -193,47 +193,6 @@ class AbstractTokenTest extends TestCase
     }
 
     /**
-     * @group legacy
-     *
-     * @dataProvider getUserChangesAdvancedUser
-     */
-    public function testSetUserSetsAuthenticatedToFalseWhenUserChangesAdvancedUser($firstUser, $secondUser)
-    {
-        $token = new ConcreteToken();
-        $token->setAuthenticated(true);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($firstUser);
-        $this->assertTrue($token->isAuthenticated());
-
-        $token->setUser($secondUser);
-        $this->assertFalse($token->isAuthenticated());
-    }
-
-    public function getUserChangesAdvancedUser()
-    {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
-        $advancedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
-
-        return [
-            ['foo', 'bar'],
-            ['foo', new TestUser('bar')],
-            ['foo', $user],
-            ['foo', $advancedUser],
-            [$user, 'foo'],
-            [$advancedUser, 'foo'],
-            [$user, new TestUser('foo')],
-            [$advancedUser, new TestUser('foo')],
-            [new TestUser('foo'), new TestUser('bar')],
-            [new TestUser('foo'), 'bar'],
-            [new TestUser('foo'), $user],
-            [new TestUser('foo'), $advancedUser],
-            [$user, $advancedUser],
-            [$advancedUser, $user],
-        ];
-    }
-
-    /**
      * @dataProvider getUsers
      */
     public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)

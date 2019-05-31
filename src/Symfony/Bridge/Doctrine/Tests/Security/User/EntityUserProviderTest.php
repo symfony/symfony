@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
@@ -172,7 +173,7 @@ class EntityUserProviderTest extends TestCase
      */
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
-        $repository = $this->getMockBuilder('\Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
+        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),

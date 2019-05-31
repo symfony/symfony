@@ -18,7 +18,7 @@ namespace Symfony\Component\Security\Core\User;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class User implements UserInterface, EquatableInterface, AdvancedUserInterface
+final class User implements UserInterface, EquatableInterface
 {
     private $username;
     private $password;

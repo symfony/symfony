@@ -72,12 +72,13 @@ class SmtpEnvelopeTest extends TestCase
         $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
     }
 
-    public function testSenderFromHeadersWithoutData()
+    public function testSenderFromHeadersWithoutFrom()
     {
-        $this->expectException(\LogicException::class);
         $headers = new Headers();
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
-        SmtpEnvelope::create(new Message($headers));
+        $e = SmtpEnvelope::create($message = new Message($headers));
+        $message->getHeaders()->addMailboxListHeader('From', ['from@symfony.com']);
+        $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
     }
 
     public function testRecipientsFromHeaders()

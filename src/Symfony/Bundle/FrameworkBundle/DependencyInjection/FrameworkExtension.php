@@ -93,9 +93,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
-use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -1279,19 +1276,6 @@ class FrameworkExtension extends Extension
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('serializer.xml');
-
-        if (!class_exists(DateIntervalNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.dateinterval');
-        }
-
-        if (!class_exists(ConstraintViolationListNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.constraint_violation_list');
-        }
-
-        if (!class_exists(ClassDiscriminatorFromClassMetadata::class)) {
-            $container->removeAlias('Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface');
-            $container->removeDefinition('serializer.mapping.class_discriminator_resolver');
-        }
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 

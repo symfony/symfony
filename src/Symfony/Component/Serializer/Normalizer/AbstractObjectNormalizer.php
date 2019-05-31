@@ -540,18 +540,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * We must not mix up the attribute cache between parent and children.
      *
      * {@inheritdoc}
-     *
-     * @param string|null $format
      */
-    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
+    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        if (\func_num_args() >= 3) {
-            $format = \func_get_arg(2);
-        } else {
-            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-            $format = null;
-        }
-
         $context = parent::createChildContext($parentContext, $attribute, $format);
         $context['cache_key'] = $this->getCacheKey($format, $context);
 

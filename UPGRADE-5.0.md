@@ -423,6 +423,7 @@ Serializer
 
    were removed, use the default context instead.
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
+ * Removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
 
 Translation
 -----------

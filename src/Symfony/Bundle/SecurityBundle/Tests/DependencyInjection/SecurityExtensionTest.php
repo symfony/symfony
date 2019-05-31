@@ -26,7 +26,7 @@ class SecurityExtensionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".
+     * @expectedExceptionMessage The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall path "/secured_area/.*".
      */
     public function testInvalidCheckPath()
     {
@@ -39,7 +39,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/secured_area/.*',
+                    'path' => '/secured_area/.*',
                     'form_login' => [
                         'check_path' => '/some_area/login_check',
                     ],
@@ -65,7 +65,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                 ],
             ],
         ]);
@@ -91,7 +91,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => [],
                 ],
             ],
@@ -113,7 +113,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => null,
                 ],
             ],
@@ -135,11 +135,11 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '^/admin',
+                    'path' => '^/admin',
                     'http_basic' => null,
                 ],
                 'stateless_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'stateless' => true,
                     'http_basic' => null,
                 ],
@@ -251,7 +251,7 @@ class SecurityExtensionTest extends TestCase
             ],
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => [],
                 ],
             ],
@@ -289,7 +289,7 @@ class SecurityExtensionTest extends TestCase
             ],
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => [],
                 ],
             ],
@@ -310,7 +310,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => null,
                 ],
             ],
@@ -333,7 +333,7 @@ class SecurityExtensionTest extends TestCase
 
             'firewalls' => [
                 'some_firewall' => [
-                    'pattern' => '/.*',
+                    'path' => '/.*',
                     'http_basic' => ['provider' => 'second'],
                 ],
             ],

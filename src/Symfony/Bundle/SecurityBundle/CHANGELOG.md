@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* Deprecated firewalls’ `pattern` option, use `path` instead
+
 4.3.0
 -----
 

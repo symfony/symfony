@@ -16,7 +16,7 @@ services:
 security:
     firewalls:
         secure:
-            pattern: ^/secure/
+            path: ^/secure/
             http_basic: { realm: "Secure Gateway API" }
             entry_point: firewall_entry_point.entry_point.stub
         default:

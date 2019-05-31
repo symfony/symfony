@@ -23,5 +23,5 @@ security:
 
     firewalls:
         test:
-            pattern:  ^/
+            path:  ^/
             security: false

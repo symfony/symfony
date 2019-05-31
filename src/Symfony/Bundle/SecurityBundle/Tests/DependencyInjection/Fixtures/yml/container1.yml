@@ -45,7 +45,7 @@ security:
 
 
     firewalls:
-        simple: { pattern: /login, security: false }
+        simple: { path: /login, security: false }
         secure:
             provider: default
             stateless: true
@@ -62,7 +62,7 @@ security:
 
         host:
             provider: default
-            pattern: /test
+            path: /test
             host: foo\.example\.org
             methods: [GET,POST]
             anonymous: true

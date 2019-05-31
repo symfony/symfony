@@ -65,7 +65,7 @@ $container->loadFromExtension('security', [
     ],
 
     'firewalls' => [
-        'simple' => ['provider' => 'default', 'pattern' => '/login', 'security' => false],
+        'simple' => ['provider' => 'default', 'path' => '/login', 'security' => false],
         'secure' => ['stateless' => true,
             'provider' => 'default',
             'http_basic' => true,
@@ -80,7 +80,7 @@ $container->loadFromExtension('security', [
         ],
         'host' => [
             'provider' => 'default',
-            'pattern' => '/test',
+            'path' => '/test',
             'host' => 'foo\\.example\\.org',
             'methods' => ['GET', 'POST'],
             'anonymous' => true,

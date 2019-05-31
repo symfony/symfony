@@ -188,7 +188,10 @@ class MainConfiguration implements ConfigurationInterface
         ;
 
         $firewallNodeBuilder
-            ->scalarNode('pattern')->end()
+            ->scalarNode('pattern')
+                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.4. Use "path" instead.')
+            ->end()
+            ->scalarNode('path')->end()
             ->scalarNode('host')->end()
             ->arrayNode('methods')
                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
@@ -304,12 +307,22 @@ class MainConfiguration implements ConfigurationInterface
             }
         }
 
-        // check for unreachable check paths
         $firewallNodeBuilder
             ->end()
             ->validate()
+                ->ifTrue(function (array $firewall) {
+                    return isset($firewall['pattern']) && !isset($firewall['path']);
+                })
+                ->then(function (array $firewall) {
+                    $firewall['path'] = $firewall['pattern'];
+                    unset($firewall['pattern']);
+
+                    return $firewall;
+                })
+
+                // check for unreachable check paths
                 ->ifTrue(function ($v) {
-                    return true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']);
+                    return true === $v['security'] && isset($v['path']) && !isset($v['request_matcher']);
                 })
                 ->then(function ($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
@@ -317,8 +330,8 @@ class MainConfiguration implements ConfigurationInterface
                             continue;
                         }
 
-                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['pattern'].'#', $firewall[$k]['check_path'])) {
-                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall pattern "%s".', $firewall[$k]['check_path'], $k, $firewall['pattern']));
+                        if (false !== strpos($firewall[$k]['check_path'], '/') && !preg_match('#'.$firewall['path'].'#', $firewall[$k]['check_path'])) {
+                            throw new \LogicException(sprintf('The check_path "%s" for login method "%s" is not matched by the firewall path "%s".', $firewall[$k]['check_path'], $k, $firewall['path']));
                         }
                     }
 

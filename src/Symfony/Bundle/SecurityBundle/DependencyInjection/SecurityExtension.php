@@ -277,11 +277,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $matcher = null;
         if (isset($firewall['request_matcher'])) {
             $matcher = new Reference($firewall['request_matcher']);
-        } elseif (isset($firewall['pattern']) || isset($firewall['host'])) {
-            $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
+        } elseif (isset($firewall['path']) || isset($firewall['host']) || !empty($firewall['methods'])) {
+            $path = $firewall['pattern'] ?? $firewall['path'] ?? null;
             $host = isset($firewall['host']) ? $firewall['host'] : null;
             $methods = isset($firewall['methods']) ? $firewall['methods'] : [];
-            $matcher = $this->createRequestMatcher($container, $pattern, $host, null, $methods);
+            $matcher = $this->createRequestMatcher($container, $path, $host, null, $methods);
         }
 
         $config->replaceArgument(2, $matcher ? (string) $matcher : null);

@@ -24,7 +24,7 @@ security:
 
     firewalls:
         main:
-            pattern:  ^/login
+            path:  ^/login
             stateless: true
             anonymous: true
             json_login_ldap:

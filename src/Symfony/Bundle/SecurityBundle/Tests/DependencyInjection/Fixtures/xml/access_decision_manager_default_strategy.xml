@@ -11,6 +11,6 @@
             </memory>
         </provider>
 
-        <firewall name="simple" pattern="/login" security="false" />
+        <firewall name="simple" path="/login" security="false" />
     </config>
 </srv:container>

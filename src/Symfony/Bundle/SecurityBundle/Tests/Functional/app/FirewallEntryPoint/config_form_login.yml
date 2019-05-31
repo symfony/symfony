@@ -4,6 +4,6 @@ imports:
 security:
     firewalls:
         secure:
-            pattern: ^/
+            path: ^/
             form_login:
                 check_path: /login_check

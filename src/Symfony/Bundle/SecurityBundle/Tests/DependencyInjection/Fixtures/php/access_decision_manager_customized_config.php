@@ -15,6 +15,6 @@ $container->loadFromExtension('security', [
         ],
     ],
     'firewalls' => [
-        'simple' => ['pattern' => '/login', 'security' => false],
+        'simple' => ['path' => '/login', 'security' => false],
     ],
 ]);

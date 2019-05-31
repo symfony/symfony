@@ -13,7 +13,7 @@ security:
 
     firewalls:
         main:
-            pattern: ^/
+            path: ^/
             anonymous: true
             json_login:
                check_path:    /chk

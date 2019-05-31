@@ -74,31 +74,29 @@ class DebugHandlersListener implements EventSubscriberInterface
         $handler = \is_array($handler) ? $handler[0] : null;
         restore_exception_handler();
 
-        if ($this->logger || null !== $this->throwAt) {
-            if ($handler instanceof ErrorHandler) {
-                if ($this->logger) {
-                    $handler->setDefaultLogger($this->logger, $this->levels);
-                    if (\is_array($this->levels)) {
-                        $levels = 0;
-                        foreach ($this->levels as $type => $log) {
-                            $levels |= $type;
-                        }
-                    } else {
-                        $levels = $this->levels;
+        if (($this->logger || null !== $this->throwAt) && $handler instanceof ErrorHandler) {
+            if ($this->logger) {
+                $handler->setDefaultLogger($this->logger, $this->levels);
+                if (\is_array($this->levels)) {
+                    $levels = 0;
+                    foreach ($this->levels as $type => $log) {
+                        $levels |= $type;
                     }
-                    if ($this->scream) {
-                        $handler->screamAt($levels);
-                    }
-                    if ($this->scope) {
-                        $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
-                    } else {
-                        $handler->scopeAt(0, true);
-                    }
-                    $this->logger = $this->levels = null;
+                } else {
+                    $levels = $this->levels;
                 }
-                if (null !== $this->throwAt) {
-                    $handler->throwAt($this->throwAt, true);
+                if ($this->scream) {
+                    $handler->screamAt($levels);
                 }
+                if ($this->scope) {
+                    $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
+                } else {
+                    $handler->scopeAt(0, true);
+                }
+                $this->logger = $this->levels = null;
+            }
+            if (null !== $this->throwAt) {
+                $handler->throwAt($this->throwAt, true);
             }
         }
         if (!$this->exceptionHandler) {

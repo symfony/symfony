@@ -4,6 +4,9 @@ CHANGELOG
 5.0.0
 -----
 
+ * Using the `date_format`, `date_widget`, and `time_widget` options of the `DateTimeType` when the `widget` option is
+   set to `single_text` is not supported anymore.
+ * The `format` option of `DateType` and `DateTimeType` cannot be used when the `html5` option is enabled.
  * Using names for buttons that do not start with a letter, a digit, or an underscore throw an exception
  * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons throw an exception.
  * removed the `ChoiceLoaderInterface` implementation in `CountryType`, `LanguageType`, `LocaleType` and `CurrencyType`

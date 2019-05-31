@@ -28,11 +28,12 @@
         "symfony/dependency-injection": "^3.4|^4.0|^5.0",
         "symfony/event-dispatcher": "^4.3",
         "symfony/expression-language": "^3.4|^4.0|^5.0",
-        "symfony/security-core": "^3.4|^4.0|^5.0",
+        "symfony/security-core": "^3.4|^4.0",
         "symfony/validator": "^3.4|^4.0|^5.0"
     },
     "conflict": {
-        "symfony/event-dispatcher": "<4.3|>=5"
+        "symfony/event-dispatcher": "<4.3|>=5",
+        "symfony/security-core": ">=5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }

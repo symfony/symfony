@@ -70,8 +70,12 @@ class AddAutoMappingConfigurationPass implements CompilerPassInterface
     /**
      * Builds a regexp to check if a class is auto-mapped.
      */
-    private function getRegexp(array $patterns): string
+    private function getRegexp(array $patterns): ?string
     {
+        if (!$patterns) {
+            return null;
+        }
+
         $regexps = [];
         foreach ($patterns as $pattern) {
             // Escape namespace

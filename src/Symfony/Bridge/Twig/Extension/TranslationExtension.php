@@ -49,11 +49,19 @@ class TranslationExtension extends AbstractExtension
     }
 
     /**
-     * @deprecated since Symfony 4.2
+     * @return TranslatorInterface|null
      */
     public function getTranslator()
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
+        if (null === $this->translator) {
+            if (!interface_exists(TranslatorInterface::class)) {
+                throw new \LogicException(sprintf('You cannot use the "%s" if the Translation Contracts are not available. Try running "composer require symfony/translation".', __CLASS__));
+            }
+
+            $this->translator = new class() implements TranslatorInterface {
+                use TranslatorTrait;
+            };
+        }
 
         return $this->translator;
     }
@@ -108,13 +116,8 @@ class TranslationExtension extends AbstractExtension
         if (null !== $count) {
             $arguments['%count%'] = $count;
         }
-        if (null === $this->translator) {
-            $this->translator = new class() implements TranslatorInterface {
-                use TranslatorTrait;
-            };
-        }
 
-        return $this->translator->trans($message, $arguments, $domain, $locale);
+        return $this->getTranslator()->trans($message, $arguments, $domain, $locale);
     }
 
     /**
@@ -122,17 +125,13 @@ class TranslationExtension extends AbstractExtension
      */
     public function transchoice($message, $count, array $arguments = [], $domain = null, $locale = null)
     {
-        if (null === $this->translator) {
-            $this->translator = new class() implements TranslatorInterface {
-                use TranslatorTrait;
-            };
+        $translator = $this->getTranslator();
+
+        if ($translator instanceof TranslatorInterface) {
+            return $translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
         }
 
-        if ($this->translator instanceof TranslatorInterface) {
-            return $this->translator->trans($message, array_merge(['%count%' => $count], $arguments), $domain, $locale);
-        }
-
-        return $this->translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
+        return $translator->transChoice($message, $count, array_merge(['%count%' => $count], $arguments), $domain, $locale);
     }
 
     /**

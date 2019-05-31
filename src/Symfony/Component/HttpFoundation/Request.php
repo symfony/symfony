@@ -1864,7 +1864,6 @@ class Request
         if (null === ($baseUrl = $this->getBaseUrl())) {
             return $requestUri;
         }
-        
         if (0 !== strpos($requestUri, $baseUrl)) {
             return $requestUri;
         }

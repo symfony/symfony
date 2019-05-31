@@ -43,7 +43,7 @@ class Timezone extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options = null)
+    public function __construct($options = null)
     {
         parent::__construct($options);
 
@@ -57,5 +57,13 @@ class Timezone extends Constraint
         if ($this->intlCompatible && !class_exists(\IntlTimeZone::class)) {
             throw new ConstraintDefinitionException('The option "intlCompatible" can only be used when the PHP intl extension is available.');
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultOption()
+    {
+        return 'zone';
     }
 }

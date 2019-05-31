@@ -23,7 +23,7 @@ class TimezoneTest extends TestCase
     {
         new Timezone();
         new Timezone(['zone' => \DateTimeZone::ALL]);
-        new Timezone(['zone' => \DateTimeZone::ALL_WITH_BC]);
+        new Timezone(\DateTimeZone::ALL_WITH_BC);
         new Timezone([
             'zone' => \DateTimeZone::PER_COUNTRY,
             'countryCode' => 'AR',

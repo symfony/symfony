@@ -75,28 +75,6 @@ class TimezoneValidator extends ConstraintValidator
               ->addViolation();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'zone';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function formatValue($value, $format = 0)
-    {
-        $value = parent::formatValue($value, $format);
-
-        if (!$value || \DateTimeZone::PER_COUNTRY === $value) {
-            return $value;
-        }
-
-        return array_search($value, (new \ReflectionClass(\DateTimeZone::class))->getConstants(), true) ?: $value;
-    }
-
     private static function getPhpTimezones(int $zone, string $countryCode = null): array
     {
         if (null !== $countryCode) {

@@ -21,7 +21,7 @@
         "symfony/config": "^4.2|^5.0",
         "symfony/dependency-injection": "^4.2|^5.0",
         "symfony/http-kernel": "^4.3|^5.0",
-        "symfony/security-core": "^4.3|^5.0",
+        "symfony/security-core": "^4.3",
         "symfony/security-csrf": "^4.2|^5.0",
         "symfony/security-guard": "^4.2|^5.0",
         "symfony/security-http": "^4.3|^5.0"

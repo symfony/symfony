@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T09:29:22Z
+
+Travis build should be green after #31712.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T11:59:21Z
+
+> can we add the `object` return type to dispatch methods?
+
+That would violate the contracts interface, wouldn't it?
+
+> please also update composer.json files to remove `^4.4` when appropriate, for clarity.
+
+The changes that I've made to the other components should not affect the compatibility with EventDispatcher 4.4, as far as I can tell.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-30T12:10:10Z
+
+PHP 7.2 return type variance allows adding the type, right?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-05-30T12:18:17Z
+
+> PHP 7.2 return type variance allows adding the type, right?
+
+Oh right, the return type. Yes, of course. I misread your comment and thought you meant the type-hint for the `$event` parameter. I will add the return type.

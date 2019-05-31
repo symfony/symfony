@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher;
 
+use Symfony\Contracts\EventDispatcher\Event;
+
 /**
  * Event encapsulation class.
  *

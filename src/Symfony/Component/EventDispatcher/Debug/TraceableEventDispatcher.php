@@ -14,14 +14,12 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\BrowserKit\Request;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
-use Symfony\Component\EventDispatcher\LegacyEventProxy;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Collects some data about event listeners.
@@ -30,7 +28,7 @@ use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableEventDispatcher implements TraceableEventDispatcherInterface
+class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterface
 {
     protected $logger;
     protected $stopwatch;
@@ -44,7 +42,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     public function __construct(EventDispatcherInterface $dispatcher, Stopwatch $stopwatch, LoggerInterface $logger = null, RequestStack $requestStack = null)
     {
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
         $this->wrappedListeners = [];
@@ -130,32 +128,22 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param string|null $eventName
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch($event, string $eventName = null): object
     {
+        if (!\is_object($event)) {
+            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
+        }
+
+        $eventName = $eventName ?? \get_class($event);
+
         if (null === $this->callStack) {
             $this->callStack = new \SplObjectStorage();
         }
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
-        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
 
-        if (\is_object($event)) {
-            $eventName = $eventName ?? \get_class($event);
-        } else {
-            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
-            $swap = $event;
-            $event = $eventName ?? new Event();
-            $eventName = $swap;
-
-            if (!$event instanceof Event) {
-                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of %s, %s given.', EventDispatcherInterface::class, Event::class, \is_object($event) ? \get_class($event) : \gettype($event)));
-            }
-        }
-
-        if (null !== $this->logger && ($event instanceof Event || $event instanceof ContractsEvent || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
+        if (null !== $this->logger && ($event instanceof Event || $event instanceof StoppableEventInterface) && $event->isPropagationStopped()) {
             $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
         }
 
@@ -291,35 +279,15 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     /**
      * Called before dispatching the event.
-     *
-     * @param object $event
      */
-    protected function beforeDispatch(string $eventName, $event)
+    protected function beforeDispatch(string $eventName, object $event)
     {
-        $this->preDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
     }
 
     /**
      * Called after dispatching the event.
-     *
-     * @param object $event
      */
-    protected function afterDispatch(string $eventName, $event)
-    {
-        $this->postDispatch($eventName, $event instanceof Event ? $event : new LegacyEventProxy($event));
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, will be removed in 5.0, use beforeDispatch instead
-     */
-    protected function preDispatch($eventName, Event $event)
-    {
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, will be removed in 5.0, use afterDispatch instead
-     */
-    protected function postDispatch($eventName, Event $event)
+    protected function afterDispatch(string $eventName, object $event)
     {
     }
 

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Mailer\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Allows the transformation of a Message.

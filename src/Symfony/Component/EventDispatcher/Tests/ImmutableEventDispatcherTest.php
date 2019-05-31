@@ -12,8 +12,8 @@
 namespace Symfony\Component\EventDispatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -39,13 +39,15 @@ class ImmutableEventDispatcherTest extends TestCase
     public function testDispatchDelegates()
     {
         $event = new Event();
+        $expectedResult = new class() {
+        };
 
         $this->innerDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($event, 'event')
-            ->willReturn('result');
+            ->willReturn($expectedResult);
 
-        $this->assertSame('result', $this->dispatcher->dispatch($event, 'event'));
+        $this->assertSame($expectedResult, $this->dispatcher->dispatch($event, 'event'));
     }
 
     public function testGetListenersDelegates()

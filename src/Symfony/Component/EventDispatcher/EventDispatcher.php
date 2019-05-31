@@ -13,7 +13,7 @@ namespace Symfony\Component\EventDispatcher;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
-use Symfony\Contracts\EventDispatcher\Event as ContractsEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * The EventDispatcherInterface is the central point of Symfony's event listener system.
@@ -45,25 +45,14 @@ class EventDispatcher implements EventDispatcherInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param string|null $eventName
      */
-    public function dispatch($event/*, string $eventName = null*/)
+    public function dispatch($event, string $eventName = null): object
     {
-        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
-
-        if (\is_object($event)) {
-            $eventName = $eventName ?? \get_class($event);
-        } else {
-            @trigger_error(sprintf('Calling the "%s::dispatch()" method with the event name as first argument is deprecated since Symfony 4.3, pass it second and provide the event object first instead.', EventDispatcherInterface::class), E_USER_DEPRECATED);
-            $swap = $event;
-            $event = $eventName ?? new Event();
-            $eventName = $swap;
-
-            if (!$event instanceof Event) {
-                throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an instance of %s, %s given.', EventDispatcherInterface::class, Event::class, \is_object($event) ? \get_class($event) : \gettype($event)));
-            }
+        if (!\is_object($event)) {
+            throw new \TypeError(sprintf('Argument 1 passed to "%s::dispatch()" must be an object, %s given.', EventDispatcherInterface::class, \gettype($event)));
         }
+
+        $eventName = $eventName ?? \get_class($event);
 
         if (null !== $this->optimized && null !== $eventName) {
             $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));
@@ -229,32 +218,12 @@ class EventDispatcher implements EventDispatcherInterface
      * @param string     $eventName The name of the event to dispatch
      * @param object     $event     The event object to pass to the event handlers/listeners
      */
-    protected function callListeners(iterable $listeners, string $eventName, $event)
+    protected function callListeners(iterable $listeners, string $eventName, object $event)
     {
-        if ($event instanceof Event) {
-            $this->doDispatch($listeners, $eventName, $event);
-
-            return;
-        }
-
-        $stoppable = $event instanceof ContractsEvent || $event instanceof StoppableEventInterface;
+        $stoppable = $event instanceof Event || $event instanceof StoppableEventInterface;
 
         foreach ($listeners as $listener) {
             if ($stoppable && $event->isPropagationStopped()) {
-                break;
-            }
-            // @deprecated: the ternary operator is part of a BC layer and should be removed in 5.0
-            $listener($listener instanceof WrappedListener ? new LegacyEventProxy($event) : $event, $eventName, $this);
-        }
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, use callListeners() instead
-     */
-    protected function doDispatch($listeners, $eventName, Event $event)
-    {
-        foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
                 break;
             }
             $listener($event, $eventName, $this);

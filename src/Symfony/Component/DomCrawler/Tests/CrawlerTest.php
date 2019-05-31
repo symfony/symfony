@@ -1091,6 +1091,7 @@ HTML;
             ['/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'],
             ['/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'],
             ['http://base.com/', '/registration', 'http://base.com/registration', 'http://domain.com/registration', '<base> tag does work with a URL and form action'],
+            ['http://base.com/', 'http://base.com/registration', 'http://base.com/registration', null, '<base> tag does work with a URL and form action'],
             ['http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'],
             ['http://base.com/path', '/registration', 'http://base.com/registration', 'http://domain.com/path/form', '<base> tag does work with a URL and form action'],
         ];

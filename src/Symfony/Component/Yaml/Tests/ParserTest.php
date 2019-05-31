@@ -526,8 +526,8 @@ EOF;
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Support for mapping keys in multi-line blocks is deprecated since Symfony 4.3 and will throw a ParseException in 5.0.
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Mapping values are not allowed in multi-line blocks at line 2 (near "dbal:wrong").
      */
     public function testMappingKeyInMultiLineStringTriggersDeprecationNotice()
     {

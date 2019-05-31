@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * Removed support for mappings inside multi-line strings.
+
 4.3.0
 -----
 

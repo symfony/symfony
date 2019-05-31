@@ -25,6 +25,11 @@ DependencyInjection
        factory: ['@factory_service', method]
    ```
 
+MonologBridge
+--------------
+
+* The `RouteProcessor` has been marked final.
+
 TwigBridge
 ----------
 

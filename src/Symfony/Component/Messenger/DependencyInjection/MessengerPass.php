@@ -260,7 +260,6 @@ class MessengerPass implements CompilerPassInterface
 
         if ($container->hasDefinition('console.command.messenger_consume_messages')) {
             $container->getDefinition('console.command.messenger_consume_messages')
-                ->replaceArgument(0, ServiceLocatorTagPass::register($container, $buses))
                 ->replaceArgument(3, array_values($receiverNames));
         }
 

@@ -23,7 +23,7 @@ if (interface_exists(PsrEventDispatcherInterface::class)) {
          * Dispatches an event to all registered listeners.
          *
          * For BC with Symfony 4, the $eventName argument is not declared explicitly on the
-         * signature of the method. Implementations that are not bound by this BC contraint
+         * signature of the method. Implementations that are not bound by this BC constraint
          * MUST declare it explicitly, as allowed by PHP.
          *
          * @param object      $event     The event to pass to the event handlers/listeners
@@ -44,7 +44,7 @@ if (interface_exists(PsrEventDispatcherInterface::class)) {
          * Dispatches an event to all registered listeners.
          *
          * For BC with Symfony 4, the $eventName argument is not declared explicitly on the
-         * signature of the method. Implementations that are not bound by this BC contraint
+         * signature of the method. Implementations that are not bound by this BC constraint
          * MUST declare it explicitly, as allowed by PHP.
          *
          * @param object      $event     The event to pass to the event handlers/listeners

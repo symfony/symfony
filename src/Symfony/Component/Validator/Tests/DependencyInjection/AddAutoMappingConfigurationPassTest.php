@@ -70,4 +70,17 @@ class AddAutoMappingConfigurationPassTest extends TestCase
             ['Symfony\Component\Validator\Tests\Fixtures\\**', ['trailing_double_star'], '{^App\\\\|^Symfony\\\\Component\\\\Validator\\\\Tests\\\\Fixtures\\\\.*?$}'],
         ];
     }
+
+    public function testDoNotMapAllClassesWhenConfigIsEmpty()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('validator.auto_mapping', []);
+
+        $container->register('validator.builder', ValidatorBuilder::class);
+        $container->register('loader')->addTag('validator.auto_mapper');
+
+        (new AddAutoMappingConfigurationPass())->process($container);
+
+        $this->assertNull($container->getDefinition('loader')->getArgument('$classValidatorRegexp'));
+    }
 }

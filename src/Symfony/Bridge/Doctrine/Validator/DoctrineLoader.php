@@ -42,7 +42,7 @@ final class DoctrineLoader implements LoaderInterface
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         $className = $metadata->getClassName();
-        if (null !== $this->classValidatorRegexp && !preg_match($this->classValidatorRegexp, $className)) {
+        if (null === $this->classValidatorRegexp || !preg_match($this->classValidatorRegexp, $className)) {
             return false;
         }
 

@@ -45,11 +45,6 @@ class RoutableMessageBus implements MessageBusInterface
             throw new InvalidArgumentException('Messages passed to RoutableMessageBus::dispatch() must be inside an Envelope');
         }
 
-        return $this->getMessageBus($envelope)->dispatch($envelope, $stamps);
-    }
-
-    private function getMessageBus(Envelope $envelope): MessageBusInterface
-    {
         /** @var BusNameStamp|null $busNameStamp */
         $busNameStamp = $envelope->last(BusNameStamp::class);
 
@@ -58,11 +53,17 @@ class RoutableMessageBus implements MessageBusInterface
                 throw new InvalidArgumentException(sprintf('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.'));
             }
 
-            return $this->fallbackBus;
+            return $this->fallbackBus->dispatch($envelope, $stamps);
         }
 
-        $busName = $busNameStamp->getBusName();
+        return $this->getMessageBus($busNameStamp->getBusName())->dispatch($envelope, $stamps);
+    }
 
+    /**
+     * @internal
+     */
+    public function getMessageBus(string $busName): MessageBusInterface
+    {
         if (!$this->busLocator->has($busName)) {
             throw new InvalidArgumentException(sprintf('Bus named "%s" does not exist.', $busName));
         }

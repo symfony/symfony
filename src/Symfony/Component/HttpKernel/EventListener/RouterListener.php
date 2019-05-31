@@ -77,12 +77,14 @@ class RouterListener implements EventSubscriberInterface
 
     private function setCurrentRequest(Request $request = null)
     {
-        if (null !== $request) {
-            try {
-                $this->context->fromRequest($request);
-            } catch (\UnexpectedValueException $e) {
-                throw new BadRequestHttpException($e->getMessage(), $e, $e->getCode());
-            }
+        if (null === $request) {
+            return;
+        }
+
+        try {
+            $this->context->fromRequest($request);
+        } catch (\UnexpectedValueException $e) {
+            throw new BadRequestHttpException($e->getMessage(), $e, $e->getCode());
         }
     }
 

@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\Tests\AbstractLayoutTest;
 
 abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
@@ -1693,6 +1694,10 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
      */
     public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
     {
+        if (method_exists(FormTypeExtensionInterface::class, 'getExtendedTypes')) {
+            $this->markTestSkipped('The test requires symfony/form 4.x.');
+        }
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
             'input' => 'string',
             'date_widget' => 'choice',

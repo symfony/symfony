@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -31,10 +30,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @final since Symfony 4.3
  */
-class RememberMeListener implements ListenerInterface
+class RememberMeListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $rememberMeServices;
     private $authenticationManager;
@@ -49,7 +46,7 @@ class RememberMeListener implements ListenerInterface
         $this->rememberMeServices = $rememberMeServices;
         $this->authenticationManager = $authenticationManager;
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
         $this->catchExceptions = $catchExceptions;
         $this->sessionStrategy = null === $sessionStrategy ? new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE) : $sessionStrategy;
     }

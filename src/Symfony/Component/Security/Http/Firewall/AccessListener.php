@@ -24,12 +24,10 @@ use Symfony\Component\Security\Http\AccessMapInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class AccessListener implements ListenerInterface
+class AccessListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $accessDecisionManager;
     private $map;

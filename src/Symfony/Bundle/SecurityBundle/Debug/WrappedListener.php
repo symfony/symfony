@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Debug;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -21,22 +19,17 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  *
- * @internal since Symfony 4.3
+ * @internal
  */
-final class WrappedListener implements ListenerInterface
+final class WrappedListener
 {
-    use LegacyListenerTrait;
-
     private $response;
     private $listener;
     private $time;
     private $stub;
     private static $hasVarDumper;
 
-    /**
-     * @param callable $listener
-     */
-    public function __construct($listener)
+    public function __construct(callable $listener)
     {
         $this->listener = $listener;
 
@@ -45,18 +38,10 @@ final class WrappedListener implements ListenerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(RequestEvent $event)
     {
         $startTime = microtime(true);
-        if (\is_callable($this->listener)) {
-            ($this->listener)($event);
-        } else {
-            @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, implement "__invoke()" instead.', \get_class($this)), E_USER_DEPRECATED);
-            $this->listener->handle($event);
-        }
+        ($this->listener)($event);
         $this->time = microtime(true) - $startTime;
         $this->response = $event->getResponse();
     }

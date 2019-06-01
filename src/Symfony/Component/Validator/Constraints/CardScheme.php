@@ -32,7 +32,7 @@ class CardScheme extends Constraint
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
     ];
 
-    public $message = 'Unsupported card type or invalid card number.';
+    public $message = 'This is an unsupported card type or invalid card number.';
     public $schemes;
 
     public function getDefaultOption()

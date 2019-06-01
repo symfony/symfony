@@ -215,11 +215,11 @@
                 <target>Колекцията трябва да съдържа точно {{ limit }} елемент.|Колекцията трябва да съдържа точно {{ limit }} елемента.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Invalid card number.</source>
+                <source>This is an invalid card number.</source>
                 <target>Невалиден номер на карта.</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
+                <source>This is an unsupported card type or invalid card number.</source>
                 <target>Неподдържан тип карта или невалиден номер на карта.</target>
             </trans-unit>
             <trans-unit id="59">

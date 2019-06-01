@@ -215,11 +215,11 @@
                 <target>Ova kolekcija bi trebalo da sadrži tačno {{ limit }} element.|Ova kolekcija bi trebalo da sadrži tačno {{ limit }} elemenata.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Invalid card number.</source>
+                <source>This is an invalid card number.</source>
                 <target>Broj kartice nije validan.</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
+                <source>This is an unsupported card type or invalid card number.</source>
                 <target>Tip kartice nije podržan ili broj kartice nije validan.</target>
             </trans-unit>
             <trans-unit id="59">

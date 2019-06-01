@@ -215,11 +215,11 @@
                 <target>Bu derlem {{ limit }} eleman içermelidir.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Invalid card number.</source>
+                <source>This is an invalid card number.</source>
                 <target>Geçersiz kart numarası.</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
+                <source>This is an unsupported card type or invalid card number.</source>
                 <target>Desteklenmeyen kart tipi veya geçersiz kart numarası.</target>
             </trans-unit>
             <trans-unit id="59">

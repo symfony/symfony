@@ -215,11 +215,11 @@
                 <target>Denne samling skal indeholde præcis ét element.|Denne samling skal indeholde præcis {{ limit }} elementer.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Invalid card number.</source>
+                <source>This is an invalid card number.</source>
                 <target>Ugyldigt kortnummer.</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
+                <source>This is an unsupported card type or invalid card number.</source>
                 <target>Ikke-understøttet korttype eller ugyldigt kortnummer.</target>
             </trans-unit>
             <trans-unit id="59">

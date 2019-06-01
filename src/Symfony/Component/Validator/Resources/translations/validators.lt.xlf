@@ -215,11 +215,11 @@
                 <target>Sąraše turi būti lygiai {{ limit }} įrašas.|Sąraše turi būti lygiai {{ limit }} įrašai.|Sąraše turi būti lygiai {{ limit }} įrašų.</target>
             </trans-unit>
             <trans-unit id="57">
-                <source>Invalid card number.</source>
+                <source>This is an invalid card number.</source>
                 <target>Klaidingas kortelės numeris.</target>
             </trans-unit>
             <trans-unit id="58">
-                <source>Unsupported card type or invalid card number.</source>
+                <source>This is an unsupported card type or invalid card number.</source>
                 <target>Kortelės tipas nepalaikomas arba klaidingas kortelės numeris.</target>
             </trans-unit>
             <trans-unit id="59">

@@ -33,5 +33,5 @@ class Luhn extends Constraint
         self::CHECKSUM_FAILED_ERROR => 'CHECKSUM_FAILED_ERROR',
     ];
 
-    public $message = 'Invalid card number.';
+    public $message = 'This is an invalid card number.';
 }

@@ -27,7 +27,7 @@ class ConsumeMessagesCommandTest extends TestCase
 {
     public function testConfigurationWithDefaultReceiver()
     {
-        $command = new ConsumeMessagesCommand($this->createMock(ServiceLocator::class), $this->createMock(ServiceLocator::class), null, ['amqp']);
+        $command = new ConsumeMessagesCommand($this->createMock(RoutableMessageBus::class), $this->createMock(ServiceLocator::class), null, ['amqp']);
         $inputArgument = $command->getDefinition()->getArgument('receivers');
         $this->assertFalse($inputArgument->isRequired());
         $this->assertSame(['amqp'], $inputArgument->getDefault());
@@ -98,6 +98,10 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertContains('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a "Psr\Container\ContainerInterface" instance as first argument to "Symfony\Component\Messenger\Command\ConsumeMessagesCommand::__construct()" is deprecated since Symfony 4.4, pass a "Symfony\Component\Messenger\RoutableMessageBus" instance instead.
+     */
     public function testBasicRunWithBusLocator()
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
@@ -130,6 +134,10 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertContains('[OK] Consuming messages from transports "dummy-receiver"', $tester->getDisplay());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a "Psr\Container\ContainerInterface" instance as first argument to "Symfony\Component\Messenger\Command\ConsumeMessagesCommand::__construct()" is deprecated since Symfony 4.4, pass a "Symfony\Component\Messenger\RoutableMessageBus" instance instead.
+     */
     public function testRunWithBusOptionAndBusLocator()
     {
         $envelope = new Envelope(new \stdClass());

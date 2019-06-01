@@ -175,12 +175,7 @@ abstract class AbstractExtension implements FormExtensionInterface
                 throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
             }
 
-            $extendedTypes = [];
             foreach ($extension::getExtendedTypes() as $extendedType) {
-                $extendedTypes[] = $extendedType;
-            }
-
-            foreach ($extendedTypes as $extendedType) {
                 $this->typeExtensions[$extendedType][] = $extension;
             }
         }

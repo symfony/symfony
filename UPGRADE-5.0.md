@@ -269,6 +269,8 @@ Messenger
 ---------
 
  * The `LoggingMiddleware` class has been removed, pass a logger to `SendMessageMiddleware` instead.
+ * Passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor now
+   throws as `\TypeError`, pass a `RoutableMessageBus`  instance instead.
 
 Monolog
 -------

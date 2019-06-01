@@ -4,7 +4,7 @@ UPGRADE FROM 4.3 to 4.4
 HttpKernel
 ----------
 
-* The `DebugHandlersListener` class has been marked as `final`
+ * The `DebugHandlersListener` class has been marked as `final`
 
 DependencyInjection
 -------------------
@@ -25,10 +25,16 @@ DependencyInjection
        factory: ['@factory_service', method]
    ```
 
+Messenger
+---------
+
+ * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
+   pass a `RoutableMessageBus`  instance instead.
+
 MonologBridge
 --------------
 
-* The `RouteProcessor` has been marked final.
+ * The `RouteProcessor` has been marked final.
 
 TwigBridge
 ----------

@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The selected value is not a valid choice.</source>
-                <target>Ova vrijednost nije valjan izbor.</target>
+                <target>Izabrana vrijednost nije valjan izbor.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>

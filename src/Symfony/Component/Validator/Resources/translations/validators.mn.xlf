@@ -19,15 +19,15 @@
                 <target>Энэ утга хоосон байх ёстой.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Сонгосон утга буруу байна.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Хамгийн багадаа {{ limit }} утга сонгогдсон байх ёстой.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Хамгийн ихдээ {{ limit }} утга сонгогдох боломжтой.</target>
             </trans-unit>
             <trans-unit id="8">

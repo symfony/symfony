@@ -19,15 +19,15 @@
                 <target>Ši reikšmė turi būti tuščia.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Neteisingas pasirinkimas.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Turite pasirinkti bent {{ limit }} variantą.|Turite pasirinkti bent {{ limit }} variantus.|Turite pasirinkti bent {{ limit }} variantų.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Turite pasirinkti ne daugiau kaip {{ limit }} variantą.|Turite pasirinkti ne daugiau kaip {{ limit }} variantus.|Turite pasirinkti ne daugiau kaip {{ limit }} variantų.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -359,7 +359,7 @@
                 <target>Reikšmė nėra tinkama laiko juosta.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Slaptažodis yra nutekėjęs duomenų saugumo pažeidime, jo naudoti negalima. Prašome naudoti kitą slaptažodį.</target>
             </trans-unit>
         </body>

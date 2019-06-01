@@ -19,15 +19,15 @@
                 <target>Este valor deve ser vazio.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>O valor selecionado não é uma opção válida.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Você deve selecionar, no mínimo, {{ limit }} opção.|Você deve selecionar, no mínimo, {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Você deve selecionar, no máximo, {{ limit }} opção.|Você deve selecionar, no máximo, {{ limit }} opções.</target>
             </trans-unit>
             <trans-unit id="8">

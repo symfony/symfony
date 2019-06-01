@@ -19,15 +19,15 @@
                 <target>Значэнне павінна быць пустым.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Абранае вамі значэнне не сапраўднае.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Вы павінны выбраць хаця б {{ limit }} варыянт.|Вы павінны выбраць хаця б {{ limit }} варыянтаў.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Вы павінны выбраць не больш за {{ limit }} варыянт.|Вы павінны выбраць не больш за {{ limit }} варыянтаў.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -359,7 +359,7 @@
                 <target>Значэнне не з'яўляецца сапраўдным гадзінным поясам.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Гэты пароль быў выкрадзены ў выніку ўзлому дадзеных, таму яго нельга выкарыстоўваць. Калі ласка, выкарыстоўвайце іншы пароль.</target>
             </trans-unit>
         </body>

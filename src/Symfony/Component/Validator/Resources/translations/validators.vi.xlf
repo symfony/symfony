@@ -19,15 +19,15 @@
                 <target>Giá trị này phải rỗng.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Giá trị bạn vừa chọn không hợp lệ.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Bạn phải chọn ít nhất {{ limit }} lựa chọn.|Bạn phải chọn ít nhất {{ limit }} lựa chọn.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Bạn phải chọn nhiều nhất {{ limit }} lựa chọn.|Bạn phải chọn nhiều  nhất {{ limit }} lựa chọn.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -359,7 +359,7 @@
                 <target>Giá trị này không phải là múi giờ hợp lệ.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Mật khẩu này đã bị rò rỉ dữ liệu, không được sử dụng nữa. Xin vui lòng sử dụng mật khẩu khác.</target>
            </trans-unit>
         </body>

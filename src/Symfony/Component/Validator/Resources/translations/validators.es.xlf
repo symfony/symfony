@@ -19,15 +19,15 @@
                 <target>Este valor debería estar vacío.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>El valor seleccionado no es una opción válida.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Debe seleccionar al menos {{ limit }} opción.|Debe seleccionar al menos {{ limit }} opciones.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Debe seleccionar como máximo {{ limit }} opción.|Debe seleccionar como máximo {{ limit }} opciones.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -359,7 +359,7 @@
                 <target>Este valor no es una zona horaria válida.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Esta contraseña no se puede utilizar porque está incluida en un listado de contraseñas públicas obtenido gracias a fallos de seguridad de otros sitios y aplicaciones. Por favor utilice otra contraseña.</target>
             </trans-unit>
         </body>

@@ -19,15 +19,15 @@
                 <target>Արժեքը պետք է լինի դատարկ։</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Ձեր ընտրած արժեքը անվավեր ընտրություն է։</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Դուք պետք է ընտրեք ամենաքիչը {{ limit }} տարբերակներ։</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Դուք պետք է ընտրեք ոչ ավելի քան {{ limit }} տարբերակներ։</target>
             </trans-unit>
             <trans-unit id="8">

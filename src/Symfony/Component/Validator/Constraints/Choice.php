@@ -37,10 +37,10 @@ class Choice extends Constraint
     public $strict = false;
     public $min;
     public $max;
-    public $message = 'The value you selected is not a valid choice.';
+    public $message = 'The selected value is not a valid choice.';
     public $multipleMessage = 'One or more of the given values is invalid.';
-    public $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';
-    public $maxMessage = 'You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.';
+    public $minMessage = 'At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.';
+    public $maxMessage = 'At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.';
 
     /**
      * {@inheritdoc}

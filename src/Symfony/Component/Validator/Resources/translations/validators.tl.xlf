@@ -19,15 +19,15 @@
                 <target>Ang halaga nito ay dapat walang laman.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Ang halaga ng iyong pinili ay hindi balidong pagpili.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>Kailangan mong pumili ng pinakamababang {{ limit }} ng pagpilian.|Kailangan mong pumili ng pinakamababang {{ limit }} ng mga pagpipilian.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>Kailangan mong pumili ng pinakamataas {{ limit }} ng pagpipilian.|Kailangan mong pumili ng pinakamataas {{ limit }} ng mga pagpipilian.</target>
             </trans-unit>
             <trans-unit id="8">
@@ -359,7 +359,7 @@
                 <target>Ang halagang ito ay hindi wastong timezone.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Naikalat ang password na ito sa isang data breach at hindi na dapat gamitin. Mangyaring gumamit ng ibang pang password.</target>
             </trans-unit>
         </body>

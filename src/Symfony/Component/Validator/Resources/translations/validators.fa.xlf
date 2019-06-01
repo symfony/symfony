@@ -19,15 +19,15 @@
                 <target>این فیلد باید خالی باشد.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>گزینه انتخابی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
                 <target>باید حداقل {{ limit }} گزینه انتخاب کنید.|باید حداقل {{ limit }} گزینه انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
                 <target>حداکثر {{ limit }} گزینه می توانید انتخاب کنید.|حداکثر {{ limit }} گزینه می توانید انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="8">

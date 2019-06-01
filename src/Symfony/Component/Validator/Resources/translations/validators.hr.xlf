@@ -19,16 +19,16 @@
                 <target>Ova vrijednost treba biti prazna.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>The value you selected is not a valid choice.</source>
+                <source>The selected value is not a valid choice.</source>
                 <target>Ova vrijednost nije valjan izbor.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Izaberite barem {{ limit }} mogućnosti.</target>
+                <source>At least {{ limit }} choice must be selected.|At least {{ limit }} choices must be selected.</source>
+                <target>Barem {{ limit }} mogućnost mora biti izabrana.|Barem {{ limit }} mogućnosti moraju biti izabrane.|Barem {{ limit }} mogućnosti mora biti izabrano.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Izaberite najviše {{ limit }} mogućnosti.</target>
+                <source>At most {{ limit }} choice must be selected.|At most {{ limit }} choices must be selected.</source>
+                <target>Najviše {{ limit }} mogućnost mora biti izabrana.|Najviše {{ limit }} mogućnosti moraju biti izabrane.|Najviše {{ limit }} mogućnosti mora biti izabrano.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -359,7 +359,7 @@
                 <target>Ova vrijednost nije validna vremenska zona.</target>
             </trans-unit>
             <trans-unit id="93">
-                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <source>This password has been leaked in a data breach. A different password must be used.</source>
                 <target>Ova lozinka je procurila u nekom od sigurnosnih propusta, te je potrebno koristiti drugu lozinku.</target>
             </trans-unit>
         </body>

@@ -101,7 +101,7 @@ class Serializer implements SerializerInterface
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
-        $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope);
+        $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
         return [
             'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
@@ -153,6 +153,30 @@ class Serializer implements SerializerInterface
             if ($stamp instanceof SerializerStamp) {
                 return $stamp;
             }
+        }
+
+        return null;
+    }
+
+    private function getContentTypeHeader(): array
+    {
+        $mimeType = $this->getMimeTypeForFormat();
+
+        return null === $mimeType ? [] : ['Content-Type' => $mimeType];
+    }
+
+    private function getMimeTypeForFormat(): ?string
+    {
+        switch ($this->format) {
+            case 'json':
+                return 'application/json';
+            case 'xml':
+                return 'application/xml';
+            case 'yml':
+            case 'yaml':
+                return 'application/x-yaml';
+            case 'csv':
+                return 'text/csv';
         }
 
         return null;

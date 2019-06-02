@@ -14,6 +14,8 @@ namespace Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
 
 /**
+ * Test change on Deprecation !!
+ *
  * @internal
  */
 class Deprecation

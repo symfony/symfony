@@ -16,6 +16,13 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 
 class DeprecationTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        $reflection = new \ReflectionClass(Deprecation::class);
+        printf("filename: %s\n", $reflection->getFileName());
+        echo file_get_contents($reflection->getFileName());
+    }
+
     public function testItCanDetermineTheClassWhereTheDeprecationHappened()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);

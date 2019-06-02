@@ -109,8 +109,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes($class, $property, array $context = [])
     {
-        if ($fromDeclared = $this->extractFromDeclaredType($class, $property)) {
-            return $fromDeclared;
+        if ($fromDeclaredType = $this->extractFromDeclaredType($class, $property)) {
+            return $fromDeclaredType;
         }
 
         if ($fromMutator = $this->extractFromMutator($class, $property)) {

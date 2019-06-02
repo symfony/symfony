@@ -90,7 +90,7 @@ abstract class FormField
     /**
      * Gets the value of the field.
      *
-     * @return string|array The value of the field
+     * @return string|array|null The value of the field
      */
     public function getValue()
     {

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+* Added the ability to extract property type from the property declaration
+
 4.3.0
 -----
 

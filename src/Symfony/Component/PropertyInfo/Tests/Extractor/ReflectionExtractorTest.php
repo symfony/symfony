@@ -15,9 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -225,6 +227,29 @@ class ReflectionExtractorTest extends TestCase
             ['defaultString', [new Type(Type::BUILTIN_TYPE_STRING, false)]],
             ['defaultArray', [new Type(Type::BUILTIN_TYPE_ARRAY, false)]],
             ['defaultNull', null],
+        ];
+    }
+
+    /**
+     * @dataProvider declaredTypeProvider
+     */
+    public function testExtractFromDeclaredType($property, $type)
+    {
+        if (version_compare(PHP_VERSION, '7.4.0-dev', '<')) {
+            $this->markTestSkipped('Extracting type from declared type is enabled only on PHP 7.4+');
+        }
+
+        $this->assertEquals($type, $this->extractor->getTypes(Php74Dummy::class, $property, []));
+    }
+
+    public function declaredTypeProvider()
+    {
+        return [
+            ['int', [new Type(Type::BUILTIN_TYPE_INT, false)]],
+            ['string', [new Type(Type::BUILTIN_TYPE_STRING, true)]],
+            ['dummy', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
+            ['optionalDummy', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)]],
+            ['callable', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)]],
         ];
     }
 

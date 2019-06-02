@@ -109,6 +109,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public function getTypes($class, $property, array $context = [])
     {
+        if ($fromDeclared = $this->extractFromDeclaredType($class, $property)) {
+            return $fromDeclared;
+        }
+
         if ($fromMutator = $this->extractFromMutator($class, $property)) {
             return $fromMutator;
         }
@@ -183,6 +187,35 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return false;
+    }
+
+    private function extractFromDeclaredType(string $class, string $property)
+    {
+        // to be removed as soon as Symfony bumps the minimum PHP Version to 7.4
+        if (version_compare(PHP_VERSION, '7.4.0-dev', '<')) {
+            return null;
+        }
+
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        $reflectionProperty = $reflectionClass->getProperty($property);
+
+        if (!$reflectionProperty->hasType()) {
+            return null;
+        }
+
+        $reflectionType = $reflectionProperty->getType();
+        $type = $reflectionType->getName();
+
+        if ($reflectionType->isBuiltIn()) {
+            return [new Type(static::MAP_TYPES[$type] ?? $type, $reflectionType->allowsNull())];
+        }
+
+        return [new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionType->allowsNull(), $type)];
     }
 
     /**

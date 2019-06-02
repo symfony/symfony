@@ -27,6 +27,7 @@ matrix:
           env: deps=high
         - php: 7.3
           env: deps=low
+        - php: 7.4snapshot
 
     fast_finish: true
 

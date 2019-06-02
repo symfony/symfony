@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * added `offsetGet()` method to the `Options` interface with a new boolean argument `$triggerDeprecation`
+
 4.3.0
 -----
 

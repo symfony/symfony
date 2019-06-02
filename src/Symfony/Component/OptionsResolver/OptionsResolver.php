@@ -825,28 +825,13 @@ class OptionsResolver implements Options
     }
 
     /**
-     * Returns the resolved value of an option.
-     *
-     * @param string $option             The option name
-     * @param bool   $triggerDeprecation Whether to trigger the deprecation or not (true by default)
-     *
-     * @return mixed The option value
-     *
-     * @throws AccessException           If accessing this method outside of
-     *                                   {@link resolve()}
-     * @throws NoSuchOptionException     If the option is not set
-     * @throws InvalidOptionsException   If the option doesn't fulfill the
-     *                                   specified validation rules
-     * @throws OptionDefinitionException If there is a cyclic dependency between
-     *                                   lazy options and/or normalizers
+     * {@inheritdoc}
      */
-    public function offsetGet($option/*, bool $triggerDeprecation = true*/)
+    public function offsetGet($option, bool $triggerDeprecation = true)
     {
         if (!$this->locked) {
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
-
-        $triggerDeprecation = 1 === \func_num_args() || \func_get_arg(1);
 
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {

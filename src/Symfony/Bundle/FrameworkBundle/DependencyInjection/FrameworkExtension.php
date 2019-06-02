@@ -21,7 +21,6 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
-use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
@@ -88,12 +87,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
-use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -792,18 +787,11 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('router.resource', $config['resource']);
-        $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.container_class')); // deprecated
         $router = $container->findDefinition('router.default');
         $argument = $router->getArgument(2);
         $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
-        }
-        if (!class_exists(CompiledUrlMatcher::class)) {
-            $argument['matcher_class'] = $argument['matcher_base_class'] = $argument['matcher_base_class'] ?? RedirectableUrlMatcher::class;
-            $argument['matcher_dumper_class'] = PhpMatcherDumper::class;
-            $argument['generator_class'] = $argument['generator_base_class'] = $argument['generator_base_class'] ?? UrlGenerator::class;
-            $argument['generator_dumper_class'] = PhpGeneratorDumper::class;
         }
         $router->replaceArgument(2, $argument);
 

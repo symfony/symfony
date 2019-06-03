@@ -127,6 +127,7 @@ class PdoStore implements StoreInterface
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
             }
             $this->prune();
+
             return;
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.

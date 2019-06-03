@@ -23,18 +23,6 @@ class Registry
 {
     private $workflows = [];
 
-    /**
-     * @param Workflow                 $workflow
-     * @param SupportStrategyInterface $supportStrategy
-     *
-     * @deprecated since Symfony 4.1, use addWorkflow() instead
-     */
-    public function add(Workflow $workflow, $supportStrategy)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.', __METHOD__), E_USER_DEPRECATED);
-        $this->workflows[] = [$workflow, $supportStrategy];
-    }
-
     public function addWorkflow(WorkflowInterface $workflow, WorkflowSupportStrategyInterface $supportStrategy)
     {
         $this->workflows[] = [$workflow, $supportStrategy];

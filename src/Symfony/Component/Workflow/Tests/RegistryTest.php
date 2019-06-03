@@ -29,21 +29,6 @@ class RegistryTest extends TestCase
         $this->registry = null;
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "Symfony\Component\Workflow\Registry::add()" method is deprecated since Symfony 4.1. Use addWorkflow() instead.
-     */
-    public function testAddIsDeprecated()
-    {
-        $registry = new Registry();
-
-        $registry->add($w = new Workflow(new Definition([], []), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
-
-        $workflow = $registry->get(new Subject1());
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
-    }
-
     public function testGetWithSuccess()
     {
         $workflow = $this->registry->get(new Subject1());
@@ -108,23 +93,6 @@ class RegistryTest extends TestCase
         $this->assertCount(0, $workflows);
     }
 
-    /**
-     * @group legacy
-     */
-    private function createSupportStrategy($supportedClassName)
-    {
-        $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
-        $strategy->expects($this->any())->method('supports')
-            ->willReturnCallback(function ($workflow, $subject) use ($supportedClassName) {
-                return $subject instanceof $supportedClassName;
-            });
-
-        return $strategy;
-    }
-
-    /**
-     * @group legacy
-     */
     private function createWorkflowSupportStrategy($supportedClassName)
     {
         $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();

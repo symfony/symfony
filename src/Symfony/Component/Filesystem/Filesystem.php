@@ -751,7 +751,6 @@ class Filesystem
 
             return $result;
         } catch (\Throwable $e) {
-        } catch (\Exception $e) {
         }
         \restore_error_handler();
 

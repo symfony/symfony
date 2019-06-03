@@ -105,6 +105,7 @@ class ExtensionPass implements CompilerPassInterface
         } else {
             $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
             $container->removeDefinition('templating.engine.twig');
+            $container->removeDefinition('twig.cache_warmer');
         }
 
         if ($container->has('assets.packages')) {

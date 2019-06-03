@@ -35,6 +35,8 @@
             <argument type="service" id="Psr\Container\ContainerInterface" />
             <argument type="service" id="templating.finder" on-invalid="ignore" />
             <argument type="collection" /> <!-- Twig paths -->
+
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
         </service>
 
         <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">

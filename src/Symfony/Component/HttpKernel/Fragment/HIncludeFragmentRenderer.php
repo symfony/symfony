@@ -52,6 +52,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      * @param EngineInterface|Environment|null $templating An EngineInterface or an Environment instance
      *
      * @throws \InvalidArgumentException
+     *
+     * @internal
      */
     public function setTemplating($templating)
     {

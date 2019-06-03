@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
+
 4.3.0
 -----
 

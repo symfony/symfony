@@ -1,0 +1,42 @@
+{
+  "name": "symfony/security-oauth-server",
+  "type": "library",
+  "description": "Symfony Security Component - OAuthServer",
+  "keywords": [],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Guillaume Loulier",
+      "email": "contact@guillaumeloulier.fr"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.1.3",
+    "defuse/php-encryption": "~2.2.1",
+    "ext-json": "*",
+    "psr/log": "^1.0",
+    "symfony/contracts": "~1.1.2",
+    "symfony/options-resolver": "~4.3",
+    "symfony/http-foundation": "~4.3"
+  },
+  "require-dev": {
+    "psr/http-message": "~1.0"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\Security\\OAuthServer\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "4.4-dev"
+    }
+  }
+}

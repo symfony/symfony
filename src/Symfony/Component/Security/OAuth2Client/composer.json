@@ -1,0 +1,38 @@
+{
+  "name": "symfony/security-oauth2-client",
+  "type": "library",
+  "description": "Symfony Security Component - OAuth2Client",
+  "keywords": [],
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Guillaume Loulier",
+      "email": "contact@guillaumeloulier.fr"
+    },
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.1.3",
+    "ext-json": "*",
+    "psr/log": "^1.0",
+    "symfony/contracts": "~1.1.2",
+    "symfony/http-client": "~4.3",
+    "symfony/options-resolver": "~4.3"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\Security\\OAuth2Client\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "4.4-dev"
+    }
+  }
+}

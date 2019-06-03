@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 /**
@@ -32,24 +31,10 @@ class TemplateControllerTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testTemplating()
-    {
-        $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
-        $templating->expects($this->exactly(2))->method('render')->willReturn('bar');
-
-        $controller = new TemplateController(null, $templating);
-
-        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
-        $this->assertEquals('bar', $controller('mytemplate')->getContent());
-    }
-
-    /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.
+     * @expectedExceptionMessage You can not use the TemplateController if the Twig Bundle is not available.
      */
-    public function testNoTwigNorTemplating()
+    public function testNoTwig()
     {
         $controller = new TemplateController();
 

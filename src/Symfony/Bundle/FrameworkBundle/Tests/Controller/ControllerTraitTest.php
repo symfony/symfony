@@ -439,56 +439,6 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertSame(301, $response->getStatusCode());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testRenderViewTemplating()
-    {
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $templating->expects($this->once())->method('render')->willReturn('bar');
-
-        $container = new Container();
-        $container->set('templating', $templating);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertEquals('bar', $controller->renderView('foo'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderTemplating()
-    {
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $templating->expects($this->once())->method('render')->willReturn('bar');
-
-        $container = new Container();
-        $container->set('templating', $templating);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertEquals('bar', $controller->render('foo')->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testStreamTemplating()
-    {
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-
-        $container = new Container();
-        $container->set('templating', $templating);
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
-    }
-
     public function testCreateNotFoundException()
     {
         $controller = $this->createController();

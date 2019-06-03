@@ -35,19 +35,6 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testDoNoDuplicateDefaultFormResources()
-    {
-        $input = ['templating' => [
-            'form' => ['resources' => ['FrameworkBundle:Form']],
-            'engines' => ['php'],
-        ]];
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [$input]);
-
-        $this->assertEquals(['FrameworkBundle:Form'], $config['templating']['form']['resources']);
-    }
-
     public function getTestValidSessionName()
     {
         return [
@@ -304,15 +291,6 @@ class ConfigurationTest extends TestCase
             'request' => [
                 'enabled' => false,
                 'formats' => [],
-            ],
-            'templating' => [
-                'enabled' => false,
-                'hinclude_default_template' => null,
-                'form' => [
-                    'resources' => ['FrameworkBundle:Form'],
-                ],
-                'engines' => [],
-                'loaders' => [],
             ],
             'assets' => [
                 'enabled' => !class_exists(FullStack::class),

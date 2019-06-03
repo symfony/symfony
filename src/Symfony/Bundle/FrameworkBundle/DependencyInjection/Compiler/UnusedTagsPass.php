@@ -54,7 +54,6 @@ class UnusedTagsPass implements CompilerPassInterface
         'security.voter',
         'serializer.encoder',
         'serializer.normalizer',
-        'templating.helper',
         'translation.dumper',
         'translation.extractor',
         'translation.loader',

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `TwigEngine` class, use `\Twig\Environment` instead.
+
 4.4.0
 -----
 

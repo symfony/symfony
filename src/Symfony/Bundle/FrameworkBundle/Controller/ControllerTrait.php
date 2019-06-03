@@ -205,14 +205,8 @@ trait ControllerTrait
      */
     protected function renderView(string $view, array $parameters = []): string
     {
-        if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
-
-            return $this->container->get('templating')->render($view, $parameters);
-        }
-
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
+            throw new \LogicException('You can not use the "renderView" method if the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
         }
 
         return $this->container->get('twig')->render($view, $parameters);
@@ -225,15 +219,7 @@ trait ControllerTrait
      */
     protected function render(string $view, array $parameters = [], Response $response = null): Response
     {
-        if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
-
-            $content = $this->container->get('templating')->render($view, $parameters);
-        } elseif ($this->container->has('twig')) {
-            $content = $this->container->get('twig')->render($view, $parameters);
-        } else {
-            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
-        }
+        $content = $this->renderView($view, $parameters);
 
         if (null === $response) {
             $response = new Response();
@@ -251,23 +237,15 @@ trait ControllerTrait
      */
     protected function stream(string $view, array $parameters = [], StreamedResponse $response = null): StreamedResponse
     {
-        if ($this->container->has('templating')) {
-            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
-
-            $templating = $this->container->get('templating');
-
-            $callback = function () use ($templating, $view, $parameters) {
-                $templating->stream($view, $parameters);
-            };
-        } elseif ($this->container->has('twig')) {
-            $twig = $this->container->get('twig');
-
-            $callback = function () use ($twig, $view, $parameters) {
-                $twig->display($view, $parameters);
-            };
-        } else {
-            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "stream" method if the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
         }
+
+        $twig = $this->container->get('twig');
+
+        $callback = function () use ($twig, $view, $parameters) {
+            $twig->display($view, $parameters);
+        };
 
         if (null === $response) {
             return new StreamedResponse($callback);

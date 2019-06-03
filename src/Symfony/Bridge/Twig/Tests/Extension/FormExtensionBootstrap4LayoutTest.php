@@ -14,11 +14,11 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 /**
  * Class providing test cases for the Bootstrap 4 horizontal Twig form theme.
@@ -37,7 +37,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
     {
         parent::setUp();
 
-        $loader = new StubFilesystemLoader([
+        $loader = new FilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
         ]);
@@ -80,7 +80,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
 
     public function testMoneyWidgetInIso()
     {
-        $environment = new Environment(new StubFilesystemLoader([
+        $environment = new Environment(new FilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
         ]), ['strict_variables' => true]);

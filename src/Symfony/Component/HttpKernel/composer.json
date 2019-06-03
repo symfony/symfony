@@ -36,7 +36,6 @@
         "symfony/process": "^4.4|^5.0",
         "symfony/routing": "^4.4|^5.0",
         "symfony/stopwatch": "^4.4|^5.0",
-        "symfony/templating": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/translation-contracts": "^1.1",
         "symfony/var-dumper": "^4.4|^5.0",

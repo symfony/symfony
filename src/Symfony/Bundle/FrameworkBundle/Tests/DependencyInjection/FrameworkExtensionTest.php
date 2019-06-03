@@ -160,15 +160,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('esi'));
     }
 
-    /**
-     * @group legacy
-     * @expectedException \LogicException
-     */
-    public function testAmbiguousWhenBothTemplatingAndFragments()
-    {
-        $this->createContainerFromFile('template_and_fragments');
-    }
-
     public function testSsi()
     {
         $container = $this->createContainerFromFile('full');
@@ -575,37 +566,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('request.add_request_formats_listener'), '->registerRequestConfiguration() does not load request.xml when no request formats are defined');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testTemplating()
-    {
-        $container = $this->createContainerFromFile('templating');
-
-        $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
-
-        $this->assertEquals('templating.engine.delegating', (string) $container->getAlias('templating'), '->registerTemplatingConfiguration() configures delegating loader if multiple engines are provided');
-
-        $this->assertEquals($container->getDefinition('templating.loader.chain'), $container->getDefinition('templating.loader.wrapped'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
-
-        $this->assertEquals($container->getDefinition('templating.loader'), $container->getDefinition('templating.loader.cache'), '->registerTemplatingConfiguration() configures the loader to use cache');
-
-        $this->assertEquals('%templating.loader.cache.path%', $container->getDefinition('templating.loader.cache')->getArgument(1));
-        $this->assertEquals('/path/to/cache', $container->getParameter('templating.loader.cache.path'));
-
-        $this->assertEquals(['php', 'twig'], $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
-
-        $this->assertEquals(['FrameworkBundle:Form', 'theme1', 'theme2'], $container->getParameter('templating.helper.form.resources'), '->registerTemplatingConfiguration() registers the theme and adds the base theme');
-        $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
-    }
-
-    public function testTemplatingCanBeDisabled()
-    {
-        $container = $this->createContainerFromFile('templating_disabled');
-
-        $this->assertFalse($container->hasParameter('templating.engines'), '"templating.engines" container parameter is not registered when templating is disabled.');
-    }
-
     public function testAssets()
     {
         $container = $this->createContainerFromFile('assets');
@@ -648,13 +608,6 @@ abstract class FrameworkExtensionTest extends TestCase
         // default package
         $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
-    }
-
-    public function testAssetsCanBeDisabled()
-    {
-        $container = $this->createContainerFromFile('assets_disabled');
-
-        $this->assertFalse($container->has('templating.helper.assets'), 'The templating.helper.assets helper service is removed when assets are disabled.');
     }
 
     public function testWebLink()
@@ -847,16 +800,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['en', 'fr'], $calls[1][1][0]);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     */
-    public function testTemplatingRequiresAtLeastOneEngine()
-    {
-        $container = $this->createContainer();
-        $loader = new FrameworkExtension();
-        $loader->load([['templating' => null]], $container);
     }
 
     public function testValidation()
@@ -1281,45 +1224,6 @@ abstract class FrameworkExtensionTest extends TestCase
             }
         }
         $this->assertEquals($expectedLoaders, $loaders);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAssetHelperWhenAssetsAreEnabled()
-    {
-        $container = $this->createContainerFromFile('templating');
-        $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
-
-        $this->assertSame('assets.packages', (string) $packages);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAssetHelperWhenTemplatesAreEnabledAndNoAssetsConfiguration()
-    {
-        $container = $this->createContainerFromFile('templating_no_assets');
-        $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
-
-        $this->assertSame('assets.packages', (string) $packages);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
-    {
-        $container = $this->createContainerFromFile('templating_php_assets_disabled');
-
-        $this->assertTrue(!$container->has('templating.helper.assets'), 'The templating.helper.assets helper service is removed when assets are disabled.');
-    }
-
-    public function testAssetHelperWhenAssetsAndTemplatesAreDisabled()
-    {
-        $container = $this->createContainerFromFile('default_config');
-
-        $this->assertFalse($container->hasDefinition('templating.helper.assets'));
     }
 
     public function testSerializerServiceIsRegisteredWhenEnabled()

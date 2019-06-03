@@ -114,7 +114,6 @@
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
             <argument type="service" id="twig" on-invalid="ignore" />
-            <argument type="service" id="templating" on-invalid="ignore" />
         </service>
     </services>
 </container>

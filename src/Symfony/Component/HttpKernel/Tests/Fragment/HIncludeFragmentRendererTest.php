@@ -82,20 +82,4 @@ class HIncludeFragmentRendererTest extends TestCase
         $strategy = new HIncludeFragmentRenderer($twig);
         $this->assertEquals('<hx:include src="/foo">loading...</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'loading...'])->getContent());
     }
-
-    /**
-     * @group legacy
-     */
-    public function testRenderWithDefaultTextLegacy()
-    {
-        $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
-        $engine->expects($this->once())
-            ->method('exists')
-            ->with('default')
-            ->willThrowException(new \InvalidArgumentException());
-
-        // only default
-        $strategy = new HIncludeFragmentRenderer($engine);
-        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
-    }
 }

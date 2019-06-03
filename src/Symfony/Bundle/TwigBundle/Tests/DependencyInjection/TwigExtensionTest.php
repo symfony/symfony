@@ -238,9 +238,6 @@ class TwigExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @group legacy
-     */
     public function testRuntimeLoader()
     {
         $container = $this->createContainer();
@@ -250,8 +247,6 @@ class TwigExtensionTest extends TestCase
         $container->setParameter('debug.file_link_format', 'test');
         $container->setParameter('foo', 'FooClass');
         $container->register('http_kernel', 'FooClass');
-        $container->register('templating.locator', 'FooClass');
-        $container->register('templating.name_parser', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);

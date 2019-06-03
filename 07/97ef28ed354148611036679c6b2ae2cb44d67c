@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-03T14:21:25Z
+
+The `mergePasswordAndSalt()` method in the `BasePasswordEncoder` class could be updated as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-03T19:28:04Z
+
+> we should deprecate the salt argument completely as it's not best practice anymore
+
+100% the only issue is figuring out a smooth way to upgrade. I think we'll be able to do it in 5.1 once we provide a way to migrate passwords to new hash algos. Would that make sense?

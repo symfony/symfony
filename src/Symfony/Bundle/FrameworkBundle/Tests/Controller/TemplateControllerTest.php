@@ -31,6 +31,9 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testTemplating()
     {
         $templating = $this->getMockBuilder(EngineInterface::class)->getMock();

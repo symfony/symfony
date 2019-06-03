@@ -220,6 +220,11 @@ FrameworkBundle
  * Support for the legacy directory structure in `translation:update` and `debug:translation` commands has been removed.
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
 
+HttpClient
+----------
+
+ * Added method `cancel()` to `ResponseInterface`
+
 HttpFoundation
 --------------
 

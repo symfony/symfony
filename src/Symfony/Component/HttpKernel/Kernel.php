@@ -487,7 +487,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                     $fresh = true;
                 }
             } catch (\Throwable $e) {
-            } catch (\Exception $e) {
             } finally {
                 error_reporting($errorLevel);
             }
@@ -556,7 +555,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             try {
                 $oldContainer = include $cache->getPath();
             } catch (\Throwable $e) {
-            } catch (\Exception $e) {
             } finally {
                 error_reporting($errorLevel);
             }

@@ -481,6 +481,16 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 
+    public function testCancel()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header');
+
+        $response->cancel();
+        $this->expectException(TransportExceptionInterface::class);
+        $response->getHeaders();
+    }
+
     public function testOnProgressCancel()
     {
         $client = $this->getHttpClient(__FUNCTION__);

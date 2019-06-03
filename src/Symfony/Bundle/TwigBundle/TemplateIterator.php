@@ -24,21 +24,18 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class TemplateIterator implements \IteratorAggregate
 {
     private $kernel;
-    private $rootDir;
     private $templates;
     private $paths;
     private $defaultPath;
 
     /**
      * @param KernelInterface $kernel      A KernelInterface instance
-     * @param string          $rootDir     The directory where global templates can be stored
      * @param array           $paths       Additional Twig paths to warm
      * @param string|null     $defaultPath The directory where global templates can be stored
      */
-    public function __construct(KernelInterface $kernel, string $rootDir, array $paths = [], string $defaultPath = null)
+    public function __construct(KernelInterface $kernel, array $paths = [], string $defaultPath = null)
     {
         $this->kernel = $kernel;
-        $this->rootDir = $rootDir;
         $this->paths = $paths;
         $this->defaultPath = $defaultPath;
     }
@@ -52,14 +49,8 @@ class TemplateIterator implements \IteratorAggregate
             return $this->templates;
         }
 
-        $templates = $this->findTemplatesInDirectory($this->rootDir.'/Resources/views');
+        $templates = null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles']) : [];
 
-        if (null !== $this->defaultPath) {
-            $templates = array_merge(
-                $templates,
-                $this->findTemplatesInDirectory($this->defaultPath, null, ['bundles'])
-            );
-        }
         foreach ($this->kernel->getBundles() as $bundle) {
             $name = $bundle->getName();
             if ('Bundle' === substr($name, -6)) {
@@ -69,14 +60,8 @@ class TemplateIterator implements \IteratorAggregate
             $templates = array_merge(
                 $templates,
                 $this->findTemplatesInDirectory($bundle->getPath().'/Resources/views', $name),
-                $this->findTemplatesInDirectory($this->rootDir.'/Resources/'.$bundle->getName().'/views', $name)
+                null !== $this->defaultPath ? $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name) : []
             );
-            if (null !== $this->defaultPath) {
-                $templates = array_merge(
-                    $templates,
-                    $this->findTemplatesInDirectory($this->defaultPath.'/bundles/'.$bundle->getName(), $name)
-                );
-            }
         }
 
         foreach ($this->paths as $dir => $namespace) {

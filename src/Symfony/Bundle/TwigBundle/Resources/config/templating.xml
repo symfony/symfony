@@ -17,6 +17,8 @@
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />
+
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.4 and will be removed in 5.0.</deprecated>
         </service>
     </services>
 </container>

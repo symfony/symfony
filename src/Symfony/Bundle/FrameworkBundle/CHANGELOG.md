@@ -6,6 +6,11 @@ CHANGELOG
 
  * Removed support to load translation resources from the legacy directories `src/Resources/translations/` and `src/Resources/<BundleName>/translations/`
 
+4.4.0
+-----
+
+ * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
+
 4.3.0
 -----
 

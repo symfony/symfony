@@ -31,8 +31,18 @@ class ClockMockTest extends TestCase
         ClockMock::withClockMock(1234567890.125);
     }
 
+    public function testFail()
+    {
+        $this->assertTrue(false, "test test test");
+    }
+
     public function testTime()
     {
+        echo "test time\n";
+
+        //$reflection = new \ReflectionClass(ClockMock::class);
+        //printf("ClockMock file: %s\n", $reflection->getFileName());
+
         $this->assertSame(1234567890, time());
     }
 

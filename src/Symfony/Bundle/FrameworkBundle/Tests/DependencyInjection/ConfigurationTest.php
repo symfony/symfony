@@ -21,6 +21,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Oauth\Provider\GenericProvider;
 
 class ConfigurationTest extends TestCase
 {
@@ -353,6 +354,10 @@ class ConfigurationTest extends TestCase
             'mailer' => [
                 'dsn' => 'smtp://null',
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+            ],
+            'oauth' => [
+                'enabled' => !class_exists(FullStack::class) && class_exists(GenericProvider::class),
+                'providers' => [],
             ],
         ];
     }

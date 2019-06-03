@@ -1,0 +1,33 @@
+{
+  "name": "symfony/oauth",
+  "type": "library",
+  "description": "An abstraction which allow to use OAuth as authentication method",
+  "homepage": "https://symfony.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Symfony Community",
+      "homepage": "https://symfony.com/contributors"
+    }
+  ],
+  "require": {
+    "php": "^7.1.3",
+    "ext-json": "*",
+    "psr/log": "^1.0",
+    "symfony/contracts": "~1.1.2",
+    "symfony/http-client": "~4.3",
+    "symfony/options-resolver": "~4.3"
+  },
+  "autoload": {
+    "psr-4": { "Symfony\\Component\\OAuth\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "4.4-dev"
+    }
+  }
+}

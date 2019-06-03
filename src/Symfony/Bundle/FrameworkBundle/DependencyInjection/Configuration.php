@@ -27,6 +27,7 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Oauth\Provider\GenericProvider;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
@@ -104,6 +105,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyAccessSection($rootNode);
         $this->addPropertyInfoSection($rootNode);
         $this->addCacheSection($rootNode);
+        $this->addOauthSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
@@ -875,6 +877,82 @@ class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifTrue(function ($v) { return isset($v['cache.app']) || isset($v['cache.system']); })
                                 ->thenInvalid('"cache.app" and "cache.system" are reserved names')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addOauthSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('oauth')
+                    ->info('Oauth security provider configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(GenericProvider::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->fixXmlConfig('providers')
+                    ->children()
+                        ->arrayNode('default_options')
+                            ->children()
+                                ->enumNode('type')
+                                    ->info('The type of Oauth client needed: authorization_code, implicit, client, resource_owner')
+                                    ->values(['authorization_code', 'implicit', 'client', 'resource_owner'])
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('client_id')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('client_secret')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('authorization_url')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('redirect_uri')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('access_token_url')
+                                    ->isRequired()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('providers')
+                            ->useAttributeAsKey('name')
+                            ->normalizeKeys(false)
+                            ->arrayPrototype()
+                                ->beforeNormalization()
+                                ->always()
+                                ->then(function ($config) {
+                                    if (!class_exists(GenericProvider::class)) {
+                                        throw new LogicException('Oauth support cannot be enabled as the component is not installed. Try running "composer require symfony/oauth".');
+                                    }
+
+                                    return \is_array($config) ? $config : ['client_id' => $config];
+                                })
+                            ->end()
+                            ->children()
+                                ->enumNode('type')
+                                    ->info('The type of Oauth client needed: authorization_code, implicit, client_credentials, resource_owner')
+                                    ->values(['authorization_code', 'implicit', 'client_credentials', 'resource_owner'])
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('client_id')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('client_secret')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('authorization_url')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('redirect_uri')
+                                    ->isRequired()
+                                ->end()
+                                ->scalarNode('accessToken_url')
+                                    ->isRequired()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

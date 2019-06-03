@@ -126,7 +126,7 @@ class PdoStore implements StoreInterface
             if ($key->isExpired()) {
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
             }
-
+            $this->prune();
             return;
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
@@ -140,9 +140,7 @@ class PdoStore implements StoreInterface
             throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $key));
         }
 
-        if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
-            $this->prune();
-        }
+        $this->prune();
     }
 
     /**
@@ -294,13 +292,15 @@ class PdoStore implements StoreInterface
     }
 
     /**
-     * Cleanups the table by removing all expired locks.
+     * Cleans up the table by removing all expired locks according to gcProbability.
      */
     private function prune(): void
     {
-        $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
+        if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
+            $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
 
-        $this->getConnection()->exec($sql);
+            $this->getConnection()->exec($sql);
+        }
     }
 
     private function getDriver(): string

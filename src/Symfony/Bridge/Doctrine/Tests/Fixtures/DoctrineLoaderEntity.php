@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineLoaderEntity
+class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 {
     /**
      * @ORM\Id

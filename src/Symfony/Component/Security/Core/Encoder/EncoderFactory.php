@@ -85,7 +85,17 @@ class EncoderFactory implements EncoderFactoryInterface
     private function getEncoderConfigFromAlgorithm($config)
     {
         if ('auto' === $config['algorithm']) {
-            $config['algorithm'] = SodiumPasswordEncoder::isSupported() ? 'sodium' : 'native';
+            $encoderChain = [];
+            // "plaintext" is not listed as any leaked hashes could then be used to authenticate directly
+            foreach ([SodiumPasswordEncoder::isSupported() ? 'sodium' : 'native', 'pbkdf2', $config['hash_algorithm']] as $algo) {
+                $config['algorithm'] = $algo;
+                $encoderChain[] = $this->createEncoder($config);
+            }
+
+            return [
+                'class' => MigratingPasswordEncoder::class,
+                'arguments' => $encoderChain,
+            ];
         }
 
         switch ($config['algorithm']) {

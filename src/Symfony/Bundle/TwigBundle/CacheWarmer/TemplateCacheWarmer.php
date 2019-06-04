@@ -28,7 +28,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     private $twig;
     private $iterator;
 
-    public function __construct(ContainerInterface $container, \Traversable $iterator)
+    public function __construct(ContainerInterface $container, iterable $iterator)
     {
         // As this cache warmer is optional, dependencies should be lazy-loaded, that's why a container should be injected.
         $this->container = $container;

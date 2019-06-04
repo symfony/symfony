@@ -99,4 +99,20 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
 
         throw new LogicException('Libsodium is not available. You should either install the sodium extension, upgrade to PHP 7.2+ or use a different encoder.');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function needsRehash(string $encoded): bool
+    {
+        if (\function_exists('sodium_crypto_pwhash_str_needs_rehash')) {
+            return \sodium_crypto_pwhash_str_needs_rehash($encoded, $this->opsLimit, $this->memLimit);
+        }
+
+        if (\extension_loaded('libsodium')) {
+            return \Sodium\crypto_pwhash_str_needs_rehash($encoded, $this->opsLimit, $this->memLimit);
+        }
+
+        throw new LogicException('Libsodium is not available. You should either install the sodium extension, upgrade to PHP 7.2+ or use a different encoder.');
+    }
 }

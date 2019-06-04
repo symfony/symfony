@@ -67,4 +67,17 @@ class NativePasswordEncoderTest extends TestCase
         $this->assertFalse($encoder->isPasswordValid($result, str_repeat('a', 73), 'salt'));
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 72), 'salt'));
     }
+
+    public function testNeedsRehash()
+    {
+        $encoder = new NativePasswordEncoder(4, 11000, 4);
+
+        $this->assertTrue($encoder->needsRehash('dummyhash'));
+
+        $hash = $encoder->encodePassword('foo', 'salt');
+        $this->assertFalse($encoder->needsRehash($hash));
+
+        $encoder = new NativePasswordEncoder(5, 11000, 5);
+        $this->assertTrue($encoder->needsRehash($hash));
+    }
 }

@@ -17,6 +17,11 @@ CHANGELOG
 * Removed the `getRoles()` method from the `TokenInterface`. Tokens must implement the `getRoleNames()` method
   instead and return roles as strings.
 
+4.4.0
+-----
+
+ * Added method `needsRehash()` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+
 4.3.0
 -----
 

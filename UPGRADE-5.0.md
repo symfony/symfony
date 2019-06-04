@@ -221,6 +221,15 @@ FrameworkBundle
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
 
+HttpClient
+----------
+
+ * Added method `cancel()` to `ResponseInterface`
+ * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+   has been removed.
+ * The `ControllerResolver` and `DelegatingLoader` classes have been made `final`.
+ * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been removed.
+
 HttpFoundation
 --------------
 
@@ -313,6 +322,7 @@ Routing
 Security
 --------
 
+ * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` must have a new `needsRehash()` method
  * The `Role` and `SwitchUserRole` classes have been removed.
  * The `getReachableRoles()` method of the `RoleHierarchy` class has been removed. It has been replaced by the new
    `getReachableRoleNames()` method.

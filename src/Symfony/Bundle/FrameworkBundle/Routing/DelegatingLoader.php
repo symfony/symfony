@@ -23,20 +23,33 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * to the fully-qualified form (from a:b:c to class::method).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {
+    /**
+     * @deprecated since Symfony 4.4
+     */
     protected $parser;
     private $loading = false;
     private $defaultOptions;
 
     /**
-     * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
+     * @param LoaderResolverInterface $resolver
+     * @param array                   $defaultOptions
      */
-    public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver, array $defaultOptions = [])
+    public function __construct($resolver, $defaultOptions = [])
     {
-        $this->parser = $parser;
+        if ($resolver instanceof ControllerNameParser) {
+            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ControllerNameParser::class, __METHOD__, LoaderResolverInterface::class), E_USER_DEPRECATED);
+            $this->parser = $resolver;
+            $resolver = $defaultOptions;
+            $defaultOptions = 2 < \func_num_args() ? func_get_arg(2) : [];
+        } elseif (2 < \func_num_args() && func_get_arg(2) instanceof ControllerNameParser) {
+            $this->parser = func_get_arg(2);
+        }
+
         $this->defaultOptions = $defaultOptions;
 
         parent::__construct($resolver);
@@ -86,7 +99,7 @@ class DelegatingLoader extends BaseDelegatingLoader
                 continue;
             }
 
-            if (2 === substr_count($controller, ':')) {
+            if ($this->parser && 2 === substr_count($controller, ':')) {
                 $deprecatedNotation = $controller;
 
                 try {

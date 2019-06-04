@@ -27,9 +27,13 @@ class ControllerNameParser
 {
     protected $kernel;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, bool $triggerDeprecation = true)
     {
         $this->kernel = $kernel;
+
+        if ($triggerDeprecation) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
     }
 
     /**

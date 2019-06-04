@@ -10,6 +10,13 @@ CHANGELOG
  * removed support for using the `Email` constraint without `egulias/email-validator`
  * removed support for using the `Expression` constraint without `symfony/expression-language`
 
+4.4.0
+-----
+
+ * added the `compared_value_path` parameter in violations when using any 
+   comparison constraint with the `propertyPath` option.
+ * added support for checking an array of types in `TypeValidator`
+
 4.3.0
 -----
 

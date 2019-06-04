@@ -16,22 +16,18 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
- * Closes connection and therefore saves number of connections.
+ * Clears entity manager after calling all handlers.
  *
- * @author Fuong <insidestyles@gmail.com>
- *
- * @experimental in 4.3
+ * @author Konstantin Myakshin <molodchick@gmail.com>
  */
-class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
+class DoctrineClearEntityManagerMiddleware extends AbstractDoctrineMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
         try {
-            $connection = $entityManager->getConnection();
-
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            $connection->close();
+            $entityManager->clear();
         }
     }
 }

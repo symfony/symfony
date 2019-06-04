@@ -18,14 +18,30 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since Symfony 4.4
  */
 class ControllerResolver extends ContainerControllerResolver
 {
+    /**
+     * @deprecated since Symfony 4.4
+     */
     protected $parser;
 
-    public function __construct(ContainerInterface $container, ControllerNameParser $parser, LoggerInterface $logger = null)
+    /**
+     * @param LoggerInterface|null $logger
+     */
+    public function __construct(ContainerInterface $container, $logger = null)
     {
-        $this->parser = $parser;
+        if ($logger instanceof ControllerNameParser) {
+            @trigger_error(sprintf('Passing a "%s" instance as 2nd argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance or null instead.', ControllerNameParser::class, __METHOD__, LoggerInterface::class), E_USER_DEPRECATED);
+            $this->parser = $logger;
+            $logger = 2 < \func_num_args() ? func_get_arg(2) : null;
+        } elseif (2 < \func_num_args() && func_get_arg(2) instanceof ControllerNameParser) {
+            $this->parser = func_get_arg(2);
+        } elseif ($logger && !$logger instanceof LoggerInterface) {
+            throw new \TypeError(sprintf('Argument 2 of "%s()" must be an instance of "%s" or null, "%s" given.', __METHOD__, LoggerInterface::class, \is_object($logger) ? \get_class($logger) : \gettype($logger)), E_USER_DEPRECATED);
+        }
 
         parent::__construct($container, $logger);
     }
@@ -35,7 +51,7 @@ class ControllerResolver extends ContainerControllerResolver
      */
     protected function createController($controller)
     {
-        if (false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
+        if ($this->parser && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
             $deprecatedNotation = $controller;
             $controller = $this->parser->parse($deprecatedNotation, false);

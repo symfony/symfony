@@ -72,6 +72,11 @@ interface ResponseInterface
     public function toArray(bool $throw = true): array;
 
     /**
+     * Cancels the response.
+     */
+    public function cancel(): void;
+
+    /**
      * Returns info coming from the transport layer.
      *
      * This method SHOULD NOT throw any ExceptionInterface and SHOULD be non-blocking.

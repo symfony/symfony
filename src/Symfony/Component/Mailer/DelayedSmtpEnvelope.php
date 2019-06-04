@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Mailer;
 
-use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
-use Symfony\Component\Mime\RawMessage;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -31,13 +29,8 @@ final class DelayedSmtpEnvelope extends SmtpEnvelope
     private $recipientsSet = false;
     private $message;
 
-    public function __construct(RawMessage $message)
+    public function __construct(Message $message)
     {
-        if (!$message instanceof Message) {
-            // FIXME: parse the raw message to create the envelope?
-            throw new InvalidArgumentException(sprintf('Unable to create an SmtpEnvelope from a "%s" message.', RawMessage::class));
-        }
-
         $this->message = $message;
     }
 

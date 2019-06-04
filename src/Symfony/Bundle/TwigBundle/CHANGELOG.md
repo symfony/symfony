@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * marked the `TemplateIterator` as `internal`
+
 4.2.0
 -----
 

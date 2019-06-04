@@ -301,7 +301,13 @@ trait HttpClientTrait
         }
 
         try {
-            $value = json_encode($value, $flags | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0), $maxDepth);
+            if (\PHP_VERSION_ID >= 70300) {
+                // Work around https://bugs.php.net/77997
+                json_encode(null);
+                $flags |= JSON_THROW_ON_ERROR;
+            }
+
+            $value = json_encode($value, $flags, $maxDepth);
         } catch (\JsonException $e) {
             throw new InvalidArgumentException(sprintf('Invalid value for "json" option: %s.', $e->getMessage()));
         }

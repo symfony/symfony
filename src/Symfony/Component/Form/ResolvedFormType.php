@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -92,7 +93,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     public function createBuilder(FormFactoryInterface $factory, $name, array $options = [])
     {
-        $options = $this->getOptionsResolver()->resolve($options);
+        try {
+            $options = $this->getOptionsResolver()->resolve($options);
+        } catch (ExceptionInterface $e) {
+            throw new $e(sprintf('An error has occurred resolving the options of the form "%s": %s', \get_class($this->getInnerType()), $e->getMessage()), $e->getCode(), $e);
+        }
 
         // Should be decoupled from the specific option at some point
         $dataClass = isset($options['data_class']) ? $options['data_class'] : null;

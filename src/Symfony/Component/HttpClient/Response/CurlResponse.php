@@ -167,6 +167,7 @@ final class CurlResponse implements ResponseInterface
             if (!\in_array(curl_getinfo($this->handle, CURLINFO_PRIVATE), ['headers', 'content'], true)) {
                 rewind($this->debugBuffer);
                 $info['debug'] = stream_get_contents($this->debugBuffer);
+                curl_setopt($this->handle, CURLOPT_VERBOSE, false);
                 fclose($this->debugBuffer);
                 $this->debugBuffer = null;
                 $this->finalInfo = $info;

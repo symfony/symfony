@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-16T14:36:39Z
+
+Not sure why Appveyor fails. Not related to this change.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-16T15:09:20Z
+
+I accidentally said it contained deprecations but it doesn't. Carson doesn't remove the label now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-18T16:08:26Z
+
+I like this idea a **lot**!
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-20T07:19:51Z
+
+> I like this idea a **lot**!
+
+@fabpot Great, Anything I need to change to accept this?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-05-23T15:01:13Z
+
+Great idea!
+I wonder, does it even need to be within the `<html>` tag, or can't it simply be first and last lines?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-23T15:53:04Z
+
+> I wonder, does it even need to be within the `<html>` tag, or can't it simply be first and last lines?
+
+I think that would be a lot nicer indeed, first and last line. What do others think?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-23T15:56:32Z
+
+Another idea:
+```html
+<html><head><meta charset="UTF-8">
+<!-- Notice: Undefined index: payouts in /Volumes/CS/www/src/Generated/GraphQL/Query/TransactionList/Data.php line 33 (500 Internal Server Error) -->
+```
+
+put the first 3 tags on 1 line, so that the comment is on line 2.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-05-23T19:07:02Z
+
+the issue raised by @mpdude in https://github.com/symfony/symfony/pull/31514#discussion_r284902251 relates to possible [Codepage Sniffing](https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/dd565635(v=vs.85))
+
+AFAIK it's safe to put it on first line, as we set the charset already
+
+https://github.com/symfony/symfony/blob/63d730920b43ee5355c6ff3a730fc67a8c325db7/src/Symfony/Component/HttpFoundation/Response.php#L280
+
+moreover, it's always a comment, so no encoding-rendering issues involved.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-24T08:19:36Z
+
+Changed it to this now:
+```html
+<!-- Notice: Undefined index: payouts in /Volumes/CS/www/src/Generated/GraphQL/Query/TransactionList/Data.php line 33 (500 Internal Server Error) -->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="robots" content="noindex,nofollow">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>    Notice: Undefined index: payouts in /Volumes/CS/www/src/Generated/GraphQL/Query/TransactionList/Data.php line 33 (500 Internal Server Error)
+</title>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAADVUlEQVRIx82XX0jTURTHLYPyqZdefQx66CEo80+aYpoIkqzUikz6Z5klQoWUWYRIJYEUGpQ+lIr9U5dOTLdCtkmWZis3rbnC5fw/neYW002307mX/cZvP3/7o1PwwOdh95x7vnf39zvnd29AgBer2xO6DclAXiMqZAqxIiNIN/IYSUS2BPhjmGATchUxI+ADWiRhpWK7HKuHFVBFdmU5YvnI4grFGCaReF/EBH4KsZlGgj2JBTuCYBWRIYF8YoEOJ6wBt/gEs7mBbyOjQXruPLSdOgPCiEiPSUUHDoL8Ug5IUo9B/d5wrt+G7OAKNrODPuVdB6vRCIzN6SdBlpW9RIgk/1FeAXabzRlrUPVCS/JhbmwudztnGeeH9AyXBIwtmM3wLinZJZHifjHw2V+NBoRh+9ixQrbgbnaSIcl7cGea6hoXQbNe7za241oeO5Z0p42M4BV2EqP2D50wo+6HzvwC6C4sApNOR8cmOrtcnhtj2kYRyC9eBvXzKrBZrXSs72kFd1t3MoKVbMekQkEnSNKOO8fac3LpmK6l1TlGtsxmsdKFsecPYgwxst0cwROMYDXboSotg0WLBRqjY51jLYcENElXwW2XJKPydvoI2GN9T8rBtrAArYIUruBJXkFheCQYlCpQP6uk5dAQFQNaUROMSGVQFxLmkoQsxDJrhLbTZ+nvVsERME9MgPJRKV/58AsyomTSzE813WLFvWK++qI0xSfQl8k8Pg46sYRuv5t6dS+4RqxDwaa4BGjYH+NTQvKScIp9+YL/hoZh3jDtLRHtt2C3g6bmhX+CpsFBWg7ilDSPgj0lD2ncr5ev/BP8VvyAJhqVyZeUhPOrEhEFxgEtjft846Z/guQTNT89Q5P9flMLoth4F7808wKtWWKzAwNQHxrh/1vaid2F+XpYTSbQf1XA2McOmOpROnvpvMEA4tSjq1cW0sws2gCYxswY6TKkvzYnJq1NHZLnRU4BX+4U0uburvusu8Kv8iHY7qefkM4IFngJHEOUXmLEPgiGsI8YnlZILit3vSSLRTQe/MPIZva5pshNIEmyFQlCvruJKXPkCEfmePzkphXHdzZNQdoRI9KPlBAxlj/I8U97ERPS5bjGbWDFbEdqHVe5caTBeZZx2H/IMvzeN15yoQAAAABJRU5ErkJggg==%0A">
+
+       <!-- ... clip ... -->
+
+    Sfjs.addEventListener(document, 'DOMContentLoaded', function() {
+        Sfjs.createTabs();
+        Sfjs.createToggles();
+        Sfjs.createFilters();
+    });
+
+/*]]>*/</script>
+
+    </body>
+</html>
+<!-- Notice: Undefined index: payouts in /Volumes/CS/www/src/Generated/GraphQL/Query/TransactionList/Data.php line 33 (500 Internal Server Error) -->
+```
+
+---------------------------------------------------------------------------
+
+by mpdude at 2019-05-30T15:28:14Z
+
+Is it really *that* important to have the comments at the very first and last line to risk any quirks with having comments outside the <html> tags?
+
+If I got this right, it’s about getting developer-readable error messages also when you look at the html source of the error page or got it with `curl`.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2019-05-30T18:08:53Z
+
+It makes it a lot easier to quickly read, yes.
+
+I don't think there are rendering issues. Plus, these pages are only shown for developers.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-04T06:31:56Z
+
+Let's merge as is. We can tweak later on if some report issues with that.

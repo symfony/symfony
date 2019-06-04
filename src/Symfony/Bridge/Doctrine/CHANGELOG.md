@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added `DoctrineClearEntityManagerMiddleware`
+
+
 4.3.0
 -----
 

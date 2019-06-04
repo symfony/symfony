@@ -175,6 +175,22 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
+     * Check for known terminal emulators who don't support hyperlinks
+     * @return bool
+     */
+    private function checkHrefSupport():bool
+    {
+        if ('JetBrains-JediTerm' === getenv('TERMINAL_EMULATOR')) {
+            return false;
+        }
+        if (getenv('KONSOLE_VERSION')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Applies the style to a given text.
      *
      * @param string $text The text to style
@@ -187,7 +203,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $unsetCodes = [];
 
         if (null === $this->handlesHrefGracefully) {
-            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR');
+            $this->handlesHrefGracefully = $this->checkHrefSupport();
         }
 
         if (null !== $this->foreground) {

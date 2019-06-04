@@ -140,6 +140,9 @@ final class SocketStream extends AbstractStream
         if ($this->streamContextOptions) {
             $options = array_merge($options, $this->streamContextOptions);
         }
+        if ($this->isTLS()) {
+            $options['ssl']['crypto_method'] = $options['ssl']['crypto_method'] ?? STREAM_CRYPTO_METHOD_TLS_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+        }
         $streamContext = stream_context_create($options);
         $this->stream = @stream_socket_client($this->url, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $streamContext);
         if (false === $this->stream) {

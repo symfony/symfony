@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mailer\DelayedSmtpEnvelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -62,7 +63,7 @@ abstract class AbstractTransport implements TransportInterface
             $envelope = clone $envelope;
         } else {
             try {
-                $envelope = SmtpEnvelope::create($message);
+                $envelope = new DelayedSmtpEnvelope($message);
             } catch (\Exception $e) {
                 throw new TransportException('Cannot send message without a valid envelope.', 0, $e);
             }

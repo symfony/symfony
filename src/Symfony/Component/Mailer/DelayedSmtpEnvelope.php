@@ -1,0 +1,105 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Mailer;
+
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
+use Symfony\Component\Mailer\Exception\LogicException;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\RawMessage;
+
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @experimental in 4.3
+ *
+ * @internal
+ */
+final class DelayedSmtpEnvelope extends SmtpEnvelope
+{
+    private $senderSet = false;
+    private $recipientsSet = false;
+    private $message;
+
+    public function __construct(RawMessage $message)
+    {
+        if (!$message instanceof Message) {
+            // FIXME: parse the raw message to create the envelope?
+            throw new InvalidArgumentException(sprintf('Unable to create an SmtpEnvelope from a "%s" message.', RawMessage::class));
+        }
+
+        $this->message = $message;
+    }
+
+    public function setSender(Address $sender): void
+    {
+        parent::setSender($sender);
+
+        $this->senderSet = true;
+    }
+
+    public function getSender(): Address
+    {
+        if ($this->senderSet) {
+            return parent::getSender();
+        }
+
+        return self::getSenderFromHeaders($this->message->getHeaders());
+    }
+
+    public function setRecipients(array $recipients): void
+    {
+        parent::setRecipients($recipients);
+
+        $this->recipientsSet = parent::getRecipients();
+    }
+
+    /**
+     * @return Address[]
+     */
+    public function getRecipients(): array
+    {
+        if ($this->recipientsSet) {
+            return parent::getRecipients();
+        }
+
+        return self::getRecipientsFromHeaders($this->message->getHeaders());
+    }
+
+    private static function getRecipientsFromHeaders(Headers $headers): array
+    {
+        $recipients = [];
+        foreach (['to', 'cc', 'bcc'] as $name) {
+            foreach ($headers->getAll($name) as $header) {
+                $recipients = array_merge($recipients, $header->getAddresses());
+            }
+        }
+
+        return $recipients;
+    }
+
+    private static function getSenderFromHeaders(Headers $headers): Address
+    {
+        if ($return = $headers->get('Return-Path')) {
+            return $return->getAddress();
+        }
+        if ($sender = $headers->get('Sender')) {
+            return $sender->getAddress();
+        }
+        if ($from = $headers->get('From')) {
+            return $from->getAddresses()[0];
+        }
+
+        throw new LogicException('Unable to determine the sender of the message.');
+    }
+}

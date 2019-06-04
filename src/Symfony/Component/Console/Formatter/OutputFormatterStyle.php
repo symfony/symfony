@@ -175,10 +175,11 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Check for known terminal emulators who don't support hyperlinks
+     * Check for known terminal emulators who don't support hyperlinks.
+     *
      * @return bool
      */
-    private function checkHrefSupport():bool
+    private function checkHrefSupport(): bool
     {
         if ('JetBrains-JediTerm' === getenv('TERMINAL_EMULATOR')) {
             return false;

@@ -22,6 +22,8 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
+ * @method void cancel()
+ *
  * @experimental in 1.1
  */
 interface ResponseInterface
@@ -70,11 +72,6 @@ interface ResponseInterface
      * @throws ServerExceptionInterface      On a 5xx when $throw is true
      */
     public function toArray(bool $throw = true): array;
-
-    /**
-     * Cancels the response.
-     */
-    public function cancel(): void;
 
     /**
      * Returns info coming from the transport layer.

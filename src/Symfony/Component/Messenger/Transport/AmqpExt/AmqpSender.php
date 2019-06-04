@@ -50,12 +50,26 @@ class AmqpSender implements SenderInterface
             $delay = $delayStamp->getDelay();
         }
 
+        $amqpStamp = $envelope->last(AmqpStamp::class);
+        if (isset($encodedMessage['headers']['Content-Type'])) {
+            $contentType = $encodedMessage['headers']['Content-Type'];
+            unset($encodedMessage['headers']['Content-Type']);
+
+            $attributes = $amqpStamp ? $amqpStamp->getAttributes() : [];
+
+            if (!isset($attributes['content_type'])) {
+                $attributes['content_type'] = $contentType;
+
+                $amqpStamp = new AmqpStamp($amqpStamp ? $amqpStamp->getRoutingKey() : null, $amqpStamp ? $amqpStamp->getFlags() : AMQP_NOPARAM, $attributes);
+            }
+        }
+
         try {
             $this->connection->publish(
                 $encodedMessage['body'],
                 $encodedMessage['headers'] ?? [],
                 $delay,
-                $envelope->last(AmqpStamp::class)
+                $amqpStamp
             );
         } catch (\AMQPException $e) {
             throw new TransportException($e->getMessage(), 0, $e);

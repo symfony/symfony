@@ -81,7 +81,7 @@ final class DoctrineLoader implements LoaderInterface
             if (null === $constraint) {
                 if (isset($mapping['originalClass'])) {
                     $metadata->addPropertyConstraint($mapping['declaredField'], new Valid());
-                } else {
+                } elseif (property_exists($className, $mapping['fieldName'])) {
                     $metadata->addPropertyConstraint($mapping['fieldName'], new Length(['max' => $mapping['length']]));
                 }
             } elseif (null === $constraint->max) {

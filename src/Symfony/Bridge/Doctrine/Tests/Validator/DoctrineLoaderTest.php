@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderParentEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\DoctrineLoader;
 use Symfony\Component\Validator\Constraints\Length;
@@ -75,10 +76,29 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame(10, $alreadyMappedMaxLengthConstraints[0]->max);
         $this->assertSame(1, $alreadyMappedMaxLengthConstraints[0]->min);
 
+        $publicParentMaxLengthMetadata = $classMetadata->getPropertyMetadata('publicParentMaxLength');
+        $this->assertCount(1, $publicParentMaxLengthMetadata);
+        $publicParentMaxLengthConstraints = $publicParentMaxLengthMetadata[0]->getConstraints();
+        $this->assertCount(1, $publicParentMaxLengthConstraints);
+        $this->assertInstanceOf(Length::class, $publicParentMaxLengthConstraints[0]);
+        $this->assertSame(35, $publicParentMaxLengthConstraints[0]->max);
+
         $embeddedMetadata = $classMetadata->getPropertyMetadata('embedded');
         $this->assertCount(1, $embeddedMetadata);
         $this->assertSame(CascadingStrategy::CASCADE, $embeddedMetadata[0]->getCascadingStrategy());
         $this->assertSame(TraversalStrategy::IMPLICIT, $embeddedMetadata[0]->getTraversalStrategy());
+
+        $parentClassMetadata = $validator->getMetadataFor(new DoctrineLoaderParentEntity());
+
+        $publicParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('publicParentMaxLength');
+        $this->assertCount(0, $publicParentMaxLengthMetadata);
+
+        $privateParentMaxLengthMetadata = $parentClassMetadata->getPropertyMetadata('privateParentMaxLength');
+        $this->assertCount(1, $privateParentMaxLengthMetadata);
+        $privateParentMaxLengthConstraints = $privateParentMaxLengthMetadata[0]->getConstraints();
+        $this->assertCount(1, $privateParentMaxLengthConstraints);
+        $this->assertInstanceOf(Length::class, $privateParentMaxLengthConstraints[0]);
+        $this->assertSame(30, $privateParentMaxLengthConstraints[0]->max);
 
         $embeddedClassMetadata = $validator->getMetadataFor(new DoctrineLoaderEmbed());
 

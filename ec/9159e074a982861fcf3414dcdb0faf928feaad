@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by rpkamp at 2019-05-25T11:56:33Z
+
+Liking the name `MigratingPasswordEncoder`. Much better than `ChainedPasswordEncoder` - it conveys much more intent! :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-04T06:41:37Z
+
+Rebased, ready.

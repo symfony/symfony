@@ -221,6 +221,11 @@ FrameworkBundle
  * Removed the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.
  * Removed support for `templating` engine in `TemplateController`, use Twig instead
 
+HttpClient
+----------
+
+ * Added method `cancel()` to `ResponseInterface`
+
 HttpFoundation
 --------------
 

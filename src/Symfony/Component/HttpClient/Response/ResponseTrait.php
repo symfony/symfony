@@ -170,6 +170,15 @@ trait ResponseTrait
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function cancel(): void
+    {
+        $this->info['error'] = 'Response has been canceled.';
+        $this->close();
+    }
+
+    /**
      * Closes the response and all its network handles.
      */
     abstract protected function close(): void;

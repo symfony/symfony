@@ -25,6 +25,11 @@ DependencyInjection
        factory: ['@factory_service', method]
    ```
 
+HttpClient
+----------
+
+ * Added method `cancel()` to `ResponseInterface`
+
 Messenger
 ---------
 

@@ -28,15 +28,10 @@ final class MessageConverter
     /**
      * @throws RuntimeException when unable to convert the message to an email
      */
-    public static function toEmail(RawMessage $message): Email
+    public static function toEmail(Message $message): Email
     {
         if ($message instanceof Email) {
             return $message;
-        }
-
-        if (RawMessage::class === \get_class($message)) {
-            // FIXME: parse the raw message to create the envelope?
-            throw new RuntimeException(sprintf('Unable to create an Email from an instance of "%s" as it is not supported yet.', RawMessage::class));
         }
 
         // try to convert to a "simple" Email instance

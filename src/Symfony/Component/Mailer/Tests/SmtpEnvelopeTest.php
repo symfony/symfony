@@ -91,10 +91,4 @@ class SmtpEnvelopeTest extends TestCase
         $e = SmtpEnvelope::create(new Message($headers));
         $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
     }
-
-    public function testCreateWithRawMessage()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        SmtpEnvelope::create(new RawMessage(''));
-    }
 }

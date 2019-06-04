@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2019-05-31T16:03:37Z
+
+@fabpot I'm getting a new error:
+
+> An email must have a "From" header
+
+I think it relates to the difference between "Sender" and "From" that I was mentioning (https://github.com/symfony/symfony/issues/31733#issuecomment-497456467) - though I'm far from an expert on this stuff. Should the `EnvelopeListener` set both sender *and* from? Or just the from, since the sender is derived from that?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-31T19:39:44Z
+
+"From" is what you write on the letter, "Sender" is what you write on the envelope. If you don't provide an envelope, we create one for you based on what you wrote on the letter. So, you must always provide a "From" (or register a MessageListener to do it for you -- will be part of the semantic configuration when available of course).

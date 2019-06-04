@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * UserPasswordEncoderInterface is the interface for the password encoder service.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
+ *
+ * @method bool needsRehash(UserInterface $user, string $encoded)
  */
 interface UserPasswordEncoderInterface
 {

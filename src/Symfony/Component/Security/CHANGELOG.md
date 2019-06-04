@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * Added method `needsRehash()` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+
 4.3.0
 -----
 

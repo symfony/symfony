@@ -12,7 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\User\User;
 
 class UserPasswordEncoderTest extends TestCase
 {
@@ -67,5 +70,24 @@ class UserPasswordEncoderTest extends TestCase
 
         $isValid = $passwordEncoder->isPasswordValid($userMock, 'plainPassword');
         $this->assertTrue($isValid);
+    }
+
+    public function testNeedsRehash()
+    {
+        $user = new User('username', null);
+        $encoder = new NativePasswordEncoder(4, 20000, 4);
+
+        $mockEncoderFactory = $this->getMockBuilder(EncoderFactoryInterface::class)->getMock();
+        $mockEncoderFactory->expects($this->any())
+            ->method('getEncoder')
+            ->with($user)
+            ->will($this->onConsecutiveCalls($encoder, $encoder, new NativePasswordEncoder(5, 20000, 5), $encoder));
+
+        $passwordEncoder = new UserPasswordEncoder($mockEncoderFactory);
+
+        $hash = $passwordEncoder->encodePassword($user, 'foo', 'salt');
+        $this->assertFalse($passwordEncoder->needsRehash($user, $hash));
+        $this->assertTrue($passwordEncoder->needsRehash($user, $hash));
+        $this->assertFalse($passwordEncoder->needsRehash($user, $hash));
     }
 }

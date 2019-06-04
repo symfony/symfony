@@ -55,6 +55,10 @@ switch ($vars['REQUEST_URI']) {
         header('Location: http://foo.example.', true, 301);
         break;
 
+    case '/301/invalid':
+        header('Location: //?foo=bar', true, 301);
+        break;
+
     case '/302':
         if (!isset($vars['HTTP_AUTHORIZATION'])) {
             header('Location: http://localhost:8057/', true, 302);

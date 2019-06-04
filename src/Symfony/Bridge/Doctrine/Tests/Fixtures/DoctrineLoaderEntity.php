@@ -55,4 +55,9 @@ class DoctrineLoaderEntity
      * @ORM\Column(unique=true)
      */
     public $alreadyMappedUnique;
+
+    /**
+     * @ORM\Embedded(class=DoctrineLoaderEmbed::class)
+     */
+    public $embedded;
 }

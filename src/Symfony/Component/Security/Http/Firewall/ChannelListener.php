@@ -22,12 +22,10 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class ChannelListener implements ListenerInterface
+class ChannelListener
 {
-    use LegacyListenerTrait;
-
     private $map;
     private $authenticationEntryPoint;
     private $logger;

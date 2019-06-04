@@ -11,14 +11,12 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Firewall\AccessListener;
-use Symfony\Component\Security\Http\Firewall\LogoutListener;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Firewall uses a FirewallMap to register security listeners for the given
@@ -38,17 +36,12 @@ class Firewall implements EventSubscriberInterface
 
     public function __construct(FirewallMapInterface $map, EventDispatcherInterface $dispatcher)
     {
-        // the type-hint will be updated to the "EventDispatcherInterface" from symfony/contracts in 5.0
-
         $this->map = $map;
         $this->dispatcher = $dispatcher;
         $this->exceptionListeners = new \SplObjectStorage();
     }
 
-    /**
-     * @internal since Symfony 4.3
-     */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -56,11 +49,6 @@ class Firewall implements EventSubscriberInterface
 
         // register listeners for this firewall
         $listeners = $this->map->getListeners($event->getRequest());
-
-        if (3 !== \count($listeners)) {
-            @trigger_error(sprintf('Not returning an array of 3 elements from %s::getListeners() is deprecated since Symfony 4.2, the 3rd element must be an instance of %s or null.', FirewallMapInterface::class, LogoutListener::class), E_USER_DEPRECATED);
-            $listeners[2] = null;
-        }
 
         $authenticationListeners = $listeners[0];
         $exceptionListener = $listeners[1];
@@ -93,16 +81,9 @@ class Firewall implements EventSubscriberInterface
             }
         };
 
-        if ($event instanceof RequestEvent) {
-            $this->callListeners($event, $authenticationListeners());
-        } else {
-            $this->handleRequest($event, $authenticationListeners());
-        }
+        $this->callListeners($event, $authenticationListeners());
     }
 
-    /**
-     * @internal since Symfony 4.3
-     */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
         $request = $event->getRequest();
@@ -126,21 +107,8 @@ class Firewall implements EventSubscriberInterface
 
     protected function callListeners(RequestEvent $event, iterable $listeners)
     {
-        $this->handleRequest($event, $listeners);
-    }
-
-    /**
-     * @deprecated since Symfony 4.3, use callListeners instead
-     */
-    protected function handleRequest(GetResponseEvent $event, $listeners)
-    {
         foreach ($listeners as $listener) {
-            if (\is_callable($listener)) {
-                $listener($event);
-            } else {
-                @trigger_error(sprintf('Calling the "%s::handle()" method from the firewall is deprecated since Symfony 4.3, implement "__invoke()" instead.', \get_class($this)), E_USER_DEPRECATED);
-                $listener->handle($event);
-            }
+            $listener($event);
 
             if ($event->hasResponse()) {
                 break;

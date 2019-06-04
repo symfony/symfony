@@ -12,14 +12,10 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Http\Firewall;
-use Symfony\Component\Security\Http\Firewall\ExceptionListener;
-use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class FirewallTest extends TestCase
 {
@@ -110,34 +106,5 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
 
         $this->assertFalse($event->hasResponse());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not returning an array of 3 elements from Symfony\Component\Security\Http\FirewallMapInterface::getListeners() is deprecated since Symfony 4.2, the 3rd element must be an instance of Symfony\Component\Security\Http\Firewall\LogoutListener or null.
-     */
-    public function testMissingLogoutListener()
-    {
-        $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
-
-        $listener = $this->getMockBuilder(ExceptionListener::class)->disableOriginalConstructor()->getMock();
-        $listener
-            ->expects($this->once())
-            ->method('register')
-            ->with($this->equalTo($dispatcher))
-        ;
-
-        $request = new Request();
-
-        $map = $this->getMockBuilder(FirewallMapInterface::class)->getMock();
-        $map
-            ->expects($this->once())
-            ->method('getListeners')
-            ->with($this->equalTo($request))
-            ->willReturn([[], $listener])
-        ;
-
-        $firewall = new Firewall($map, $dispatcher);
-        $firewall->onKernelRequest(new RequestEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 }

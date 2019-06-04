@@ -24,12 +24,10 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class AnonymousAuthenticationListener implements ListenerInterface
+class AnonymousAuthenticationListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $secret;
     private $authenticationManager;

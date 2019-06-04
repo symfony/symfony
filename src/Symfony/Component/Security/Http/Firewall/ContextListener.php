@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -28,6 +27,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ContextListener manages the SecurityContext persistence through a session.
@@ -35,12 +35,10 @@ use Symfony\Component\Security\Http\Event\DeauthenticatedEvent;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class ContextListener implements ListenerInterface
+class ContextListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $sessionKey;
     private $logger;
@@ -64,18 +62,6 @@ class ContextListener implements ListenerInterface
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
         $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
-    }
-
-    /**
-     * Enables deauthentication during refreshUser when the user has changed.
-     *
-     * @param bool $logoutOnUserChange
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function setLogoutOnUserChange($logoutOnUserChange)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**

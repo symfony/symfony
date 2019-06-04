@@ -28,12 +28,10 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class LogoutListener implements ListenerInterface
+class LogoutListener
 {
-    use LegacyListenerTrait;
-
     private $tokenStorage;
     private $options;
     private $handlers;

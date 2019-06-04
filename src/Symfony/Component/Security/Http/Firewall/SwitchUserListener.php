@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -36,12 +35,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
-class SwitchUserListener implements ListenerInterface
+class SwitchUserListener
 {
-    use LegacyListenerTrait;
-
     const EXIT_VALUE = '_exit';
 
     private $tokenStorage;
@@ -69,7 +66,7 @@ class SwitchUserListener implements ListenerInterface
         $this->usernameParameter = $usernameParameter;
         $this->role = $role;
         $this->logger = $logger;
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
         $this->stateless = $stateless;
     }
 

@@ -7,6 +7,7 @@ CHANGELOG
  * removed the first and second constructor argument of `ConfigDataCollector` 
  * removed `ConfigDataCollector::getApplicationName()` 
  * removed `ConfigDataCollector::getApplicationVersion()`
+ * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
 
 4.3.0
 -----

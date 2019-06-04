@@ -37,7 +37,6 @@ class AbstractControllerTest extends ControllerTraitTest
             'serializer' => '?Symfony\\Component\\Serializer\\SerializerInterface',
             'session' => '?Symfony\\Component\\HttpFoundation\\Session\\SessionInterface',
             'security.authorization_checker' => '?Symfony\\Component\\Security\\Core\\Authorization\\AuthorizationCheckerInterface',
-            'templating' => '?Symfony\\Component\\Templating\\EngineInterface',
             'twig' => '?Twig\\Environment',
             'doctrine' => '?Doctrine\\Common\\Persistence\\ManagerRegistry',
             'form.factory' => '?Symfony\\Component\\Form\\FormFactoryInterface',

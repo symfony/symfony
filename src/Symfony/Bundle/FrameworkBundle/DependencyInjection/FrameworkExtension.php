@@ -197,23 +197,20 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
         if (!$container->hasParameter('debug.file_link_format')) {
-            if (!$container->hasParameter('templating.helper.code.file_link_format')) {
-                $links = [
-                    'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                    'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-                    'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-                    'sublime' => 'subl://open?url=file://%%f&line=%%l',
-                    'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
-                    'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
-                    'vscode' => 'vscode://file/%%f:%%l',
-                ];
-                $ide = $config['ide'];
-                // mark any env vars found in the ide setting as used
-                $container->resolveEnvPlaceholders($ide);
+            $links = [
+                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                'sublime' => 'subl://open?url=file://%%f&line=%%l',
+                'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
+                'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
+                'vscode' => 'vscode://file/%%f:%%l',
+            ];
+            $ide = $config['ide'];
+            // mark any env vars found in the ide setting as used
+            $container->resolveEnvPlaceholders($ide);
 
-                $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
-            }
-            $container->setParameter('debug.file_link_format', '%templating.helper.code.file_link_format%');
+            $container->setParameter('debug.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
         }
 
         if (!empty($config['test'])) {
@@ -267,16 +264,6 @@ class FrameworkExtension extends Extension
             }
 
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
-        }
-
-        if ($this->isConfigEnabled($container, $config['templating'])) {
-            @trigger_error('Enabling the Templating component is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
-
-            if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
-                throw new LogicException('Templating support cannot be enabled as the Templating component is not installed. Try running "composer require symfony/templating".');
-            }
-
-            $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
         if ($this->messengerConfigEnabled = $this->isConfigEnabled($container, $config['messenger'])) {
@@ -493,9 +480,6 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('fragment.renderer.hinclude');
 
             return;
-        }
-        if ($container->hasParameter('fragment.renderer.hinclude.global_template') && null !== $container->getParameter('fragment.renderer.hinclude.global_template') && null !== $config['hinclude_default_template']) {
-            throw new \LogicException('You cannot set both "templating.hinclude_default_template" and "fragments.hinclude_default_template", please only use "fragments.hinclude_default_template".');
         }
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
@@ -910,85 +894,6 @@ class FrameworkExtension extends Extension
 
             $listener = $container->getDefinition('request.add_request_formats_listener');
             $listener->replaceArgument(0, $config['formats']);
-        }
-    }
-
-    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
-    {
-        $loader->load('templating.xml');
-
-        $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
-
-        if ($container->getParameter('kernel.debug')) {
-            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
-
-            $container->getDefinition('templating.loader.cache')
-                ->addTag('monolog.logger', ['channel' => 'templating'])
-                ->addMethodCall('setLogger', [$logger]);
-            $container->getDefinition('templating.loader.chain')
-                ->addTag('monolog.logger', ['channel' => 'templating'])
-                ->addMethodCall('setLogger', [$logger]);
-        }
-
-        if (!empty($config['loaders'])) {
-            $loaders = array_map(function ($loader) { return new Reference($loader); }, $config['loaders']);
-
-            // Use a delegation unless only a single loader was registered
-            if (1 === \count($loaders)) {
-                $container->setAlias('templating.loader', (string) reset($loaders))->setPrivate(true);
-            } else {
-                $container->getDefinition('templating.loader.chain')->addArgument($loaders);
-                $container->setAlias('templating.loader', 'templating.loader.chain')->setPrivate(true);
-            }
-        }
-
-        $container->setParameter('templating.loader.cache.path', null);
-        if (isset($config['cache'])) {
-            // Wrap the existing loader with cache (must happen after loaders are registered)
-            $container->setDefinition('templating.loader.wrapped', $container->findDefinition('templating.loader'));
-            $loaderCache = $container->getDefinition('templating.loader.cache');
-            $container->setParameter('templating.loader.cache.path', $config['cache']);
-
-            $container->setDefinition('templating.loader', $loaderCache);
-        }
-
-        $container->setParameter('templating.engines', $config['engines']);
-        $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
-
-        // Use a delegation unless only a single engine was registered
-        if (1 === \count($engines)) {
-            $container->setAlias('templating', (string) reset($engines))->setPublic(true);
-        } else {
-            $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
-            foreach ($engines as $engine) {
-                $templateEngineDefinition->addMethodCall('addEngine', [$engine]);
-            }
-            $container->setAlias('templating', 'templating.engine.delegating')->setPublic(true);
-        }
-
-        $container->getDefinition('fragment.renderer.hinclude')
-            ->addTag('kernel.fragment_renderer', ['alias' => 'hinclude'])
-            ->replaceArgument(0, new Reference('templating'))
-        ;
-
-        // configure the PHP engine if needed
-        if (\in_array('php', $config['engines'], true)) {
-            $loader->load('templating_php.xml');
-
-            $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
-
-            if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
-                $loader->load('templating_debug.xml');
-
-                $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
-                $container->setAlias('debug.templating.engine.php', 'templating.engine.php')->setPrivate(true);
-            }
-
-            if ($container->has('assets.packages')) {
-                $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
-            } else {
-                $container->removeDefinition('templating.helper.assets');
-            }
         }
     }
 

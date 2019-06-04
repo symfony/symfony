@@ -15,6 +15,7 @@ CHANGELOG
  * calling to `FormRenderer::searchAndRenderBlock()` method for fields which were already rendered throw a `BadMethodCallException`
  * removed the `regions` option of the `TimezoneType`
  * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
+ * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
 
 4.3.0
 -----

@@ -26,7 +26,7 @@
         </service>
 
         <service id="fragment.renderer.hinclude" class="Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer">
-            <argument /> <!-- templating or Twig service -->
+            <argument type="service" id="twig" on-invalid="null" />
             <argument type="service" id="uri_signer" />
             <argument>%fragment.renderer.hinclude.global_template%</argument>
             <call method="setFragmentPath"><argument>%fragment.path%</argument></call>

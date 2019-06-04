@@ -32,17 +32,16 @@
         "symfony/finder": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
         "symfony/routing": "^4.4|^5.0",
-        "symfony/templating": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
-        "symfony/framework-bundle": "^4.4|^5.0",
+        "symfony/framework-bundle": "^5.0",
         "symfony/web-link": "^4.4|^5.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
     "conflict": {
         "symfony/dependency-injection": "<4.4",
-        "symfony/framework-bundle": "<4.4",
+        "symfony/framework-bundle": "<5.0",
         "symfony/translation": "<4.4"
     },
     "autoload": {

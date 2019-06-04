@@ -31,6 +31,11 @@ class JsonFileDumper extends FileDumper
             $flags = \defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0;
         }
 
+        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $flags)) {
+            // Work around https://bugs.php.net/77997
+            json_encode(null);
+        }
+
         return json_encode($messages->all($domain), $flags);
     }
 

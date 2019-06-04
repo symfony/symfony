@@ -153,6 +153,11 @@ class JsonResponse extends Response
                     restore_error_handler();
                 }
             } else {
+                if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $this->encodingOptions)) {
+                    // Work around https://bugs.php.net/77997
+                    json_encode(null);
+                }
+
                 try {
                     $data = json_encode($data, $this->encodingOptions);
                 } catch (\Exception $e) {

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added the `compared_value_path` parameter in violations when using any 
+   comparison constraint with the `propertyPath` option.
+
 4.3.0
 -----
 

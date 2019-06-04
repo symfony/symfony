@@ -77,12 +77,17 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         }
 
         if (!$this->compareValues($value, $comparedValue)) {
-            $this->context->buildViolation($constraint->message)
+            $violationBuilder = $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE))
                 ->setParameter('{{ compared_value }}', $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE))
                 ->setParameter('{{ compared_value_type }}', $this->formatTypeOf($comparedValue))
-                ->setCode($this->getErrorCode())
-                ->addViolation();
+                ->setCode($this->getErrorCode());
+
+            if (null !== $path) {
+                $violationBuilder->setParameter('{{ compared_value_path }}', $path);
+            }
+
+            $violationBuilder->addViolation();
         }
     }
 

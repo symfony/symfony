@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-04T09:12:28Z
+
+The method signatures in the `Logger` class are not compatible with the interface from the HttpKernel component 5.0 (see the currently failing tests).

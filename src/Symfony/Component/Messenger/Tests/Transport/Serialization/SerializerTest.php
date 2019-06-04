@@ -55,7 +55,8 @@ class SerializerTest extends TestCase
         $this->assertArrayHasKey('body', $encoded);
         $this->assertArrayHasKey('headers', $encoded);
         $this->assertArrayHasKey('type', $encoded['headers']);
-        $this->assertEquals(DummyMessage::class, $encoded['headers']['type']);
+        $this->assertSame(DummyMessage::class, $encoded['headers']['type']);
+        $this->assertSame('application/json', $encoded['headers']['Content-Type']);
     }
 
     public function testUsesTheCustomFormatAndContext()

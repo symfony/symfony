@@ -69,6 +69,39 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
+    public function testContentTypeHeaderIsMovedToAttribute()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
+
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        unset($encoded['headers']['Content-Type']);
+        $stamp = new AmqpStamp(null, AMQP_NOPARAM, ['content_type' => 'application/json']);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testContentTypeHeaderDoesNotOverwriteAttribute()
+    {
+        $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new AmqpStamp('rk', AMQP_NOPARAM, ['content_type' => 'custom']));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
+
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
+        $serializer->method('encode')->with($envelope)->willReturnOnConsecutiveCalls($encoded);
+
+        $connection = $this->getMockBuilder(Connection::class)->disableOriginalConstructor()->getMock();
+        unset($encoded['headers']['Content-Type']);
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
+
+        $sender = new AmqpSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
     /**
      * @expectedException \Symfony\Component\Messenger\Exception\TransportException
      */

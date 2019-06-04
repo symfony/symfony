@@ -72,12 +72,13 @@ class SmtpEnvelopeTest extends TestCase
         $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
     }
 
-    public function testSenderFromHeadersWithoutData()
+    public function testSenderFromHeadersWithoutFrom()
     {
-        $this->expectException(\LogicException::class);
         $headers = new Headers();
         $headers->addMailboxListHeader('To', ['from@symfony.com']);
-        SmtpEnvelope::create(new Message($headers));
+        $e = SmtpEnvelope::create($message = new Message($headers));
+        $message->getHeaders()->addMailboxListHeader('From', ['from@symfony.com']);
+        $this->assertEquals('from@symfony.com', $e->getSender()->getAddress());
     }
 
     public function testRecipientsFromHeaders()
@@ -89,11 +90,5 @@ class SmtpEnvelopeTest extends TestCase
         $headers->addMailboxListHeader('Bcc', ['bcc@symfony.com']);
         $e = SmtpEnvelope::create(new Message($headers));
         $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
-    }
-
-    public function testCreateWithRawMessage()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        SmtpEnvelope::create(new RawMessage(''));
     }
 }

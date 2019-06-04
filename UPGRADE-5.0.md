@@ -225,6 +225,10 @@ HttpClient
 ----------
 
  * Added method `cancel()` to `ResponseInterface`
+ * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+   has been removed.
+ * The `ControllerResolver` and `DelegatingLoader` classes have been made `final`.
+ * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been removed.
 
 HttpFoundation
 --------------

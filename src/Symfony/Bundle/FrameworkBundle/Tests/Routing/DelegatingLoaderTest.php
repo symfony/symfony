@@ -13,6 +13,10 @@ use Symfony\Component\Routing\RouteCollection;
 
 class DelegatingLoaderTest extends TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a "Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser" instance as first argument to "Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader::__construct()" is deprecated since Symfony 4.4, pass a "Symfony\Component\Config\Loader\LoaderResolverInterface" instance instead.
+     */
     public function testConstructorApi()
     {
         $controllerNameParser = $this->getMockBuilder(ControllerNameParser::class)
@@ -24,10 +28,6 @@ class DelegatingLoaderTest extends TestCase
 
     public function testLoadDefaultOptions()
     {
-        $controllerNameParser = $this->getMockBuilder(ControllerNameParser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $loaderResolver = $this->getMockBuilder(LoaderResolverInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,7 +46,7 @@ class DelegatingLoaderTest extends TestCase
             ->method('load')
             ->willReturn($routeCollection);
 
-        $delegatingLoader = new DelegatingLoader($controllerNameParser, $loaderResolver, ['utf8' => true]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver, ['utf8' => true]);
 
         $loadedRouteCollection = $delegatingLoader->load('foo');
         $this->assertCount(2, $loadedRouteCollection);

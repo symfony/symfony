@@ -63,7 +63,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
             ->willReturn('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction')
         ;
 
-        $resolver = $this->createControllerResolver(null, null, $parser);
+        $resolver = $this->createLegacyControllerResolver(null, null, $parser);
         $request = Request::create('/');
         $request->attributes->set('_controller', $shortName);
 
@@ -105,7 +105,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $container = new Container();
         $container->set(TestAbstractController::class, $controller);
 
-        $resolver = $this->createControllerResolver(null, $container);
+        $resolver = $this->createLegacyControllerResolver(null, $container);
 
         $request = Request::create('/');
         $request->attributes->set('_controller', TestAbstractController::class.'::fooAction');
@@ -127,7 +127,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $container = new Container();
         $container->set(DummyController::class, $controller);
 
-        $resolver = $this->createControllerResolver(null, $container);
+        $resolver = $this->createLegacyControllerResolver(null, $container);
 
         $request = Request::create('/');
         $request->attributes->set('_controller', DummyController::class.'::fooAction');
@@ -176,7 +176,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)
+    protected function createLegacyControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)
     {
         if (!$parser) {
             $parser = $this->createMockParser();
@@ -187,6 +187,15 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         }
 
         return new ControllerResolver($container, $parser, $logger);
+    }
+
+    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null)
+    {
+        if (!$container) {
+            $container = $this->createMockContainer();
+        }
+
+        return new ControllerResolver($container, $logger);
     }
 
     protected function createMockParser()

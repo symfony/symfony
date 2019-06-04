@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-05-29T19:29:22Z
+
+I've switched branch to 4.4, tests are green.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-04T06:59:15Z
+
+PR now includes `DoctrineClearEntityManagerMiddleware` as well.

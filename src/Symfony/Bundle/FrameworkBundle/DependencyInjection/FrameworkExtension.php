@@ -627,7 +627,7 @@ class FrameworkExtension extends Extension
 
             // Create places
             $places = array_column($workflow['places'], 'name');
-            $initialMarking = $workflow['initial_marking'] ?? $workflow['initial_place'] ?? [];
+            $initialMarking = $workflow['initial_marking'] ?? [];
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
@@ -639,17 +639,11 @@ class FrameworkExtension extends Extension
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
-                $markingStoreDefinition = new ChildDefinition('workflow.marking_store.'.$workflow['marking_store']['type']);
-                if ('method' === $workflow['marking_store']['type']) {
-                    $markingStoreDefinition->setArguments([
-                        'state_machine' === $type, //single state
-                        $workflow['marking_store']['property'],
-                    ]);
-                } else {
-                    foreach ($workflow['marking_store']['arguments'] as $argument) {
-                        $markingStoreDefinition->addArgument($argument);
-                    }
-                }
+                $markingStoreDefinition = new ChildDefinition('workflow.marking_store.method');
+                $markingStoreDefinition->setArguments([
+                    'state_machine' === $type, //single state
+                    $workflow['marking_store']['property'],
+                ]);
             } elseif (isset($workflow['marking_store']['service'])) {
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
             }
@@ -668,29 +662,19 @@ class FrameworkExtension extends Extension
             $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name.'.'.$type);
 
             // Validate Workflow
-            $validator = null;
-            switch (true) {
-                case 'state_machine' === $workflow['type']:
-                    $validator = new Workflow\Validator\StateMachineValidator();
-                    break;
-                case 'single_state' === ($workflow['marking_store']['type'] ?? null):
-                    $validator = new Workflow\Validator\WorkflowValidator(true);
-                    break;
-                case 'multiple_state' === ($workflow['marking_store']['type'] ?? false):
-                    $validator = new Workflow\Validator\WorkflowValidator(false);
-                    break;
+            $realDefinition = (new Workflow\DefinitionBuilder($places))
+                ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
+                    return $container->get((string) $ref);
+                }, $transitions))
+                ->setInitialPlace($initialMarking)
+                ->build()
+            ;
+            if ('state_machine' === $workflow['type']) {
+                $validator = new Workflow\Validator\StateMachineValidator();
+            } else {
+                $validator = new Workflow\Validator\WorkflowValidator();
             }
-
-            if ($validator) {
-                $realDefinition = (new Workflow\DefinitionBuilder($places))
-                    ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
-                        return $container->get((string) $ref);
-                    }, $transitions))
-                    ->setInitialPlace($initialMarking)
-                    ->build()
-                ;
-                $validator->validate($realDefinition, $name);
-            }
+            $validator->validate($realDefinition, $name);
 
             // Add workflow to Registry
             if ($workflow['supports']) {

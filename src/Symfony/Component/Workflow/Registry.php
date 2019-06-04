@@ -12,7 +12,6 @@
 namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
-use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 
 /**

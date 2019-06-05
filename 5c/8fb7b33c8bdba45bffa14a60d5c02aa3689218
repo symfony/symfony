@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-29T11:38:44Z
+
+Thanks, please rebase and retarget for branch 4.4, as we don't add deprecations on other branches.
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-05-29T14:43:51Z
+
+@nicolas-grekas  Done
+Even if I'm not sure of what I have done :/
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-04T06:02:58Z
+
+@dFayet It looks like your merged a branch here. It makes the pull request not-mergeable on our side. Can you rebase your branch (it will remove the merge commit)?
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-06-04T09:08:56Z
+
+@fabpot done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-04T10:06:13Z
+
+Can you have a look at the tests, they seem to be broken because of these changes (low).
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-06-04T15:20:23Z
+
+@fabpot Done for low. Is there anything to be done for the high one?

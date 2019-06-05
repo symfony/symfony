@@ -48,11 +48,6 @@ abstract class ObjectRouteLoader extends Loader
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method" or "service" if your service has an "__invoke" method.', $resource));
         }
 
-        if (1 === substr_count($resource, ':')) {
-            $resource = str_replace(':', '::', $resource);
-            @trigger_error(sprintf('Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use %s instead.', $resource), E_USER_DEPRECATED);
-        }
-
         $parts = explode('::', $resource);
         $serviceString = $parts[0];
         $method = $parts[1] ?? '__invoke';

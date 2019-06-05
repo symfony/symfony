@@ -78,10 +78,9 @@ class Route implements \Serializable
     }
 
     /**
-     * @internal since Symfony 4.3
-     * @final since Symfony 4.3
+     * @internal
      */
-    public function serialize()
+    final public function serialize()
     {
         return serialize($this->__serialize());
     }
@@ -105,10 +104,9 @@ class Route implements \Serializable
     }
 
     /**
-     * @internal since Symfony 4.3
-     * @final since Symfony 4.3
+     * @internal
      */
-    public function unserialize($serialized)
+    final public function unserialize($serialized)
     {
         $this->__unserialize(unserialize($serialized));
     }

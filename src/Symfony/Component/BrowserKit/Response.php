@@ -13,17 +13,12 @@ namespace Symfony\Component\BrowserKit;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 4.3
  */
-class Response
+final class Response
 {
-    /** @internal */
-    protected $content;
-    /** @internal */
-    protected $status;
-    /** @internal */
-    protected $headers;
+    private $content;
+    private $status;
+    private $headers;
 
     /**
      * The headers array is a set of key/value pairs. If a header is present multiple times
@@ -62,23 +57,6 @@ class Response
     }
 
     /**
-     * Returns the build header line.
-     *
-     * @param string $name  The header name
-     * @param string $value The header value
-     *
-     * @return string The built header line
-     *
-     * @deprecated since Symfony 4.3
-     */
-    protected function buildHeader($name, $value)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
-
-        return sprintf("%s: %s\n", $name, $value);
-    }
-
-    /**
      * Gets the response content.
      *
      * @return string The response content
@@ -86,20 +64,6 @@ class Response
     public function getContent()
     {
         return $this->content;
-    }
-
-    /**
-     * Gets the response status code.
-     *
-     * @return int The response status code
-     *
-     * @deprecated since Symfony 4.3, use getStatusCode() instead
-     */
-    public function getStatus()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.3, use getStatusCode() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->status;
     }
 
     public function getStatusCode(): int

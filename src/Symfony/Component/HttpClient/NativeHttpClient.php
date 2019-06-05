@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\NativeClientState;
 use Symfony\Component\HttpClient\Response\NativeResponse;
@@ -352,7 +353,15 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 return null;
             }
 
-            $url = self::resolveUrl(self::parseUrl($location), $info['url']);
+            try {
+                $url = self::parseUrl($location);
+            } catch (InvalidArgumentException $e) {
+                $info['redirect_url'] = null;
+
+                return null;
+            }
+
+            $url = self::resolveUrl($url, $info['url']);
             $info['redirect_url'] = implode('', $url);
 
             if ($info['redirect_count'] >= $maxRedirects) {

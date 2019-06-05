@@ -22,7 +22,8 @@
         "symfony/options-resolver": "~4.3|^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/property-access": "^3.4|^4.0|^5.0"
+        "symfony/property-access": "^3.4|^4.0|^5.0",
+        "symfony/service-contracts": "~1.1"
     },
     "require-dev": {
         "doctrine/collections": "~1.0",

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,17 +33,12 @@ class ExceptionListener implements EventSubscriberInterface
     protected $controller;
     protected $logger;
     protected $debug;
-    private $charset;
-    private $fileLinkFormat;
-    private $isTerminating = false;
 
-    public function __construct($controller, LoggerInterface $logger = null, $debug = false, string $charset = null, $fileLinkFormat = null)
+    public function __construct($controller, LoggerInterface $logger = null, $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
-        $this->charset = $charset;
-        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
@@ -61,16 +55,9 @@ class ExceptionListener implements EventSubscriberInterface
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         if (null === $this->controller) {
-            if (!$event->isMasterRequest()) {
-                return;
-            }
-            if (!$this->isTerminating) {
-                $this->isTerminating = true;
-
-                return;
-            }
-            $this->isTerminating = false;
+            return;
         }
+
         $exception = $event->getException();
         $request = $this->duplicateRequest($exception, $event->getRequest());
         $eventDispatcher = \func_num_args() > 2 ? func_get_arg(2) : null;
@@ -105,11 +92,6 @@ class ExceptionListener implements EventSubscriberInterface
             };
             $eventDispatcher->addListener(KernelEvents::RESPONSE, $cspRemovalListener, -128);
         }
-    }
-
-    public function reset()
-    {
-        $this->isTerminating = false;
     }
 
     public static function getSubscribedEvents()
@@ -150,12 +132,8 @@ class ExceptionListener implements EventSubscriberInterface
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
         $attributes = [
-            'exception' => $exception = FlattenException::create($exception),
-            '_controller' => $this->controller ?: function () use ($exception) {
-                $handler = new ExceptionHandler($this->debug, $this->charset, $this->fileLinkFormat);
-
-                return new Response($handler->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders());
-            },
+            '_controller' => $this->controller,
+            'exception' => FlattenException::create($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         ];
         $request = $request->duplicate(null, null, $attributes);

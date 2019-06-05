@@ -316,8 +316,9 @@ Routing
 
  * The `generator_base_class`, `generator_cache_class`, `matcher_base_class`, and `matcher_cache_class` router
    options have been removed.
- * `Route` and `CompiledRoute` don't implement `Serializable` anymore; if you serialize them, please
-   ensure your unserialization logic can recover from a failure related to an updated serialization format
+ * `Serializable` implementing methods for `Route` and `CompiledRoute` are final.
+   Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
+   with the new serialization methods in PHP 7.4.
 
 Security
 --------

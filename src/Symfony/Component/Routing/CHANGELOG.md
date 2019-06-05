@@ -8,8 +8,9 @@ CHANGELOG
  * added `CompiledUrlGenerator` and `CompiledUrlGeneratorDumper`
  * deprecated `PhpGeneratorDumper` and `PhpMatcherDumper`
  * deprecated `generator_base_class`, `generator_cache_class`, `matcher_base_class` and `matcher_cache_class` router options
- * deprecated implementing `Serializable` for `Route` and `CompiledRoute`; if you serialize them, please
-   ensure your unserialization logic can recover from a failure related to an updated serialization format
+ * `Serializable` implementing methods for `Route` and `CompiledRoute` are marked as `@internal` and `@final`.
+   Instead of overwriting them, use `__serialize` and `__unserialize` as extension points which are forward compatible
+   with the new serialization methods in PHP 7.4.
  * exposed `utf8` Route option, defaults "locale" and "format" in configuration loaders and configurators
  * added support for invokable route loader services
 

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-04T11:44:56Z
+
+Oh, please also patch VarDumper, it has a similar check.
+
+---------------------------------------------------------------------------
+
+by belinde at 2019-06-04T13:01:38Z
+
+> Oh, please also patch VarDumper, it has a similar check.
+
+I'm on it. I've also noted that there was a test for TERMINAL_EMULATOR=JetBrains-JediTerm: should I add a test just for Konsole?
+
+And what should I do, just add another commit to the PR or I must close it and do another one with the two commits squashed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-04T13:03:17Z
+
+No tests is OK to me, this wouldn't make much sense.
+
+---------------------------------------------------------------------------
+
+by belinde at 2019-06-04T13:09:34Z
+
+Opened bug report to Konsole: https://bugs.kde.org/show_bug.cgi?id=408288
+Edited the description of the PR

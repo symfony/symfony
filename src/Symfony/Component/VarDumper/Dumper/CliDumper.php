@@ -435,7 +435,7 @@ class CliDumper extends AbstractDumper
         }
 
         if (null === $this->handlesHrefGracefully) {
-            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR');
+            $this->handlesHrefGracefully = 'JetBrains-JediTerm' !== getenv('TERMINAL_EMULATOR') && !getenv('KONSOLE_VERSION');
         }
 
         if (isset($attr['ellipsis'], $attr['ellipsis-type'])) {

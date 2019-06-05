@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpClient;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\CurlClientState;
 use Symfony\Component\HttpClient\Internal\PushedResponse;
@@ -392,14 +393,20 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
         }
 
         return static function ($ch, string $location) use ($redirectHeaders) {
-            if ($redirectHeaders && $host = parse_url($location, PHP_URL_HOST)) {
+            try {
+                $location = self::parseUrl($location);
+            } catch (InvalidArgumentException $e) {
+                return null;
+            }
+
+            if ($redirectHeaders && $host = parse_url('http:'.$location['authority'], PHP_URL_HOST)) {
                 $requestHeaders = $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
             }
 
             $url = self::parseUrl(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL));
 
-            return implode('', self::resolveUrl(self::parseUrl($location), $url));
+            return implode('', self::resolveUrl($location, $url));
         };
     }
 }

@@ -721,9 +721,6 @@ class FrameworkExtension extends Extension
             $container->setParameter('debug.error_handler.throw_at', 0);
         }
 
-        $definition->replaceArgument(4, $debug);
-        $definition->replaceArgument(6, $debug);
-
         if ($debug && class_exists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
             $definition->setPublic(false);

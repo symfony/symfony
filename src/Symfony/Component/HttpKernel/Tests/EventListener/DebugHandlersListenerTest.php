@@ -104,6 +104,7 @@ class DebugHandlersListenerTest extends TestCase
         $xListeners = [
             KernelEvents::REQUEST => [[$listener, 'configure']],
             ConsoleEvents::COMMAND => [[$listener, 'configure']],
+            KernelEvents::EXCEPTION => [[$listener, 'onKernelException']],
         ];
         $this->assertSame($xListeners, $dispatcher->getListeners());
 

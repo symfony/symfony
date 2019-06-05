@@ -36,12 +36,11 @@ class JsonEncode implements EncoderInterface
     {
         $context = $this->resolveContext($context);
 
-        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $context['json_encode_options'])) {
-            // Work around https://bugs.php.net/77997
-            json_encode(null);
-        }
-
         $encodedJson = json_encode($data, $context['json_encode_options']);
+
+        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $context['json_encode_options'])) {
+            return $encodedJson;
+        }
 
         if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new NotEncodableValueException(json_last_error_msg());

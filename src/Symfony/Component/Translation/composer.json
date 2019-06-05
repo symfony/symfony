@@ -35,6 +35,7 @@
     "conflict": {
         "symfony/config": "<4.4",
         "symfony/dependency-injection": "<4.4",
+        "symfony/twig-bundle": "<5.0",
         "symfony/yaml": "<4.4"
     },
     "provide": {

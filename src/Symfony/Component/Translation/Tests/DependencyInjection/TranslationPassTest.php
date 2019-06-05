@@ -68,7 +68,7 @@ class TranslationPassTest extends TestCase
             ->setArguments([null, null, null, null, null, null, [], []])
         ;
         $container->register('twig.template_iterator')
-            ->setArguments([null, null, ['other/templates' => null, 'tpl' => 'App']])
+            ->setArguments([null, ['other/templates' => null, 'tpl' => 'App']])
         ;
         $container->setParameter('twig.default_path', 'templates');
 
@@ -109,7 +109,7 @@ class TranslationPassTest extends TestCase
             ])
         ;
         $container->register('twig.template_iterator')
-            ->setArguments([null, null, ['other/templates' => null, 'tpl' => 'App']])
+            ->setArguments([null, ['other/templates' => null, 'tpl' => 'App']])
         ;
         $container->setParameter('twig.default_path', 'templates');
 

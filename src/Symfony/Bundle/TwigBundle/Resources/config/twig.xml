@@ -31,7 +31,6 @@
 
         <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">
             <argument type="service" id="kernel" />
-            <argument>%kernel.root_dir%</argument>
             <argument type="collection" /> <!-- Twig paths -->
             <argument>%twig.default_path%</argument>
         </service>

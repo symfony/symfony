@@ -32,7 +32,7 @@
         "symfony/finder": "^4.4|^5.0",
         "symfony/form": "^4.4|^5.0",
         "symfony/routing": "^4.4|^5.0",
-        "symfony/translation": "^4.4|^5.0",
+        "symfony/translation": "^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/framework-bundle": "^5.0",
         "symfony/web-link": "^4.4|^5.0",
@@ -42,7 +42,7 @@
     "conflict": {
         "symfony/dependency-injection": "<4.4",
         "symfony/framework-bundle": "<5.0",
-        "symfony/translation": "<4.4"
+        "symfony/translation": "<5.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },

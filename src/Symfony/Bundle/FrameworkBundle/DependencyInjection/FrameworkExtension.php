@@ -77,6 +77,12 @@ use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\StoreInterface;
+use Symfony\Component\Mailer\Bridge\Amazon\Factory\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Google\Factory\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Factory\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Factory\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Factory\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Factory\SendgridTransportFactory;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -1955,7 +1961,23 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
+        $loader->load('mailer_transports.xml');
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
+
+        $classToServices = [
+            SesTransportFactory::class => 'mailer.transport_factory.amazon',
+            GmailTransportFactory::class => 'mailer.transport_factory.gmail',
+            MandrillTransportFactory::class => 'mailer.transport_factory.mailchimp',
+            MailgunTransportFactory::class => 'mailer.transport_factory.mailgun',
+            PostmarkTransportFactory::class => 'mailer.transport_factory.postmark',
+            SendgridTransportFactory::class => 'mailer.transport_factory.sendgrid',
+        ];
+
+        foreach ($classToServices as $class => $service) {
+            if (!class_exists($class)) {
+                $container->removeDefinition($service);
+            }
+        }
 
         $recipients = $config['envelope']['recipients'] ?? null;
         $sender = $config['envelope']['sender'] ?? null;

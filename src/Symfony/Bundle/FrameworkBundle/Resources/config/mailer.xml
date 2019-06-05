@@ -12,12 +12,13 @@
         <service id="mailer" alias="mailer.mailer" />
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer" />
 
+        <service id="mailer.transport_factory" class="Symfony\Component\Mailer\Transport">
+            <argument type="tagged_iterator" tag="mailer.transport_factory" />
+        </service>
+
         <service id="mailer.default_transport" class="Symfony\Component\Mailer\Transport\TransportInterface">
-            <factory class="Symfony\Component\Mailer\Transport" method="fromDsn" />
+            <factory service="mailer.transport_factory" method="fromString" />
             <argument /> <!-- env(MAILER_DSN) -->
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="http_client" on-invalid="ignore" />
-            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Mailer\Transport\TransportInterface" alias="mailer.default_transport" />
 

@@ -58,7 +58,7 @@ interface PropertyAccessorInterface
      *
      *     $propertyAccessor = PropertyAccess::createPropertyAccessor();
      *
-     *     echo $propertyAccessor->getValue($object, 'child.name);
+     *     echo $propertyAccessor->getValue($object, 'child.name');
      *     // equals echo $object->getChild()->getName();
      *
      * This method first tries to find a public getter for each property in the

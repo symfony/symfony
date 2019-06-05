@@ -486,4 +486,17 @@ class EnvVarProcessorTest extends TestCase
 
         $this->assertEquals('foo', $result);
     }
+
+    public function testGetEnvSplit()
+    {
+        $processor = new EnvVarProcessor(new Container());
+
+        $result = $processor->getEnv('split', 'foo', function ($name) {
+            $this->assertSame('foo', $name);
+
+            return 'one,two,three';
+        });
+
+        $this->assertSame(['one', 'two', 'three'], $result);
+    }
 }

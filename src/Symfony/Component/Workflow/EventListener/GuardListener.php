@@ -80,17 +80,11 @@ class GuardListener
             throw new InvalidTokenConfigurationException(sprintf('There are no tokens available for workflow %s.', $event->getWorkflowName()));
         }
 
-        $roleNames = $token->getRoleNames();
-
-        if (null !== $this->roleHierarchy) {
-            $roleNames = $this->roleHierarchy->getReachableRoleNames($roleNames);
-        }
-
         $variables = [
             'token' => $token,
             'user' => $token->getUser(),
             'subject' => $event->getSubject(),
-            'role_names' => $roleNames,
+            'role_names' => $this->roleHierarchy->getReachableRoleNames($token->getRoleNames()),
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
             // needed for the is_* expression function

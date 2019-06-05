@@ -20,8 +20,6 @@
             <argument /> <!-- name -->
         </service>
 
-        <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
-        <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
         <service id="workflow.marking_store.method" class="Symfony\Component\Workflow\MarkingStore\MethodMarkingStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />

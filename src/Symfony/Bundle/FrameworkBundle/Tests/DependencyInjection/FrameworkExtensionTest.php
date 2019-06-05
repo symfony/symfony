@@ -279,46 +279,12 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testWorkflowLegacy()
-    {
-        $container = $this->createContainerFromFile('workflow-legacy');
-
-        $this->assertTrue($container->hasDefinition('state_machine.legacy'), 'Workflow is registered as a service');
-        $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.legacy')->getParent());
-        $this->assertTrue($container->hasDefinition('state_machine.legacy.definition'), 'Workflow definition is registered as a service');
-
-        $workflowDefinition = $container->getDefinition('state_machine.legacy.definition');
-
-        $this->assertSame(['draft'], $workflowDefinition->getArgument(2));
-
-        $this->assertSame(
-            [
-                'draft',
-                'published',
-            ],
-            $workflowDefinition->getArgument(0),
-            'Places are passed to the workflow definition'
-        );
-    }
-
-    /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage A transition from a place/state must have an unique name. Multiple transitions named "go" from place/state "first" where found on StateMachine "my_workflow".
      */
     public function testWorkflowAreValidated()
     {
         $this->createContainerFromFile('workflow_not_valid');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "type" and "service" cannot be used together.
-     */
-    public function testWorkflowCannotHaveBothTypeAndService()
-    {
-        $this->createContainerFromFile('workflow_legacy_with_type_and_service');
     }
 
     /**
@@ -337,16 +303,6 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
     {
         $this->createContainerFromFile('workflow_without_support_and_support_strategy');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "arguments" and "service" cannot be used together.
-     * @group legacy
-     */
-    public function testWorkflowCannotHaveBothArgumentsAndService()
-    {
-        $this->createContainerFromFile('workflow_legacy_with_arguments_and_service');
     }
 
     public function testWorkflowMultipleTransitionsWithSameName()
@@ -450,14 +406,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 
-    public function testExplicitlyEnabledWorkflows()
+    public function testWorkflowsExplicitlyEnabled()
     {
         $container = $this->createContainerFromFile('workflows_explicitly_enabled');
 
         $this->assertTrue($container->hasDefinition('workflow.foo.definition'));
     }
 
-    public function testExplicitlyEnabledWorkflowNamedWorkflows()
+    public function testWorkflowsNamedExplicitlyEnabled()
     {
         $container = $this->createContainerFromFile('workflows_explicitly_enabled_named_workflows');
 

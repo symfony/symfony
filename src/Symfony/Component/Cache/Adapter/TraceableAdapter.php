@@ -45,10 +45,10 @@ class TraceableAdapter implements AdapterInterface, CacheInterface, PruneableInt
         }
 
         $isHit = true;
-        $callback = function (CacheItem $item) use ($callback, &$isHit) {
+        $callback = function (CacheItem $item, bool &$save) use ($callback, &$isHit) {
             $isHit = $item->isHit();
 
-            return $callback($item);
+            return $callback($item, $save);
         };
 
         $event = $this->start(__FUNCTION__);

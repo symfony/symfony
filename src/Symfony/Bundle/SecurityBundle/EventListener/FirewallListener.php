@@ -15,6 +15,8 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\Security\Http\FirewallMapInterface;
@@ -41,8 +43,12 @@ class FirewallListener extends Firewall
     /**
      * @internal
      */
-    public function configureLogoutUrlGenerator(GetResponseEvent $event)
+    public function configureLogoutUrlGenerator(KernelEvent $event)
     {
+        if (GetResponseEvent::class === \get_class($event)) {
+            @trigger_error(sprintf('The %s event has been deprecated since Symfony 4.3 and will be replaced by %s event in Symfony 5.0.', GetResponseEvent::class, RequestEvent::class), E_USER_DEPRECATED);
+        }
+
         if (!$event->isMasterRequest()) {
             return;
         }

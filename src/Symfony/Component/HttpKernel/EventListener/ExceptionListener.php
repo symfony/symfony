@@ -17,7 +17,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -41,8 +43,12 @@ class ExceptionListener implements EventSubscriberInterface
         $this->debug = $debug;
     }
 
-    public function logKernelException(GetResponseForExceptionEvent $event)
+    public function logKernelException(KernelEvent $event)
     {
+        if (GetResponseForExceptionEvent::class === \get_class($event)) {
+            @trigger_error(sprintf('The %s event has been deprecated since Symfony 4.3 and will be replaced by %s event in Symfony 5.0.', GetResponseForExceptionEvent::class, ExceptionEvent::class), E_USER_DEPRECATED);
+        }
+
         $e = FlattenException::create($event->getException());
 
         $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
@@ -52,8 +58,12 @@ class ExceptionListener implements EventSubscriberInterface
      * @param string                   $eventName
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(KernelEvent $event)
     {
+        if (GetResponseForExceptionEvent::class === \get_class($event)) {
+            @trigger_error(sprintf('The %s event has been deprecated since Symfony 4.3 and will be replaced by %s event in Symfony 5.0.', GetResponseForExceptionEvent::class, ExceptionEvent::class), E_USER_DEPRECATED);
+        }
+
         if (null === $this->controller) {
             return;
         }

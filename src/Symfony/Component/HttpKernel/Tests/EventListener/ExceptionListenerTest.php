@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -124,6 +125,29 @@ class ExceptionListenerTest extends TestCase
         $request->setRequestFormat('xml');
 
         $event = new ExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('xml', $response->getContent());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent event has been deprecated since Symfony 4.3 and will be replaced by Symfony\Component\HttpKernel\Event\ExceptionEvent event in Symfony 5.0.
+     */
+    public function testPassingShouldTriggerDeprecated()
+    {
+        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+            return new Response($request->getRequestFormat());
+        });
+
+        $request = Request::create('/');
+        $request->setRequestFormat('xml');
+
+        $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);
 
         $response = $event->getResponse();

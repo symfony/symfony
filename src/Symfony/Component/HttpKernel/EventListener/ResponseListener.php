@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -34,8 +36,12 @@ class ResponseListener implements EventSubscriberInterface
     /**
      * Filters the Response.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(KernelEvent $event)
     {
+        if (FilterResponseEvent::class === \get_class($event)) {
+            @trigger_error(sprintf('The %s event has been deprecated since Symfony 4.3 and will be replaced by %s event in Symfony 5.0.', FilterResponseEvent::class, ResponseEvent::class), E_USER_DEPRECATED);
+        }
+
         if (!$event->isMasterRequest()) {
             return;
         }

@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -60,8 +62,12 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         return self::DISABLED !== $this->mode;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(KernelEvent $event)
     {
+        if (FilterResponseEvent::class === \get_class($event)) {
+            @trigger_error(sprintf('The %s event has been deprecated since Symfony 4.3 and will be replaced by %s event in Symfony 5.0.', FilterResponseEvent::class, ResponseEvent::class), E_USER_DEPRECATED);
+        }
+
         $response = $event->getResponse();
         $request = $event->getRequest();
 

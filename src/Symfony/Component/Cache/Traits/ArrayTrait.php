@@ -129,7 +129,7 @@ trait ArrayTrait
             } catch (\Exception $e) {
                 $type = \is_object($value) ? \get_class($value) : \gettype($value);
                 $message = sprintf('Failed to save key "{key}" of type %s: %s', $type, $e->getMessage());
-                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e]);
+                CacheItem::log($this->logger, $message, ['key' => $key, 'exception' => $e]);
 
                 return;
             }

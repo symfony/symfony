@@ -185,6 +185,12 @@ class JsonDescriptor extends Descriptor
     private function writeData(array $data, array $options)
     {
         $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+
+        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $flags)) {
+            // Work around https://bugs.php.net/77997
+            json_encode(null);
+        }
+
         $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 

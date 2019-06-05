@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-04T13:50:04Z
+
+@bpolaszek Looks like an unrelated commit is part of your PR now (from a PR I've just merged).
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-06-04T13:58:42Z
+
+@fabpot Yes, since travis and appveyor failed on my 2nd commit, I tried to rebase and it looks like it's all messed up... I'm trying again.
+
+---------------------------------------------------------------------------
+
+by bpolaszek at 2019-06-04T15:05:19Z
+
+Well, builds are still failing but I don't think it's related.

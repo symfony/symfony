@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-04T15:18:52Z
+
+I hit this too :)
+```sh
+composer create-project symfony/website-skeleton sf43w
+cd sf43w
+composer require symfony/mailer
+bin/console make:command tito
+# type-hint the new MailerInterface => BOOM
+```

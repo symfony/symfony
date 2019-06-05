@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-29T08:36:38Z
+
+Please submit ready PR on the topic, otherwise, we're going to collapse under the load.
+Please take time to properly fill in the PR template, cleanup tests (including unused fixtures, etc.)
+Removing legacy code might look like an easy task but it must be a very careful one.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-05T06:11:29Z
+
+@nicolas-grekas this is ready ! the big change is linked to the fact that I'm moving old `Client` class to the new `AbstractBrowser` class, the rest is test update :).

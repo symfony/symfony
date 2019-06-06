@@ -778,7 +778,7 @@ class FrameworkExtension extends Extension
         $loader->load('routing.xml');
 
         if ($config['utf8']) {
-            $container->getDefinition('routing.loader')->replaceArgument(2, ['utf8' => true]);
+            $container->getDefinition('routing.loader')->replaceArgument(1, ['utf8' => true]);
         }
 
         $container->setParameter('router.resource', $config['resource']);

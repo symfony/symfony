@@ -108,6 +108,16 @@ class DoctrineLoaderTest extends TestCase
         $this->assertCount(1, $embeddedMaxLengthConstraints);
         $this->assertInstanceOf(Length::class, $embeddedMaxLengthConstraints[0]);
         $this->assertSame(25, $embeddedMaxLengthConstraints[0]->max);
+
+        $this->assertCount(0, $classMetadata->getPropertyMetadata('guidField'));
+        $this->assertCount(0, $classMetadata->getPropertyMetadata('simpleArrayField'));
+
+        $textFieldMetadata = $classMetadata->getPropertyMetadata('textField');
+        $this->assertCount(1, $textFieldMetadata);
+        $textFieldConstraints = $textFieldMetadata[0]->getConstraints();
+        $this->assertCount(1, $textFieldConstraints);
+        $this->assertInstanceOf(Length::class, $textFieldConstraints[0]);
+        $this->assertSame(1000, $textFieldConstraints[0]->max);
     }
 
     public function testFieldMappingsConfiguration()

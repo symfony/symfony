@@ -277,11 +277,9 @@ class WebTestCaseTest extends TestCase
         return new class($client) extends WebTestCase {
             use WebTestAssertionsTrait;
 
-            protected static $client;
-
             public function __construct(KernelBrowser $client)
             {
-                static::$client = $client;
+                self::getClient($client);
             }
         };
     }

@@ -385,7 +385,7 @@ Validator
  * The `symfony/translation` dependency has been removed - run `composer require symfony/translation` if you need the component
  * The `checkMX` and `checkHost` options of the `Email` constraint are deprecated
  * The component is now decoupled from `symfony/translation` and uses `Symfony\Contracts\Translation\TranslatorInterface` instead
- * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder` made final
+ * The `ValidatorBuilderInterface` has been deprecated and `ValidatorBuilder::setTranslator()` has been made final
  * Deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`. Use `Type` instead or remove the constraint if the underlying model is type hinted to `\DateTimeInterface` already.
  * Using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl` is deprecated
  * Using the `Email` constraint in strict mode without `egulias/email-validator` is deprecated

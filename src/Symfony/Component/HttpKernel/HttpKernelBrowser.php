@@ -16,8 +16,8 @@ namespace Symfony\Component\HttpKernel;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method Request  getRequest()  A Request instance
- * @method Response getResponse() A Response instance
+ * @method \Symfony\Component\HttpFoundation\Request  getRequest()  A Request instance
+ * @method \Symfony\Component\HttpFoundation\Response getResponse() A Response instance
  */
 class HttpKernelBrowser extends Client
 {

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-06T09:24:05Z
+
+/cc @ro0NL
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-06T09:57:14Z
+
+@aweelex Does it work if we pass the timezone as a `DateTimeZone()` instance to the `IntlDateFormatter` constructor instead?
+
+---------------------------------------------------------------------------
+
+by aweelex at 2019-06-06T10:17:18Z
+
+@xabbuh oh, yes. And it seems to be the best way to solve this problem. Because we already have exeption on wrong `DateTimeZone ` in `DataTransformerInterface`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-06T10:22:08Z
+
+Thank you for checking. Can you rebase your changes on the `3.4` branch? It's affected too, right?
+
+---------------------------------------------------------------------------
+
+by aweelex at 2019-06-06T11:00:40Z
+
+Ok, it seems that changes should go to 3.4 and 4.4. I rebased commits to 3.4. Is everything alright here? @nicolas-grekas?

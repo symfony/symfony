@@ -29,14 +29,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MailgunTransport extends AbstractHttpTransport
 {
     private $key;
-    private $domain;
-    private $region;
+    private $endpoint;
 
     public function __construct(string $key, string $domain, string $region = MailgunRegionConfiguration::REGION_DEFAULT, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
-        $this->domain = $domain;
-        $this->region = $region;
+        $this->endpoint = MailgunRegionConfiguration::resolveHttpEndpoint($domain, $region);
 
         parent::__construct($client, $dispatcher, $logger);
     }
@@ -51,7 +49,7 @@ class MailgunTransport extends AbstractHttpTransport
         foreach ($body->getPreparedHeaders()->getAll() as $header) {
             $headers[] = $header->toString();
         }
-        $response = $this->client->request('POST', MailgunRegionConfiguration::resolveHttpEndpoint($this->domain, $this->region), [
+        $response = $this->client->request('POST', $this->endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
             'body' => $body->bodyToIterable(),

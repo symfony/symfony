@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\Exception\RuntimeException;
  *
  * @experimental in 4.3
  */
-class MailgunRegionConfiguration
+final class MailgunRegionConfiguration
 {
     public const REGION_DEFAULT = self::REGION_US;
     public const REGION_EU = 'EU';

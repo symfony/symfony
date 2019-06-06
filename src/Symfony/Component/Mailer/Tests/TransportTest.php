@@ -100,23 +100,23 @@ class TransportTest extends TestCase
     /**
      * @dataProvider provideFromDsnMailgun
      */
-    public function testFromDsnMailgun(string $expectedInstance, string $protocol, $region = null)
+    public function testFromDsnMailgun(string $expectedInstance, string $expected, string $protocol, $region = null)
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $client = $this->createMock(HttpClientInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
 
-        $dsn = $protocol.'://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun'.$region;
+        $dsn = $protocol.'://'.urlencode('u$er').':'.urlencode('client').'@mailgun'.$region;
         $transport = Transport::fromDsn($dsn, $dispatcher, $client, $logger);
         $this->assertInstanceOf($expectedInstance, $transport);
         if (Mailgun\Smtp\MailgunTransport::class === $expectedInstance) {
             $this->assertEquals('u$er', $transport->getUsername());
-            $this->assertEquals('pa$s', $transport->getPassword());
+            $this->assertEquals($expected, $transport->getPassword());
             $this->assertProperties($transport, $dispatcher, $logger);
         } else {
             $this->assertProperties($transport, $dispatcher, $logger, [
                 'key' => 'u$er',
-                'domain' => 'pa$s',
+                'endpoint' => $expected,
                 'client' => $client,
             ]);
         }
@@ -124,20 +124,31 @@ class TransportTest extends TestCase
 
     public function provideFromDsnMailgun()
     {
-        yield [Mailgun\Smtp\MailgunTransport::class, 'smtp', null];
-        yield [Mailgun\Http\MailgunTransport::class, 'http', null];
-        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', null];
-        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', '?region=EU'];
-        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', '?region=US'];
+        yield [Mailgun\Smtp\MailgunTransport::class, 'client', 'smtp', null];
+        yield [Mailgun\Http\MailgunTransport::class, 'https://api.mailgun.net/v3/client/messages.mime', 'http', null];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'https://api.mailgun.net/v3/client/messages', 'api', null];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'https://api.eu.mailgun.net/v3/client/messages', 'api', '?region=EU'];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'https://api.mailgun.net/v3/client/messages', 'api', '?region=US'];
     }
 
-    public function testFromDsnMailgunWithExpection()
+    public function testFromDstMailgunWithExceptionWrongFormat()
     {
         $this->expectException(LogicException::class);
         Transport::fromDsn('foo://mailgun');
+    }
 
+    /**
+     * @dataProvider provideFromDstMailgunWithExceptionWrongRegion
+     */
+    public function testFromDstMailgunWithExceptionWrongRegion(string $schema)
+    {
         $this->expectException(RuntimeException::class);
-        Transport::fromDsn('api://user:password@mailgun?region=RU');
+        Transport::fromDsn($schema.'://user:password@mailgun?region=RU');
+    }
+
+    public function provideFromDstMailgunWithExceptionWrongRegion()
+    {
+        return [['smtp'], ['http'], ['api']];
     }
 
     public function testFromDsnPostmark()

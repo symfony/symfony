@@ -52,10 +52,8 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
-use Symfony\Component\Validator\Util\LegacyTranslatorProxy;
 use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
@@ -575,8 +573,6 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
-        $this->assertTrue($container->hasAlias('message_bus'));
-        $this->assertTrue($container->getAlias('message_bus')->isPublic());
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertTrue($container->getAlias('messenger.default_bus')->isPublic());
         $this->assertFalse($container->hasDefinition('messenger.transport.amqp.factory'));
@@ -674,8 +670,6 @@ abstract class FrameworkExtensionTest extends TestCase
             ['id' => 'handle_message', 'arguments' => []],
         ], $container->getParameter('messenger.bus.queries.middleware'));
 
-        $this->assertTrue($container->hasAlias('message_bus'));
-        $this->assertSame('messenger.bus.commands', (string) $container->getAlias('message_bus'));
         $this->assertTrue($container->hasAlias('messenger.default_bus'));
         $this->assertSame('messenger.bus.commands', (string) $container->getAlias('messenger.default_bus'));
     }
@@ -777,11 +771,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals([new Reference('validator.validator_factory')], $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
-        if (interface_exists(TranslatorInterface::class) && class_exists(LegacyTranslatorProxy::class)) {
-            $this->assertEquals([new Definition(LegacyTranslatorProxy::class, [new Reference('translator')])], $calls[1][1]);
-        } else {
-            $this->assertEquals([new Reference('translator')], $calls[1][1]);
-        }
+        $this->assertEquals([new Reference('translator')], $calls[1][1]);
         $this->assertSame('setTranslationDomain', $calls[2][0]);
         $this->assertSame(['%validator.translation_domain%'], $calls[2][1]);
         $this->assertSame('addXmlMappings', $calls[3][0]);
@@ -920,39 +910,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setMetadataCache', $calls[++$i][0]);
         $this->assertEquals([new Reference('validator.mapping.cache.symfony')], $calls[$i][1]);
         // no cache, no annotations, no static methods
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage "strict_email" and "email_validation_mode" cannot be used together.
-     */
-    public function testCannotConfigureStrictEmailAndEmailValidationModeAtTheSameTime()
-    {
-        $this->createContainerFromFile('validation_strict_email_and_validation_mode');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
-     */
-    public function testEnabledStrictEmailOptionIsMappedToStrictEmailValidationMode()
-    {
-        $container = $this->createContainerFromFile('validation_strict_email_enabled');
-
-        $this->assertSame('strict', $container->getDefinition('validator.email')->getArgument(0));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
-     */
-    public function testDisabledStrictEmailOptionIsMappedToLooseEmailValidationMode()
-    {
-        $container = $this->createContainerFromFile('validation_strict_email_disabled');
-
-        $this->assertSame('loose', $container->getDefinition('validator.email')->getArgument(0));
     }
 
     public function testEmailValidationModeIsPassedToEmailValidator()

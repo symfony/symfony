@@ -50,7 +50,6 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services (deprecated)'),
                 new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Used to show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
@@ -116,10 +115,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('show-private')) {
-            @trigger_error('The "--show-private" option no longer has any effect and is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 

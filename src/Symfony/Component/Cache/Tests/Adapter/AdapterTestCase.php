@@ -12,9 +12,12 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
+use PHPUnit\Framework\Assert;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Contracts\Cache\CallbackInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
@@ -57,6 +60,22 @@ abstract class AdapterTestCase extends CachePoolTest
             $this->assertSame($value, $item->get());
         }, INF));
         $this->assertFalse($isHit);
+
+        $this->assertSame($value, $cache->get('bar', new class($value) implements CallbackInterface {
+            private $value;
+
+            public function __construct(int $value)
+            {
+                $this->value = $value;
+            }
+
+            public function __invoke(CacheItemInterface $item, bool &$save)
+            {
+                Assert::assertSame('bar', $item->getKey());
+
+                return $this->value;
+            }
+        }));
     }
 
     public function testRecursiveGet()

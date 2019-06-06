@@ -30,12 +30,12 @@ trait WebTestAssertionsTrait
 {
     public static function assertResponseIsSuccessful(string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new ResponseConstraint\ResponseIsSuccessful(), $message);
+        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseIsSuccessful(), $message);
     }
 
     public static function assertResponseStatusCodeSame(int $expectedCode, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
+        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseStatusCodeSame($expectedCode), $message);
     }
 
     public static function assertResponseRedirects(string $expectedLocation = null, int $expectedCode = null, string $message = ''): void
@@ -48,42 +48,42 @@ trait WebTestAssertionsTrait
             $constraint = LogicalAnd::fromConstraints($constraint, new ResponseConstraint\ResponseStatusCodeSame($expectedCode));
         }
 
-        self::assertThat(static::getResponse(), $constraint, $message);
+        self::assertThat(self::getResponse(), $constraint, $message);
     }
 
     public static function assertResponseHasHeader(string $headerName, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHasHeader($headerName), $message);
+        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHasHeader($headerName), $message);
     }
 
     public static function assertResponseNotHasHeader(string $headerName, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasHeader($headerName)), $message);
+        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasHeader($headerName)), $message);
     }
 
     public static function assertResponseHeaderSame(string $headerName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue), $message);
+        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue), $message);
     }
 
     public static function assertResponseHeaderNotSame(string $headerName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
+        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHeaderSame($headerName, $expectedValue)), $message);
     }
 
     public static function assertResponseHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
+        self::assertThat(self::getResponse(), new ResponseConstraint\ResponseHasCookie($name, $path, $domain), $message);
     }
 
     public static function assertResponseNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasCookie($name, $path, $domain)), $message);
+        self::assertThat(self::getResponse(), new LogicalNot(new ResponseConstraint\ResponseHasCookie($name, $path, $domain)), $message);
     }
 
     public static function assertResponseCookieValueSame(string $name, string $expectedValue, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getResponse(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getResponse(), LogicalAnd::fromConstraints(
             new ResponseConstraint\ResponseHasCookie($name, $path, $domain),
             new ResponseConstraint\ResponseCookieValueSame($name, $expectedValue, $path, $domain)
         ), $message);
@@ -91,17 +91,17 @@ trait WebTestAssertionsTrait
 
     public static function assertBrowserHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getClient(), new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain), $message);
+        self::assertThat(self::getClient(), new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain), $message);
     }
 
     public static function assertBrowserNotHasCookie(string $name, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getClient(), new LogicalNot(new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain)), $message);
+        self::assertThat(self::getClient(), new LogicalNot(new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain)), $message);
     }
 
     public static function assertBrowserCookieValueSame(string $name, string $expectedValue, bool $raw = false, string $path = '/', string $domain = null, string $message = ''): void
     {
-        self::assertThat(static::getClient(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getClient(), LogicalAnd::fromConstraints(
             new BrowserKitConstraint\BrowserHasCookie($name, $path, $domain),
             new BrowserKitConstraint\BrowserCookieValueSame($name, $expectedValue, $raw, $path, $domain)
         ), $message);
@@ -109,17 +109,17 @@ trait WebTestAssertionsTrait
 
     public static function assertSelectorExists(string $selector, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), new DomCrawlerConstraint\CrawlerSelectorExists($selector), $message);
+        self::assertThat(self::getCrawler(), new DomCrawlerConstraint\CrawlerSelectorExists($selector), $message);
     }
 
     public static function assertSelectorNotExists(string $selector, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorExists($selector)), $message);
+        self::assertThat(self::getCrawler(), new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorExists($selector)), $message);
     }
 
     public static function assertSelectorTextContains(string $selector, string $text, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text)
         ), $message);
@@ -127,7 +127,7 @@ trait WebTestAssertionsTrait
 
     public static function assertSelectorTextSame(string $selector, string $text, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
             new DomCrawlerConstraint\CrawlerSelectorTextSame($selector, $text)
         ), $message);
@@ -135,7 +135,7 @@ trait WebTestAssertionsTrait
 
     public static function assertSelectorTextNotContains(string $selector, string $text, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists($selector),
             new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorTextContains($selector, $text))
         ), $message);
@@ -153,7 +153,7 @@ trait WebTestAssertionsTrait
 
     public static function assertInputValueSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
             new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue)
         ), $message);
@@ -161,7 +161,7 @@ trait WebTestAssertionsTrait
 
     public static function assertInputValueNotSame(string $fieldName, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(static::getCrawler(), LogicalAnd::fromConstraints(
+        self::assertThat(self::getCrawler(), LogicalAnd::fromConstraints(
             new DomCrawlerConstraint\CrawlerSelectorExists("input[name=\"$fieldName\"]"),
             new LogicalNot(new DomCrawlerConstraint\CrawlerSelectorAttributeValueSame("input[name=\"$fieldName\"]", 'value', $expectedValue))
         ), $message);
@@ -169,7 +169,7 @@ trait WebTestAssertionsTrait
 
     public static function assertRequestAttributeValueSame(string $name, string $expectedValue, string $message = ''): void
     {
-        self::assertThat(static::getRequest(), new ResponseConstraint\RequestAttributeValueSame($name, $expectedValue), $message);
+        self::assertThat(self::getRequest(), new ResponseConstraint\RequestAttributeValueSame($name, $expectedValue), $message);
     }
 
     public static function assertRouteSame($expectedRoute, array $parameters = [], string $message = ''): void
@@ -183,21 +183,27 @@ trait WebTestAssertionsTrait
             $constraint = LogicalAnd::fromConstraints($constraint, ...$constraints);
         }
 
-        self::assertThat(static::getRequest(), $constraint, $message);
+        self::assertThat(self::getRequest(), $constraint, $message);
     }
 
-    private static function getClient(): KernelBrowser
+    private static function getClient(KernelBrowser $newClient = null): ?KernelBrowser
     {
-        if (!static::$client instanceof KernelBrowser) {
-            static::fail(\sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient"?', __CLASS__));
+        static $client;
+
+        if (0 < \func_num_args()) {
+            return $client = $newClient;
         }
 
-        return static::$client;
+        if (!$client instanceof KernelBrowser) {
+            static::fail(\sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', __CLASS__));
+        }
+
+        return $client;
     }
 
     private static function getCrawler(): Crawler
     {
-        if (!$crawler = static::getClient()->getCrawler()) {
+        if (!$crawler = self::getClient()->getCrawler()) {
             static::fail('A client must have a crawler to make assertions. Did you forget to make an HTTP request?');
         }
 
@@ -206,7 +212,7 @@ trait WebTestAssertionsTrait
 
     private static function getResponse(): Response
     {
-        if (!$response = static::getClient()->getResponse()) {
+        if (!$response = self::getClient()->getResponse()) {
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
         }
 
@@ -215,7 +221,7 @@ trait WebTestAssertionsTrait
 
     private static function getRequest(): Request
     {
-        if (!$request = static::getClient()->getRequest()) {
+        if (!$request = self::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');
         }
 

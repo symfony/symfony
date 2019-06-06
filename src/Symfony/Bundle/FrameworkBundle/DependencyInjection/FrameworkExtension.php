@@ -1607,7 +1607,8 @@ class FrameworkExtension extends Extension
                 $combinedDefinition->replaceArgument(0, $storeDefinitions);
                 $container->setDefinition('lock.'.$resourceName.'.store', $combinedDefinition);
             } else {
-                $container->setAlias('lock.'.$resourceName.'.store', new Alias((string) $storeDefinitions[0], false));
+                $storeDefinition = new ChildDefinition($storeDefinitions[0]);
+                $container->setDefinition('lock.'.$resourceName.'.store', $storeDefinition);
             }
 
             // Generate factories for each resource

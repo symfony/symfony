@@ -254,7 +254,7 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container = new ContainerBuilder();
         $container
-            ->register('lock.store', $this->createMock($storeClassName))
+            ->register('lock.default.store', $this->createMock($storeClassName))
             ->setPublic(false)
         ;
         $container

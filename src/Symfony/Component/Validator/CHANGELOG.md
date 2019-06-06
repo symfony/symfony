@@ -9,7 +9,7 @@ CHANGELOG
  * added `DivisibleBy` constraint
  * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `ValidatorBuilderInterface`
- * made `ValidatorBuilder` final
+ * made `ValidatorBuilder::setTranslator()` final
  * marked `format` the default option in `DateTime` constraint
  * deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`.
  * deprecated using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl`

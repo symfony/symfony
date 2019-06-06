@@ -109,7 +109,7 @@
         "masterminds/html5": "^2.6",
         "monolog/monolog": "~1.11",
         "nyholm/psr7": "^1.0",
-        "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
+        "ocramius/proxy-manager": "^2.1",
         "predis/predis": "~1.1",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0",
@@ -122,6 +122,7 @@
         "masterminds/html5": "<2.6",
         "phpdocumentor/reflection-docblock": "<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",
+        "ocramius/proxy-manager": "<2.1",
         "phpunit/phpunit": "<5.4.3"
     },
     "autoload": {

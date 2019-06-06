@@ -5,10 +5,13 @@ CHANGELOG
 -----
 
  * removed the `checkDNS` and `dnsMessage` options of the `Url` constraint
+ * removed the `checkMX`, `checkHost` and `strict` options of the `Email` constraint
  * removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`
  * removed support for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints without `symfony/intl`
  * removed support for using the `Email` constraint without `egulias/email-validator`
  * removed support for using the `Expression` constraint without `symfony/expression-language`
+ * changed default value of `canonicalize` option of `Locale` constraint to `true`
+ * removed `ValidatorBuilderInterface`
 
 4.4.0
 -----

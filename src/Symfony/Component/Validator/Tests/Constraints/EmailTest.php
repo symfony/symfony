@@ -16,17 +16,6 @@ use Symfony\Component\Validator\Constraints\Email;
 
 class EmailTest extends TestCase
 {
-    /**
-     * @expectedDeprecation The "strict" property is deprecated since Symfony 4.1. Use "mode"=>"strict" instead.
-     * @group legacy
-     */
-    public function testLegacyConstructorStrict()
-    {
-        $subject = new Email(['strict' => true]);
-
-        $this->assertTrue($subject->strict);
-    }
-
     public function testConstructorStrict()
     {
         $subject = new Email(['mode' => Email::VALIDATION_MODE_STRICT]);

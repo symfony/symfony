@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -30,7 +30,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     private $cacheDir;
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(RequestEvent $event)
     {
         if ($event->getException() instanceof Danger) {
             $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));

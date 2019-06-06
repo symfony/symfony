@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-05T16:30:56Z
+
+Why is this a trait BTW, and not plain methods on WebTestCase?
+Unless I missed it, #30813 doesn't tell about that, does it?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2019-06-05T16:46:49Z
+
+I can’t remember why, maybe @pierstoval can help us
+
+---------------------------------------------------------------------------
+
+by Pierstoval at 2019-06-05T19:32:34Z
+
+The trait was not discussed, I thought it was convenient to have all assertions in one place, especially when needing them statically. A fix to make the client static in the trait is welcomed, indeed.

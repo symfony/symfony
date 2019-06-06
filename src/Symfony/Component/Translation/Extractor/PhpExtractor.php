@@ -50,25 +50,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         ],
         [
             '->',
-            'transChoice',
-            '(',
-            self::MESSAGE_TOKEN,
-            ',',
-            self::METHOD_ARGUMENTS_TOKEN,
-            ',',
-            self::METHOD_ARGUMENTS_TOKEN,
-            ',',
-            self::DOMAIN_TOKEN,
-        ],
-        [
-            '->',
             'trans',
-            '(',
-            self::MESSAGE_TOKEN,
-        ],
-        [
-            '->',
-            'transChoice',
             '(',
             self::MESSAGE_TOKEN,
         ],
@@ -194,18 +176,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Extracts trans message from PHP tokens.
-     *
-     * @param array            $tokens
-     * @param MessageCatalogue $catalog
-     * @param string           $filename
      */
-    protected function parseTokens($tokens, MessageCatalogue $catalog/*, string $filename*/)
+    protected function parseTokens(array $tokens, MessageCatalogue $catalog, string $filename)
     {
-        if (\func_num_args() < 3 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "string $filename" argument in version 5.0, not defining it is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
-        }
-        $filename = 2 < \func_num_args() ? \func_get_arg(2) : '';
-
         $tokenIterator = new \ArrayIterator($tokens);
 
         for ($key = 0; $key < $tokenIterator->count(); ++$key) {

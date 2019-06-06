@@ -43,22 +43,6 @@ abstract class FileDumper implements DumperInterface
     }
 
     /**
-     * Sets backup flag.
-     *
-     * @param bool $backup
-     *
-     * @deprecated since Symfony 4.1
-     */
-    public function setBackup($backup)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
-
-        if (false !== $backup) {
-            throw new \LogicException('The backup feature is no longer supported.');
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function dump(MessageCatalogue $messages, $options = [])

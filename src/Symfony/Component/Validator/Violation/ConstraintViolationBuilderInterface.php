@@ -85,7 +85,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Contracts\Translation\TranslatorInterface::transChoice()
+     * @see \Symfony\Contracts\Translation\TranslatorInterface::trans()
      */
     public function setPlural($number);
 

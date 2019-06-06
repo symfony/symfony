@@ -73,7 +73,7 @@ final class DoctrineLoader implements LoaderInterface
                 $metadata->addConstraint(new UniqueEntity(['fields' => $mapping['fieldName']]));
             }
 
-            if (null === ($mapping['length'] ?? null)) {
+            if (null === ($mapping['length'] ?? null) || !\in_array($mapping['type'], ['string', 'text'], true)) {
                 continue;
             }
 

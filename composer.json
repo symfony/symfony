@@ -98,7 +98,7 @@
         "doctrine/reflection": "~1.0",
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
-        "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
+        "ocramius/proxy-manager": "^2.1",
         "predis/predis": "~1.1",
         "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
         "symfony/phpunit-bridge": "~3.4|~4.0",
@@ -108,6 +108,7 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.3.0",
+        "ocramius/proxy-manager": "<2.1",
         "phpunit/phpunit": "<5.4.3"
     },
     "provide": {

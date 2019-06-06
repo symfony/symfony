@@ -38,8 +38,6 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  * The default implementation of {@link ValidatorBuilderInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @final since Symfony 4.2
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
@@ -255,6 +253,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @final since Symfony 4.2
      */
     public function setTranslator(LegacyTranslatorInterface $translator)
     {

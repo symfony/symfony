@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 /**
@@ -33,10 +34,14 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     private $validatorBuilder;
 
     /**
-     * @param string $phpArrayFile The PHP file where metadata are cached
+     * @param ValidatorBuilder $validatorBuilder
+     * @param string           $phpArrayFile     The PHP file where metadata are cached
      */
-    public function __construct(ValidatorBuilderInterface $validatorBuilder, string $phpArrayFile)
+    public function __construct($validatorBuilder, string $phpArrayFile)
     {
+        if (!$validatorBuilder instanceof ValidatorBuilder || !$validatorBuilder instanceof ValidatorBuilderInterface) {
+            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, ValidatorBuilder::class, \is_object($validatorBuilder) ? \get_class($validatorBuilder) : \gettype($validatorBuilder)));
+        }
         if (2 < \func_num_args() && \func_get_arg(2) instanceof CacheItemPoolInterface) {
             @trigger_error(sprintf('The CacheItemPoolInterface $fallbackPool argument of "%s()" is deprecated since Symfony 4.2, you should not pass it anymore.', __METHOD__), E_USER_DEPRECATED);
         }

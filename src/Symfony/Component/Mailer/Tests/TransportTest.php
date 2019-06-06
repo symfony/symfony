@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Bridge\Postmark;
 use Symfony\Component\Mailer\Bridge\Sendgrid;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
+use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -96,35 +97,47 @@ class TransportTest extends TestCase
         Transport::fromDsn('http://gmail');
     }
 
-    public function testFromDsnMailgun()
+    /**
+     * @dataProvider provideFromDsnMailgun
+     */
+    public function testFromDsnMailgun(string $expectedInstance, string $protocol, $region = null)
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $logger = $this->createMock(LoggerInterface::class);
-        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, null, $logger);
-        $this->assertInstanceOf(Mailgun\Smtp\MailgunTransport::class, $transport);
-        $this->assertEquals('u$er', $transport->getUsername());
-        $this->assertEquals('pa$s', $transport->getPassword());
-        $this->assertProperties($transport, $dispatcher, $logger);
-
         $client = $this->createMock(HttpClientInterface::class);
-        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailgun\Http\MailgunTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'domain' => 'pa$s',
-            'client' => $client,
-        ]);
+        $logger = $this->createMock(LoggerInterface::class);
 
-        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
-        $this->assertInstanceOf(Mailgun\Http\Api\MailgunTransport::class, $transport);
-        $this->assertProperties($transport, $dispatcher, $logger, [
-            'key' => 'u$er',
-            'domain' => 'pa$s',
-            'client' => $client,
-        ]);
+        $dsn = $protocol.'://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun'.$region;
+        $transport = Transport::fromDsn($dsn, $dispatcher, $client, $logger);
+        $this->assertInstanceOf($expectedInstance, $transport);
+        if (Mailgun\Smtp\MailgunTransport::class === $expectedInstance) {
+            $this->assertEquals('u$er', $transport->getUsername());
+            $this->assertEquals('pa$s', $transport->getPassword());
+            $this->assertProperties($transport, $dispatcher, $logger);
+        } else {
+            $this->assertProperties($transport, $dispatcher, $logger, [
+                'key' => 'u$er',
+                'domain' => 'pa$s',
+                'client' => $client,
+            ]);
+        }
+    }
 
+    public function provideFromDsnMailgun()
+    {
+        yield [Mailgun\Smtp\MailgunTransport::class, 'smtp', null];
+        yield [Mailgun\Http\MailgunTransport::class, 'http', null];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', null];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', '?region=EU'];
+        yield [Mailgun\Http\Api\MailgunTransport::class, 'api', '?region=US'];
+    }
+
+    public function testFromDsnMailgunWithExpection()
+    {
         $this->expectException(LogicException::class);
         Transport::fromDsn('foo://mailgun');
+
+        $this->expectException(RuntimeException::class);
+        Transport::fromDsn('api://user:password@mailgun?region=RU');
     }
 
     public function testFromDsnPostmark()

@@ -100,14 +100,19 @@ class Transport
                     throw new \LogicException('Unable to send emails via Mailgun as the bridge is not installed. Try running "composer require symfony/mailgun-mailer".');
                 }
 
+                $region = Mailgun\MailgunRegionConfiguration::REGION_DEFAULT;
+                if (!empty($query['region'])) {
+                    $region = $query['region'];
+                }
+
                 if ('smtp' === $parsedDsn['scheme']) {
-                    return new Mailgun\Smtp\MailgunTransport($user, $pass, $dispatcher, $logger);
+                    return new Mailgun\Smtp\MailgunTransport($user, $pass, $region, $dispatcher, $logger);
                 }
                 if ('http' === $parsedDsn['scheme']) {
-                    return new Mailgun\Http\MailgunTransport($user, $pass, $client, $dispatcher, $logger);
+                    return new Mailgun\Http\MailgunTransport($user, $pass, $region, $client, $dispatcher, $logger);
                 }
                 if ('api' === $parsedDsn['scheme']) {
-                    return new Mailgun\Http\Api\MailgunTransport($user, $pass, $client, $dispatcher, $logger);
+                    return new Mailgun\Http\Api\MailgunTransport($user, $pass, $region, $client, $dispatcher, $logger);
                 }
 
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));

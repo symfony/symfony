@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Http\Api;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mailer\Bridge\Mailgun\MailgunRegionConfiguration;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\Http\Api\AbstractApiTransport;
@@ -27,15 +28,15 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MailgunTransport extends AbstractApiTransport
 {
-    private const ENDPOINT = 'https://api.mailgun.net/v3/%domain%/messages';
-
     private $key;
     private $domain;
+    private $region;
 
-    public function __construct(string $key, string $domain, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, string $domain, string $region = MailgunRegionConfiguration::REGION_DEFAULT, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
         $this->domain = $domain;
+        $this->region = $region;
 
         parent::__construct($client, $dispatcher, $logger);
     }
@@ -48,8 +49,7 @@ class MailgunTransport extends AbstractApiTransport
             $headers[] = $header->toString();
         }
 
-        $endpoint = str_replace('%domain%', urlencode($this->domain), self::ENDPOINT);
-        $response = $this->client->request('POST', $endpoint, [
+        $response = $this->client->request('POST', MailgunRegionConfiguration::resolveApiEndpoint($this->domain, $this->region), [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,
             'body' => $body->bodyToIterable(),

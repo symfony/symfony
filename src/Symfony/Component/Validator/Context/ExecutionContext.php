@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Context;
 
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -128,24 +127,12 @@ class ExecutionContext implements ExecutionContextInterface
     private $initializedObjects;
 
     /**
-     * Creates a new execution context.
+     * @param mixed $root The root value of the validated object graph
      *
-     * @param ValidatorInterface  $validator         The validator
-     * @param mixed               $root              The root value of the
-     *                                               validated object graph
-     * @param TranslatorInterface $translator        The translator
-     * @param string|null         $translationDomain The translation domain to
-     *                                               use for translating
-     *                                               violation messages
-     *
-     * @internal Called by {@link ExecutionContextFactory}. Should not be used
-     *           in user code.
+     * @internal Called by {@link ExecutionContextFactory}. Should not be used in user code.
      */
-    public function __construct(ValidatorInterface $validator, $root, $translator, string $translationDomain = null)
+    public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, string $translationDomain = null)
     {
-        if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 3 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->validator = $validator;
         $this->root = $root;
         $this->translator = $translator;

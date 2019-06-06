@@ -23,14 +23,10 @@ abstract class WebTestCase extends KernelTestCase
 {
     use WebTestAssertionsTrait;
 
-    /** @var KernelBrowser|null */
-    protected static $client;
-
     protected function doTearDown(): void
     {
         parent::doTearDown();
-
-        static::$client = null;
+        self::getClient(null);
     }
 
     /**
@@ -56,6 +52,6 @@ abstract class WebTestCase extends KernelTestCase
 
         $client->setServerParameters($server);
 
-        return static::$client = $client;
+        return self::getClient($client);
     }
 }

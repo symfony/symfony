@@ -6,23 +6,23 @@
 
     <services>
         <service id="mailer.mailer" class="Symfony\Component\Mailer\Mailer">
-            <argument type="service" id="mailer.transport" />
+            <argument type="service" id="mailer.default_transport" />
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
         </service>
         <service id="mailer" alias="mailer.mailer" />
         <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer" />
 
-        <service id="mailer.transport" class="Symfony\Component\Mailer\Transport\TransportInterface">
+        <service id="mailer.default_transport" class="Symfony\Component\Mailer\Transport\TransportInterface">
             <factory class="Symfony\Component\Mailer\Transport" method="fromDsn" />
             <argument /> <!-- env(MAILER_DSN) -->
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="http_client" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
-        <service id="Symfony\Component\Mailer\Transport\TransportInterface" alias="mailer.transport" />
+        <service id="Symfony\Component\Mailer\Transport\TransportInterface" alias="mailer.default_transport" />
 
         <service id="mailer.messenger.message_handler" class="Symfony\Component\Mailer\Messenger\MessageHandler">
-            <argument type="service" id="mailer.transport" />
+            <argument type="service" id="mailer.default_transport" />
             <tag name="messenger.message_handler" />
         </service>
     </services>

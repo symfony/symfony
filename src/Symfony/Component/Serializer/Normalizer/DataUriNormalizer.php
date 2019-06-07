@@ -34,12 +34,12 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
     ];
 
     /**
-     * @var MimeTypeGuesserInterface
+     * @var MimeTypeGuesserInterface|null
      */
     private $mimeTypeGuesser;
 
     /**
-     * @param MimeTypeGuesserInterface
+     * @param MimeTypeGuesserInterface|null $mimeTypeGuesser
      */
     public function __construct($mimeTypeGuesser = null)
     {
@@ -48,8 +48,8 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
         } elseif (null === $mimeTypeGuesser) {
             if (class_exists(MimeTypes::class)) {
                 $mimeTypeGuesser = MimeTypes::getDefault();
-            } else {
-                @trigger_error(sprintf('Passing null to "%s()" without symfony/mime installed is deprecated since Symfony 4.3, install symfony/mime.', __METHOD__), E_USER_DEPRECATED);
+            } elseif (class_exists(MimeTypeGuesser::class)) {
+                @trigger_error(sprintf('Passing null to "%s()" to use a default MIME type guesser without Symfony Mime installed is deprecated since Symfony 4.3. Try running "composer require symfony/mime".', __METHOD__), E_USER_DEPRECATED);
                 $mimeTypeGuesser = MimeTypeGuesser::getInstance();
             }
         } elseif (!$mimeTypeGuesser instanceof MimeTypes) {
@@ -156,7 +156,9 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
 
         if ($this->mimeTypeGuesser instanceof DeprecatedMimeTypeGuesserInterface && $mimeType = $this->mimeTypeGuesser->guess($object->getPathname())) {
             return $mimeType;
-        } elseif ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guessMimeType($object->getPathname())) {
+        }
+
+        if ($this->mimeTypeGuesser && $mimeType = $this->mimeTypeGuesser->guessMimeType($object->getPathname())) {
             return $mimeType;
         }
 

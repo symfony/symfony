@@ -30,11 +30,12 @@ class RoundRobinTransport implements TransportInterface
     private $transports = [];
     private $retryPeriod;
     private $cursor = 0;
+    private $shuffle;
 
     /**
      * @param TransportInterface[] $transports
      */
-    public function __construct(array $transports, int $retryPeriod = 60)
+    public function __construct(array $transports, int $retryPeriod = 60, bool $shuffle = false)
     {
         if (!$transports) {
             throw new TransportException(__CLASS__.' must have at least one transport configured.');
@@ -43,6 +44,7 @@ class RoundRobinTransport implements TransportInterface
         $this->transports = $transports;
         $this->deadTransports = new \SplObjectStorage();
         $this->retryPeriod = $retryPeriod;
+        $this->shuffle = $shuffle;
     }
 
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
@@ -94,7 +96,7 @@ class RoundRobinTransport implements TransportInterface
 
     private function moveCursor(int $cursor): int
     {
-        if (0 === $cursor) {
+        if ($this->shuffle && 0 === $cursor) {
             // randomise order of transports at the beginning of iterating
             shuffle($this->transports);
         }

@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Definition\BaseNode;
-use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
@@ -80,10 +79,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
                     continue;
                 }
 
-                try {
-                    $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
-                } catch (TreeWithoutRootNodeException $e) {
-                }
+                $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
             }
         } finally {
             BaseNode::resetPlaceholders();

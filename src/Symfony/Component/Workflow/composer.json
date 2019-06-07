@@ -20,8 +20,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.9",
-        "symfony/property-access": "^4.4|^5.0"
+        "php": "^7.2.9"
     },
     "require-dev": {
         "psr/log": "~1.0",

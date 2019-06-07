@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xavismeh at 2019-06-07T09:24:04Z
+
+You could also remove (Single|Multiple)StateMarkingStore classes, couldn't you?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-06-07T09:32:02Z
+
+> You could also remove (Single|Multiple)StateMarkingStore classes, couldn't you?
+
+They does not exist anymore. See #31824

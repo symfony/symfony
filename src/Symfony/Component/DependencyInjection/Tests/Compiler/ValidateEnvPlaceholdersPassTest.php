@@ -390,7 +390,7 @@ class EnvConfigurationWithoutRootNode implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        return new TreeBuilder();
+        return new TreeBuilder('env_extension');
     }
 }
 
@@ -398,8 +398,8 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('env_extension')
+        $treeBuilder = new TreeBuilder('env_extension');
+        $treeBuilder
             ->children()
                 ->arrayNode('nodes')
                     ->isRequired()

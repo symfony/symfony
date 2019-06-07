@@ -100,11 +100,7 @@ class Transport
                     throw new \LogicException('Unable to send emails via Mailgun as the bridge is not installed. Try running "composer require symfony/mailgun-mailer".');
                 }
 
-                $region = Mailgun\MailgunRegionConfiguration::REGION_DEFAULT;
-                if (!empty($query['region'])) {
-                    $region = $query['region'];
-                }
-
+                $region = $query['region'] ?? Mailgun\MailgunRegionConfiguration::REGION_DEFAULT;
                 if ('smtp' === $parsedDsn['scheme']) {
                     return new Mailgun\Smtp\MailgunTransport($user, $pass, $region, $dispatcher, $logger);
                 }

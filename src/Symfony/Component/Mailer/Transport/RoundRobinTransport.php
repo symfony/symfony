@@ -94,6 +94,11 @@ class RoundRobinTransport implements TransportInterface
 
     private function moveCursor(int $cursor): int
     {
+        if (0 === $cursor) {
+            // randomise order of transports at the beginning of iterating
+            shuffle($this->transports);
+        }
+
         return ++$cursor >= \count($this->transports) ? 0 : $cursor;
     }
 }

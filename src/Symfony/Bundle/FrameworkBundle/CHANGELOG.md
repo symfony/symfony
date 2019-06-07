@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * Added the ability to specify a custom mailer `transport_id`
  * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
  * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services

@@ -375,6 +375,7 @@ class ConfigurationTest extends TestCase
             'mailer' => [
                 'dsn' => 'smtp://null',
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
+                'transport_id' => null,
             ],
         ];
     }

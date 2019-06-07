@@ -1523,8 +1523,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('mailer')
                     ->info('Mailer configuration')
                     ->{!class_exists(FullStack::class) && class_exists(Mailer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->beforeNormalization()
+                        ->always(function ($v) {
+                            if (isset($v['dsn']) && isset($v['transport_id'])) {
+                                throw new LogicException('You must set the mailer "dsn" to null, to use a custom transport service.');
+                            }
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('dsn')->defaultValue('smtp://null')->end()
+                        ->scalarNode('transport_id')->defaultNull()->end()
                     ->end()
                 ->end()
             ->end()

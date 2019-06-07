@@ -45,6 +45,7 @@ class RoundRobinTransport implements TransportInterface
         $this->deadTransports = new \SplObjectStorage();
         $this->retryPeriod = $retryPeriod;
         $this->shuffle = $shuffle;
+        $this->shuffleTransportsOrder($this->cursor);
     }
 
     public function send(RawMessage $message, SmtpEnvelope $envelope = null): ?SentMessage
@@ -96,11 +97,17 @@ class RoundRobinTransport implements TransportInterface
 
     private function moveCursor(int $cursor): int
     {
-        if ($this->shuffle && 0 === $cursor) {
-            // randomise order of transports at the beginning of iterating
-            shuffle($this->transports);
-        }
+        $cursor = ++$cursor >= \count($this->transports) ? 0 : $cursor;
+        $this->shuffleTransportsOrder($cursor);
 
-        return ++$cursor >= \count($this->transports) ? 0 : $cursor;
+        return $cursor;
+    }
+
+    private function shuffleTransportsOrder(int $cursor = null)
+    {
+        if (false === $this->shuffle || 0 !== $cursor) {
+            return;
+        }
+        shuffle($this->transports);
     }
 }

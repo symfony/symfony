@@ -249,7 +249,6 @@ class ReflectionExtractorTest extends TestCase
             ['string', [new Type(Type::BUILTIN_TYPE_STRING, true)]],
             ['dummy', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
             ['optionalDummy', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)]],
-            ['callable', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)]],
         ];
     }
 

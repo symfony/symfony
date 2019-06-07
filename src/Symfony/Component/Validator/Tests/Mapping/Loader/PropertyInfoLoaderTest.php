@@ -46,6 +46,7 @@ class PropertyInfoLoaderTest extends TestCase
                 'alreadyMappedNotBlank',
                 'alreadyPartiallyMappedCollection',
                 'readOnly',
+                'nonExistentField',
             ])
         ;
         $propertyInfoStub

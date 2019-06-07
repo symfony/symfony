@@ -11,10 +11,13 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
+/**
+ * @group legacy
+ */
 class FilesystemLoaderTest extends TestCase
 {
     public function testGetSourceContext()
@@ -61,7 +64,7 @@ class FilesystemLoaderTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('name.format.engine')
-            ->willReturn(new TemplateReference('', '', 'name', 'format', 'engine'))
+            ->willReturn($this->getMockBuilder(TemplateReferenceInterface::class)->getMock())
         ;
 
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
@@ -85,7 +88,7 @@ class FilesystemLoaderTest extends TestCase
             ->expects($this->once())
             ->method('parse')
             ->with('name.format.engine')
-            ->willReturn(new TemplateReference('', '', 'name', 'format', 'engine'))
+            ->willReturn($this->getMockBuilder(TemplateReferenceInterface::class)->getMock())
         ;
 
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();

@@ -1920,7 +1920,8 @@ class FrameworkExtension extends Extension
         if (null === $config['transport_id']) {
             $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
         } else {
-            $container->getDefinition('mailer.mailer')->setArgument(0, new Reference($config['transport_id']));
+            $container->removeDefinition('mailer.default_transport');
+            $container->setAlias('mailer.default_transport', $config['transport_id']);
         }
     }
 

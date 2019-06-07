@@ -48,4 +48,8 @@ class PropertyInfoLoaderEntity
     public $alreadyPartiallyMappedCollection;
 
     public $readOnly;
+
+    public function setNonExistentField()
+    {
+    }
 }

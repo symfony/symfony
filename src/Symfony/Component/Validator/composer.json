@@ -44,7 +44,7 @@
         "symfony/dependency-injection": "<3.4",
         "symfony/http-kernel": "<3.4",
         "symfony/intl": "<4.3",
-        "symfony/translation": "<5.0",
+        "symfony/translation": ">=5.0",
         "symfony/yaml": "<3.4"
     },
     "suggest": {

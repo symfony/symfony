@@ -77,6 +77,26 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
+    public function testStringInputWithFloatData(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 12345.6789, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+
+        $this->assertSame('12345,68', $form->createView()->vars['value']);
+    }
+
+    public function testStringInputWithIntData(): void
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 12345, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+
+        $this->assertSame('12345,00', $form->createView()->vars['value']);
+    }
+
     public function testDefaultFormattingWithRounding(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP]);

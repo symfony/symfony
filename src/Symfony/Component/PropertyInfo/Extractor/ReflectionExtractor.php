@@ -191,7 +191,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function extractFromDeclaredType(string $class, string $property)
     {
-        if (version_compare(PHP_VERSION_ID, 70400, '<')) {
+        if (version_compare(\PHP_VERSION_ID, 70400, '<')) {
             return null;
         }
 
@@ -314,8 +314,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * @param \ReflectionType $reflectionType
+     * @param \ReflectionType                              $reflectionType
      * @param object|\ReflectionMethod|\ReflectionProperty $reflector
+     *
      * @return Type
      */
     private function extractFromReflectionType(\ReflectionType $reflectionType, object $reflector): Type
@@ -331,10 +332,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $type = new Type($phpTypeOrClass, $nullable);
         } elseif ($reflector instanceof \ReflectionMethod || $reflector instanceof \ReflectionProperty) {
             $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflector));
-        }  else {
+        } else {
             throw new \BadMethodCallException(
                 '$reflector should be an instance of ReflectionMethod or ReflectionProperty, '
-                . get_class($reflector) . ' given'
+                .\get_class($reflector).' given'
             );
         }
 
@@ -342,8 +343,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * @param string $name
+     * @param string                                       $name
      * @param object|\ReflectionMethod|\ReflectionProperty $reflector
+     *
      * @return string
      */
     private function resolveTypeName(string $name, object $reflector): string
@@ -351,7 +353,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!($reflector instanceof \ReflectionMethod || $reflector instanceof \ReflectionProperty)) {
             throw new \BadMethodCallException(
                 '$reflector should be an instance of ReflectionMethod or ReflectionProperty, '
-                . get_class($reflector) . ' given'
+                .\get_class($reflector).' given'
             );
         }
 

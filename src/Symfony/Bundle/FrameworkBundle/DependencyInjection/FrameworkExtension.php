@@ -1916,7 +1916,11 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('mailer.xml');
-        $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
+        $transport = $container->getDefinition('mailer.default_transport');
+        $transport->setArgument(0, $config['dsn']);
+        if (null !== $config['transport']) {
+            $transport->setArgument(4, new Reference($config['transport']));
+        }
     }
 
     /**

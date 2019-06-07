@@ -31,14 +31,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class Transport
 {
-    public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
+    public static function fromDsn(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null, TransportInterface $customTransport = null): TransportInterface
     {
         // failover?
         $dsns = preg_split('/\s++\|\|\s++/', $dsn);
         if (\count($dsns) > 1) {
             $transports = [];
             foreach ($dsns as $dsn) {
-                $transports[] = self::createTransport($dsn, $dispatcher, $client, $logger);
+                $transports[] = self::createTransport($dsn, $dispatcher, $client, $logger, $customTransport);
             }
 
             return new Transport\FailoverTransport($transports);
@@ -49,16 +49,16 @@ class Transport
         if (\count($dsns) > 1) {
             $transports = [];
             foreach ($dsns as $dsn) {
-                $transports[] = self::createTransport($dsn, $dispatcher, $client, $logger);
+                $transports[] = self::createTransport($dsn, $dispatcher, $client, $logger, $customTransport);
             }
 
             return new Transport\RoundRobinTransport($transports);
         }
 
-        return self::createTransport($dsn, $dispatcher, $client, $logger);
+        return self::createTransport($dsn, $dispatcher, $client, $logger, $customTransport);
     }
 
-    private static function createTransport(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null): TransportInterface
+    private static function createTransport(string $dsn, EventDispatcherInterface $dispatcher = null, HttpClientInterface $client = null, LoggerInterface $logger = null, TransportInterface $customTransport = null): TransportInterface
     {
         if (false === $parsedDsn = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsn));
@@ -169,6 +169,12 @@ class Transport
                 }
 
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));
+            case 'custom':
+                if (!$customTransport) {
+                    throw new \LogicException('You must specify the transport class when using the "custom" provider.');
+                }
+
+                return new $customTransport($user, $pass, $query, $client, $dispatcher, $logger);
             default:
                 if ('smtp' === $parsedDsn['scheme']) {
                     $transport = new Transport\Smtp\EsmtpTransport($parsedDsn['host'], $parsedDsn['port'] ?? 25, $query['encryption'] ?? null, $query['auth_mode'] ?? null, $dispatcher, $logger);

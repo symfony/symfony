@@ -1525,6 +1525,7 @@ class Configuration implements ConfigurationInterface
                     ->{!class_exists(FullStack::class) && class_exists(Mailer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('dsn')->defaultValue('smtp://null')->end()
+                        ->scalarNode('transport')->defaultNull()->end()
                     ->end()
                 ->end()
             ->end()

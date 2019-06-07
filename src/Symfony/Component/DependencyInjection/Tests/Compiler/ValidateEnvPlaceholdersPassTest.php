@@ -332,6 +332,7 @@ class EnvConfigurationWithoutRootNode implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
+        throw new \Exception();
         return new TreeBuilder('env_extension');
     }
 }
@@ -340,6 +341,7 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
 {
     public function getConfigTreeBuilder()
     {
+        throw new \Exception();
         $treeBuilder = new TreeBuilder('env_extension');
         $treeBuilder->getRootNode()
             ->children()

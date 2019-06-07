@@ -22,4 +22,5 @@ class Php74Dummy
     public ?string $string;
     public Dummy $dummy;
     public ?Dummy $optionalDummy;
+    public iterable $iterable;
 }

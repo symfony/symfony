@@ -150,27 +150,12 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
                 $this->parameters,
                 $this->translationDomain
             );
-        } elseif ($this->translator instanceof TranslatorInterface) {
+        } else {
             $translatedMessage = $this->translator->trans(
                 $this->message,
                 ['%count%' => $this->plural] + $this->parameters,
                 $this->translationDomain
             );
-        } else {
-            try {
-                $translatedMessage = $this->translator->transChoice(
-                    $this->message,
-                    $this->plural,
-                    $this->parameters,
-                    $this->translationDomain
-                );
-            } catch (\InvalidArgumentException $e) {
-                $translatedMessage = $this->translator->trans(
-                    $this->message,
-                    $this->parameters,
-                    $this->translationDomain
-                );
-            }
         }
 
         $this->violations->add(new ConstraintViolation(

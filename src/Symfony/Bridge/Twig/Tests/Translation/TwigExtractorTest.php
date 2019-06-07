@@ -50,15 +50,6 @@ class TwigExtractorTest extends TestCase
         }
     }
 
-    /**
-     * @group legacy
-     * @dataProvider getLegacyExtractData
-     */
-    public function testLegacyExtract($template, $messages)
-    {
-        $this->testExtract($template, $messages);
-    }
-
     public function getExtractData()
     {
         return [
@@ -77,24 +68,6 @@ class TwigExtractorTest extends TestCase
 
             // make sure this works with twig's named arguments
             ['{{ "new key" | trans(domain="domain") }}', ['new key' => 'domain']],
-        ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function getLegacyExtractData()
-    {
-        return [
-            ['{{ "new key" | transchoice(1) }}', ['new key' => 'messages']],
-            ['{{ "new key" | transchoice(1) | upper }}', ['new key' => 'messages']],
-            ['{{ "new key" | transchoice(1, {}, "domain") }}', ['new key' => 'domain']],
-
-            // make sure 'trans_default_domain' tag is supported
-            ['{% trans_default_domain "domain" %}{{ "new key"|transchoice }}', ['new key' => 'domain']],
-
-            // make sure this works with twig's named arguments
-            ['{{ "new key" | transchoice(domain="domain", count=1) }}', ['new key' => 'domain']],
         ];
     }
 

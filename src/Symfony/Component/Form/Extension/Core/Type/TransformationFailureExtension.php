@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\EventListener\TransformationFailureListener;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,14 +23,8 @@ class TransformationFailureExtension extends AbstractTypeExtension
 {
     private $translator;
 
-    /**
-     * @param TranslatorInterface|null $translator
-     */
-    public function __construct($translator = null)
+    public function __construct(TranslatorInterface $translator = null)
     {
-        if (null !== $translator && !$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         $this->translator = $translator;
     }
 

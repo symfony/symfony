@@ -13,14 +13,13 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface as LegacyTranslatorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorInterface, TranslatorBagInterface, WarmableInterface
+class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface
 {
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;
@@ -36,11 +35,8 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorIn
     /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
-    public function __construct($translator)
+    public function __construct(TranslatorInterface $translator)
     {
-        if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
-            throw new \TypeError(sprintf('Argument 1 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
-        }
         if (!$translator instanceof TranslatorBagInterface || !$translator instanceof LocaleAwareInterface) {
             throw new InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and LocaleAwareInterface.', \get_class($translator)));
         }
@@ -55,24 +51,6 @@ class DataCollectorTranslator implements LegacyTranslatorInterface, TranslatorIn
     {
         $trans = $this->translator->trans($id, $parameters, $domain, $locale);
         $this->collectMessage($locale, $domain, $id, $trans, $parameters);
-
-        return $trans;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.2, use the trans() method instead with a %count% parameter
-     */
-    public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-    {
-        if ($this->translator instanceof TranslatorInterface) {
-            $trans = $this->translator->trans($id, ['%count%' => $number] + $parameters, $domain, $locale);
-        } else {
-            $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-        }
-
-        $this->collectMessage($locale, $domain, $id, $trans, ['%count%' => $number] + $parameters);
 
         return $trans;
     }

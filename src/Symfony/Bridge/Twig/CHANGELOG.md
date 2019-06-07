@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * removed `TwigEngine` class, use `\Twig\Environment` instead.
+ * removed `transChoice` filter and token
 
 4.4.0
 -----

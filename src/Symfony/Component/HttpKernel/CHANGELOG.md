@@ -8,6 +8,7 @@ CHANGELOG
  * removed `ConfigDataCollector::getApplicationName()` 
  * removed `ConfigDataCollector::getApplicationVersion()`
  * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
+ * removed `TranslatorListener`
 
 4.3.0
 -----

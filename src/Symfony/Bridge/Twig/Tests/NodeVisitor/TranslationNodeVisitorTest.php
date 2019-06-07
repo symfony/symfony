@@ -57,10 +57,8 @@ class TranslationNodeVisitorTest extends TestCase
 
         return [
             [TwigNodeProvider::getTransFilter($message), [[$message, null]]],
-            [TwigNodeProvider::getTransChoiceFilter($message), [[$message, null]]],
             [TwigNodeProvider::getTransTag($message), [[$message, null]]],
             [TwigNodeProvider::getTransFilter($message, $domain), [[$message, $domain]]],
-            [TwigNodeProvider::getTransChoiceFilter($message, $domain), [[$message, $domain]]],
             [TwigNodeProvider::getTransTag($message, $domain), [[$message, $domain]]],
         ];
     }

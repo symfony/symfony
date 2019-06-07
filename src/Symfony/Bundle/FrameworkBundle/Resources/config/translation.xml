@@ -21,7 +21,6 @@
             </call>
             <tag name="kernel.locale_aware" />
         </service>
-        <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" />
         <service id="Symfony\Contracts\Translation\TranslatorInterface" alias="translator" />
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator">

@@ -17,6 +17,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended2;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php74Dummy;
@@ -250,6 +251,8 @@ class ReflectionExtractorTest extends TestCase
             ['dummy', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)]],
             ['optionalDummy', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)]],
             ['iterable', [new Type(Type::BUILTIN_TYPE_ITERABLE, false)]],
+            ['self', [new Type(Type::BUILTIN_TYPE_OBJECT, false, Php74Dummy::class)]],
+            ['parent', [new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
         ];
     }
 

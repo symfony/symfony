@@ -209,13 +209,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $reflectionType = $reflectionProperty->getType();
-        $type = $reflectionType->getName();
 
-        if ($reflectionType->isBuiltIn()) {
-            return [new Type(static::MAP_TYPES[$type] ?? $type, $reflectionType->allowsNull())];
-        }
-
-        return [new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionType->allowsNull(), $type)];
+        return [$this->extractFromReflectionType($reflectionType, null, $reflectionProperty)];
     }
 
     /**
@@ -234,7 +229,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         if (!$reflectionType = $reflectionParameter->getType()) {
             return null;
         }
-        $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod);
+        $type = $this->extractFromReflectionType($reflectionType, $reflectionMethod, null);
 
         if (\in_array($prefix, $this->arrayMutatorPrefixes)) {
             $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type);
@@ -256,7 +251,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         if ($reflectionType = $reflectionMethod->getReturnType()) {
-            return [$this->extractFromReflectionType($reflectionType, $reflectionMethod)];
+            return [$this->extractFromReflectionType($reflectionType, $reflectionMethod, null)];
         }
 
         if (\in_array($prefix, ['is', 'can', 'has'])) {
@@ -291,7 +286,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
             $reflectionType = $parameter->getType();
 
-            return $reflectionType ? [$this->extractFromReflectionType($reflectionType, $constructor)] : null;
+            return $reflectionType ? [$this->extractFromReflectionType($reflectionType, $constructor, null)] : null;
         }
 
         if ($parentClass = $reflectionClass->getParentClass()) {
@@ -320,7 +315,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return [new Type(static::MAP_TYPES[$type] ?? $type)];
     }
 
-    private function extractFromReflectionType(\ReflectionType $reflectionType, \ReflectionMethod $reflectionMethod): Type
+    private function extractFromReflectionType(\ReflectionType $reflectionType, ?\ReflectionMethod $reflectionMethod, ?\ReflectionProperty $reflectionProperty): Type
     {
         $phpTypeOrClass = $reflectionType->getName();
         $nullable = $reflectionType->allowsNull();
@@ -331,19 +326,27 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $type = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
         } elseif ($reflectionType->isBuiltin()) {
             $type = new Type($phpTypeOrClass, $nullable);
+        } elseif (null !== $reflectionMethod) {
+            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflectionMethod, null));
+        } elseif (null !== $reflectionProperty) {
+            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, null, $reflectionProperty));
         } else {
-            $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflectionMethod));
+            throw new \BadMethodCallException('You should provide method or property reflection');
         }
 
         return $type;
     }
 
-    private function resolveTypeName(string $name, \ReflectionMethod $reflectionMethod): string
+    private function resolveTypeName(string $name, ?\ReflectionMethod $reflectionMethod, ?\ReflectionProperty $reflectionProperty): string
     {
-        if ('self' === $lcName = strtolower($name)) {
-            return $reflectionMethod->getDeclaringClass()->name;
+        if (null === ($reflection = $reflectionMethod ?? $reflectionProperty)) {
+            throw new \BadMethodCallException('You should provide method or property reflection');
         }
-        if ('parent' === $lcName && $parent = $reflectionMethod->getDeclaringClass()->getParentClass()) {
+
+        if ('self' === $lcName = strtolower($name)) {
+            return $reflection->getDeclaringClass()->name;
+        }
+        if ('parent' === $lcName && $parent = $reflection->getDeclaringClass()->getParentClass()) {
             return $parent->name;
         }
 

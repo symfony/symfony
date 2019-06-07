@@ -16,11 +16,13 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
  *
  * @author Tales Santos <tales.augusto.santos@gmail.com>
  */
-class Php74Dummy
+class Php74Dummy extends ParentDummy
 {
     public int $int;
     public ?string $string;
     public Dummy $dummy;
+    public parent $parent;
+    public self $self;
     public ?Dummy $optionalDummy;
     public iterable $iterable;
 }

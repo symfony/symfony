@@ -399,7 +399,7 @@ class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInte
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('env_extension');
-        $treeBuilder
+        $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('nodes')
                     ->isRequired()

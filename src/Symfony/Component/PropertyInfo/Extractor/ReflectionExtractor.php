@@ -203,7 +203,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
-
         if (!$reflectionProperty->hasType()) {
             return null;
         }

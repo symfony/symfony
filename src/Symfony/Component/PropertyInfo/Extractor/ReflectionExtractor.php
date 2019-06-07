@@ -198,11 +198,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         try {
             $reflectionClass = new \ReflectionClass($class);
+            $reflectionProperty = $reflectionClass->getProperty($property);
         } catch (\ReflectionException $e) {
             return null;
         }
 
-        $reflectionProperty = $reflectionClass->getProperty($property);
 
         if (!$reflectionProperty->hasType()) {
             return null;

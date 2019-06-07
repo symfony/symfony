@@ -53,7 +53,7 @@ trait PriorityTaggedServiceTrait
         $services = [];
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : (method_exists($serviceId, 'getDefaultPriority') ? $serviceId::getDefaultPriority() : 0);
 
             if (null === $indexAttribute && !$needsIndexes) {
                 $services[$priority][] = new Reference($serviceId);

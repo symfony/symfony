@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-07T11:02:30Z
+
+alternatively, we can update the compiler pass in MonologBundle and check the transport class there

@@ -60,6 +60,10 @@ final class PropertyInfoLoader implements LoaderInterface
                 continue;
             }
 
+            if (!property_exists($className, $property)) {
+                continue;
+            }
+
             $types = $this->typeExtractor->getTypes($className, $property);
             if (null === $types) {
                 continue;

@@ -191,8 +191,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     private function extractFromDeclaredType(string $class, string $property)
     {
-        // to be removed as soon as Symfony bumps the minimum PHP Version to 7.4
-        if (version_compare(PHP_VERSION, '7.4.0-dev', '<')) {
+        if (version_compare(PHP_VERSION_ID, 70400, '<')) {
             return null;
         }
 

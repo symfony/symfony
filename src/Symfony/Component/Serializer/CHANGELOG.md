@@ -16,6 +16,7 @@ CHANGELOG
    use the default context instead.
  * removed `XmlEncoder::setRootNodeName()` & `XmlEncoder::getRootNodeName()`, use the default context instead.
  * removed individual encoders/normalizers options as constructor arguments.
+ * removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
 
 4.3.0
 -----

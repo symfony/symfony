@@ -40,22 +40,8 @@ class JsonDecode implements DecoderInterface
         self::RECURSION_DEPTH => 512,
     ];
 
-    /**
-     * Constructs a new JsonDecode instance.
-     *
-     * @param array $defaultContext
-     */
-    public function __construct($defaultContext = [], int $depth = 512)
+    public function __construct(array $defaultContext = [])
     {
-        if (!\is_array($defaultContext)) {
-            @trigger_error(sprintf('Using constructor parameters that are not a default context is deprecated since Symfony 4.2, use the "%s" and "%s" keys of the context instead.', self::ASSOCIATIVE, self::RECURSION_DEPTH), E_USER_DEPRECATED);
-
-            $defaultContext = [
-                self::ASSOCIATIVE => (bool) $defaultContext,
-                self::RECURSION_DEPTH => $depth,
-            ];
-        }
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 

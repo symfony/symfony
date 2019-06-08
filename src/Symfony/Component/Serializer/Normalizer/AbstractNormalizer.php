@@ -203,24 +203,14 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * If a circular reference handler is set, it will be called. Otherwise, a
      * {@class CircularReferenceException} will be thrown.
      *
-     * @final since Symfony 4.2
-     *
-     * @param object      $object
-     * @param string|null $format
-     * @param array       $context
+     * @final
      *
      * @return mixed
      *
      * @throws CircularReferenceException
      */
-    protected function handleCircularReference($object/*, string $format = null, array $context = []*/)
+    protected function handleCircularReference(object $object, string $format = null, array $context = [])
     {
-        if (\func_num_args() < 2 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have two new "string $format = null" and "array $context = []" arguments in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-        $format = \func_num_args() > 1 ? func_get_arg(1) : null;
-        $context = \func_num_args() > 2 ? func_get_arg(2) : [];
-
         $circularReferenceHandler = $context[self::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[self::CIRCULAR_REFERENCE_HANDLER];
         if ($circularReferenceHandler) {
             return $circularReferenceHandler($object, $format, $context);
@@ -450,20 +440,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param array       $parentContext
-     * @param string      $attribute     Attribute name
-     * @param string|null $format
-     *
-     * @return array
-     *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
+    protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {
-        if (\func_num_args() < 3) {
-            @trigger_error(sprintf('Method "%s::%s()" will have a third "?string $format" argument in version 5.0; not defining it is deprecated since Symfony 4.3.', \get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-            $format = null;
-        }
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
         } else {

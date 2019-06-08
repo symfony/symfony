@@ -10,6 +10,8 @@ CHANGELOG
  * The `SimpleFormFactory` and `SimplePreAuthenticationFactory` classes have been removed,
    use Guard instead.
  * Removed `LogoutUrlHelper` and `SecurityHelper` templating helpers, use Twig instead
+ * Removed the `logout_on_user_change` firewall option
+ * Removed the `threads` encoder option
 
 4.3.0
 -----

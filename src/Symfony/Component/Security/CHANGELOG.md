@@ -20,6 +20,10 @@ CHANGELOG
    the `getReachableRoleNames()` method instead and return roles as strings.
  * Removed the `getRoles()` method from the `TokenInterface`. Tokens must implement the `getRoleNames()` method
    instead and return roles as strings.
+ * Made the `serialize` and `unserialize` methods of `AbstractToken` final and internal
+ * Removed the `serialize` and `unserialize` methods from `AuthenticationException`
+ * Added method `__serialize` and `__unserialize` to `TokenInterface`
+ * Added method `needsRehash` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
 
 4.4.0
 -----

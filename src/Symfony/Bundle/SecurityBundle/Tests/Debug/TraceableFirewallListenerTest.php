@@ -51,6 +51,7 @@ class TraceableFirewallListenerTest extends TestCase
             ->willReturn([[$listener], null, null]);
 
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
+        $firewall->configureLogoutUrlGenerator($event);
         $firewall->onKernelRequest($event);
 
         $listeners = $firewall->getWrappedListeners();

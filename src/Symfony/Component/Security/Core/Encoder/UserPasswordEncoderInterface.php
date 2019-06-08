@@ -17,8 +17,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * UserPasswordEncoderInterface is the interface for the password encoder service.
  *
  * @author Ariel Ferrandini <arielferrandini@gmail.com>
- *
- * @method bool needsRehash(UserInterface $user, string $encoded)
  */
 interface UserPasswordEncoderInterface
 {
@@ -39,4 +37,9 @@ interface UserPasswordEncoderInterface
      * @return bool true if the password is valid, false otherwise
      */
     public function isPasswordValid(UserInterface $user, $raw);
+
+    /**
+     * Checks if an encoded password would benefit from rehashing.
+     */
+    public function needsRehash(UserInterface $user, string $encoded): bool;
 }

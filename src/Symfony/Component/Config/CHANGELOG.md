@@ -3,8 +3,10 @@ CHANGELOG
 
 5.0.0
 -----
+
  * Dropped support for constructing a `TreeBuilder` without passing root node information.
  * Removed the `root()` method in `TreeBuilder`, pass the root node information to the constructor instead
+ * Added method `getChildNodeDefinitions()` to ParentNodeDefinitionInterface
 
 4.3.0
 -----

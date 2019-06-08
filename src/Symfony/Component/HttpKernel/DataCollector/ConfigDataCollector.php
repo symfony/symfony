@@ -212,20 +212,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Gets the application name.
-     *
-     * @return string The application name
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getAppName()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
-        return 'n/a';
-    }
-
-    /**
      * Gets the environment.
      *
      * @return string The environment

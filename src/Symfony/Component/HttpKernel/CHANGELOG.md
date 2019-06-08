@@ -9,6 +9,7 @@ CHANGELOG
  * removed `ConfigDataCollector::getApplicationVersion()`
  * removed support for `Symfony\Component\Templating\EngineInterface` in `HIncludeFragmentRenderer`, use a `Twig\Environment` only
  * removed `TranslatorListener` in favor of `LocaleAwareListener`
+ * removed `getRootDir()` and `getName()` from `Kernel` and `KernelInterface`
  * removed `FilterControllerArgumentsEvent`, use `ControllerArgumentsEvent` instead
  * removed `FilterControllerEvent`, use `ControllerEvent` instead
  * removed `FilterResponseEvent`, use `ResponseEvent` instead

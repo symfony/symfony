@@ -13,7 +13,6 @@
             <argument>%kernel.bundles_metadata%</argument>
             <argument>%twig.default_path%</argument>
             <argument type="service" id="debug.file_link_formatter" on-invalid="null" />
-            <argument>%kernel.root_dir%</argument>
             <tag name="console.command" command="debug:twig" />
         </service>
 

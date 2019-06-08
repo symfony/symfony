@@ -55,17 +55,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     protected $bundles = [];
 
     protected $container;
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    protected $rootDir;
     protected $environment;
     protected $debug;
     protected $booted = false;
-    /**
-     * @deprecated since Symfony 4.2
-     */
-    protected $name;
     protected $startTime;
 
     private $projectDir;
@@ -87,8 +79,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         $this->environment = $environment;
         $this->debug = $debug;
-        $this->rootDir = $this->getRootDir(false);
-        $this->name = $this->getName(false);
     }
 
     public function __clone()
@@ -280,27 +270,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.2
-     */
-    public function getName(/* $triggerDeprecation = true */)
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        if (null === $this->name) {
-            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
-            if (ctype_digit($this->name[0])) {
-                $this->name = '_'.$this->name;
-            }
-        }
-
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function getEnvironment()
     {
@@ -313,25 +282,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function isDebug()
     {
         return $this->debug;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since Symfony 4.2, use getProjectDir() instead
-     */
-    public function getRootDir(/* $triggerDeprecation = true */)
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2, use getProjectDir() instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        if (null === $this->rootDir) {
-            $r = new \ReflectionObject($this);
-            $this->rootDir = \dirname($r->getFileName());
-        }
-
-        return $this->rootDir;
     }
 
     /**
@@ -450,8 +400,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     {
         $class = \get_class($this);
         $class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).str_replace('.', '_', ContainerBuilder::hash($class)) : $class;
-        $class = $this->name.str_replace('\\', '_', $class).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
-
+        $class = str_replace('\\', '_', $class).ucfirst($this->environment).($this->debug ? 'Debug' : '').'Container';
         if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $class)) {
             throw new \InvalidArgumentException(sprintf('The environment "%s" contains invalid characters, it can only contain characters allowed in PHP class names.', $this->environment));
         }
@@ -611,18 +560,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             ];
         }
 
+        $rootDir = new \ReflectionObject($this);
+        $rootDir = \dirname($rootDir->getFileName());
+
         return [
             /*
              * @deprecated since Symfony 4.2, use kernel.project_dir instead
              */
-            'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
+            'kernel.root_dir' => realpath($rootDir) ?: $rootDir,
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.debug' => $this->debug,
-            /*
-             * @deprecated since Symfony 4.2
-             */
-            'kernel.name' => $this->name,
             'kernel.cache_dir' => realpath($cacheDir = $this->warmupDir ?: $this->getCacheDir()) ?: $cacheDir,
             'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
             'kernel.bundles' => $bundles,
@@ -837,48 +785,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return $output;
     }
 
-    /**
-     * @deprecated since Symfony 4.3
-     */
-    public function serialize()
-    {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
-
-        return serialize([$this->environment, $this->debug]);
-    }
-
-    /**
-     * @deprecated since Symfony 4.3
-     */
-    public function unserialize($data)
-    {
-        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
-        list($environment, $debug) = unserialize($data, ['allowed_classes' => false]);
-
-        $this->__construct($environment, $debug);
-    }
-
     public function __sleep()
     {
-        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
-            $this->serialized = $this->serialize();
-
-            return ['serialized'];
-        }
-
         return ['environment', 'debug'];
     }
 
     public function __wakeup()
     {
-        if (__CLASS__ !== $c = (new \ReflectionMethod($this, 'serialize'))->getDeclaringClass()->name) {
-            @trigger_error(sprintf('Implementing the "%s::serialize()" method is deprecated since Symfony 4.3.', $c), E_USER_DEPRECATED);
-            $this->unserialize($this->serialized);
-            unset($this->serialized);
-
-            return;
-        }
         $this->__construct($this->environment, $this->debug);
     }
 }

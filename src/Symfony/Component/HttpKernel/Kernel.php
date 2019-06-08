@@ -261,6 +261,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $files = [];
 
         if ($isResource && file_exists($file = $dir.'/'.$bundle->getName().$overridePath)) {
+            if (0 === strpos($dir, 'app') || 0 === strpos($dir, 'src')) {
+                @trigger_error('Using the global fallback to load resources is deprecated since Symfony 4.4 and will be removed in 5.0.', E_USER_DEPRECATED);
+            }
             $files[] = $file;
         }
 

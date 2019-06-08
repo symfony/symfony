@@ -34,6 +34,10 @@ class FileLocatorTest extends TestCase
         $locator->locate('/some/path');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecated Using the global fallback to load resources is deprecated since Symfony 4.4 and will be removed in 5.0.
+     */
     public function testLocateWithGlobalResourcePath()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
@@ -42,7 +46,7 @@ class FileLocatorTest extends TestCase
             ->method('locateResource')
             ->with('@BundleName/some/path', '/global/resource/path', false);
 
-        $locator = new FileLocator($kernel, '/global/resource/path');
-        $locator->locate('@BundleName/some/path', null, false);
+        $locator = new FileLocator($kernel, '/global/resource/path', []);
+        $locator->locate('@BundleName/some/path', '/global/resource/path', false);
     }
 }

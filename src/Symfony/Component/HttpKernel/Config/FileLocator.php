@@ -29,12 +29,14 @@ class FileLocator extends BaseFileLocator
      * @param string|null     $path   The path the global resource directory
      * @param array           $paths  An array of paths where to look for resources
      */
-    public function __construct(KernelInterface $kernel, string $path = null, array $paths = [])
+    public function __construct(KernelInterface $kernel, $paths = [])
     {
         $this->kernel = $kernel;
-        if (null !== $path) {
+        if (3 === \count(\func_get_args()) && \is_string(func_get_arg(1)) && null !== ($path = func_get_arg(1))) {
+            $paths = func_get_arg(2);
             $this->path = $path;
             $paths[] = $path;
+            @trigger_error(sprintf('Using "$path" for a global resource directory in %s is deprecated since Symfony 4.4 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         parent::__construct($paths);

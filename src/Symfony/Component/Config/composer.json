@@ -21,10 +21,10 @@
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
-        "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/event-dispatcher": "^4.4|^5.0",
         "symfony/finder": "^4.4|^5.0",
         "symfony/messenger": "^4.4|^5.0",
+        "symfony/service-contracts": "^1.1",
         "symfony/yaml": "^4.4|^5.0"
     },
     "conflict": {

@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\CacheWarmer;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\CompatibilityServiceSubscriberInterface as ServiceSubscriberInterface;
+use Symfony\Bundle\TwigBundle\DependencyInjection\CompatibilityServiceSubscriberInterface as ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Twig\Environment;
 use Twig\Error\Error;

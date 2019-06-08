@@ -30,7 +30,6 @@ class DeprecationErrorHandler
     const MODE_WEAK = 'max[total]=999999&verbose=0';
     const MODE_STRICT = 'max[total]=0';
 
-    private $mode;
     private $configuration;
     private $deprecations = [
         'unsilencedCount' => 0,
@@ -215,9 +214,7 @@ class DeprecationErrorHandler
         if (null !== $this->configuration) {
             return $this->configuration;
         }
-        if (false === $mode = $this->mode) {
-            $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
-        }
+        $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
         if ('strict' === $mode) {
             return $this->configuration = Configuration::inStrictMode();
         }

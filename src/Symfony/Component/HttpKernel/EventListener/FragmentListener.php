@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\UriSigner;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\UriSigner;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FragmentListener implements EventSubscriberInterface
 {
@@ -51,7 +51,7 @@ class FragmentListener implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException if the request does not come from a trusted IP
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
 

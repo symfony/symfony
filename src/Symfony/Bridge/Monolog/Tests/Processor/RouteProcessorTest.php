@@ -16,7 +16,7 @@ use Symfony\Bridge\Monolog\Processor\RouteProcessor;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class RouteProcessorTest extends TestCase
 {
@@ -122,9 +122,9 @@ class RouteProcessorTest extends TestCase
         $this->assertEquals(['extra' => []], $record);
     }
 
-    private function mockGetResponseEvent(Request $request): GetResponseEvent
+    private function mockGetResponseEvent(Request $request): RequestEvent
     {
-        $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event = $this->getMockBuilder(RequestEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getRequest')->willReturn($request);
 
         return $event;

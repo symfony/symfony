@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -31,7 +31,7 @@ use Twig\Environment;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
@@ -60,7 +60,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         return self::DISABLED !== $this->mode;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         $response = $event->getResponse();
         $request = $event->getRequest();

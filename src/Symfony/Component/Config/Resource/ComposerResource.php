@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ComposerResource implements SelfCheckingResourceInterface
 {
@@ -46,7 +46,7 @@ class ComposerResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         self::refresh();
 

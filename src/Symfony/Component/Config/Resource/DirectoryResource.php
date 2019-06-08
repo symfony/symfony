@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class DirectoryResource implements SelfCheckingResourceInterface
 {
@@ -68,7 +68,7 @@ class DirectoryResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         if (!is_dir($this->resource)) {
             return false;

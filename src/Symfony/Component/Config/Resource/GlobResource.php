@@ -21,7 +21,7 @@ use Symfony\Component\Finder\Glob;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
 {
@@ -68,7 +68,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         $hash = $this->computeHash();
 

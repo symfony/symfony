@@ -261,40 +261,6 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
-     */
-    public function testConstructDeprecatedSize()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
-            UPLOAD_ERR_OK,
-            false
-        );
-
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
-     */
-    public function testConstructDeprecatedSizeWhenPassingOnlyThe4Needed()
-    {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif')
-        );
-
-        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
-    }
-
     public function testGetExtension()
     {
         $file = new UploadedFile(

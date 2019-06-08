@@ -180,7 +180,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * Gets the fallback locales.
      *
-     * @internal since Symfony 4.2
+     * @internal
      *
      * @return array The fallback locales
      */

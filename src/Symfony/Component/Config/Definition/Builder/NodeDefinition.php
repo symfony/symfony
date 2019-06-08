@@ -359,12 +359,8 @@ abstract class NodeDefinition implements NodeParentInterface
     public function setPathSeparator(string $separator)
     {
         if ($this instanceof ParentNodeDefinitionInterface) {
-            if (method_exists($this, 'getChildNodeDefinitions')) {
-                foreach ($this->getChildNodeDefinitions() as $child) {
-                    $child->setPathSeparator($separator);
-                }
-            } else {
-                @trigger_error('Passing a ParentNodeDefinitionInterface without getChildNodeDefinitions() is deprecated since Symfony 4.1.', E_USER_DEPRECATED);
+            foreach ($this->getChildNodeDefinitions() as $child) {
+                $child->setPathSeparator($separator);
             }
         }
 

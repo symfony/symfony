@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class ControllerResolver extends ContainerControllerResolver
 {

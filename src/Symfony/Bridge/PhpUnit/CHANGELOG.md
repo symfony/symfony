@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+ * removed `weak_vendor` mode, use `max[self]=0` instead
+
 4.3.0
 -----
 

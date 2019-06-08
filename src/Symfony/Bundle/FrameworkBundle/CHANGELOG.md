@@ -16,6 +16,7 @@ CHANGELOG
  * Removed the `cache.app.simple` service and its corresponding PSR-16 autowiring alias
  * Removed cache-related compiler passes and `RequestDataCollector`
  * Removed the `translator.selector` and `session.save_listener` services
+ * Removed `SecurityUserValueResolver`, use `UserValueResolver` instead
 
 4.4.0
 -----

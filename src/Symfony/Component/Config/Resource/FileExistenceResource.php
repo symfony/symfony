@@ -19,7 +19,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Charles-Henri Bruyand <charleshenri.bruyand@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FileExistenceResource implements SelfCheckingResourceInterface
 {
@@ -55,7 +55,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         return file_exists($this->resource) === $this->exists;
     }

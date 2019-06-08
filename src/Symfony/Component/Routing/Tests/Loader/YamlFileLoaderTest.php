@@ -382,8 +382,8 @@ class YamlFileLoaderTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo" in "%srequirements_without_placeholder_name.yml"?
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "\d+" of route "foo"
      */
     public function testRequirementsWithoutPlaceholderName()
     {

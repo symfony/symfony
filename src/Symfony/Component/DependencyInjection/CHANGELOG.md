@@ -4,8 +4,13 @@ CHANGELOG
 5.0.0
 -----
 
-* removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
-* removed support for non-string default env() parameters
+ * removed support for auto-discovered extension configuration class which does not implement `ConfigurationInterface`
+ * removed support for non-string default env() parameters
+ * moved `ServiceSubscriberInterface` to the `Symfony\Contracts\Service` namespace
+ * removed `RepeatedPass` and `RepeatablePassInterface`
+ * removed support for short factory/configurator syntax from `YamlFileLoader`
+ * removed `ResettableContainerInterface`, use `ResetInterface` instead
+ * added argument `$returnsClone` to `Definition::addMethodCall()`
 
 4.4.0
 -----

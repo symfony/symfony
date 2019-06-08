@@ -20,6 +20,8 @@ CHANGELOG
  * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
  * removed `Client`, use `HttpKernelBrowser` instead
  * added method `getProjectDir()` to `KernelInterface`
+ * removed methods `serialize` and `unserialize` from `DataCollector`, store the serialized state in the data property instead
+ * made `ProfilerStorageInterface` internal
 
 4.3.0
 -----

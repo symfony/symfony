@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FileResource implements SelfCheckingResourceInterface
 {
@@ -60,7 +60,7 @@ class FileResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
     }

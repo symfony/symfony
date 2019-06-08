@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.0
+-----
+
+* removed `FlattenException::setTraceFromException()` in favor of `setTraceFromThrowable()`
+
 4.3.0
 -----
 

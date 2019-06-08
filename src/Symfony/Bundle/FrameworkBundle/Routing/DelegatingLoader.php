@@ -23,7 +23,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DelegatingLoader extends BaseDelegatingLoader
 {

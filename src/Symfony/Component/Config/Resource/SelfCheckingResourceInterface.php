@@ -26,5 +26,5 @@ interface SelfCheckingResourceInterface extends ResourceInterface
      *
      * @return bool True if the resource has not been updated, false otherwise
      */
-    public function isFresh($timestamp);
+    public function isFresh(int $timestamp);
 }

@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\TreeWithoutRootNodeException;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
 use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
@@ -274,20 +273,6 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testConfigurationWithoutRootNode(): void
-    {
-        $container = new ContainerBuilder();
-        $container->registerExtension(new EnvExtension(new EnvConfigurationWithoutRootNode()));
-        $container->loadFromExtension('env_extension');
-
-        $this->doProcess($container);
-
-        $this->addToAssertionCount(1);
-    }
-
     public function testEmptyConfigFromMoreThanOneSource()
     {
         $container = new ContainerBuilder();
@@ -386,14 +371,6 @@ class EnvConfiguration implements ConfigurationInterface
     }
 }
 
-class EnvConfigurationWithoutRootNode implements ConfigurationInterface
-{
-    public function getConfigTreeBuilder()
-    {
-        return new TreeBuilder('env_extension');
-    }
-}
-
 class ConfigurationWithArrayNodeRequiringOneElement implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
@@ -438,11 +415,7 @@ class EnvExtension extends Extension
             return;
         }
 
-        try {
-            $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
-        } catch (TreeWithoutRootNodeException $e) {
-            $this->config = null;
-        }
+        $this->config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
     }
 
     public function getConfig()

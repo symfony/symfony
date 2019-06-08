@@ -17,6 +17,8 @@ CHANGELOG
  * removed `GetResponseForExceptionEvent`, use `ExceptionEvent` instead
  * removed `PostResponseEvent`, use `TerminateEvent` instead
  * removed `SaveSessionListener` in favor of `AbstractSessionListener` 
+ * removed `Client`, use `HttpKernelBrowser` instead
+ * added method `getProjectDir()` to `KernelInterface`
 
 4.3.0
 -----

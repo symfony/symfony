@@ -144,25 +144,6 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @final since Symfony 4.3, use __serialize() instead
-     *
-     * @internal since Symfony 4.3, use __serialize() instead
-     */
-    public function serialize()
-    {
-        $serialized = $this->__serialize();
-
-        if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
-            $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
-        }
-
-        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
-    }
-
-    /**
      * Restores the object state from an array given by __serialize().
      *
      * There is no need to unserialize any entry in $data, they are already ready-to-use.
@@ -181,18 +162,6 @@ abstract class AbstractToken implements TokenInterface
     public function __unserialize(array $data): void
     {
         [$this->user, $this->authenticated, , $this->attributes, $this->roleNames] = $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @final since Symfony 4.3, use __unserialize() instead
-     *
-     * @internal since Symfony 4.3, use __unserialize() instead
-     */
-    public function unserialize($serialized)
-    {
-        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
     /**
@@ -270,6 +239,22 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return sprintf('%s(user="%s", authenticated=%s, roles="%s")', $class, $this->getUsername(), json_encode($this->authenticated), implode(', ', $roles));
+    }
+
+    /**
+     * @internal
+     */
+    final public function serialize()
+    {
+        return serialize($this->__serialize());
+    }
+
+    /**
+     * @internal
+     */
+    final public function unserialize($serialized)
+    {
+        $this->__unserialize(\is_array($serialized) ? $serialized : unserialize($serialized));
     }
 
     private function hasUserChanged(UserInterface $user)

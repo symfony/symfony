@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Workflow;
 
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\Workflow\Event\AnnounceEvent;
 use Symfony\Component\Workflow\Event\CompletedEvent;
 use Symfony\Component\Workflow\Event\EnteredEvent;
@@ -43,7 +42,7 @@ class Workflow implements WorkflowInterface
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = $dispatcher;
         $this->name = $name;
     }
 

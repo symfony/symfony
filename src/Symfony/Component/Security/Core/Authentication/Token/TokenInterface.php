@@ -16,9 +16,6 @@ namespace Symfony\Component\Security\Core\Authentication\Token;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @method array __serialize()                                                                             Returns all the necessary state of the object for serialization purposes - not implementing it is deprecated since Symfony 4.3
- * @method void  __unserialize(array $data) Restores the object state from an array given by __serialize() - not implementing it is deprecated since Symfony 4.3
  */
 interface TokenInterface extends \Serializable
 {
@@ -134,4 +131,14 @@ interface TokenInterface extends \Serializable
      * @param mixed  $value The attribute value
      */
     public function setAttribute($name, $value);
+
+    /**
+     * Returns all the necessary state of the object for serialization purposes.
+     */
+    public function __serialize(): array;
+
+    /**
+     * Restores the object state from an array given by __serialize().
+     */
+    public function __unserialize(array $data): void;
 }

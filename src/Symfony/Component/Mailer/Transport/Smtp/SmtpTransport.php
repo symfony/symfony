@@ -12,7 +12,6 @@
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -22,6 +21,7 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Sends emails over SMTP.

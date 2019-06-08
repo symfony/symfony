@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\CompatibilityServiceSubscriberInterface as ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Generates the router matcher and generator classes.

@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements RepeatablePassInterface
+class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 {
     private $graph;
     private $currentDefinition;
@@ -47,14 +47,6 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         $this->onlyConstructorArguments = $onlyConstructorArguments;
         $this->hasProxyDumper = $hasProxyDumper;
         $this->enableExpressionProcessing();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**

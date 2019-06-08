@@ -191,21 +191,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLoadFactoryShortSyntax()
-    {
-        $container = new ContainerBuilder();
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('services14.yml');
-        $services = $container->getDefinitions();
-
-        $this->assertEquals([new Reference('baz'), 'getClass'], $services['factory']->getFactory(), '->load() parses the factory tag with service:method');
-        $this->assertEquals(['FooBacFactory', 'createFooBar'], $services['factory_with_static_call']->getFactory(), '->load() parses the factory tag with Class::method');
-        $this->assertEquals([new Reference('factory'), '__invoke'], $services['invokable_factory']->getFactory(), '->load() parses string service reference');
-    }
-
     public function testFactorySyntaxError()
     {
         $container = new ContainerBuilder();
@@ -213,20 +198,6 @@ class YamlFileLoaderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "factory" option for the "invalid_factory" service must be the id of the service without the "@" prefix (replace "@factory:method" with "factory:method"');
         $loader->load('bad_factory_syntax.yml');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLoadConfiguratorShortSyntax()
-    {
-        $container = new ContainerBuilder();
-        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('services_configurator_short_syntax.yml');
-        $services = $container->getDefinitions();
-
-        $this->assertEquals([new Reference('foo_bar_configurator'), 'configure'], $services['foo_bar']->getConfigurator(), '->load() parses the configurator tag with service:method');
-        $this->assertEquals(['FooBarConfigurator', 'configureFooBar'], $services['foo_bar_with_static_call']->getConfigurator(), '->load() parses the configurator tag with Class::method');
     }
 
     public function testExtensions()

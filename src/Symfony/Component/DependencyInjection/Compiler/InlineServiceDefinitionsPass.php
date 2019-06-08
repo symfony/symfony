@@ -22,10 +22,9 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
+class InlineServiceDefinitionsPass extends AbstractRecursivePass
 {
     private $analyzingPass;
-    private $repeatedPass;
     private $cloningIds = [];
     private $connectedIds = [];
     private $notInlinedIds = [];
@@ -35,15 +34,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
     {
         $this->analyzingPass = $analyzingPass;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        $this->repeatedPass = $repeatedPass;
     }
 
     public function process(ContainerBuilder $container)
@@ -93,10 +83,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
                     }
                 }
             } while ($this->inlinedIds && $this->analyzingPass);
-
-            if ($this->inlinedIds && $this->repeatedPass) {
-                $this->repeatedPass->setRepeat();
-            }
 
             foreach ($remainingInlinedIds as $id) {
                 $definition = $container->getDefinition($id);

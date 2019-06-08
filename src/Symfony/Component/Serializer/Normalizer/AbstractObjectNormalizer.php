@@ -540,6 +540,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * We must not mix up the attribute cache between parent and children.
      *
      * {@inheritdoc}
+     *
+     * @internal
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
     {

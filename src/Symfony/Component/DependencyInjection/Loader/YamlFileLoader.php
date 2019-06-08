@@ -592,14 +592,6 @@ class YamlFileLoader extends FileLoader
                 throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s" in "%s").', $parameter, $id, $callable, substr($callable, 1), $file));
             }
 
-            if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
-                $parts = explode(':', $callable);
-
-                @trigger_error(sprintf('Using short %s syntax for service "%s" is deprecated since Symfony 4.4, use "[\'@%s\', \'%s\']" instead.', $parameter, $id, ...$parts), E_USER_DEPRECATED);
-
-                return [$this->resolveServices('@'.$parts[0], $file), $parts[1]];
-            }
-
             return $callable;
         }
 

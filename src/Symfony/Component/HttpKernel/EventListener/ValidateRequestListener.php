@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Magnus Nordlander <magnus@fervo.se>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ValidateRequestListener implements EventSubscriberInterface
 {

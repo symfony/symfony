@@ -22,7 +22,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @author Piotr Stankowski <git@trakos.pl>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class RouteProcessor implements EventSubscriberInterface, ResetInterface
 {

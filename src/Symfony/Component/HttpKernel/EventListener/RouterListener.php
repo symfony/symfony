@@ -38,7 +38,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class RouterListener implements EventSubscriberInterface
 {

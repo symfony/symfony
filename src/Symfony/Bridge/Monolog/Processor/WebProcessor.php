@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class WebProcessor extends BaseWebProcessor implements EventSubscriberInterface
 {

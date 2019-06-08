@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ProfilerListener implements EventSubscriberInterface
 {

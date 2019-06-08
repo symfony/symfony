@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
  *
  * @author Philipp Kräutli <pkraeutli@astina.ch>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class SwiftMailerHandler extends BaseSwiftMailerHandler
 {

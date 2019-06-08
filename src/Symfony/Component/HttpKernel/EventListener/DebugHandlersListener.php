@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DebugHandlersListener implements EventSubscriberInterface
 {
@@ -150,9 +150,6 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @internal
-     */
     public function onKernelException(ExceptionEvent $event)
     {
         if (!$this->hasTerminatedWithException || !$event->isMasterRequest()) {

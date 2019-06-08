@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {

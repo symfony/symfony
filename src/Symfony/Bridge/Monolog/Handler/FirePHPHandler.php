@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {

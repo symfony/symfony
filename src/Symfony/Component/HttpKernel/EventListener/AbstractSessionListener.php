@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  *
- * @internal since Symfony 4.3
+ * @internal
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
@@ -121,9 +121,6 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @internal
-     */
     public function onFinishRequest(FinishRequestEvent $event)
     {
         if ($event->isMasterRequest()) {

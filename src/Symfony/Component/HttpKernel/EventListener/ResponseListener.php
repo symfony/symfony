@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ResponseListener implements EventSubscriberInterface
 {

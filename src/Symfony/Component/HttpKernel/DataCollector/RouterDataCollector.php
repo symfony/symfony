@@ -66,8 +66,6 @@ class RouterDataCollector extends DataCollector
 
     /**
      * Remembers the controller associated to each request.
-     *
-     * @final since Symfony 4.3
      */
     public function onKernelController(ControllerEvent $event)
     {

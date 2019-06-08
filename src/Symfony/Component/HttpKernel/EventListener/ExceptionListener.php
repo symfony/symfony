@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ExceptionListener implements EventSubscriberInterface
 {

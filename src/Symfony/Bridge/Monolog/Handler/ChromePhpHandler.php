@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  *
  * @author Christophe Coevoet <stof@notk.org>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ChromePhpHandler extends BaseChromePhpHandler
 {

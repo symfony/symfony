@@ -31,7 +31,7 @@ use Twig\Environment;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class WebDebugToolbarListener implements EventSubscriberInterface
 {

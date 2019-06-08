@@ -315,11 +315,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     /**
      * @param \ReflectionType                              $reflectionType
-     * @param object|\ReflectionMethod|\ReflectionProperty $reflector
+     * @param \ReflectionMethod|\ReflectionProperty $reflector
      *
      * @return Type
      */
-    private function extractFromReflectionType(\ReflectionType $reflectionType, object $reflector): Type
+    private function extractFromReflectionType(\ReflectionType $reflectionType, $reflector): Type
     {
         $phpTypeOrClass = $reflectionType->getName();
         $nullable = $reflectionType->allowsNull();
@@ -344,11 +344,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     /**
      * @param string                                       $name
-     * @param object|\ReflectionMethod|\ReflectionProperty $reflector
+     * @param \ReflectionMethod|\ReflectionProperty $reflector
      *
      * @return string
      */
-    private function resolveTypeName(string $name, object $reflector): string
+    private function resolveTypeName(string $name, $reflector): string
     {
         if (!($reflector instanceof \ReflectionMethod || $reflector instanceof \ReflectionProperty)) {
             throw new \BadMethodCallException(

@@ -717,7 +717,11 @@ class YamlFileLoader extends FileLoader
                     throw new InvalidArgumentException(sprintf('"!service_locator" tag only accepts maps of "@service" references in "%s".', $file));
                 }
             }
-            if (\in_array($value->getTag(), ['tagged', 'tagged_locator'], true)) {
+            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
+                if ('tagged' === $value->getTag()) {
+                    @trigger_error('"!tagged" is deprecated since Symfony 4.4 and will be removed in 5.0, use "!tagged_iterator" instead.', E_USER_DEPRECATED);
+                }
+
                 $forLocator = 'tagged_locator' === $value->getTag();
 
                 if (\is_string($argument) && $argument) {

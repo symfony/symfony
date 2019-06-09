@@ -142,7 +142,7 @@
       <tag name="foo"/>
     </service>
     <service id="tagged_iterator" class="Bar" public="true">
-      <argument type="tagged" tag="foo"/>
+      <argument type="tagged_iterator" tag="foo"/>
     </service>
     <service id="runtime_error" class="stdClass" public="true">
       <argument type="service" id="errored_definition"/>

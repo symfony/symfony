@@ -157,7 +157,7 @@ services:
     tagged_iterator:
         class: Bar
         arguments:
-            - !tagged foo
+            - !tagged_iterator foo
         public: true
     Psr\Container\ContainerInterface:
         alias: service_container

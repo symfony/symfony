@@ -314,7 +314,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * @param \ReflectionType                              $reflectionType
+     * @param \ReflectionType                       $reflectionType
      * @param \ReflectionMethod|\ReflectionProperty $reflector
      *
      * @return Type
@@ -333,9 +333,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         } elseif ($reflector instanceof \ReflectionMethod || $reflector instanceof \ReflectionProperty) {
             $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $this->resolveTypeName($phpTypeOrClass, $reflector));
         } else {
-            throw new \BadMethodCallException(
+            throw new \InvalidArgumentException(
                 '$reflector should be an instance of ReflectionMethod or ReflectionProperty, '
-                .\get_class($reflector).' given'
+                .(\is_object($reflector) ? \get_class($reflector) : \gettype($reflector)).' given'
             );
         }
 
@@ -343,7 +343,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * @param string                                       $name
+     * @param string                                $name
      * @param \ReflectionMethod|\ReflectionProperty $reflector
      *
      * @return string
@@ -351,9 +351,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function resolveTypeName(string $name, $reflector): string
     {
         if (!($reflector instanceof \ReflectionMethod || $reflector instanceof \ReflectionProperty)) {
-            throw new \BadMethodCallException(
+            throw new \InvalidArgumentException(
                 '$reflector should be an instance of ReflectionMethod or ReflectionProperty, '
-                .\get_class($reflector).' given'
+                .(\is_object($reflector) ? \get_class($reflector) : \gettype($reflector)).' given'
             );
         }
 

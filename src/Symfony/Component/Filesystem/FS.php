@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Filesystem;
 
-use function func_get_args;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 
@@ -50,7 +49,7 @@ class FS
      */
     public static function copy($originFile, $targetFile, $overwriteNewerFiles = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -63,7 +62,7 @@ class FS
      */
     public static function mkdir($dirs, $mode = 0777)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -75,7 +74,7 @@ class FS
      */
     public static function exists($files)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -89,7 +88,7 @@ class FS
      */
     public static function touch($files, $time = null, $atime = null)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -101,7 +100,7 @@ class FS
      */
     public static function remove($files)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -116,7 +115,7 @@ class FS
      */
     public static function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -130,7 +129,7 @@ class FS
      */
     public static function chown($files, $user, $recursive = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -144,7 +143,7 @@ class FS
      */
     public static function chgrp($files, $group, $recursive = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -159,7 +158,7 @@ class FS
      */
     public static function rename($origin, $target, $overwrite = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -173,7 +172,7 @@ class FS
      */
     public static function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -187,7 +186,7 @@ class FS
      */
     public static function hardlink($originFile, $targetFiles)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -208,7 +207,7 @@ class FS
      */
     public static function readlink($path, $canonicalize = false)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -221,7 +220,7 @@ class FS
      */
     public static function makePathRelative($endPath, $startPath)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -245,7 +244,7 @@ class FS
      */
     public static function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = [])
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -257,7 +256,7 @@ class FS
      */
     public static function isAbsolutePath($file)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -271,7 +270,7 @@ class FS
      */
     public static function tempnam($dir, $prefix)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -284,7 +283,7 @@ class FS
      */
     public static function dumpFile($filename, $content)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -297,7 +296,7 @@ class FS
      */
     public static function appendToFile($filename, $content)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
     /**
@@ -305,15 +304,16 @@ class FS
      */
     public static function handleError($type, $msg)
     {
-        return self::__callStatic(__FUNCTION__, func_get_args());
+        return self::__callStatic(__FUNCTION__, \func_get_args());
     }
 
-    public static function __callStatic($method, $args) {
+    public static function __callStatic($method, $args)
+    {
         if (null === self::$instance) {
             self::$instance = new Filesystem();
         }
 
-        return call_user_func_array([self::$instance, $method], $args);
+        return \call_user_func_array([self::$instance, $method], $args);
     }
 
     private function __construct()

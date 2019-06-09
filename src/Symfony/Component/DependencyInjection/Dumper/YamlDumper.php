@@ -248,7 +248,7 @@ class YamlDumper extends Dumper
                     }
                 }
 
-                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged' : 'tagged_locator', $content);
+                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }
 
             if ($value instanceof IteratorArgument) {

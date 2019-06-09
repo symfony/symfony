@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated support for short factories and short configurators in Yaml
+ * deprecated `tagged` in favor of `tagged_iterator`
 
 4.3.0
 -----

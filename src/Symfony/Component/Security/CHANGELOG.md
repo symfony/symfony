@@ -24,6 +24,9 @@ CHANGELOG
  * Removed the `serialize` and `unserialize` methods from `AuthenticationException`
  * Added method `__serialize` and `__unserialize` to `TokenInterface`
  * Added method `needsRehash` to `PasswordEncoderInterface` and `UserPasswordEncoderInterface`
+ * Removed `ExpressionVoter::addExpressionLanguageProvider()`
+ * Made `Security::getUser()` return null when the user is not an instanceof `UserInterface`,
+   use `getToken()->getUser()` instead
 
 4.4.0
 -----

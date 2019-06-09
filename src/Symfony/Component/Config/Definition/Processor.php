@@ -16,7 +16,7 @@ namespace Symfony\Component\Config\Definition;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since version 4.1
+ * @final
  */
 class Processor
 {
@@ -75,7 +75,7 @@ class Processor
      *
      * @return array
      */
-    public static function normalizeConfig($config, $key, $plural = null)
+    public static function normalizeConfig(array $config, string $key, string $plural = null)
     {
         if (null === $plural) {
             $plural = $key.'s';

@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ReflectionClassResource implements SelfCheckingResourceInterface
 {
@@ -35,7 +35,10 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         $this->excludedVendors = $excludedVendors;
     }
 
-    public function isFresh($timestamp)
+    /**
+     * {@inheritdoc}
+     */
+    public function isFresh(int $timestamp)
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();

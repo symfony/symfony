@@ -93,7 +93,6 @@
             </call>
 
             <tag name="console.command" command="messenger:consume" />
-            <tag name="console.command" command="messenger:consume-messages" />
             <tag name="monolog.logger" channel="messenger" />
         </service>
 

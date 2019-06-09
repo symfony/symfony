@@ -60,17 +60,10 @@ class UploadedFile extends File
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct(string $path, string $originalName, string $mimeType = null, int $error = null, $test = false)
+    public function __construct(string $path, string $originalName, string $mimeType = null, int $error = null, bool $test = false)
     {
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
-
-        if (4 < \func_num_args() ? !\is_bool($test) : null !== $error && @filesize($path) === $error) {
-            @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
-            $error = $test;
-            $test = 5 < \func_num_args() ? func_get_arg(5) : false;
-        }
-
         $this->error = $error ?: UPLOAD_ERR_OK;
         $this->test = $test;
 
@@ -141,23 +134,6 @@ class UploadedFile extends File
     public function guessClientExtension()
     {
         return MimeTypes::getDefault()->getExtensions($this->getClientMimeType())[0] ?? null;
-    }
-
-    /**
-     * Returns the file size.
-     *
-     * It is extracted from the request from which the file has been uploaded.
-     * Then it should not be considered as a safe value.
-     *
-     * @deprecated since Symfony 4.1, use getSize() instead.
-     *
-     * @return int|null The file sizes
-     */
-    public function getClientSize()
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.1. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->getSize();
     }
 
     /**

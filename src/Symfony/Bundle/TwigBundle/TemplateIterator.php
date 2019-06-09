@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @internal since Symfony 4.4
+ * @internal
  */
 class TemplateIterator implements \IteratorAggregate
 {

@@ -19,7 +19,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface
 {
@@ -61,7 +61,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp)
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 

@@ -21,11 +21,6 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
  */
 class DeprecationErrorHandler
 {
-    /**
-     * @deprecated since Symfony 4.3, use max[self]=0 instead
-     */
-    const MODE_WEAK_VENDORS = 'weak_vendors';
-
     const MODE_DISABLED = 'disabled';
     const MODE_WEAK = 'max[total]=999999&verbose=0';
     const MODE_STRICT = 'max[total]=0';
@@ -226,13 +221,6 @@ class DeprecationErrorHandler
         }
         if ('weak' === $mode) {
             return $this->configuration = Configuration::inWeakMode();
-        }
-        if (self::MODE_WEAK_VENDORS === $mode) {
-            ++$this->deprecations['remaining directCount'];
-            $msg = sprintf('Setting SYMFONY_DEPRECATIONS_HELPER to "%s" is deprecated in favor of "max[self]=0"', $mode);
-            $ref = &$this->deprecations['remaining direct'][$msg]['count'];
-            ++$ref;
-            $mode = 'max[self]=0';
         }
         if (isset($mode[0]) && '/' === $mode[0]) {
             return $this->configuration = Configuration::fromRegex($mode);

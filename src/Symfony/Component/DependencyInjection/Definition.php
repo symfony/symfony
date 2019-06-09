@@ -349,7 +349,7 @@ class Definition
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall($method, array $arguments = []/*, bool $returnsClone = false*/)
+    public function addMethodCall($method, array $arguments = [], bool $returnsClone = false)
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');

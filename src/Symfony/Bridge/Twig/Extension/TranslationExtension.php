@@ -27,7 +27,7 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.2
+ * @final
  */
 class TranslationExtension extends AbstractExtension
 {
@@ -40,10 +40,7 @@ class TranslationExtension extends AbstractExtension
         $this->translationNodeVisitor = $translationNodeVisitor;
     }
 
-    /**
-     * @return TranslatorInterface|null
-     */
-    public function getTranslator()
+    public function getTranslator(): ?TranslatorInterface
     {
         if (null === $this->translator) {
             if (!interface_exists(TranslatorInterface::class)) {

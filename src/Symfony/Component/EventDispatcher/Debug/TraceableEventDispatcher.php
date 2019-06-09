@@ -175,7 +175,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
      *
      * @param Request|null $request The request to get listeners for
      */
-    public function getCalledListeners(/* Request $request = null */)
+    public function getCalledListeners(Request $request = null)
     {
         if (null === $this->callStack) {
             return [];
@@ -198,7 +198,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
      *
      * @param Request|null $request The request to get listeners for
      */
-    public function getNotCalledListeners(/* Request $request = null */)
+    public function getNotCalledListeners(Request $request = null)
     {
         try {
             $allListeners = $this->getListeners();
@@ -244,7 +244,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * @param Request|null $request The request to get orphaned events for
      */
-    public function getOrphanedEvents(/* Request $request = null */): array
+    public function getOrphanedEvents(Request $request = null): array
     {
         if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
             return $this->orphanedEvents[spl_object_hash($request)] ?? [];

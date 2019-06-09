@@ -18,7 +18,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class ContainerParametersResource implements ResourceInterface
 {

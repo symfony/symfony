@@ -137,14 +137,10 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
+    public function __construct(array $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!\function_exists('proc_open')) {
             throw new LogicException('The Process class relies on proc_open, which is not available on your PHP installation.');
-        }
-
-        if (!\is_array($command)) {
-            @trigger_error(sprintf('Passing a command as string when creating a "%s" instance is deprecated since Symfony 4.2, pass it as an array of its arguments instead, or use the "Process::fromShellCommandline()" constructor if you need features provided by the shell.', __CLASS__), E_USER_DEPRECATED);
         }
 
         $this->commandline = $command;
@@ -963,24 +959,6 @@ class Process implements \IteratorAggregate
     public function getCommandLine()
     {
         return \is_array($this->commandline) ? implode(' ', array_map([$this, 'escapeArgument'], $this->commandline)) : $this->commandline;
-    }
-
-    /**
-     * Sets the command line to be executed.
-     *
-     * @param string|array $commandline The command to execute
-     *
-     * @return self The current Process instance
-     *
-     * @deprecated since Symfony 4.2.
-     */
-    public function setCommandLine($commandline)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->commandline = $commandline;
-
-        return $this;
     }
 
     /**

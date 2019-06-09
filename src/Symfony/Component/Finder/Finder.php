@@ -438,13 +438,8 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see SortableIterator
      */
-    public function sortByName(/* bool $useNaturalSort = false */)
+    public function sortByName(bool $useNaturalSort = false)
     {
-        if (\func_num_args() < 1 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "bool $useNaturalSort = false" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-        $useNaturalSort = 0 < \func_num_args() && func_get_arg(0);
-
         $this->sort = $useNaturalSort ? Iterator\SortableIterator::SORT_BY_NAME_NATURAL : Iterator\SortableIterator::SORT_BY_NAME;
 
         return $this;

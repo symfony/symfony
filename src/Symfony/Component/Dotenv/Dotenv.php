@@ -39,15 +39,10 @@ final class Dotenv
 
     /**
      * @var bool If `putenv()` should be used to define environment variables or not.
-     *           Beware that `putenv()` is not thread safe and this setting will default
-     *           to `false` in Symfony 5.0.
+     *           Beware that `putenv()` is not thread safe, that's why this setting defaults to false
      */
-    public function __construct(bool $usePutenv = true)
+    public function __construct(bool $usePutenv = false)
     {
-        if (!\func_num_args()) {
-            @trigger_error(sprintf('The default value of "$usePutenv" argument of "%s" will be changed from "true" to "false" in Symfony 5.0. You should define its value explicitly.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->usePutenv = $usePutenv;
     }
 

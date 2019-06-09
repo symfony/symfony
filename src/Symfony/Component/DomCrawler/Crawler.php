@@ -494,13 +494,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * @throws \InvalidArgumentException When current node is empty
      * @throws \RuntimeException         If the CssSelector Component is not available and $selector is provided
      */
-    public function children(/* string $selector = null */)
+    public function children(string $selector = null)
     {
-        if (\func_num_args() < 1 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
-            @trigger_error(sprintf('The "%s()" method will have a new "string $selector = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-        $selector = 0 < \func_num_args() ? func_get_arg(0) : null;
-
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
@@ -562,11 +557,11 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function text(/* $default = null */)
+    public function text($default = null)
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return $default;
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -584,11 +579,11 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException When current node is empty
      */
-    public function html(/* $default = null */)
+    public function html($default = null)
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return $default;
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');

@@ -26,7 +26,7 @@ use Symfony\Component\VarDumper\Server\Connection;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class DumpDataCollector extends DataCollector implements DataDumperInterface
 {

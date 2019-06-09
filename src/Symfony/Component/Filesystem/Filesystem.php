@@ -671,7 +671,7 @@ class Filesystem
     public function dumpFile($filename, $content)
     {
         if (\is_array($content)) {
-            @trigger_error(sprintf('Calling "%s()" with an array in the $content argument is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, %s given.', __METHOD__, $content));
         }
 
         $dir = \dirname($filename);
@@ -708,7 +708,7 @@ class Filesystem
     public function appendToFile($filename, $content)
     {
         if (\is_array($content)) {
-            @trigger_error(sprintf('Calling "%s()" with an array in the $content argument is deprecated since Symfony 4.3.', __METHOD__), E_USER_DEPRECATED);
+            throw new \TypeError(sprintf('Argument 2 passed to %s() must be string or resource, %s given.', __METHOD__, $content));
         }
 
         $dir = \dirname($filename);

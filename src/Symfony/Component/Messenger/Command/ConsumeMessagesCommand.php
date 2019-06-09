@@ -49,22 +49,8 @@ class ConsumeMessagesCommand extends Command
     /** @var CacheItemPoolInterface|null */
     private $restartSignalCachePool;
 
-    /**
-     * @param RoutableMessageBus $routableBus
-     */
-    public function __construct($routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], /* ContainerInterface */ $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
+    public function __construct(RoutableMessageBus $routableBus, ContainerInterface $receiverLocator, LoggerInterface $logger = null, array $receiverNames = [], ContainerInterface $retryStrategyLocator = null, EventDispatcherInterface $eventDispatcher = null)
     {
-        if ($routableBus instanceof ContainerInterface) {
-            @trigger_error(sprintf('Passing a "%s" instance as first argument to "%s()" is deprecated since Symfony 4.4, pass a "%s" instance instead.', ContainerInterface::class, __METHOD__, RoutableMessageBus::class), E_USER_DEPRECATED);
-            $routableBus = new RoutableMessageBus($routableBus);
-        }
-
-        if (\is_array($retryStrategyLocator)) {
-            @trigger_error(sprintf('The 5th argument of the class "%s" should be a retry-strategy locator, an array of bus names as a value is deprecated since Symfony 4.3.', __CLASS__), E_USER_DEPRECATED);
-
-            $retryStrategyLocator = null;
-        }
-
         $this->routableBus = $routableBus;
         $this->receiverLocator = $receiverLocator;
         $this->logger = $logger;
@@ -159,12 +145,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':consume-')) {
-            $message = 'The use of the "messenger:consume-messages" command is deprecated since version 4.3 and will be removed in 5.0. Use "messenger:consume" instead.';
-            @trigger_error($message, E_USER_DEPRECATED);
-            $output->writeln(sprintf('<comment>%s</comment>', $message));
-        }
-
         $receivers = [];
         $retryStrategies = [];
         foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {

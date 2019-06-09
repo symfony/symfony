@@ -28,7 +28,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @final since Symfony 4.3
+ * @final
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {

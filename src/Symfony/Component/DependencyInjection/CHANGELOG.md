@@ -11,6 +11,7 @@ CHANGELOG
  * removed support for short factory/configurator syntax from `YamlFileLoader`
  * removed `ResettableContainerInterface`, use `ResetInterface` instead
  * added argument `$returnsClone` to `Definition::addMethodCall()`
+ * removed `tagged`, use `tagged_iterator` instead
 
 4.4.0
 -----

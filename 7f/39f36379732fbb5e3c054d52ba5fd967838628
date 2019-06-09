@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-05-12T09:32:42Z
+
+The TravisCi failure seems strange to me. I added the new argument type `tagged_iterator` to the `services-1.0.xsd` (See: https://github.com/symfony/symfony/pull/31321/files#diff-0e535437d820c04db5c34dcc4210e3da) and the XmlParsingException shouldn't occur. Maybe a caching issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-22T14:35:45Z
+
+(rebase needed also)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-03T15:57:35Z
+
+The failing job is checking out branch 4.4 and loading dependencies with your patch applied.
+This highlights that FrameworkBundle 4.4 is currently not compatible with DI 5.0 in your PR.
+That's what needs to be fixed.

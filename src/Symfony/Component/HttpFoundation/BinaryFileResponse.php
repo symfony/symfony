@@ -34,6 +34,7 @@ class BinaryFileResponse extends Response
     protected $offset = 0;
     protected $maxlen = -1;
     protected $deleteFileAfterSend = false;
+    protected $callback;
 
     /**
      * @param \SplFileInfo|string $file               The file to stream
@@ -43,8 +44,9 @@ class BinaryFileResponse extends Response
      * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param callable|null       $callback           A valid PHP callback or null to set it later
      */
-    public function __construct($file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
+    public function __construct($file, int $status = 200, array $headers = [], bool $public = true, string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true, callable $callback = null)
     {
         parent::__construct(null, $status, $headers);
 
@@ -52,6 +54,9 @@ class BinaryFileResponse extends Response
 
         if ($public) {
             $this->setPublic();
+        }
+        if (null !== $callback) {
+            $this->setCallback($callback);
         }
     }
 
@@ -63,10 +68,11 @@ class BinaryFileResponse extends Response
      * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param callable|null       $callback           A valid PHP callback or null to set it later
      *
      * @return static
      */
-    public static function create($file = null, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
+    public static function create($file = null, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true, $callback = null)
     {
         return new static($file, $status, $headers, $public, $contentDisposition, $autoEtag, $autoLastModified);
     }
@@ -175,6 +181,20 @@ class BinaryFileResponse extends Response
 
         $dispositionHeader = $this->headers->makeDisposition($disposition, $filename, $filenameFallback);
         $this->headers->set('Content-Disposition', $dispositionHeader);
+
+        return $this;
+    }
+
+    /**
+     * Sets the PHP callback associated with this Response.
+     *
+     * @param callable $callback A valid PHP callback
+     *
+     * @return $this
+     */
+    public function setCallback(callable $callback)
+    {
+        $this->callback = $callback;
 
         return $this;
     }
@@ -307,6 +327,10 @@ class BinaryFileResponse extends Response
 
         if ($this->deleteFileAfterSend && file_exists($this->file->getPathname())) {
             unlink($this->file->getPathname());
+        }
+
+        if ($this->callback !== null) {
+            ($this->callback)();
         }
 
         return $this;

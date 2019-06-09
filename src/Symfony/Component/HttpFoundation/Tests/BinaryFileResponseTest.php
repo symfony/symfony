@@ -352,6 +352,17 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Content-Length'));
     }
 
+    public function testCallback()
+    {
+        $called = 0;
+
+        $response = new BinaryFileResponse(__FILE__, 200, [], true, null, false, true, function () use (&$called) { ++$called; });
+
+        $response->sendContent();
+        $this->assertEquals(1, $called);
+
+    }
+
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);

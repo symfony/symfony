@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-08T08:25:42Z
+
+the idea was for e.g. vendors using `OptionsResolver` to opt-out from end-user deprecations themselves, i.e. the same reason why SF needs it.
+
+So it's a feature .. kinda :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-08T08:30:35Z
+
+Does this have to be at the `Options` level? Because sure, it also exists on `OptionsResolver` and it makes sense there.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-08T08:36:20Z
+
+> Does this have to be at the Options level?
+
+I think yes, because that's what you typehint for:
+
+```php
+$resolver->setDefaults([
+    'a' => function (Options $options) {
+        $b = $options->offsetGet('b', false); // never triggers
+        $c = $options['c']; // always triggers
+    },
+]);
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-08T12:46:10Z
+
+This was about documentation only :) (for IDEs mainly)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-08T12:51:26Z
+
+should be target 4.2

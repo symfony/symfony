@@ -17,8 +17,10 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -48,7 +50,7 @@ class Serializer implements SerializerInterface
     public static function create(): self
     {
         if (!class_exists(SymfonySerializer::class)) {
-            throw new LogicException(sprintf('The "%s" class requires Symfony\'s Serializer component. Try running "composer require symfony/serializer" or use "%s" instead.', __CLASS__, PhpSerializer::class));
+            throw new LogicException(sprintf('The "%s" class requires Symfony\'s Serializer component. Try running "composer require symfony/serializer-pack" or use "%s" instead.', __CLASS__, PhpSerializer::class));
         }
 
         $encoders = [new XmlEncoder(), new JsonEncoder()];
@@ -82,6 +84,10 @@ class Serializer implements SerializerInterface
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $encodedEnvelope['headers']['type'], $this->format, $context);
         } catch (UnexpectedValueException $e) {
+            if (!class_exists(PropertyAccessor::class) && false !== strpos($e->getMessage(), 'no supporting normalizer found')) {
+                throw new LogicException('No denormalizer found to decode message. Try running "composer require symfony/property-access".', $e->getCode(), $e);
+            }
+
             throw new MessageDecodingFailedException(sprintf('Could not decode message: %s.', $e->getMessage()), $e->getCode(), $e);
         }
 
@@ -103,10 +109,14 @@ class Serializer implements SerializerInterface
 
         $headers = ['type' => \get_class($envelope->getMessage())] + $this->encodeStamps($envelope) + $this->getContentTypeHeader();
 
-        return [
-            'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
-            'headers' => $headers,
-        ];
+        try {
+            return [
+                'body' => $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+                'headers' => $headers,
+            ];
+        } catch (NotNormalizableValueException $e) {
+            throw new LogicException('No normalizers were found to encode message. Try running "composer require symfony/property-access".', $e->getCode(), $e);
+        }
     }
 
     private function decodeStamps(array $encodedEnvelope): array
@@ -120,6 +130,10 @@ class Serializer implements SerializerInterface
             try {
                 $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
             } catch (UnexpectedValueException $e) {
+                if (!class_exists(PropertyAccessor::class) && false !== strpos($e->getMessage(), 'no supporting normalizer found')) {
+                    throw new LogicException('No denormalizer found to decode message. Try running "composer require symfony/property-access".', $e->getCode(), $e);
+                }
+
                 throw new MessageDecodingFailedException(sprintf('Could not decode stamp: %s.', $e->getMessage()), $e->getCode(), $e);
             }
         }
@@ -138,7 +152,11 @@ class Serializer implements SerializerInterface
 
         $headers = [];
         foreach ($allStamps as $class => $stamps) {
-            $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
+            try {
+                $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
+            } catch (NotNormalizableValueException $e) {
+                throw new LogicException('No normalizers were found to encode stamps. Try running "composer require symfony/property-access".', $e->getCode(), $e);
+            }
         }
 
         return $headers;

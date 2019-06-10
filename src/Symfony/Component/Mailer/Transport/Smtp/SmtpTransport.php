@@ -148,9 +148,9 @@ class SmtpTransport extends AbstractTransport
     protected function doSend(SentMessage $message): void
     {
         $envelope = $message->getEnvelope();
-        $this->doMailFromCommand($envelope->getSender()->toString());
+        $this->doMailFromCommand($envelope->getSender()->getEncodedAddress());
         foreach ($envelope->getRecipients() as $recipient) {
-            $this->doRcptToCommand($recipient->toString());
+            $this->doRcptToCommand($recipient->getEncodedAddress());
         }
 
         $this->executeCommand("DATA\r\n", [354]);

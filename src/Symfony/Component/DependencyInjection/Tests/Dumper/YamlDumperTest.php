@@ -109,6 +109,18 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_argument.yml', $dumper->dump());
     }
 
+    public function testTaggedWithDefaultPriorityMethod()
+    {
+        $taggedIterator = new TaggedIteratorArgument('foo', null, null, false, 'foopriority');
+        $container = new ContainerBuilder();
+        $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
+        $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_with_tagged_priority_method.yml', $dumper->dump());
+    }
+
     private function assertEqualYamlStructure($expected, $yaml, $message = '')
     {
         $parser = new Parser();

@@ -220,6 +220,24 @@ class XmlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_arguments.xml', $dumper->dump());
     }
 
+    public function testTaggedWithDefaultPriorityMethod()
+    {
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', null, null, false, 'foopriority');
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')->addTag('foo_tag');
+        $container->register('foo_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator)
+        ;
+        $container->register('foo_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/xml/services_with_tagged_priority_method.xml', $dumper->dump());
+    }
+
     public function testDumpAbstractServices()
     {
         $container = include self::$fixturesPath.'/containers/container_abstract.php';

@@ -115,22 +115,39 @@ function iterator(array $values): IteratorArgument
 
 /**
  * Creates a lazy iterator by tag name.
+ *
+ * @param string $tag
+ * @param string|null $indexAttribute
+ * @param string|null $defaultIndexMethod
+ * @param bool $needsIndexes
+ * @param string|null $defaultPriorityMethod
+ * @return TaggedIteratorArgument
  */
-function tagged(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null): TaggedIteratorArgument
+function tagged(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null): TaggedIteratorArgument
 {
-    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod);
+    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod,$needsIndexes, $defaultPriorityMethod);
 }
 
 /**
  * Creates a service locator by tag name.
+ *
+ * @param string $tag
+ * @param string $indexAttribute
+ * @param string|null $defaultIndexMethod
+ * @param bool $needsIndexes
+ * @param string|null $defaultPriorityMethod
+ * @return ServiceLocatorArgument
  */
-function tagged_locator(string $tag, string $indexAttribute, string $defaultIndexMethod = null): ServiceLocatorArgument
+function tagged_locator(string $tag, string $indexAttribute, string $defaultIndexMethod = null, bool $needsIndexes = true, string $defaultPriorityMethod = null): ServiceLocatorArgument
 {
-    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, true));
+    return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, $needsIndexes, $defaultPriorityMethod));
 }
 
 /**
  * Creates an expression.
+ *
+ * @param string $expression
+ * @return Expression
  */
 function expr(string $expression): Expression
 {

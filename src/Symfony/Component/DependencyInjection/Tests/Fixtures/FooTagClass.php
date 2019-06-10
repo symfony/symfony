@@ -8,4 +8,9 @@ class FooTagClass
     {
         return 'foo_tag_class';
     }
+
+    public static function getDefaultPriority()
+    {
+        return 20;
+    }
 }

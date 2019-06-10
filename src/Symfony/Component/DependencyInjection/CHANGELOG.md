@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated support for short factories and short configurators in Yaml
+ * added ability to define an priority method for a tagged collection
 
 4.3.0
 -----

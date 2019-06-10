@@ -41,19 +41,69 @@ trait PriorityTaggedServiceTrait
      */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
-        $indexAttribute = $defaultIndexMethod = $needsIndexes = null;
+        $indexAttribute = $defaultIndexMethod = $needsIndexes = $defaultPriorityMethod = null;
 
         if ($tagName instanceof TaggedIteratorArgument) {
             $indexAttribute = $tagName->getIndexAttribute();
             $defaultIndexMethod = $tagName->getDefaultIndexMethod();
             $needsIndexes = $tagName->needsIndexes();
+            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod();
             $tagName = $tagName->getTag();
         }
 
         $services = [];
 
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : (method_exists($serviceId, 'getDefaultPriority') ? $serviceId::getDefaultPriority() : 0);
+            $class = $container->getDefinition($serviceId)->getClass();
+            $class = $container->getParameterBag()->resolveValue($class) ?: null;
+
+            if (!$r = $container->getReflectionClass($class)) {
+                throw new InvalidArgumentException( sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
+            }
+
+            $priority = 0;
+            if ($defaultPriorityMethod && $r->hasMethod($defaultPriorityMethod)) {
+                if (!($rpm = $r->getMethod($defaultPriorityMethod))->isStatic()) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Method "%s::%s()" should be static: tag "%s" on service "%s" is missing default priority method.',
+                            $class,
+                            $defaultPriorityMethod,
+                            $tagName,
+                            $serviceId
+                        )
+                    );
+                }
+
+                if (!$rpm->isPublic()) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Method "%s::%s()" should be public: tag "%s" on service "%s" is missing default priority method.',
+                            $class,
+                            $defaultPriorityMethod,
+                            $tagName,
+                            $serviceId
+                        )
+                    );
+                }
+
+                $priority = $rpm->invoke(null);
+
+                if (!\is_integer($priority)) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Method "%s::%s()" should return an integer, got %s: tag "%s" on service "%s" is missing default priority method.',
+                            $class,
+                            $defaultPriorityMethod,
+                            \gettype($priority),
+                            $tagName,
+                            $serviceId
+                        )
+                    );
+                }
+            }
+
+            $priority = $attributes[0]['priority'] ?? $priority;
 
             if (null === $indexAttribute && !$needsIndexes) {
                 $services[$priority][] = new Reference($serviceId);
@@ -61,17 +111,10 @@ trait PriorityTaggedServiceTrait
                 continue;
             }
 
-            $class = $container->getDefinition($serviceId)->getClass();
-            $class = $container->getParameterBag()->resolveValue($class) ?: null;
-
             if (null !== $indexAttribute && isset($attributes[0][$indexAttribute])) {
                 $services[$priority][$attributes[0][$indexAttribute]] = new TypedReference($serviceId, $class, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $attributes[0][$indexAttribute]);
 
                 continue;
-            }
-
-            if (!$r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
             }
 
             $class = $r->name;

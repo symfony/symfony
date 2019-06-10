@@ -317,6 +317,23 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
     }
 
+    public function testParseTaggedArgumentsWithPriority()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_tagged_priority_method.yml');
+
+        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged_iterator')->getArguments());
+        $this->assertCount(1, $container->getDefinition('foo_service_tagged_locator')->getArguments());
+
+        $taggedIterator = new TaggedIteratorArgument('foo', null, null, false, 'foopriority');
+        $this->assertEquals($taggedIterator, $container->getDefinition('foo_service_tagged_iterator')->getArgument(0));
+
+        $taggedIterator = new TaggedIteratorArgument('foo', null, null, true, 'foopriority');
+        $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('foo_service_tagged_locator')->getArgument(0));
+    }
+
     public function testNameOnlyTagsAreAllowedAsString()
     {
         $container = new ContainerBuilder();

@@ -402,6 +402,30 @@ class IntegrationTest extends TestCase
         ];
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
+
+    public function testTaggedServiceWithPriorityMethod()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['priority' => 10])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar')
+        ;
+        $container->register(FooBarTaggedClass::class)
+            ->addArgument(new TaggedIteratorArgument('foo_bar', null, null, false, 'getDefaultPriority'))
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(FooBarTaggedClass::class);
+
+        $param = iterator_to_array($s->getParam()->getIterator());
+        $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface

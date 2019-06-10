@@ -297,6 +297,10 @@ class XmlDumper extends Dumper
                         $element->setAttribute('default-index-method', $tag->getDefaultIndexMethod());
                     }
                 }
+
+                if (null !== $tag->getDefaultPriorityMethod()) {
+                    $element->setAttribute('default-priority-method', $tag->getDefaultPriorityMethod());
+                }
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');

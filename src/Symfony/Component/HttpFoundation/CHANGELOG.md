@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * passing arguments to `Request::isMethodSafe()` is deprecated.
+ * added callback to BinaryFileResponse
 
 4.3.0
 -----

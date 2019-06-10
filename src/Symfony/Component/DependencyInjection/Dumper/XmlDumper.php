@@ -287,7 +287,7 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
             } elseif ($value instanceof TaggedIteratorArgument || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())) {
-                $element->setAttribute('type', $value instanceof TaggedIteratorArgument ? 'tagged' : 'tagged_locator');
+                $element->setAttribute('type', $value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator');
                 $element->setAttribute('tag', $tag->getTag());
 
                 if (null !== $tag->getIndexAttribute()) {

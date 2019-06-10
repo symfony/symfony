@@ -244,7 +244,7 @@ class YamlDumper extends Dumper
                         $content['default_index_method'] = $tag->getDefaultIndexMethod();
                     }
                 }
-
+              
                 if (null !== $tag->getDefaultPriorityMethod()) {
                     $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
                 }
@@ -252,8 +252,8 @@ class YamlDumper extends Dumper
                 if (count($content) === 1) {
                     $content = $tag->getTag();
                 }
-
-                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged' : 'tagged_locator', $content);
+              
+                return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }
 
             if ($value instanceof IteratorArgument) {

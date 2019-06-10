@@ -24,6 +24,27 @@ DependencyInjection
      my_service:
        factory: ['@factory_service', method]
    ```
+ * Deprecated `tagged` in favor of `tagged_iterator`
+
+   Before:
+   ```yaml
+   services:
+       App\Handler:
+           tags: ['app.handler']
+   
+       App\HandlerCollection:
+           arguments: [!tagged app.handler]
+   ```
+
+   After:
+   ```yaml
+   services:
+       App\Handler:
+       tags: ['app.handler']
+    
+   App\HandlerCollection:
+       arguments: [!tagged_iterator app.handler]
+   ```
 
 HttpClient
 ----------

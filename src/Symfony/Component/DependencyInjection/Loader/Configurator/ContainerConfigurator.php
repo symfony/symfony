@@ -116,6 +116,18 @@ function iterator(array $values): IteratorArgument
 /**
  * Creates a lazy iterator by tag name.
  *
+ * @deprecated since Symfony 4.4, to be removed in 5.0, use "tagged_iterator" instead.
+ */
+function tagged(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null): TaggedIteratorArgument
+{
+    @trigger_error(__NAMESPACE__.'\tagged() is deprecated since Symfony 4.4 and will be removed in 5.0, use '.__NAMESPACE__.'\tagged_iterator() instead.', E_USER_DEPRECATED);
+
+    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, $needsIndexes, $defaultPriorityMethod);
+}
+
+/**
+ * Creates a lazy iterator by tag name.
+ *
  * @param string $tag
  * @param string|null $indexAttribute
  * @param string|null $defaultIndexMethod
@@ -123,9 +135,9 @@ function iterator(array $values): IteratorArgument
  * @param string|null $defaultPriorityMethod
  * @return TaggedIteratorArgument
  */
-function tagged(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null): TaggedIteratorArgument
+function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null): TaggedIteratorArgument
 {
-    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod,$needsIndexes, $defaultPriorityMethod);
+    return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, $needsIndexes, $defaultPriorityMethod);
 }
 
 /**

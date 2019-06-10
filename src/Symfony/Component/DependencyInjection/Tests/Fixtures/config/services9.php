@@ -128,7 +128,7 @@ return function (ContainerConfigurator $c) {
 
     $s->set('tagged_iterator', 'Bar')
         ->public()
-        ->args([tagged('foo')]);
+        ->args([tagged_iterator('foo')]);
 
     $s->set('runtime_error', 'stdClass')
         ->args([new Reference('errored_definition', ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE)])

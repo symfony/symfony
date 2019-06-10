@@ -561,6 +561,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * {@inheritdoc}
      *
      * @param string|null $format
+     *
+     * @internal
      */
     protected function createChildContext(array $parentContext, $attribute/*, ?string $format */)
     {

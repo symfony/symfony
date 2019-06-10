@@ -545,6 +545,9 @@ class XmlFileLoader extends FileLoader
                     }
                     break;
                 case 'tagged':
+                    @trigger_error(sprintf('Type "%s" of tag <%s> in "%s" is deprecated since Symfony 4.4 and will be removed in 5.0, use "tagged_iterator" instead.', $arg->getAttribute('type'), $name, $file), E_USER_DEPRECATED);
+                    // no break
+                case 'tagged_iterator':
                 case 'tagged_locator':
                     $type = $arg->getAttribute('type');
                     $forLocator = 'tagged_locator' === $type;

@@ -7,7 +7,7 @@ services:
     listener_aggregator:
         class: Bar\FooClass
         public: true
-        arguments: [!tagged listener]
+        arguments: [!tagged_iterator listener]
     .2_stdClass~%s:
         class: stdClass
         public: false

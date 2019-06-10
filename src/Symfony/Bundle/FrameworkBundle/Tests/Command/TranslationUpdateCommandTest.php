@@ -182,11 +182,6 @@ class TranslationUpdateCommandTest extends TestCase
 
         $kernel
             ->expects($this->any())
-            ->method('getRootDir')
-            ->willReturn($this->translationDir);
-
-        $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->willReturn([]);
 

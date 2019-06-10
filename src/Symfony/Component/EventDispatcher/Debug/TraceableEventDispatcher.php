@@ -53,7 +53,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addListener(string $eventName, $listener, int $priority = 0)
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
     }
@@ -69,7 +69,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function removeListener($eventName, $listener)
+    public function removeListener(string $eventName, $listener)
     {
         if (isset($this->wrappedListeners[$eventName])) {
             foreach ($this->wrappedListeners[$eventName] as $index => $wrappedListener) {
@@ -95,7 +95,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function getListeners($eventName = null)
+    public function getListeners(string $eventName = null)
     {
         return $this->dispatcher->getListeners($eventName);
     }
@@ -103,7 +103,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function getListenerPriority($eventName, $listener)
+    public function getListenerPriority(string $eventName, $listener)
     {
         // we might have wrapped listeners for the event (if called while dispatching)
         // in that case get the priority by wrapper
@@ -121,7 +121,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     /**
      * {@inheritdoc}
      */
-    public function hasListeners($eventName = null)
+    public function hasListeners(string $eventName = null)
     {
         return $this->dispatcher->hasListeners($eventName);
     }
@@ -272,7 +272,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
      *
      * @return mixed
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         return $this->dispatcher->{$method}(...$arguments);
     }
@@ -291,7 +291,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     {
     }
 
-    private function preProcess($eventName)
+    private function preProcess(string $eventName): void
     {
         if (!$this->dispatcher->hasListeners($eventName)) {
             $this->orphanedEvents[$this->currentRequestHash][] = $eventName;
@@ -309,7 +309,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
         }
     }
 
-    private function postProcess($eventName)
+    private function postProcess(string $eventName): void
     {
         unset($this->wrappedListeners[$eventName]);
         $skipped = false;

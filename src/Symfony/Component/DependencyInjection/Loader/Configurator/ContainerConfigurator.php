@@ -128,11 +128,12 @@ function tagged(string $tag, string $indexAttribute = null, string $defaultIndex
 /**
  * Creates a lazy iterator by tag name.
  *
- * @param string $tag
+ * @param string      $tag
  * @param string|null $indexAttribute
  * @param string|null $defaultIndexMethod
- * @param bool $needsIndexes
+ * @param bool        $needsIndexes
  * @param string|null $defaultPriorityMethod
+ *
  * @return TaggedIteratorArgument
  */
 function tagged_iterator(string $tag, string $indexAttribute = null, string $defaultIndexMethod = null, bool $needsIndexes = false, string $defaultPriorityMethod = null): TaggedIteratorArgument
@@ -143,11 +144,12 @@ function tagged_iterator(string $tag, string $indexAttribute = null, string $def
 /**
  * Creates a service locator by tag name.
  *
- * @param string $tag
- * @param string $indexAttribute
+ * @param string      $tag
+ * @param string      $indexAttribute
  * @param string|null $defaultIndexMethod
- * @param bool $needsIndexes
+ * @param bool        $needsIndexes
  * @param string|null $defaultPriorityMethod
+ *
  * @return ServiceLocatorArgument
  */
 function tagged_locator(string $tag, string $indexAttribute, string $defaultIndexMethod = null, bool $needsIndexes = true, string $defaultPriorityMethod = null): ServiceLocatorArgument
@@ -159,6 +161,7 @@ function tagged_locator(string $tag, string $indexAttribute, string $defaultInde
  * Creates an expression.
  *
  * @param string $expression
+ *
  * @return Expression
  */
 function expr(string $expression): Expression

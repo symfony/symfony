@@ -58,7 +58,7 @@ trait PriorityTaggedServiceTrait
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
 
             if (!$r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException( sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
+                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
             }
 
             $priority = 0;
@@ -89,7 +89,7 @@ trait PriorityTaggedServiceTrait
 
                 $priority = $rpm->invoke(null);
 
-                if (!\is_integer($priority)) {
+                if (!\is_int($priority)) {
                     throw new InvalidArgumentException(
                         sprintf(
                             'Method "%s::%s()" should return an integer, got %s: tag "%s" on service "%s" is missing default priority method.',

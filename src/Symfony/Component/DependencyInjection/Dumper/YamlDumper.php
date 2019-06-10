@@ -244,15 +244,15 @@ class YamlDumper extends Dumper
                         $content['default_index_method'] = $tag->getDefaultIndexMethod();
                     }
                 }
-              
+
                 if (null !== $tag->getDefaultPriorityMethod()) {
                     $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
                 }
 
-                if (count($content) === 1) {
+                if (1 === \count($content)) {
                     $content = $tag->getTag();
                 }
-              
+
                 return new TaggedValue($value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator', $content);
             }
 

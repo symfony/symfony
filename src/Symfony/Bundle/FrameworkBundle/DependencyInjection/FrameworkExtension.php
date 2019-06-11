@@ -1167,14 +1167,15 @@ class FrameworkExtension extends Extension
                 ->followLinks()
                 ->files()
                 ->filter(function (\SplFileInfo $file) {
-                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                    return 2 <= substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
                 })
                 ->in($dirs)
                 ->sortByName()
             ;
 
             foreach ($finder as $file) {
-                list(, $locale) = explode('.', $file->getBasename(), 3);
+                $fileNameParts = explode('.', basename($file));
+                $locale = $fileNameParts[\count($fileNameParts) - 2];
                 if (!isset($files[$locale])) {
                     $files[$locale] = [];
                 }

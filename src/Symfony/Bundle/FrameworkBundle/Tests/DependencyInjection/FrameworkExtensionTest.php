@@ -817,6 +817,11 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds translation resources in default path'
         );
+        $this->assertContains(
+            strtr(__DIR__.'/Fixtures/translations/domain.with.dots.en.yml', '/', \DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds translation resources with dots in domain'
+        );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();
         $this->assertEquals(['fr'], $calls[1][1][0]);

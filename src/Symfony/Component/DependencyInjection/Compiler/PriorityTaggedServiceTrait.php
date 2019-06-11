@@ -63,43 +63,18 @@ trait PriorityTaggedServiceTrait
 
             $priority = 0;
             if ($defaultPriorityMethod && $r->hasMethod($defaultPriorityMethod)) {
-                if (!($rpm = $r->getMethod($defaultPriorityMethod))->isStatic()) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" must be static.',
-                            $class,
-                            $defaultPriorityMethod,
-                            $tagName,
-                            $serviceId
-                        )
-                    );
+                if (!($priorityReflMethod = $r->getMethod($defaultPriorityMethod))->isStatic()) {
+                    throw new InvalidArgumentException(sprintf('Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" must be static.', $class, $defaultPriorityMethod, $tagName, $serviceId));
                 }
 
-                if (!$rpm->isPublic()) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Method "%s::%s()" should be public: tag "%s" on service "%s" is missing default priority method.',
-                            $class,
-                            $defaultPriorityMethod,
-                            $tagName,
-                            $serviceId
-                        )
-                    );
+                if (!$priorityReflMethod->isPublic()) {
+                    throw new InvalidArgumentException(sprintf('Method "%s::%s()" should be public: tag "%s" on service "%s" is missing default priority method.', $class, $defaultPriorityMethod, $tagName, $serviceId));
                 }
 
-                $priority = $rpm->invoke(null);
+                $priority = $priorityReflMethod->invoke(null);
 
                 if (!\is_int($priority)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            'Method "%s::%s()" should return an integer, got %s: tag "%s" on service "%s" is missing default priority method.',
-                            $class,
-                            $defaultPriorityMethod,
-                            \gettype($priority),
-                            $tagName,
-                            $serviceId
-                        )
-                    );
+                    throw new InvalidArgumentException(sprintf('Method "%s::%s()" should return an integer, got %s: tag "%s" on service "%s" is missing default priority method.', $class, $defaultPriorityMethod, \gettype($priority), $tagName, $serviceId));
                 }
             }
 

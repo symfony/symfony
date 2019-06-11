@@ -1,0 +1,9 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    mailer:
+        envelope:
+            sender: sender@example.org
+            recipients:
+                - redirected@example.org

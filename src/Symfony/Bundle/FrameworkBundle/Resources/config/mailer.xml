@@ -25,5 +25,11 @@
             <argument type="service" id="mailer.default_transport" />
             <tag name="messenger.message_handler" />
         </service>
+
+        <service id="mailer.envelope_listener" class="Symfony\Component\Mailer\EventListener\EnvelopeListener">
+            <argument /> <!-- sender -->
+            <argument /> <!-- recipients -->
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </container>

@@ -66,7 +66,7 @@ trait PriorityTaggedServiceTrait
                 if (!($rpm = $r->getMethod($defaultPriorityMethod))->isStatic()) {
                     throw new InvalidArgumentException(
                         sprintf(
-                            'Method "%s::%s()" should be static: tag "%s" on service "%s" is missing default priority method.',
+                            'Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" must be static.',
                             $class,
                             $defaultPriorityMethod,
                             $tagName,

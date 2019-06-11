@@ -79,7 +79,7 @@ final class DoctrineLoader implements LoaderInterface
 
             $constraint = $this->getLengthConstraint($metadata, $mapping['fieldName']);
             if (null === $constraint) {
-                if (isset($mapping['originalClass'])) {
+                if (isset($mapping['originalClass']) && false === strpos($mapping['declaredField'], '.')) {
                     $metadata->addPropertyConstraint($mapping['declaredField'], new Valid());
                 } elseif (property_exists($className, $mapping['fieldName'])) {
                     $metadata->addPropertyConstraint($mapping['fieldName'], new Length(['max' => $mapping['length']]));

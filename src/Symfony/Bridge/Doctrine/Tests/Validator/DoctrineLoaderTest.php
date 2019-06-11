@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\BaseUser;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderNestedEmbed;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DoctrineLoaderParentEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\DoctrineLoader;
@@ -108,6 +109,20 @@ class DoctrineLoaderTest extends TestCase
         $this->assertCount(1, $embeddedMaxLengthConstraints);
         $this->assertInstanceOf(Length::class, $embeddedMaxLengthConstraints[0]);
         $this->assertSame(25, $embeddedMaxLengthConstraints[0]->max);
+
+        $nestedEmbeddedMetadata = $embeddedClassMetadata->getPropertyMetadata('nestedEmbedded');
+        $this->assertCount(1, $nestedEmbeddedMetadata);
+        $this->assertSame(CascadingStrategy::CASCADE, $nestedEmbeddedMetadata[0]->getCascadingStrategy());
+        $this->assertSame(TraversalStrategy::IMPLICIT, $nestedEmbeddedMetadata[0]->getTraversalStrategy());
+
+        $nestedEmbeddedClassMetadata = $validator->getMetadataFor(new DoctrineLoaderNestedEmbed());
+
+        $nestedEmbeddedMaxLengthMetadata = $nestedEmbeddedClassMetadata->getPropertyMetadata('nestedEmbeddedMaxLength');
+        $this->assertCount(1, $nestedEmbeddedMaxLengthMetadata);
+        $nestedEmbeddedMaxLengthConstraints = $nestedEmbeddedMaxLengthMetadata[0]->getConstraints();
+        $this->assertCount(1, $nestedEmbeddedMaxLengthConstraints);
+        $this->assertInstanceOf(Length::class, $nestedEmbeddedMaxLengthConstraints[0]);
+        $this->assertSame(27, $nestedEmbeddedMaxLengthConstraints[0]->max);
 
         $this->assertCount(0, $classMetadata->getPropertyMetadata('guidField'));
         $this->assertCount(0, $classMetadata->getPropertyMetadata('simpleArrayField'));

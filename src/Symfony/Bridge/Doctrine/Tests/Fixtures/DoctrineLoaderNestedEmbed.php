@@ -14,17 +14,12 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Embeddable
+ * @ORM\Embeddable()
  */
-class DoctrineLoaderEmbed
+class DoctrineLoaderNestedEmbed
 {
     /**
-     * @ORM\Column(length=25)
+     * @ORM\Column(length=27)
      */
-    public $embeddedMaxLength;
-
-    /**
-     * @ORM\Embedded(class=DoctrineLoaderNestedEmbed::class)
-     */
-    public $nestedEmbedded;
+    public $nestedEmbeddedMaxLength;
 }

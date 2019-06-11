@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-11T09:40:53Z
+
+That's a new feature to me, it should target master.
+Also please add some test cases.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-05-12T08:56:38Z
+
+Changed target branch to master and added unit tests.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-05-16T13:12:02Z
+
+this should indeed target master, as it will require the same kind of changes in any other code dealing with the same convention for translation resources (this will affect https://github.com/willdurand/BazingaJsTranslationBundle for instance). So we should not merge this as a bugfix.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-06-09T11:24:35Z
+
+Is there anything else I need to do in order to get this PR merged? :-)

@@ -224,22 +224,22 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
 
         $hash = 1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) ? spl_object_hash($request) : null;
+        $calledListeners = [];
+
+        if (null !== $this->callStack) {
+            foreach ($this->callStack as $calledListener) {
+                list(, $requestHash) = $this->callStack->getInfo();
+
+                if (null === $hash || $hash === $requestHash) {
+                    $calledListeners[] = $calledListener->getWrappedListener();
+                }
+            }
+        }
+
         $notCalled = [];
         foreach ($allListeners as $eventName => $listeners) {
             foreach ($listeners as $listener) {
-                $called = false;
-                if (null !== $this->callStack) {
-                    foreach ($this->callStack as $calledListener) {
-                        list(, $requestHash) = $this->callStack->getInfo();
-                        if ((null === $hash || $hash === $requestHash) && $calledListener->getWrappedListener() === $listener) {
-                            $called = true;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (!$called) {
+                if (!\in_array($listener, $calledListeners, true)) {
                     if (!$listener instanceof WrappedListener) {
                         $listener = new WrappedListener($listener, null, $this->stopwatch, $this);
                     }

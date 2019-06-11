@@ -12,11 +12,11 @@
 namespace Symfony\Component\Mailer\Bridge\Amazon\Http\Api;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\Http\Api\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**

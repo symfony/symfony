@@ -14,7 +14,6 @@ namespace Symfony\Component\Mailer\Transport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\DelayedSmtpEnvelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -22,6 +21,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>

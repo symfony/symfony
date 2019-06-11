@@ -73,13 +73,13 @@ final class Psr18Client implements ClientInterface
 
             $psrResponse = $this->responseFactory->createResponse($response->getStatusCode());
 
-            foreach ($response->getHeaders() as $name => $values) {
+            foreach ($response->getHeaders(false) as $name => $values) {
                 foreach ($values as $value) {
                     $psrResponse = $psrResponse->withAddedHeader($name, $value);
                 }
             }
 
-            return $psrResponse->withBody($this->streamFactory->createStream($response->getContent()));
+            return $psrResponse->withBody($this->streamFactory->createStream($response->getContent(false)));
         } catch (TransportExceptionInterface $e) {
             if ($e instanceof \InvalidArgumentException) {
                 throw new Psr18RequestException($e, $request);

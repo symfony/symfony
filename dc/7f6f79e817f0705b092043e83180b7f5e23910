@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-08T13:39:07Z
+
+Makes sense to me, don't miss bumping the bridge's lowest version in composer.json
+
+> why Psr14 interface is optional for Contract's `EventDispatcherInterface
+
+technically: because we are >=PHP7.1 while PSR14 is >=7.2
+also because PSR14 doesn't need to be a hard requirement.
+
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-09T08:15:34Z
+
+@nicolas-grekas I've updated minimum required versions for both Bridge -> Mailer and Mailer -> Bridge, but deps=high job still fails because current dev-master hasn't my changes. How can I fix that or should we just ignore this failed job?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-09T16:28:26Z
+
+> How can I fix that or should we just ignore this failed job?
+
+deps=high can fail in this situation, until the patch is merged to master.

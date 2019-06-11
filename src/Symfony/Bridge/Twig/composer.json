@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^7.2.9",
+        "symfony/translation-contracts": "^1.1",
         "twig/twig": "^1.41|^2.10"
     },
     "require-dev": {

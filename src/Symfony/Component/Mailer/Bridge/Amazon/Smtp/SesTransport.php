@@ -12,8 +12,8 @@
 namespace Symfony\Component\Mailer\Bridge\Amazon\Smtp;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Kevin Verschaeve

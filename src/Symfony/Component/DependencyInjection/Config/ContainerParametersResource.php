@@ -35,7 +35,7 @@ class ContainerParametersResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'container_parameters_'.md5(serialize($this->parameters));
     }
@@ -43,7 +43,7 @@ class ContainerParametersResource implements ResourceInterface
     /**
      * @return array Tracked parameters
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

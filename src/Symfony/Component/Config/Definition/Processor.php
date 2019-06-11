@@ -28,7 +28,7 @@ class Processor
      *
      * @return array The processed configuration
      */
-    public function process(NodeInterface $configTree, array $configs)
+    public function process(NodeInterface $configTree, array $configs): array
     {
         $currentConfig = [];
         foreach ($configs as $config) {
@@ -47,7 +47,7 @@ class Processor
      *
      * @return array The processed configuration
      */
-    public function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    public function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs);
     }
@@ -75,7 +75,7 @@ class Processor
      *
      * @return array
      */
-    public static function normalizeConfig(array $config, string $key, string $plural = null)
+    public static function normalizeConfig(array $config, string $key, string $plural = null): array
     {
         if (null === $plural) {
             $plural = $key.'s';

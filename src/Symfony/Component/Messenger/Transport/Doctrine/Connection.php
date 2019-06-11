@@ -65,7 +65,7 @@ class Connection
         return $this->configuration;
     }
 
-    public static function buildConfiguration($dsn, array $options = [])
+    public static function buildConfiguration($dsn, array $options = []): array
     {
         if (false === $components = parse_url($dsn)) {
             throw new InvalidArgumentException(sprintf('The given Doctrine Messenger DSN "%s" is invalid.', $dsn));
@@ -328,7 +328,7 @@ class Connection
         return $schema;
     }
 
-    public static function formatDateTime(\DateTimeInterface $dateTime)
+    public static function formatDateTime(\DateTimeInterface $dateTime): string
     {
         return $dateTime->format('Y-m-d\TH:i:s');
     }

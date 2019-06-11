@@ -40,7 +40,7 @@ final class Response
      *
      * @return string The response with headers and content
      */
-    public function __toString()
+    public function __toString(): string
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
@@ -61,7 +61,7 @@ final class Response
      *
      * @return string The response content
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -76,7 +76,7 @@ final class Response
      *
      * @return array The response headers
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }

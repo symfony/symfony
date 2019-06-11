@@ -44,7 +44,7 @@ final class GitRepository
         return new self(realpath($targetDir));
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -64,7 +64,7 @@ final class GitRepository
         return $this->getLastLine($this->execInPath('git log -1 --format="%an"'));
     }
 
-    public function getLastAuthoredDate()
+    public function getLastAuthoredDate(): \DateTime
     {
         return new \DateTime($this->getLastLine($this->execInPath('git log -1 --format="%ai"')));
     }

@@ -167,7 +167,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         (new ExceptionListener($controller, $this->logger, $debug))->onKernelException($event);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
 

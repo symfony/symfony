@@ -75,7 +75,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Override default behavior since we check the user agent in onKernelResponse.
      */
-    protected function headersAccepted()
+    protected function headersAccepted(): bool
     {
         return true;
     }

@@ -51,7 +51,7 @@ final class HandlerDescriptor
         return $this->options[$option] ?? null;
     }
 
-    private function callableName(callable $handler)
+    private function callableName(callable $handler): string
     {
         if (\is_array($handler)) {
             if (\is_object($handler[0])) {

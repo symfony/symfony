@@ -30,7 +30,7 @@ class ComposerResource implements SelfCheckingResourceInterface
         $this->vendors = self::$runtimeVendors;
     }
 
-    public function getVendors()
+    public function getVendors(): array
     {
         return array_keys($this->vendors);
     }
@@ -38,7 +38,7 @@ class ComposerResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return __CLASS__;
     }
@@ -46,7 +46,7 @@ class ComposerResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh(int $timestamp)
+    public function isFresh(int $timestamp): bool
     {
         self::refresh();
 

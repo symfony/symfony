@@ -26,7 +26,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function defaults(array $defaults)
+    final public function defaults(array $defaults): object
     {
         $this->route->addDefaults($defaults);
 
@@ -38,7 +38,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function requirements(array $requirements)
+    final public function requirements(array $requirements): object
     {
         $this->route->addRequirements($requirements);
 
@@ -50,7 +50,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function options(array $options)
+    final public function options(array $options): object
     {
         $this->route->addOptions($options);
 
@@ -62,7 +62,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function utf8(bool $utf8 = true)
+    final public function utf8(bool $utf8 = true): object
     {
         $this->route->addOptions(['utf8' => $utf8]);
 
@@ -74,7 +74,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function condition(string $condition)
+    final public function condition(string $condition): object
     {
         $this->route->setCondition($condition);
 
@@ -86,7 +86,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function host(string $pattern)
+    final public function host(string $pattern): object
     {
         $this->route->setHost($pattern);
 
@@ -101,7 +101,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function schemes(array $schemes)
+    final public function schemes(array $schemes): object
     {
         $this->route->setSchemes($schemes);
 
@@ -116,7 +116,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function methods(array $methods)
+    final public function methods(array $methods): object
     {
         $this->route->setMethods($methods);
 
@@ -130,7 +130,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function controller($controller)
+    final public function controller($controller): object
     {
         $this->route->addDefaults(['_controller' => $controller]);
 
@@ -142,7 +142,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function locale(string $locale)
+    final public function locale(string $locale): object
     {
         $this->route->addDefaults(['_locale' => $locale]);
 
@@ -154,7 +154,7 @@ trait RouteTrait
      *
      * @return $this
      */
-    final public function format(string $format)
+    final public function format(string $format): object
     {
         $this->route->addDefaults(['_format' => $format]);
 

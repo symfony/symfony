@@ -43,7 +43,7 @@ final class User implements UserInterface, EquatableInterface
         $this->roles = $roles;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getUsername();
     }
@@ -51,7 +51,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -59,7 +59,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -74,7 +74,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -82,7 +82,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isAccountNonExpired(): bool
     {
         return $this->accountNonExpired;
     }
@@ -90,7 +90,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return $this->accountNonLocked;
     }
@@ -98,7 +98,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isCredentialsNonExpired()
+    public function isCredentialsNonExpired(): bool
     {
         return $this->credentialsNonExpired;
     }
@@ -106,7 +106,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -121,7 +121,7 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof self) {
             return false;

@@ -112,7 +112,7 @@ class ErrorHandler
      *
      * @return self The registered error handler
      */
-    public static function register(self $handler = null, $replace = true)
+    public static function register(self $handler = null, $replace = true): self
     {
         if (null === self::$reservedMemory) {
             self::$reservedMemory = str_repeat('x', 10240);
@@ -210,7 +210,7 @@ class ErrorHandler
      *
      * @throws \InvalidArgumentException
      */
-    public function setLoggers(array $loggers)
+    public function setLoggers(array $loggers): array
     {
         $prevLogged = $this->loggedErrors;
         $prev = $this->loggers;
@@ -261,7 +261,7 @@ class ErrorHandler
      *
      * @return callable|null The previous exception handler
      */
-    public function setExceptionHandler(callable $handler = null)
+    public function setExceptionHandler(callable $handler = null): ?callable
     {
         $prev = $this->exceptionHandler;
         $this->exceptionHandler = $handler;
@@ -277,7 +277,7 @@ class ErrorHandler
      *
      * @return int The previous value
      */
-    public function throwAt($levels, $replace = false)
+    public function throwAt($levels, $replace = false): int
     {
         $prev = $this->thrownErrors;
         $this->thrownErrors = ($levels | E_RECOVERABLE_ERROR | E_USER_ERROR) & ~E_USER_DEPRECATED & ~E_DEPRECATED;
@@ -297,7 +297,7 @@ class ErrorHandler
      *
      * @return int The previous value
      */
-    public function scopeAt($levels, $replace = false)
+    public function scopeAt($levels, $replace = false): int
     {
         $prev = $this->scopedErrors;
         $this->scopedErrors = (int) $levels;
@@ -316,7 +316,7 @@ class ErrorHandler
      *
      * @return int The previous value
      */
-    public function traceAt($levels, $replace = false)
+    public function traceAt($levels, $replace = false): int
     {
         $prev = $this->tracedErrors;
         $this->tracedErrors = (int) $levels;
@@ -335,7 +335,7 @@ class ErrorHandler
      *
      * @return int The previous value
      */
-    public function screamAt($levels, $replace = false)
+    public function screamAt($levels, $replace = false): int
     {
         $prev = $this->screamedErrors;
         $this->screamedErrors = (int) $levels;
@@ -374,7 +374,7 @@ class ErrorHandler
      * @param string $file
      * @param int    $line
      *
-     * @return bool Returns false when no handling happens so that the PHP engine can handle the error itself
+     * @return bool|void Returns false when no handling happens so that the PHP engine can handle the error itself
      *
      * @throws \ErrorException When $this->thrownErrors requests so
      *
@@ -670,7 +670,7 @@ class ErrorHandler
      *
      * @return FatalErrorHandlerInterface[] An array of FatalErrorHandlerInterface
      */
-    protected function getFatalErrorHandlers()
+    protected function getFatalErrorHandlers(): array
     {
         return [
             new UndefinedFunctionFatalErrorHandler(),
@@ -682,7 +682,7 @@ class ErrorHandler
     /**
      * Cleans the trace by removing function arguments and the frames added by the error handler and DebugClassLoader.
      */
-    private function cleanTrace($backtrace, $type, $file, $line, $throw)
+    private function cleanTrace($backtrace, $type, $file, $line, $throw): array
     {
         $lightTrace = $backtrace;
 

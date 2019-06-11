@@ -61,11 +61,9 @@ final class ReverseContainer
     }
 
     /**
-     * @return object
-     *
      * @throws ServiceNotFoundException When the service is not reversible
      */
-    public function getService(string $id)
+    public function getService(string $id): object
     {
         if ($this->serviceContainer->has($id)) {
             return $this->serviceContainer->get($id);

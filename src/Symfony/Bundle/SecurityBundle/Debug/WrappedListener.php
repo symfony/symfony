@@ -54,7 +54,7 @@ final class WrappedListener
         return $this->listener->{$method}(...$arguments);
     }
 
-    public function getWrappedListener()
+    public function getWrappedListener(): callable
     {
         return $this->listener;
     }

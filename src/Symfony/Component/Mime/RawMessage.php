@@ -56,7 +56,7 @@ class RawMessage implements \Serializable
     /**
      * @internal
      */
-    final public function serialize()
+    final public function serialize(): string
     {
         return serialize($this->__serialize());
     }

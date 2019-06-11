@@ -116,7 +116,7 @@ final class Envelope
     /**
      * @return object The original message contained in the envelope
      */
-    public function getMessage()
+    public function getMessage(): object
     {
         return $this->message;
     }

@@ -140,11 +140,9 @@ class ContextListener
     /**
      * Refreshes the user by reloading it from the user provider.
      *
-     * @return TokenInterface|null
-     *
      * @throws \RuntimeException
      */
-    protected function refreshUser(TokenInterface $token)
+    protected function refreshUser(TokenInterface $token): ?TokenInterface
     {
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {

@@ -22,4 +22,9 @@ class DoctrineLoaderEmbed
      * @ORM\Column(length=25)
      */
     public $embeddedMaxLength;
+
+    /**
+     * @ORM\Embedded(class=DoctrineLoaderNestedEmbed::class)
+     */
+    public $nestedEmbedded;
 }

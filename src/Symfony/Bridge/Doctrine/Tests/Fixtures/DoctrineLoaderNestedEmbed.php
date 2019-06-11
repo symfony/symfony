@@ -9,14 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\OptionsResolver;
+namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
+
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Contains resolved option values.
- *
- * @author Bernhard Schussek <bschussek@gmail.com>
- * @author Tobias Schultze <http://tobion.de>
+ * @ORM\Embeddable()
  */
-interface Options extends \ArrayAccess, \Countable
+class DoctrineLoaderNestedEmbed
 {
+    /**
+     * @ORM\Column(length=27)
+     */
+    public $nestedEmbeddedMaxLength;
 }

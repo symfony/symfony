@@ -64,6 +64,10 @@ class Transport
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN is invalid.', $dsn));
         }
 
+        if (!isset($parsedDsn['scheme'])) {
+            throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a transport scheme.', $dsn));
+        }
+
         if (!isset($parsedDsn['host'])) {
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a mailer name.', $dsn));
         }

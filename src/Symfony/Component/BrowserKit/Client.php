@@ -162,6 +162,17 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
+    /**
+     * @param string      $method
+     * @param string      $uri
+     * @param array       $parameters
+     * @param array       $files
+     * @param array       $server
+     * @param string|null $content
+     * @param bool        $changeHistory
+     *
+     * @return Crawler
+     */
     public function xmlHttpRequest(string $method, string $uri, array $parameters = [], array $files = [], array $server = [], string $content = null, bool $changeHistory = true): Crawler
     {
         $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
@@ -281,7 +292,11 @@ abstract class Client
     /**
      * Clicks on a given link.
      *
+     * @param \Symfony\Component\DomCrawler\Link $link
+     *
      * @return Crawler
+     *
+     * @throws \ReflectionException
      */
     public function click(Link $link)
     {
@@ -296,6 +311,10 @@ abstract class Client
      * Clicks the first link (or clickable image) that contains the given text.
      *
      * @param string $linkText The text of the link or the alt attribute of the clickable image
+     *
+     * @return Crawler
+     *
+     * @throws \ReflectionException
      */
     public function clickLink(string $linkText): Crawler
     {
@@ -309,11 +328,12 @@ abstract class Client
     /**
      * Submits a form.
      *
-     * @param Form  $form             A Form instance
-     * @param array $values           An array of form field values
-     * @param array $serverParameters An array of server parameters
+     * @param \Symfony\Component\DomCrawler\Form $form   A Form instance
+     * @param array                              $values An array of form field values
      *
      * @return Crawler
+     *
+     * @throws \ReflectionException
      */
     public function submit(Form $form, array $values = []/*, array $serverParameters = []*/)
     {
@@ -335,6 +355,10 @@ abstract class Client
      * @param array  $fieldValues      Use this syntax: ['my_form[name]' => '...', 'my_form[email]' => '...']
      * @param string $method           The HTTP method used to submit the form
      * @param array  $serverParameters These values override the ones stored in $_SERVER (HTTP headers must include a HTTP_ prefix as PHP does)
+     *
+     * @return Crawler
+     *
+     * @throws \ReflectionException
      */
     public function submitForm(string $button, array $fieldValues = [], string $method = 'POST', array $serverParameters = []): Crawler
     {
@@ -715,6 +739,12 @@ abstract class Client
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 
+    /**
+     * @param $server
+     * @param $uri
+     *
+     * @return mixed
+     */
     private function updateServerFromUri($server, $uri)
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
@@ -725,6 +755,11 @@ abstract class Client
         return $server;
     }
 
+    /**
+     * @param $uri
+     *
+     * @return mixed|string
+     */
     private function extractHost($uri)
     {
         $host = parse_url($uri, PHP_URL_HOST);

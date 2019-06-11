@@ -6,7 +6,7 @@ CHANGELOG
 
  * deprecated support for short factories and short configurators in Yaml
  * deprecated `tagged` in favor of `tagged_iterator`
- * added ability to define an priority method for a tagged collection
+ * added ability to define a priority method for a tagged collection
 
 4.3.0
 -----

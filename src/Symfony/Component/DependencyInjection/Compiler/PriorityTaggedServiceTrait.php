@@ -57,7 +57,7 @@ trait PriorityTaggedServiceTrait
             $class = $container->getDefinition($serviceId)->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
 
-            if (!$r = $container->getReflectionClass($class)) {
+            if (null !== $r = $container->getReflectionClass($class)) {
                 throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
             }
 

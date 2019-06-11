@@ -89,7 +89,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $submitted = false;
 
     /**
-     * @var ClickableInterface|null The button that was used to submit the form
+     * @var FormInterface|ClickableInterface|null The button that was used to submit the form
      */
     private $clickedButton;
 
@@ -747,7 +747,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     /**
      * Returns the button that was used to submit the form.
      *
-     * @return ClickableInterface|null
+     * @return FormInterface|ClickableInterface|null
      */
     public function getClickedButton()
     {

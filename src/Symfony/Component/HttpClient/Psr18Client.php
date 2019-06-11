@@ -12,15 +12,25 @@
 namespace Symfony\Component\HttpClient;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Request;
+use Nyholm\Psr7\Uri;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Client\RequestExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+if (!interface_exists(RequestFactoryInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-factory" package is not installed. Try running "composer require nyholm/psr7".');
+}
 
 if (!interface_exists(ClientInterface::class)) {
     throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\Psr18Client" as the "psr/http-client" package is not installed. Try running "composer require psr/http-client".');
@@ -37,7 +47,7 @@ if (!interface_exists(ClientInterface::class)) {
  *
  * @experimental in 4.3
  */
-final class Psr18Client implements ClientInterface
+final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface
 {
     private $client;
     private $responseFactory;
@@ -62,6 +72,9 @@ final class Psr18Client implements ClientInterface
         $this->streamFactory = $this->streamFactory ?? $psr17Factory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         try {
@@ -87,6 +100,62 @@ final class Psr18Client implements ClientInterface
 
             throw new Psr18NetworkException($e, $request);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRequest(string $method, $uri): RequestInterface
+    {
+        if ($this->responseFactory instanceof RequestFactoryInterface) {
+            return $this->responseFactory->createRequest($method, $uri);
+        }
+
+        if (!class_exists(Request::class)) {
+            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        }
+
+        return new Request($method, $uri);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStream(string $content = ''): StreamInterface
+    {
+        return $this->streamFactory->createStream($content);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStreamFromFile(string $filename, string $mode = 'r'): StreamInterface
+    {
+        return $this->streamFactory->createStreamFromFile($filename, $mode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStreamFromResource($resource): StreamInterface
+    {
+        return $this->streamFactory->createStreamFromResource($resource);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createUri(string $uri = ''): UriInterface
+    {
+        if ($this->responseFactory instanceof UriFactoryInterface) {
+            return $this->responseFactory->createUri($uri);
+        }
+
+        if (!class_exists(Uri::class)) {
+            throw new \LogicException(sprintf('You cannot use "%s()" as the "nyholm/psr7" package is not installed. Try running "composer require nyholm/psr7".', __METHOD__));
+        }
+
+        return new Uri($uri);
     }
 }
 

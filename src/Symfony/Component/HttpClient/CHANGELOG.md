@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * made `Psr18Client` implement relevant PSR-17 factories
- * added `$response->cancel()`
+ * added `HttplugClient`
 
 4.3.0
 -----

@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-06-11T09:20:00Z
+
+I've profiled the same app again after applying this patch:
+
+* Before: https://blackfire.io/profiles/f35213c7-d5b5-4eb4-8315-4ad3f24ac9e9/graph
+* After: https://blackfire.io/profiles/0c3f3471-e073-4599-ad24-b1ea6766b2fa/graph
+* Comparison: https://blackfire.io/profiles/compare/5e4b5a28-2cd7-4f4d-9c0d-cfef1d439f63/graph
+
+Impressive 😱
+
+![image](https://user-images.githubusercontent.com/73419/59259860-cf92b180-8c3a-11e9-8408-7443a9783c1d.png)
+
+Thanks a lot Christian!
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-11T09:38:45Z
+
+Can't we target 4.2 with this change?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-11T09:51:42Z
+
+if this has been introduced in 4.2 I think this should target 4.2 as this is more than a bugfix !
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-06-11T09:58:19Z
+
+In the past, our policy with performance improvements was:
+
+* Never merge them in older branches. It's tempting to do ... but at the same time, it's too easy to introduce bugs.
+* Only merging in "next" branch is great to promote the performance improvements of the new version (and encourage upgrading).
+
+Things can change though if this is considered a bug fix.

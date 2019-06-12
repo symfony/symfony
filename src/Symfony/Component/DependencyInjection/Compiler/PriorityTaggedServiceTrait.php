@@ -56,14 +56,11 @@ trait PriorityTaggedServiceTrait
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $attributes) {
             $class = $container->getDefinition($serviceId)->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
-
-            if (null !== $r = $container->getReflectionClass($class)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
-            }
+            $reflectionClass = $container->getReflectionClass($class);
 
             $priority = 0;
-            if ($defaultPriorityMethod && $r->hasMethod($defaultPriorityMethod)) {
-                if (!($priorityReflMethod = $r->getMethod($defaultPriorityMethod))->isStatic()) {
+            if (null !== $defaultPriorityMethod && null !== $reflectionClass && $reflectionClass->hasMethod($defaultPriorityMethod)) {
+                if (!($priorityReflMethod = $reflectionClass->getMethod($defaultPriorityMethod))->isStatic()) {
                     throw new InvalidArgumentException(sprintf('Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" must be static.', $class, $defaultPriorityMethod, $tagName, $serviceId));
                 }
 
@@ -92,9 +89,13 @@ trait PriorityTaggedServiceTrait
                 continue;
             }
 
-            $class = $r->name;
+            if (null === $reflectionClass) {
+                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $serviceId));
+            }
 
-            if (!$r->hasMethod($defaultIndexMethod)) {
+            $class = $reflectionClass->name;
+
+            if (!$reflectionClass->hasMethod($defaultIndexMethod)) {
                 if ($needsIndexes) {
                     $services[$priority][$serviceId] = new TypedReference($serviceId, $class);
 
@@ -104,7 +105,7 @@ trait PriorityTaggedServiceTrait
                 throw new InvalidArgumentException(sprintf('Method "%s::%s()" not found: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
             }
 
-            if (!($rm = $r->getMethod($defaultIndexMethod))->isStatic()) {
+            if (!($rm = $reflectionClass->getMethod($defaultIndexMethod))->isStatic()) {
                 throw new InvalidArgumentException(sprintf('Method "%s::%s()" should be static: tag "%s" on service "%s" is missing "%s" attribute.', $class, $defaultIndexMethod, $tagName, $serviceId, $indexAttribute));
             }
 

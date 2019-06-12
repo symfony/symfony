@@ -74,7 +74,7 @@ trait PriorityTaggedServiceTrait
                 $priority = $priorityReflMethod->invoke(null);
 
                 if (!\is_int($priority)) {
-                    throw new InvalidArgumentException(sprintf('Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" should return an integer, got %s.', $class, $defaultPriorityMethod, \gettype($priority), $tagName, $serviceId));
+                    throw new InvalidArgumentException(sprintf('Default priority method "%s::%s()" of the "%s"-tagged collection on service "%s" should return an integer, got %s.', $class, $defaultPriorityMethod, $tagName, $serviceId, \gettype($priority)));
                 }
             }
 

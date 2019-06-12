@@ -236,6 +236,20 @@ class RequestTest extends TestCase
         // Fragment should not be included in the URI
         $request = Request::create('http://test.com/foo#bar');
         $this->assertEquals('http://test.com/foo', $request->getUri());
+
+        $request = Request::create('http://test.com/test/app.php', 'GET', [], [], [],
+            [
+                'DOCUMENT_ROOT' => '/var/www/www.test.com',
+                'SCRIPT_FILENAME' => '/var/www/www.test.com/app/app.php',
+                'SCRIPT_NAME' => '/app/app.php',
+                'PHP_SELF' => '/app/app.php/test/app.php',
+            ]);
+        $this->assertEquals('http://test.com/test/app.php', $request->getUri());
+        $this->assertEquals('/test/app.php', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
     }
 
     public function testCreateWithRequestUri()

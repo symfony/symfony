@@ -1810,6 +1810,11 @@ class Request
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
         }
 
+        // if requestUri not start from baseUrl
+        if (0 !== strpos(rawurldecode($truncatedRequestUri), $baseUrl)) {
+            return '';
+        }
+
         return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);
     }
 

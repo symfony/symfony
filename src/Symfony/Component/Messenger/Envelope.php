@@ -88,7 +88,7 @@ final class Envelope
         $cloned = clone $this;
 
         foreach ($cloned->stamps as $class => $stamps) {
-            if ($class === $type || \is_subclass_of($class, $type)) {
+            if ($class === $type || is_subclass_of($class, $type)) {
                 unset($cloned->stamps[$class]);
             }
         }

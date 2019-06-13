@@ -174,7 +174,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function name($patterns)
     {
-        $this->names = \array_merge($this->names, (array) $patterns);
+        $this->names = array_merge($this->names, (array) $patterns);
 
         return $this;
     }
@@ -190,7 +190,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notName($patterns)
     {
-        $this->notNames = \array_merge($this->notNames, (array) $patterns);
+        $this->notNames = array_merge($this->notNames, (array) $patterns);
 
         return $this;
     }
@@ -212,7 +212,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function contains($patterns)
     {
-        $this->contains = \array_merge($this->contains, (array) $patterns);
+        $this->contains = array_merge($this->contains, (array) $patterns);
 
         return $this;
     }
@@ -234,7 +234,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notContains($patterns)
     {
-        $this->notContains = \array_merge($this->notContains, (array) $patterns);
+        $this->notContains = array_merge($this->notContains, (array) $patterns);
 
         return $this;
     }
@@ -258,7 +258,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function path($patterns)
     {
-        $this->paths = \array_merge($this->paths, (array) $patterns);
+        $this->paths = array_merge($this->paths, (array) $patterns);
 
         return $this;
     }
@@ -282,7 +282,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function notPath($patterns)
     {
-        $this->notPaths = \array_merge($this->notPaths, (array) $patterns);
+        $this->notPaths = array_merge($this->notPaths, (array) $patterns);
 
         return $this;
     }

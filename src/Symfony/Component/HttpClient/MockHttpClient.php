@@ -78,7 +78,7 @@ class MockHttpClient implements HttpClientInterface
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
-        } elseif (!\is_iterable($responses)) {
+        } elseif (!is_iterable($responses)) {
             throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of MockResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 

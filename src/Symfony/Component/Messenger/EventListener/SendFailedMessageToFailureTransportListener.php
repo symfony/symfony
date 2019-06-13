@@ -61,7 +61,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
             $throwable = $throwable->getNestedExceptions()[0];
         }
 
-        $flattenedException = \class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
+        $flattenedException = class_exists(FlattenException::class) ? FlattenException::createFromThrowable($throwable) : null;
         $envelope = $envelope->withoutAll(ReceivedStamp::class)
             ->withoutAll(TransportMessageIdStamp::class)
             ->with(new SentToFailureTransportStamp($event->getReceiverName()))

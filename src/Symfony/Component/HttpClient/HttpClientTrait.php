@@ -200,7 +200,7 @@ trait HttpClientTrait
             if (\is_int($name)) {
                 [$name, $values] = explode(':', $values, 2);
                 $values = [ltrim($values)];
-            } elseif (!\is_iterable($values)) {
+            } elseif (!is_iterable($values)) {
                 $values = (array) $values;
             }
 

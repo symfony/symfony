@@ -168,8 +168,8 @@ final class CurlResponse implements ResponseInterface
                 rewind($this->debugBuffer);
                 $info['debug'] = stream_get_contents($this->debugBuffer);
                 curl_setopt($this->handle, CURLOPT_VERBOSE, false);
-                fclose($this->debugBuffer);
-                $this->debugBuffer = null;
+                rewind($this->debugBuffer);
+                ftruncate($this->debugBuffer, 0);
                 $this->finalInfo = $info;
             }
         }

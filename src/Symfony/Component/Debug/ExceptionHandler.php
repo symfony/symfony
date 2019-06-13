@@ -457,10 +457,10 @@ EOF;
 
     private function addElementToGhost()
     {
-        if (!isset(self::GHOST_ADDONS[\date('m-d')])) {
+        if (!isset(self::GHOST_ADDONS[date('m-d')])) {
             return '';
         }
 
-        return '<path d="'.self::GHOST_ADDONS[\date('m-d')].'" fill="#fff" fill-opacity="0.6"></path>';
+        return '<path d="'.self::GHOST_ADDONS[date('m-d')].'" fill="#fff" fill-opacity="0.6"></path>';
     }
 }

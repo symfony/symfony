@@ -52,6 +52,6 @@ class TimeDataCollectorTest extends TestCase
 
         $c->collect($request, new Response());
         $this->assertEquals(123456000, $c->getStartTime());
-        $this->assertSame(\class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
+        $this->assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
     }
 }

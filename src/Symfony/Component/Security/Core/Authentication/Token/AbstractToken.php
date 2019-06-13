@@ -144,6 +144,26 @@ abstract class AbstractToken implements TokenInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @final since Symfony 4.3, use __serialize() instead
+     *
+     * @internal since Symfony 4.3, use __serialize() instead
+     */
+    public function serialize()
+    {
+        $serialized = $this->__serialize();
+
+        if (null === $isCalledFromOverridingMethod = \func_num_args() ? func_get_arg(0) : null) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
+            $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
+        }
+
+        return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
+>>>>>>> 4.4
+    }
+
+    /**
      * Restores the object state from an array given by __serialize().
      *
      * There is no need to unserialize any entry in $data, they are already ready-to-use.

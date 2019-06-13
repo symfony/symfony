@@ -68,9 +68,9 @@ class Transport
             throw new InvalidArgumentException(sprintf('The "%s" mailer DSN must contain a mailer name.', $dsn));
         }
 
-        $user = \urldecode($parsedDsn['user'] ?? '');
-        $pass = \urldecode($parsedDsn['pass'] ?? '');
-        \parse_str($parsedDsn['query'] ?? '', $query);
+        $user = urldecode($parsedDsn['user'] ?? '');
+        $pass = urldecode($parsedDsn['pass'] ?? '');
+        parse_str($parsedDsn['query'] ?? '', $query);
 
         switch ($parsedDsn['host']) {
             case 'null':

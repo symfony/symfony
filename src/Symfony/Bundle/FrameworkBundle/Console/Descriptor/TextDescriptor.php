@@ -557,8 +557,11 @@ class TextDescriptor extends Descriptor
         }
 
         $fileLink = $this->fileLinkFormatter->format($r->getFileName(), $r->getStartLine());
+        if ($fileLink) {
+            return sprintf('<href=%s>%s</>', $fileLink, $anchorText);
+        }
 
-        return sprintf('<href=%s>%s</>', $fileLink, $anchorText);
+        return $anchorText;
     }
 
     private function formatCallable($callable): string

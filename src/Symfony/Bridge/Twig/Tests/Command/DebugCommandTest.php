@@ -295,7 +295,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, null, false, ['message' => $message]);
         $tester->execute([], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $this->assertContains(\json_encode($message), $display);
+        $this->assertContains(json_encode($message), $display);
     }
 
     public function testWithGlobalsJson()
@@ -304,7 +304,7 @@ TXT
         $tester = $this->createCommandTester([], [], null, null, false, $globals);
         $tester->execute(['--format' => 'json'], ['decorated' => true]);
         $display = $tester->getDisplay();
-        $display = \json_decode($display, true);
+        $display = json_decode($display, true);
         $this->assertSame($globals, $display['globals']);
     }
 
@@ -313,10 +313,10 @@ TXT
         $tester = $this->createCommandTester();
         $tester->execute(['--format' => 'json'], ['decorated' => false]);
         $display = $tester->getDisplay();
-        $display1 = \json_decode($display, true);
+        $display1 = json_decode($display, true);
         $tester->execute(['--filter' => 'date', '--format' => 'json'], ['decorated' => false]);
         $display = $tester->getDisplay();
-        $display2 = \json_decode($display, true);
+        $display2 = json_decode($display, true);
         $this->assertNotSame($display1, $display2);
     }
 

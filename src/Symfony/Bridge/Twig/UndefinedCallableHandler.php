@@ -85,7 +85,7 @@ class UndefinedCallableHandler
 
     private static function onUndefined($name, $type, $component)
     {
-        if (\class_exists(FullStack::class) && isset(self::$fullStackEnable[$component])) {
+        if (class_exists(FullStack::class) && isset(self::$fullStackEnable[$component])) {
             throw new SyntaxError(sprintf('Did you forget to %s? Unknown %s "%s".', self::$fullStackEnable[$component], $type, $name));
         }
 

@@ -69,6 +69,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     public function hasMetadataFor($value)
     {
-        return \is_object($value) || (\is_string($value) && (\class_exists($value) || \interface_exists($value, false)));
+        return \is_object($value) || (\is_string($value) && (class_exists($value) || interface_exists($value, false)));
     }
 }

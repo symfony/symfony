@@ -566,7 +566,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -588,7 +588,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -1220,7 +1220,7 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     private function createCssSelectorConverter(): CssSelectorConverter
     {
-        if (!\class_exists(CssSelectorConverter::class)) {
+        if (!class_exists(CssSelectorConverter::class)) {
             throw new \LogicException('To filter with a CSS selector, install the CssSelector component ("composer require symfony/css-selector"). Or use filterXpath instead.');
         }
 

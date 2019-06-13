@@ -61,8 +61,8 @@ abstract class AbstractApiTransport extends AbstractTransport
 
     protected function getRecipients(Email $email, SmtpEnvelope $envelope): array
     {
-        return \array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
-            return false === \in_array($address, \array_merge($email->getCc(), $email->getBcc()), true);
+        return array_filter($envelope->getRecipients(), function (Address $address) use ($email) {
+            return false === \in_array($address, array_merge($email->getCc(), $email->getBcc()), true);
         });
     }
 }

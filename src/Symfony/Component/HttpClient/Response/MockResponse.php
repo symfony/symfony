@@ -44,7 +44,7 @@ class MockResponse implements ResponseInterface
      */
     public function __construct($body = '', array $info = [])
     {
-        $this->body = \is_iterable($body) ? $body : (string) $body;
+        $this->body = is_iterable($body) ? $body : (string) $body;
         $this->info = $info + $this->info;
 
         if (!isset($info['response_headers'])) {

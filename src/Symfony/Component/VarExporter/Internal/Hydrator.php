@@ -65,7 +65,7 @@ class Hydrator
             };
         }
 
-        if (!\class_exists($class) && !\interface_exists($class, false) && !\trait_exists($class, false)) {
+        if (!class_exists($class) && !interface_exists($class, false) && !trait_exists($class, false)) {
             throw new ClassNotFoundException($class);
         }
         $classReflector = new \ReflectionClass($class);

@@ -123,7 +123,7 @@ class Connection
 
         $this->executeQuery($queryBuilder->getSQL(), [
             ':body' => $body,
-            ':headers' => \json_encode($headers),
+            ':headers' => json_encode($headers),
             ':queue_name' => $this->configuration['queue_name'],
             ':created_at' => self::formatDateTime($now),
             ':available_at' => self::formatDateTime($availableAt),
@@ -155,7 +155,7 @@ class Connection
                 return null;
             }
 
-            $doctrineEnvelope['headers'] = \json_decode($doctrineEnvelope['headers'], true);
+            $doctrineEnvelope['headers'] = json_decode($doctrineEnvelope['headers'], true);
 
             $queryBuilder = $this->driverConnection->createQueryBuilder()
                 ->update($this->configuration['table_name'])

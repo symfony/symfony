@@ -46,7 +46,7 @@ class HttpFoundationExtension extends AbstractExtension
 
         $requestContext = null;
         if (2 === \func_num_args()) {
-            $requestContext = \func_get_arg(1);
+            $requestContext = func_get_arg(1);
             if (null !== $requestContext && !$requestContext instanceof RequestContext) {
                 throw new \TypeError(sprintf('The second argument must be an instance of "%s".', RequestContext::class));
             }

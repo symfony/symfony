@@ -56,7 +56,7 @@ class SesTransport extends AbstractHttpTransport
             ],
             'body' => [
                 'Action' => 'SendRawEmail',
-                'RawMessage.Data' => \base64_encode($message->toString()),
+                'RawMessage.Data' => base64_encode($message->toString()),
             ],
         ]);
 

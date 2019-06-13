@@ -67,7 +67,7 @@ class SendgridTransport extends AbstractApiTransport
         }
 
         $personalization = [
-            'to' => \array_map($addressStringifier, $this->getRecipients($email, $envelope)),
+            'to' => array_map($addressStringifier, $this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];
         if ($emails = array_map($addressStringifier, $email->getCc())) {

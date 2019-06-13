@@ -232,7 +232,7 @@ class HttpClientTraitTest extends TestCase
     public function provideFingerprints()
     {
         foreach (['md5', 'sha1', 'sha256'] as $algo) {
-            $hash = \hash($algo, $algo);
+            $hash = hash($algo, $algo);
             yield [$hash, [$algo => $hash]];
         }
 

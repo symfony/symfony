@@ -60,7 +60,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
                 $item->metadata[CacheItem::METADATA_TAGS] = $value['tags'] ?? [];
                 if (isset($value['meta'])) {
                     // For compactness these values are packed, & expiry is offset to reduce size
-                    $v = \unpack('Ve/Nc', $value['meta']);
+                    $v = unpack('Ve/Nc', $value['meta']);
                     $item->metadata[CacheItem::METADATA_EXPIRY] = $v['e'] + CacheItem::METADATA_EXPIRY_OFFSET;
                     $item->metadata[CacheItem::METADATA_CTIME] = $v['c'];
                 }
@@ -96,16 +96,16 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
                     if ($metadata) {
                         // For compactness, expiry and creation duration are packed, using magic numbers as separators
-                        $value['meta'] = \pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME]);
+                        $value['meta'] = pack('VN', (int) $metadata[CacheItem::METADATA_EXPIRY] - CacheItem::METADATA_EXPIRY_OFFSET, $metadata[CacheItem::METADATA_CTIME]);
                     }
 
                     // Extract tag changes, these should be removed from values in doSave()
                     $value['tag-operations'] = ['add' => [], 'remove' => []];
                     $oldTags = $item->metadata[CacheItem::METADATA_TAGS] ?? [];
-                    foreach (\array_diff($value['tags'], $oldTags) as $addedTag) {
+                    foreach (array_diff($value['tags'], $oldTags) as $addedTag) {
                         $value['tag-operations']['add'][] = $getId($tagPrefix.$addedTag);
                     }
-                    foreach (\array_diff($oldTags, $value['tags']) as $removedTag) {
+                    foreach (array_diff($oldTags, $value['tags']) as $removedTag) {
                         $value['tag-operations']['remove'][] = $getId($tagPrefix.$removedTag);
                     }
 
@@ -236,7 +236,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         }
 
         try {
-            if ($this->doDelete(\array_values($ids), $tagData)) {
+            if ($this->doDelete(array_values($ids), $tagData)) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -271,7 +271,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         }
 
         $tagIds = [];
-        foreach (\array_unique($tags) as $tag) {
+        foreach (array_unique($tags) as $tag) {
             $tagIds[] = $this->getId(self::TAGS_PREFIX.$tag);
         }
 

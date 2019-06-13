@@ -13,7 +13,6 @@ namespace Symfony\Component\Mailer;
 
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\NamedAddress;
 use Symfony\Component\Mime\RawMessage;
 
 /**
@@ -42,7 +41,7 @@ class SmtpEnvelope
 
     public function setSender(Address $sender): void
     {
-        $this->sender = $sender instanceof NamedAddress ? new Address($sender->getAddress()) : $sender;
+        $this->sender = new Address($sender->getAddress());
     }
 
     public function getSender(): Address
@@ -50,6 +49,9 @@ class SmtpEnvelope
         return $this->sender;
     }
 
+    /**
+     * @param Address[] $recipients
+     */
     public function setRecipients(array $recipients): void
     {
         if (!$recipients) {
@@ -58,12 +60,10 @@ class SmtpEnvelope
 
         $this->recipients = [];
         foreach ($recipients as $recipient) {
-            if ($recipient instanceof NamedAddress) {
-                $recipient = new Address($recipient->getAddress());
-            } elseif (!$recipient instanceof Address) {
+            if (!$recipient instanceof Address) {
                 throw new InvalidArgumentException(sprintf('A recipient must be an instance of "%s" (got "%s").', Address::class, \is_object($recipient) ? \get_class($recipient) : \gettype($recipient)));
             }
-            $this->recipients[] = $recipient;
+            $this->recipients[] = new Address($recipient->getAddress());
         }
     }
 

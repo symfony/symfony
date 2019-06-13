@@ -92,7 +92,7 @@ class ProjectServiceContainer extends Container
             });
         }
 
-        include_once $this->targetDirs[0].'/Fixtures/includes/foo_lazy.php';
+        include_once \dirname(__DIR__, 1 + 0).'/Fixtures/includes/foo_lazy.php';
 
         return new \Bar\FooClass(new \Bar\FooLazyClass());
     }

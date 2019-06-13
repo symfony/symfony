@@ -76,7 +76,7 @@ class SesTransport extends AbstractApiTransport
         if ($email->getAttachments()) {
             return [
                 'Action' => 'SendRawEmail',
-                'RawMessage.Data' => \base64_encode($email->toString()),
+                'RawMessage.Data' => base64_encode($email->toString()),
             ];
         }
 

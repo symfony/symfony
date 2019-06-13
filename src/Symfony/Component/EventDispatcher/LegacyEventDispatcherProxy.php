@@ -53,7 +53,7 @@ final class LegacyEventDispatcherProxy implements EventDispatcherInterface
      */
     public function dispatch($event/*, string $eventName = null*/)
     {
-        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
+        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
 
         if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);

@@ -82,7 +82,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         $this->init($redisClient, $namespace, $defaultLifetime, $marshaller);
 
         // Make sure php-redis is 3.1.3 or higher configured for Redis classes
-        if (!$this->redis instanceof Predis\Client && \version_compare(\phpversion('redis'), '3.1.3', '<')) {
+        if (!$this->redis instanceof Predis\Client && version_compare(phpversion('redis'), '3.1.3', '<')) {
             throw new LogicException('RedisTagAwareAdapter requires php-redis 3.1.3 or higher, alternatively use predis/predis');
         }
     }
@@ -120,7 +120,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
         foreach ($results as $id => $result) {
             // Skip results of SADD/SREM operations, they'll be 1 or 0 depending on if set value already existed or not
-            if (\is_numeric($result)) {
+            if (is_numeric($result)) {
                 continue;
             }
             // setEx results
@@ -152,7 +152,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
             }
 
             foreach ($tagData as $tagId => $idList) {
-                yield 'sRem' => \array_merge([$tagId], $idList);
+                yield 'sRem' => array_merge([$tagId], $idList);
             }
         })->rewind();
 
@@ -178,10 +178,10 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         });
 
         // Flatten generator result from pipeline, ignore keys (tag ids)
-        $ids = \array_unique(\array_merge(...\iterator_to_array($tagIdSets, false)));
+        $ids = array_unique(array_merge(...iterator_to_array($tagIdSets, false)));
 
         // Delete cache in chunks to avoid overloading the connection
-        foreach (\array_chunk($ids, self::BULK_DELETE_LIMIT) as $chunkIds) {
+        foreach (array_chunk($ids, self::BULK_DELETE_LIMIT) as $chunkIds) {
             $this->doDelete($chunkIds);
         }
 

@@ -30,17 +30,17 @@ class ClassExistsMock
 
     public static function class_exists($name, $autoload = true)
     {
-        return (bool) (self::$classes[ltrim($name, '\\')] ?? \class_exists($name, $autoload));
+        return (bool) (self::$classes[ltrim($name, '\\')] ?? class_exists($name, $autoload));
     }
 
     public static function interface_exists($name, $autoload = true)
     {
-        return (bool) (self::$classes[ltrim($name, '\\')] ?? \interface_exists($name, $autoload));
+        return (bool) (self::$classes[ltrim($name, '\\')] ?? interface_exists($name, $autoload));
     }
 
     public static function trait_exists($name, $autoload = true)
     {
-        return (bool) (self::$classes[ltrim($name, '\\')] ?? \trait_exists($name, $autoload));
+        return (bool) (self::$classes[ltrim($name, '\\')] ?? trait_exists($name, $autoload));
     }
 
     public static function register($class)

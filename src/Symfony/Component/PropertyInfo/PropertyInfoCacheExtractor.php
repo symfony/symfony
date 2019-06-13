@@ -110,7 +110,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         }
 
         // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
-        $encodedMethod = \rawurlencode($method);
+        $encodedMethod = rawurlencode($method);
         if (\array_key_exists($encodedMethod, $this->arrayCache) && \array_key_exists($serializedArguments, $this->arrayCache[$encodedMethod])) {
             return $this->arrayCache[$encodedMethod][$serializedArguments];
         }

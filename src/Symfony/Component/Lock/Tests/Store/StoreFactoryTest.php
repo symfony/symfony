@@ -38,23 +38,23 @@ class StoreFactoryTest extends TestCase
 
     public function validConnections()
     {
-        if (\class_exists(\Redis::class)) {
+        if (class_exists(\Redis::class)) {
             yield [$this->createMock(\Redis::class), RedisStore::class];
         }
-        if (\class_exists(RedisProxy::class)) {
+        if (class_exists(RedisProxy::class)) {
             yield [$this->createMock(RedisProxy::class), RedisStore::class];
         }
         yield [new \Predis\Client(), RedisStore::class];
-        if (\class_exists(\Memcached::class)) {
+        if (class_exists(\Memcached::class)) {
             yield [new \Memcached(), MemcachedStore::class];
         }
-        if (\class_exists(\Zookeeper::class)) {
+        if (class_exists(\Zookeeper::class)) {
             yield [$this->createMock(\Zookeeper::class), ZookeeperStore::class];
         }
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];
         }
-        if (\class_exists(\Memcached::class) && \class_exists(AbstractAdapter::class)) {
+        if (class_exists(\Memcached::class) && class_exists(AbstractAdapter::class)) {
             yield ['memcached://server.com', MemcachedStore::class];
         }
 

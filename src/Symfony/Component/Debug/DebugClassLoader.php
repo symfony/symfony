@@ -238,7 +238,7 @@ class DebugClassLoader
                 }
             }
 
-            if ($refl->isInterface() && false !== \strpos($doc, 'method') && preg_match_all('#\n \* @method\s+(static\s+)?+(?:[\w\|&\[\]\\\]+\s+)?(\w+(?:\s*\([^\)]*\))?)+(.+?([[:punct:]]\s*)?)?(?=\r?\n \*(?: @|/$|\r?\n))#', $doc, $notice, PREG_SET_ORDER)) {
+            if ($refl->isInterface() && false !== strpos($doc, 'method') && preg_match_all('#\n \* @method\s+(static\s+)?+(?:[\w\|&\[\]\\\]+\s+)?(\w+(?:\s*\([^\)]*\))?)+(.+?([[:punct:]]\s*)?)?(?=\r?\n \*(?: @|/$|\r?\n))#', $doc, $notice, PREG_SET_ORDER)) {
                 foreach ($notice as $method) {
                     $static = '' !== $method[1];
                     $name = $method[2];

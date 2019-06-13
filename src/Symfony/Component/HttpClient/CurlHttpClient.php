@@ -284,7 +284,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
     {
         if ($responses instanceof CurlResponse) {
             $responses = [$responses];
-        } elseif (!\is_iterable($responses)) {
+        } elseif (!is_iterable($responses)) {
             throw new \TypeError(sprintf('%s() expects parameter 1 to be an iterable of CurlResponse objects, %s given.', __METHOD__, \is_object($responses) ? \get_class($responses) : \gettype($responses)));
         }
 

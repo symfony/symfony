@@ -126,7 +126,7 @@ class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements Prune
                 }
 
                 $valueFile = $itemLink->getRealPath();
-                if ($valueFile && \file_exists($valueFile)) {
+                if ($valueFile && file_exists($valueFile)) {
                     @unlink($valueFile);
                 }
 

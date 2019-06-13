@@ -69,7 +69,7 @@ class AuthenticationException extends RuntimeException
     {
         $serialized = $this->__serialize();
 
-        if (null === $isCalledFromOverridingMethod = \func_num_args() ? \func_get_arg(0) : null) {
+        if (null === $isCalledFromOverridingMethod = \func_num_args() ? func_get_arg(0) : null) {
             $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
             $isCalledFromOverridingMethod = isset($trace[1]['function'], $trace[1]['object']) && 'serialize' === $trace[1]['function'] && $this === $trace[1]['object'];
         }

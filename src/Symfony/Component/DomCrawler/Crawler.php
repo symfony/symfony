@@ -566,7 +566,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');
@@ -588,7 +588,7 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         if (!$this->nodes) {
             if (0 < \func_num_args()) {
-                return \func_get_arg(0);
+                return func_get_arg(0);
             }
 
             throw new \InvalidArgumentException('The current node list is empty.');

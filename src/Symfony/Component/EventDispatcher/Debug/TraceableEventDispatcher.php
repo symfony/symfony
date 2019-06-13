@@ -140,7 +140,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
 
         $currentRequestHash = $this->currentRequestHash = $this->requestStack && ($request = $this->requestStack->getCurrentRequest()) ? spl_object_hash($request) : '';
-        $eventName = 1 < \func_num_args() ? \func_get_arg(1) : null;
+        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
 
         if (\is_object($event)) {
             $eventName = $eventName ?? \get_class($event);
@@ -193,7 +193,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
         $called = [];
         foreach ($this->callStack as $listener) {
             list($eventName, $requestHash) = $this->callStack->getInfo();
@@ -223,7 +223,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             return [];
         }
 
-        $hash = 1 <= \func_num_args() && null !== ($request = \func_get_arg(0)) ? spl_object_hash($request) : null;
+        $hash = 1 <= \func_num_args() && null !== ($request = func_get_arg(0)) ? spl_object_hash($request) : null;
         $calledListeners = [];
 
         if (null !== $this->callStack) {
@@ -258,7 +258,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     public function getOrphanedEvents(/* Request $request = null */): array
     {
-        if (1 <= \func_num_args() && null !== $request = \func_get_arg(0)) {
+        if (1 <= \func_num_args() && null !== $request = func_get_arg(0)) {
             return $this->orphanedEvents[spl_object_hash($request)] ?? [];
         }
 

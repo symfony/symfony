@@ -93,7 +93,7 @@ abstract class AbstractTransport implements TransportInterface
      */
     protected function stringifyAddresses(array $addresses): array
     {
-        return \array_map(function (Address $a) {
+        return array_map(function (Address $a) {
             return $a->toString();
         }, $addresses);
     }

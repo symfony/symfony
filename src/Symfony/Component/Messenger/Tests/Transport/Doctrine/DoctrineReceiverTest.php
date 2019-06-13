@@ -80,7 +80,7 @@ class DoctrineReceiverTest extends TestCase
         $connection->method('findAll')->with(50)->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
-        $actualEnvelopes = \iterator_to_array($receiver->all(50));
+        $actualEnvelopes = iterator_to_array($receiver->all(50));
         $this->assertCount(2, $actualEnvelopes);
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }

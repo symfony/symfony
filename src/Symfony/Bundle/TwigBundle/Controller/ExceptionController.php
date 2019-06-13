@@ -104,6 +104,11 @@ class ExceptionController
 
         // For error pages, try to find a template for the specific HTTP status code and format
         if (!$showException) {
+            $template = sprintf('%s.html.twig', $code);
+            if ($this->templateExists($template)) {
+                return $template;
+            }
+
             $template = sprintf('@Twig/Exception/%s%s.%s.twig', $name, $code, $format);
             if ($this->templateExists($template)) {
                 return $template;

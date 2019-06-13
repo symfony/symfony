@@ -1798,7 +1798,8 @@ class Request
         }
 
         $basename = basename($baseUrl);
-        if (empty($basename) || !strpos(rawurldecode($truncatedRequestUri), $basename)) {
+        $truncatedRequestUri = rawurldecode($truncatedRequestUri);
+        if (empty($basename) || !strpos($truncatedRequestUri, $basename) || 0 !== strpos($truncatedRequestUri, $baseUrl)) {
             // no match whatsoever; set it blank
             return '';
         }
@@ -1808,11 +1809,6 @@ class Request
         // from PATH_INFO or QUERY_STRING
         if (\strlen($requestUri) >= \strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && 0 !== $pos) {
             $baseUrl = substr($requestUri, 0, $pos + \strlen($baseUrl));
-        }
-
-        // if requestUri not start from baseUrl
-        if (0 !== strpos(rawurldecode($truncatedRequestUri), $baseUrl)) {
-            return '';
         }
 
         return rtrim($baseUrl, '/'.\DIRECTORY_SEPARATOR);

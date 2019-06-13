@@ -34,7 +34,7 @@ class TypedReference extends Reference
             @trigger_error(sprintf('The $requiringClass argument of "%s()" is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
 
             $this->requiringClass = $invalidBehavior;
-            $invalidBehavior = 3 < \func_num_args() ? \func_get_arg(3) : ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            $invalidBehavior = 3 < \func_num_args() ? func_get_arg(3) : ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         } else {
             $this->name = $type === $id ? $name : null;
         }

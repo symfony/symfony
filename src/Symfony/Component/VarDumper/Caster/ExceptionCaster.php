@@ -283,7 +283,7 @@ class ExceptionCaster
 
         if (isset($a[Caster::PREFIX_PROTECTED.'message']) && false !== strpos($a[Caster::PREFIX_PROTECTED.'message'], "class@anonymous\0")) {
             $a[Caster::PREFIX_PROTECTED.'message'] = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
-                return \class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
+                return class_exists($m[0], false) ? get_parent_class($m[0]).'@anonymous' : $m[0];
             }, $a[Caster::PREFIX_PROTECTED.'message']);
         }
 

@@ -213,7 +213,7 @@ class GraphvizDumper implements DumperInterface
      */
     protected function escape($value): string
     {
-        return \is_bool($value) ? ($value ? '1' : '0') : \addslashes($value);
+        return \is_bool($value) ? ($value ? '1' : '0') : addslashes($value);
     }
 
     private function addAttributes(array $attributes): string

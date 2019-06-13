@@ -114,7 +114,7 @@ class Connection
                 continue;
             }
 
-            if (!\is_numeric($arguments[$key])) {
+            if (!is_numeric($arguments[$key])) {
                 throw new InvalidArgumentException(sprintf('Integer expected for queue argument "%s", %s given.', $key, \gettype($arguments[$key])));
             }
 

@@ -65,7 +65,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return \is_subclass_of($type, DenormalizableInterface::class);
+        return is_subclass_of($type, DenormalizableInterface::class);
     }
 
     /**

@@ -743,15 +743,15 @@ class Filesystem
     private static function box($func)
     {
         self::$lastError = null;
-        \set_error_handler(__CLASS__.'::handleError');
+        set_error_handler(__CLASS__.'::handleError');
         try {
             $result = $func(...\array_slice(\func_get_args(), 1));
-            \restore_error_handler();
+            restore_error_handler();
 
             return $result;
         } catch (\Throwable $e) {
         }
-        \restore_error_handler();
+        restore_error_handler();
 
         throw $e;
     }

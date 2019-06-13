@@ -127,8 +127,8 @@ class ZookeeperStore implements StoreInterface
         // For example: foo/bar will become /foo-bar and /foo/bar will become /-foo-bar
         $resource = (string) $key;
 
-        if (false !== \strpos($resource, '/')) {
-            $resource = \strtr($resource, ['/' => '-']).'-'.sha1($resource);
+        if (false !== strpos($resource, '/')) {
+            $resource = strtr($resource, ['/' => '-']).'-'.sha1($resource);
         }
 
         if ('' === $resource) {

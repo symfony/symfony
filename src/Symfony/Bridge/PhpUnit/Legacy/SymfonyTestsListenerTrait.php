@@ -53,7 +53,7 @@ class SymfonyTestsListenerTrait
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
-        $enableDebugClassLoader = \class_exists('Symfony\Component\Debug\DebugClassLoader');
+        $enableDebugClassLoader = class_exists('Symfony\Component\Debug\DebugClassLoader');
 
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!\is_array($namespaces)) {

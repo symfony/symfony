@@ -40,7 +40,7 @@ class Exporter
         $refs = $values;
         foreach ($values as $k => $value) {
             if (\is_resource($value)) {
-                throw new NotInstantiableTypeException(\get_resource_type($value).' resource');
+                throw new NotInstantiableTypeException(get_resource_type($value).' resource');
             }
             $refs[$k] = $objectsPool;
 
@@ -115,14 +115,14 @@ class Exporter
                 goto handle_value;
             }
 
-            if (\method_exists($class, '__sleep')) {
+            if (method_exists($class, '__sleep')) {
                 if (!\is_array($sleep = $value->__sleep())) {
                     trigger_error('serialize(): __sleep should return an array only containing the names of instance-variables to serialize', E_USER_NOTICE);
                     $value = null;
                     goto handle_value;
                 }
                 foreach ($sleep as $name) {
-                    if (\property_exists($value, $name) && !$reflector->hasProperty($name)) {
+                    if (property_exists($value, $name) && !$reflector->hasProperty($name)) {
                         $arrayValue[$name] = $value->$name;
                     }
                 }
@@ -171,7 +171,7 @@ class Exporter
             $objectsPool[$value] = [$id = \count($objectsPool)];
             $properties = self::prepare($properties, $objectsPool, $refsPool, $objectsCount, $valueIsStatic);
             ++$objectsCount;
-            $objectsPool[$value] = [$id, $class, $properties, \method_exists($class, '__unserialize') ? -$objectsCount : (\method_exists($class, '__wakeup') ? $objectsCount : 0)];
+            $objectsPool[$value] = [$id, $class, $properties, method_exists($class, '__unserialize') ? -$objectsCount : (method_exists($class, '__wakeup') ? $objectsCount : 0)];
 
             $value = new Reference($id);
 

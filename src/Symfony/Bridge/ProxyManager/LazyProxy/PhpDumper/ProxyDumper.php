@@ -99,7 +99,7 @@ EOF;
 
     private static function getProxyManagerVersion(): string
     {
-        if (!\class_exists(Version::class)) {
+        if (!class_exists(Version::class)) {
             return '0.0.1';
         }
 

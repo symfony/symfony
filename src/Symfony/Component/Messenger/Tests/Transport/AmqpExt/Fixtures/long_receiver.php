@@ -35,7 +35,7 @@ $retryStrategy = new MultiplierRetryStrategy(3, 0);
 $worker = new Worker(['the_receiver' => $receiver], new class() implements MessageBusInterface {
     public function dispatch($envelope, array $stamps = []): Envelope
     {
-        echo 'Get envelope with message: '.\get_class($envelope->getMessage())."\n";
+        echo 'Get envelope with message: '.get_class($envelope->getMessage())."\n";
         echo sprintf("with stamps: %s\n", json_encode(array_keys($envelope->all()), JSON_PRETTY_PRINT));
 
         sleep(30);

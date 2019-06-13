@@ -43,7 +43,7 @@
         "symfony/var-dumper": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "symfony/expression-language": "^4.4|^5.0",
-        "doctrine/doctrine-bundle": "~1.5",
+        "doctrine/doctrine-bundle": "^1.5|^2.0",
         "twig/twig": "~1.34|~2.4"
     },
     "conflict": {

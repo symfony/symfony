@@ -29,12 +29,14 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
     use AbstractAdapterTrait;
     use ContractsTrait;
 
+    protected const NS_SEPARATOR = ':';
+
     private static $apcuSupported;
     private static $phpFilesSupported;
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).'_';
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::NS_SEPARATOR;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }

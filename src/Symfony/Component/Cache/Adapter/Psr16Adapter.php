@@ -25,6 +25,8 @@ class Psr16Adapter extends AbstractAdapter implements PruneableInterface, Resett
 {
     use ProxyTrait;
 
+    protected const NS_SEPARATOR = '_';
+
     private $miss;
 
     public function __construct(CacheInterface $pool, string $namespace = '', int $defaultLifetime = 0)

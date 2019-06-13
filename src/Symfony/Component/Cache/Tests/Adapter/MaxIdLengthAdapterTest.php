@@ -26,8 +26,8 @@ class MaxIdLengthAdapterTest extends TestCase
         $cache->expects($this->exactly(2))
             ->method('doHave')
             ->withConsecutive(
-                [$this->equalTo('----------_nWfzGiCgLczv3SSUzXL3kg:')],
-                [$this->equalTo('----------_---------------------------------------')]
+                [$this->equalTo('----------:nWfzGiCgLczv3SSUzXL3kg:')],
+                [$this->equalTo('----------:---------------------------------------')]
             );
 
         $cache->hasItem(str_repeat('-', 40));
@@ -46,7 +46,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionMethod->setAccessible(true);
 
         // No versioning enabled
-        $this->assertEquals('--------------------------_------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
+        $this->assertEquals('--------------------------:------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
@@ -56,7 +56,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $reflectionProperty->setValue($cache, true);
 
         // Versioning enabled
-        $this->assertEquals('--------------------------_1/------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
+        $this->assertEquals('--------------------------:1/------------', $reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)]));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 12)])));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 23)])));
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));

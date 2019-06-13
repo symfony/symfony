@@ -681,7 +681,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         switch ($this->driver) {
             case 'mysql':
                 // MySQL 5.7.5 and later enforces a maximum length on lock names of 64 characters. Previously, no limit was enforced.
-                $lockId = \substr($sessionId, 0, 64);
+                $lockId = substr($sessionId, 0, 64);
                 // should we handle the return value? 0 on timeout, null on error
                 // we use a timeout of 50 seconds which is also the default for innodb_lock_wait_timeout
                 $stmt = $this->pdo->prepare('SELECT GET_LOCK(:key, 50)');

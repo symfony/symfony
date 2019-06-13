@@ -81,7 +81,7 @@ class PreAuthenticatedToken extends AbstractToken
     {
         $serialized = [$this->credentials, $this->providerKey, parent::serialize(true)];
 
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
     }
 
     /**

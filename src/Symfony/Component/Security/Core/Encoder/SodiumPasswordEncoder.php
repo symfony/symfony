@@ -48,11 +48,15 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
 
     public static function isSupported(): bool
     {
+        if (\extension_loaded('libsodium') || \function_exists('sodium_crypto_pwhash_str')) {
+            return true;
+        }
+
         if (class_exists('ParagonIE_Sodium_Compat') && method_exists('ParagonIE_Sodium_Compat', 'crypto_pwhash_is_available')) {
             return \ParagonIE_Sodium_Compat::crypto_pwhash_is_available();
         }
 
-        return \function_exists('sodium_crypto_pwhash_str') || \extension_loaded('libsodium');
+        return false;
     }
 
     /**

@@ -35,6 +35,7 @@
         "predis/predis": "~1.1",
         "psr/simple-cache": "^1.0",
         "symfony/config": "~4.2",
+        "symfony/debug": "^4",
         "symfony/dependency-injection": "~3.4|~4.1",
         "symfony/var-dumper": "^4.1.1"
     },

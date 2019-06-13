@@ -53,13 +53,9 @@ class Caster
             $hasDebugInfo = $class->hasMethod('__debugInfo');
             $class = $class->name;
         }
-        if ($hasDebugInfo) {
-            $a = $obj->__debugInfo();
-        } elseif ($obj instanceof \Closure) {
-            $a = [];
-        } else {
-            $a = (array) $obj;
-        }
+
+        $a = $obj instanceof \Closure ? [] : (array) $obj;
+
         if ($obj instanceof \__PHP_Incomplete_Class) {
             return $a;
         }
@@ -90,6 +86,17 @@ class Caster
                     $keys[$i] = $k;
                 }
                 $a = array_combine($keys, $a);
+            }
+        }
+
+        if ($hasDebugInfo && \is_array($debugInfo = $obj->__debugInfo())) {
+            foreach ($debugInfo as $k => $v) {
+                if (!isset($k[0]) || "\0" !== $k[0]) {
+                    $k = self::PREFIX_VIRTUAL.$k;
+                }
+
+                unset($a[$k]);
+                $a[$k] = $v;
             }
         }
 

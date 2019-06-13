@@ -256,7 +256,7 @@ class DateType extends AbstractType
         };
 
         $resolver->setDefaults([
-            'years' => range(date('Y') - 5, date('Y') + 5),
+            'years' => range((int) date('Y') - 5, (int) date('Y') + 5),
             'months' => range(1, 12),
             'days' => range(1, 31),
             'widget' => 'choice',

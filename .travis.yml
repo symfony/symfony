@@ -48,13 +48,20 @@ services:
 
 before_install:
     - |
-      # Enable Sury ppa
+      # Enable extra ppa
       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
       sudo add-apt-repository -y ppa:ondrej/php
       sudo rm /etc/apt/sources.list.d/google-chrome.list
       sudo rm /etc/apt/sources.list.d/mongodb-3.4.list
+      sudo wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
+      echo "deb http://packages.couchbase.com/ubuntu xenial xenial/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
       sudo apt update
-      sudo apt install -y librabbitmq-dev libsodium-dev
+      sudo apt install -y librabbitmq-dev libsodium-dev libcouchbase-dev zlib1g-dev
+
+    - |
+      # Start Couchbase
+      docker pull couchbase:6.0.1
+      docker run -d --name couchbase -p 8091-8094:8091-8094 -p 11210:11210 couchbase:6.0.1
 
     - |
       # Start Redis cluster
@@ -75,6 +82,11 @@ before_install:
       mkdir /tmp/librdkafka
       curl https://codeload.github.com/edenhill/librdkafka/tar.gz/v0.11.6 | tar xzf - -C /tmp/librdkafka
       (cd  /tmp/librdkafka/librdkafka-0.11.6 && ./configure && make && sudo make install)
+
+    - |
+      # Create new Couchbase Cluster and Bucket ephemeral
+      docker exec couchbase /opt/couchbase/bin/couchbase-cli cluster-init -c localhost:8091 --cluster-username=Administrator --cluster-password=111111 --cluster-ramsize=256
+      docker exec couchbase /opt/couchbase/bin/couchbase-cli bucket-create -c localhost:8091 --bucket=cache --bucket-type=ephemeral --bucket-ramsize=100 -u Administrator -p 111111
 
     - |
       # General configuration
@@ -191,6 +203,7 @@ before_install:
           tfold ext.amqp tpecl amqp-1.9.4 amqp.so $INI
           tfold ext.rdkafka tpecl rdkafka-4.0.2 rdkafka.so $INI
           tfold ext.redis tpecl redis-4.3.0 redis.so $INI "no"
+          tfold ext.couchbase tpecl couchbase-2.6.0 couchbase.so $INI
       done
     - |
       # List all php extensions with versions

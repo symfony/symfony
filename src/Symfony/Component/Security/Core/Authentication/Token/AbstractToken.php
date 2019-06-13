@@ -160,7 +160,6 @@ abstract class AbstractToken implements TokenInterface
         }
 
         return $isCalledFromOverridingMethod ? $serialized : serialize($serialized);
->>>>>>> 4.4
     }
 
     /**

@@ -54,6 +54,6 @@ class UserPasswordEncoder implements UserPasswordEncoderInterface
     {
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        return method_exists($encoder, 'needsRehash') && $encoder->needsRehash($encoded);
+        return $encoder->needsRehash($encoded);
     }
 }

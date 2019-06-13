@@ -99,6 +99,53 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
+    public function testHandleDelayedEventFromQueue()
+    {
+        $message = new DummyMessage('Hello');
+        $event = new DummyEvent('Event on queue');
+
+        $middleware = new DispatchAfterCurrentBusMiddleware();
+        $commandHandlingMiddleware = $this->createMock(MiddlewareInterface::class);
+        $eventHandlingMiddleware = $this->createMock(MiddlewareInterface::class);
+
+        // This bus simulates the bus that are used when messages come back form the queue
+        $messageBusAfterQueue = new MessageBus([
+            // Create a new middleware
+            new DispatchAfterCurrentBusMiddleware(),
+            $eventHandlingMiddleware,
+        ]);
+
+        $fakePutMessageOnQueue = $this->createMock(MiddlewareInterface::class);
+        $fakePutMessageOnQueue->expects($this->any())
+            ->method('handle')
+            ->with($this->callback(function ($envelope) use ($messageBusAfterQueue) {
+                // Fake putting the message on the queue
+                // Fake reading the queue
+                // Now, we add the message back to a new bus.
+                $messageBusAfterQueue->dispatch($envelope);
+
+                return true;
+            }))
+            ->willReturnArgument(0);
+
+        $eventBus = new MessageBus([
+            $middleware,
+            $fakePutMessageOnQueue,
+        ]);
+
+        $messageBus = new MessageBus([
+            $middleware,
+            new DispatchingMiddleware($eventBus, [
+                new Envelope($event, [new DispatchAfterCurrentBusStamp()]),
+            ]),
+            $commandHandlingMiddleware,
+        ]);
+
+        $this->expectHandledMessage($commandHandlingMiddleware, 0, $message);
+        $this->expectHandledMessage($eventHandlingMiddleware, 0, $event);
+        $messageBus->dispatch($message);
+    }
+
     /**
      * @param MiddlewareInterface|MockObject $handlingMiddleware
      */

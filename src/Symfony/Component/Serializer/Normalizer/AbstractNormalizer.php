@@ -313,7 +313,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, string $format = null*/)
     {
         if (\func_num_args() >= 6) {
-            $format = \func_get_arg(5);
+            $format = func_get_arg(5);
         } else {
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);

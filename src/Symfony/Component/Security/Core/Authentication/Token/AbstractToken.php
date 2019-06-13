@@ -139,7 +139,7 @@ abstract class AbstractToken implements TokenInterface
     {
         $serialized = [$this->user, $this->authenticated, $this->roles, $this->attributes];
 
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
     }
 
     /**

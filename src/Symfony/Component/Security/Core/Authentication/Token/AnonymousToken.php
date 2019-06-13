@@ -61,7 +61,7 @@ class AnonymousToken extends AbstractToken
     {
         $serialized = [$this->secret, parent::serialize(true)];
 
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
     }
 
     /**

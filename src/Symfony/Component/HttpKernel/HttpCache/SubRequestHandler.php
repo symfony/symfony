@@ -31,7 +31,7 @@ class SubRequestHandler
         // save global state related to trusted headers and proxies
         $trustedProxies = Request::getTrustedProxies();
         $trustedHeaderSet = Request::getTrustedHeaderSet();
-        if (\method_exists(Request::class, 'getTrustedHeaderName')) {
+        if (method_exists(Request::class, 'getTrustedHeaderName')) {
             Request::setTrustedProxies($trustedProxies, -1);
             $trustedHeaders = [
                 Request::HEADER_FORWARDED => Request::getTrustedHeaderName(Request::HEADER_FORWARDED, false),

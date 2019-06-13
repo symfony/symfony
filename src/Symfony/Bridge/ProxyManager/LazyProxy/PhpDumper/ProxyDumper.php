@@ -58,7 +58,7 @@ class ProxyDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= sprintf(' $this->%s[%s] =', \method_exists(ContainerBuilder::class, 'addClassResource') || ($definition->isPublic() && !$definition->isPrivate()) ? 'services' : 'privates', var_export($id, true));
+            $instantiation .= sprintf(' $this->%s[%s] =', method_exists(ContainerBuilder::class, 'addClassResource') || ($definition->isPublic() && !$definition->isPrivate()) ? 'services' : 'privates', var_export($id, true));
         }
 
         if (null === $factoryCode) {
@@ -120,7 +120,7 @@ EOF;
      */
     private static function getProxyManagerVersion()
     {
-        if (!\class_exists(Version::class)) {
+        if (!class_exists(Version::class)) {
             return '0.0.1';
         }
 

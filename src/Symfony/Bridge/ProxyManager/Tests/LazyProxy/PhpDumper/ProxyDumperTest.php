@@ -103,7 +103,7 @@ class ProxyDumperTest extends TestCase
             [
                 (new Definition(__CLASS__))
                     ->setPublic(false),
-                \method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates',
+                method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates',
             ],
             [
                 (new Definition(__CLASS__))

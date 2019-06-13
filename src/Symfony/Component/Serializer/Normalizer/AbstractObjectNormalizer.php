@@ -380,7 +380,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     protected function createChildContext(array $parentContext, $attribute/*, string $format = null */)
     {
         if (\func_num_args() >= 3) {
-            $format = \func_get_arg(2);
+            $format = func_get_arg(2);
         } else {
             // will be deprecated in version 4
             $format = null;

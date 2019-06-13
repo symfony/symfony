@@ -168,7 +168,7 @@ class DebugClassLoader
 
     private function checkClass($class, $file = null)
     {
-        $exists = null === $file || \class_exists($class, false) || \interface_exists($class, false) || \trait_exists($class, false);
+        $exists = null === $file || class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
         if (null !== $file && $class && '\\' === $class[0]) {
             $class = substr($class, 1);
@@ -186,13 +186,13 @@ class DebugClassLoader
             }
             $name = $refl->getName();
 
-            if ($name !== $class && 0 === \strcasecmp($name, $class)) {
+            if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: "%s" vs "%s".', $class, $name));
             }
 
             $deprecations = $this->checkAnnotations($refl, $name);
 
-            if (isset(self::$php7Reserved[\strtolower($refl->getShortName())])) {
+            if (isset(self::$php7Reserved[strtolower($refl->getShortName())])) {
                 $deprecations[] = sprintf('The "%s" class uses the reserved name "%s", it will break on PHP 7 and higher', $name, $refl->getShortName());
             }
 
@@ -223,23 +223,23 @@ class DebugClassLoader
         $deprecations = [];
 
         // Don't trigger deprecations for classes in the same vendor
-        if (2 > $len = 1 + (\strpos($class, '\\') ?: \strpos($class, '_'))) {
+        if (2 > $len = 1 + (strpos($class, '\\') ?: strpos($class, '_'))) {
             $len = 0;
             $ns = '';
         } else {
-            $ns = \str_replace('_', '\\', \substr($class, 0, $len));
+            $ns = str_replace('_', '\\', substr($class, 0, $len));
         }
 
         // Detect annotations on the class
         if (false !== $doc = $refl->getDocComment()) {
             foreach (['final', 'deprecated', 'internal'] as $annotation) {
-                if (false !== \strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$|\r?\n)#s', $doc, $notice)) {
+                if (false !== strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$|\r?\n)#s', $doc, $notice)) {
                     self::${$annotation}[$class] = isset($notice[1]) ? preg_replace('#\.?\r?\n( \*)? *(?= |\r?\n|$)#', '', $notice[1]) : '';
                 }
             }
         }
 
-        $parent = \get_parent_class($class);
+        $parent = get_parent_class($class);
         $parentAndOwnInterfaces = $this->getOwnInterfaces($class, $parent);
         if ($parent) {
             $parentAndOwnInterfaces[$parent] = $parent;
@@ -254,22 +254,22 @@ class DebugClassLoader
         }
 
         // Detect if the parent is annotated
-        foreach ($parentAndOwnInterfaces + \class_uses($class, false) as $use) {
+        foreach ($parentAndOwnInterfaces + class_uses($class, false) as $use) {
             if (!isset(self::$checkedClasses[$use])) {
                 $this->checkClass($use);
             }
-            if (isset(self::$deprecated[$use]) && \strncmp($ns, \str_replace('_', '\\', $use), $len) && !isset(self::$deprecated[$class])) {
+            if (isset(self::$deprecated[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len) && !isset(self::$deprecated[$class])) {
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
                 $deprecations[] = sprintf('The "%s" %s %s "%s" that is deprecated%s.', $class, $type, $verb, $use, self::$deprecated[$use]);
             }
-            if (isset(self::$internal[$use]) && \strncmp($ns, \str_replace('_', '\\', $use), $len)) {
+            if (isset(self::$internal[$use]) && strncmp($ns, str_replace('_', '\\', $use), $len)) {
                 $deprecations[] = sprintf('The "%s" %s is considered internal%s. It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $class);
             }
         }
 
-        if (\trait_exists($class)) {
+        if (trait_exists($class)) {
             return $deprecations;
         }
 
@@ -296,7 +296,7 @@ class DebugClassLoader
 
             if (isset(self::$internalMethods[$class][$method->name])) {
                 list($declaringClass, $message) = self::$internalMethods[$class][$method->name];
-                if (\strncmp($ns, $declaringClass, $len)) {
+                if (strncmp($ns, $declaringClass, $len)) {
                     $deprecations[] = sprintf('The "%s::%s()" method is considered internal%s. It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $class);
                 }
             }
@@ -307,7 +307,7 @@ class DebugClassLoader
             }
 
             foreach (['final', 'internal'] as $annotation) {
-                if (false !== \strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$|\r?\n)#s', $doc, $notice)) {
+                if (false !== strpos($doc, $annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$|\r?\n)#s', $doc, $notice)) {
                     $message = isset($notice[1]) ? preg_replace('#\.?\r?\n( \*)? *(?= |\r?\n|$)#', '', $notice[1]) : '';
                     self::${$annotation.'Methods'}[$class][$method->name] = [$class, $message];
                 }

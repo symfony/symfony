@@ -191,7 +191,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsNormalization($data, $format = null/*, array $context = []*/)
     {
         if (\func_num_args() > 2) {
-            $context = \func_get_arg(2);
+            $context = func_get_arg(2);
         } else {
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
@@ -212,7 +212,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDenormalization($data, $type, $format = null/*, array $context = []*/)
     {
         if (\func_num_args() > 3) {
-            $context = \func_get_arg(3);
+            $context = func_get_arg(3);
         } else {
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
@@ -286,7 +286,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsEncoding($format/*, array $context = []*/)
     {
         if (\func_num_args() > 1) {
-            $context = \func_get_arg(1);
+            $context = func_get_arg(1);
         } else {
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
@@ -307,7 +307,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     public function supportsDecoding($format/*, array $context = []*/)
     {
         if (\func_num_args() > 1) {
-            $context = \func_get_arg(1);
+            $context = func_get_arg(1);
         } else {
             if (__CLASS__ !== \get_class($this)) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);

@@ -62,7 +62,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
     {
         $serialized = [parent::serialize(true), $this->messageKey, $this->messageData];
 
-        return $this->doSerialize($serialized, \func_num_args() ? \func_get_arg(0) : null);
+        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
     }
 
     /**

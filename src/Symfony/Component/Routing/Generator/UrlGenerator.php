@@ -222,16 +222,18 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
         }
 
-        if ((self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) && !empty($host)) {
-            $port = '';
-            if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                $port = ':'.$this->context->getHttpPort();
-            } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                $port = ':'.$this->context->getHttpsPort();
-            }
+        if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
+            if ('' !== $host || ('' !== $scheme && 'http' !== $scheme && 'https' !== $scheme)) {
+                $port = '';
+                if ('http' === $scheme && 80 !== $this->context->getHttpPort()) {
+                    $port = ':'.$this->context->getHttpPort();
+                } elseif ('https' === $scheme && 443 !== $this->context->getHttpsPort()) {
+                    $port = ':'.$this->context->getHttpsPort();
+                }
 
-            $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
-            $schemeAuthority .= $host.$port;
+                $schemeAuthority = self::NETWORK_PATH === $referenceType || '' === $scheme ? '//' : "$scheme://";
+                $schemeAuthority .= $host.$port;
+            }
         }
 
         if (self::RELATIVE_PATH === $referenceType) {

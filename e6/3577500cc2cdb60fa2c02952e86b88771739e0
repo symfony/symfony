@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-12T16:38:01Z
+
+I managed to reproduce the issue and I confirm the attached patch works.

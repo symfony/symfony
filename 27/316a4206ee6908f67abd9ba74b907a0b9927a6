@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-12T13:53:38Z
+
+Is that the only one in the full code base? Can you have a look please?
+
+---------------------------------------------------------------------------
+
+by steef at 2019-06-12T15:41:26Z
+
+Good one, will have a look!
+
+---------------------------------------------------------------------------
+
+by steef at 2019-06-13T08:48:04Z
+
+@nicolas-grekas I've updated the PR! For now I only focussed on the form component as this is my first contribution to an open source project ever 😀
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-13T09:04:47Z
+
+Thanks :)
+Please check all components, there's no hurry so you can take your time and we'll help review!
+
+---------------------------------------------------------------------------
+
+by steef at 2019-06-13T09:16:09Z
+
+Alright, will do!
+
+---------------------------------------------------------------------------
+
+by steef at 2019-06-13T13:52:15Z
+
+@nicolas-grekas I've checked all components and updated the PR! But I now see that Travis CI for PHP: 7.2 and 7.3 is failing with out of memory errors. Rerunning doesn't fix the problem. Do you have an idea?

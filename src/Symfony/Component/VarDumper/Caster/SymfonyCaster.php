@@ -48,4 +48,16 @@ class SymfonyCaster
 
         return $a;
     }
+
+    public static function castHttpClientResponse($response, array $a, Stub $stub, $isNested)
+    {
+        $stub->cut += \count($a);
+        $a = [];
+
+        foreach ($response->getInfo() + ['debug' => $response->getInfo('debug')] as $k => $v) {
+            $a[Caster::PREFIX_VIRTUAL.$k] = $v;
+        }
+
+        return $a;
+    }
 }

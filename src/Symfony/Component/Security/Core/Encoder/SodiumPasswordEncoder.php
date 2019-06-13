@@ -106,7 +106,7 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
     public function needsRehash(string $encoded): bool
     {
         if (\function_exists('sodium_crypto_pwhash_str_needs_rehash')) {
-            return \sodium_crypto_pwhash_str_needs_rehash($encoded, $this->opsLimit, $this->memLimit);
+            return sodium_crypto_pwhash_str_needs_rehash($encoded, $this->opsLimit, $this->memLimit);
         }
 
         if (\extension_loaded('libsodium')) {

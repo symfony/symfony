@@ -106,7 +106,7 @@ trait AbstractTrait
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
-            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), ':', 5);
+            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::getNsSeparator(), 5);
             try {
                 $cleared = $this->doSave(['@'.$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
@@ -235,13 +235,13 @@ trait AbstractTrait
         CacheItem::validateKey($key);
 
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
-            $this->namespaceVersion = '1:';
+            $this->namespaceVersion = '1'.static::getNsSeparator();
             try {
                 foreach ($this->doFetch(['@'.$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
-                if ('1:' === $this->namespaceVersion) {
-                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), ':', 5);
+                if ('1'.static::getNsSeparator() === $this->namespaceVersion) {
+                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), static::getNsSeparator(), 5);
                     $this->doSave(['@'.$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
@@ -252,7 +252,7 @@ trait AbstractTrait
             return $this->namespace.$this->namespaceVersion.$key;
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
-            $id = $this->namespace.$this->namespaceVersion.substr_replace(base64_encode(hash('sha256', $key, true)), ':', -(\strlen($this->namespaceVersion) + 22));
+            $id = $this->namespace.$this->namespaceVersion.substr_replace(base64_encode(hash('sha256', $key, true)), static::getNsSeparator(), -(\strlen($this->namespaceVersion) + 22));
         }
 
         return $id;
@@ -264,5 +264,13 @@ trait AbstractTrait
     public static function handleUnserializeCallback($class)
     {
         throw new \DomainException('Class not found: '.$class);
+    }
+
+    /**
+     * @return string the namespace separator for cache keys
+     */
+    protected static function getNsSeparator()
+    {
+        return ':';
     }
 }

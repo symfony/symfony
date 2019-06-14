@@ -14,45 +14,7 @@ namespace Symfony\Contracts\EventDispatcher;
 use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 
 if (interface_exists(PsrEventDispatcherInterface::class)) {
-    /**
-     * Allows providing hooks on domain-specific lifecycles by dispatching events.
-     */
-    interface EventDispatcherInterface extends PsrEventDispatcherInterface
-    {
-        /**
-         * Dispatches an event to all registered listeners.
-         *
-         * For BC with Symfony 4, the $eventName argument is not declared explicitly on the
-         * signature of the method. Implementations that are not bound by this BC constraint
-         * MUST declare it explicitly, as allowed by PHP.
-         *
-         * @param object      $event     The event to pass to the event handlers/listeners
-         * @param string|null $eventName The name of the event to dispatch. If not supplied,
-         *                               the class of $event should be used instead.
-         *
-         * @return object The passed $event MUST be returned
-         */
-        public function dispatch($event/*, string $eventName = null*/);
-    }
+    require __DIR__.\DIRECTORY_SEPARATOR.'EventDispatcherInterface+psr14.php';
 } else {
-    /**
-     * Allows providing hooks on domain-specific lifecycles by dispatching events.
-     */
-    interface EventDispatcherInterface
-    {
-        /**
-         * Dispatches an event to all registered listeners.
-         *
-         * For BC with Symfony 4, the $eventName argument is not declared explicitly on the
-         * signature of the method. Implementations that are not bound by this BC constraint
-         * MUST declare it explicitly, as allowed by PHP.
-         *
-         * @param object      $event     The event to pass to the event handlers/listeners
-         * @param string|null $eventName The name of the event to dispatch. If not supplied,
-         *                               the class of $event should be used instead.
-         *
-         * @return object The passed $event MUST be returned
-         */
-        public function dispatch($event/*, string $eventName = null*/);
-    }
+    require __DIR__.\DIRECTORY_SEPARATOR.'EventDispatcherInterface-psr14.php';
 }

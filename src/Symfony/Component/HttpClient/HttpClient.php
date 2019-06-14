@@ -32,7 +32,11 @@ final class HttpClient
     public static function create(array $defaultOptions = [], int $maxHostConnections = 6, int $maxPendingPushes = 50): HttpClientInterface
     {
         if (\extension_loaded('curl')) {
-            return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
+            if ('\\' !== \DIRECTORY_SEPARATOR || ini_get('curl.cainfo') || ini_get('openssl.cafile') || ini_get('openssl.capath')) {
+                return new CurlHttpClient($defaultOptions, $maxHostConnections, $maxPendingPushes);
+            }
+
+            @trigger_error('Configure the "curl.cainfo", "openssl.cafile" or "openssl.capath" php.ini setting to enable the CurlHttpClient', E_USER_WARNING);
         }
 
         return new NativeHttpClient($defaultOptions, $maxHostConnections);

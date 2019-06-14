@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-11T20:54:05Z
+
+possible duplicate of #31897
+relates to #31810
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-06-11T21:15:21Z
+
+my bad. Implemented the code last week and didn't noticed someone opened another PR
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-06-11T21:31:26Z
+
+looking at #31897, I think that the approach of this PR is way simpler. Reopening it

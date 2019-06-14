@@ -25,8 +25,19 @@ class ExpressionValidator extends ConstraintValidator
 {
     private $expressionLanguage;
 
-    public function __construct($propertyAccessor = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(/*ExpressionLanguage */$expressionLanguage = null)
     {
+        if (!$expressionLanguage instanceof ExpressionLanguage) {
+            if (null !== $expressionLanguage) {
+                @trigger_error(sprintf('The "%s" first argument must be an instance of "%s" or null since 4.4. "%s" given', __METHOD__, ExpressionLanguage::class, \is_object($expressionLanguage) ? \get_class($expressionLanguage) : \gettype($expressionLanguage)), E_USER_DEPRECATED);
+            }
+
+            if (\func_num_args() > 1 && func_get_arg(1) instanceof ExpressionLanguage) {
+                @trigger_error(sprintf('The "%s" instance should be passed as "%s" first argument instead of second argument since 4.4.', ExpressionLanguage::class, __METHOD__), E_USER_DEPRECATED);
+                $expressionLanguage = func_get_arg(1);
+            }
+        }
+
         $this->expressionLanguage = $expressionLanguage;
     }
 

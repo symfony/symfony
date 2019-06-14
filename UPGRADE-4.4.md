@@ -85,3 +85,9 @@ TwigBridge
 
  * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
    `DebugCommand::__construct()` method, swap the variables position.
+
+Validator
+---------
+
+ * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
+   Pass it as the first argument instead.

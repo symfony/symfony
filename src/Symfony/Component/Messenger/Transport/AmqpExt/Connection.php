@@ -62,9 +62,9 @@ class Connection
     {
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
-                'routing_key_pattern' => 'delay_%routing_key%_%delay%',
+                'routing_key_pattern' => 'delay_%exchange_name%_%routing_key%_%delay%',
                 'exchange_name' => 'delay',
-                'queue_name_pattern' => 'delay_queue_%routing_key%_%delay%',
+                'queue_name_pattern' => 'delay_queue_%exchange_name%_%routing_key%_%delay%',
             ],
         ], $connectionOptions);
         $this->exchangeOptions = $exchangeOptions;
@@ -93,8 +93,8 @@ class Connection
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
      *   * delay:
-     *     * routing_key_pattern: The pattern of the routing key (Default: "delay_%routing_key%_%delay%")
-     *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_queue_%routing_key%_%delay%")
+     *     * routing_key_pattern: The pattern of the routing key (Default: "delay_%exchange_name%_%routing_key%_%delay%")
+     *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_queue_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the retried messages (Default: "delay")
      *   * auto_setup: Enable or not the auto-setup of queues and exchanges (Default: true)
      *   * prefetch_count: set channel prefetch count
@@ -246,12 +246,12 @@ class Connection
             $this->clear();
         }
 
-        $exchange = $this->getDelayExchange();
-        $exchange->declareExchange();
+        $this->exchange()->declareExchange(); // setup normal exchange for delay queue to DLX messages to
+        $this->getDelayExchange()->declareExchange();
 
         $queue = $this->createDelayQueue($delay, $routingKey);
         $queue->declareQueue();
-        $queue->bind($exchange->getName(), $this->getRoutingKeyForDelay($delay, $routingKey));
+        $queue->bind($this->connectionOptions['delay']['exchange_name'], $this->getRoutingKeyForDelay($delay, $routingKey));
     }
 
     private function getDelayExchange(): \AMQPExchange
@@ -278,18 +278,17 @@ class Connection
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName(str_replace(
-            ['%delay%', '%routing_key%'],
-            [$delay, $routingKey ?? ''],
+            ['%delay%', '%exchange_name%', '%routing_key%'],
+            [$delay, $this->exchangeOptions['name'], $routingKey ?? ''],
             $this->connectionOptions['delay']['queue_name_pattern']
         ));
         $queue->setArguments([
             'x-message-ttl' => $delay,
-            'x-dead-letter-exchange' => $this->exchange()->getName(),
+            'x-dead-letter-exchange' => $this->exchangeOptions['name'],
+            // after being released from to DLX, make sure the original routing key will be used
+            // we must use an empty string instead of null for the argument to be picked up
+            'x-dead-letter-routing-key' => $routingKey ?? '',
         ]);
-
-        // after being released from to DLX, make sure the original routing key will be used
-        // we must use an empty string instead of null for the argument to be picked up
-        $queue->setArgument('x-dead-letter-routing-key', $routingKey ?? '');
 
         return $queue;
     }
@@ -297,8 +296,8 @@ class Connection
     private function getRoutingKeyForDelay(int $delay, ?string $finalRoutingKey): string
     {
         return str_replace(
-            ['%delay%', '%routing_key%'],
-            [$delay, $finalRoutingKey ?? ''],
+            ['%delay%', '%exchange_name%', '%routing_key%'],
+            [$delay, $this->exchangeOptions['name'], $finalRoutingKey ?? ''],
             $this->connectionOptions['delay']['routing_key_pattern']
         );
     }
@@ -353,7 +352,7 @@ class Connection
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
             $this->queue($queueName)->declareQueue();
             foreach ($queueConfig['binding_keys'] ?? [null] as $bindingKey) {
-                $this->queue($queueName)->bind($this->exchange()->getName(), $bindingKey);
+                $this->queue($queueName)->bind($this->exchangeOptions['name'], $bindingKey);
             }
         }
     }
@@ -377,6 +376,7 @@ class Connection
             } catch (\AMQPConnectionException $e) {
                 $credentials = $this->connectionOptions;
                 $credentials['password'] = '********';
+                unset($credentials['delay']);
 
                 throw new \AMQPException(sprintf('Could not connect to the AMQP server. Please verify the provided DSN. (%s)', json_encode($credentials)), 0, $e);
             }

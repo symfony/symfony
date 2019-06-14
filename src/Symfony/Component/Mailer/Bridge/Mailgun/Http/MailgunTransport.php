@@ -27,14 +27,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class MailgunTransport extends AbstractHttpTransport
 {
-    private const ENDPOINT = 'https://api.mailgun.net/v3/%domain%/messages.mime';
+    private const ENDPOINT = 'https://api.%region_dot%mailgun.net/v3/%domain%/messages.mime';
     private $key;
     private $domain;
+    private $region;
 
-    public function __construct(string $key, string $domain, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, string $domain, string $region = null, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
     {
         $this->key = $key;
         $this->domain = $domain;
+        $this->region = $region;
 
         parent::__construct($client, $dispatcher, $logger);
     }
@@ -49,7 +51,7 @@ class MailgunTransport extends AbstractHttpTransport
         foreach ($body->getPreparedHeaders()->getAll() as $header) {
             $headers[] = $header->toString();
         }
-        $endpoint = str_replace('%domain%', urlencode($this->domain), self::ENDPOINT);
+        $endpoint = str_replace(['%domain%', '%region_dot%'], [urlencode($this->domain), 'us' !== ($this->region ?: 'us') ? $this->region.'.' : ''], self::ENDPOINT);
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => 'api:'.$this->key,
             'headers' => $headers,

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by moufmouf at 2019-06-13T14:50:51Z
+
+@nicolas-grekas Ready for review. I think I took into account all your comments.
+
+What do you want me to do with #32019? Shall I close it (if you want to backport the bug from this version?) or shall I continue working on it to make it in line with this PR?

@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-06-08T21:01:34Z
+
+@ro0NL @xabbuh
+
+I moved the `find(...)` method into the `ArrayNodeDefinition` class, removed the getter, took the `pathSeparator` into account and changed the path section extraction as suggested. I also adjusted the tests accordingly.
+
+WDYT?

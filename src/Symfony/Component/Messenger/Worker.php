@@ -140,14 +140,16 @@ class Worker implements WorkerInterface
 
             $this->dispatchEvent(new WorkerMessageFailedEvent($envelope, $transportName, $throwable, $shouldRetry));
 
+            $retryCount = RedeliveryStamp::getRetryCountFromEnvelope($envelope);
             if ($shouldRetry) {
-                $retryCount = $this->getRetryCount($envelope) + 1;
+                ++$retryCount;
+                $delay = $retryStrategy->getWaitingTime($envelope);
                 if (null !== $this->logger) {
-                    $this->logger->error('Retrying {class} - retry #{retryCount}.', $context + ['retryCount' => $retryCount, 'error' => $throwable]);
+                    $this->logger->error('Error thrown while handling message {class}. Dispatching for retry #{retryCount} using {delay} ms delay. Error: "{error}"', $context + ['retryCount' => $retryCount, 'delay' => $delay, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
                 }
 
                 // add the delay and retry stamp info + remove ReceivedStamp
-                $retryEnvelope = $envelope->with(new DelayStamp($retryStrategy->getWaitingTime($envelope)))
+                $retryEnvelope = $envelope->with(new DelayStamp($delay))
                     ->with(new RedeliveryStamp($retryCount, $this->getSenderClassOrAlias($envelope)))
                     ->withoutAll(ReceivedStamp::class);
 
@@ -157,7 +159,7 @@ class Worker implements WorkerInterface
                 $receiver->ack($envelope);
             } else {
                 if (null !== $this->logger) {
-                    $this->logger->critical('Rejecting {class} (removing from transport).', $context + ['error' => $throwable]);
+                    $this->logger->critical('Error thrown while handling message {class}. Removing from transport after {retryCount} retries. Error: "{error}"', $context + ['retryCount' => $retryCount, 'error' => $throwable->getMessage(), 'exception' => $throwable]);
                 }
 
                 $receiver->reject($envelope);
@@ -205,14 +207,6 @@ class Worker implements WorkerInterface
         }
 
         return $retryStrategy->isRetryable($envelope);
-    }
-
-    private function getRetryCount(Envelope $envelope): int
-    {
-        /** @var RedeliveryStamp|null $retryMessageStamp */
-        $retryMessageStamp = $envelope->last(RedeliveryStamp::class);
-
-        return $retryMessageStamp ? $retryMessageStamp->getRetryCount() : 0;
     }
 
     private function getSenderClassOrAlias(Envelope $envelope): string

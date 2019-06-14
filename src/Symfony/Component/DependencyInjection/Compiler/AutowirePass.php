@@ -379,13 +379,14 @@ class AutowirePass extends AbstractRecursivePass
         $container->setAliases($this->container->getAliases());
         $container->setDefinitions($this->container->getDefinitions());
         $container->setResourceTracking(false);
+        $currentId = $this->currentId;
 
-        return function () use ($container, $reference, $label) {
-            return $this->createTypeNotFoundMessage($container, $reference, $label);
+        return function () use ($container, $reference, $label, $currentId) {
+            return $this->createTypeNotFoundMessage($container, $reference, $label, $currentId);
         };
     }
 
-    private function createTypeNotFoundMessage(ContainerBuilder $container, TypedReference $reference, $label)
+    private function createTypeNotFoundMessage(ContainerBuilder $container, TypedReference $reference, $label, string $currentId)
     {
         if (!$r = $container->getReflectionClass($type = $reference->getType(), false)) {
             // either $type does not exist or a parent class does not exist
@@ -409,7 +410,7 @@ class AutowirePass extends AbstractRecursivePass
             }
         }
 
-        $message = sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
+        $message = sprintf('Cannot autowire service "%s": %s %s', $currentId, $label, $message);
 
         if (null !== $this->lastFailure) {
             $message = $this->lastFailure."\n".$message;

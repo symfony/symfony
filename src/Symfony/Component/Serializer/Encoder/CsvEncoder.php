@@ -39,8 +39,12 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
      * @param string $escapeChar
      * @param string $keySeparator
      */
-    public function __construct($delimiter = ',', $enclosure = '"', $escapeChar = '\\', $keySeparator = '.')
+    public function __construct($delimiter = ',', $enclosure = '"', $escapeChar = '', $keySeparator = '.')
     {
+        if ('' === $escapeChar && \PHP_VERSION_ID < 70400) {
+            $escapeChar = '\\';
+        }
+
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
         $this->escapeChar = $escapeChar;

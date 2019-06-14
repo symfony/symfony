@@ -25,14 +25,14 @@ class ConnectionTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The given AMQP DSN "amqp://" is invalid.
+     * @expectedExceptionMessage The given AMQP DSN "amqp://:" is invalid.
      */
     public function testItCannotBeConstructedWithAWrongDsn()
     {
-        Connection::fromDsn('amqp://');
+        Connection::fromDsn('amqp://:');
     }
 
-    public function testItGetsParametersFromTheDsn()
+    public function testItCanBeConstructedWithDefaults()
     {
         $this->assertEquals(
             new Connection([
@@ -44,7 +44,23 @@ class ConnectionTest extends TestCase
             ], [
                 'messages' => [],
             ]),
-            Connection::fromDsn('amqp://localhost/%2f/messages')
+            Connection::fromDsn('amqp://')
+        );
+    }
+
+    public function testItGetsParametersFromTheDsn()
+    {
+        $this->assertEquals(
+            new Connection([
+                'host' => 'host',
+                'port' => 5672,
+                'vhost' => '/',
+            ], [
+                'name' => 'custom',
+            ], [
+                'custom' => [],
+            ]),
+            Connection::fromDsn('amqp://host/%2f/custom')
         );
     }
 
@@ -52,9 +68,9 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             new Connection([
-                'host' => 'redis',
+                'host' => 'localhost',
                 'port' => 1234,
-                'vhost' => '/',
+                'vhost' => 'vhost',
                 'login' => 'guest',
                 'password' => 'password',
             ], [
@@ -62,7 +78,7 @@ class ConnectionTest extends TestCase
             ], [
                 'queueName' => [],
             ]),
-            Connection::fromDsn('amqp://guest:password@redis:1234/%2f/queue?exchange[name]=exchangeName&queues[queueName]')
+            Connection::fromDsn('amqp://guest:password@localhost:1234/vhost/queue?exchange[name]=exchangeName&queues[queueName]')
         );
     }
 
@@ -70,18 +86,16 @@ class ConnectionTest extends TestCase
     {
         $this->assertEquals(
             new Connection([
-                'host' => 'redis',
-                'port' => 1234,
+                'host' => 'localhost',
+                'port' => 5672,
                 'vhost' => '/',
-                'login' => 'guest',
-                'password' => 'password',
                 'persistent' => 'true',
             ], [
                 'name' => 'exchangeName',
             ], [
                 'queueName' => [],
             ]),
-            Connection::fromDsn('amqp://guest:password@redis:1234/%2f/queue?exchange[name]=exchangeName&queues[queueName]', [
+            Connection::fromDsn('amqp://localhost/%2f/queue?exchange[name]=exchangeName&queues[queueName]', [
                 'persistent' => 'true',
                 'exchange' => ['name' => 'toBeOverwritten'],
             ])

@@ -70,14 +70,14 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
             return true;
         }
 
-        $retries = $this->getCurrentRetryCount($message);
+        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         return $retries < $this->maxRetries;
     }
 
     public function getWaitingTime(Envelope $message): int
     {
-        $retries = $this->getCurrentRetryCount($message);
+        $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
         $delay = $this->delayMilliseconds * pow($this->multiplier, $retries);
 
@@ -86,13 +86,5 @@ class MultiplierRetryStrategy implements RetryStrategyInterface
         }
 
         return $delay;
-    }
-
-    private function getCurrentRetryCount(Envelope $message): int
-    {
-        /** @var RedeliveryStamp|null $retryMessageStamp */
-        $retryMessageStamp = $message->last(RedeliveryStamp::class);
-
-        return $retryMessageStamp ? $retryMessageStamp->getRetryCount() : 0;
     }
 }

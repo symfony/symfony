@@ -17,13 +17,11 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -150,7 +148,7 @@ class Worker implements WorkerInterface
 
                 // add the delay and retry stamp info + remove ReceivedStamp
                 $retryEnvelope = $envelope->with(new DelayStamp($delay))
-                    ->with(new RedeliveryStamp($retryCount, $this->getSenderClassOrAlias($envelope)))
+                    ->with(new RedeliveryStamp($retryCount, $transportName))
                     ->withoutAll(ReceivedStamp::class);
 
                 // re-send the message
@@ -197,28 +195,6 @@ class Worker implements WorkerInterface
             return false;
         }
 
-        $sentStamp = $envelope->last(SentStamp::class);
-        if (null === $sentStamp) {
-            if (null !== $this->logger) {
-                $this->logger->warning('Message will not be retried because the SentStamp is missing and so the target sender cannot be determined.');
-            }
-
-            return false;
-        }
-
         return $retryStrategy->isRetryable($envelope);
-    }
-
-    private function getSenderClassOrAlias(Envelope $envelope): string
-    {
-        /** @var SentStamp|null $sentStamp */
-        $sentStamp = $envelope->last(SentStamp::class);
-
-        if (null === $sentStamp) {
-            // should not happen, because of the check in shouldRetry()
-            throw new LogicException('Could not find SentStamp.');
-        }
-
-        return $sentStamp->getSenderAlias() ?: $sentStamp->getSenderClass();
     }
 }

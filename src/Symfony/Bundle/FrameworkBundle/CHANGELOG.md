@@ -8,6 +8,7 @@ CHANGELOG
  * Deprecated the `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
  * Deprecated the `controller_name_converter` and `resolve_controller_name_subscriber` services
  * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`
+ * Deprecated booting the kernel before running `WebTestCase::createClient()`
 
 4.3.0
 -----

@@ -83,6 +83,8 @@ class SessionTest extends WebTestCase
             $client1->insulate();
         }
 
+        $this->ensureKernelShutdown();
+
         // start second client
         $client2 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {

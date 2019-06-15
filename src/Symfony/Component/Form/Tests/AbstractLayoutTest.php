@@ -2765,4 +2765,87 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             [true],
         ];
     }
+
+    public function testWeekSingleText()
+    {
+        $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
+            'input' => 'string',
+            'widget' => 'single_text',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="week"]
+    [@name="holidays"]
+    [@class="my&class"]
+    [@value="1970-W01"]
+'
+        );
+    }
+
+    public function testWeekSingleTextNoHtml5()
+    {
+        $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
+            'input' => 'string',
+            'widget' => 'single_text',
+            'html5' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/input
+    [@type="text"]
+    [@name="holidays"]
+    [@class="my&class"]
+    [@value="1970-W01"]
+'
+        );
+    }
+
+    public function testWeekChoices()
+    {
+        $data = ['year' => date('Y'), 'week' => 1];
+
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', $data, [
+            'input' => 'array',
+            'required' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class"]
+    [
+        ./select
+            [@id="name_year"]
+            [./option[@value="'.$data['year'].'"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_week"]
+            [./option[@value="'.$data['week'].'"][@selected="selected"]]
+    ]
+    [count(.//select)=2]'
+        );
+    }
+
+    public function testWeekText()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
+            'input' => 'string',
+            'widget' => 'text',
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class"]
+    [
+        ./input
+            [@id="name_year"]
+            [@type="number"]
+            [@value="2000"]
+        /following-sibling::input
+            [@id="name_week"]
+            [@type="number"]
+            [@value="1"]
+    ]
+    [count(./input)=2]'
+        );
+    }
 }

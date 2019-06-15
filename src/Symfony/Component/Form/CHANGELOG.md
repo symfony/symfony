@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * add new `WeekType`
  * using different values for the "model_timezone" and "view_timezone" options of the `TimeType` without configuring a
    reference date is deprecated
  * preferred choices are repeated in the list of all choices

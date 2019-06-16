@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2019-06-15T18:07:41Z
+
+Shouldn't this target 2.8 ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-15T18:36:37Z
+
+i figured master because of
+
+> That should be submitted on master: we shouldn't change the version on a patch release. (https://github.com/symfony/symfony/pull/29439#issuecomment-443889671)
+
+so this changes the default version; for 2.8 users can leverage `SYMFONY_PHPUNIT_VERSION=8.2`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-15T19:09:07Z
+
+We should maybe remember to bump before the 4.4.0 if a new version is released meanwhile.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-15T20:28:32Z
+
+We should definitively not forget to bump to v8 :)
+
+Im wondering about the purpose of hardcoding the upper bound constraint for PHPUnit :/ it blocks the `require phpunit/phpunit` case and let Composer decide the stable version :thinking:  Not doing so,
+ would make tools like https://github.com/jakzal/toolbox (installing simple-phpunit on a Docker image) always make simple-phpunit install the latest stable phpunit  by default.
+
+AFAIK it's not possible to do e.g. `SYMFONY_PHPUNIT_VERSION=@stable` due some hardcoded version checks, which maybe arent needed as php 7 (?) (#31948)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-15T21:03:20Z
+
+> it's not possible to do e.g. SYMFONY_PHPUNIT_VERSION=@stable due some hardcoded version checks
+
+did you try relaxing those? now that we use composer to download phpunit, maybe it could be made to work?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-16T04:55:58Z
+
+@nicolas-grekas IIUC ideally the default for sf4.4 as of php7.2 would be `@stable` right? To avoid having to invoke `SYMFONY_PHPUNIT_VERSION=@stable simple-phpunit` all the time.
+
+And im not sure doing it as of php7.2, if we dont need the version upfront i tend to prefer not hardcoding any upper limits :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-16T06:26:06Z
+
+I'm not sure: what about BC when a new major of phpunit is released?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-16T06:29:06Z
+
+Ultimately let the user decide its fixed version using `SYMFONY_PHPUNIT_VERSION=x.y`?
+
+Having `@stable` by default seems sensible :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-16T06:33:04Z
+
+Isn't it already the case? See
+https://github.com/symfony/recipes/blob/master/symfony/phpunit-bridge/4.1/phpunit.xml.dist
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-16T06:55:12Z
+
+I see, let's leave as is. Explicit version control is nice anyway. Basically i was looking for a cheap solution to let https://hub.docker.com/r/jakzal/phpqa/ install both a wrapped v7 and v8 by default. But it's distributed from 7.1 to 7.3, so v8 should be excluded for 7.1
+
+The toolbox also installs v7 + v8 natively under different binaries: https://github.com/jakzal/toolbox/blob/master/resources/tools.json#L618-L641
+
+This works because it can exclude 7.1 tag-based per tool, but not per install command for a single tool. As simple-phpunit is a version manager it doesnt make sense to have e.g. `simple-phpunit + simple-phpunit-7`.
+
+Therefor im leaning to exclude the whole simple-phpunit binary in the toolbox, on 7.1. (cc @jakzal), then it can be installed using `SYMFONY_PHPUNIT_VERSION=8.2 simple-phpinit install` without relying on any defaults in SF.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2019-06-16T07:29:20Z
+
+I figured PHPunit 7 can also be bumped.

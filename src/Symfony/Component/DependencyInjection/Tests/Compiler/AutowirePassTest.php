@@ -50,6 +50,22 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "Symfony\Component\DependencyInjection\Tests\CompilerEslaAction": argument "$notExisting" of method "Symfony\Component\DependencyInjection\Tests\Compiler\ElsaAction::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotExisting" but this class was not found.
+     */
+    public function testProcessNotExistingActionParam()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(Foo::class);
+        $barDefinition = $container->register(__NAMESPACE__.'EslaAction', __NAMESPACE__.'\ElsaAction');
+        $barDefinition->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowirePass())->process($container);
+    }
+
     public function testProcessVariadic()
     {
         $container = new ContainerBuilder();

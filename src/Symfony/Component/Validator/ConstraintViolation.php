@@ -44,12 +44,12 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                         violation
      * @param int|null        $plural          The number for determining the plural
      *                                         form when translating the message
-     * @param mixed           $code            The error code of the violation
+     * @param string|null     $code            The error code of the violation
      * @param Constraint|null $constraint      The constraint whose validation
      *                                         caused the violation
      * @param mixed           $cause           The cause of the violation
      */
-    public function __construct(?string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
+    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;

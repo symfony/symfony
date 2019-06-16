@@ -28,10 +28,11 @@ class RedirectResponseTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cannot redirect to an empty URL.
      */
-    public function testRedirectResponseConstructorNullUrl()
+    public function testRedirectResponseConstructorEmptyUrl()
     {
-        $response = new RedirectResponse(null);
+        $response = new RedirectResponse('');
     }
 
     /**

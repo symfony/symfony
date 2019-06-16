@@ -47,9 +47,12 @@ $getEnvVar = function ($name, $default = false) {
     return $default;
 };
 
-if (PHP_VERSION_ID >= 70100) {
+if (PHP_VERSION_ID >= 70200) {
+    // PHPUnit 8 requires PHP 7.2+
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.2');
+} elseif (PHP_VERSION_ID >= 70100) {
     // PHPUnit 7 requires PHP 7.1+
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.4');
+    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '7.5');
 } elseif (PHP_VERSION_ID >= 70000) {
     // PHPUnit 6 requires PHP 7.0+
     $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '6.5');

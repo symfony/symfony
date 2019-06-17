@@ -78,6 +78,8 @@ class SimpleCacheAdapter extends AbstractAdapter implements PruneableInterface
 
     /**
      * @return string the namespace separator for cache keys
+     *
+     * @internal
      */
     protected static function getNsSeparator()
     {

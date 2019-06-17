@@ -108,7 +108,7 @@ trait AbstractTrait
         if ($cleared = $this->versioningIsEnabled) {
             $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::getNsSeparator(), 5);
             try {
-                $cleared = $this->doSave(['@'.$this->namespace => $namespaceVersion], 0);
+                $cleared = $this->doSave([static::getNsSeparator().$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
                 $cleared = false;
             }
@@ -237,12 +237,12 @@ trait AbstractTrait
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->namespaceVersion = '1'.static::getNsSeparator();
             try {
-                foreach ($this->doFetch(['@'.$this->namespace]) as $v) {
+                foreach ($this->doFetch([static::getNsSeparator().$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
                 if ('1'.static::getNsSeparator() === $this->namespaceVersion) {
                     $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), static::getNsSeparator(), 5);
-                    $this->doSave(['@'.$this->namespace => $this->namespaceVersion], 0);
+                    $this->doSave([static::getNsSeparator().$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
             }
@@ -268,6 +268,8 @@ trait AbstractTrait
 
     /**
      * @return string the namespace separator for cache keys
+     *
+     * @internal
      */
     protected static function getNsSeparator()
     {

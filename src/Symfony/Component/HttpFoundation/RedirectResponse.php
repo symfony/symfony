@@ -32,8 +32,13 @@ class RedirectResponse extends Response
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      */
-    public function __construct(string $url, int $status = 302, array $headers = [])
+    public function __construct(?string $url, int $status = 302, array $headers = [])
     {
+        if (null === $url) {
+            @trigger_error(sprintf('Passing a null url when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+            $url = '';
+        }
+
         parent::__construct('', $status, $headers);
 
         $this->setTargetUrl($url);
@@ -82,7 +87,7 @@ class RedirectResponse extends Response
      */
     public function setTargetUrl($url)
     {
-        if ('' == $url) {
+        if ('' === ($url ?? '')) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }
 

@@ -123,7 +123,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new InvalidArgumentException(sprintf('Class "%s" not found. Is the "data_class" form option set correctly?', $dataClass));
         }
 
-        $this->name = $name ?? '';
+        $this->name = (string) $name;
         $this->dataClass = $dataClass;
         $this->dispatcher = $dispatcher;
         $this->options = $options;
@@ -772,7 +772,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
      *
-     * @internal since Symfony 4.4
+     * @internal since Symfony 4.4, to be removed in 5.0
      */
     public static function validateName($name)
     {
@@ -794,8 +794,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *   * starts with a letter, digit or underscore
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
+     *
+     * @final since Symfony 4.4
      */
-    final public static function isValidName(?string $name): bool
+    public static function isValidName(?string $name): bool
     {
         return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }

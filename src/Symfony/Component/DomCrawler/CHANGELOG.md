@@ -7,6 +7,11 @@ CHANGELOG
 * Added argument `$selector` to ``Crawler::children()`
 * Added argument `$default` to ``Crawler::text()` and `html()`
 
+4.4.0
+-----
+
+* Added `Form::getName()` method.
+
 4.3.0
 -----
 

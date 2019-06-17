@@ -11,15 +11,10 @@
 
 namespace Symfony\Component\Cache\Exception;
 
-use Psr\Cache\InvalidArgumentException as Psr6CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException as SimpleCacheInterface;
 
 if (interface_exists(SimpleCacheInterface::class)) {
-    class InvalidArgumentException extends \InvalidArgumentException implements Psr6CacheInterface, SimpleCacheInterface
-    {
-    }
+    require __DIR__.\DIRECTORY_SEPARATOR.'InvalidArgumentException+psr16.php';
 } else {
-    class InvalidArgumentException extends \InvalidArgumentException implements Psr6CacheInterface
-    {
-    }
+    require __DIR__.\DIRECTORY_SEPARATOR.'InvalidArgumentException-psr16.php';
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -253,6 +254,34 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             'expression' => 'false',
         ]);
 
+        $expressionLanguage = $this->getMockBuilder(ExpressionLanguage::class)->getMock();
+
+        $used = false;
+
+        $expressionLanguage->method('evaluate')
+            ->willReturnCallback(function () use (&$used) {
+                $used = true;
+
+                return true;
+            });
+
+        $validator = new ExpressionValidator($expressionLanguage);
+        $validator->initialize($this->createContext());
+        $validator->validate(null, $constraint);
+
+        $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\ExpressionLanguage\ExpressionLanguage" instance should be passed as "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument instead of second argument since 4.4.
+     */
+    public function testLegacyExpressionLanguageUsage()
+    {
+        $constraint = new Expression([
+            'expression' => 'false',
+        ]);
+
         $expressionLanguage = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ExpressionLanguage')->getMock();
 
         $used = false;
@@ -269,6 +298,15 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $validator->validate(null, $constraint);
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\Validator\Constraints\ExpressionValidator::__construct" first argument must be an instance of "Symfony\Component\ExpressionLanguage\ExpressionLanguage" or null since 4.4. "string" given
+     */
+    public function testConstructorInvalidType()
+    {
+        new ExpressionValidator('foo');
     }
 
     public function testPassingCustomValues()

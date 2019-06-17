@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Cache\Exception;
 
-use Psr\SimpleCache\LogicException as SimpleCacheInterface;
+use Psr\Cache\CacheException as Psr6CacheInterface;
+use Psr\SimpleCache\CacheException as SimpleCacheInterface;
 
-if (interface_exists(SimpleCacheInterface::class)) {
-    require __DIR__.\DIRECTORY_SEPARATOR.'LogicException-psr16.php';
-} else {
-    require __DIR__.\DIRECTORY_SEPARATOR.'LogicException-psr16.php';
+class CacheException extends \Exception implements Psr6CacheInterface, SimpleCacheInterface
+{
 }

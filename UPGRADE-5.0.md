@@ -475,6 +475,7 @@ TwigBridge
 Validator
 --------
 
+ * An `ExpressionLanguage` instance or null must be passed as the first argument of `ExpressionValidator::__construct()`
  * The `checkMX` and `checkHost` options of the `Email` constraint were removed
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.

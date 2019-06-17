@@ -251,6 +251,16 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
+     * Gets the form name.
+     *
+     * If no name is defined on the form, an empty string is returned.
+     */
+    public function getName(): string
+    {
+        return $this->node->getAttribute('name');
+    }
+
+    /**
      * Returns true if the named field exists.
      *
      * @param string $name The field name

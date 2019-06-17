@@ -16,6 +16,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. Pass it as the first argument instead.
  * added the `compared_value_path` parameter in violations when using any 
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`

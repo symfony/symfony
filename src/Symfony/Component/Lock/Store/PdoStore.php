@@ -16,7 +16,6 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -36,6 +35,8 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class PdoStore implements StoreInterface
 {
+    use ExpiringStoreTrait;
+
     private $conn;
     private $dsn;
     private $driver;
@@ -123,11 +124,6 @@ class PdoStore implements StoreInterface
 
         try {
             $stmt->execute();
-            if ($key->isExpired()) {
-                throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
-            }
-
-            return;
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
@@ -136,13 +132,11 @@ class PdoStore implements StoreInterface
             $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        if ($key->isExpired()) {
-            throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $key));
-        }
-
         if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
             $this->prune();
         }
+
+        $this->checkNotExpired($key);
     }
 
     /**
@@ -178,9 +172,7 @@ class PdoStore implements StoreInterface
             throw new LockConflictedException();
         }
 
-        if ($key->isExpired()) {
-            throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
-        }
+        $this->checkNotExpired($key);
     }
 
     /**
@@ -294,7 +286,7 @@ class PdoStore implements StoreInterface
     }
 
     /**
-     * Cleanups the table by removing all expired locks.
+     * Cleans up the table by removing all expired locks.
      */
     private function prune(): void
     {

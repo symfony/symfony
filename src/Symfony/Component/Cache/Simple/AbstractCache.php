@@ -23,6 +23,11 @@ use Symfony\Component\Cache\Traits\AbstractTrait;
  */
 abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
 {
+    /**
+     * @internal
+     */
+    const NS_SEPARATOR = ':';
+
     use AbstractTrait {
         deleteItems as private;
         AbstractTrait::deleteItem as delete;

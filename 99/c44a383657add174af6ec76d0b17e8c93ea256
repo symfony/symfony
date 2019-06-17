@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2019-06-17T09:37:20Z
+
+This changes the public API and involve code changes in userland though (and could be worth a CHANGELOG entry), which hints that this is a new feature to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-17T09:40:00Z
+
+> This changes the public API and involve code changes in userland though (and could be worth a CHANGELOG entry), which hints that this is a new feature to me.
+
+for experimental components, we can bypass this rule, because here this is also a BC break, and we should close any such issues asap. That's why I added "bug fix at the contracts level" in the description.

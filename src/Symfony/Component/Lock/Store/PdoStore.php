@@ -124,9 +124,6 @@ class PdoStore implements StoreInterface
 
         try {
             $stmt->execute();
-            $this->checkNotExpired($key);
-
-            return;
         } catch (DBALException $e) {
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
@@ -135,11 +132,11 @@ class PdoStore implements StoreInterface
             $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        $this->checkNotExpired($key);
-
         if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
             $this->prune();
         }
+
+        $this->checkNotExpired($key);
     }
 
     /**
@@ -289,7 +286,7 @@ class PdoStore implements StoreInterface
     }
 
     /**
-     * Cleanups the table by removing all expired locks.
+     * Cleans up the table by removing all expired locks.
      */
     private function prune(): void
     {

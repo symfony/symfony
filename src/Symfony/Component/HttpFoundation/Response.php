@@ -679,7 +679,7 @@ class Response
             return (int) $age;
         }
 
-        return max(time() - $this->getDate()->format('U'), 0);
+        return max(time() - (int) $this->getDate()->format('U'), 0);
     }
 
     /**
@@ -759,7 +759,7 @@ class Response
         }
 
         if (null !== $this->getExpires()) {
-            return (int) ($this->getExpires()->format('U') - $this->getDate()->format('U'));
+            return (int) $this->getExpires()->format('U') - (int) $this->getDate()->format('U');
         }
 
         return null;

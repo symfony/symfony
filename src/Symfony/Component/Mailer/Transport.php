@@ -101,13 +101,13 @@ class Transport
                 }
 
                 if ('smtp' === $parsedDsn['scheme']) {
-                    return new Mailgun\Smtp\MailgunTransport($user, $pass, $dispatcher, $logger);
+                    return new Mailgun\Smtp\MailgunTransport($user, $pass, $query['region'] ?? null, $dispatcher, $logger);
                 }
                 if ('http' === $parsedDsn['scheme']) {
-                    return new Mailgun\Http\MailgunTransport($user, $pass, $client, $dispatcher, $logger);
+                    return new Mailgun\Http\MailgunTransport($user, $pass, $query['region'] ?? null, $client, $dispatcher, $logger);
                 }
                 if ('api' === $parsedDsn['scheme']) {
-                    return new Mailgun\Http\Api\MailgunTransport($user, $pass, $client, $dispatcher, $logger);
+                    return new Mailgun\Http\Api\MailgunTransport($user, $pass, $query['region'] ?? null, $client, $dispatcher, $logger);
                 }
 
                 throw new LogicException(sprintf('The "%s" scheme is not supported for mailer "%s".', $parsedDsn['scheme'], $parsedDsn['host']));

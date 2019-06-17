@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Stamp;
 
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Messenger\Envelope;
 
 /**
  * Stamp applied when a messages needs to be redelivered.
@@ -36,6 +37,14 @@ class RedeliveryStamp implements StampInterface
         $this->exceptionMessage = $exceptionMessage;
         $this->flattenException = $flattenException;
         $this->redeliveredAt = new \DateTimeImmutable();
+    }
+
+    public static function getRetryCountFromEnvelope(Envelope $envelope): int
+    {
+        /** @var self|null $retryMessageStamp */
+        $retryMessageStamp = $envelope->last(self::class);
+
+        return $retryMessageStamp ? $retryMessageStamp->getRetryCount() : 0;
     }
 
     public function getRetryCount(): int

@@ -22,8 +22,10 @@ use Symfony\Component\Mailer\Bridge\Sendgrid;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Email;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class TransportTest extends TestCase
 {
@@ -106,6 +108,15 @@ class TransportTest extends TestCase
         $this->assertEquals('pa$s', $transport->getPassword());
         $this->assertProperties($transport, $dispatcher, $logger);
 
+        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, null, $logger);
+        $this->assertEquals('smtp.mailgun.org', $transport->getStream()->getHost());
+
+        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, null, $logger);
+        $this->assertEquals('smtp.eu.mailgun.org', $transport->getStream()->getHost());
+
+        $transport = Transport::fromDsn('smtp://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, null, $logger);
+        $this->assertEquals('smtp.mailgun.org', $transport->getStream()->getHost());
+
         $client = $this->createMock(HttpClientInterface::class);
         $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
         $this->assertInstanceOf(Mailgun\Http\MailgunTransport::class, $transport);
@@ -115,6 +126,25 @@ class TransportTest extends TestCase
             'client' => $client,
         ]);
 
+        $response = $this->createMock(ResponseInterface::class);
+        $response->expects($this->any())->method('getStatusCode')->willReturn(200);
+        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->text('Hello you');
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
+        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.eu.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
+        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages.mime')->willReturn($response);
+        $transport = Transport::fromDsn('http://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
+
         $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
         $this->assertInstanceOf(Mailgun\Http\Api\MailgunTransport::class, $transport);
         $this->assertProperties($transport, $dispatcher, $logger, [
@@ -122,6 +152,21 @@ class TransportTest extends TestCase
             'domain' => 'pa$s',
             'client' => $client,
         ]);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.eu.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
 
         $this->expectException(LogicException::class);
         Transport::fromDsn('foo://mailgun');

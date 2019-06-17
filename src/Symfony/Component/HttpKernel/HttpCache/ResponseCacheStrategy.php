@@ -85,7 +85,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
         $this->storeRelativeAgeDirective('s-maxage', $response->headers->getCacheControlDirective('s-maxage') ?: $response->headers->getCacheControlDirective('max-age'), $age);
 
         $expires = $response->getExpires();
-        $expires = null !== $expires ? $expires->format('U') - $response->getDate()->format('U') : null;
+        $expires = null !== $expires ? (int) $expires->format('U') - (int) $response->getDate()->format('U') : null;
         $this->storeRelativeAgeDirective('expires', $expires >= 0 ? $expires : null, 0);
     }
 

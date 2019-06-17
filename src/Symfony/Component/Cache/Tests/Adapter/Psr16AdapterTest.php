@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -27,5 +28,15 @@ class Psr16AdapterTest extends AdapterTestCase
     public function createCachePool($defaultLifetime = 0)
     {
         return new Psr16Adapter(new Psr16Cache(new FilesystemAdapter()), '', $defaultLifetime);
+    }
+
+    public function testValidCacheKeyWithNamespace()
+    {
+        $cache = new Psr16Adapter(new Psr16Cache(new ArrayAdapter()), 'some_namespace', 0);
+        $item = $cache->getItem('my_key');
+        $item->set('someValue');
+        $cache->save($item);
+
+        $this->assertTrue($cache->getItem('my_key')->isHit(), 'Stored item is successfully retrieved.');
     }
 }

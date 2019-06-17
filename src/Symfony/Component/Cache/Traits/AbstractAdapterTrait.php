@@ -118,9 +118,9 @@ trait AbstractAdapterTrait
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
-            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), ':', 5);
+            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5);
             try {
-                $cleared = $this->doSave(['/'.$this->namespace => $namespaceVersion], 0);
+                $cleared = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
                 $cleared = false;
             }
@@ -327,14 +327,14 @@ trait AbstractAdapterTrait
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];
-            $this->namespaceVersion = '1/';
+            $this->namespaceVersion = '1'.static::NS_SEPARATOR;
             try {
-                foreach ($this->doFetch(['/'.$this->namespace]) as $v) {
+                foreach ($this->doFetch([static::NS_SEPARATOR.$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
-                if ('1:' === $this->namespaceVersion) {
-                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), ':', 5);
-                    $this->doSave(['@'.$this->namespace => $this->namespaceVersion], 0);
+                if ('1'.static::NS_SEPARATOR === $this->namespaceVersion) {
+                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), static::NS_SEPARATOR, 5);
+                    $this->doSave([static::NS_SEPARATOR.$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
             }
@@ -351,7 +351,7 @@ trait AbstractAdapterTrait
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
             // Use MD5 to favor speed over security, which is not an issue here
-            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), ':', -(\strlen($this->namespaceVersion) + 2));
+            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), static::NS_SEPARATOR, -(\strlen($this->namespaceVersion) + 2));
             $id = $this->namespace.$this->namespaceVersion.$id;
         }
 

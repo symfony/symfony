@@ -145,7 +145,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
     private $lockSetData = false;
 
     /**
-     * @var string|int|null
+     * @var string|null
      */
     private $name;
 
@@ -845,6 +845,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             if (!\is_string($child) && !\is_int($child)) {
                 throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormInterface');
             }
+
+            $child = (string) $child;
 
             if (null !== $type && !\is_string($type) && !$type instanceof FormTypeInterface) {
                 throw new UnexpectedTypeException($type, 'string or Symfony\Component\Form\FormTypeInterface');

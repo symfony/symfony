@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -90,7 +91,9 @@ class FormValidator extends ConstraintValidator
                             $validator->atPath('data')->validate($form->getData(), $constraint, $group);
 
                             // Prevent duplicate validation
-                            continue 2;
+                            if (!$constraint instanceof Composite) {
+                                continue 2;
+                            }
                         }
                     }
                 }
@@ -137,7 +140,7 @@ class FormValidator extends ConstraintValidator
         // Mark the form with an error if it contains extra fields
         if (!$config->getOption('allow_extra_fields') && \count($form->getExtraData()) > 0) {
             $this->context->setConstraint($formConstraint);
-            $this->context->buildViolation($config->getOption('extra_fields_message'))
+            $this->context->buildViolation($config->getOption('extra_fields_message', ''))
                 ->setParameter('{{ extra_fields }}', '"'.implode('", "', array_keys($form->getExtraData())).'"')
                 ->setInvalidValue($form->getExtraData())
                 ->setCode(Form::NO_SUCH_FIELD_ERROR)

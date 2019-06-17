@@ -441,6 +441,7 @@ class Response
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
      *
+     * @param null|string $text Reason Phrase, to be sent with the code. This not sent in HTTP/2.
      * @return $this
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid

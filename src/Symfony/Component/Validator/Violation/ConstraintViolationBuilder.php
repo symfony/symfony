@@ -47,8 +47,12 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * @param TranslatorInterface $translator
      */
-    public function __construct(ConstraintViolationList $violations, Constraint $constraint, string $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)
+    public function __construct(ConstraintViolationList $violations, Constraint $constraint, ?string $message, array $parameters, $root, string $propertyPath, $invalidValue, $translator, string $translationDomain = null)
     {
+        if (null === $message) {
+            @trigger_error(sprintf('Passing a null message when instantiating a "%s" is deprecated since Symfony 4.4.', __CLASS__), E_USER_DEPRECATED);
+            $message = '';
+        }
         if (!$translator instanceof LegacyTranslatorInterface && !$translator instanceof TranslatorInterface) {
             throw new \TypeError(sprintf('Argument 8 passed to %s() must be an instance of %s, %s given.', __METHOD__, TranslatorInterface::class, \is_object($translator) ? \get_class($translator) : \gettype($translator)));
         }

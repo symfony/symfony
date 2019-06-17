@@ -47,10 +47,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function __construct(?string $name, NodeInterface $parent = null, string $pathSeparator = self::DEFAULT_PATH_SEPARATOR)
     {
-        if (null === $name) {
-            $name = '';
-        }
-        if (false !== strpos($name, $pathSeparator)) {
+        if (false !== strpos($name = (string) $name, $pathSeparator)) {
             throw new \InvalidArgumentException('The name must not contain "'.$pathSeparator.'".');
         }
 

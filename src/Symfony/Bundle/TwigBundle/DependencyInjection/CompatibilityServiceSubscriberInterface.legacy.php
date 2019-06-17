@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
+namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface as LegacyServiceSubscriberInterface;
 
-if (interface_exists(LegacyServiceSubscriberInterface::class)) {
-    require __DIR__.\DIRECTORY_SEPARATOR.'CompatibilityServiceSubscriberInterface.legacy.php';
-} else {
-    require __DIR__.\DIRECTORY_SEPARATOR.'CompatibilityServiceSubscriberInterface.contracts.php';
+/**
+ * @internal
+ */
+interface CompatibilityServiceSubscriberInterface extends LegacyServiceSubscriberInterface
+{
 }

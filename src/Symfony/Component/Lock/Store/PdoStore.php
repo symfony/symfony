@@ -16,7 +16,6 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -36,6 +35,8 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class PdoStore implements StoreInterface
 {
+    use ExpiringStoreTrait;
+
     private $conn;
     private $dsn;
     private $driver;
@@ -123,9 +124,7 @@ class PdoStore implements StoreInterface
 
         try {
             $stmt->execute();
-            if ($key->isExpired()) {
-                throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
-            }
+            $this->checkNotExpired($key);
 
             return;
         } catch (DBALException $e) {
@@ -136,9 +135,7 @@ class PdoStore implements StoreInterface
             $this->putOffExpiration($key, $this->initialTtl);
         }
 
-        if ($key->isExpired()) {
-            throw new LockExpiredException(sprintf('Failed to store the "%s" lock.', $key));
-        }
+        $this->checkNotExpired($key);
 
         if ($this->gcProbability > 0 && (1.0 === $this->gcProbability || (random_int(0, PHP_INT_MAX) / PHP_INT_MAX) <= $this->gcProbability)) {
             $this->prune();
@@ -178,9 +175,7 @@ class PdoStore implements StoreInterface
             throw new LockConflictedException();
         }
 
-        if ($key->isExpired()) {
-            throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
-        }
+        $this->checkNotExpired($key);
     }
 
     /**

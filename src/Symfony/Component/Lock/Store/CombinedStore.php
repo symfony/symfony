@@ -16,7 +16,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -30,6 +29,7 @@ use Symfony\Component\Lock\Strategy\StrategyInterface;
 class CombinedStore implements StoreInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+    use ExpiringStoreTrait;
 
     /** @var StoreInterface[] */
     private $stores;
@@ -78,6 +78,8 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             }
         }
 
+        $this->checkNotExpired($key);
+
         if ($this->strategy->isMet($successCount, $storesCount)) {
             return;
         }
@@ -125,9 +127,7 @@ class CombinedStore implements StoreInterface, LoggerAwareInterface
             }
         }
 
-        if ($key->isExpired()) {
-            throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $key));
-        }
+        $this->checkNotExpired($key);
 
         if ($this->strategy->isMet($successCount, $storesCount)) {
             return;

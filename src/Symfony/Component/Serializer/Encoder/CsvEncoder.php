@@ -216,10 +216,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             if (\is_array($value)) {
                 $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
-                if ($escapeFormulas && \in_array(substr($value, 0, 1), $this->formulasStartCharacters, true)) {
+                if ($escapeFormulas && \in_array(substr((string) $value, 0, 1), $this->formulasStartCharacters, true)) {
                     $result[$parentKey.$key] = "\t".$value;
                 } else {
-                    $result[$parentKey.$key] = $value;
+                    // Ensures an actual value is used when dealing with true and false
+                    $result[$parentKey.$key] = false === $value ? 0 : (true === $value ? 1 : $value);
                 }
             }
         }

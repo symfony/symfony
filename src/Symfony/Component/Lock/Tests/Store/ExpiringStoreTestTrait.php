@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Exception\LockExpiredException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
@@ -104,5 +105,29 @@ trait ExpiringStoreTestTrait
         $store->putOffExpiration($key, 1);
         $this->assertGreaterThanOrEqual(0, $key->getRemainingLifetime());
         $this->assertLessThanOrEqual(1, $key->getRemainingLifetime());
+    }
+
+    public function testExpiredLockCleaned()
+    {
+        $resource = uniqid(__METHOD__, true);
+
+        $key1 = new Key($resource);
+        $key2 = new Key($resource);
+
+        /** @var StoreInterface $store */
+        $store = $this->getStore();
+        $key1->reduceLifetime(0);
+
+        $this->assertTrue($key1->isExpired());
+        try {
+            $store->save($key1);
+            $this->fail('The store shouldn\'t have save an expired key');
+        } catch (LockExpiredException $e) {
+        }
+
+        $this->assertFalse($store->exists($key1));
+
+        $store->save($key2);
+        $this->assertTrue($store->exists($key2));
     }
 }

@@ -55,10 +55,10 @@ class JsonResponse extends Response
      *
      * Example:
      *
-     *     return JsonResponse::create($data, 200)
+     *     return JsonResponse::create(['key' => 'value'])
      *         ->setSharedMaxAge(300);
      *
-     * @param mixed $data    The json response data
+     * @param mixed $data    The JSON response data
      * @param int   $status  The response status code
      * @param array $headers An array of response headers
      *
@@ -70,7 +70,18 @@ class JsonResponse extends Response
     }
 
     /**
-     * Make easier the creation of JsonResponse from raw json.
+     * Factory method for chainability.
+     *
+     * Example:
+     *
+     *     return JsonResponse::fromJsonString('{"key": "value"}')
+     *         ->setSharedMaxAge(300);
+     *
+     * @param string|null $data    The JSON response string
+     * @param int         $status  The response status code
+     * @param array       $headers An array of response headers
+     *
+     * @return static
      */
     public static function fromJsonString($data = null, $status = 200, $headers = [])
     {

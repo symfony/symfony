@@ -600,34 +600,66 @@ class UrlGeneratorTest extends TestCase
 
     public function testDefaultHostIsUsedWhenContextHostIsEmpty()
     {
-        $routes = $this->getRoutes('test', new Route('/route', ['domain' => 'my.fallback.host'], ['domain' => '.+'], [], '{domain}', ['http']));
+        $routes = $this->getRoutes('test', new Route('/path', ['domain' => 'my.fallback.host'], ['domain' => '.+'], [], '{domain}'));
 
         $generator = $this->getGenerator($routes);
         $generator->getContext()->setHost('');
 
-        $this->assertSame('http://my.fallback.host/app.php/route', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
+        $this->assertSame('http://my.fallback.host/app.php/path', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
-    public function testDefaultHostIsUsedWhenContextHostIsEmptyAndSchemeIsNot()
+    public function testDefaultHostIsUsedWhenContextHostIsEmptyAndPathReferenceType()
     {
-        $routes = $this->getRoutes('test', new Route('/route', ['domain' => 'my.fallback.host'], ['domain' => '.+'], [], '{domain}', ['http', 'https']));
+        $routes = $this->getRoutes('test', new Route('/path', ['domain' => 'my.fallback.host'], ['domain' => '.+'], [], '{domain}'));
 
         $generator = $this->getGenerator($routes);
         $generator->getContext()->setHost('');
-        $generator->getContext()->setScheme('https');
 
-        $this->assertSame('https://my.fallback.host/app.php/route', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
+        $this->assertSame('//my.fallback.host/app.php/path', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH));
     }
 
-    public function testAbsoluteUrlFallbackToRelativeIfHostIsEmptyAndSchemeIsNot()
+    public function testAbsoluteUrlFallbackToPathIfHostIsEmptyAndSchemeIsHttp()
     {
-        $routes = $this->getRoutes('test', new Route('/route', [], [], [], '', ['http', 'https']));
+        $routes = $this->getRoutes('test', new Route('/route'));
 
         $generator = $this->getGenerator($routes);
         $generator->getContext()->setHost('');
         $generator->getContext()->setScheme('https');
 
         $this->assertSame('/app.php/route', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testAbsoluteUrlFallbackToNetworkIfSchemeIsEmptyAndHostIsNot()
+    {
+        $routes = $this->getRoutes('test', new Route('/path'));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setHost('example.com');
+        $generator->getContext()->setScheme('');
+
+        $this->assertSame('//example.com/app.php/path', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testAbsoluteUrlFallbackToPathIfSchemeAndHostAreEmpty()
+    {
+        $routes = $this->getRoutes('test', new Route('/path'));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setHost('');
+        $generator->getContext()->setScheme('');
+
+        $this->assertSame('/app.php/path', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
+    }
+
+    public function testAbsoluteUrlWithNonHttpSchemeAndEmptyHost()
+    {
+        $routes = $this->getRoutes('test', new Route('/path', [], [], [], '', ['file']));
+
+        $generator = $this->getGenerator($routes);
+        $generator->getContext()->setBaseUrl('');
+        $generator->getContext()->setHost('');
+
+        $this->assertSame('file:///path', $generator->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     public function testGenerateNetworkPath()

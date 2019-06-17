@@ -419,3 +419,10 @@ class NonAutowirableDecorator implements DecoratorInterface
     {
     }
 }
+
+final class ElsaAction
+{
+    public function __construct(NotExisting $notExisting)
+    {
+    }
+}

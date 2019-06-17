@@ -64,7 +64,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $handler = $handlerDescriptor->getHandler();
                 $handledStamp = HandledStamp::fromDescriptor($handlerDescriptor, $handler($message));
                 $envelope = $envelope->with($handledStamp);
-                $this->logger->info('Message "{class}" handled by "{handler}"', $context + ['handler' => $handledStamp->getHandlerName()]);
+                $this->logger->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[] = $e;
             }
@@ -75,7 +75,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 throw new NoHandlerForMessageException(sprintf('No handler for message "%s".', $context['class']));
             }
 
-            $this->logger->info('No handler for message "{class}"', $context);
+            $this->logger->info('No handler for message {class}', $context);
         }
 
         if (\count($exceptions)) {

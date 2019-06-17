@@ -54,37 +54,30 @@ class SendMessageMiddleware implements MiddlewareInterface
 
         $sender = null;
 
-        try {
-            if ($envelope->all(ReceivedStamp::class)) {
-                // it's a received message, do not send it back
-                $this->logger->info('Received message "{class}"', $context);
-            } else {
-                /** @var RedeliveryStamp|null $redeliveryStamp */
-                $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
+        if ($envelope->all(ReceivedStamp::class)) {
+            // it's a received message, do not send it back
+            $this->logger->info('Received message {class}', $context);
+        } else {
+            /** @var RedeliveryStamp|null $redeliveryStamp */
+            $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
 
-                // dispatch event unless this is a redelivery
-                $shouldDispatchEvent = null === $redeliveryStamp;
-                foreach ($this->getSenders($envelope, $redeliveryStamp) as $alias => $sender) {
-                    if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
-                        $event = new SendMessageToTransportsEvent($envelope);
-                        $this->eventDispatcher->dispatch($event);
-                        $envelope = $event->getEnvelope();
-                        $shouldDispatchEvent = false;
-                    }
-
-                    $this->logger->info('Sending message "{class}" with "{sender}"', $context + ['sender' => \get_class($sender)]);
-                    $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
+            // dispatch event unless this is a redelivery
+            $shouldDispatchEvent = null === $redeliveryStamp;
+            foreach ($this->getSenders($envelope, $redeliveryStamp) as $alias => $sender) {
+                if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
+                    $event = new SendMessageToTransportsEvent($envelope);
+                    $this->eventDispatcher->dispatch($event);
+                    $envelope = $event->getEnvelope();
+                    $shouldDispatchEvent = false;
                 }
-            }
 
-            if (null === $sender) {
-                return $stack->next()->handle($envelope, $stack);
+                $this->logger->info('Sending message {class} with {sender}', $context + ['sender' => \get_class($sender)]);
+                $envelope = $sender->send($envelope->with(new SentStamp(\get_class($sender), \is_string($alias) ? $alias : null)));
             }
-        } catch (\Throwable $e) {
-            $context['exception'] = $e;
-            $this->logger->warning('An exception occurred while handling message "{class}": '.$e->getMessage(), $context);
+        }
 
-            throw $e;
+        if (null === $sender) {
+            return $stack->next()->handle($envelope, $stack);
         }
 
         // message should only be sent and not be handled by the next middleware

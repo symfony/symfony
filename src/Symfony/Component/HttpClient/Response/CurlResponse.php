@@ -336,7 +336,7 @@ final class CurlResponse implements ResponseInterface
                 return 0;
             }
 
-            if ($certinfo = curl_getinfo($ch, CURLINFO_CERTINFO)) {
+            if (\function_exists('openssl_x509_read') && $certinfo = curl_getinfo($ch, CURLINFO_CERTINFO)) {
                 $info['peer_certificate_chain'] = array_map('openssl_x509_read', array_column($certinfo, 'Cert'));
             }
 

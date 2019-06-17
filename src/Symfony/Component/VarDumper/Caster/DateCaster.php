@@ -88,7 +88,7 @@ class DateCaster
                 if (self::PERIOD_LIMIT === $i) {
                     $now = new \DateTimeImmutable();
                     $dates[] = sprintf('%s more', ($end = $p->getEndDate())
-                        ? ceil(($end->format('U.u') - $d->format('U.u')) / ($now->add($p->getDateInterval())->format('U.u') - $now->format('U.u')))
+                        ? ceil(($end->format('U.u') - $d->format('U.u')) / ((int) $now->add($p->getDateInterval())->format('U.u') - (int) $now->format('U.u')))
                         : $p->recurrences - $i
                     );
                     break;

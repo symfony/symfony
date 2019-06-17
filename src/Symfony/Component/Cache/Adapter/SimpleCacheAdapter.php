@@ -20,6 +20,11 @@ use Symfony\Component\Cache\Traits\ProxyTrait;
  */
 class SimpleCacheAdapter extends AbstractAdapter implements PruneableInterface
 {
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = '_';
+
     use ProxyTrait;
 
     private $miss;
@@ -74,13 +79,5 @@ class SimpleCacheAdapter extends AbstractAdapter implements PruneableInterface
     protected function doSave(array $values, $lifetime)
     {
         return $this->pool->setMultiple($values, 0 === $lifetime ? null : $lifetime);
-    }
-
-    /**
-     * @return string the namespace separator for cache keys
-     */
-    protected static function getNsSeparator()
-    {
-        return '_';
     }
 }

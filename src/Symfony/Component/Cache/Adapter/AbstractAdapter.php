@@ -27,6 +27,11 @@ use Symfony\Contracts\Cache\CacheInterface;
  */
 abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
+    /**
+     * @internal
+     */
+    protected const NS_SEPARATOR = ':';
+
     use AbstractTrait;
     use ContractsTrait;
 
@@ -38,7 +43,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::getNsSeparator();
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::NS_SEPARATOR;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }

@@ -107,9 +107,9 @@ trait AbstractTrait
     {
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
-            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::getNsSeparator(), 5);
+            $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5);
             try {
-                $cleared = $this->doSave([static::getNsSeparator().$this->namespace => $namespaceVersion], 0);
+                $cleared = $this->doSave([static::NS_SEPARATOR.$this->namespace => $namespaceVersion], 0);
             } catch (\Exception $e) {
                 $cleared = false;
             }
@@ -242,14 +242,14 @@ trait AbstractTrait
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];
-            $this->namespaceVersion = '1'.static::getNsSeparator();
+            $this->namespaceVersion = '1'.static::NS_SEPARATOR;
             try {
-                foreach ($this->doFetch([static::getNsSeparator().$this->namespace]) as $v) {
+                foreach ($this->doFetch([static::NS_SEPARATOR.$this->namespace]) as $v) {
                     $this->namespaceVersion = $v;
                 }
-                if ('1'.static::getNsSeparator() === $this->namespaceVersion) {
-                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), static::getNsSeparator(), 5);
-                    $this->doSave([static::getNsSeparator().$this->namespace => $this->namespaceVersion], 0);
+                if ('1'.static::NS_SEPARATOR === $this->namespaceVersion) {
+                    $this->namespaceVersion = substr_replace(base64_encode(pack('V', time())), static::NS_SEPARATOR, 5);
+                    $this->doSave([static::NS_SEPARATOR.$this->namespace => $this->namespaceVersion], 0);
                 }
             } catch (\Exception $e) {
             }
@@ -266,7 +266,7 @@ trait AbstractTrait
         }
         if (\strlen($id = $this->namespace.$this->namespaceVersion.$key) > $this->maxIdLength) {
             // Use MD5 to favor speed over security, which is not an issue here
-            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), static::getNsSeparator(), -(\strlen($this->namespaceVersion) + 2));
+            $this->ids[$key] = $id = substr_replace(base64_encode(hash('md5', $key, true)), static::NS_SEPARATOR, -(\strlen($this->namespaceVersion) + 2));
             $id = $this->namespace.$this->namespaceVersion.$id;
         }
 
@@ -279,13 +279,5 @@ trait AbstractTrait
     public static function handleUnserializeCallback($class)
     {
         throw new \DomainException('Class not found: '.$class);
-    }
-
-    /**
-     * @return string the namespace separator for cache keys
-     */
-    protected static function getNsSeparator()
-    {
-        return ':';
     }
 }

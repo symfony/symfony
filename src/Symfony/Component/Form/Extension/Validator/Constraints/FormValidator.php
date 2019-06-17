@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -90,7 +91,9 @@ class FormValidator extends ConstraintValidator
                             $validator->atPath('data')->validate($form->getData(), $constraint, $group);
 
                             // Prevent duplicate validation
-                            continue 2;
+                            if (!$constraint instanceof Composite) {
+                                continue 2;
+                            }
                         }
                     }
                 }

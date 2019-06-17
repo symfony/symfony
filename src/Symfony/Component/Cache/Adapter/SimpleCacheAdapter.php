@@ -75,4 +75,12 @@ class SimpleCacheAdapter extends AbstractAdapter implements PruneableInterface
     {
         return $this->pool->setMultiple($values, 0 === $lifetime ? null : $lifetime);
     }
+
+    /**
+     * @return string the namespace separator for cache keys
+     */
+    protected static function getNsSeparator()
+    {
+        return '_';
+    }
 }

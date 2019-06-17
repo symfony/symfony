@@ -38,7 +38,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::getNsSeparator();
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }

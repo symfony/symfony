@@ -29,6 +29,24 @@ class CsvEncoderTest extends TestCase
         $this->encoder = new CsvEncoder();
     }
 
+    public function testTrueFalseValues()
+    {
+        $data = [
+            'string' => 'foo',
+            'int' => 2,
+            'false' => false,
+            'true' => true,
+        ];
+
+        // Check that true and false are appropriately handled
+        $this->assertEquals(<<<'CSV'
+string,int,false,true
+foo,2,0,1
+
+CSV
+    , $this->encoder->encode($data, 'csv'));
+    }
+
     public function testSupportEncoding()
     {
         $this->assertTrue($this->encoder->supportsEncoding('csv'));

@@ -39,7 +39,7 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(?string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
+    public function __construct(string $prefix, string $pattern, bool $recursive, bool $forExclusion = false, array $excludedPrefixes = [])
     {
         $this->prefix = realpath($prefix) ?: (file_exists($prefix) ? $prefix : false);
         $this->pattern = $pattern;

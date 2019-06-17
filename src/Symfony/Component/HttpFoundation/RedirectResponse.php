@@ -32,7 +32,7 @@ class RedirectResponse extends Response
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      */
-    public function __construct(?string $url, int $status = 302, array $headers = [])
+    public function __construct(string $url, int $status = 302, array $headers = [])
     {
         parent::__construct('', $status, $headers);
 
@@ -82,7 +82,7 @@ class RedirectResponse extends Response
      */
     public function setTargetUrl($url)
     {
-        if (empty($url)) {
+        if ('' == $url) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }
 

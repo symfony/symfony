@@ -46,6 +46,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     {
         $this->tokenManager = $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock();
         $this->translator = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         parent::setUp();
     }
@@ -371,16 +372,11 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->with($csrfToken)
             ->willReturn(false);
 
-        $this->translator->expects($this->once())
-             ->method('trans')
-             ->with('Foobar')
-             ->willReturn('[trans]Foobar[/trans]');
-
         $form = $this->factory
             ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
-                'csrf_message' => 'Foobar',
+                'csrf_message' => '[trans]Foobar[/trans]',
                 'csrf_token_id' => 'TOKEN_ID',
                 'compound' => true,
             ])

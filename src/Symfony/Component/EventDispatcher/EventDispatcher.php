@@ -135,7 +135,19 @@ class EventDispatcher implements EventDispatcherInterface
     public function hasListeners($eventName = null)
     {
         if (null !== $eventName) {
-            return !empty($this->listeners[$eventName]);
+            if(!empty($this->listeners[$eventName])) {
+                return true;
+            }
+
+            if (\class_exists($eventName)) {
+                foreach (\class_parents($eventName) as $parentEvent) {
+                    if (!empty($this->listeners[$parentEvent])) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         foreach ($this->listeners as $eventListeners) {

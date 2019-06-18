@@ -55,9 +55,8 @@ class EnvelopeTest extends TestCase
     {
         $envelope = new Envelope(new DummyMessage('dummy'), [
             new ReceivedStamp('transport1'),
-            new DelayStamp(5000),
-            new DummyExtendsDelayStamp(5000),
-            new DummyImplementsFooBarStampInterface(),
+            new DummyExtendsFooBarStamp(),
+            new DummyImplementsFooBarStamp(),
         ]);
 
         $envelope2 = $envelope->withoutStampsOfType(DummyNothingImplementsMeStampInterface::class);
@@ -66,12 +65,11 @@ class EnvelopeTest extends TestCase
         $envelope3 = $envelope2->withoutStampsOfType(ReceivedStamp::class);
         $this->assertEmpty($envelope3->all(ReceivedStamp::class));
 
-        $envelope4 = $envelope3->withoutStampsOfType(DelayStamp::class);
-        $this->assertEmpty($envelope4->all(DelayStamp::class));
-        $this->assertEmpty($envelope4->all(DummyExtendsDelayStamp::class));
+        $envelope4 = $envelope3->withoutStampsOfType(DummyImplementsFooBarStamp::class);
+        $this->assertEmpty($envelope4->all(DummyImplementsFooBarStamp::class));
+        $this->assertEmpty($envelope4->all(DummyExtendsFooBarStamp::class));
 
-        $envelope5 = $envelope4->withoutStampsOfType(DummyFooBarStampInterface::class);
-        $this->assertEmpty($envelope5->all(DummyImplementsFooBarStampInterface::class));
+        $envelope5 = $envelope3->withoutStampsOfType(DummyFooBarStampInterface::class);
         $this->assertEmpty($envelope5->all());
     }
 
@@ -118,15 +116,15 @@ class EnvelopeTest extends TestCase
     }
 }
 
-class DummyExtendsDelayStamp extends DelayStamp
-{
-}
 interface DummyFooBarStampInterface extends StampInterface
 {
 }
 interface DummyNothingImplementsMeStampInterface extends StampInterface
 {
 }
-class DummyImplementsFooBarStampInterface implements DummyFooBarStampInterface
+class DummyImplementsFooBarStamp implements DummyFooBarStampInterface
+{
+}
+class DummyExtendsFooBarStamp extends DummyImplementsFooBarStamp
 {
 }

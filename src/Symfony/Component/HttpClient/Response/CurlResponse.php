@@ -55,6 +55,7 @@ final class CurlResponse implements ResponseInterface
         $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
         $info = &$this->info;
         $headers = &$this->headers;
+        $debugBuffer = $this->debugBuffer;
 
         if (!$info['response_headers']) {
             // Used to keep track of what we're waiting for
@@ -88,9 +89,11 @@ final class CurlResponse implements ResponseInterface
         if ($onProgress = $options['on_progress']) {
             $url = isset($info['url']) ? ['url' => $info['url']] : [];
             curl_setopt($ch, CURLOPT_NOPROGRESS, false);
-            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url, $multi) {
+            curl_setopt($ch, CURLOPT_PROGRESSFUNCTION, static function ($ch, $dlSize, $dlNow) use ($onProgress, &$info, $url, $multi, $debugBuffer) {
                 try {
-                    $onProgress($dlNow, $dlSize, $url + curl_getinfo($ch) + $info);
+                    rewind($debugBuffer);
+                    $debug = ['debug' => stream_get_contents($debugBuffer)];
+                    $onProgress($dlNow, $dlSize, $url + curl_getinfo($ch) + $info + $debug);
                 } catch (\Throwable $e) {
                     $multi->handlesActivity[(int) $ch][] = null;
                     $multi->handlesActivity[(int) $ch][] = $e;
@@ -148,12 +151,6 @@ final class CurlResponse implements ResponseInterface
         if (!$info = $this->finalInfo) {
             self::perform($this->multi);
 
-            if ('debug' === $type) {
-                rewind($this->debugBuffer);
-
-                return stream_get_contents($this->debugBuffer);
-            }
-
             $info = array_merge($this->info, curl_getinfo($this->handle));
             $info['url'] = $this->info['url'] ?? $info['url'];
             $info['redirect_url'] = $this->info['redirect_url'] ?? null;
@@ -164,9 +161,10 @@ final class CurlResponse implements ResponseInterface
                 $info['starttransfer_time'] = 0.0;
             }
 
+            rewind($this->debugBuffer);
+            $info['debug'] = stream_get_contents($this->debugBuffer);
+
             if (!\in_array(curl_getinfo($this->handle, CURLINFO_PRIVATE), ['headers', 'content'], true)) {
-                rewind($this->debugBuffer);
-                $info['debug'] = stream_get_contents($this->debugBuffer);
                 curl_setopt($this->handle, CURLOPT_VERBOSE, false);
                 rewind($this->debugBuffer);
                 ftruncate($this->debugBuffer, 0);

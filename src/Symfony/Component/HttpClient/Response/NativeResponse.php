@@ -78,18 +78,12 @@ final class NativeResponse implements ResponseInterface
         if (!$info = $this->finalInfo) {
             self::perform($this->multi);
 
-            if ('debug' === $type) {
-                return $this->info['debug'];
-            }
-
             $info = $this->info;
             $info['url'] = implode('', $info['url']);
             unset($info['fopen_time'], $info['size_body'], $info['request_header']);
 
             if (null === $this->buffer) {
                 $this->finalInfo = $info;
-            } else {
-                unset($info['debug']);
             }
         }
 

@@ -66,7 +66,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         if (null !== $this->optimized && null !== $eventName) {
-            $listeners = $this->optimized[$eventName] ?? (empty($this->listeners[$eventName]) ? [] : $this->optimizeListeners($eventName));
+            $listeners = $this->getOptimized($eventName);
         } else {
             $listeners = $this->getListeners($eventName);
         }
@@ -304,6 +304,32 @@ class EventDispatcher implements EventDispatcherInterface
                 $this->sorted[$eventName][] = $listener;
             }
         }
+    }
+
+    public function getOptimized(string $eventName): array
+    {
+        if (!$this->hasListeners($eventName)) {
+            return [];
+        }
+
+        if (isset($this->listeners[$eventName]) && !isset($this->optimized[$eventName])) {
+            $this->optimizeListeners($eventName);
+        }
+
+        $listeners = $this->optimized[$eventName] ?? [];
+        if (!\class_exists($eventName)) {
+            return $listeners;
+        }
+
+        $classParents = \class_parents($eventName);
+        foreach ($classParents as $parentEvent) {
+            if (isset($this->listeners[$parentEvent]) && !isset($this->optimized[$parentEvent])) {
+                $this->optimizeListeners($parentEvent);
+            }
+            $listeners = \array_merge($listeners, $this->optimized[$parentEvent] ?? []);
+        }
+
+        return $listeners;
     }
 
     /**

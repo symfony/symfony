@@ -93,14 +93,14 @@ class EventDispatcher implements EventDispatcherInterface
             }
 
             $listeners = $this->sorted[$eventName] ?? [];
-            if (!\class_exists($eventName)) {
+            if (!class_exists($eventName)) {
                 return $listeners;
             }
 
-            $classParents = \class_parents($eventName);
+            $classParents = class_parents($eventName);
             foreach ($classParents as $parentEvent) {
                 $this->sortListeners($parentEvent);
-                $listeners = \array_merge($listeners, $this->sorted[$parentEvent] ?? []);
+                $listeners = array_merge($listeners, $this->sorted[$parentEvent] ?? []);
             }
 
             return $listeners;
@@ -146,12 +146,12 @@ class EventDispatcher implements EventDispatcherInterface
     public function hasListeners($eventName = null)
     {
         if (null !== $eventName) {
-            if(!empty($this->listeners[$eventName])) {
+            if (!empty($this->listeners[$eventName])) {
                 return true;
             }
 
-            if (\class_exists($eventName)) {
-                foreach (\class_parents($eventName) as $parentEvent) {
+            if (class_exists($eventName)) {
+                foreach (class_parents($eventName) as $parentEvent) {
                     if (!empty($this->listeners[$parentEvent])) {
                         return true;
                     }
@@ -317,16 +317,16 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         $listeners = $this->optimized[$eventName] ?? [];
-        if (!\class_exists($eventName)) {
+        if (!class_exists($eventName)) {
             return $listeners;
         }
 
-        $classParents = \class_parents($eventName);
+        $classParents = class_parents($eventName);
         foreach ($classParents as $parentEvent) {
             if (isset($this->listeners[$parentEvent]) && !isset($this->optimized[$parentEvent])) {
                 $this->optimizeListeners($parentEvent);
             }
-            $listeners = \array_merge($listeners, $this->optimized[$parentEvent] ?? []);
+            $listeners = array_merge($listeners, $this->optimized[$parentEvent] ?? []);
         }
 
         return $listeners;

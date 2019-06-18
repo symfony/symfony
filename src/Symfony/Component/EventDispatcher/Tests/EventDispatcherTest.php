@@ -519,12 +519,10 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
 
 class ParentEvent
 {
-
 }
 
 class ChildEvent extends ParentEvent
 {
-
 }
 
 class TestEventSubscriberWithEventFqcn implements EventSubscriberInterface

@@ -6,6 +6,7 @@ CHANGELOG
 
  * The signature of the `EventDispatcherInterface::dispatch()` method should be updated to `dispatch($event, string $eventName = null)`, not doing so is deprecated
  * deprecated the `Event` class, use `Symfony\Contracts\EventDispatcher\Event` instead
+ * added support for events to be subscribed to using the FQCN of their parent
 
 4.1.0
 -----

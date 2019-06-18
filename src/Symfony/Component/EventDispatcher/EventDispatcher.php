@@ -84,7 +84,7 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
-            if (empty($this->listeners[$eventName])) {
+            if (!$this->hasListeners($eventName)) {
                 return [];
             }
 
@@ -92,7 +92,18 @@ class EventDispatcher implements EventDispatcherInterface
                 $this->sortListeners($eventName);
             }
 
-            return $this->sorted[$eventName];
+            $listeners = $this->sorted[$eventName] ?? [];
+            if (!\class_exists($eventName)) {
+                return $listeners;
+            }
+
+            $classParents = \class_parents($eventName);
+            foreach ($classParents as $parentEvent) {
+                $this->sortListeners($parentEvent);
+                $listeners = \array_merge($listeners, $this->sorted[$parentEvent] ?? []);
+            }
+
+            return $listeners;
         }
 
         foreach ($this->listeners as $eventName => $eventListeners) {
@@ -278,6 +289,10 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function sortListeners(string $eventName)
     {
+        if (!isset($this->listeners[$eventName])) {
+            return;
+        }
+
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = [];
 

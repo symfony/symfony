@@ -420,6 +420,19 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($this->dispatcher->hasListeners(ParentEvent::class));
         $this->assertTrue($this->dispatcher->hasListeners(ChildEvent::class));
     }
+
+    public function testGetListenersWithEventChild()
+    {
+        $subscriber = new TestEventSubscriberWithEventFqcn();
+        $this->dispatcher->addSubscriber($subscriber);
+
+        $parent = $this->dispatcher->getListeners(ParentEvent::class);
+        $child = $this->dispatcher->getListeners(ChildEvent::class);
+
+        $expected = [[$subscriber, 'handleParentEvent']];
+        $this->assertSame($expected, $this->dispatcher->getListeners(ParentEvent::class));
+        $this->assertSame($expected, $this->dispatcher->getListeners(ChildEvent::class));
+    }
 }
 
 class CallableClass

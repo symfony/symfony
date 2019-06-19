@@ -13,11 +13,13 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Http\Api;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SmtpEnvelope;
 use Symfony\Component\Mailer\Transport\Http\Api\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -58,7 +60,12 @@ class MailgunTransport extends AbstractApiTransport
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
+
+            try {
+                $error = $response->toArray(false);
+            } catch (DecodingExceptionInterface $e) {
+                throw new TransportException(sprintf('Unable to send an email (code %s).', $response->getStatusCode()));
+            }
 
             throw new TransportException(sprintf('Unable to send an email: %s (code %s).', $error['message'], $response->getStatusCode()));
         }

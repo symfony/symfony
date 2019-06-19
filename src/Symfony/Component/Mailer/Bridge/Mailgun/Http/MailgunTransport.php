@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Http\AbstractHttpTransport;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -59,7 +60,12 @@ class MailgunTransport extends AbstractHttpTransport
         ]);
 
         if (200 !== $response->getStatusCode()) {
-            $error = $response->toArray(false);
+
+            try {
+                $error = $response->toArray(false);
+            } catch (DecodingExceptionInterface $e) {
+                throw new TransportException(sprintf('Unable to send an email (code %s).', $response->getStatusCode()));
+            }
 
             throw new TransportException(sprintf('Unable to send an email: %s (code %s).', $error['message'], $response->getStatusCode()));
         }

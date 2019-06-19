@@ -49,6 +49,11 @@ class PropertyInfoLoaderEntity
 
     public $readOnly;
 
+    /**
+     * @Assert\DisableAutoMapping
+     */
+    public $noAutoMapping;
+
     public function setNonExistentField()
     {
     }

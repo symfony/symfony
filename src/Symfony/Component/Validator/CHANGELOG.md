@@ -4,6 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
+ * added `EnableAutoMapping` and `DisableAutoMapping` constraints to enable or disable auto mapping for class or a property 
  * using anything else than a `string` as the code of a `ConstraintViolation` is deprecated, a `string` type-hint will
    be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
    method in 5.0

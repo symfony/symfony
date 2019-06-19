@@ -117,13 +117,22 @@ class Filesystem
      *
      * @return bool true if the file exists, false otherwise
      */
-    public function exists($files)
+    public function exists($files /*, $dangling = false */)
     {
+        if (\func_num_args() < 2 && __CLASS__ !== \get_class($this) && __CLASS__ !== (new \ReflectionMethod($this, __FUNCTION__))->getDeclaringClass()->getName() && !$this instanceof \PHPUnit\Framework\MockObject\MockObject && !$this instanceof \Prophecy\Prophecy\ProphecySubjectInterface) {
+            @trigger_error(sprintf('The "%s()" method will have one new "$dangling = false" argument in version 5.0, not defining it is deprecated since Symfony 4.4.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $dangling = isset(\func_get_args()[1]) ? func_get_arg(1) : false;
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
         foreach ($this->toIterable($files) as $file) {
             if (\strlen($file) > $maxPathLength) {
                 throw new IOException(sprintf('Could not check if file exist because path length exceeds %d characters.', $maxPathLength), 0, null, $file);
+            }
+
+            if ($dangling && is_link($file)) {
+                return true;
             }
 
             if (!file_exists($file)) {

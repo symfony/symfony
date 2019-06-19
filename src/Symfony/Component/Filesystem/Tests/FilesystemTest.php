@@ -375,9 +375,22 @@ class FilesystemTest extends FilesystemTestCase
         mkdir($basePath);
         touch($basePath.'file1');
         mkdir($basePath.'folder');
-
         $this->assertTrue($this->filesystem->exists($basePath.'file1'));
         $this->assertTrue($this->filesystem->exists($basePath.'folder'));
+    }
+
+    public function testDanglingExists()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Symbolink files does not work the same on windows');
+        }
+        $basePath = $this->workspace.\DIRECTORY_SEPARATOR.'directory'.\DIRECTORY_SEPARATOR;
+
+        mkdir($basePath);
+        touch($basePath.'testLink');
+        exec(sprintf('ln -s %stestLink %stestDanglingLink && rm %stestLink', $basePath, $basePath, $basePath));
+        $this->assertTrue($this->filesystem->exists($basePath.'testDanglingLink', true));
+        $this->assertFalse($this->filesystem->exists($basePath.'testDanglingLink', false));
     }
 
     /**

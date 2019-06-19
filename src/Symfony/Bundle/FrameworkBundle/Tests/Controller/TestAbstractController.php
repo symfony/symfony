@@ -167,9 +167,9 @@ class TestAbstractController extends AbstractController
         return parent::isCsrfTokenValid($id, $token);
     }
 
-    public function dispatchMessage($message): Envelope
+    public function dispatchMessage($message, array $stamps = []): Envelope
     {
-        return parent::dispatchMessage($message);
+        return parent::dispatchMessage($message, $stamps);
     }
 
     public function addLink(Request $request, Link $link): void

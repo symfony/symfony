@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
+use Http\Client\HttpClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Client\ClientInterface;
@@ -60,7 +61,6 @@ use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
-use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
@@ -1881,6 +1881,10 @@ class FrameworkExtension extends Extension
             $container->removeAlias(ClientInterface::class);
         }
 
+        if (!interface_exists(HttpClient::class)) {
+            $container->removeDefinition(HttpClient::class);
+        }
+
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
             if ('http_client' === $name) {
                 throw new InvalidArgumentException(sprintf('Invalid scope name: "%s" is reserved.', $name));
@@ -1901,9 +1905,8 @@ class FrameworkExtension extends Extension
             $container->registerAliasForArgument($name, HttpClientInterface::class);
 
             if ($hasPsr18) {
-                $container->register('psr18.'.$name, Psr18Client::class)
-                    ->setAutowired(true)
-                    ->setArguments([new Reference($name)]);
+                $container->setDefinition('psr18.'.$name, new ChildDefinition('psr18.http_client'))
+                    ->replaceArgument(0, new Reference($name));
 
                 $container->registerAliasForArgument('psr18.'.$name, ClientInterface::class, $name);
             }

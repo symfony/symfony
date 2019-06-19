@@ -453,7 +453,7 @@ class EventDispatcherTest extends TestCase
 
     public function testGetListenersWithEventInterface()
     {
-        $subscriber = new TestEventSubscriberWithInterfaceFqcn()    ;
+        $subscriber = new TestEventSubscriberWithInterfaceFqcn();
         $this->dispatcher->addSubscriber($subscriber);
 
         $expected = [[$subscriber, 'handleEventInterface']];

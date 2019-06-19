@@ -1037,7 +1037,7 @@ class Request
             $pos = strrpos($host, ':');
         }
 
-        if (false !== $pos) {
+        if (false !== $pos && !empty(substr($host, $pos + 1))) {
             return (int) substr($host, $pos + 1);
         }
 

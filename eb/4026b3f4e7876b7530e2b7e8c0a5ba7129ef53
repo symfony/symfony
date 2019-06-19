@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by dzuelke at 2019-06-18T22:22:39Z
+
+Is there anything in https://github.com/php/php-src/blob/PHP-7.4/UPGRADING that could use addressing maybe? It seems like nested ternary operators would be in some library somewhere...
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-18T22:32:57Z
+
+> This PR turns the new warning into a deprecation, so that we will be able to remove the added "if" in 5.0.
+
+Wouldn't it be enough if we don't upmerge this workaround to 4.x?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-18T22:40:37Z
+
+> It seems like nested ternary operators would be in some library somewhere...
+
+Symfony itself has quite a few. ;-) But a nested ternary should only trigger a `E_DEPRECATED` iirc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-19T06:47:53Z
+
+We can remove in 4, but there's no hurry, and new BC breaks are for 5, that's why I added this comment.

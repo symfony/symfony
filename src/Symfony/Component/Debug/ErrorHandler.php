@@ -382,6 +382,11 @@ class ErrorHandler
      */
     public function handleError($type, $message, $file, $line)
     {
+        // @deprecated to be removed in Symfony 5.0
+        if (\PHP_VERSION_ID >= 70300 && $message && '"' === $message[0] && 0 === strpos($message, '"continue') && preg_match('/^"continue(?: \d++)?" targeting switch is equivalent to "break(?: \d++)?"\. Did you mean to use "continue(?: \d++)?"\?$/', $message)) {
+            $type = E_DEPRECATED;
+        }
+
         // Level is the current error reporting level to manage silent error.
         $level = error_reporting();
         $silenced = 0 === ($level & $type);

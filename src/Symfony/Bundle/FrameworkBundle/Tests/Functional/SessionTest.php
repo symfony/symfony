@@ -71,7 +71,7 @@ class SessionTest extends WebTestCase
 
     /**
      * See if two separate insulated clients can run without
-     * polluting eachother's session data.
+     * polluting each other's session data.
      *
      * @dataProvider getConfigs
      */

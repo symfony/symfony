@@ -415,7 +415,7 @@ class EventDispatcherTest extends TestCase
 
     public function testHasListenersWithEventChild()
     {
-        $this->dispatcher->addSubscriber(new TestEventSubscriberWithEventFqcn());
+        $this->dispatcher->addSubscriber(new TestEventSubscriberWithParentEventFqcn());
         $this->assertTrue($this->dispatcher->hasListeners());
         $this->assertTrue($this->dispatcher->hasListeners(ParentEvent::class));
         $this->assertTrue($this->dispatcher->hasListeners(ChildEvent::class));
@@ -423,11 +423,8 @@ class EventDispatcherTest extends TestCase
 
     public function testGetListenersWithEventChild()
     {
-        $subscriber = new TestEventSubscriberWithEventFqcn();
+        $subscriber = new TestEventSubscriberWithParentEventFqcn();
         $this->dispatcher->addSubscriber($subscriber);
-
-        $parent = $this->dispatcher->getListeners(ParentEvent::class);
-        $child = $this->dispatcher->getListeners(ChildEvent::class);
 
         $expected = [[$subscriber, 'handleParentEvent']];
         $this->assertSame($expected, $this->dispatcher->getListeners(ParentEvent::class));
@@ -436,13 +433,44 @@ class EventDispatcherTest extends TestCase
 
     public function testDispatchWithEventChild()
     {
-        $subscriber = new TestEventSubscriberWithEventFqcn();
+        $subscriber = new TestEventSubscriberWithParentEventFqcn();
         $this->dispatcher->addSubscriber($subscriber);
 
         $this->assertFalse($subscriber->handleParentInvoked);
 
         $this->dispatcher->dispatch(new ChildEvent());
         $this->assertTrue($subscriber->handleParentInvoked);
+    }
+
+    public function testHasListenersWithEventInterface()
+    {
+        $this->dispatcher->addSubscriber(new TestEventSubscriberWithInterfaceFqcn());
+        $this->assertTrue($this->dispatcher->hasListeners());
+        $this->assertTrue($this->dispatcher->hasListeners(EventInterface::class));
+        $this->assertTrue($this->dispatcher->hasListeners(ParentEvent::class));
+        $this->assertTrue($this->dispatcher->hasListeners(ChildEvent::class));
+    }
+
+    public function testGetListenersWithEventInterface()
+    {
+        $subscriber = new TestEventSubscriberWithInterfaceFqcn()    ;
+        $this->dispatcher->addSubscriber($subscriber);
+
+        $expected = [[$subscriber, 'handleEventInterface']];
+        $this->assertSame($expected, $this->dispatcher->getListeners(EventInterface::class));
+        $this->assertSame($expected, $this->dispatcher->getListeners(ParentEvent::class));
+        $this->assertSame($expected, $this->dispatcher->getListeners(ChildEvent::class));
+    }
+
+    public function testDispatchWithEventInterface()
+    {
+        $subscriber = new TestEventSubscriberWithInterfaceFqcn();
+        $this->dispatcher->addSubscriber($subscriber);
+
+        $this->assertFalse($subscriber->handleInterfaceInvoked);
+
+        $this->dispatcher->dispatch(new ChildEvent());
+        $this->assertTrue($subscriber->handleInterfaceInvoked);
     }
 }
 
@@ -517,7 +545,11 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
     }
 }
 
-class ParentEvent
+interface EventInterface
+{
+}
+
+class ParentEvent implements EventInterface
 {
 }
 
@@ -525,7 +557,7 @@ class ChildEvent extends ParentEvent
 {
 }
 
-class TestEventSubscriberWithEventFqcn implements EventSubscriberInterface
+class TestEventSubscriberWithParentEventFqcn implements EventSubscriberInterface
 {
     public $handleParentInvoked = false;
 
@@ -537,5 +569,20 @@ class TestEventSubscriberWithEventFqcn implements EventSubscriberInterface
     public function handleParentEvent($e)
     {
         $this->handleParentInvoked = true;
+    }
+}
+
+class TestEventSubscriberWithInterfaceFqcn implements EventSubscriberInterface
+{
+    public $handleInterfaceInvoked = false;
+
+    public static function getSubscribedEvents()
+    {
+        return [EventInterface::class => 'handleEventInterface'];
+    }
+
+    public function handleEventInterface($e)
+    {
+        $this->handleInterfaceInvoked = true;
     }
 }

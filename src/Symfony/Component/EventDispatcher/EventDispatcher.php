@@ -97,7 +97,7 @@ class EventDispatcher implements EventDispatcherInterface
                 return $listeners;
             }
 
-            $classParents = class_parents($eventName);
+            $classParents = array_merge(class_parents($eventName), class_implements($eventName));
             foreach ($classParents as $parentEvent) {
                 $this->sortListeners($parentEvent);
                 $listeners = array_merge($listeners, $this->sorted[$parentEvent] ?? []);
@@ -151,7 +151,8 @@ class EventDispatcher implements EventDispatcherInterface
             }
 
             if (class_exists($eventName)) {
-                foreach (class_parents($eventName) as $parentEvent) {
+                $classParents = array_merge(class_parents($eventName), class_implements($eventName));
+                foreach ($classParents as $parentEvent) {
                     if (!empty($this->listeners[$parentEvent])) {
                         return true;
                     }
@@ -321,7 +322,7 @@ class EventDispatcher implements EventDispatcherInterface
             return $listeners;
         }
 
-        $classParents = class_parents($eventName);
+        $classParents = array_merge(class_parents($eventName), class_implements($eventName));
         foreach ($classParents as $parentEvent) {
             if (isset($this->listeners[$parentEvent]) && !isset($this->optimized[$parentEvent])) {
                 $this->optimizeListeners($parentEvent);

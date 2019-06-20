@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  * BundleInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @method string getPublicPath() Returns relative path for public assets
  */
 interface BundleInterface extends ContainerAwareInterface
 {

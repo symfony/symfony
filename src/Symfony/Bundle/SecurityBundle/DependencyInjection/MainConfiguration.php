@@ -143,15 +143,6 @@ class MainConfiguration implements ConfigurationInterface
                             ->integerNode('port')->defaultNull()->end()
                             ->arrayNode('ips')
                                 ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
-                                ->beforeNormalization()->always()->then(function ($v) {
-                                    foreach ($v as $ip) {
-                                        if (false === $this->isValidIp($ip)) {
-                                            throw new \LogicException(sprintf('The given "%s" value in the "access_control" config option is not a valid IP address.', $ip));
-                                        }
-                                    }
-
-                                    return $v;
-                                })->end()
                                 ->prototype('scalar')->end()
                             ->end()
                             ->arrayNode('methods')
@@ -431,31 +422,5 @@ class MainConfiguration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
-    }
-
-    private function isValidIp(string $cidr): bool
-    {
-        $cidrParts = explode('/', $cidr);
-
-        if (1 === \count($cidrParts)) {
-            return false !== filter_var($cidrParts[0], FILTER_VALIDATE_IP);
-        }
-
-        $ip = $cidrParts[0];
-        $netmask = $cidrParts[1];
-
-        if (!ctype_digit($netmask)) {
-            return false;
-        }
-
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            return $netmask <= 32;
-        }
-
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            return $netmask <= 128;
-        }
-
-        return false;
     }
 }

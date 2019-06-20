@@ -1,6 +1,9 @@
 imports:
     - { resource: ./../config/default.yml }
 
+parameters:
+    env(APP_IP): '127.0.0.1'
+
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext
@@ -43,6 +46,8 @@ security:
         - { path: ^/secured-by-one-real-ip$, ips: 198.51.100.0, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secured-by-one-real-ip-with-mask$, ips: '203.0.113.0/24', roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secured-by-one-real-ipv6$, ips: 0:0:0:0:0:ffff:c633:6400, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-one-env-placeholder$, ips: '%env(APP_IP)%', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-one-env-placeholder-and-one-real-ip$, ips: ['%env(APP_IP)%', 198.51.100.0], roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
         - { path: ^/protected-via-expression$, allow_if: "(is_anonymous() and request.headers.get('user-agent') matches '/Firefox/i') or is_granted('ROLE_USER')" }
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

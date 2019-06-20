@@ -109,7 +109,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     public function testInvalidIpsInAccessControl()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The given "256.357.458.559" value in the "access_control" config option is not a valid IP address.');
+        $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
 
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
         $client->request('GET', '/unprotected_resource');

@@ -7,6 +7,7 @@ CHANGELOG
  * Implementing the `BundleInterface` without implementing the `getPublicDir()` method is deprecated.
    This method will be added to the interface in 5.0.
  * The `DebugHandlersListener` class has been marked as `final`
+ * Add support for dumping the container in one file instead of many files
 
 4.3.0
 -----
@@ -38,8 +39,8 @@ CHANGELOG
 
  * deprecated `KernelInterface::getRootDir()` and the `kernel.root_dir` parameter
  * deprecated `KernelInterface::getName()` and the `kernel.name` parameter
- * deprecated the first and second constructor argument of `ConfigDataCollector` 
- * deprecated `ConfigDataCollector::getApplicationName()` 
+ * deprecated the first and second constructor argument of `ConfigDataCollector`
+ * deprecated `ConfigDataCollector::getApplicationName()`
  * deprecated `ConfigDataCollector::getApplicationVersion()`
 
 4.1.0

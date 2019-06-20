@@ -479,6 +479,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function initializeContainer()
     {
+        $asFiles = $this->getKernelParameters()['container.dump_as_files'] ?? true;
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
@@ -488,6 +489,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             $fresh = $oldContainer = false;
             try {
+                if (!$asFiles) {
+                    require_once $cache->getPath();
+                    $this->container = new $class();
+                    $this->container->set('kernel', $this);
+
+                    return;
+                }
                 if (file_exists($cache->getPath()) && \is_object($this->container = include $cache->getPath())) {
                     $this->container->set('kernel', $this);
                     $oldContainer = $this->container;
@@ -557,7 +565,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             }
         }
 
-        if (null === $oldContainer && file_exists($cache->getPath())) {
+        if ($asFiles && null === $oldContainer && file_exists($cache->getPath())) {
             $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             try {
                 $oldContainer = include $cache->getPath();
@@ -569,7 +577,12 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $oldContainer = \is_object($oldContainer) ? new \ReflectionClass($oldContainer) : false;
 
         $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-        $this->container = require $cache->getPath();
+        if ($asFiles) {
+            $this->container = require $cache->getPath();
+        } else {
+            require $cache->getPath();
+            $this->container = new $class();
+        }
         $this->container->set('kernel', $this);
 
         if ($oldContainer && \get_class($this->container) !== $oldContainer->name) {
@@ -731,26 +744,32 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
+        $asFiles = $container->hasParameter('container.dump_as_files') ? $container->getParameter('container.dump_as_files') : true;
+
         $content = $dumper->dump([
             'class' => $class,
             'base_class' => $baseClass,
             'file' => $cache->getPath(),
-            'as_files' => true,
+            'as_files' => $asFiles,
             'debug' => $this->debug,
             'build_time' => $container->hasParameter('kernel.container_build_time') ? $container->getParameter('kernel.container_build_time') : time(),
         ]);
 
-        $rootCode = array_pop($content);
-        $dir = \dirname($cache->getPath()).'/';
-        $fs = new Filesystem();
+        if ($asFiles) {
+            $rootCode = array_pop($content);
+            $dir = \dirname($cache->getPath()).'/';
+            $fs = new Filesystem();
 
-        foreach ($content as $file => $code) {
-            $fs->dumpFile($dir.$file, $code);
-            @chmod($dir.$file, 0666 & ~umask());
-        }
-        $legacyFile = \dirname($dir.$file).'.legacy';
-        if (file_exists($legacyFile)) {
-            @unlink($legacyFile);
+            foreach ($content as $file => $code) {
+                $fs->dumpFile($dir.$file, $code);
+                @chmod($dir.$file, 0666 & ~umask());
+            }
+            $legacyFile = \dirname($dir.$file).'.legacy';
+            if (file_exists($legacyFile)) {
+                @unlink($legacyFile);
+            }
+        } else {
+            $rootCode = $content;
         }
 
         $cache->write($rootCode, $container->getResources());

@@ -103,6 +103,18 @@ class KernelTest extends TestCase
         $this->assertFileNotExists($legacyContainerDir.'.legacy');
     }
 
+    public function testKernelWithOneFileContainer()
+    {
+        $kernel = new KernelWithOneFileContainer('dev', true);
+        $kernel->boot();
+
+        $this->assertNotNull($kernel->getContainer());
+
+        $kernel->shutdown();
+        $kernel->boot();
+        $this->assertNotNull($kernel->getContainer());
+    }
+
     public function testBootInitializesBundlesAndContainer()
     {
         $kernel = $this->getKernel(['initializeBundles', 'initializeContainer']);
@@ -773,5 +785,31 @@ class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->setParameter('test.processed', true);
+    }
+}
+
+class KernelWithOneFileContainer extends Kernel
+{
+    public function registerBundles()
+    {
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    public function getProjectDir()
+    {
+        return __DIR__.'/Fixtures';
+    }
+
+    protected function getKernelParameters()
+    {
+        return array_merge(parent::getKernelParameters(), [
+            'container.build_id' => 'static',
+            'container.build_hash' => 'static',
+            'container.dump_as_files' => false,
+        ]);
     }
 }

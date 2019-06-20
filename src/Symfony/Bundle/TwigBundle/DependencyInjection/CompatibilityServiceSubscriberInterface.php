@@ -12,9 +12,20 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface as LegacyServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 if (interface_exists(LegacyServiceSubscriberInterface::class)) {
-    require __DIR__.\DIRECTORY_SEPARATOR.'CompatibilityServiceSubscriberInterface.legacy.php';
+    /**
+     * @internal
+     */
+    interface CompatibilityServiceSubscriberInterface extends LegacyServiceSubscriberInterface
+    {
+    }
 } else {
-    require __DIR__.\DIRECTORY_SEPARATOR.'CompatibilityServiceSubscriberInterface.contracts.php';
+    /**
+     * @internal
+     */
+    interface CompatibilityServiceSubscriberInterface extends ServiceSubscriberInterface
+    {
+    }
 }

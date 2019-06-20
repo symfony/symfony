@@ -19,4 +19,4 @@ security:
 
     access_control:
         # the '256.357.458.559' IP is wrong on purpose, to check invalid IP errors
-        - { path: ^/unprotected_resource$, ips: [1.1.1.1, 256.357.458.559], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/unprotected_resource$, ips: [1.1.1.1, '%env(APP_IP)%', 256.357.458.559], roles: IS_AUTHENTICATED_ANONYMOUSLY }

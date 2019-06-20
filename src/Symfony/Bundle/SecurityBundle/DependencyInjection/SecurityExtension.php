@@ -731,20 +731,32 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createRequestMatcher($container, $path = null, $host = null, int $port = null, $methods = [], $ip = null, array $attributes = [])
+    private function createRequestMatcher(ContainerBuilder $container, $path = null, $host = null, int $port = null, $methods = [], array $ips = null, array $attributes = [])
     {
         if ($methods) {
             $methods = array_map('strtoupper', (array) $methods);
         }
 
-        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ip, $attributes]);
+        if (null !== $ips) {
+            foreach ($ips as $ip) {
+                $container->resolveEnvPlaceholders($ip, null, $usedEnvs);
+
+                if (!$usedEnvs && !$this->isValidIp($ip)) {
+                    throw new \LogicException(sprintf('The given value "%s" in the "security.access_control" config option is not a valid IP address.', $ip));
+                }
+
+                $usedEnvs = null;
+            }
+        }
+
+        $id = '.security.request_matcher.'.ContainerBuilder::hash([$path, $host, $port, $methods, $ips, $attributes]);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
         }
 
         // only add arguments that are necessary
-        $arguments = [$path, $host, $methods, $ip, $attributes, null, $port];
+        $arguments = [$path, $host, $methods, $ips, $attributes, null, $port];
         while (\count($arguments) > 0 && !end($arguments)) {
             array_pop($arguments);
         }
@@ -787,5 +799,31 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
     {
         // first assemble the factories
         return new MainConfiguration($this->factories, $this->userProviderFactories);
+    }
+
+    private function isValidIp(string $cidr): bool
+    {
+        $cidrParts = explode('/', $cidr);
+
+        if (1 === \count($cidrParts)) {
+            return false !== filter_var($cidrParts[0], FILTER_VALIDATE_IP);
+        }
+
+        $ip = $cidrParts[0];
+        $netmask = $cidrParts[1];
+
+        if (!ctype_digit($netmask)) {
+            return false;
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $netmask <= 32;
+        }
+
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return $netmask <= 128;
+        }
+
+        return false;
     }
 }

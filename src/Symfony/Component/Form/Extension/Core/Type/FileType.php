@@ -159,7 +159,7 @@ class FileType extends AbstractType
         }
 
         if (null !== $this->translator) {
-            $message = $this->translator->trans($messageTemplate, $messageParameters);
+            $message = $this->translator->trans($messageTemplate, $messageParameters, 'validators');
         } else {
             $message = strtr($messageTemplate, $messageParameters);
         }

@@ -93,6 +93,7 @@ HttpFoundation
 --------------
 
  * `ApacheRequest` is deprecated, use `Request` class instead.
+ * Passing a third argument to `HeaderBag::get()` is deprecated since Symfony 4.4, use method `all()` instead
 
 HttpKernel
 ----------

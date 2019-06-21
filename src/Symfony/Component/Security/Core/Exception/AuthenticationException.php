@@ -26,7 +26,7 @@ class AuthenticationException extends RuntimeException implements \Serializable
     /**
      * Get the token.
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
      */
     public function getToken()
     {

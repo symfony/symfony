@@ -4,6 +4,7 @@ CHANGELOG
 5.0.0
 -----
 
+ * an `ExpressionLanguage` instance or null must be passed as the first argument of `ExpressionValidator::__construct()`
  * removed the `checkDNS` and `dnsMessage` options of the `Url` constraint
  * removed the `checkMX`, `checkHost` and `strict` options of the `Email` constraint
  * removed support for validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`

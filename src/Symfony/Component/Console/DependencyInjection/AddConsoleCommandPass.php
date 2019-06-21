@@ -86,13 +86,6 @@ class AddConsoleCommandPass implements CompilerPassInterface
             if ($aliases) {
                 $definition->addMethodCall('setAliases', [$aliases]);
             }
-
-            $storeDefinition = 'lock.default.store';
-            if ($container->hasDefinition($storeDefinition)) {
-                if (\method_exists($definition->getClass(), 'setStore')) {
-                    $definition->addMethodCall('setStore', [$container->getDefinition($storeDefinition)]);
-                }
-            }
         }
 
         $container

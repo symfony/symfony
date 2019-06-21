@@ -26,7 +26,7 @@ class AuthenticationException extends RuntimeException
     /**
      * Get the token.
      *
-     * @return TokenInterface
+     * @return TokenInterface|null
      */
     public function getToken()
     {

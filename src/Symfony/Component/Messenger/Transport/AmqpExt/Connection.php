@@ -430,6 +430,7 @@ class Connection
         $this->amqpChannel = null;
         $this->amqpQueues = [];
         $this->amqpExchange = null;
+        $this->amqpDelayExchange = null;
     }
 
     private function shouldSetup(): bool

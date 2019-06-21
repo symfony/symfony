@@ -1,11 +1,6 @@
 UPGRADE FROM 4.3 to 4.4
 =======================
 
-HttpKernel
-----------
-
- * The `DebugHandlersListener` class has been marked as `final`
-
 DependencyInjection
 -------------------
 
@@ -46,29 +41,30 @@ DependencyInjection
        arguments: [!tagged_iterator app.handler]
    ```
 
+FrameworkBundle
+---------------
+
+ * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
+ * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
+   has been deprecated.
+ * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`.
+ * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
+
 HttpClient
 ----------
 
  * Added method `cancel()` to `ResponseInterface`
 
-FrameworkBundle
----------------
+HttpKernel
+----------
 
- * The `$parser` argument of `ControllerResolver::__construct()` and `DelegatingLoader::__construct()`
-   has been deprecated.
- * The `ControllerResolver` and `DelegatingLoader` classes have been marked as `final`.
- * The `controller_name_converter` and `resolve_controller_name_subscriber` services have been deprecated.
+ * The `DebugHandlersListener` class has been marked as `final`
 
 Messenger
 ---------
 
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
-
-FrameworkBundle
----------------
-
- * Deprecated support for `templating` engine in `TemplateController`, use Twig instead
 
 MonologBridge
 --------------

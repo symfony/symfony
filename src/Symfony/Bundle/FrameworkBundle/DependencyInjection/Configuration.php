@@ -949,6 +949,8 @@ class Configuration implements ConfigurationInterface
                     ->info('Property access configuration')
                     ->children()
                         ->booleanNode('magic_call')->defaultFalse()->end()
+                        ->booleanNode('magic_get')->defaultTrue()->end()
+                        ->booleanNode('magic_set')->defaultTrue()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_property_path')->defaultTrue()->end()
                     ->end()

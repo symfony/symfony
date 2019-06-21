@@ -415,6 +415,8 @@ class ConfigurationTest extends TestCase
             ],
             'property_access' => [
                 'magic_call' => false,
+                'magic_get' => true,
+                'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
             ],

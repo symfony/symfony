@@ -51,6 +51,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     public const ALLOW_PROTECTED = 2;
     public const ALLOW_PUBLIC = 4;
 
+    /** @var int Allow none of the magic methods */
+    public const DISALLOW_MAGIC_METHODS = 0;
+    /** @var int Allow magic __get methods */
+    public const ALLOW_MAGIC_GET = 1 << 0;
+    /** @var int Allow magic __set methods */
+    public const ALLOW_MAGIC_SET = 1 << 1;
+    /** @var int Allow magic __call methods */
+    public const ALLOW_MAGIC_CALL = 1 << 2;
+
     private const MAP_TYPES = [
         'integer' => Type::BUILTIN_TYPE_INT,
         'boolean' => Type::BUILTIN_TYPE_BOOL,
@@ -62,6 +71,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $arrayMutatorPrefixes;
     private $enableConstructorExtraction;
     private $methodReflectionFlags;
+    private $magicMethodsFlags;
     private $propertyReflectionFlags;
     private $inflector;
 
@@ -73,7 +83,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null)
+    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true, int $accessFlags = self::ALLOW_PUBLIC, InflectorInterface $inflector = null, int $magicMethodsFlags = self::ALLOW_MAGIC_GET | self::ALLOW_MAGIC_SET)
     {
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
@@ -81,6 +91,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->enableConstructorExtraction = $enableConstructorExtraction;
         $this->methodReflectionFlags = $this->getMethodsFlags($accessFlags);
         $this->propertyReflectionFlags = $this->getPropertyFlags($accessFlags);
+        $this->magicMethodsFlags = $magicMethodsFlags;
         $this->inflector = $inflector ?? new EnglishInflector();
 
         $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
@@ -230,7 +241,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
-        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
+        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
+        $allowMagicGet = (bool) ($magicMethods & self::ALLOW_MAGIC_GET);
+
+        if (isset($context['enable_magic_call_extraction'])) {
+            trigger_deprecation('symfony/property-info', '5.2', 'Using the "enable_magic_call_extraction" context option in "%s()" is deprecated. Use "enable_magic_methods_extraction" instead.', __METHOD__);
+
+            $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        }
 
         $hasProperty = $reflClass->hasProperty($property);
         $camelProp = $this->camelize($property);
@@ -258,7 +277,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisiblityForProperty($reflProperty), $reflProperty->isStatic(), true);
         }
 
-        if ($reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
+        if ($allowMagicGet && $reflClass->hasMethod('__get') && ($reflClass->getMethod('__get')->getModifiers() & $this->methodReflectionFlags)) {
             return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
         }
 
@@ -281,7 +300,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
-        $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
+        $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
+        $allowMagicSet = (bool) ($magicMethods & self::ALLOW_MAGIC_SET);
+
+        if (isset($context['enable_magic_call_extraction'])) {
+            trigger_deprecation('symfony/property-info', '5.2', 'Using the "enable_magic_call_extraction" context option in "%s()" is deprecated. Use "enable_magic_methods_extraction" instead.', __METHOD__);
+
+            $allowMagicCall = $context['enable_magic_call_extraction'] ?? false;
+        }
+
         $allowConstruct = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
         $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
 
@@ -347,12 +375,14 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisiblityForProperty($reflProperty), $reflProperty->isStatic());
         }
 
-        [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
-        if ($accessible) {
-            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
-        }
+        if ($allowMagicSet) {
+            [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
+            if ($accessible) {
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+            }
 
-        $errors = array_merge($errors, $methodAccessibleErrors);
+            $errors = array_merge($errors, $methodAccessibleErrors);
+        }
 
         if ($allowMagicCall) {
             [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__call', 2);

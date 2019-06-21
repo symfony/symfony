@@ -17,6 +17,17 @@ Mime
 
  * Deprecated `Address::fromString()`, use `Address::create()` instead
 
+PropertyAccess
+--------------
+
+ * Deprecated passing a boolean as the first argument of `PropertyAccessor::__construct()`.
+   Pass a combination of bitwise flags instead.
+
+PropertyInfo
+------------
+
+ * Dropped the `enable_magic_call_extraction` context option in `ReflectionExtractor::getWriteInfo()` and `ReflectionExtractor::getReadInfo()` in favor of `enable_magic_methods_extraction`.
+
 TwigBundle
 ----------
 

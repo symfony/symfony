@@ -81,8 +81,6 @@ trait LockableTrait
 
     /**
      * Sets the internal store for the command to be used.
-     *
-     * @param StoreInterface $store
      */
     public function setStore(StoreInterface $store)
     {

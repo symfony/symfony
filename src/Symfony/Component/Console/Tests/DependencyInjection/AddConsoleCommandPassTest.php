@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -247,34 +246,6 @@ class AddConsoleCommandPassTest extends TestCase
 
         $container->compile();
     }
-
-    public function testProcessRegistersStoreInCommand()
-    {
-        $storeClassName = 'Symfony\Component\Lock\StoreInterface';
-
-        $container = new ContainerBuilder();
-        $container
-            ->register('lock.default.store', $this->createMock($storeClassName))
-            ->setPublic(false)
-        ;
-        $container
-            ->register('lockable.command', LockableCommand::class)
-            ->setPublic(false)
-            ->addTag('console.command', ['command' => 'lockable'])
-        ;
-
-        $pass = new AddConsoleCommandPass();
-        $pass->process($container);
-
-        $command = $container->get('lockable.command');
-        $this->assertInstanceOf(LockableCommand::class, $command);
-
-        $reflection = new \ReflectionClass($command);
-        $property = $reflection->getProperty('store');
-        $property->setAccessible(true);
-        $store = $property->getValue($command);
-        $this->assertInstanceOf($storeClassName, $store);
-    }
 }
 
 class MyCommand extends Command
@@ -284,9 +255,4 @@ class MyCommand extends Command
 class NamedCommand extends Command
 {
     protected static $defaultName = 'default';
-}
-
-class LockableCommand extends Command
-{
-    use LockableTrait;
 }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2019-06-21T07:08:47Z
+
+Shouldn't we trigger a deprecation here so users actually uses string instead of floats in their entities?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-21T08:45:51Z
+
+I have updated the code a bit. The changes made for the `StringToFloatTransformer` have been reverted. Instead the `NumberType` takes care of the type cast.
+
+This allows us to deprecate the behaviour with a better message in 4.4 as suggested in https://github.com/symfony/symfony/pull/32125#issuecomment-504317999 and we do not need to weaken the `StringToFloatTransformer`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-21T10:26:33Z
+
+@fancyweb see #32130

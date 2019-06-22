@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-18T03:28:38Z
+
+Isn't the better fix to mark the stamp as `NonSendableStampInterface` like I did in https://github.com/symfony/symfony/pull/32078/files#diff-b7c2047b729d043126dd65bd3e85d157R23 ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-18T03:33:52Z
+
+I guess we can do both.

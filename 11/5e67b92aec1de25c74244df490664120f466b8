@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-20T06:29:34Z
+
+Not a big fan of having HttpPlug code in FWB. It should be in a bridge/bundle, but not in the framework which is only about our code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-20T07:01:10Z
+
+I removed the named autowiring aliases because they make no sense actually - nobody should code against HTTPlug anymore.
+But since many libs still consume HTTPlug, and since we provide an HttplugClient to ease moving the ecosystem forward, it makes sense to me to have the generic autowiring alias.
+
+I considered moving this to a recipe, but it would need two packages to be applicable (php-http/httplug and symfony/http-client), so that we cannot have one that fits both conditions. Creating a pack would make no sense since the goal of HTTPlug its to fade out now that PSR18 is released.
+
+Moving HttplugClient to the php-http org is possible.
+But yet another package :(
+While a few lines here make everything so much simpler...

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
 4.3.0
 -----
 

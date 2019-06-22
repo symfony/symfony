@@ -48,7 +48,7 @@
         "symfony/security-http": "~3.4|~4.0",
         "symfony/serializer": "^4.3",
         "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/translation": "~4.2",
+        "symfony/translation": "~4.3",
         "symfony/templating": "~3.4|~4.0",
         "symfony/twig-bundle": "~2.8|~3.2|~4.0",
         "symfony/validator": "^4.1",

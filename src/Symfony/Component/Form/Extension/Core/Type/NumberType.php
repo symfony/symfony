@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
@@ -37,6 +38,14 @@ class NumberType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
+            $builder->addModelTransformer(new CallbackTransformer(
+                function ($value) {
+                    return \is_float($value) || \is_int($value) ? (string) $value : $value;
+                },
+                function ($value) {
+                    return $value;
+                }
+            ));
         }
     }
 

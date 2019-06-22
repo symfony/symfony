@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-06-21T09:24:49Z
+
+~Hmm, it should be fixed in 3.4 actually.~
+
+---------------------------------------------------------------------------
+
+by Lctrs at 2019-06-21T09:29:38Z
+
+`Symfony\Component\Validator\Exception\LogicException` has been introduced in `4.2`.

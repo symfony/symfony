@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-23T09:34:26Z
+
+The fix from #32138 only applies for the `4.3` branch, but I think we should harden the test suite for older branches too.

@@ -289,7 +289,19 @@ final class CurlResponse implements ResponseInterface
             // Regular header line: add it to the list
             self::addResponseHeaders([substr($data, 0, -2)], $info, $headers);
 
-            if (0 === strpos($data, 'HTTP') && 300 <= $info['http_code'] && $info['http_code'] < 400) {
+            if (0 !== strpos($data, 'HTTP/')) {
+                if (0 === stripos($data, 'Location:')) {
+                    $location = trim(substr($data, 9, -2));
+                }
+
+                return \strlen($data);
+            }
+
+            if (\function_exists('openssl_x509_read') && $certinfo = curl_getinfo($ch, CURLINFO_CERTINFO)) {
+                $info['peer_certificate_chain'] = array_map('openssl_x509_read', array_column($certinfo, 'Cert'));
+            }
+
+            if (300 <= $info['http_code'] && $info['http_code'] < 400) {
                 if (curl_getinfo($ch, CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
                     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
                 } elseif (303 === $info['http_code'] || ('POST' === $info['http_method'] && \in_array($info['http_code'], [301, 302], true))) {
@@ -298,15 +310,14 @@ final class CurlResponse implements ResponseInterface
                 }
             }
 
-            if (0 === stripos($data, 'Location:')) {
-                $location = trim(substr($data, 9, -2));
-            }
-
             return \strlen($data);
         }
 
         // End of headers: handle redirects and add to the activity list
-        $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        if (200 > $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE)) {
+            return \strlen($data);
+        }
+
         $info['redirect_url'] = null;
 
         if (300 <= $statusCode && $statusCode < 400 && null !== $location) {
@@ -334,10 +345,6 @@ final class CurlResponse implements ResponseInterface
 
             if ('destruct' === $waitFor) {
                 return 0;
-            }
-
-            if (\function_exists('openssl_x509_read') && $certinfo = curl_getinfo($ch, CURLINFO_CERTINFO)) {
-                $info['peer_certificate_chain'] = array_map('openssl_x509_read', array_column($certinfo, 'Cert'));
             }
 
             curl_setopt($ch, CURLOPT_PRIVATE, 'content');

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-11T15:29:20Z
+
+> I have not added type for methods with @inheritdoc annotation, should I?
+
+yes please if possible
+
+> Don't we want to type also functions without @return annotation? (still in final classes)
+
+yes, when possible too (i.e. only one type is returned)
+
+> If yes is the answer of the previous one, do we also want the void return type?
+
+I don't think void provides much benefit so I would suggest to not added, that will save us from some merge conflicts.
+
+> I have also added the return type in the DependencyInjection PhpDumper, but is it also wanted?
+
+At least not in this PR to me, see my comment on it.
+
+> Should we update the documentation's code samples when they display final classes?
+
+sure

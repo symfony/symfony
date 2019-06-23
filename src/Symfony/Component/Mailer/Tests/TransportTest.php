@@ -71,11 +71,18 @@ class TransportTest extends TestCase
         Transport::fromDsn('some://');
     }
 
+    public function testNoScheme()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "//sendmail" mailer DSN must contain a transport scheme.');
+        Transport::fromDsn('//sendmail');
+    }
+
     public function testFromInvalidDsnNoHost()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "?!" mailer DSN must contain a mailer name.');
-        Transport::fromDsn('?!');
+        $this->expectExceptionMessage('The "file:///some/path" mailer DSN must contain a mailer name.');
+        Transport::fromDsn('file:///some/path');
     }
 
     public function testFromInvalidTransportName()

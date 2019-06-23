@@ -113,10 +113,8 @@ class LogoutListener
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to logout requests where
      * certain parameters is present.
-     *
-     * @return bool
      */
-    protected function requiresLogout(Request $request)
+    protected function requiresLogout(Request $request): bool
     {
         return isset($this->options['logout_path']) && $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
     }

@@ -384,8 +384,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param bool|string $trackContents Whether to track contents of the given resource. If a string is passed,
      *                                   it will be used as pattern for tracking contents of the requested directory
      *
-     * @return bool
-     *
      * @final
      */
     public function fileExists(string $path, $trackContents = true): bool

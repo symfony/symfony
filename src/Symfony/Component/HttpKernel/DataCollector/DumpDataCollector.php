@@ -148,7 +148,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     /**
      * @internal
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         if (!$this->dataCount) {
             $this->data = [];
@@ -180,12 +180,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         self::__construct($this->stopwatch, $fileLinkFormat, $charset);
     }
 
-    public function getDumpsCount()
+    public function getDumpsCount(): int
     {
         return $this->dataCount;
     }
 
-    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1)
+    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1): array
     {
         $data = fopen('php://memory', 'r+b');
 
@@ -212,7 +212,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $dumps;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'dump';
     }

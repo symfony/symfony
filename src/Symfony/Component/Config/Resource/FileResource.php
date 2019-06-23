@@ -44,7 +44,7 @@ class FileResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
@@ -52,7 +52,7 @@ class FileResource implements SelfCheckingResourceInterface
     /**
      * @return string The canonicalized, absolute path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -60,7 +60,7 @@ class FileResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh(int $timestamp)
+    public function isFresh(int $timestamp): bool
     {
         return false !== ($filemtime = @filemtime($this->resource)) && $filemtime <= $timestamp;
     }

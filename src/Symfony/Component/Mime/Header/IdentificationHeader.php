@@ -46,10 +46,7 @@ final class IdentificationHeader extends AbstractHeader
         $this->setId($body);
     }
 
-    /**
-     * @return array
-     */
-    public function getBody()
+    public function getBody(): array
     {
         return $this->getIds();
     }

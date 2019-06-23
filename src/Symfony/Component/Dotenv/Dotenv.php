@@ -211,7 +211,7 @@ final class Dotenv
         }
     }
 
-    private function lexVarname()
+    private function lexVarname(): string
     {
         // var name + optional export
         if (!preg_match('/(export[ \t]++)?('.self::VARNAME_REGEX.')/A', $this->data, $matches, 0, $this->cursor)) {
@@ -239,7 +239,7 @@ final class Dotenv
         return $matches[2];
     }
 
-    private function lexValue()
+    private function lexValue(): string
     {
         if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, 0, $this->cursor)) {
             $this->moveCursor($matches[0]);
@@ -334,7 +334,7 @@ final class Dotenv
         return $v;
     }
 
-    private function lexNestedExpression()
+    private function lexNestedExpression(): string
     {
         ++$this->cursor;
         $value = '';
@@ -467,7 +467,7 @@ final class Dotenv
         $this->lineno += substr_count($text, "\n");
     }
 
-    private function createFormatException($message)
+    private function createFormatException($message): FormatException
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
     }

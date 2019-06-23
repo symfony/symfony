@@ -46,7 +46,7 @@ class Caster
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject($obj, $class, $hasDebugInfo = false)
+    public static function castObject($obj, $class, $hasDebugInfo = false): array
     {
         $a = $obj instanceof \Closure ? [] : (array) $obj;
 
@@ -110,7 +110,7 @@ class Caster
      *
      * @return array The filtered array
      */
-    public static function filter(array $a, $filter, array $listedProperties = [], &$count = 0)
+    public static function filter(array $a, $filter, array $listedProperties = [], &$count = 0): array
     {
         $count = 0;
 
@@ -151,12 +151,13 @@ class Caster
         return $a;
     }
 
-    public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, $isNested)
+    public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, $isNested): array
     {
         if (isset($a['__PHP_Incomplete_Class_Name'])) {
             $stub->class .= '('.$a['__PHP_Incomplete_Class_Name'].')';
             unset($a['__PHP_Incomplete_Class_Name']);
         }
+
 
         return $a;
     }

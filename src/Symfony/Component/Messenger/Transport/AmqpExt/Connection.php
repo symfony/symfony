@@ -274,7 +274,7 @@ class Connection
      * which is the original exchange, resulting on it being put back into
      * the original queue.
      */
-    private function createDelayQueue(int $delay, ?string $routingKey)
+    private function createDelayQueue(int $delay, ?string $routingKey): \AMQPQueue
     {
         $queue = $this->amqpFactory->createQueue($this->channel());
         $queue->setName(str_replace(

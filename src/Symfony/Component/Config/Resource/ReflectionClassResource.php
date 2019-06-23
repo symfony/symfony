@@ -38,7 +38,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh(int $timestamp)
+    public function isFresh(int $timestamp): bool
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
@@ -58,7 +58,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return true;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return 'reflection.'.$this->className;
     }

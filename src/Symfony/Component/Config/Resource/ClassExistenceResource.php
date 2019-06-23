@@ -43,7 +43,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->resource;
     }
@@ -51,7 +51,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -61,7 +61,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
      *
      * @throws \ReflectionException when a parent class/interface/trait is not found
      */
-    public function isFresh(int $timestamp)
+    public function isFresh(int $timestamp): bool
     {
         $loaded = class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
 

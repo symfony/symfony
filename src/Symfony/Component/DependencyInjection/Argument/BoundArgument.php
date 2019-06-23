@@ -43,7 +43,7 @@ final class BoundArgument implements ArgumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getValues()
+    public function getValues(): array
     {
         return [$this->value, $this->identifier, $this->used, $this->type, $this->file];
     }

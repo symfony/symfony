@@ -57,7 +57,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
      *
      * @return bool always true
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
@@ -65,7 +65,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'router' => RouterInterface::class,

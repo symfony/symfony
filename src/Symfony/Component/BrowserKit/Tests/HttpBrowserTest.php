@@ -59,7 +59,7 @@ class TestHttpClient extends HttpBrowser
         return $response;
     }
 
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         $response = parent::doRequest($request);
 

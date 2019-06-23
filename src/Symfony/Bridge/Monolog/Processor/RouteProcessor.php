@@ -35,7 +35,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         $this->reset();
     }
 
-    public function __invoke(array $records)
+    public function __invoke(array $records): array
     {
         if ($this->routeData && !isset($records['extra']['requests'])) {
             $records['extra']['requests'] = array_values($this->routeData);
@@ -78,7 +78,7 @@ class RouteProcessor implements EventSubscriberInterface, ResetInterface
         unset($this->routeData[$requestId]);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['addRouteData', 1],

@@ -94,7 +94,7 @@ class ExceptionListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::EXCEPTION => [
@@ -126,10 +126,8 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @param \Exception $exception The thrown exception
      * @param Request    $request   The original request
-     *
-     * @return Request The cloned request
      */
-    protected function duplicateRequest(\Exception $exception, Request $request)
+    protected function duplicateRequest(\Exception $exception, Request $request): Request
     {
         $attributes = [
             '_controller' => $this->controller,

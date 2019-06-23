@@ -258,7 +258,7 @@ EOT
         return self::METHOD_COPY;
     }
 
-    private function getPublicDirectory(ContainerInterface $container)
+    private function getPublicDirectory(ContainerInterface $container): string
     {
         $defaultPublicDir = 'public';
 

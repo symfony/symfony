@@ -37,7 +37,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -53,7 +53,7 @@ final class CacheItem implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function isHit()
+    public function isHit(): bool
     {
         return $this->isHit;
     }
@@ -145,11 +145,9 @@ final class CacheItem implements ItemInterface
      *
      * @param string $key The key to validate
      *
-     * @return string
-     *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key)
+    public static function validateKey($key): string
     {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', \is_object($key) ? \get_class($key) : \gettype($key)));

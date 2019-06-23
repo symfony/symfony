@@ -26,7 +26,7 @@ trait DecorateTrait
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    final public function decorate($id, $renamedId = null, $priority = 0)
+    final public function decorate($id, $renamedId = null, $priority = 0): object
     {
         $this->definition->setDecoratedService($id, $renamedId, $priority);
 

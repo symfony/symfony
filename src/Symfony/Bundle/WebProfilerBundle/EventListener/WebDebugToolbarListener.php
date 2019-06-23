@@ -55,7 +55,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->cspHandler = $cspHandler;
     }
 
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return self::DISABLED !== $this->mode;
     }
@@ -136,7 +136,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::RESPONSE => ['onKernelResponse', -128],

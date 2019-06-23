@@ -46,7 +46,7 @@ final class MethodMarkingStore implements MarkingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function getMarking($subject)
+    public function getMarking($subject): Marking
     {
         $method = 'get'.ucfirst($this->property);
 

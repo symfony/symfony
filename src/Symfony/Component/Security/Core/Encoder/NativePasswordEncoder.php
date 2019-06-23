@@ -78,7 +78,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     /**
      * {@inheritdoc}
      */
-    public function isPasswordValid($encoded, $raw, $salt)
+    public function isPasswordValid($encoded, $raw, $salt): bool
     {
         if (72 < \strlen($raw) && 0 === strpos($encoded, '$2')) {
             // BCrypt encodes only the first 72 chars

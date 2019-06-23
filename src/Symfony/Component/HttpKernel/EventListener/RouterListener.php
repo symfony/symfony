@@ -157,7 +157,7 @@ class RouterListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [['onKernelRequest', 32]],
@@ -166,7 +166,7 @@ class RouterListener implements EventSubscriberInterface
         ];
     }
 
-    private function createWelcomeResponse()
+    private function createWelcomeResponse(): Response
     {
         $version = Kernel::VERSION;
         $baseDir = realpath($this->projectDir).\DIRECTORY_SEPARATOR;

@@ -93,7 +93,7 @@ class RoutingExtension extends AbstractExtension
      *
      * @final
      */
-    public function isUrlGenerationSafe(Node $argsNode)
+    public function isUrlGenerationSafe(Node $argsNode): array
     {
         // support named arguments
         $paramsNode = $argsNode->hasNode('parameters') ? $argsNode->getNode('parameters') : (

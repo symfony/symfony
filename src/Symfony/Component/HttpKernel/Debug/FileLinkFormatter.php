@@ -76,7 +76,7 @@ class FileLinkFormatter
     /**
      * @internal
      */
-    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString)
+    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString): ?string
     {
         try {
             return $router->generate($routeName).$queryString;

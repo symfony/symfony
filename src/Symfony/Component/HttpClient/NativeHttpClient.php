@@ -402,7 +402,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         };
     }
 
-    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy, array $noProxy)
+    private static function configureHeadersAndProxy($context, string $host, array $requestHeaders, ?array $proxy, array $noProxy): bool
     {
         if (null === $proxy) {
             return stream_context_set_option($context, 'http', 'header', $requestHeaders);

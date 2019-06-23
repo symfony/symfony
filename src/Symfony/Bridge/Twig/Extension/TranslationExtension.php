@@ -58,7 +58,7 @@ class TranslationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('trans', [$this, 'trans']),
@@ -70,7 +70,7 @@ class TranslationExtension extends AbstractExtension
      *
      * @return AbstractTokenParser[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             // {% trans %}Symfony is great!{% endtrans %}
@@ -84,17 +84,17 @@ class TranslationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getNodeVisitors()
+    public function getNodeVisitors(): array
     {
         return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
     }
 
-    public function getTranslationNodeVisitor()
+    public function getTranslationNodeVisitor(): TranslationNodeVisitor
     {
         return $this->translationNodeVisitor ?: $this->translationNodeVisitor = new TranslationNodeVisitor();
     }
 
-    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null)
+    public function trans($message, array $arguments = [], $domain = null, $locale = null, $count = null): string
     {
         if (null !== $count) {
             $arguments['%count%'] = $count;
@@ -106,7 +106,7 @@ class TranslationExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'translator';
     }

@@ -156,7 +156,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = [])
+    public function isReadable($class, $property, array $context = []): bool
     {
         if ($this->isAllowedProperty($class, $property)) {
             return true;
@@ -170,7 +170,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = [])
+    public function isWritable($class, $property, array $context = []): bool
     {
         if ($this->isAllowedProperty($class, $property)) {
             return true;
@@ -292,7 +292,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    private function extractFromDefaultValue(string $class, string $property)
+    private function extractFromDefaultValue(string $class, string $property): ?array
     {
         try {
             $reflectionClass = new \ReflectionClass($class);

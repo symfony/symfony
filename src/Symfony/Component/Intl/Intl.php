@@ -69,7 +69,7 @@ final class Intl
      *
      * @return bool Returns true if the intl extension is installed, false otherwise
      */
-    public static function isExtensionLoaded()
+    public static function isExtensionLoaded(): bool
     {
         return class_exists('\ResourceBundle');
     }
@@ -79,7 +79,7 @@ final class Intl
      *
      * @return string|null The ICU version or NULL if it could not be determined
      */
-    public static function getIcuVersion()
+    public static function getIcuVersion(): ?string
     {
         if (false === self::$icuVersion) {
             if (!self::isExtensionLoaded()) {
@@ -109,7 +109,7 @@ final class Intl
      *
      * @return string The version of the installed ICU data
      */
-    public static function getIcuDataVersion()
+    public static function getIcuDataVersion(): string
     {
         if (false === self::$icuDataVersion) {
             self::$icuDataVersion = trim(file_get_contents(self::getDataDirectory().'/version.txt'));
@@ -123,7 +123,7 @@ final class Intl
      *
      * @return string The ICU version of the stub classes
      */
-    public static function getIcuStubVersion()
+    public static function getIcuStubVersion(): string
     {
         return '64.2';
     }
@@ -133,7 +133,7 @@ final class Intl
      *
      * @return string The absolute path to the data directory
      */
-    public static function getDataDirectory()
+    public static function getDataDirectory(): string
     {
         return __DIR__.'/Resources/data';
     }

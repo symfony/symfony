@@ -12,6 +12,8 @@ CHANGELOG
  * Removed `LogoutUrlHelper` and `SecurityHelper` templating helpers, use Twig instead
  * Removed the `logout_on_user_change` firewall option
  * Removed the `threads` encoder option
+ * Removed the `security.authentication.trust_resolver.anonymous_class` parameter
+ * Removed the `security.authentication.trust_resolver.rememberme_class` parameter
 
 4.3.0
 -----

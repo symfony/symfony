@@ -13,6 +13,7 @@ CHANGELOG
  * removed support for using the `Expression` constraint without `symfony/expression-language`
  * changed default value of `canonicalize` option of `Locale` constraint to `true`
  * removed `ValidatorBuilderInterface`
+ * passing a null message when instantiating a `ConstraintViolation` is not allowed
 
 4.4.0
 -----

@@ -16,6 +16,7 @@ CHANGELOG
  * removed the `regions` option of the `TimezoneType`
  * removed the `$scale` argument of the `IntegerToLocalizedStringTransformer`
  * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
+ * passing a null message when instantiating a `Symfony\Component\Form\FormError` is not allowed
 
 4.3.0
 -----

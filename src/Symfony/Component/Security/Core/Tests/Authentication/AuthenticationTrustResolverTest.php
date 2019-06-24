@@ -55,39 +55,6 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Configuring a custom anonymous token class is deprecated since Symfony 4.2; have the "Symfony\Component\Security\Core\Tests\Authentication\FakeCustomToken" class extend the "Symfony\Component\Security\Core\Authentication\Token\AnonymousToken" class instead, and remove the "Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver" constructor argument.
-     */
-    public function testsAnonymousDeprecationWithCustomClasses()
-    {
-        $resolver = new AuthenticationTrustResolver(FakeCustomToken::class);
-
-        $this->assertTrue($resolver->isAnonymous(new FakeCustomToken()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Configuring a custom remember me token class is deprecated since Symfony 4.2; have the "Symfony\Component\Security\Core\Tests\Authentication\FakeCustomToken" class extend the "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken" class instead, and remove the "Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver" constructor argument.
-     */
-    public function testIsRememberMeDeprecationWithCustomClasses()
-    {
-        $resolver = new AuthenticationTrustResolver(null, FakeCustomToken::class);
-
-        $this->assertTrue($resolver->isRememberMe(new FakeCustomToken()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Configuring a custom remember me token class is deprecated since Symfony 4.2; have the "Symfony\Component\Security\Core\Tests\Authentication\FakeCustomToken" class extend the "Symfony\Component\Security\Core\Authentication\Token\RememberMeToken" class instead, and remove the "Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver" constructor argument.
-     */
-    public function testIsFullFledgedDeprecationWithCustomClasses()
-    {
-        $resolver = new AuthenticationTrustResolver(FakeCustomToken::class, FakeCustomToken::class);
-
-        $this->assertFalse($resolver->isFullFledged(new FakeCustomToken()));
-    }
-
     public function testIsAnonymousWithClassAsConstructorButStillExtending()
     {
         $resolver = $this->getResolver();

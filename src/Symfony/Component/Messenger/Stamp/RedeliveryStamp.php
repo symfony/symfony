@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Envelope;
  *
  * @experimental in 4.3
  */
-class RedeliveryStamp implements StampInterface
+final class RedeliveryStamp implements StampInterface
 {
     private $retryCount;
     private $senderClassOrAlias;

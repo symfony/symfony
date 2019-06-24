@@ -18,7 +18,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @experimental in 4.3
  */
-class TransportMessageIdStamp implements StampInterface
+final class TransportMessageIdStamp implements StampInterface
 {
     private $id;
 

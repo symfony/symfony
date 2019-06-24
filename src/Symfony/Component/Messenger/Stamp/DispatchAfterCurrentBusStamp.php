@@ -20,6 +20,6 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DispatchAfterCurrentBusStamp implements StampInterface
+final class DispatchAfterCurrentBusStamp implements NonSendableStampInterface
 {
 }

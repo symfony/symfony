@@ -18,7 +18,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */
-class BusNameStamp implements StampInterface
+final class BusNameStamp implements StampInterface
 {
     private $busName;
 

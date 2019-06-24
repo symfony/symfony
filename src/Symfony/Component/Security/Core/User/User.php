@@ -67,8 +67,9 @@ final class User implements UserInterface, EquatableInterface
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
+        return null;
     }
 
     /**

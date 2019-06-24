@@ -120,7 +120,7 @@ final class User implements UserInterface, EquatableInterface, AdvancedUserInter
     {
     }
 
-    public function getExtraFields()
+    public function getExtraFields(): array
     {
         return $this->extraFields;
     }

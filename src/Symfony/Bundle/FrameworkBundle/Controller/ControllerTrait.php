@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -93,6 +94,20 @@ trait ControllerTrait
         $subRequest = $request->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+    }
+
+    /**
+     * Forwards the request to another controller using route to which this controller is mapped.
+     *
+     * @final
+     */
+    protected function forwardByRoute(string $name, array $path = [], array $query = []): Response
+    {
+        if (!$route = $this->container->get('router')->getRouteCollection()->get($name)) {
+            throw new RouteNotFoundException(sprintf('Unable to find a controller for the named route "%s" as such route does not exist.', $name));
+        }
+
+        return $this->forward($route->getDefault('_controller'), $path, $query);
     }
 
     /**

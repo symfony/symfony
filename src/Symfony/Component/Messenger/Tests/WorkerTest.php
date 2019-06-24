@@ -84,7 +84,7 @@ class WorkerTest extends TestCase
     public function testDispatchCausesRetry()
     {
         $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'sender_alias')])],
+            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
         ]);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
@@ -97,7 +97,7 @@ class WorkerTest extends TestCase
             $this->assertNotNull($redeliveryStamp);
             // retry count now at 1
             $this->assertSame(1, $redeliveryStamp->getRetryCount());
-            $this->assertSame('sender_alias', $redeliveryStamp->getSenderClassOrAlias());
+            $this->assertSame('transport1', $redeliveryStamp->getSenderClassOrAlias());
 
             // received stamp is removed
             $this->assertNull($envelope->last(ReceivedStamp::class));
@@ -108,7 +108,7 @@ class WorkerTest extends TestCase
         $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
         $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(true);
 
-        $worker = new Worker(['receiver1' => $receiver], $bus, ['receiver1' => $retryStrategy]);
+        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {
@@ -123,7 +123,7 @@ class WorkerTest extends TestCase
     public function testDispatchCausesRejectWhenNoRetry()
     {
         $receiver = new DummyReceiver([
-            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'sender_alias')])],
+            [new Envelope(new DummyMessage('Hello'), [new SentStamp('Some\Sender', 'transport1')])],
         ]);
 
         $bus = $this->getMockBuilder(MessageBusInterface::class)->getMock();
@@ -132,7 +132,7 @@ class WorkerTest extends TestCase
         $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
         $retryStrategy->expects($this->once())->method('isRetryable')->willReturn(false);
 
-        $worker = new Worker(['receiver1' => $receiver], $bus, ['receiver1' => $retryStrategy]);
+        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {
@@ -155,7 +155,7 @@ class WorkerTest extends TestCase
         $retryStrategy = $this->getMockBuilder(RetryStrategyInterface::class)->getMock();
         $retryStrategy->expects($this->never())->method('isRetryable');
 
-        $worker = new Worker(['receiver1' => $receiver], $bus, ['receiver1' => $retryStrategy]);
+        $worker = new Worker(['transport1' => $receiver], $bus, ['transport1' => $retryStrategy]);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             // stop after the messages finish
             if (null === $envelope) {

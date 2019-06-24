@@ -185,7 +185,7 @@ class ArgumentResolverTest extends TestCase
         $resolver = new ArgumentResolver($factory, [$valueResolver]);
 
         $valueResolver->expects($this->any())->method('supports')->willReturn(true);
-        $valueResolver->expects($this->any())->method('resolve')->willReturn('foo');
+        $valueResolver->expects($this->any())->method('resolve')->willReturn([]);
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');

@@ -37,7 +37,7 @@ interface ArgumentValueResolverInterface
      * @param Request          $request
      * @param ArgumentMetadata $argument
      *
-     * @return \Generator
+     * @return iterable
      */
     public function resolve(Request $request, ArgumentMetadata $argument);
 }

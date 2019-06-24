@@ -17,7 +17,7 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DelayedMessageHandlingException extends \RuntimeException implements ExceptionInterface
+class DelayedMessageHandlingException extends RuntimeException
 {
     private $exceptions;
 

@@ -82,13 +82,16 @@ trait ControllerTrait
     /**
      * Forwards the request to another controller.
      *
-     * @param string $controller The controller name (a string like Bundle\BlogBundle\Controller\PostController::indexAction)
+     * @param string $controller The controller name (a string like Bundle\BlogBundle\Controller\PostController::indexAction) or only method name when forwarding to another method within the same controller
      *
      * @final
      */
     protected function forward(string $controller, array $path = [], array $query = []): Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
+        if (false === strpos($controller, '::')) {
+            $controller = \get_class($this).'::'.$controller;
+        }
         $path['_controller'] = $controller;
         $subRequest = $request->duplicate($query, null, $path);
 

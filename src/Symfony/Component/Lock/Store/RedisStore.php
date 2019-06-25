@@ -71,6 +71,9 @@ class RedisStore implements StoreInterface
         $this->checkNotExpired($key);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function waitAndSave(Key $key)
     {
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', \get_class($this)));

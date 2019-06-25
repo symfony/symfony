@@ -19,6 +19,7 @@ use Symfony\Component\Lock\Exception\InvalidTtlException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistStoreInterface;
 use Symfony\Component\Lock\StoreInterface;
 
 /**
@@ -34,7 +35,7 @@ use Symfony\Component\Lock\StoreInterface;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class PdoStore implements StoreInterface
+class PdoStore implements StoreInterface, PersistStoreInterface
 {
     use ExpiringStoreTrait;
 
@@ -145,6 +146,7 @@ class PdoStore implements StoreInterface
      */
     public function waitAndSave(Key $key)
     {
+        @trigger_error(sprintf('%s has been deprecated since Symfony 4.4 and will be removed in Symfony 5.0.', __METHOD__));
         throw new NotSupportedException(sprintf('The store "%s" does not supports blocking locks.', __METHOD__));
     }
 

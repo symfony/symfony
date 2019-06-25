@@ -191,21 +191,18 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             return [];
         }
 
+        $calledListeners = [];
+
+        if (null !== $this->callStack) {
+            foreach ($this->callStack as $calledListener) {
+                $calledListeners[] = $calledListener->getWrappedListener();
+            }
+        }
+
         $notCalled = [];
         foreach ($allListeners as $eventName => $listeners) {
             foreach ($listeners as $listener) {
-                $called = false;
-                if (null !== $this->callStack) {
-                    foreach ($this->callStack as $calledListener) {
-                        if ($calledListener->getWrappedListener() === $listener) {
-                            $called = true;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (!$called) {
+                if (!\in_array($listener, $calledListeners, true)) {
                     if (!$listener instanceof WrappedListener) {
                         $listener = new WrappedListener($listener, null, $this->stopwatch, $this);
                     }

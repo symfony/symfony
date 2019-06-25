@@ -772,7 +772,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
      *
-     * @internal since Symfony 4.4, to be removed in 5.0
+     * @internal since Symfony 4.4
      */
     public static function validateName($name)
     {

@@ -66,10 +66,22 @@ trait ArrayTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
-        $this->values = $this->expiries = [];
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
+
+        if ('' !== $prefix) {
+            foreach ($this->values as $key => $value) {
+                if (0 === strpos($key, $prefix)) {
+                    unset($this->values[$key], $this->expiries[$key]);
+                }
+            }
+        } else {
+            $this->values = $this->expiries = [];
+        }
 
         return true;
     }

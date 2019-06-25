@@ -213,10 +213,26 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
-        $this->deferred = [];
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
+
+        if ('' !== $prefix) {
+            foreach ($this->deferred as $key => $item) {
+                if (0 === strpos($key, $prefix)) {
+                    unset($this->deferred[$key]);
+                }
+            }
+        } else {
+            $this->deferred = [];
+        }
+
+        if ($this->pool instanceof AdapterInterface) {
+            return $this->pool->clear($prefix);
+        }
 
         return $this->pool->clear();
     }

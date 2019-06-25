@@ -1,6 +1,11 @@
 UPGRADE FROM 4.3 to 4.4
 =======================
 
+Cache
+-----
+
+ * Added argument `$prefix` to `AdapterInterface::clear()`
+
 DependencyInjection
 -------------------
 

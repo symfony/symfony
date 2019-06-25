@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\VarExporter\VarExporter;
@@ -121,12 +122,19 @@ EOF;
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
         $this->keys = $this->values = [];
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
+
+        if ($this->pool instanceof AdapterInterface) {
+            return $this->pool->clear($prefix) && $cleared;
+        }
 
         return $this->pool->clear() && $cleared;
     }

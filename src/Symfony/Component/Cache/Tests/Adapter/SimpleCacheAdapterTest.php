@@ -23,6 +23,7 @@ class SimpleCacheAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
         'testPrune' => 'SimpleCache just proxies',
+        'testClearPrefix' => 'SimpleCache cannot clear by prefix',
     ];
 
     public function createCachePool($defaultLifetime = 0)

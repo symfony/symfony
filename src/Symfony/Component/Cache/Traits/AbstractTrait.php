@@ -102,9 +102,12 @@ trait AbstractTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
         $this->deferred = [];
         if ($cleared = $this->versioningIsEnabled) {
             $namespaceVersion = substr_replace(base64_encode(pack('V', mt_rand())), static::NS_SEPARATOR, 5);
@@ -120,7 +123,7 @@ trait AbstractTrait
         }
 
         try {
-            return $this->doClear($this->namespace) || $cleared;
+            return $this->doClear($this->namespace.$prefix) || $cleared;
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to clear the cache: '.$e->getMessage(), ['exception' => $e]);
 

@@ -23,6 +23,7 @@ class DoctrineAdapterTest extends AdapterTestCase
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayCache is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayCache is not.',
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
+        'testClearPrefix' => 'Doctrine cannot clear by prefix',
     ];
 
     public function createCachePool($defaultLifetime = 0)

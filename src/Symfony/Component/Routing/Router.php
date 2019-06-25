@@ -159,12 +159,11 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Sets an option.
      *
-     * @param string $key   The key
-     * @param mixed  $value The value
+     * @param mixed $value The value
      *
      * @throws \InvalidArgumentException
      */
-    public function setOption($key, $value)
+    public function setOption(string $key, $value)
     {
         if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -176,13 +175,11 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Gets an option value.
      *
-     * @param string $key The key
-     *
      * @return mixed The value
      *
      * @throws \InvalidArgumentException
      */
-    public function getOption($key)
+    public function getOption(string $key)
     {
         if (!\array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -237,7 +234,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH)
     {
         return $this->getGenerator()->generate($name, $parameters, $referenceType);
     }
@@ -245,7 +242,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathinfo)
+    public function match(string $pathinfo)
     {
         return $this->getMatcher()->match($pathinfo);
     }

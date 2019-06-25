@@ -37,8 +37,8 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
         $this->opsLimit = $opsLimit ?? max(6, \defined('SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE') ? \SODIUM_CRYPTO_PWHASH_OPSLIMIT_MODERATE : 6);
         $this->memLimit = $memLimit ?? max(64 * 1024 * 1024, \defined('SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE') ? \SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE : 64 * 1024 * 2014);
 
-        if (2 > $this->opsLimit) {
-            throw new \InvalidArgumentException('$opsLimit must be 2 or greater.');
+        if (3 > $this->opsLimit) {
+            throw new \InvalidArgumentException('$opsLimit must be 3 or greater.');
         }
 
         if (10 * 1024 > $this->memLimit) {
@@ -48,11 +48,7 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
 
     public static function isSupported(): bool
     {
-        if (class_exists('ParagonIE_Sodium_Compat') && method_exists('ParagonIE_Sodium_Compat', 'crypto_pwhash_is_available')) {
-            return \ParagonIE_Sodium_Compat::crypto_pwhash_is_available();
-        }
-
-        return \function_exists('sodium_crypto_pwhash_str') || \extension_loaded('libsodium');
+        return \function_exists('sodium_crypto_pwhash_str_needs_rehash') || \function_exists('Sodium\crypto_pwhash_str_needs_rehash');
     }
 
     /**

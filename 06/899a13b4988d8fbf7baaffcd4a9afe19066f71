@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-24T23:34:55Z
+
+There is a `to be removed in 5.0` on this method:
+https://github.com/symfony/symfony/blob/81241590520ce8338777072b6bdcc8600a00cbda/src/Symfony/Component/Form/FormConfigBuilder.php#L775-L777
+
+What's the planned alternative for this case?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-25T01:46:48Z
+
+The plan was to make the method private.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-25T12:32:32Z
+
+> The plan was to make the method private.
+
+@Tobion but it's used out there (`ButtonBuilder`):
+https://github.com/symfony/symfony/blob/d2711bfe0e206b571ef505c50bc1dbd4c1fec1ba/src/Symfony/Component/Form/ButtonBuilder.php#L64
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-25T13:30:45Z
+
+Tests (low) are broken.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-25T13:49:17Z
+
+Mmm, I'm not sure why, the broken tests are being eliminated here :thinking:

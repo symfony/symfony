@@ -311,6 +311,8 @@ abstract class FrameworkExtensionTest extends TestCase
             $workflowDefinition->getArgument(0),
             'Places are passed to the workflow definition'
         );
+
+        $this->assertSame(['workflow.definition' => [['name' => 'legacy', 'type' => 'state_machine']]], $workflowDefinition->getTags());
     }
 
     /**

@@ -9,6 +9,7 @@ CHANGELOG
  * removed method `UploadedFile::getClientSize()` and the related constructor argument
  * made `Request::getSession()` throw if the session has not been set before
  * removed `Response::HTTP_RESERVED_FOR_WEBDAV_ADVANCED_COLLECTIONS_EXPIRED_PROPOSAL`
+ * passing a null url when instantiating a `RedirectResponse` is not allowed
 
 4.4.0
 -----

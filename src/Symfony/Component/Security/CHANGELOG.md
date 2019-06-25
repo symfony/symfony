@@ -27,6 +27,7 @@ CHANGELOG
  * Removed `ExpressionVoter::addExpressionLanguageProvider()`
  * Made `Security::getUser()` return null when the user is not an instanceof `UserInterface`,
    use `getToken()->getUser()` instead
+ * Removed the `AuthenticationTrustResolver` constructor arguments
 
 4.4.0
 -----

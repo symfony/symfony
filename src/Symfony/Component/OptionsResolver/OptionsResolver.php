@@ -846,8 +846,6 @@ class OptionsResolver implements Options
             throw new AccessException('Array access is only supported within closures of lazy options and normalizers.');
         }
 
-        $triggerDeprecation = 1 === \func_num_args() || func_get_arg(1);
-
         // Shortcut for resolved options
         if (isset($this->resolved[$option]) || \array_key_exists($option, $this->resolved)) {
             if ($triggerDeprecation && isset($this->deprecated[$option]) && (isset($this->given[$option]) || $this->calling) && \is_string($this->deprecated[$option])) {

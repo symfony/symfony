@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T10:29:12Z
+
+@nicolas-grekas should I do something similar here: https://github.com/symfony/symfony/blob/1dce522b9aa7a1691972e38eb858fb596a6d0e51/src/Symfony/Bridge/PhpUnit/bootstrap.php#L38-L40
+
+?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T10:40:01Z
+
+Please resolve #31955 first
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-08T13:29:09Z
+
+I'd propose merging this as a bug fix on 4.3, which is the very of Dotenv that relates here, WDYT?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T14:21:21Z
+
+It can be viewed as a bug if you use the bridge v4.3 and a recent version of dotenv so yeah, let's do this :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T14:38:25Z
+
+Done. What about my question about the bootstrap file above?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-08T14:55:11Z
+
+Let's update the bootstrap file too.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T15:14:38Z
+
+I should really test before I push :sweat:
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T15:17:15Z
+
+Apparently having the class not defined at all is a requirement in disabled mode, so let's do this.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-08T15:26:54Z
+
+Is setting via `putenv` kind of deprecated now? Or will it be fully supported forever? Should I change existing phpt files to randomly use each of them?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2019-06-23T10:44:08Z
+
+IMHO, this is quite important to finish and release as if I understand correctly, for now there is no way to configure the SYMFONY_DEPRECATIONS_HELPER variable except by using a real env var (quite cumbersome and the documentation is very misleading on this subject if that's true). Or am I missing something?
+
+I'd be happy to give a hand to finish this if needed.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-23T12:48:49Z
+
+Thanks for proposing your help @tgalopin . To me, this could very well be finished already, the only doubts I have are sum up in my previous comment. @nicolas-grekas what do you think the next steps are regarding this?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2019-06-23T15:44:58Z
+
+I do not reproduce the build failure locally (I use php 7.3). They are probably due to autoloading conflicts, as usual.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-26T07:56:14Z
+
+Can you have a look at the broken tests?

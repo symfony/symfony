@@ -41,6 +41,17 @@ switch ($vars['REQUEST_URI']) {
         ob_start('ob_gzhandler');
         break;
 
+    case '/103':
+        header('HTTP/1.1 103 Early Hints');
+        header('Link: </style.css>; rel=preload; as=style', false);
+        header('Link: </script.js>; rel=preload; as=script', false);
+        echo "HTTP/1.1 200 OK\r\n";
+        echo "Date: Fri, 26 May 2017 10:02:11 GMT\r\n";
+        echo "Content-Length: 13\r\n";
+        echo "\r\n";
+        echo 'Here the body';
+        exit;
+
     case '/404':
         header('Content-Type: application/json', true, 404);
         break;

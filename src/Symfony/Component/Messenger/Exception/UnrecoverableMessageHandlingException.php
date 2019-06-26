@@ -12,15 +12,12 @@
 namespace Symfony\Component\Messenger\Exception;
 
 /**
- * Thrown while handling a message to indicate that handling will continue to fail.
- *
- * If something goes wrong while handling a message that's received from a transport
- * and the message should not be retried, a handler can throw this exception.
+ * A concrete implementation of UnrecoverableExceptionInterface that can be used directly.
  *
  * @author Frederic Bouchery <frederic@bouchery.fr>
  *
  * @experimental in 4.3
  */
-class UnrecoverableMessageHandlingException extends RuntimeException
+class UnrecoverableMessageHandlingException extends RuntimeException implements UnrecoverableExceptionInterface
 {
 }

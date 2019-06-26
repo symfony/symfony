@@ -71,11 +71,18 @@ class TransportTest extends TestCase
         Transport::fromDsn('some://');
     }
 
+    public function testNoScheme()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "//sendmail" mailer DSN must contain a transport scheme.');
+        Transport::fromDsn('//sendmail');
+    }
+
     public function testFromInvalidDsnNoHost()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "?!" mailer DSN must contain a mailer name.');
-        Transport::fromDsn('?!');
+        $this->expectExceptionMessage('The "file:///some/path" mailer DSN must contain a mailer name.');
+        Transport::fromDsn('file:///some/path');
     }
 
     public function testFromInvalidTransportName()
@@ -163,6 +170,19 @@ class TransportTest extends TestCase
         $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=eu', $dispatcher, $client, $logger);
         $transport->send($message);
 
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html('test');
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $stream = fopen('data://text/plain,'.$message->getTextBody(), 'r');
+        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html($stream);
         $client = $this->createMock(HttpClientInterface::class);
         $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
         $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);

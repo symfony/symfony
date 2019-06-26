@@ -230,4 +230,90 @@ class ConnectionTest extends TestCase
     {
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
+
+    public function testFind()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
+        $id = 1;
+        $stmt = $this->getStatementMock([
+            'id' => $id,
+            'body' => '{"message":"Hi"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+        ]);
+
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('where')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('');
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $driverConnection
+            ->method('prepare')
+            ->willReturn($stmt);
+
+        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $doctrineEnvelope = $connection->find($id);
+        $this->assertEquals(1, $doctrineEnvelope['id']);
+        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
+    }
+
+    public function testFindAll()
+    {
+        $queryBuilder = $this->getQueryBuilderMock();
+        $driverConnection = $this->getDBALConnectionMock();
+        $schemaSynchronizer = $this->getSchemaSynchronizerMock();
+        $message1 = [
+            'id' => 1,
+            'body' => '{"message":"Hi"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+        ];
+        $message2 = [
+            'id' => 2,
+            'body' => '{"message":"Hi again"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+        ];
+
+        $stmt = $this->getMockBuilder(Statement::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stmt->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([$message1, $message2]);
+
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('where')
+            ->willReturn($queryBuilder);
+        $queryBuilder
+            ->method('getSQL')
+            ->willReturn('');
+        $queryBuilder
+            ->method('getParameters')
+            ->willReturn([]);
+        $driverConnection
+            ->method('prepare')
+            ->willReturn($stmt);
+
+        $connection = new Connection([], $driverConnection, $schemaSynchronizer);
+        $doctrineEnvelopes = $connection->findAll();
+
+        $this->assertEquals(1, $doctrineEnvelopes[0]['id']);
+        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelopes[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[0]['headers']);
+
+        $this->assertEquals(2, $doctrineEnvelopes[1]['id']);
+        $this->assertEquals('{"message":"Hi again"}', $doctrineEnvelopes[1]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelopes[1]['headers']);
+    }
 }

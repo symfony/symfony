@@ -721,6 +721,15 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertSame('/?a=a&b=b', $body['REQUEST_URI']);
     }
 
+    public function testInformationalResponse()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/103');
+
+        $this->assertSame('Here the body', $response->getContent());
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     /**
      * @requires extension zlib
      */

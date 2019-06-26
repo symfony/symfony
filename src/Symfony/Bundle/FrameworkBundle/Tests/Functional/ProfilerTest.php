@@ -28,9 +28,9 @@ class ProfilerTest extends WebTestCase
 
         // enable the profiler for the next request
         $client->enableProfiler();
-        $crawler = $client->request('GET', '/profiler');
-        $profile = $client->getProfile();
-        $this->assertInternalType('object', $profile);
+        $this->assertFalse($client->getProfile());
+        $client->request('GET', '/profiler');
+        $this->assertInternalType('object', $client->getProfile());
 
         $client->request('GET', '/profiler');
         $this->assertFalse($client->getProfile());

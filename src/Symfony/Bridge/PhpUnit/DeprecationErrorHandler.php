@@ -219,7 +219,13 @@ class DeprecationErrorHandler
             return $this->configuration;
         }
         if (false === $mode = $this->mode) {
-            $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
+            if (isset($_SERVER['SYMFONY_DEPRECATIONS_HELPER'])) {
+                $mode = $_SERVER['SYMFONY_DEPRECATIONS_HELPER'];
+            } elseif (isset($_ENV['SYMFONY_DEPRECATIONS_HELPER'])) {
+                $mode = $_ENV['SYMFONY_DEPRECATIONS_HELPER'];
+            } else {
+                $mode = getenv('SYMFONY_DEPRECATIONS_HELPER');
+            }
         }
         if ('strict' === $mode) {
             return $this->configuration = Configuration::inStrictMode();

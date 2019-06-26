@@ -240,7 +240,7 @@ class ConnectionTest extends TestCase
         $stmt = $this->getStatementMock([
             'id' => $id,
             'body' => '{"message":"Hi"}',
-            'headers' => \json_encode(['type' => DummyMessage::class]),
+            'headers' => json_encode(['type' => DummyMessage::class]),
         ]);
 
         $driverConnection
@@ -274,12 +274,12 @@ class ConnectionTest extends TestCase
         $message1 = [
             'id' => 1,
             'body' => '{"message":"Hi"}',
-            'headers' => \json_encode(['type' => DummyMessage::class]),
+            'headers' => json_encode(['type' => DummyMessage::class]),
         ];
         $message2 = [
             'id' => 2,
             'body' => '{"message":"Hi again"}',
-            'headers' => \json_encode(['type' => DummyMessage::class]),
+            'headers' => json_encode(['type' => DummyMessage::class]),
         ];
 
         $stmt = $this->getMockBuilder(Statement::class)

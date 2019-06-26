@@ -240,7 +240,7 @@ class Connection
 
         $data = $this->executeQuery($queryBuilder->getSQL(), $queryBuilder->getParameters())->fetchAll();
 
-        return \array_map(function ($doctrineEnvelope) {
+        return array_map(function ($doctrineEnvelope) {
             return $this->decodeEnvelopeHeaders($doctrineEnvelope);
         }, $data);
     }
@@ -339,7 +339,7 @@ class Connection
 
     private function decodeEnvelopeHeaders(array $doctrineEnvelope): array
     {
-        $doctrineEnvelope['headers'] = \json_decode($doctrineEnvelope['headers'], true);
+        $doctrineEnvelope['headers'] = json_decode($doctrineEnvelope['headers'], true);
 
         return $doctrineEnvelope;
     }

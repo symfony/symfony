@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by jmsche at 2019-05-30T12:16:57Z
+
+Hi there, it seems better to me :)
+
+FYI using Symfony 4.3.0-beta1 (without the Twig fixes in `form_div_layout.html.twig`) here are the results:
+
+Pre-patch:
+
+```
+Remaining direct deprecation notices (1)
+
+  1x: Using an "if" condition on "for" tag is deprecated since Twig 2.10.0, use a "filter" filter or an "if" condition inside the "for" body instead (if your condition depends on a variable updated inside the loop).
+    1x in EventControllerTest::testIndex from App\Tests\Controller\Admin
+```
+
+Post-patch:
+
+```
+Other deprecation notices (1)
+
+  1x: Using an "if" condition on "for" tag is deprecated since Twig 2.10.0, use a "filter" filter or an "if" condition inside the "for" body instead (if your condition depends on a variable updated inside the loop).
+    1x in EventControllerTest::testIndex from App\Tests\Controller\Admin
+```

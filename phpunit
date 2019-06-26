@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-// Cache-Id: https://github.com/symfony/phpunit-bridge/commit/32c5fa570117630dad45c21528b93d26bad02bc1
+// Cache-Id: https://github.com/symfony/phpunit-bridge/commit/ded5bdfc4267e9e7c6e7f39c6bde66d23fc7b32f
 
 if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";

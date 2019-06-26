@@ -18,6 +18,11 @@ CHANGELOG
  * removed `TemplatingExtension` and `TemplatingRendererEngine` classes, use Twig instead
  * passing a null message when instantiating a `Symfony\Component\Form\FormError` is not allowed
 
+4.4.0
+-----
+
+ * deprecated using `int` or `float` as data for the `NumberType` when the `input` option is set to `string`
+
 4.3.0
 -----
 

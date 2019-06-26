@@ -34,9 +34,9 @@ class RetryIntegrationTest extends TestCase
         $senderAndReceiver = new DummySenderAndReceiver();
 
         $senderLocator = $this->createMock(ContainerInterface::class);
-        $senderLocator->method('has')->with('sender_alias')->willReturn(true);
-        $senderLocator->method('get')->with('sender_alias')->willReturn($senderAndReceiver);
-        $senderLocator = new SendersLocator([DummyMessage::class => ['sender_alias']], $senderLocator);
+        $senderLocator->method('has')->with('transportName')->willReturn(true);
+        $senderLocator->method('get')->with('transportName')->willReturn($senderAndReceiver);
+        $senderLocator = new SendersLocator([DummyMessage::class => ['transportName']], $senderLocator);
 
         $handler = new DummyMessageHandlerFailingFirstTimes(0);
         $throwingHandler = new DummyMessageHandlerFailingFirstTimes(1);
@@ -52,7 +52,7 @@ class RetryIntegrationTest extends TestCase
         $envelope = new Envelope(new DummyMessage('API'));
         $bus->dispatch($envelope);
 
-        $worker = new Worker(['receiverName' => $senderAndReceiver], $bus, ['receiverName' => new MultiplierRetryStrategy()]);
+        $worker = new Worker(['transportName' => $senderAndReceiver], $bus, ['transportName' => new MultiplierRetryStrategy()]);
         $worker->run([], function (?Envelope $envelope) use ($worker) {
             if (null === $envelope) {
                 $worker->stop();

@@ -21,6 +21,7 @@ security:
                 search_password: ''
                 default_roles: ROLE_USER
                 uid_key: uid
+                extra_fields: ['email']
 
     firewalls:
         main:

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionBagProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
@@ -259,5 +260,29 @@ class SessionTest extends TestCase
 
         $flash->get('hello');
         $this->assertTrue($this->session->isEmpty());
+    }
+
+    public function testGetBagWithBagImplementingGetBag()
+    {
+        $bag = new AttributeBag();
+        $bag->setName('foo');
+
+        $storage = new MockArraySessionStorage();
+        $storage->registerBag($bag);
+
+        $this->assertSame($bag, (new Session($storage))->getBag('foo'));
+    }
+
+    public function testGetBagWithBagNotImplementingGetBag()
+    {
+        $data = [];
+
+        $bag = new AttributeBag();
+        $bag->setName('foo');
+
+        $storage = new MockArraySessionStorage();
+        $storage->registerBag(new SessionBagProxy($bag, $data, $usageIndex));
+
+        $this->assertSame($bag, (new Session($storage))->getBag('foo'));
     }
 }

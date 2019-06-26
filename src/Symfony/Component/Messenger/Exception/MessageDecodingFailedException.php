@@ -16,6 +16,6 @@ namespace Symfony\Component\Messenger\Exception;
  *
  * @experimental in 4.3
  */
-class MessageDecodingFailedException extends \InvalidArgumentException implements ExceptionInterface
+class MessageDecodingFailedException extends InvalidArgumentException
 {
 }

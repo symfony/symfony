@@ -18,7 +18,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @experimental in 4.3
  */
-class ValidationFailedException extends \RuntimeException implements ExceptionInterface
+class ValidationFailedException extends RuntimeException
 {
     private $violations;
     private $violatingMessage;

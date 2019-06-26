@@ -34,8 +34,9 @@ class LdapUserProvider implements UserProviderInterface
     private $uidKey;
     private $defaultSearch;
     private $passwordAttribute;
+    private $extraFields;
 
-    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null)
+    public function __construct(LdapInterface $ldap, string $baseDn, string $searchDn = null, string $searchPassword = null, array $defaultRoles = [], string $uidKey = null, string $filter = null, string $passwordAttribute = null, array $extraFields = [])
     {
         if (null === $uidKey) {
             $uidKey = 'sAMAccountName';
@@ -53,6 +54,7 @@ class LdapUserProvider implements UserProviderInterface
         $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
         $this->passwordAttribute = $passwordAttribute;
+        $this->extraFields = $extraFields;
     }
 
     /**
@@ -123,12 +125,17 @@ class LdapUserProvider implements UserProviderInterface
     protected function loadUser($username, Entry $entry)
     {
         $password = null;
+        $extraFields = [];
 
         if (null !== $this->passwordAttribute) {
             $password = $this->getAttributeValue($entry, $this->passwordAttribute);
         }
 
-        return new User($username, $password, $this->defaultRoles);
+        foreach ($this->extraFields as $field) {
+            $extraFields[$field] = $this->getAttributeValue($entry, $field);
+        }
+
+        return new User($username, $password, $this->defaultRoles, true, true, true, true, $extraFields);
     }
 
     /**

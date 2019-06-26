@@ -7,6 +7,11 @@ CHANGELOG
  * Added method `move() to `EntryManagerInterface`
  * Added pagination support to the ExtLdap adapter with the pageSize query option
 
+4.4.0
+-----
+
+ * Added the "extra_fields" option, an array of custom fields to pull from the LDAP server
+
 4.3.0
 -----
 

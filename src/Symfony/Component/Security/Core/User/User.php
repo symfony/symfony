@@ -27,8 +27,9 @@ final class User implements UserInterface, EquatableInterface
     private $credentialsNonExpired;
     private $accountNonLocked;
     private $roles;
+    private $extraFields;
 
-    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true, bool $userNonExpired = true, bool $credentialsNonExpired = true, bool $userNonLocked = true)
+    public function __construct(?string $username, ?string $password, array $roles = [], bool $enabled = true, bool $userNonExpired = true, bool $credentialsNonExpired = true, bool $userNonLocked = true, array $extraFields = [])
     {
         if ('' === $username || null === $username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
@@ -41,6 +42,7 @@ final class User implements UserInterface, EquatableInterface
         $this->credentialsNonExpired = $credentialsNonExpired;
         $this->accountNonLocked = $userNonLocked;
         $this->roles = $roles;
+        $this->extraFields = $extraFields;
     }
 
     public function __toString(): string
@@ -117,6 +119,11 @@ final class User implements UserInterface, EquatableInterface
      */
     public function eraseCredentials()
     {
+    }
+
+    public function getExtraFields(): array
+    {
+        return $this->extraFields;
     }
 
     /**

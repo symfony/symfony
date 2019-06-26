@@ -16,7 +16,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @experimental in 4.3
  */
-class DelayStamp implements StampInterface
+final class DelayStamp implements StampInterface
 {
     private $delay;
 

@@ -112,7 +112,7 @@ final class QueuedEnvelope
 
     public function __construct(Envelope $envelope, StackInterface $stack)
     {
-        $this->envelope = $envelope;
+        $this->envelope = $envelope->withoutAll(DispatchAfterCurrentBusStamp::class);
         $this->stack = $stack;
     }
 

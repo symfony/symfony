@@ -68,7 +68,7 @@ class MailgunTransport extends AbstractApiTransport
     {
         $headers = $email->getHeaders();
         $html = $email->getHtmlBody();
-        if (null !== $html) {
+        if (null !== $html && \is_resource($html)) {
             if (stream_get_meta_data($html)['seekable'] ?? false) {
                 rewind($html);
             }

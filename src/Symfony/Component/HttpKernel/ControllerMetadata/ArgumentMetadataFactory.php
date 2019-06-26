@@ -42,30 +42,24 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     /**
      * Returns an associated type to the given parameter if available.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return string|null|void
      */
-    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
+    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function): ?string
     {
         if (!$type = $parameter->getType()) {
-            return;
+            return null;
         }
         $name = $type->getName();
-        $lcName = strtolower($name);
 
-        if ('self' !== $lcName && 'parent' !== $lcName) {
-            return $name;
+        if ($function instanceof \ReflectionMethod) {
+            $lcName = strtolower($name);
+            switch ($lcName) {
+                case 'self':
+                    return $function->getDeclaringClass()->name;
+                case 'parent':
+                    return ($parent = $function->getDeclaringClass()->getParentClass()) ? $parent->name : null;
+            }
         }
-        if (!$function instanceof \ReflectionMethod) {
-            return;
-        }
-        if ('self' === $lcName) {
-            return $function->getDeclaringClass()->name;
-        }
-        if ($parent = $function->getDeclaringClass()->getParentClass()) {
-            return $parent->name;
-        }
+
+        return $name;
     }
 }

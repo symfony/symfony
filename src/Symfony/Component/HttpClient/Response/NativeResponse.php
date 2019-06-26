@@ -78,18 +78,12 @@ final class NativeResponse implements ResponseInterface
         if (!$info = $this->finalInfo) {
             self::perform($this->multi);
 
-            if ('debug' === $type) {
-                return $this->info['debug'];
-            }
-
             $info = $this->info;
             $info['url'] = implode('', $info['url']);
-            unset($info['fopen_time'], $info['size_body'], $info['request_header']);
+            unset($info['size_body'], $info['request_header']);
 
             if (null === $this->buffer) {
                 $this->finalInfo = $info;
-            } else {
-                unset($info['debug']);
             }
         }
 
@@ -134,7 +128,6 @@ final class NativeResponse implements ResponseInterface
                 $this->info['request_header'] .= implode("\r\n", $context['http']['header'])."\r\n\r\n";
 
                 // Send request and follow redirects when needed
-                $this->info['fopen_time'] = microtime(true);
                 $this->handle = $h = fopen($url, 'r', false, $this->context);
                 self::addResponseHeaders($http_response_header, $this->info, $this->headers, $this->info['debug']);
                 $url = ($this->resolveRedirect)($this->multi, $this->headers['location'][0] ?? null, $this->context);
@@ -152,7 +145,7 @@ final class NativeResponse implements ResponseInterface
 
             return;
         } finally {
-            $this->info['starttransfer_time'] = $this->info['total_time'] = microtime(true) - $this->info['start_time'];
+            $this->info['pretransfer_time'] = $this->info['total_time'] = microtime(true) - $this->info['start_time'];
             restore_error_handler();
         }
 
@@ -273,6 +266,7 @@ final class NativeResponse implements ResponseInterface
             if (null !== $e || !$remaining || feof($h)) {
                 // Stream completed
                 $info['total_time'] = microtime(true) - $info['start_time'];
+                $info['starttransfer_time'] = $info['starttransfer_time'] ?: $info['total_time'];
 
                 if ($onProgress) {
                     try {

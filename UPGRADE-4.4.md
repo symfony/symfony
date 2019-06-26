@@ -41,6 +41,11 @@ DependencyInjection
        arguments: [!tagged_iterator app.handler]
    ```
 
+Form
+----
+
+ * Using `int` or `float` as data for the `NumberType` when the `input` option is set to `string` is deprecated.
+
 FrameworkBundle
 ---------------
 

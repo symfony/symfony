@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\DebugBundle\DependencyInjection\DebugExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 
 class DebugExtensionTest extends TestCase
 {
@@ -34,6 +35,39 @@ class DebugExtensionTest extends TestCase
         ];
 
         $this->assertSame($expectedTags, $container->getDefinition('data_collector.dump')->getTag('data_collector'));
+    }
+
+    public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner()
+    {
+        if (!method_exists(ReflectionCaster::class, 'unsetClosureFileInfo')) {
+            $this->markTestSkipped('Method not available');
+        }
+
+        $container = $this->createContainer();
+        $container->registerExtension(new DebugExtension());
+        $container->loadFromExtension('debug', []);
+        $this->compileContainer($container);
+
+        $definition = $container->getDefinition('var_dumper.cloner');
+
+        $called = false;
+        foreach ($definition->getMethodCalls() as $call) {
+            if ('addCasters' !== $call[0]) {
+                continue;
+            }
+
+            $argument = $call[1][0] ?? null;
+            if (null === $argument) {
+                continue;
+            }
+
+            if (['Closure' => ReflectionCaster::class.'::unsetClosureFileInfo'] === $argument) {
+                $called = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($called);
     }
 
     private function createContainer()

@@ -20,7 +20,7 @@ namespace Symfony\Component\Messenger\Stamp;
  *
  * @experimental in 4.3
  */
-final class SentStamp implements StampInterface
+final class SentStamp implements NonSendableStampInterface
 {
     private $senderClass;
     private $senderAlias;

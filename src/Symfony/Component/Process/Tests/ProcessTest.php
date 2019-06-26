@@ -1500,6 +1500,50 @@ EOTXT;
         yield [1.1];
     }
 
+    public function testPreparedCommand()
+    {
+        $p = Process::fromShellCommandline('echo "$abc"DEF');
+        $p->run(null, ['abc' => 'ABC']);
+
+        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+    }
+
+    public function testPreparedCommandMulti()
+    {
+        $p = Process::fromShellCommandline('echo "$abc""$def"');
+        $p->run(null, ['abc' => 'ABC', 'def' => 'DEF']);
+
+        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+    }
+
+    public function testPreparedCommandWithQuoteInIt()
+    {
+        $p = Process::fromShellCommandline('php -r "$code" "$def"');
+        $p->run(null, ['code' => 'echo $argv[1];', 'def' => '"DEF"']);
+
+        $this->assertSame('"DEF"', rtrim($p->getOutput()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Command line is missing a value for key "$abc": echo "$abc".
+     */
+    public function testPreparedCommandWithMissingValue()
+    {
+        $p = Process::fromShellCommandline('echo "$abc"');
+        $p->run(null, ['bcd' => 'BCD']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Command line is missing a value for key "$abc": echo "$abc".
+     */
+    public function testPreparedCommandWithNoValues()
+    {
+        $p = Process::fromShellCommandline('echo "$abc"');
+        $p->run(null, []);
+    }
+
     public function testEnvArgument()
     {
         $env = ['FOO' => 'Foo', 'BAR' => 'Bar'];

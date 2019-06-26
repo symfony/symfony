@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Exception;
+namespace Symfony\Component\Ldap\Exception;
 
 /**
- * @author Samuel Roze <samuel.roze@gmail.com>
+ * AlreadyExistsException is thrown if the element already exists.
  *
- * @experimental in 4.3
+ * @author Hamza Amrouche <hamza.simperfit@gmail.com>
  */
-class NoHandlerForMessageException extends LogicException
+class AlreadyExistsException extends ConnectionException implements ExceptionInterface
 {
 }

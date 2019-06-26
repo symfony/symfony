@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-25T09:09:46Z
+
+Master then is 4.3 now so yes, this should target 4.3. But can we have a deeper analysis so that we better understand what's going on? The reverted PR had merits I suppose.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-25T09:17:12Z
+
+I'm in favor of reverting in the meantime, this change looks to impact badly most API Platform projects.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2019-06-25T09:26:25Z
+
+From the profile, it seems the reverted PR caused many many cache lookups and writes.

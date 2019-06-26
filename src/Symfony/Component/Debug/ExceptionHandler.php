@@ -97,9 +97,9 @@ class ExceptionHandler
      *
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
      *
-     * @return string The previous file link format
+     * @return string|FileLinkFormatter|null The previous file link format
      */
-    public function setFileLinkFormat($fileLinkFormat): string
+    public function setFileLinkFormat($fileLinkFormat)
     {
         $old = $this->fileLinkFormat;
         $this->fileLinkFormat = $fileLinkFormat;

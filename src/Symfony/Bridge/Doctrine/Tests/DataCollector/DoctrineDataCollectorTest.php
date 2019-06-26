@@ -102,6 +102,18 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
+    public function testCollectQueryWithNoTypes()
+    {
+        $queries = [
+            ['sql' => 'SET sql_mode=(SELECT REPLACE(@@sql_mode, \'ONLY_FULL_GROUP_BY\', \'\'))', 'params' => [], 'types' => null, 'executionMS' => 1],
+        ];
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+
+        $collectedQueries = $c->getQueries();
+        $this->assertSame([], $collectedQueries['default'][0]['types']);
+    }
+
     public function testReset()
     {
         $queries = [

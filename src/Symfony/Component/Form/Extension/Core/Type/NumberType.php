@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
@@ -38,19 +37,6 @@ class NumberType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new StringToFloatTransformer($options['scale']));
-            $builder->addModelTransformer(new CallbackTransformer(
-                function ($value) {
-                    if (\is_float($value) || \is_int($value)) {
-                        @trigger_error(sprintf('Using the %s with float or int data when the "input" option is set to "string" is deprecated since Symfony 4.4 and will throw an exception in 5.0.', self::class), E_USER_DEPRECATED);
-                        $value = (string) $value;
-                    }
-
-                    return $value;
-                },
-                function ($value) {
-                    return $value;
-                }
-            ));
         }
     }
 

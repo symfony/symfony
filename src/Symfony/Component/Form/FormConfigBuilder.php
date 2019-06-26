@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -767,19 +766,12 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|null $name The tested form name
-     *
-     * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
      *
-     * @internal since Symfony 4.4, to be removed in 5.0
+     * @internal
      */
-    public static function validateName($name)
+    final public static function validateName(?string $name)
     {
-        if (null !== $name && !\is_string($name)) {
-            throw new UnexpectedTypeException($name, 'string or null');
-        }
-
         if (!self::isValidName($name)) {
             throw new InvalidArgumentException(sprintf('The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").', $name));
         }
@@ -794,10 +786,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *   * starts with a letter, digit or underscore
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
-     *
-     * @final since Symfony 4.4
      */
-    public static function isValidName(?string $name): bool
+    final public static function isValidName(?string $name): bool
     {
         return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }

@@ -18,14 +18,14 @@ use Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerFor;
  */
 class Deprecation
 {
-    private const PATH_TYPE_VENDOR = 'path_type_vendor';
-    private const PATH_TYPE_SELF = 'path_type_internal';
-    private const PATH_TYPE_UNDETERMINED = 'path_type_undetermined';
+    const PATH_TYPE_VENDOR = 'path_type_vendor';
+    const PATH_TYPE_SELF = 'path_type_internal';
+    const PATH_TYPE_UNDETERMINED = 'path_type_undetermined';
 
-    public const TYPE_SELF = 'type_self';
-    public const TYPE_DIRECT = 'type_direct';
-    public const TYPE_INDIRECT = 'type_indirect';
-    public const TYPE_UNDETERMINED = 'type_undetermined';
+    const TYPE_SELF = 'type_self';
+    const TYPE_DIRECT = 'type_direct';
+    const TYPE_INDIRECT = 'type_indirect';
+    const TYPE_UNDETERMINED = 'type_undetermined';
 
     /**
      * @var array

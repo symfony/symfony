@@ -14,27 +14,37 @@ namespace Symfony\Component\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 /**
- * Monitors a set of responses and triggers callbacks as they complete.
+ * Calls callbacks as responses complete.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class ResponseSetMonitor implements \Countable
+final class CallbackHttpClient implements HttpClientInterface, \Countable
 {
     private $client;
     private $onHeaders;
-    private $onBody;
+    private $onContent;
     private $onError;
     private $responses;
 
-    public function __construct(HttpClientInterface $client, callable $onHeaders = null, callable $onBody = null, callable $onError = null)
+    public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
-        $this->onHeaders = $onHeaders;
-        $this->onBody = $onBody;
-        $this->onError = $onError;
         $this->responses = new \SplObjectStorage();
+    }
+
+    public function withCallbacks(?callable $onHeaders, callable $onContent = null, callable $onError = null): self
+    {
+        $new = clone $this;
+
+        $new->responses = $this->responses;
+        $new->onHeaders = $onHeaders;
+        $new->onContent = $onContent;
+        $new->onError = $onError;
+
+        return $new;
     }
 
     /**
@@ -42,10 +52,24 @@ final class ResponseSetMonitor implements \Countable
      *
      * The response must be created with the same client that was passed to the constructor.
      */
-    public function add(ResponseInterface $response, callable $onHeaders = null, callable $onBody = null, callable $onError = null): void
+    public function request(string $method, string $url, array $options): ResponseInterface
     {
-        $this->responses[$response] = [$onHeaders, $onBody, $onError];
-        $this->tick();
+        $response = $this->client->request($method, $url, $options);
+
+        if (null !== $this->onHeaders || null !== $this->onContent || null !== $this->onError) {
+            $this->responses[$response] = [$onHeaders, $onContent, $onError];
+            $this->tick();
+        }
+
+        return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stream($responses, float $timeout = null): ResponseStreamInterface
+    {
+        return new CallbackResponseStream($this->client->stream($responses, $timeout));
     }
 
     /**
@@ -79,7 +103,7 @@ final class ResponseSetMonitor implements \Countable
             $response->cancel();
         }
 
-        $this->responses = new \SplObjectStorage();
+        $this->responses->removeAll($this->responses);
     }
 
     /**
@@ -104,41 +128,17 @@ final class ResponseSetMonitor implements \Countable
             $startTime = microtime(true);
         }
 
-        foreach ($this->client->stream($this->responses, $remainingTimeout) as $response => $chunk) {
+        $stream = $this->client->stream($this->responses, $remainingTimeout);
+        $stream = new CallbackResponseStream($stream, true);
+
+        foreach ($stream as $chunk) {
             try {
-                if ($chunk->isTimeout() && !$errorOnTimeout) {
-                    continue;
-                }
-
-                if (!$chunk->isFirst() && !$chunk->isLast()) {
-                    continue;
-                }
-
-                [$onHeaders, $onBody] = $this->responses[$response];
-                $onHeaders = $onHeaders ?? $this->onHeaders;
-                $onBody = $onBody ?? $this->onBody;
-
-                if (null !== $onHeaders && $chunk->isFirst()) {
-                    $onHeaders($response);
-                }
-
-                if (null !== $onBody && $chunk->isLast()) {
-                    $onBody($response);
-                }
-
-                if (null === $onBody || $chunk->isLast()) {
-                    unset($this->responses[$response]);
+                if ($chunk->isTimeout() && $errorOnTimeout) {
+                    // throw an exception on timeout
+                    $chunk->isFirst();
                 }
             } catch (ExceptionInterface $e) {
-                [, , $onError] = $this->responses[$response];
-                $onError = $onError ?? $this->onError;
-                unset($this->responses[$response]);
-
-                if (null !== $onError) {
-                    $onError($e, $response);
-                } else {
-                    $error = $error ?? $e;
-                }
+                $error = $error ?? $e;
             } finally {
                 if (!$errorOnTimeout && $remainingTimeout) {
                     $remainingTimeout = max(0.0, $timeout - microtime(true) + $startTime);

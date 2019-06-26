@@ -98,9 +98,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             'http_code' => 0,
             'redirect_count' => 0,
             'start_time' => 0.0,
-            'fopen_time' => 0.0,
             'connect_time' => 0.0,
             'redirect_time' => 0.0,
+            'pretransfer_time' => 0.0,
             'starttransfer_time' => 0.0,
             'total_time' => 0.0,
             'namelookup_time' => 0.0,
@@ -118,7 +118,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $onProgress = static function (...$progress) use ($onProgress, &$lastProgress, &$info) {
                 $progressInfo = $info;
                 $progressInfo['url'] = implode('', $info['url']);
-                unset($progressInfo['fopen_time'], $progressInfo['size_body']);
+                unset($progressInfo['size_body']);
 
                 if ($progress && -1 === $progress[0]) {
                     // Response completed
@@ -133,14 +133,14 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
         // Always register a notification callback to compute live stats about the response
         $notification = static function (int $code, int $severity, ?string $msg, int $msgCode, int $dlNow, int $dlSize) use ($onProgress, &$info) {
-            $now = microtime(true);
-            $info['total_time'] = $now - $info['start_time'];
+            $info['total_time'] = microtime(true) - $info['start_time'];
 
             if (STREAM_NOTIFY_PROGRESS === $code) {
+                $info['starttransfer_time'] = $info['starttransfer_time'] ?: $info['total_time'];
                 $info['size_upload'] += $dlNow ? 0 : $info['size_body'];
                 $info['size_download'] = $dlNow;
             } elseif (STREAM_NOTIFY_CONNECT === $code) {
-                $info['connect_time'] += $now - $info['fopen_time'];
+                $info['connect_time'] = $info['total_time'];
                 $info['debug'] .= $info['request_header'];
                 unset($info['request_header']);
             } else {
@@ -310,7 +310,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 throw new TransportException(sprintf('Could not resolve host "%s".', $host));
             }
 
-            $info['namelookup_time'] += microtime(true) - $now;
+            $info['namelookup_time'] = microtime(true) - ($info['start_time'] ?: $now);
             $multi->dnsCache[$host] = $ip = $ip[0];
             $info['debug'] .= "* Added {$host}:0:{$ip} to DNS cache\n";
         } else {
@@ -368,10 +368,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 return null;
             }
 
-            $now = microtime(true);
             $info['url'] = $url;
             ++$info['redirect_count'];
-            $info['redirect_time'] = $now - $info['start_time'];
+            $info['redirect_time'] = microtime(true) - $info['start_time'];
 
             // Do like curl and browsers: turn POST to GET on 301, 302 and 303
             if (\in_array($info['http_code'], [301, 302, 303], true)) {

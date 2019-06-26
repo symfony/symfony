@@ -175,6 +175,19 @@ class TransportTest extends TestCase
         $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
         $transport->send($message);
 
+        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html('test');
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
+
+        $stream = fopen('data://text/plain,'.$message->getTextBody(), 'r');
+        $message = (new Email())->from('me@me.com')->to('you@you.com')->subject('hello')->html($stream);
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->with('POST', 'https://api.mailgun.net/v3/pa%24s/messages')->willReturn($response);
+        $transport = Transport::fromDsn('api://'.urlencode('u$er').':'.urlencode('pa$s').'@mailgun?region=us', $dispatcher, $client, $logger);
+        $transport->send($message);
+
         $this->expectException(LogicException::class);
         Transport::fromDsn('foo://mailgun');
     }

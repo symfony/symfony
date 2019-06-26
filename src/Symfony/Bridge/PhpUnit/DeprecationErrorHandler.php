@@ -134,13 +134,10 @@ class DeprecationErrorHandler
                 $group = 'unsilenced';
             } elseif ($deprecation->isLegacy(self::$utilPrefix)) {
                 $group = 'legacy';
+            } elseif (!$deprecation->isSelf()) {
+                $group = $deprecation->isIndirect() ? 'remaining indirect' : 'remaining direct';
             } else {
-                $group = [
-                    Deprecation::TYPE_SELF => 'remaining self',
-                    Deprecation::TYPE_DIRECT => 'remaining direct',
-                    Deprecation::TYPE_INDIRECT => 'remaining indirect',
-                    Deprecation::TYPE_UNDETERMINED => 'other',
-                ][$deprecation->getType()];
+                $group = 'remaining self';
             }
 
             if ($this->getConfiguration()->shouldDisplayStackTrace($msg)) {

@@ -33,7 +33,7 @@ class DeprecationTest extends TestCase
         }
 
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertSame(Deprecation::TYPE_SELF, $deprecation->getType());
+        $this->assertTrue($deprecation->isSelf());
     }
 
     public function testLegacyTestMethodIsDetectedAsSuch()
@@ -52,7 +52,7 @@ class DeprecationTest extends TestCase
     public function testItRulesOutFilesOutsideVendorsAsIndirect()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);
-        $this->assertNotSame(Deprecation::TYPE_INDIRECT, $deprecation->getType());
+        $this->assertFalse($deprecation->isIndirect());
     }
 
     /**

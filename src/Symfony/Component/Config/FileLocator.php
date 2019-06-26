@@ -33,7 +33,7 @@ class FileLocator implements FileLocatorInterface
     /**
      * {@inheritdoc}
      */
-    public function locate($name, $currentPath = null, $first = true)
+    public function locate(string $name, string $currentPath = null, $first = true)
     {
         if ('' == $name) {
             throw new \InvalidArgumentException('An empty file name is not valid to be located.');
@@ -81,7 +81,7 @@ class FileLocator implements FileLocatorInterface
      *
      * @return bool
      */
-    private function isAbsolutePath($file)
+    private function isAbsolutePath(string $file)
     {
         if ('/' === $file[0] || '\\' === $file[0]
             || (\strlen($file) > 3 && ctype_alpha($file[0])

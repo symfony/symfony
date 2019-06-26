@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-25T07:47:47Z
+
+While reviewing #29411 I realised that we should probably apply a patch similar to #31991 to the `3.4` branch too (see https://blackfire.io/profiles/compare/1427891b-5ce6-425a-a09b-ff998b1405ca/graph for a comparison).

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * added InvalidTtlException
+ 
 4.2.0
 -----
 

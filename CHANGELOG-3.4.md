@@ -7,6 +7,31 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.29 (2019-06-26)
+
+ * bug #32137 [HttpFoundation] fix accessing session bags (xabbuh)
+ * bug #32164 [EventDispatcher] collect called listeners information only once (xabbuh)
+ * bug #32173 [FrameworkBundle] Fix calling Client::getProfile() before sending a request (dunglas)
+ * bug #32163 [DoctrineBridge] Fix type error (norkunas)
+ * bug #32170 [Security/Core] Don't use ParagonIE_Sodium_Compat (nicolas-grekas)
+ * bug #32123 [Form] fix translation domain (xabbuh)
+ * bug #32116 [FrameworkBundle] tag the FileType service as a form type (xabbuh)
+ * bug #32090 [Debug] workaround BC break in PHP 7.3 (nicolas-grekas)
+ * bug #32071 Fix expired lock not cleaned (jderusse)
+ * bug #32057 [HttpFoundation] Fix SA/phpdoc JsonResponse (ro0NL)
+ * bug #32025 SimpleCacheAdapter fails to cache any item if a namespace is used (moufmouf)
+ * bug #32037 [Form] validate composite constraints in all groups (xabbuh)
+ * bug #32007 [Serializer] Handle true and false appropriately in CSV encoder (battye)
+ * bug #32000 [Routing] fix absolute url generation when scheme is not known (Tobion)
+ * bug #32024 [VarDumper] fix dumping objects that implement __debugInfo() (nicolas-grekas)
+ * bug #31962 Fix reporting unsilenced deprecations from insulated tests (nicolas-grekas)
+ * bug #31865 [Form] Fix wrong DateTime on outdated ICU library (aweelex)
+ * bug #31863 [HttpFoundation] Fixed case-sensitive handling of cache-control header in RedirectResponse constructor (Ivo)
+ * bug #31869 Fix json-encoding when JSON_THROW_ON_ERROR is used (nicolas-grekas)
+ * bug #31860 [HttpFoundation] work around PHP 7.3 bug related to json_encode() (nicolas-grekas)
+ * bug #31407 [Security] added support for updated "distinguished name" format in x509 authentication (Robert Kopera)
+ * bug #31654 [HttpFoundation] Do not set X-Accel-Redirect for paths outside of X-Accel-Mapping (vilius-g)
+
 * 3.4.28 (2019-05-28)
 
  * bug #31584 [Workflow] Do not trigger extra guards (lyrixx)

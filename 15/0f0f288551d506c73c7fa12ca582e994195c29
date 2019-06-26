@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-23T17:49:41Z
+
+> Thanks, we can do similar changes in many place I suppose?
+
+Certainly.
+
+> Do we have a tool to automate doing so?
+
+I'm not aware of any tool that would not require thorough human review after processing the code.
+
+This PR was a manual process. I would volunteer to iterate over the components that I'm familiar with and open similar PRs for them, if you're interested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-23T18:15:46Z
+
+Thanks, that'd be great!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-23T19:11:40Z
+
+Should we open an issue with a checklist of what to look for so we can invite the whole community to check all components?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-25T23:19:25Z
+
+> Should we open an issue with a checklist of what to look for so we can invite the whole community to check all components?
+
+I've created #32179 for this purpose.

@@ -78,31 +78,27 @@ class NumberTypeTest extends BaseTypeTest
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using the Symfony\Component\Form\Extension\Core\Type\NumberType with float or int data when the "input" option is set to "string" is deprecated since Symfony 4.4 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Expected a numeric string.
      */
     public function testStringInputWithFloatData(): void
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 12345.6789, [
+        $this->factory->create(static::TESTED_TYPE, 12345.6789, [
             'input' => 'string',
             'scale' => 2,
         ]);
-
-        $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using the Symfony\Component\Form\Extension\Core\Type\NumberType with float or int data when the "input" option is set to "string" is deprecated since Symfony 4.4 and will throw an exception in 5.0.
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Expected a numeric string.
      */
     public function testStringInputWithIntData(): void
     {
-        $form = $this->factory->create(static::TESTED_TYPE, 12345, [
+        $this->factory->create(static::TESTED_TYPE, 12345, [
             'input' => 'string',
             'scale' => 2,
         ]);
-
-        $this->assertSame('12345,00', $form->createView()->vars['value']);
     }
 
     public function testDefaultFormattingWithRounding(): void

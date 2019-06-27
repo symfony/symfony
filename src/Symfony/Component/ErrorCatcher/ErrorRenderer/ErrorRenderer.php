@@ -62,7 +62,7 @@ class ErrorRenderer
             throw new ErrorRendererNotFoundException(sprintf('No error renderer found for format "%s".', $format));
         }
 
-        if (!$exception instanceof FlattenException) {
+        if ($exception instanceof \Exception) {
             $exception = FlattenException::create($exception);
         }
 

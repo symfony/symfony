@@ -160,7 +160,7 @@ class ExceptionHandler
      */
     public function sendPhpResponse($exception)
     {
-        if (!$exception instanceof FlattenException) {
+        if ($exception instanceof \Exception) {
             $exception = FlattenException::create($exception);
         }
 

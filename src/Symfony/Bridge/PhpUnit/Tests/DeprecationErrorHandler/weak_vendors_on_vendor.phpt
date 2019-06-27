@@ -3,7 +3,8 @@ Test DeprecationErrorHandler with no self deprecations on vendor deprecation
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER=max[self]=0');
+$k = 'SYMFONY_DEPRECATIONS_HELPER';
+putenv($k.'='.$_SERVER[$k] = $_ENV[$k] = 'max[self]=0');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');

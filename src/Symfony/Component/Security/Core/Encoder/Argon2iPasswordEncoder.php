@@ -51,7 +51,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
             return true;
         }
 
-        return \function_exists('sodium_crypto_pwhash_str') || \extension_loaded('libsodium');
+        return version_compare(\extension_loaded('sodium') ? \SODIUM_LIBRARY_VERSION : phpversion('libsodium'), '1.0.9', '>=');
     }
 
     /**

@@ -144,10 +144,16 @@ final class SocketStream extends AbstractStream
             $options['ssl']['crypto_method'] = $options['ssl']['crypto_method'] ?? STREAM_CRYPTO_METHOD_TLS_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
         }
         $streamContext = stream_context_create($options);
-        $this->stream = @stream_socket_client($this->url, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $streamContext);
-        if (false === $this->stream) {
-            throw new TransportException(sprintf('Connection could not be established with host "%s": %s (%s)', $this->url, $errstr, $errno));
+
+        set_error_handler(function ($type, $msg) {
+            throw new TransportException(sprintf('Connection could not be established with host "%s": %s.', $this->url, $msg));
+        });
+        try {
+            $this->stream = stream_socket_client($this->url, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $streamContext);
+        } finally {
+            restore_error_handler();
         }
+
         stream_set_blocking($this->stream, true);
         stream_set_timeout($this->stream, $this->timeout);
         $this->in = &$this->stream;

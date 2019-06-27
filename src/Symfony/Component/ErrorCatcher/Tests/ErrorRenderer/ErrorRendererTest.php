@@ -24,7 +24,7 @@ class ErrorRendererTest extends TestCase
      */
     public function testErrorRendererNotFound()
     {
-        $exception = FlattenException::create(new \Exception('foo'));
+        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
         (new ErrorRenderer([]))->render($exception, 'foo');
     }
 
@@ -34,7 +34,7 @@ class ErrorRendererTest extends TestCase
      */
     public function testInvalidErrorRenderer()
     {
-        $exception = FlattenException::create(new \Exception('foo'));
+        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
         (new ErrorRenderer([new \stdClass()]))->render($exception, 'foo');
     }
 
@@ -43,7 +43,7 @@ class ErrorRendererTest extends TestCase
         $renderers = [new FooErrorRenderer()];
         $errorRenderer = new ErrorRenderer($renderers);
 
-        $exception = FlattenException::create(new \RuntimeException('Foo'));
+        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));
     }
 }

@@ -27,7 +27,7 @@ class ErrorRendererTest extends TestCase
         $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
         $container->expects($this->once())->method('has')->with('foo')->willReturn(false);
 
-        $exception = FlattenException::create(new \Exception('Foo'));
+        $exception = FlattenException::createFromThrowable(new \Exception('Foo'));
         (new ErrorRenderer($container))->render($exception, 'foo');
     }
 
@@ -48,7 +48,7 @@ class ErrorRendererTest extends TestCase
 
         $errorRenderer = new ErrorRenderer($container);
 
-        $exception = FlattenException::create(new \RuntimeException('Foo'));
+        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));
     }
 }

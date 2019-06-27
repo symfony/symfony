@@ -150,7 +150,7 @@ EOF
         } catch (\Exception $e) {
             // something nasty happened and we cannot throw an exception anymore
             if ($this->debug) {
-                $e = FlattenException::create($e);
+                $e = FlattenException::createFromThrowable($e);
                 $exceptionMessage = sprintf('Exception thrown when handling an exception (%s: %s)', $e->getClass(), $this->escapeHtml($e->getMessage()));
             } else {
                 $exceptionMessage = 'Whoops, looks like something went wrong.';

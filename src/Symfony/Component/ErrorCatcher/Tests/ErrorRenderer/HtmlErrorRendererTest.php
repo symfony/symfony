@@ -19,7 +19,7 @@ class HtmlErrorRendererTest extends TestCase
 {
     public function testRender()
     {
-        $exception = FlattenException::create(new \RuntimeException('Foo'));
+        $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $expected = '<!DOCTYPE html>%A<html>%A<head>%A<title>Internal Server Error</title>%A<h1 class="break-long-words exception-message">Foo</h1>%A<abbr title="RuntimeException">RuntimeException</abbr>%A';
 
         $this->assertStringMatchesFormat($expected, (new HtmlErrorRenderer())->render($exception));

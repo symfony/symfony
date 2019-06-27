@@ -42,7 +42,7 @@ class ExceptionListener implements EventSubscriberInterface
 
     public function logKernelException(ExceptionEvent $event)
     {
-        $e = FlattenException::create($event->getException());
+        $e = FlattenException::createFromThrowable($event->getException());
 
         $this->logException($event->getException(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
@@ -64,7 +64,7 @@ class ExceptionListener implements EventSubscriberInterface
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
-            $f = FlattenException::create($e);
+            $f = FlattenException::createFromThrowable($e);
 
             $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', $f->getClass(), $f->getMessage(), $e->getFile(), $e->getLine()));
 
@@ -130,7 +130,7 @@ class ExceptionListener implements EventSubscriberInterface
     {
         $attributes = [
             '_controller' => $this->controller,
-            'exception' => FlattenException::create($exception),
+            'exception' => FlattenException::createFromThrowable($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
         ];
         $request = $request->duplicate(null, null, $attributes);

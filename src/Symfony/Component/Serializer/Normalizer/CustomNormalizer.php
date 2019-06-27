@@ -25,7 +25,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         return $object->normalize($this->serializer, $format, $context);
     }
@@ -33,7 +33,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         $object = $this->extractObjectToPopulate($class, $context) ?: new $class();
         $object->denormalize($this->serializer, $data, $format, $context);
@@ -49,7 +49,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @return bool
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof NormalizableInterface;
     }
@@ -63,7 +63,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @return bool
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return is_subclass_of($type, DenormalizableInterface::class);
     }

@@ -23,5 +23,5 @@ interface ContextAwareDecoderInterface extends DecoderInterface
      *
      * @param array $context options that decoders have access to
      */
-    public function supportsDecoding($format, array $context = []);
+    public function supportsDecoding(string $format, array $context = []);
 }

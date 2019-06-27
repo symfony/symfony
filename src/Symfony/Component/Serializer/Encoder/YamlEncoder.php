@@ -43,7 +43,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = [])
+    public function encode($data, string $format, array $context = [])
     {
         $context = array_merge($this->defaultContext, $context);
 
@@ -53,7 +53,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }
@@ -61,7 +61,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = [])
     {
         $context = array_merge($this->defaultContext, $context);
 
@@ -71,7 +71,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format)
     {
         return self::FORMAT === $format || self::ALTERNATIVE_FORMAT === $format;
     }

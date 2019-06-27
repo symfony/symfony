@@ -72,7 +72,7 @@ class JsonDecode implements DecoderInterface
      *
      * @see http://php.net/json_decode json_decode
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = [])
     {
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
@@ -98,7 +98,7 @@ class JsonDecode implements DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format)
+    public function supportsDecoding(string $format)
     {
         return JsonEncoder::FORMAT === $format;
     }

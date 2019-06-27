@@ -25,7 +25,7 @@ class ResolveServiceSubscribersPass extends AbstractRecursivePass
 {
     private $serviceLocator;
 
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof Reference && $this->serviceLocator && \in_array((string) $value, [ContainerInterface::class, ServiceProviderInterface::class], true)) {
             return new Reference($this->serviceLocator);

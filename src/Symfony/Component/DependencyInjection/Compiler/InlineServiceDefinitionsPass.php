@@ -101,7 +101,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         if ($value instanceof ArgumentInterface) {
             // Reference found in ArgumentInterface::getValues() are not inlineable
@@ -155,7 +155,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
      *
      * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition($id, Definition $definition)
+    private function isInlineableDefinition(string $id, Definition $definition)
     {
         if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
             return false;

@@ -18,7 +18,7 @@ class SocketStreamTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Mailer\Exception\TransportException
-     * @expectedExceptionMessage Connection refused
+     * @expectedExceptionMessageRegExp /Connection refused|unable to connect/
      */
     public function testSocketErrorNoConnection()
     {
@@ -30,7 +30,7 @@ class SocketStreamTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Mailer\Exception\TransportException
-     * @expectedExceptionMessage no valid certs found cafile stream
+     * @expectedExceptionMessageRegExp /no valid certs found cafile stream|Unable to find the socket transport "ssl"/
      */
     public function testSocketErrorBeforeConnectError()
     {

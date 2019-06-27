@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\ErrorHandler\ErrorHandler as BaseErrorHandler;
+use Symfony\Component\ErrorCatcher\ErrorHandler as BaseErrorHandler;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ErrorHandler::class, BaseErrorHandler::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\ErrorHandler instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\ErrorHandler instead.
  */
 class ErrorHandler extends BaseErrorHandler
 {

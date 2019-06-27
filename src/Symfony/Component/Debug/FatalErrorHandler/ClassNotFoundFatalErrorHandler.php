@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug\FatalErrorHandler;
 
-use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler as BaseClassNotFoundFatalErrorHandler;
+use Symfony\Component\ErrorCatcher\FatalErrorHandler\ClassNotFoundFatalErrorHandler as BaseClassNotFoundFatalErrorHandler;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundFatalErrorHandler::class, BaseClassNotFoundFatalErrorHandler::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\ClassNotFoundFatalErrorHandler instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\FatalErrorHandler\ClassNotFoundFatalErrorHandler instead.
  */
 class ClassNotFoundFatalErrorHandler extends BaseClassNotFoundFatalErrorHandler
 {

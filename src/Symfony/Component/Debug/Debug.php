@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Debug;
 
+use Symfony\Component\ErrorHandler\BufferingLogger;
+use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\ErrorHandler\ExceptionHandler;
+
 /**
  * Registers all the debug tools.
  *

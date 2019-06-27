@@ -11,22 +11,13 @@
 
 namespace Symfony\Component\Debug\FatalErrorHandler;
 
-use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface as BaseFatalErrorHandlerInterface;
+
+@trigger_error(sprintf('The "%s" interface is deprecated since Symfony 4.4, use "%s" instead.', FatalErrorHandlerInterface::class, BaseFatalErrorHandlerInterface::class), E_USER_DEPRECATED);
 
 /**
- * Attempts to convert fatal errors to exceptions.
- *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface instead.
  */
-interface FatalErrorHandlerInterface
+interface FatalErrorHandlerInterface extends BaseFatalErrorHandlerInterface
 {
-    /**
-     * Attempts to convert an error into an exception.
-     *
-     * @param array               $error     An array as returned by error_get_last()
-     * @param FatalErrorException $exception A FatalErrorException instance
-     *
-     * @return FatalErrorException|null A FatalErrorException instance if the class is able to convert the error, null otherwise
-     */
-    public function handleError(array $error, FatalErrorException $exception);
 }

@@ -20,7 +20,7 @@
         "symfony/config": "^4.2|^5.0",
         "symfony/twig-bridge": "^4.4|^5.0",
         "symfony/http-foundation": "^4.3|^5.0",
-        "symfony/http-kernel": "^4.1|^5.0",
+        "symfony/http-kernel": "^4.4|^5.0",
         "symfony/polyfill-ctype": "~1.8",
         "twig/twig": "~1.41|~2.10"
     },

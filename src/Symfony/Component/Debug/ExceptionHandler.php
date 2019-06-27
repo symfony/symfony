@@ -60,11 +60,11 @@ class ExceptionHandler
      *
      * @param bool        $debug          Enable/disable debug mode, where the stack trace is displayed
      * @param string|null $charset        The charset used by exception messages
-     * @param string|null $fileLinkFormat The IDE link template
+     * @param string|FileLinkFormatter|null $fileLinkFormat The IDE link template
      *
      * @return static
      */
-    public static function register(bool $debug = true, string $charset = null, string $fileLinkFormat = null)
+    public static function register(bool $debug = true, string $charset = null, $fileLinkFormat = null)
     {
         $handler = new static($debug, $charset, $fileLinkFormat);
 

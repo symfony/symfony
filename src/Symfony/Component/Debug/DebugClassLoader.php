@@ -128,9 +128,6 @@ class DebugClassLoader
         }
     }
 
-    /**
-     * @return string|null
-     */
     public function findFile(string $class = null)
     {
         return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
@@ -138,8 +135,6 @@ class DebugClassLoader
 
     /**
      * Loads the given class or interface.
-     *
-     * @param string $class The name of the class
      *
      * @throws \RuntimeException
      */

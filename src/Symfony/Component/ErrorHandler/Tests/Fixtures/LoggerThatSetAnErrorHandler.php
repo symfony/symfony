@@ -2,14 +2,24 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
 
-use Symfony\Component\ErrorHandler\BufferingLogger;
+use Psr\Log\AbstractLogger;
 
-class LoggerThatSetAnErrorHandler extends BufferingLogger
+class LoggerThatSetAnErrorHandler extends AbstractLogger
 {
+    private $logs = [];
+
     public function log($level, $message, array $context = [])
     {
         set_error_handler('is_string');
-        parent::log($level, $message, $context);
+        $this->logs[] = [$level, $message, $context];
         restore_error_handler();
+    }
+
+    public function cleanLogs(): array
+    {
+        $logs = $this->logs;
+        $this->logs = [];
+
+        return $logs;
     }
 }

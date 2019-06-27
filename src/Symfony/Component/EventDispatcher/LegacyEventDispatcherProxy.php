@@ -14,7 +14,7 @@ namespace Symfony\Component\EventDispatcher;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * An helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
+ * A helper class to provide BC/FC with the legacy signature of EventDispatcherInterface::dispatch().
  *
  * This class should be deprecated in Symfony 5.1
  *

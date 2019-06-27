@@ -48,7 +48,7 @@ final class SodiumPasswordEncoder implements PasswordEncoderInterface, SelfSalti
 
     public static function isSupported(): bool
     {
-        return \function_exists('sodium_crypto_pwhash_str_needs_rehash') || \function_exists('Sodium\crypto_pwhash_str_needs_rehash');
+        return version_compare(\extension_loaded('sodium') ? \SODIUM_LIBRARY_VERSION : phpversion('libsodium'), '1.0.14', '>=');
     }
 
     /**

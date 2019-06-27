@@ -1,0 +1,167 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-04-11T08:12:56Z
+
+This is gonna be really nice !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-12T14:40:49Z
+
+Would it make sense no name the component `ErrorHandler`?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-12T15:28:28Z
+
+> Would it make sense no name the component ErrorHandler?
+
+Does that make me think that we should move `ErrorHandler` and` ExceptionHandler` classes from the Debug component to here, also? Currently, this component only solve the convertion of the exception to a formatted output (html, json, etc) but there is no `register()`/`handle()` method involved at this moment.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-12T15:31:09Z
+
+The discussion we had with @fabpot and @nicolas-grekas in Brussels concluded that we should indeed create a new component for error handling. Having the production error handling being a responsibility of a component named debug looks weird, as prod is not in debug mode.
+
+---------------------------------------------------------------------------
+
+by stof at 2019-04-12T15:36:06Z
+
+I don't think having an ErrorException class being responsible both for representing the Exception and for rendering it in multiple formats is the right architecture for the component though. This is not extendable at all, and cannot even be configurable (as you cannot instantiate the rendering layer in a place configuring it).
+
+To me, we need 3 *separate* things in the component:
+
+- the ExceptionHandler/ErrorHandler (moved from Debug)
+- the value object representing the actual exception
+- a renderer layer knowing how to render the exception in different format (HTML, JSON corresponding to some standard format, XML, etc...)
+
+And then, the Twig-based HTML error page should ideally become a hook into this renderer layer rather than being a totally separate rendering system.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-12T15:41:31Z
+
+I agree, we should also discuss about BC then, there is a lot of exception classes in Debug component used by these two handlers and we wouldn't want this new component require to `symfony/debug` :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-12T19:59:12Z
+
+*Update*
+
+ - Component renamed to "ErrorHandler" as suggested by Nicolas (it's a better name IMO too).
+ - Almost everything was moved from the Debug component because interdependence between handlers -> classes/interface, except `Debug` class.
+
+Still working on the renderer layer...
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-12T20:11:55Z
+
+> How about being able to support more formats ? Wouldn't it be better to have some sort of factory so that we can use whatever format we want ?
+
+Thanks @Taluu for your input, yes I'm working on it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-14T00:08:28Z
+
+**Update**
+
+- Added error renderer layer with interface + DI tag `error_handler.renderer` to add custom format/renderer:
+```php
+interface ErrorRendererInterface
+{
+    /**
+     * Gets the format of the content.
+     *
+     * @return string The content format
+     */
+    public static function getFormat(): string;
+
+    /**
+     * Renders an Exception and returns the Response content.
+     *
+     * @return string The Response content as a string
+     */
+    public function render(FlattenException $exception): string;
+}
+```
+- Added FrameworkBundle integration.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-14T00:08:33Z
+
+> And then, the Twig-based HTML error page should ideally become a hook into this renderer layer rather than being a totally separate rendering system.
+
+There are many changes (a big diff), most are movements + deprecations, so I prefer to leave this last issue for another PR
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-14T02:47:35Z
+
+The PR app demo is ready: https://github.com/yceruto/error-handler-app ([add custom error renderer](https://github.com/yceruto/error-handler-app/commit/06fc647841e327c05515c0da8e2c789aea808228))
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-14T02:50:02Z
+
+I guess fabbot.io failures related to `src/Symfony/Bridge/PhpUnit/Legacy/SymfonyTestsListenerTrait.php` should be ignored, isn't it?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-14T05:48:14Z
+
+Tests green! ready on my side.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-16T14:54:03Z
+
+Thanks @javiereguiluz for your review, comments addressed!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-17T13:30:28Z
+
+Now in production, the HTML error page will look like this (by default):
+![error-500](https://user-images.githubusercontent.com/2028198/56290962-4f484800-60f2-11e9-963a-c55c2e1bdb46.png)
+Same of https://github.com/symfony/symfony/pull/27699 but without TwigBundle, next https://github.com/symfony/symfony/pull/31065#issuecomment-482902891 we will reuse this one there.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-22T12:38:16Z
+
+Thanks @onEXHovia for your review.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-04-23T23:25:31Z
+
+I've splitted the main commit into several topics for easy review :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-05-28T18:56:44Z
+
+Now the Travis failures `dep=high` will be normal until the code is merged into `master|5.0`
+
+This is ready on my side and is very prone to conflicts because the large amount of files touched. Please let me know if I should split this PR for a better review or something else.
+
+friendly ping @fabpot @nicolas-grekas, does this proposal come close to what you had in mind?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-28T18:58:45Z
+
+Thanks for the ping, now that 4.3 is behind us, I will have a look at this PR closely in the next few days.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2019-06-20T15:35:35Z
+
+(Travis dep=high failures expected)
+
+Status: Needs Review

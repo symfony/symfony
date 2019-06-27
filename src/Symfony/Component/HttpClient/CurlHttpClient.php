@@ -39,7 +39,10 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
     use HttpClientTrait;
     use LoggerAwareTrait;
 
-    private $defaultOptions = self::OPTIONS_DEFAULTS;
+    private $defaultOptions = self::OPTIONS_DEFAULTS + [
+        'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
+                             //   password as the second one; or string like username:password - enabling NTLM auth
+    ];
 
     /**
      * An internal object to share state between the client and its responses.
@@ -151,6 +154,25 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface
             CURLOPT_KEYPASSWD => $options['passphrase'],
             CURLOPT_CERTINFO => $options['capture_peer_cert_chain'],
         ];
+
+        if (isset($options['auth_ntlm'])) {
+            $curlopts[CURLOPT_HTTPAUTH] = CURLAUTH_NTLM;
+
+            if (\is_array($options['auth_ntlm'])) {
+                $count = \count($options['auth_ntlm']);
+                if ($count <= 0 || $count > 2) {
+                    throw new InvalidArgumentException(sprintf('Option "auth_ntlm" must contain 1 or 2 elements, %s given.', $count));
+                }
+
+                $options['auth_ntlm'] = implode(':', $options['auth_ntlm']);
+            }
+
+            if (!\is_string($options['auth_ntlm'])) {
+                throw new InvalidArgumentException(sprintf('Option "auth_ntlm" must be string or an array, %s given.', \gettype($options['auth_ntlm'])));
+            }
+
+            $curlopts[CURLOPT_USERPWD] = $options['auth_ntlm'];
+        }
 
         if (!ZEND_THREAD_SAFE) {
             $curlopts[CURLOPT_DNS_USE_GLOBAL_CACHE] = false;

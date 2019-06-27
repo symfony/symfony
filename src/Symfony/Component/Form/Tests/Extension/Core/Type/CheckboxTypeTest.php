@@ -15,7 +15,7 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class CheckboxTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CheckboxType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CheckboxType';
 
     public function testDataIsFalseByDefault()
     {

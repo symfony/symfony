@@ -28,6 +28,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MailgunTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://api.%region_dot%mailgun.net/v3/%domain%/messages.mime';
+
     private $key;
     private $domain;
     private $region;

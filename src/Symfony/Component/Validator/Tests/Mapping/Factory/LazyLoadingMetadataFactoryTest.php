@@ -20,11 +20,11 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class LazyLoadingMetadataFactoryTest extends TestCase
 {
-    const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
-    const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
-    const INTERFACE_B_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB';
-    const PARENT_INTERFACE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParentInterface';
+    public const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    public const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    public const INTERFACE_A_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceA';
+    public const INTERFACE_B_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB';
+    public const PARENT_INTERFACE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParentInterface';
 
     public function testLoadClassMetadataWithInterface()
     {

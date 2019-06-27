@@ -23,7 +23,7 @@ use Twig\Environment;
  */
 class FormRenderer implements FormRendererInterface
 {
-    const CACHE_KEY_VAR = 'unique_block_prefix';
+    public const CACHE_KEY_VAR = 'unique_block_prefix';
 
     private $engine;
     private $csrfTokenManager;

@@ -20,8 +20,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHan
  */
 class MemcachedSessionHandlerTest extends TestCase
 {
-    const PREFIX = 'prefix_';
-    const TTL = 1000;
+    public const PREFIX = 'prefix_';
+    public const TTL = 1000;
 
     /**
      * @var MemcachedSessionHandler

@@ -19,10 +19,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 class EventDispatcherTest extends TestCase
 {
     /* Some pseudo events */
-    const preFoo = 'pre.foo';
-    const postFoo = 'post.foo';
-    const preBar = 'pre.bar';
-    const postBar = 'post.bar';
+    public const preFoo = 'pre.foo';
+    public const postFoo = 'post.foo';
+    public const preBar = 'pre.bar';
+    public const postBar = 'post.bar';
 
     /**
      * @var EventDispatcher

@@ -20,7 +20,7 @@ namespace Symfony\Component\Validator\Constraints;
  */
 class NotIdenticalTo extends AbstractComparison
 {
-    const IS_IDENTICAL_ERROR = '4aaac518-0dda-4129-a6d9-e216b9b454a0';
+    public const IS_IDENTICAL_ERROR = '4aaac518-0dda-4129-a6d9-e216b9b454a0';
 
     protected static $errorNames = [
         self::IS_IDENTICAL_ERROR => 'IS_IDENTICAL_ERROR',

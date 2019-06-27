@@ -17,8 +17,8 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
 class PropertyMetadataTest extends TestCase
 {
-    const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
-    const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
+    public const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    public const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
 
     public function testInvalidPropertyName()
     {

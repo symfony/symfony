@@ -35,9 +35,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class AssetsInstallCommand extends Command
 {
-    const METHOD_COPY = 'copy';
-    const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
-    const METHOD_RELATIVE_SYMLINK = 'relative symlink';
+    public const METHOD_COPY = 'copy';
+    public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
+    public const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
     protected static $defaultName = 'assets:install';
 

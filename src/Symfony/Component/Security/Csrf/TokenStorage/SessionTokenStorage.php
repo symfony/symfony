@@ -24,7 +24,7 @@ class SessionTokenStorage implements ClearableTokenStorageInterface
     /**
      * The namespace used to store values in the session.
      */
-    const SESSION_NAMESPACE = '_csrf';
+    public const SESSION_NAMESPACE = '_csrf';
 
     private $session;
     private $namespace;

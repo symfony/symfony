@@ -28,13 +28,10 @@ use Symfony\Component\Workflow\Transition;
  */
 class PlantUmlDumper implements DumperInterface
 {
-    private const INITIAL = '<<initial>>';
-    private const MARKED = '<<marked>>';
-
-    const STATEMACHINE_TRANSITION = 'arrow';
-    const WORKFLOW_TRANSITION = 'square';
-    const TRANSITION_TYPES = [self::STATEMACHINE_TRANSITION, self::WORKFLOW_TRANSITION];
-    const DEFAULT_OPTIONS = [
+    public const STATEMACHINE_TRANSITION = 'arrow';
+    public const WORKFLOW_TRANSITION = 'square';
+    public const TRANSITION_TYPES = [self::STATEMACHINE_TRANSITION, self::WORKFLOW_TRANSITION];
+    public const DEFAULT_OPTIONS = [
         'skinparams' => [
             'titleBorderRoundCorner' => 15,
             'titleBorderThickness' => 2,
@@ -51,6 +48,9 @@ class PlantUmlDumper implements DumperInterface
             ],
         ],
     ];
+
+    private const INITIAL = '<<initial>>';
+    private const MARKED = '<<marked>>';
 
     private $transitionType = self::STATEMACHINE_TRANSITION;
 

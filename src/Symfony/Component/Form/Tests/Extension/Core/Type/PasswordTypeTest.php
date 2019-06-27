@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class PasswordTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\PasswordType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\PasswordType';
 
     public function testEmptyIfNotSubmitted()
     {

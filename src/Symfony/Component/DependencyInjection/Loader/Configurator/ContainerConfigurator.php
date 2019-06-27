@@ -26,7 +26,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class ContainerConfigurator extends AbstractConfigurator
 {
-    const FACTORY = 'container';
+    public const FACTORY = 'container';
 
     private $container;
     private $loader;

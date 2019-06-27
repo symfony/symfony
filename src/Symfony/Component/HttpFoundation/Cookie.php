@@ -29,9 +29,9 @@ class Cookie
     private $sameSite;
     private $secureDefault = false;
 
-    const SAMESITE_NONE = 'none';
-    const SAMESITE_LAX = 'lax';
-    const SAMESITE_STRICT = 'strict';
+    public const SAMESITE_NONE = 'none';
+    public const SAMESITE_LAX = 'lax';
+    public const SAMESITE_STRICT = 'strict';
 
     /**
      * Creates cookie from raw header string.

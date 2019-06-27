@@ -16,7 +16,7 @@ use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CollectionType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CollectionType';
 
     public function testContainsNoChildByDefault()
     {

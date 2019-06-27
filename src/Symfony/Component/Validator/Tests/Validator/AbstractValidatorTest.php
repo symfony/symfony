@@ -28,9 +28,9 @@ use Symfony\Component\Validator\Tests\Fixtures\Reference;
  */
 abstract class AbstractValidatorTest extends TestCase
 {
-    const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
+    public const ENTITY_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
-    const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
+    public const REFERENCE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\Reference';
 
     /**
      * @var FakeMetadataFactory

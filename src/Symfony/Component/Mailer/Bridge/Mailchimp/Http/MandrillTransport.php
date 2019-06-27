@@ -26,6 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MandrillTransport extends AbstractHttpTransport
 {
     private const ENDPOINT = 'https://mandrillapp.com/api/1.0/messages/send-raw.json';
+
     private $key;
 
     public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)

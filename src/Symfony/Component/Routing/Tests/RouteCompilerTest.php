@@ -404,5 +404,5 @@ class RouteCompilerTest extends TestCase
 
 class Utf8RouteCompiler extends RouteCompiler
 {
-    const SEPARATORS = '/§';
+    public const SEPARATORS = '/§';
 }

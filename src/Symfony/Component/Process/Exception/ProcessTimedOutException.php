@@ -20,8 +20,8 @@ use Symfony\Component\Process\Process;
  */
 class ProcessTimedOutException extends RuntimeException
 {
-    const TYPE_GENERAL = 1;
-    const TYPE_IDLE = 2;
+    public const TYPE_GENERAL = 1;
+    public const TYPE_IDLE = 2;
 
     private $process;
     private $timeoutType;

@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
  */
 class Url extends Constraint
 {
-    const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
+    public const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
 
     protected static $errorNames = [
         self::INVALID_URL_ERROR => 'INVALID_URL_ERROR',

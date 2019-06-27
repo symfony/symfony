@@ -70,7 +70,7 @@ class ReflectionClassResourceTest extends TestCase
 /* 0*/
 /* 1*/  class %s extends ErrorException
 /* 2*/  {
-/* 3*/      const FOO = 123;
+/* 3*/      public const FOO = 123;
 /* 4*/
 /* 5*/      public $pub = [];
 /* 6*/

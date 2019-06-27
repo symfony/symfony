@@ -28,8 +28,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateType extends AbstractType
 {
-    const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
-    const HTML5_FORMAT = 'yyyy-MM-dd';
+    public const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
+    public const HTML5_FORMAT = 'yyyy-MM-dd';
 
     private static $acceptedFormats = [
         \IntlDateFormatter::FULL,

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessor;
 
 class EnvVarProcessorTest extends TestCase
 {
-    const TEST_CONST = 'test';
+    public const TEST_CONST = 'test';
 
     /**
      * @dataProvider validStrings

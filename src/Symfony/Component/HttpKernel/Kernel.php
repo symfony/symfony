@@ -65,15 +65,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $requestStackSize = 0;
     private $resetServices = false;
 
-    const VERSION = '5.0.0-DEV';
-    const VERSION_ID = 50000;
-    const MAJOR_VERSION = 5;
-    const MINOR_VERSION = 0;
-    const RELEASE_VERSION = 0;
-    const EXTRA_VERSION = 'DEV';
+    public const VERSION = '5.0.0-DEV';
+    public const VERSION_ID = 50000;
+    public const MAJOR_VERSION = 5;
+    public const MINOR_VERSION = 0;
+    public const RELEASE_VERSION = 0;
+    public const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '07/2020';
-    const END_OF_LIFE = '01/2021';
+    public const END_OF_MAINTENANCE = '07/2020';
+    public const END_OF_LIFE = '01/2021';
 
     public function __construct(string $environment, bool $debug)
     {

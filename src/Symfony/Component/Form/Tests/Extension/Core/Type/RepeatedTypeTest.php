@@ -15,7 +15,7 @@ use Symfony\Component\Form\Form;
 
 class RepeatedTypeTest extends BaseTypeTest
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
+    public const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
 
     /**
      * @var Form

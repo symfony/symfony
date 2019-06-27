@@ -20,9 +20,9 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class GetAttrNode extends Node
 {
-    const PROPERTY_CALL = 1;
-    const METHOD_CALL = 2;
-    const ARRAY_CALL = 3;
+    public const PROPERTY_CALL = 1;
+    public const METHOD_CALL = 2;
+    public const ARRAY_CALL = 3;
 
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
     {

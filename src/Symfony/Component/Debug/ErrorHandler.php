@@ -176,7 +176,7 @@ class ErrorHandler
      * @param array|int       $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param bool            $replace Whether to replace or not any existing logger
      */
-    public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, $replace = false)
+    public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, bool $replace = false)
     {
         $loggers = [];
 
@@ -526,7 +526,7 @@ class ErrorHandler
      *
      * @internal
      */
-    public function handleException($exception, array $error = null)
+    public function handleException(\Throwable $exception, array $error = null)
     {
         if (null === $error) {
             self::$exitCode = 255;

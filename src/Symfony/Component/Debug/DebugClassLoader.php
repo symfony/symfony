@@ -131,7 +131,7 @@ class DebugClassLoader
     /**
      * @return string|null
      */
-    public function findFile($class)
+    public function findFile(string $class = null)
     {
         return $this->isFinder ? $this->classLoader[0]->findFile($class) ?: null : null;
     }
@@ -143,7 +143,7 @@ class DebugClassLoader
      *
      * @throws \RuntimeException
      */
-    public function loadClass($class)
+    public function loadClass(string $class)
     {
         $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
 

@@ -64,7 +64,7 @@ class ExceptionHandler
      *
      * @return static
      */
-    public static function register($debug = true, $charset = null, $fileLinkFormat = null)
+    public static function register(bool $debug = true, string $charset = null, string $fileLinkFormat = null)
     {
         $handler = new static($debug, $charset, $fileLinkFormat);
 

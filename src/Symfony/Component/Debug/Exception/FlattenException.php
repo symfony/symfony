@@ -103,7 +103,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setStatusCode($code)
+    public function setStatusCode(int $code)
     {
         $this->statusCode = $code;
 
@@ -133,7 +133,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setClass($class)
+    public function setClass(string $class)
     {
         $this->class = 'c' === $class[0] && 0 === strpos($class, "class@anonymous\0") ? get_parent_class($class).'@anonymous' : $class;
 
@@ -148,7 +148,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setFile($file)
+    public function setFile(string $file)
     {
         $this->file = $file;
 
@@ -163,7 +163,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setLine($line)
+    public function setLine(int $line)
     {
         $this->line = $line;
 
@@ -178,7 +178,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setMessage($message)
+    public function setMessage(string $message)
     {
         if (false !== strpos($message, "class@anonymous\0")) {
             $message = preg_replace_callback('/class@anonymous\x00.*?\.php0x?[0-9a-fA-F]++/', function ($m) {
@@ -199,7 +199,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setCode($code)
+    public function setCode(int $code)
     {
         $this->code = $code;
 
@@ -257,7 +257,7 @@ class FlattenException
     /**
      * @return $this
      */
-    public function setTrace($trace, $file, $line)
+    public function setTrace(array $trace, string $file, int $line)
     {
         $this->trace = [];
         $this->trace[] = [
@@ -294,7 +294,7 @@ class FlattenException
         return $this;
     }
 
-    private function flattenArgs($args, $level = 0, &$count = 0)
+    private function flattenArgs(array $args, int $level = 0, int &$count = 0)
     {
         $result = [];
         foreach ($args as $key => $value) {

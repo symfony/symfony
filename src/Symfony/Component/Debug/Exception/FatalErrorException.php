@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\ErrorHandler\Exception\FatalErrorException as BaseFatalErrorException;
+use Symfony\Component\ErrorCatcher\Exception\FatalErrorException as BaseFatalErrorException;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', FatalErrorException::class, BaseFatalErrorException::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\FatalErrorException instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\FatalErrorException instead.
  */
 class FatalErrorException extends BaseFatalErrorException
 {

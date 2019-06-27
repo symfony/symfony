@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug\FatalErrorHandler;
 
-use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface as BaseFatalErrorHandlerInterface;
+use Symfony\Component\ErrorCatcher\FatalErrorHandler\FatalErrorHandlerInterface as BaseFatalErrorHandlerInterface;
 
 @trigger_error(sprintf('The "%s" interface is deprecated since Symfony 4.4, use "%s" instead.', FatalErrorHandlerInterface::class, BaseFatalErrorHandlerInterface::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\FatalErrorHandlerInterface instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\FatalErrorHandler\FatalErrorHandlerInterface instead.
  */
 interface FatalErrorHandlerInterface extends BaseFatalErrorHandlerInterface
 {

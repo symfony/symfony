@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\ErrorHandler\Exception\FlattenException as BaseFlattenException;
+use Symfony\Component\ErrorCatcher\Exception\FlattenException as BaseFlattenException;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', FlattenException::class, BaseFlattenException::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\FlattenException instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\FlattenException instead.
  */
 class FlattenException extends BaseFlattenException
 {

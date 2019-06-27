@@ -15,33 +15,38 @@ use Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException;
 use Symfony\Component\ErrorCatcher\Exception\FlattenException;
 
 /**
- * Renders an Exception that represents a Response content.
+ * Formats an exception to be used as response content.
+ *
+ * It delegates to implementations of ErrorRendererInterface depending on the format.
  *
  * @see ErrorRendererInterface
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ErrorRenderer
+class ErrorFormatter
 {
     private $renderers = [];
 
     /**
      * @param ErrorRendererInterface[] $renderers
      */
-    public function __construct(array $renderers)
+    public function __construct(iterable $renderers)
     {
         foreach ($renderers as $renderer) {
-            if (!$renderer instanceof ErrorRendererInterface) {
-                throw new \InvalidArgumentException(sprintf('Error renderer "%s" must implement "%s".', \get_class($renderer), ErrorRendererInterface::class));
-            }
-
-            $this->addRenderer($renderer, $renderer::getFormat());
+            $this->addRenderer($renderer);
         }
     }
 
-    public function addRenderer(ErrorRendererInterface $renderer, string $format): self
+    /**
+     * Registers an error renderer that is format specific.
+     *
+     * By passing an explicit format you can register a renderer for a different format than what
+     * ErrorRendererInterface::getFormat() would return in order to register the same renderer for
+     * several format aliases.
+     */
+    public function addRenderer(ErrorRendererInterface $renderer, string $format = null): self
     {
-        $this->renderers[$format] = $renderer;
+        $this->renderers[$format ?? $renderer::getFormat()] = $renderer;
 
         return $this;
     }

@@ -20,4 +20,13 @@ use Symfony\Component\ErrorCatcher\Exception\FlattenException as BaseFlattenExce
  */
 class FlattenException extends BaseFlattenException
 {
+    /**
+     * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception::createFromThrowable() instead.
+     */
+    public static function create(\Exception $exception, $statusCode = null, array $headers = []): self
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception::createFromThrowable() instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return parent::createFromThrowable($exception, $statusCode, $headers);
+    }
 }

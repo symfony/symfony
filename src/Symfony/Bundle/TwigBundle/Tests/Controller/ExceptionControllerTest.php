@@ -26,7 +26,7 @@ class ExceptionControllerTest extends TestCase
 
         $request = $this->createRequest('html');
         $request->attributes->set('showException', false);
-        $exception = FlattenException::create(new \Exception(), 404);
+        $exception = FlattenException::createFromThrowable(new \Exception(), 404);
         $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 
         $response = $controller->showAction($request, $exception, null);
@@ -40,7 +40,7 @@ class ExceptionControllerTest extends TestCase
         $twig = $this->createTwigEnv(['@Twig/Exception/error.html.twig' => '<html></html>']);
 
         $request = $this->createRequest('txt');
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $controller->showAction($request, $exception);
@@ -54,7 +54,7 @@ class ExceptionControllerTest extends TestCase
 
         $request = $this->createRequest('txt');
         $request->attributes->set('showException', true);
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $controller->showAction($request, $exception);
@@ -67,7 +67,7 @@ class ExceptionControllerTest extends TestCase
         $twig = $this->createTwigEnv(['@Twig/Exception/error.json.twig' => '{}']);
 
         $request = $this->createRequest('json');
-        $exception = FlattenException::create(new \Exception());
+        $exception = FlattenException::createFromThrowable(new \Exception());
         $controller = new ExceptionController($twig, false);
 
         $response = $controller->showAction($request, $exception);

@@ -49,7 +49,7 @@ class ErrorRenderer
     /**
      * Renders an Exception and returns the Response content.
      *
-     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     * @param \Throwable|FlattenException $exception A \Throwable or FlattenException instance
      * @param string                      $format    The request format (html, json, xml, etc.)
      *
      * @return string The Response content as a string
@@ -62,8 +62,8 @@ class ErrorRenderer
             throw new ErrorRendererNotFoundException(sprintf('No error renderer found for format "%s".', $format));
         }
 
-        if ($exception instanceof \Exception) {
-            $exception = FlattenException::create($exception);
+        if ($exception instanceof \Throwable) {
+            $exception = FlattenException::createFromThrowable($exception);
         }
 
         return $this->renderers[$format]->render($exception);

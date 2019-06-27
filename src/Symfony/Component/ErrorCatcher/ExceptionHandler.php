@@ -156,12 +156,12 @@ class ExceptionHandler
      * This method uses plain PHP functions like header() and echo to output
      * the response.
      *
-     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     * @param \Throwable|FlattenException $exception A \Throwable or FlattenException instance
      */
     public function sendPhpResponse($exception)
     {
-        if ($exception instanceof \Exception) {
-            $exception = FlattenException::create($exception);
+        if ($exception instanceof \Throwable) {
+            $exception = FlattenException::createFromThrowable($exception);
         }
 
         if (!headers_sent()) {

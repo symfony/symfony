@@ -16,6 +16,12 @@ define('PHPUNIT_COMPOSER_INSTALL', $vendor.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
 require_once __DIR__.'/../../bootstrap.php';
 
+$class = new \ReflectionClass(Symfony\Bridge\PhpUnit\DeprecationErrorHandler::class);
+var_dump($class->getFileName());
+echo PHP_EOL.PHP_EOL.PHP_EOL;
+echo file_get_contents($class->getFileName());
+echo PHP_EOL.PHP_EOL.PHP_EOL;
+
 @trigger_error('root deprecation', E_USER_DEPRECATED);
 
 eval(<<<'EOPHP'

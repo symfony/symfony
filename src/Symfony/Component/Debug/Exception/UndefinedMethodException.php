@@ -11,26 +11,13 @@
 
 namespace Symfony\Component\Debug\Exception;
 
+use Symfony\Component\ErrorHandler\Exception\UndefinedMethodException as BaseUndefinedMethodException;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedMethodException::class, BaseUndefinedMethodException::class), E_USER_DEPRECATED);
+
 /**
- * Undefined Method Exception.
- *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\Exception\UndefinedMethodException instead.
  */
-class UndefinedMethodException extends FatalErrorException
+class UndefinedMethodException extends BaseUndefinedMethodException
 {
-    public function __construct(string $message, \ErrorException $previous)
-    {
-        parent::__construct(
-            $message,
-            $previous->getCode(),
-            $previous->getSeverity(),
-            $previous->getFile(),
-            $previous->getLine(),
-            null,
-            true,
-            null,
-            $previous->getPrevious()
-        );
-        $this->setTrace($previous->getTrace());
-    }
 }

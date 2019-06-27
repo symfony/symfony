@@ -15,8 +15,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\ErrorHandler\ErrorHandler;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRenderer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\ErrorRendererNotFoundException;
+use Symfony\Component\ErrorHandler\ExceptionHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,6 +45,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $fileLinkFormat;
     private $scope;
     private $charset;
+    private $errorRenderer;
     private $firstCall = true;
     private $hasTerminatedWithException;
 
@@ -54,7 +58,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param string|FileLinkFormatter|null $fileLinkFormat   The format for links to source files
      * @param bool                          $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, string $charset = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, string $charset = null, ErrorRenderer $errorRenderer = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
@@ -64,6 +68,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->fileLinkFormat = $fileLinkFormat;
         $this->scope = $scope;
         $this->charset = $charset;
+        $this->errorRenderer = $errorRenderer;
     }
 
     /**
@@ -158,10 +163,17 @@ class DebugHandlersListener implements EventSubscriberInterface
 
         $debug = $this->scream && $this->scope;
         $controller = function (Request $request) use ($debug) {
-            $e = $request->attributes->get('exception');
-            $handler = new ExceptionHandler($debug, $this->charset, $this->fileLinkFormat);
+            if (null === $this->errorRenderer) {
+                $this->errorRenderer = new ErrorRenderer([new HtmlErrorRenderer($debug, $this->charset, $this->fileLinkFormat)]);
+            }
 
-            return new Response($handler->getHtml($e), $e->getStatusCode(), $e->getHeaders());
+            $e = $request->attributes->get('exception');
+
+            try {
+                return new Response($this->errorRenderer->render($e, $request->getRequestFormat()), $e->getStatusCode(), $e->getHeaders());
+            } catch (ErrorRendererNotFoundException $_) {
+                return new Response($this->errorRenderer->render($e), $e->getStatusCode(), $e->getHeaders());
+            }
         };
 
         (new ExceptionListener($controller, $this->logger, $debug))->onKernelException($event);

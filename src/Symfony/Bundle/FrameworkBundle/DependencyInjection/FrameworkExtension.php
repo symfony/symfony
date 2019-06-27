@@ -142,6 +142,7 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
+        $loader->load('error_renderer.xml');
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 

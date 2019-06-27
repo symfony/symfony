@@ -42,14 +42,11 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param Profile $profile
-     * @param string  $panel
-     *
      * @return mixed
      *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, $panel)
+    public function getName(Profile $profile, string $panel)
     {
         $templates = $this->getNames($profile);
 
@@ -97,7 +94,7 @@ class TemplateManager
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists($template)
+    protected function templateExists(string $template)
     {
         $loader = $this->twig->getLoader();
         if ($loader instanceof ExistsLoaderInterface) {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
+use Symfony\Component\ErrorCatcher\Exception\SilencedErrorContext;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 

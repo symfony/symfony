@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
+use Symfony\Component\ErrorCatcher\Exception\SilencedErrorContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -106,7 +106,7 @@ class LoggerDataCollectorTest extends TestCase
         $logs = array_map(function ($v) {
             if (isset($v['context']['exception'])) {
                 $e = &$v['context']['exception'];
-                $e = isset($e["\0*\0message"]) ? [$e["\0*\0message"], $e["\0*\0severity"]] : [$e["\0Symfony\Component\ErrorHandler\Exception\SilencedErrorContext\0severity"]];
+                $e = isset($e["\0*\0message"]) ? [$e["\0*\0message"], $e["\0*\0severity"]] : [$e["\0Symfony\Component\ErrorCatcher\Exception\SilencedErrorContext\0severity"]];
             }
 
             return $v;

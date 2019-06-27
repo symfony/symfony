@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.2.9",
         "psr/log": "~1.0",
-        "symfony/error-handler": "^4.4"
+        "symfony/error-catcher": "^4.4|^5.0"
     },
     "conflict": {
         "symfony/http-kernel": "<4.4"

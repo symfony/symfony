@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Debug\FatalErrorHandler;
 
-use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler as BaseUndefinedMethodFatalErrorHandler;
+use Symfony\Component\ErrorCatcher\FatalErrorHandler\UndefinedMethodFatalErrorHandler as BaseUndefinedMethodFatalErrorHandler;
 
 @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', UndefinedMethodFatalErrorHandler::class, BaseUndefinedMethodFatalErrorHandler::class), E_USER_DEPRECATED);
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\FatalErrorHandler\UndefinedMethodFatalErrorHandler instead.
+ * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\FatalErrorHandler\UndefinedMethodFatalErrorHandler instead.
  */
 class UndefinedMethodFatalErrorHandler extends BaseUndefinedMethodFatalErrorHandler
 {

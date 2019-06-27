@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class StateMachineValidator implements DefinitionValidatorInterface
 {
-    public function validate(Definition $definition, $name)
+    public function validate(Definition $definition, string $name)
     {
         $transitionFromNames = [];
         foreach ($definition->getTransitions() as $transition) {

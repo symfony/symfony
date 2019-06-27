@@ -15,6 +15,7 @@ use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\TransitionBlockerList;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -27,9 +28,9 @@ class GuardEvent extends Event
     /**
      * {@inheritdoc}
      */
-    public function __construct($subject, Marking $marking, Transition $transition, $workflowName = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition, WorkflowInterface $workflow = null)
     {
-        parent::__construct($subject, $marking, $transition, $workflowName);
+        parent::__construct($subject, $marking, $transition, $workflow);
 
         $this->transitionBlockerList = new TransitionBlockerList();
     }

@@ -11,13 +11,31 @@
 
 namespace Symfony\Component\Debug;
 
-use Symfony\Component\ErrorHandler\BufferingLogger as BaseBufferingLogger;
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4 and will be removed in 5.0.', BufferingLogger::class), E_USER_DEPRECATED);
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', BufferingLogger::class, BaseBufferingLogger::class), E_USER_DEPRECATED);
+use Psr\Log\AbstractLogger;
 
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorHandler\BufferingLogger instead.
+ * A buffering logger that stacks logs for later.
+ *
+ * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since Symfony 4.4 and will be removed in 5.0.
  */
-class BufferingLogger extends BaseBufferingLogger
+class BufferingLogger extends AbstractLogger
 {
+    private $logs = [];
+
+    public function log($level, $message, array $context = [])
+    {
+        $this->logs[] = [$level, $message, $context];
+    }
+
+    public function cleanLogs()
+    {
+        $logs = $this->logs;
+        $this->logs = [];
+
+        return $logs;
+    }
 }

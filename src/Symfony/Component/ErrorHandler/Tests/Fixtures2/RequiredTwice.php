@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Debug\Tests\Fixtures2;
+namespace Symfony\Component\ErrorHandler\Tests\Fixtures2;
 
 class RequiredTwice
 {

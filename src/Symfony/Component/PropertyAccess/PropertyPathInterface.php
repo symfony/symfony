@@ -60,7 +60,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
-    public function getElement($index);
+    public function getElement(int $index);
 
     /**
      * Returns whether the element at the given index is a property.
@@ -71,7 +71,7 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
-    public function isProperty($index);
+    public function isProperty(int $index);
 
     /**
      * Returns whether the element at the given index is an array index.
@@ -82,5 +82,5 @@ interface PropertyPathInterface extends \Traversable
      *
      * @throws Exception\OutOfBoundsException If the offset is invalid
      */
-    public function isIndex($index);
+    public function isIndex(int $index);
 }

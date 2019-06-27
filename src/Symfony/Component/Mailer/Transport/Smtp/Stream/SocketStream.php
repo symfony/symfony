@@ -34,14 +34,14 @@ final class SocketStream extends AbstractStream
     private $sourceIp;
     private $streamContextOptions = [];
 
-    public function setTimeout(int $timeout): self
+    public function setTimeout(float $timeout): self
     {
         $this->timeout = $timeout;
 
         return $this;
     }
 
-    public function getTimeout(): int
+    public function getTimeout(): float
     {
         return $this->timeout;
     }

@@ -12,14 +12,14 @@
 namespace Symfony\Component\ErrorCatcher\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRenderer as BaseErrorRenderer;
+use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorFormatter;
 
 /**
  * Lazily loads error renderers from the dependency injection container.
  *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class ErrorRenderer extends BaseErrorRenderer
+class LazyLoadingErrorFormatter extends ErrorFormatter
 {
     private $container;
     private $initialized = [];

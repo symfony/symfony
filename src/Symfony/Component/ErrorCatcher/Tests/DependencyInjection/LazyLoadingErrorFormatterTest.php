@@ -9,39 +9,45 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\ErrorRenderer;
+namespace Symfony\Component\ErrorCatcher\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRenderer;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\ErrorCatcher\DependencyInjection\LazyLoadingErrorFormatter;
 use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorCatcher\Exception\FlattenException;
 
-class ErrorRendererTest extends TestCase
+class LazyLoadingErrorFormatterTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException
      * @expectedExceptionMessage No error renderer found for format "foo".
      */
-    public function testErrorRendererNotFound()
-    {
-        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
-        (new ErrorRenderer([]))->render($exception, 'foo');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Error renderer "stdClass" must implement "Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface".
-     */
     public function testInvalidErrorRenderer()
     {
-        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
-        (new ErrorRenderer([new \stdClass()]))->render($exception, 'foo');
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->once())->method('has')->with('foo')->willReturn(false);
+
+        $exception = FlattenException::createFromThrowable(new \Exception('Foo'));
+        (new LazyLoadingErrorFormatter($container))->render($exception, 'foo');
     }
 
     public function testCustomErrorRenderer()
     {
-        $renderers = [new FooErrorRenderer()];
-        $errorRenderer = new ErrorRenderer($renderers);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('foo')
+            ->willReturn(true)
+        ;
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn(new FooErrorRenderer())
+        ;
+
+        $errorRenderer = new LazyLoadingErrorFormatter($container);
 
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));

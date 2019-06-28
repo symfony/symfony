@@ -477,6 +477,11 @@ Serializer
  * The `AbstractNormalizer::handleCircularReference()` method has two new `$format` and `$context` arguments.
  * Removed support for instantiating a `DataUriNormalizer` with a default MIME type guesser when the `symfony/mime` component isn't installed.
 
+Stopwatch
+---------
+
+ * Removed support of passing `null` as 1st (`$id`) argument of `Section::get()` method, pass a valid child section identifier instead.
+
 Translation
 -----------
 

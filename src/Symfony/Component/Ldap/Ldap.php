@@ -35,7 +35,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }
@@ -43,7 +43,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function query($dn, $query, array $options = []): ?QueryInterface
+    public function query(string $dn, string $query, array $options = []): ?QueryInterface
     {
         return $this->adapter->createQuery($dn, $query, $options);
     }
@@ -59,7 +59,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function escape($subject, $ignore = '', $flags = 0): ?string
+    public function escape(string $subject, string $ignore = '', int $flags = 0): ?string
     {
         return $this->adapter->escape($subject, $ignore, $flags);
     }
@@ -72,7 +72,7 @@ final class Ldap implements LdapInterface
      *
      * @return static
      */
-    public static function create($adapter, array $config = []): self
+    public static function create(string $adapter, array $config = []): self
     {
         if (!isset(self::$adapterMap[$adapter])) {
             throw new DriverNotFoundException(sprintf(

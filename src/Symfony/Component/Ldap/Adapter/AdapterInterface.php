@@ -26,13 +26,9 @@ interface AdapterInterface
     /**
      * Creates a new Query.
      *
-     * @param string $dn
-     * @param string $query
-     * @param array  $options
-     *
      * @return QueryInterface
      */
-    public function createQuery($dn, $query, array $options = []);
+    public function createQuery(string $dn, string $query, array $options = []);
 
     /**
      * Fetches the entry manager instance.
@@ -44,11 +40,7 @@ interface AdapterInterface
     /**
      * Escape a string for use in an LDAP filter or DN.
      *
-     * @param string $subject
-     * @param string $ignore
-     * @param int    $flags
-     *
      * @return string
      */
-    public function escape($subject, $ignore = '', $flags = 0);
+    public function escape(string $subject, string $ignore = '', int $flags = 0);
 }

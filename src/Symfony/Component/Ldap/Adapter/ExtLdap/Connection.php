@@ -51,7 +51,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind(string $dn = null, string $password = null)
     {
         if (!$this->connection) {
             $this->connect();
@@ -85,14 +85,14 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
         }
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
         if (!@ldap_get_option($this->connection, ConnectionOptions::getOption($name), $ret)) {
             throw new LdapException(sprintf('Could not retrieve value for option "%s".', $name));

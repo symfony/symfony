@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -25,6 +26,10 @@ class CacheWarmingTest extends TestCase
 {
     public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable()
     {
+        if (!class_exists(TemplateFinder::class)) {
+            $this->markTestSkipped('FrameworkBundle < 5.0 is required for the Templating component integration.');
+        }
+
         $kernel = new CacheWarmingKernel(true);
         $kernel->boot();
 

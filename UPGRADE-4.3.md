@@ -71,6 +71,7 @@ Form
 FrameworkBundle
 ---------------
 
+ * Deprecated the `framework.templating` option, use Twig instead.
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.

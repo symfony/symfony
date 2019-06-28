@@ -605,6 +605,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('templating')
                     ->info('templating configuration')
                     ->canBeEnabled()
+                    ->setDeprecated('The "%path%.%node%" configuration is deprecated since Symfony 4.3. Use the "twig" service directly instead.')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) { return false === $v || \is_array($v) && false === $v['enabled']; })
                         ->then(function () { return ['enabled' => false, 'engines' => false]; })

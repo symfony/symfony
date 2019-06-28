@@ -602,6 +602,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
+    /**
+     * @group legacy
+     */
     public function testTemplatingCanBeDisabled()
     {
         $container = $this->createContainerFromFile('templating_disabled');
@@ -867,6 +870,7 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testTemplatingRequiresAtLeastOneEngine()

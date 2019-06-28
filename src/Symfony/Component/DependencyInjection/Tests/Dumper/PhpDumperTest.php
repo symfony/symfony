@@ -1251,7 +1251,7 @@ class PhpDumperTest extends TestCase
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
 {
-    public function getEnv($prefix, $name, \Closure $getEnv)
+    public function getEnv(string $prefix, string $name, \Closure $getEnv)
     {
         return str_rot13($getEnv($name));
     }

@@ -16,11 +16,9 @@ trait FileTrait
     /**
      * Sets a file to require before creating the service.
      *
-     * @param string $file A full pathname to include
-     *
      * @return $this
      */
-    final public function file($file): object
+    final public function file(string $file): object
     {
         $this->definition->setFile($file);
 

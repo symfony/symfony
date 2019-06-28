@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -339,7 +340,10 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function analyzeCircularReferences($sourceId, array $edges, &$checkedNodes, &$currentPath = [])
+    /**
+     * @param ServiceReferenceGraphEdge[] $edges
+     */
+    private function analyzeCircularReferences(string $sourceId, array $edges, array &$checkedNodes, array &$currentPath = [])
     {
         $checkedNodes[$sourceId] = true;
         $currentPath[$sourceId] = $sourceId;
@@ -368,7 +372,7 @@ EOF;
         unset($currentPath[$sourceId]);
     }
 
-    private function connectCircularReferences($sourceId, &$currentPath, &$subPath = [])
+    private function connectCircularReferences(string $sourceId, array &$currentPath, array &$subPath = [])
     {
         $subPath[$sourceId] = $sourceId;
         $currentPath[$sourceId] = $sourceId;
@@ -391,7 +395,7 @@ EOF;
         unset($subPath[$sourceId]);
     }
 
-    private function collectLineage($class, array &$lineage)
+    private function collectLineage(string $class, array &$lineage)
     {
         if (isset($lineage[$class])) {
             return;
@@ -1284,9 +1288,8 @@ EOF;
 
         $code = <<<'EOF'
 
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
@@ -1301,9 +1304,8 @@ EOF;
         return $this->parameters[$name];
     }
 
-    public function hasParameter($name)
+    public function hasParameter(string $name)
     {
-        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return true;
         }
@@ -1311,7 +1313,7 @@ EOF;
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -1334,7 +1336,7 @@ EOF;
 
 EOF;
         if (!$this->asFiles) {
-            $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n/m', '', $code);
+            $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n\n?/m', '', $code);
         }
 
         if ($dynamicPhp) {
@@ -1891,7 +1893,7 @@ EOF;
         return $this->doExport($value, true);
     }
 
-    private function doExport($value, $resolveEnv = false)
+    private function doExport($value, bool $resolveEnv = false)
     {
         $shouldCacheValue = $resolveEnv && \is_string($value);
         if ($shouldCacheValue && isset($this->exportedVariables[$value])) {

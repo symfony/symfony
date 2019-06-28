@@ -27,7 +27,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name)
     {
         if (0 === strpos($name, 'env(') && ')' === substr($name, -1) && 'env()' !== $name) {
             $env = substr($name, 4, -1);

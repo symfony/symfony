@@ -5,13 +5,13 @@ CHANGELOG
 -----
 
 * deprecated the `BufferingLogger`, `ErrorHandler` and `ExceptionHandler` classes, 
-  they have been moved to the `ErrorHandler` component
+  they have been moved to the `ErrorCatcher` component
 * deprecated the `FatalErrorHandlerInterface`, `ClassNotFoundFatalErrorHandler`,  
   `UndefinedFunctionFatalErrorHandler` and `UndefinedMethodFatalErrorHandler` classes,
-  they have been moved to the `ErrorHandler` component
+  they have been moved to the `ErrorCatcher` component
 * deprecated the `ClassNotFoundException`, `FatalErrorException`, `FatalThrowableError`,
   `FlattenException`, `OutOfMemoryException`, `SilencedErrorContext`, `UndefinedFunctionException`,
-  and `UndefinedMethodException`, they have been moved to the `ErrorHandler` component
+  and `UndefinedMethodException`, they have been moved to the `ErrorCatcher` component
 
 4.3.0
 -----

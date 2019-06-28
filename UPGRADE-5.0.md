@@ -101,7 +101,7 @@ DependencyInjection
    services:
        App\Handler:
            tags: ['app.handler']
- 
+
        App\HandlerCollection:
            arguments: [!tagged_iterator app.handler]
    ```
@@ -113,7 +113,6 @@ DoctrineBridge
    injected instead
  * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field will throw an exception, pass `null` instead
  * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field will not apply any optimization
-
 
 DomCrawler
 ----------
@@ -268,6 +267,7 @@ HttpFoundation
    use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
  * The `FileinfoMimeTypeGuesser` class has been removed,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
+ * `ApacheRequest` has been removed, use the `Request` class instead.
 
 HttpKernel
 ----------
@@ -517,7 +517,6 @@ Workflow
                marking_store:
                    property: state
    ```
-
 
  * Support for using a workflow with a single state marking is dropped. Use a state machine instead.
 

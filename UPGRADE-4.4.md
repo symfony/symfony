@@ -26,7 +26,7 @@ DependencyInjection
    services:
        App\Handler:
            tags: ['app.handler']
-   
+
        App\HandlerCollection:
            arguments: [!tagged app.handler]
    ```
@@ -36,7 +36,7 @@ DependencyInjection
    services:
        App\Handler:
        tags: ['app.handler']
-    
+
    App\HandlerCollection:
        arguments: [!tagged_iterator app.handler]
    ```
@@ -59,6 +59,11 @@ HttpClient
 ----------
 
  * Added method `cancel()` to `ResponseInterface`
+
+HttpFoundation
+--------------
+
+ * `ApacheRequest` is deprecated, use `Request` class instead.
 
 HttpKernel
 ----------
@@ -84,11 +89,11 @@ Security
 TwigBridge
 ----------
 
- * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
+ * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
 
 Validator
 ---------
 
- * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
+ * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
    Pass it as the first argument instead.

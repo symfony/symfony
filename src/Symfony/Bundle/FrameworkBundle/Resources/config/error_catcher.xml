@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="error_catcher.error_renderer" class="Symfony\Component\ErrorCatcher\DependencyInjection\ErrorRenderer">
+        <service id="error_catcher.error_formatter" class="Symfony\Component\ErrorCatcher\DependencyInjection\LazyLoadingErrorFormatter">
             <argument /> <!-- error renderer locator -->
         </service>
 

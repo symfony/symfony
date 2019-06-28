@@ -9,44 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests\DependencyInjection;
+namespace Symfony\Component\ErrorCatcher\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorRenderer;
+use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorFormatter;
 use Symfony\Component\ErrorCatcher\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorCatcher\Exception\FlattenException;
 
-class ErrorRendererTest extends TestCase
+class ErrorFormatterTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\ErrorCatcher\Exception\ErrorRendererNotFoundException
      * @expectedExceptionMessage No error renderer found for format "foo".
      */
+    public function testErrorRendererNotFound()
+    {
+        $exception = FlattenException::createFromThrowable(new \Exception('foo'));
+        (new ErrorFormatter([]))->render($exception, 'foo');
+    }
+
+    /**
+     * @expectedException \TypeError
+     */
     public function testInvalidErrorRenderer()
     {
-        $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
-        $container->expects($this->once())->method('has')->with('foo')->willReturn(false);
-
-        $exception = FlattenException::createFromThrowable(new \Exception('Foo'));
-        (new ErrorRenderer($container))->render($exception, 'foo');
+        new ErrorFormatter([new \stdClass()]);
     }
 
     public function testCustomErrorRenderer()
     {
-        $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with('foo')
-            ->willReturn(true)
-        ;
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->willReturn(new FooErrorRenderer())
-        ;
-
-        $errorRenderer = new ErrorRenderer($container);
+        $renderers = [new FooErrorRenderer()];
+        $errorRenderer = new ErrorFormatter($renderers);
 
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
         $this->assertSame('Foo', $errorRenderer->render($exception, 'foo'));

@@ -17,17 +17,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorCatcherPass;
-use Symfony\Component\ErrorCatcher\DependencyInjection\ErrorRenderer;
+use Symfony\Component\ErrorCatcher\DependencyInjection\LazyLoadingErrorFormatter;
 use Symfony\Component\ErrorCatcher\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorCatcher\ErrorRenderer\JsonErrorRenderer;
 
-class ErrorPassTest extends TestCase
+class ErrorCatcherPassTest extends TestCase
 {
     public function testProcess()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', true);
-        $definition = $container->register('error_catcher.error_renderer', ErrorRenderer::class)
+        $definition = $container->register('error_catcher.error_formatter', LazyLoadingErrorFormatter::class)
             ->addArgument([])
         ;
         $container->register('error_catcher.renderer.html', HtmlErrorRenderer::class)

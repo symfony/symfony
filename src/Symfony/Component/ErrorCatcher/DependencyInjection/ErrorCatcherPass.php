@@ -25,7 +25,7 @@ class ErrorCatcherPass implements CompilerPassInterface
     private $rendererService;
     private $rendererTag;
 
-    public function __construct(string $rendererService = 'error_catcher.error_renderer', string $rendererTag = 'error_catcher.renderer')
+    public function __construct(string $rendererService = 'error_catcher.error_formatter', string $rendererTag = 'error_catcher.renderer')
     {
         $this->rendererService = $rendererService;
         $this->rendererTag = $rendererTag;

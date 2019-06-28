@@ -47,14 +47,19 @@ class JsonEncode implements EncoderInterface
      */
     public function encode($data, $format, array $context = [])
     {
-        $jsonEncodeOptions = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
-        $encodedJson = json_encode($data, $jsonEncodeOptions);
+        $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
 
-        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $jsonEncodeOptions)) {
+        try {
+            $encodedJson = json_encode($data, $options);
+        } catch (\JsonException $e) {
+            throw new NotEncodableValueException($e->getMessage(), 0, $e);
+        }
+
+        if (\PHP_VERSION_ID >= 70300 && (JSON_THROW_ON_ERROR & $options)) {
             return $encodedJson;
         }
 
-        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($jsonEncodeOptions & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+        if (JSON_ERROR_NONE !== json_last_error() && (false === $encodedJson || !($options & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new NotEncodableValueException(json_last_error_msg());
         }
 

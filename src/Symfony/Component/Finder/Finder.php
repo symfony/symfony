@@ -582,7 +582,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Searches files and directories which match defined rules.
      *
-     * @param string|array $dirs A directory path or an array of directories
+     * @param string|string[] $dirs A directory path or an array of directories
      *
      * @return $this
      *

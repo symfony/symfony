@@ -103,6 +103,10 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = [], $handler = null, MetadataBag $metaBag = null)
     {
+        if (!\extension_loaded('session')) {
+            throw new \LogicException('PHP extension "session" is required.');
+        }
+
         $options += [
             'cache_limiter' => '',
             'cache_expire' => 0,

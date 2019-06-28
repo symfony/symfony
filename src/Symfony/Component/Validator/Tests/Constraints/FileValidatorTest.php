@@ -435,23 +435,23 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
     public function uploadedFileErrorProvider()
     {
         $tests = [
-            [UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'],
-            [UPLOAD_ERR_PARTIAL, 'uploadPartialErrorMessage'],
-            [UPLOAD_ERR_NO_FILE, 'uploadNoFileErrorMessage'],
-            [UPLOAD_ERR_NO_TMP_DIR, 'uploadNoTmpDirErrorMessage'],
-            [UPLOAD_ERR_CANT_WRITE, 'uploadCantWriteErrorMessage'],
-            [UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'],
+            [(string) UPLOAD_ERR_FORM_SIZE, 'uploadFormSizeErrorMessage'],
+            [(string) UPLOAD_ERR_PARTIAL, 'uploadPartialErrorMessage'],
+            [(string) UPLOAD_ERR_NO_FILE, 'uploadNoFileErrorMessage'],
+            [(string) UPLOAD_ERR_NO_TMP_DIR, 'uploadNoTmpDirErrorMessage'],
+            [(string) UPLOAD_ERR_CANT_WRITE, 'uploadCantWriteErrorMessage'],
+            [(string) UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'],
         ];
 
         if (class_exists('Symfony\Component\HttpFoundation\File\UploadedFile')) {
             // when no maxSize is specified on constraint, it should use the ini value
-            $tests[] = [UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            $tests[] = [(string) UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
                 '{{ suffix }}' => 'MiB',
             ]];
 
             // it should use the smaller limitation (maxSize option in this case)
-            $tests[] = [UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            $tests[] = [(string) UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => 1,
                 '{{ suffix }}' => 'bytes',
             ], '1'];
@@ -464,14 +464,14 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
             // it correctly parses the maxSize option and not only uses simple string comparison
             // 1000M should be bigger than the ini value
-            $tests[] = [UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            $tests[] = [(string) UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => $limit,
                 '{{ suffix }}' => $suffix,
             ], '1000M'];
 
             // it correctly parses the maxSize option and not only uses simple string comparison
             // 1000M should be bigger than the ini value
-            $tests[] = [UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            $tests[] = [(string) UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
                 '{{ limit }}' => '0.1',
                 '{{ suffix }}' => 'MB',
             ], '100K'];

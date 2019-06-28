@@ -454,6 +454,8 @@ TwigBridge
 Validator
 --------
 
+ * Removed support for non-string codes of a `ConstraintViolation`. A `string` type-hint was added to the constructor of
+   the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()` method.
  * An `ExpressionLanguage` instance or null must be passed as the first argument of `ExpressionValidator::__construct()`
  * The `checkMX` and `checkHost` options of the `Email` constraint were removed
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.

@@ -50,17 +50,6 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidComparisonToPropertyPathOnArray()
-    {
-        $constraint = new Bic(['ibanPropertyPath' => '[root][value]']);
-
-        $this->setObject(['root' => ['value' => 'FR14 2004 1010 0505 0001 3M02 606']]);
-
-        $this->validator->validate('SOGEFRPP', $constraint);
-
-        $this->assertNoViolation();
-    }
-
     public function testInvalidComparisonToPropertyPath()
     {
         $constraint = new Bic(['ibanPropertyPath' => 'value']);

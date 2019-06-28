@@ -309,7 +309,9 @@ class RouteCollectionBuilder
             } else {
                 /* @var self $route */
                 $subCollection = $route->build();
-                $subCollection->addPrefix($this->prefix);
+                if (null !== $this->prefix) {
+                    $subCollection->addPrefix($this->prefix);
+                }
 
                 $routeCollection->addCollection($subCollection);
             }

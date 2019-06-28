@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-06-28T13:23:46Z
+
+> I started reviewing this, but I'm not sure it's desired, the new name is not better when only one place exists - and code exists that would need to be upgraded, to a name that wouldn't fit well.
+
+Everywhere else we are using `initialPlaces` - at the plural form.  So it's consistent with the rest of the component.
+
+We should merge it in 4.3 to avoid confusion

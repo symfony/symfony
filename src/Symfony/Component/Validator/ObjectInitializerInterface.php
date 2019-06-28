@@ -27,5 +27,5 @@ interface ObjectInitializerInterface
      *
      * @param object $object The object to validate
      */
-    public function initialize($object);
+    public function initialize(object $object);
 }

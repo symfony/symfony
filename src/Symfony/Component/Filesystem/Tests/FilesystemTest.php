@@ -456,20 +456,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFilePermissions(400, $file);
     }
 
-    public function testChmodWithWrongModLeavesPreviousPermissionsUntouched()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'file';
-        touch($dir);
-
-        $permissions = fileperms($dir);
-
-        $this->filesystem->chmod($dir, 'Wrongmode');
-
-        $this->assertSame($permissions, fileperms($dir));
-    }
-
     public function testChmodRecursive()
     {
         $this->markAsSkippedIfChmodIsMissing();
@@ -1397,7 +1383,6 @@ class FilesystemTest extends FilesystemTestCase
             ['var/lib', false],
             ['../var/lib', false],
             ['', false],
-            [null, false],
         ];
     }
 

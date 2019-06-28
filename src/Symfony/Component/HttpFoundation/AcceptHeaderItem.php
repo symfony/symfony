@@ -34,11 +34,9 @@ class AcceptHeaderItem
     /**
      * Builds an AcceptHeaderInstance instance from a string.
      *
-     * @param string $itemValue
-     *
      * @return self
      */
-    public static function fromString($itemValue)
+    public static function fromString(string $itemValue)
     {
         $parts = HeaderUtils::split($itemValue, ';=');
 
@@ -66,11 +64,9 @@ class AcceptHeaderItem
     /**
      * Set the item value.
      *
-     * @param string $value
-     *
      * @return $this
      */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = $value;
 
@@ -90,11 +86,9 @@ class AcceptHeaderItem
     /**
      * Set the item quality.
      *
-     * @param float $quality
-     *
      * @return $this
      */
-    public function setQuality($quality)
+    public function setQuality(float $quality)
     {
         $this->quality = $quality;
 
@@ -114,11 +108,9 @@ class AcceptHeaderItem
     /**
      * Set the item index.
      *
-     * @param int $index
-     *
      * @return $this
      */
-    public function setIndex($index)
+    public function setIndex(int $index)
     {
         $this->index = $index;
 
@@ -138,11 +130,9 @@ class AcceptHeaderItem
     /**
      * Tests if an attribute exists.
      *
-     * @param string $name
-     *
      * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
         return isset($this->attributes[$name]);
     }
@@ -150,12 +140,11 @@ class AcceptHeaderItem
     /**
      * Returns an attribute by its name.
      *
-     * @param string $name
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
@@ -173,12 +162,9 @@ class AcceptHeaderItem
     /**
      * Set an attribute.
      *
-     * @param string $name
-     * @param string $value
-     *
      * @return $this
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, string $value)
     {
         if ('q' === $name) {
             $this->quality = (float) $value;

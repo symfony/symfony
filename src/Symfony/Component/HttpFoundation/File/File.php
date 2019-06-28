@@ -25,9 +25,6 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string $path      The path to the file
-     * @param bool   $checkPath Whether to check the path or not
-     *
      * @throws FileNotFoundException If the given path is not a file
      */
     public function __construct(string $path, bool $checkPath = true)
@@ -76,14 +73,11 @@ class File extends \SplFileInfo
     /**
      * Moves the file to a new location.
      *
-     * @param string $directory The destination folder
-     * @param string $name      The new file name
-     *
      * @return self A File object representing the new file
      *
      * @throws FileException if the target file could not be created
      */
-    public function move($directory, $name = null)
+    public function move(string $directory, string $name = null)
     {
         $target = $this->getTargetFile($directory, $name);
 
@@ -117,11 +111,9 @@ class File extends \SplFileInfo
     /**
      * Returns locale independent base name of the given path.
      *
-     * @param string $name The new file name
-     *
      * @return string containing
      */
-    protected function getName($name)
+    protected function getName(string $name)
     {
         $originalName = str_replace('\\', '/', $name);
         $pos = strrpos($originalName, '/');

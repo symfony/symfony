@@ -18,10 +18,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage;
  */
 class PhpBridgeSessionStorage extends NativeSessionStorage
 {
-    /**
-     * @param \SessionHandlerInterface|null $handler
-     */
-    public function __construct($handler = null, MetadataBag $metaBag = null)
+    public function __construct(\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null)
     {
         if (!\extension_loaded('session')) {
             throw new \LogicException('PHP extension "session" is required.');

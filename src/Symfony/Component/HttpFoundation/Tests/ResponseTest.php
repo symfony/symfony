@@ -901,16 +901,6 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals((string) $content, $response->getContent());
     }
 
-    /**
-     * @dataProvider invalidContentProvider
-     */
-    public function testSetContentInvalid($content)
-    {
-        $this->expectException('UnexpectedValueException');
-        $response = new Response();
-        $response->setContent($content);
-    }
-
     public function testSettersAreChainable()
     {
         $response = new Response();
@@ -949,15 +939,6 @@ class ResponseTest extends ResponseTestCase
             'obj' => [new StringableObject()],
             'string' => ['Foo'],
             'int' => [2],
-        ];
-    }
-
-    public function invalidContentProvider()
-    {
-        return [
-            'obj' => [new \stdClass()],
-            'array' => [[]],
-            'bool' => [true, '1'],
         ];
     }
 

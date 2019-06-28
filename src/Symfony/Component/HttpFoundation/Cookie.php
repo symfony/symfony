@@ -36,12 +36,9 @@ class Cookie
     /**
      * Creates cookie from raw header string.
      *
-     * @param string $cookie
-     * @param bool   $decode
-     *
      * @return static
      */
-    public static function fromString($cookie, $decode = false)
+    public static function fromString(string $cookie, bool $decode = false)
     {
         $data = [
             'expires' => 0,
@@ -74,8 +71,6 @@ class Cookie
     }
 
     /**
-     * @param string                        $name     The name of the cookie
-     * @param string|null                   $value    The value of the cookie
      * @param int|string|\DateTimeInterface $expire   The time the cookie expires
      * @param string                        $path     The path on the server in which the cookie will be available on
      * @param string|null                   $domain   The domain that the cookie is available to

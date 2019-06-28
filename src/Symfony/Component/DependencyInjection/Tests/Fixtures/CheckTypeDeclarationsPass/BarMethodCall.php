@@ -1,10 +1,14 @@
 <?php
 
-namespace Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeHintsPass;
+namespace Symfony\Component\DependencyInjection\Tests\Fixtures\CheckTypeDeclarationsPass;
 
 class BarMethodCall
 {
     public $foo;
+
+    public function setBar(Bar $bar)
+    {
+    }
 
     public function setFoo(\stdClass $foo)
     {

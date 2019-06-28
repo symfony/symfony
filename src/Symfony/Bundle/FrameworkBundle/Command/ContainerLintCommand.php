@@ -11,19 +11,21 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CheckTypeHintsPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class ContainerLintCommand extends Command
+final class ContainerLintCommand extends Command
 {
+    protected static $defaultName = 'lint:container';
+
     /**
      * @var ContainerBuilder
      */
@@ -35,37 +37,33 @@ class ContainerLintCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Lints container for services arguments type hints')
-            ->setHelp('This command will parse all your defined services and check that you are injecting service without type error based on type hints.')
-            ->addOption('only-used-services', 'o', InputOption::VALUE_NONE, 'Check only services that are used in your application')
+            ->setDescription('Ensures that arguments injected into services match type declarations')
+            ->setHelp('This command parses service definitions and ensures that injected values match the type declarations of each services\' class.')
+            ->addOption('ignore-unused-services', 'o', InputOption::VALUE_NONE, 'Ignore unused services')
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $container = $this->getContainerBuilder();
 
         $container->setParameter('container.build_id', 'lint_container');
 
         $container->addCompilerPass(
-            new CheckTypeHintsPass(),
-            $input->getOption('only-used-services') ? PassConfig::TYPE_AFTER_REMOVING : PassConfig::TYPE_BEFORE_OPTIMIZATION
+            new CheckTypeDeclarationsPass(true),
+            $input->getOption('ignore-unused-services') ? PassConfig::TYPE_AFTER_REMOVING : PassConfig::TYPE_OPTIMIZE,
+            -5
         );
 
         $container->compile();
+
+        return 0;
     }
 
-    /**
-     * Loads the ContainerBuilder from the cache.
-     *
-     * @return ContainerBuilder
-     *
-     * @throws \LogicException
-     */
-    protected function getContainerBuilder()
+    private function getContainerBuilder(): ContainerBuilder
     {
         if ($this->containerBuilder) {
             return $this->containerBuilder;
@@ -74,10 +72,9 @@ class ContainerLintCommand extends Command
         $kernel = $this->getApplication()->getKernel();
 
         if (!$kernel->isDebug() || !(new ConfigCache($kernel->getContainer()->getParameter('debug.container.dump'), true))->isFresh()) {
-            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, get_class($kernel));
+            $buildContainer = \Closure::bind(function () { return $this->buildContainer(); }, $kernel, \get_class($kernel));
             $container = $buildContainer();
-            $container->getCompilerPassConfig()->setRemovingPasses(array());
-            $container->compile();
+            $container->getCompilerPassConfig()->setRemovingPasses([]);
         } else {
             (new XmlFileLoader($container = new ContainerBuilder(), new FileLocator()))->load($kernel->getContainer()->getParameter('debug.container.dump'));
         }

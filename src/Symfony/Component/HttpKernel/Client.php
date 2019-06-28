@@ -23,6 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Client simulates a browser and makes requests to an HttpKernel instance.
  *
+ * @method Request  getRequest()  A Request instance
+ * @method Response getResponse() A Response instance
+ *
  * @deprecated since Symfony 4.3, use HttpKernelBrowser instead.
  */
 class Client extends AbstractBrowser

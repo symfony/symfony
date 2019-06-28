@@ -84,10 +84,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL host name.
-     *
-     * @param string|null $regexp A Regexp
      */
-    public function matchHost($regexp)
+    public function matchHost(?string $regexp)
     {
         $this->host = $regexp;
     }
@@ -104,10 +102,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for the URL path info.
-     *
-     * @param string|null $regexp A Regexp
      */
-    public function matchPath($regexp)
+    public function matchPath(?string $regexp)
     {
         $this->path = $regexp;
     }
@@ -117,7 +113,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @param string $ip A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
-    public function matchIp($ip)
+    public function matchIp(string $ip)
     {
         $this->matchIps($ip);
     }
@@ -144,11 +140,8 @@ class RequestMatcher implements RequestMatcherInterface
 
     /**
      * Adds a check for request attribute.
-     *
-     * @param string $key    The request attribute name
-     * @param string $regexp A Regexp
      */
-    public function matchAttribute($key, $regexp)
+    public function matchAttribute(string $key, string $regexp)
     {
         $this->attributes[$key] = $regexp;
     }

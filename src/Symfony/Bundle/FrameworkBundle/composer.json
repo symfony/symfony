@@ -20,6 +20,7 @@
         "ext-xml": "*",
         "symfony/cache": "~4.3",
         "symfony/config": "~4.2",
+        "symfony/debug": "~4.0",
         "symfony/dependency-injection": "^4.3",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3",

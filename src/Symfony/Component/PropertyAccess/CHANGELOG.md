@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * deprecated passing `null` as `$defaultLifetime` 2nd argument of `PropertyAccessor::createCache()` method,
+   pass `0` instead
+
 4.3.0
 -----
 

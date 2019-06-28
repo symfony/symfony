@@ -32,5 +32,5 @@ interface InstantiatorInterface
      *
      * @return object
      */
-    public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator);
+    public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator);
 }

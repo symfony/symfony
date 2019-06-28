@@ -4,7 +4,14 @@ CHANGELOG
 5.0.0
 -----
 
-* removed `FlattenException::setTraceFromException()` in favor of `setTraceFromThrowable()`
+* removed the `BufferingLogger`, `ErrorHandler` and `ExceptionHandler` classes, 
+  they have been moved to the `ErrorCatcher` component
+* removed the `FatalErrorHandlerInterface`, `ClassNotFoundFatalErrorHandler`,  
+  `UndefinedFunctionFatalErrorHandler` and `UndefinedMethodFatalErrorHandler` classes,
+  they have been moved to the `ErrorCatcher` component
+* removed the `ClassNotFoundException`, `FatalErrorException`, `FatalThrowableError`,
+  `FlattenException`, `OutOfMemoryException`, `SilencedErrorContext`, `UndefinedFunctionException`,
+  and `UndefinedMethodException`, they have been moved to the `ErrorCatcher` component
 
 4.4.0
 -----

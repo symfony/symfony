@@ -297,6 +297,8 @@ Workflow
                    type: method
    ```
 
+ * Using `DefinitionBuilder::setInitialPlace()` is deprecated, use `DefinitionBuilder::setInitialPlaces()` instead.
+
 Yaml
 ----
 

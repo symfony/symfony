@@ -90,7 +90,7 @@ class FrameworkBundle extends Bundle
             KernelEvents::FINISH_REQUEST,
         ];
 
-        $this->addCompilerPassIfExists($container, ErrorCatcherPass::class);
+        $container->addCompilerPass(new ErrorCatcherPass());
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);

@@ -22,6 +22,7 @@
         "symfony/class-loader": "~3.2",
         "symfony/dependency-injection": "^3.4.24|^4.2.5",
         "symfony/config": "~3.4|~4.0",
+        "symfony/debug": "~2.8|~3.0|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/http-foundation": "^3.3.11|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",

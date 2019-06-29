@@ -21,10 +21,7 @@ interface PropertyListExtractorInterface
     /**
      * Gets the list of properties available for the given class.
      *
-     * @param string $class
-     * @param array  $context
-     *
      * @return string[]|null
      */
-    public function getProperties($class, array $context = []);
+    public function getProperties(string $class, array $context = []);
 }

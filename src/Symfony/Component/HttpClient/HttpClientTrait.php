@@ -19,8 +19,6 @@ use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
  * All methods are static to prevent implementers from creating memory leaks via circular references.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 trait HttpClientTrait
 {

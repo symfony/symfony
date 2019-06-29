@@ -19,7 +19,6 @@ use Symfony\Component\Messenger\Envelope;
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
  * @internal
- * @experimental in 4.3
  */
 class SingleMessageReceiver implements ReceiverInterface
 {

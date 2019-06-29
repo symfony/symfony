@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 /**
  * @author Guillaume Gammelin <ggammelin@gmail.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.3
  */
 final class AmqpStamp implements StampInterface
 {

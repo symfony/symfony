@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Event;
  * Dispatched when a worker has been stopped.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
- *
- * @experimental in 4.3
  */
 class WorkerStoppedEvent
 {

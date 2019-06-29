@@ -19,8 +19,6 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  * @author xu.li<AthenaLightenedMyPath@gmail.com>
  *
  * @see https://developers.google.com/google-apps/gmail/xoauth2_protocol
- *
- * @experimental in 4.3
  */
 class XOAuth2Authenticator implements AuthenticatorInterface
 {

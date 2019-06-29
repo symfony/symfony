@@ -20,8 +20,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @experimental in 4.3
  */
 class RedisTransport implements TransportInterface, SetupableTransportInterface
 {

@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime\Encoder;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class EightBitContentEncoder implements ContentEncoderInterface
 {

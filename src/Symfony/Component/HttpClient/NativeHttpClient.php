@@ -29,8 +29,6 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  * but each request is opened synchronously.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterface
 {

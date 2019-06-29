@@ -18,8 +18,6 @@ use Symfony\Component\Messenger\WorkerInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class StopWhenRestartSignalIsReceived implements WorkerInterface
 {

@@ -23,8 +23,6 @@ use Symfony\Component\Mime\RawMessage;
  * as they allow asynchronous sending.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 interface TransportInterface
 {

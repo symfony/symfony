@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Envelope;
  * Dispatched when a message was received from a transport and handling failed.
  *
  * The event name is the class name.
- *
- * @experimental in 4.3
  */
 class WorkerMessageFailedEvent extends AbstractWorkerMessageEvent
 {

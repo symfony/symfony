@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
  * Thrown by responses' toArray() method when their content cannot be JSON-decoded.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 final class JsonException extends \JsonException implements DecodingExceptionInterface
 {

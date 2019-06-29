@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Ryan Weaver<ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class PhpSerializer implements SerializerInterface
 {

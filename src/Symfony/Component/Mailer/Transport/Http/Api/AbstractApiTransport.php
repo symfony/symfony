@@ -25,8 +25,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 abstract class AbstractApiTransport extends AbstractTransport
 {

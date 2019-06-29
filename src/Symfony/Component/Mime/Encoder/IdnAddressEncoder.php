@@ -25,8 +25,6 @@ use Symfony\Component\Mime\Exception\AddressEncoderException;
  * the SMTPUTF8 extension.
  *
  * @author Christian Schmidt
- *
- * @experimental in 4.3
  */
 final class IdnAddressEncoder implements AddressEncoderInterface
 {

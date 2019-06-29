@@ -21,8 +21,6 @@ use Symfony\Component\Messenger\Worker\StopWhenRestartSignalIsReceived;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class StopWorkersCommand extends Command
 {

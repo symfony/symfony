@@ -23,8 +23,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
 {

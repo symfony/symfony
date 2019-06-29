@@ -26,8 +26,6 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
  * Sends a rejected message to a "failure transport".
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class SendFailedMessageToFailureTransportListener implements EventSubscriberInterface
 {

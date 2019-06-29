@@ -19,8 +19,6 @@ use Symfony\Component\Mime\RawMessage;
  * Allows the transformation of a Message.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class MessageEvent extends Event
 {

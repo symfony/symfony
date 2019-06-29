@@ -16,8 +16,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @author Gary PEGEOT <garypegeot@gmail.com>
- *
- * @experimental in 4.3
  */
 class InMemoryTransportFactory implements TransportFactoryInterface, ResetInterface
 {

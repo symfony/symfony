@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  * Closes connection and therefore saves number of connections.
  *
  * @author Fuong <insidestyles@gmail.com>
- *
- * @experimental in 4.3
  */
 class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
 {

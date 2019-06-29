@@ -21,8 +21,6 @@ use Symfony\Component\Mailer\Exception\TransportException;
  * @author Chris Corbyn
  *
  * @internal
- *
- * @experimental in 4.3
  */
 abstract class AbstractStream
 {

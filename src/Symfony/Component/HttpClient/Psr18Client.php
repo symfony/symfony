@@ -44,8 +44,6 @@ if (!interface_exists(ClientInterface::class)) {
  * and stream factories with flex-provided autowiring aliases.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 final class Psr18Client implements ClientInterface, RequestFactoryInterface, StreamFactoryInterface, UriFactoryInterface
 {

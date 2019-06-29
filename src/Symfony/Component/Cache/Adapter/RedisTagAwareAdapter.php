@@ -41,8 +41,6 @@ use Symfony\Component\Cache\Traits\RedisTrait;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author André Rømcke <andre.romcke+symfony@gmail.com>
- *
- * @experimental in 4.3
  */
 class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 {

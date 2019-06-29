@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Envelope;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 interface RetryStrategyInterface
 {

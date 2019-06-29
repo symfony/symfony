@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by julien57 at 2019-06-27T07:35:09Z
+
+__toString method of CsrfToken return a string.

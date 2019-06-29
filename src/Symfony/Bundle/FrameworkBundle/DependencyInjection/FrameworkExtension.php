@@ -707,13 +707,10 @@ class FrameworkExtension extends Extension
             }
 
             if ($validator) {
-                $realDefinition = (new Workflow\DefinitionBuilder($places))
-                    ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
-                        return $container->get((string) $ref);
-                    }, $transitions))
-                    ->setInitialPlace($initialMarking)
-                    ->build()
-                ;
+                $trs = array_map(function (Reference $ref) use ($container): Workflow\Transition {
+                    return $container->get((string) $ref);
+                }, $transitions);
+                $realDefinition = new Workflow\Definition($places, $trs, $initialMarking);
                 $validator->validate($realDefinition, $name);
             }
 

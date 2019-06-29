@@ -24,7 +24,7 @@ class DefinitionBuilder
 {
     private $places = [];
     private $transitions = [];
-    private $initialPlace;
+    private $initialPlaces;
     private $metadataStore;
 
     /**
@@ -42,7 +42,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace, $this->metadataStore);
+        return new Definition($this->places, $this->transitions, $this->initialPlaces, $this->metadataStore);
     }
 
     /**
@@ -54,20 +54,36 @@ class DefinitionBuilder
     {
         $this->places = [];
         $this->transitions = [];
-        $this->initialPlace = null;
+        $this->initialPlaces = null;
         $this->metadataStore = null;
 
         return $this;
     }
 
     /**
+     * @deprecated since Symfony 4.3. Use setInitialPlaces() instead.
+     *
      * @param string $place
      *
      * @return $this
      */
     public function setInitialPlace($place)
     {
-        $this->initialPlace = $place;
+        @trigger_error(sprintf('Calling %s::setInitialPlace() is deprecated since Symfony 4.3. Call setInitialPlaces() instead.', __CLASS__), E_USER_DEPRECATED);
+
+        $this->initialPlaces = $place;
+
+        return $this;
+    }
+
+    /**
+     * @param string|string[]|null $initialPlaces
+     *
+     * @return $this
+     */
+    public function setInitialPlaces($initialPlaces)
+    {
+        $this->initialPlaces = $initialPlaces;
 
         return $this;
     }
@@ -80,7 +96,7 @@ class DefinitionBuilder
     public function addPlace($place)
     {
         if (!$this->places) {
-            $this->initialPlace = $place;
+            $this->initialPlaces = $place;
         }
 
         $this->places[$place] = $place;

@@ -129,7 +129,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setPerformDeepMerging(bool $boolean)
     {
-        $this->performDeepMerging = (bool) $boolean;
+        $this->performDeepMerging = $boolean;
     }
 
     /**

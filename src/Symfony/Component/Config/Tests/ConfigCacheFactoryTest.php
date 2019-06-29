@@ -13,17 +13,18 @@ namespace Symfony\Component\Config\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheInterface;
 
 class ConfigCacheFactoryTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid type for callback argument. Expected callable, but got "object".
-     */
-    public function testCacheWithInvalidCallback()
+    public function testCanCreateCache()
     {
         $cacheFactory = new ConfigCacheFactory(true);
 
-        $cacheFactory->cache('file', new \stdClass());
+        $cache = $cacheFactory->cache('file', function (ConfigCacheInterface $cache) {
+            return;
+        });
+
+        $this->assertInstanceOf(ConfigCacheInterface::class, $cache);
     }
 }

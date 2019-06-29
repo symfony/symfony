@@ -18,7 +18,7 @@ use Twig\TwigFunction;
  * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
  * @author Titouan Galopin <galopintitouan@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class CsrfExtension extends AbstractExtension
 {

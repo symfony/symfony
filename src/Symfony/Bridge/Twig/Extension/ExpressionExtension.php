@@ -20,7 +20,7 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class ExpressionExtension extends AbstractExtension
 {
@@ -29,7 +29,7 @@ class ExpressionExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('expression', [$this, 'createExpression']),

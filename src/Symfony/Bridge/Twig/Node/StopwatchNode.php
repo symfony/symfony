@@ -20,7 +20,7 @@ use Twig\Node\Node;
  *
  * @author Wouter J <wouter@wouterj.nl>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class StopwatchNode extends Node
 {
@@ -29,7 +29,7 @@ class StopwatchNode extends Node
         parent::__construct(['body' => $body, 'name' => $name, 'var' => $var], [], $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)

@@ -21,7 +21,7 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class YamlExtension extends AbstractExtension
 {
@@ -30,7 +30,7 @@ class YamlExtension extends AbstractExtension
      *
      * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('yaml_encode', [$this, 'encode']),

@@ -19,11 +19,11 @@ use Twig\Node\Expression\FunctionExpression;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class SearchAndRenderBlockNode extends FunctionExpression
 {
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
         $compiler->raw('$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(');

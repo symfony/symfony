@@ -22,7 +22,7 @@ use Twig\TwigFunction;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class WebLinkExtension extends AbstractExtension
 {
@@ -38,7 +38,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('link', [$this, 'link']),

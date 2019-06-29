@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class HttpKernelRuntime
 {

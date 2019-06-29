@@ -20,7 +20,7 @@
         "ext-xml": "*",
         "doctrine/event-manager": "~1.0",
         "doctrine/persistence": "~1.0",
-        "twig/twig": "^2.10",
+        "twig/twig": "^2.10|^3",
         "psr/cache": "~1.0",
         "psr/container": "^1.0",
         "psr/link": "^1.0",

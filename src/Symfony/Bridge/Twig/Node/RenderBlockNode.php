@@ -22,11 +22,11 @@ use Twig\Node\Expression\FunctionExpression;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class RenderBlockNode extends FunctionExpression
 {
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
         $arguments = iterator_to_array($this->getNode('arguments'));

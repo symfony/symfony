@@ -17,7 +17,7 @@ use Twig\Node\Node;
 /**
  * @author Julien Galenski <julien.galenski@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DumpNode extends Node
 {
@@ -37,7 +37,7 @@ class DumpNode extends Node
     /**
      * {@inheritdoc}
      */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->write("if (\$this->env->isDebug()) {\n")

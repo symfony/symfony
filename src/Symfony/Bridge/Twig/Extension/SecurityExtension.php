@@ -22,7 +22,7 @@ use Twig\TwigFunction;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class SecurityExtension extends AbstractExtension
 {
@@ -55,7 +55,7 @@ class SecurityExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('is_granted', [$this, 'isGranted']),

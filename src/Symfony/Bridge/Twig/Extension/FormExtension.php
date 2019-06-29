@@ -26,7 +26,7 @@ use Twig\TwigTest;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class FormExtension extends AbstractExtension
 {
@@ -35,7 +35,7 @@ class FormExtension extends AbstractExtension
      *
      * @return TokenParserInterface[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             // {% form_theme form "SomeBundle::widgets.twig" %}
@@ -48,7 +48,7 @@ class FormExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('form_widget', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
@@ -70,7 +70,7 @@ class FormExtension extends AbstractExtension
      *
      * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('humanize', ['Symfony\Component\Form\FormRenderer', 'humanize']),
@@ -83,7 +83,7 @@ class FormExtension extends AbstractExtension
      *
      * @return TwigTest[]
      */
-    public function getTests()
+    public function getTests(): array
     {
         return [
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),

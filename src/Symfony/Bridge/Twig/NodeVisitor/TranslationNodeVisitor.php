@@ -23,7 +23,7 @@ use Twig\NodeVisitor\AbstractNodeVisitor;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TranslationNodeVisitor extends AbstractNodeVisitor
 {
@@ -51,10 +51,8 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
 
     /**
      * {@inheritdoc}
-     *
-     * @return Node
      */
-    protected function doEnterNode(Node $node, Environment $env)
+    protected function doEnterNode(Node $node, Environment $env): Node
     {
         if (!$this->enabled) {
             return $node;
@@ -93,10 +91,8 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
 
     /**
      * {@inheritdoc}
-     *
-     * @return Node|null
      */
-    protected function doLeaveNode(Node $node, Environment $env)
+    protected function doLeaveNode(Node $node, Environment $env): ?Node
     {
         return $node;
     }
@@ -104,7 +100,7 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
     /**
      * {@inheritdoc}
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return 0;
     }

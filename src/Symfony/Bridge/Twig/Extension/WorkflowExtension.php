@@ -22,7 +22,7 @@ use Twig\TwigFunction;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class WorkflowExtension extends AbstractExtension
 {
@@ -36,7 +36,7 @@ class WorkflowExtension extends AbstractExtension
     /**
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('workflow_can', [$this, 'canTransition']),

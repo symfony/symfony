@@ -25,7 +25,7 @@ class_exists('Twig\Node\Expression\ArrayExpression');
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TransNode extends Node
 {
@@ -48,7 +48,7 @@ class TransNode extends Node
         parent::__construct($nodes, [], $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
 

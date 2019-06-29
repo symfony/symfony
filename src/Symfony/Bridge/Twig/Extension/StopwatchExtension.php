@@ -21,7 +21,7 @@ use Twig\TokenParser\TokenParserInterface;
  *
  * @author Wouter J <wouter@wouterj.nl>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class StopwatchExtension extends AbstractExtension
 {
@@ -42,7 +42,7 @@ class StopwatchExtension extends AbstractExtension
     /**
      * @return TokenParserInterface[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [
             /*

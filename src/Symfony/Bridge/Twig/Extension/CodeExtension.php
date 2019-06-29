@@ -20,7 +20,7 @@ use Twig\TwigFilter;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class CodeExtension extends AbstractExtension
 {
@@ -45,7 +45,7 @@ class CodeExtension extends AbstractExtension
      *
      * @return TwigFilter[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('abbr_class', [$this, 'abbrClass'], ['is_safe' => ['html']]),

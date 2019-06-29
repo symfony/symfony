@@ -25,7 +25,7 @@ use Twig\TwigFunction;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class DumpExtension extends AbstractExtension
 {
@@ -41,7 +41,7 @@ class DumpExtension extends AbstractExtension
     /**
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('dump', [$this, 'dump'], ['is_safe' => ['html'], 'needs_context' => true, 'needs_environment' => true]),
@@ -51,7 +51,7 @@ class DumpExtension extends AbstractExtension
     /**
      * @return TokenParserInterface[]
      */
-    public function getTokenParsers()
+    public function getTokenParsers(): array
     {
         return [new DumpTokenParser()];
     }

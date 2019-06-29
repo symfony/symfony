@@ -20,7 +20,7 @@ use Twig\TwigFunction;
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class LogoutUrlExtension extends AbstractExtension
 {
@@ -36,7 +36,7 @@ class LogoutUrlExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('logout_url', [$this, 'getLogoutUrl']),

@@ -25,16 +25,14 @@ use Twig\TokenParser\AbstractTokenParser;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since Symfony 4.4
+ * @final
  */
 class TransTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
-     *
-     * @return Node
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -91,10 +89,8 @@ class TransTokenParser extends AbstractTokenParser
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'trans';
     }

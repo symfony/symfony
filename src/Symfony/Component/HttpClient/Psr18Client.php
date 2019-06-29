@@ -25,6 +25,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use Symfony\Component\HttpClient\Response\ResponseTrait;
+use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -90,7 +92,9 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 }
             }
 
-            return $psrResponse->withBody($this->streamFactory->createStream($response->getContent(false)));
+            $body = isset(class_uses($response)[ResponseTrait::class]) ? $response->toStream() : StreamWrapper::createResource($response, $this->client);
+
+            return $psrResponse->withBody($this->streamFactory->createStreamFromResource($body));
         } catch (TransportExceptionInterface $e) {
             if ($e instanceof \InvalidArgumentException) {
                 throw new Psr18RequestException($e, $request);

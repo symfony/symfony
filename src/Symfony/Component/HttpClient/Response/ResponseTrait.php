@@ -179,6 +179,19 @@ trait ResponseTrait
     }
 
     /**
+     * Casts the response to a PHP stream resource.
+     *
+     * @return resource|null
+     */
+    public function toStream()
+    {
+        // Ensure headers arrived
+        $this->getStatusCode();
+
+        return StreamWrapper::createResource($this, null, $this->content, $this->handle && 'stream' === get_resource_type($this->handle) ? $this->handle : null);
+    }
+
+    /**
      * Closes the response and all its network handles.
      */
     abstract protected function close(): void;

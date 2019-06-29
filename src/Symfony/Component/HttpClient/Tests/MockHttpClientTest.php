@@ -17,7 +17,6 @@ use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
-use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
@@ -31,13 +30,13 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
 
         $body = '{
-            "SERVER_PROTOCOL": "HTTP/1.1",
-            "SERVER_NAME": "127.0.0.1",
-            "REQUEST_URI": "/",
-            "REQUEST_METHOD": "GET",
-            "HTTP_FOO": "baR",
-            "HTTP_HOST": "localhost:8057"
-        }';
+    "SERVER_PROTOCOL": "HTTP/1.1",
+    "SERVER_NAME": "127.0.0.1",
+    "REQUEST_URI": "/",
+    "REQUEST_METHOD": "GET",
+    "HTTP_FOO": "baR",
+    "HTTP_HOST": "localhost:8057"
+}';
 
         $client = new NativeHttpClient();
 
@@ -97,6 +96,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 $responses[] = $mock;
                 break;
 
+            case 'testToStream':
             case 'testBadRequestBody':
             case 'testOnProgressCancel':
             case 'testOnProgressError':

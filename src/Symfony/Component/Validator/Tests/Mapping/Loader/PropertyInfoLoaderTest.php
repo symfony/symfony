@@ -80,7 +80,7 @@ class PropertyInfoLoaderTest extends TestCase
             ))
         ;
 
-        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub);
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{^Symfony\\\\Component\\\\Validator\\\\Tests\\\\Fixtures\\\\PropertyInfoLoaderEntity}');
 
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping()
@@ -184,7 +184,7 @@ class PropertyInfoLoaderTest extends TestCase
     public function regexpProvider()
     {
         return [
-            [true, null],
+            [false, null],
             [true, '{^'.preg_quote(PropertyInfoLoaderEntity::class).'$|^'.preg_quote(Entity::class).'$}'],
             [false, '{^'.preg_quote(Entity::class).'$}'],
         ];

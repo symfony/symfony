@@ -84,12 +84,9 @@ final class Response
     /**
      * Gets a response header.
      *
-     * @param string $header The header name
-     * @param bool   $first  Whether to return the first value or all header values
-     *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader($header, $first = true)
+    public function getHeader(string $header, bool $first = true)
     {
         $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {

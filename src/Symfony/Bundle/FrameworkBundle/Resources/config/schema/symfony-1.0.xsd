@@ -269,6 +269,10 @@
     </xsd:complexType>
 
     <xsd:complexType name="cache_pool">
+        <xsd:sequence>
+            <xsd:element name="adapter" type="cache_pool_adapter" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="adapter" type="xsd:string" />
         <xsd:attribute name="tags" type="xsd:string" />
@@ -276,6 +280,11 @@
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
         <xsd:attribute name="provider" type="xsd:string" />
         <xsd:attribute name="clearer" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="cache_pool_adapter">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="provider" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="workflow">

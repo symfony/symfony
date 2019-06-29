@@ -29,6 +29,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -1809,16 +1810,29 @@ class FrameworkExtension extends Extension
         }
         foreach (['app', 'system'] as $name) {
             $config['pools']['cache.'.$name] = [
-                'adapter' => $config[$name],
+                'adapters' => [$config[$name]],
                 'public' => true,
                 'tags' => false,
             ];
         }
         foreach ($config['pools'] as $name => $pool) {
-            if ($config['pools'][$pool['adapter']]['tags'] ?? false) {
-                $pool['adapter'] = '.'.$pool['adapter'].'.inner';
+            $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
+
+            foreach ($pool['adapters'] as $provider => $adapter) {
+                if ($config['pools'][$adapter]['tags'] ?? false) {
+                    $pool['adapters'][$provider] = $adapter = '.'.$adapter.'.inner';
+                }
             }
-            $definition = new ChildDefinition($pool['adapter']);
+
+            if (1 === \count($pool['adapters'])) {
+                if (!isset($pool['provider']) && !\is_int($provider)) {
+                    $pool['provider'] = $provider;
+                }
+                $definition = new ChildDefinition($adapter);
+            } else {
+                $definition = new Definition(ChainAdapter::class, [$pool['adapters'], 0]);
+                $pool['reset'] = 'reset';
+            }
 
             if ($pool['tags']) {
                 if (true !== $pool['tags'] && ($config['pools'][$pool['tags']]['tags'] ?? false)) {
@@ -1849,7 +1863,7 @@ class FrameworkExtension extends Extension
             }
 
             $definition->setPublic($pool['public']);
-            unset($pool['adapter'], $pool['public'], $pool['tags']);
+            unset($pool['adapters'], $pool['public'], $pool['tags']);
 
             $definition->addTag('cache.pool', $pool);
             $container->setDefinition($name, $definition);

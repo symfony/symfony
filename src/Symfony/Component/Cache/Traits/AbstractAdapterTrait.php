@@ -61,7 +61,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if item exists in the cache, false otherwise
      */
-    abstract protected function doHave($id);
+    abstract protected function doHave(string $id);
 
     /**
      * Deletes all items in the pool.
@@ -70,7 +70,7 @@ trait AbstractAdapterTrait
      *
      * @return bool True if the pool was successfully cleared, false otherwise
      */
-    abstract protected function doClear($namespace);
+    abstract protected function doClear(string $namespace);
 
     /**
      * Removes multiple items from the pool.
@@ -89,7 +89,7 @@ trait AbstractAdapterTrait
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
-    abstract protected function doSave(array $values, $lifetime);
+    abstract protected function doSave(array $values, int $lifetime);
 
     /**
      * {@inheritdoc}

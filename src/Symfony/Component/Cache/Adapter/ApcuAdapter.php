@@ -80,7 +80,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace)
     {
         return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== \PHP_SAPI || filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))
             ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
@@ -102,7 +102,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         try {
             if (false === $failures = apcu_store($values, null, $lifetime)) {

@@ -199,7 +199,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         $ok = true;
         $expiry = $lifetime ? time() + $lifetime : 'PHP_INT_MAX';
@@ -256,7 +256,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace)
     {
         $this->values = [];
 

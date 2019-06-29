@@ -234,7 +234,7 @@ class MemcachedAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         if (!$values = $this->marshaller->marshall($values, $failed)) {
             return $failed;
@@ -300,7 +300,7 @@ class MemcachedAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace)
     {
         return '' === $namespace && $this->getClient()->flush();
     }

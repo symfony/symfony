@@ -31,7 +31,7 @@ class Psr6Cache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($class)
+    public function has(string $class)
     {
         return $this->cacheItemPool->hasItem($this->escapeClassName($class));
     }
@@ -39,7 +39,7 @@ class Psr6Cache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function read($class)
+    public function read(string $class)
     {
         $item = $this->cacheItemPool->getItem($this->escapeClassName($class));
 

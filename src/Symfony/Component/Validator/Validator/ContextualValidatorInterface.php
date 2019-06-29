@@ -32,7 +32,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function atPath($path);
+    public function atPath(string $path);
 
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -58,7 +58,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validateProperty($object, $propertyName, $groups = null);
+    public function validateProperty($object, string $propertyName, $groups = null);
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -71,7 +71,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
+    public function validatePropertyValue($objectOrClass, string $propertyName, $value, $groups = null);
 
     /**
      * Returns the violations that have been generated so far in the context

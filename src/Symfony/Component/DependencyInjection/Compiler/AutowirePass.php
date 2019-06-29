@@ -65,7 +65,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    protected function processValue($value, $isRoot = false)
+    protected function processValue($value, bool $isRoot = false)
     {
         try {
             return $this->doProcessValue($value, $isRoot);
@@ -80,7 +80,7 @@ class AutowirePass extends AbstractRecursivePass
         }
     }
 
-    private function doProcessValue($value, $isRoot = false)
+    private function doProcessValue($value, bool $isRoot = false)
     {
         if ($value instanceof TypedReference) {
             if ($ref = $this->getAutowiredReference($value)) {
@@ -373,7 +373,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    private function createTypeNotFoundMessageCallback(TypedReference $reference, $label)
+    private function createTypeNotFoundMessageCallback(TypedReference $reference, string $label)
     {
         $container = new ContainerBuilder($this->container->getParameterBag());
         $container->setAliases($this->container->getAliases());
@@ -386,7 +386,7 @@ class AutowirePass extends AbstractRecursivePass
         };
     }
 
-    private function createTypeNotFoundMessage(ContainerBuilder $container, TypedReference $reference, $label, string $currentId)
+    private function createTypeNotFoundMessage(ContainerBuilder $container, TypedReference $reference, string $label, string $currentId)
     {
         if (!$r = $container->getReflectionClass($type = $reference->getType(), false)) {
             // either $type does not exist or a parent class does not exist
@@ -444,7 +444,7 @@ class AutowirePass extends AbstractRecursivePass
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
     }
 
-    private function getAliasesSuggestionForType(ContainerBuilder $container, $type, $extraContext = null)
+    private function getAliasesSuggestionForType(ContainerBuilder $container, string $type, $extraContext = null)
     {
         $aliases = [];
         foreach (class_parents($type) + class_implements($type) as $parent) {

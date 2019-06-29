@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-29T09:22:46Z
+
+I've also removed the `@experimental` tag on Contracts. I think it makes sense as the HttpClient component won't be experimental anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-29T09:47:24Z
+
+For contracts, we may want to do it later, in case we want to release a new "bugfix" version.
+:+1: otherwise!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-29T16:45:01Z
+
+Contract changes reverted.

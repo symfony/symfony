@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\PdoStore;
 
 /**
@@ -56,5 +57,22 @@ class PdoStoreTest extends AbstractStoreTest
     public function testAbortAfterExpiration()
     {
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
+     */
+    public function testInvalidTtl()
+    {
+        $store = $this->getStore();
+        $store->putOffExpiration(new Key('toto'), 0.1);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
+     */
+    public function testInvalidTtlConstruct()
+    {
+        return new PdoStore('sqlite:'.self::$dbFile, [], 0.1, 0.1);
     }
 }

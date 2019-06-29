@@ -33,6 +33,7 @@ CHANGELOG
  * Dispatch `CompletedEvent` on `workflow.completed`
  * Dispatch `AnnounceEvent` on `workflow.announce`
  * Added support for many `initialPlaces`
+ * Deprecated `DefinitionBuilder::setInitialPlace()` method, use `DefinitionBuilder::setInitialPlaces()` instead.
  * Deprecated the `MultipleStateMarkingStore` class, use the `MethodMarkingStore` instead.
  * Deprecated the `SingleStateMarkingStore` class, use the `MethodMarkingStore` instead.
 

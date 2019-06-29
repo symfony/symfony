@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use Symfony\Component\Lock\Store\RedisStore;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
@@ -32,5 +34,13 @@ class RedisStoreTest extends AbstractRedisStoreTest
         $redis->connect(getenv('REDIS_HOST'));
 
         return $redis;
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\InvalidTtlException
+     */
+    public function testInvalidTtl()
+    {
+        new RedisStore($this->getRedisConnection(), -1);
     }
 }

@@ -661,18 +661,16 @@ class FrameworkExtension extends Extension
             $container->registerAliasForArgument($workflowId, WorkflowInterface::class, $name.'.'.$type);
 
             // Validate Workflow
-            $realDefinition = (new Workflow\DefinitionBuilder($places))
-                ->addTransitions(array_map(function (Reference $ref) use ($container): Workflow\Transition {
-                    return $container->get((string) $ref);
-                }, $transitions))
-                ->setInitialPlace($initialMarking)
-                ->build()
-            ;
             if ('state_machine' === $workflow['type']) {
                 $validator = new Workflow\Validator\StateMachineValidator();
             } else {
                 $validator = new Workflow\Validator\WorkflowValidator();
             }
+
+            $trs = array_map(function (Reference $ref) use ($container): Workflow\Transition {
+                return $container->get((string) $ref);
+            }, $transitions);
+            $realDefinition = new Workflow\Definition($places, $trs, $initialMarking);
             $validator->validate($realDefinition, $name);
 
             // Add workflow to Registry
@@ -1704,7 +1702,7 @@ class FrameworkExtension extends Extension
 
             if (!$container->getParameter('kernel.debug')) {
                 $propertyAccessDefinition->setFactory([PropertyAccessor::class, 'createCache']);
-                $propertyAccessDefinition->setArguments([null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
+                $propertyAccessDefinition->setArguments([null, 0, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)]);
                 $propertyAccessDefinition->addTag('cache.pool', ['clearer' => 'cache.system_clearer']);
                 $propertyAccessDefinition->addTag('monolog.logger', ['channel' => 'cache']);
             } else {

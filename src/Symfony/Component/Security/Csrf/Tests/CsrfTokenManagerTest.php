@@ -160,6 +160,7 @@ class CsrfTokenManagerTest extends TestCase
     public function testNamespaced()
     {
         $generator = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock();
+        $generator->expects($this->once())->method('generateToken')->willReturn('random');
         $storage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock();
 
         $requestStack = new RequestStack();
@@ -169,6 +170,7 @@ class CsrfTokenManagerTest extends TestCase
 
         $token = $manager->getToken('foo');
         $this->assertSame('foo', $token->getId());
+        $this->assertSame('random', $token->getValue());
     }
 
     public function getManagerGeneratorAndStorage()

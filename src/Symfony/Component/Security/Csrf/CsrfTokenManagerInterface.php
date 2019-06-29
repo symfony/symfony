@@ -49,8 +49,6 @@ interface CsrfTokenManagerInterface
     /**
      * Invalidates the CSRF token with the given ID, if one exists.
      *
-     * @param string $tokenId The token ID
-     *
      * @return string|null Returns the removed token value if one existed, NULL
      *                     otherwise
      */

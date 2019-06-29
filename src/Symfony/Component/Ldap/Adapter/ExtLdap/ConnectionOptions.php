@@ -45,7 +45,7 @@ final class ConnectionOptions
     const X_SASL_AUTHCID = 0x6102;
     const X_SASL_AUTHZID = 0x6103;
 
-    public static function getOptionName($name): string
+    public static function getOptionName(string $name): string
     {
         return sprintf('%s::%s', self::class, strtoupper($name));
     }
@@ -58,7 +58,7 @@ final class ConnectionOptions
      *
      * @throws LdapException
      */
-    public static function getOption($name): int
+    public static function getOption(string $name): int
     {
         // Convert
         $constantName = self::getOptionName($name);
@@ -70,7 +70,7 @@ final class ConnectionOptions
         return \constant($constantName);
     }
 
-    public static function isOption($name): bool
+    public static function isOption(string $name): bool
     {
         return \defined(self::getOptionName($name));
     }

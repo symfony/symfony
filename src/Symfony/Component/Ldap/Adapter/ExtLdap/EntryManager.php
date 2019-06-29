@@ -101,7 +101,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function rename(Entry $entry, $newRdn, $removeOldRdn = true)
+    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true)
     {
         $con = $this->getConnectionResource();
 

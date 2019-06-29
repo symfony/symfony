@@ -29,7 +29,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  * @author André Rømcke <andre.romcke+symfony@gmail.com>
  *
  * @internal
- * @experimental in 4.3
  */
 abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, LoggerAwareInterface, ResettableInterface
 {

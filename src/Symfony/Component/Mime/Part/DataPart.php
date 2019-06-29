@@ -17,8 +17,6 @@ use Symfony\Component\Mime\MimeTypes;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class DataPart extends TextPart
 {

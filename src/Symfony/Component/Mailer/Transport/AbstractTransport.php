@@ -25,8 +25,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 abstract class AbstractTransport implements TransportInterface
 {

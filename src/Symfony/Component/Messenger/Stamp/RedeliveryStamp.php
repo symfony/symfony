@@ -16,8 +16,6 @@ use Symfony\Component\Messenger\Envelope;
 
 /**
  * Stamp applied when a messages needs to be redelivered.
- *
- * @experimental in 4.3
  */
 final class RedeliveryStamp implements StampInterface
 {

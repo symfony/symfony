@@ -32,8 +32,6 @@ use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand
 {

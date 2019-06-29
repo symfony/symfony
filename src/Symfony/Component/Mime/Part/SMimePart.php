@@ -15,8 +15,6 @@ use Symfony\Component\Mime\Header\Headers;
 
 /**
  * @author Sebastiaan Stok <s.stok@rollerscapes.net>
- *
- * @experimental in 4.4
  */
 class SMimePart extends AbstractPart
 {

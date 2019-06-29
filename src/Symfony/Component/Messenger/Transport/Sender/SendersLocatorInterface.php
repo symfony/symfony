@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Exception\UnknownSenderException;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @experimental in 4.3
  */
 interface SendersLocatorInterface
 {

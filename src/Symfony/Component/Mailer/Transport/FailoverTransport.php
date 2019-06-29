@@ -15,8 +15,6 @@ namespace Symfony\Component\Mailer\Transport;
  * Uses several Transports using a failover algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class FailoverTransport extends RoundRobinTransport
 {

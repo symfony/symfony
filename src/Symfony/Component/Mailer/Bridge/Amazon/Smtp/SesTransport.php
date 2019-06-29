@@ -17,8 +17,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Kevin Verschaeve
- *
- * @experimental in 4.3
  */
 class SesTransport extends EsmtpTransport
 {

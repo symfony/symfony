@@ -16,8 +16,6 @@ namespace Symfony\Component\Mime;
  * @author Xavier De Cock <xdecock@gmail.com>
  *
  * @internal
- *
- * @experimental in 4.3
  */
 final class CharacterStream
 {

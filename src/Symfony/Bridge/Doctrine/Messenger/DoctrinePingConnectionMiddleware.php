@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  * Checks whether the connection is still open or reconnects otherwise.
  *
  * @author Fuong <insidestyles@gmail.com>
- *
- * @experimental in 4.3
  */
 class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 {

@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
  * Represents a 4xx response.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 final class ClientException extends \RuntimeException implements ClientExceptionInterface
 {

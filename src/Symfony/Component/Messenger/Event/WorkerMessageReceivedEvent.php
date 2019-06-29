@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Event;
  * Dispatched when a message was received from a transport but before sent to the bus.
  *
  * The event name is the class name.
- *
- * @experimental in 4.3
  */
 class WorkerMessageReceivedEvent extends AbstractWorkerMessageEvent
 {

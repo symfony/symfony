@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\WorkerInterface;
 
 /**
  * @author Simon Delicata <simon.delicata@free.fr>
- *
- * @experimental in 4.3
  */
 class StopWhenTimeLimitIsReachedWorker implements WorkerInterface
 {

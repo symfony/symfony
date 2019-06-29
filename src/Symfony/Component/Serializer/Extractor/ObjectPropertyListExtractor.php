@@ -15,8 +15,6 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 
 /**
  * @author David Maicher <mail@dmaicher.de>
- *
- * @experimental in 4.3
  */
 final class ObjectPropertyListExtractor implements ObjectPropertyListExtractorInterface
 {

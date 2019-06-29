@@ -33,8 +33,6 @@ use Symfony\Component\Mime\Exception\LogicException;
  *     $guesser->registerGuesser(new FileinfoMimeTypeGuesser('/path/to/magic/file'));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class MimeTypes implements MimeTypesInterface
 {

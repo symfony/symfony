@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 interface ReceiverInterface
 {

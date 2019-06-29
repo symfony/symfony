@@ -19,8 +19,6 @@ use Symfony\Component\Mime\Message;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @experimental in 4.3
- *
  * @internal
  */
 final class DelayedSmtpEnvelope extends SmtpEnvelope

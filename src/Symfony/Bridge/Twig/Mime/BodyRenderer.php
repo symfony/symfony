@@ -18,8 +18,6 @@ use Twig\Environment;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class BodyRenderer implements BodyRendererInterface
 {

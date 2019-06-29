@@ -21,8 +21,6 @@ use Symfony\Component\Mime\RawMessage;
  * Uses several Transports using a round robin algorithm.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class RoundRobinTransport implements TransportInterface
 {

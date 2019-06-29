@@ -23,8 +23,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Chris Corbyn
- *
- * @experimental in 4.3
  */
 class EsmtpTransport extends SmtpTransport
 {

@@ -60,7 +60,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes($object, $format = null, array $context = [])
+    protected function extractAttributes($object, string $format = null, array $context = [])
     {
         // If not using groups, detect manually
         $attributes = [];
@@ -118,7 +118,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    protected function getAttributeValue($object, $attribute, string $format = null, array $context = [])
     {
         $cacheKey = \get_class($object);
         if (!\array_key_exists($cacheKey, $this->discriminatorCache)) {

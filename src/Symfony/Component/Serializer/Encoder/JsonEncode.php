@@ -36,7 +36,7 @@ class JsonEncode implements EncoderInterface
      *
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = [])
+    public function encode($data, string $format, array $context = [])
     {
         $options = $context[self::OPTIONS] ?? $this->defaultContext[self::OPTIONS];
 
@@ -60,7 +60,7 @@ class JsonEncode implements EncoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format)
+    public function supportsEncoding(string $format)
     {
         return JsonEncoder::FORMAT === $format;
     }

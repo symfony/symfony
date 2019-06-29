@@ -51,7 +51,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function encode($data, $format, array $context = [])
+    public function encode($data, string $format, array $context = [])
     {
         $handle = fopen('php://temp,', 'w+');
 
@@ -110,7 +110,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function decode($data, $format, array $context = [])
+    public function decode(string $data, string $format, array $context = [])
     {
         $handle = fopen('php://temp', 'r+');
         fwrite($handle, $data);

@@ -46,7 +46,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateTimeInterface) {
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
@@ -66,7 +66,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateTimeInterface;
     }
@@ -76,7 +76,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
@@ -113,7 +113,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return isset(self::$supportedTypes[$type]);
     }

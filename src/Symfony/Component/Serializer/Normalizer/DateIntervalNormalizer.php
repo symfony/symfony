@@ -38,7 +38,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      *
      * @throws InvalidArgumentException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof \DateInterval) {
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
@@ -50,7 +50,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null)
     {
         return $data instanceof \DateInterval;
     }
@@ -69,7 +69,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, $class, string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
             throw new InvalidArgumentException(sprintf('Data expected to be a string, %s given.', \gettype($data)));
@@ -96,7 +96,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, string $format = null)
     {
         return \DateInterval::class === $type;
     }

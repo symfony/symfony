@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by sstok at 2019-04-07T13:04:48Z
+
+Any suggestions to clean-up the Header parsing is welcome btw.
+
+I found https://github.com/zbateson/mail-mime-parser but we can't use it as-is, it depends on Guzzle streams and PSR-7. But maybe we can use it's code logic (not this actual library) for the Mime component (in the long run) to parse Mime messages.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-04-08T17:55:28Z
+
+Good news, due to the way the Mime component handles messages this will be actually easier than I expected 😄
+
+~~After the message is signed we need to extract the boundary of the envelope and then use this to find the signature, then we can extract the signature, and create a new message (`SMimeMesage`) which holds the original message (the wrapped message) and signature as a `SignedPart` (`multipart/signed`) body. The original message does not have to be reconstructed as this remains unchanged when wrapped by the signing process.~~ It was actually easier than expected, and it only took me two weeks to discover this 🙃
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-04-27T09:53:33Z
+
+What would be safest way to remove these temp files? When you remove them to soon the application will crash, at least for the final message.
+
+The intermediate files can be safely removed after processing as they are no longer needed.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2019-04-27T11:56:43Z
+
+in case of tmpfile(), those are removed automatically when there is no longer any reference to it
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-04-28T11:52:42Z
+
+Using `tmpfile()` seems to work perfectly well, at least on my system 😝
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-05-02T09:51:25Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-02T16:35:24Z
+
+Can you explain how you would send such messages? As far as I understand, the resulting message does not contain all headers from the original message. Is that expected?
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-05-08T07:39:56Z
+
+>  As far as I understand, the resulting message does not contain all headers from the original message. Is that expected?
+
+Yes, this is expected, the original message is wrapped inside a new MIME entity making the S/MIME basically the envelope. This is how OpenSSL does this internally, adding the original headers might be possible but I'm not sure this conforms the standard.
+
+Parsing the S/MIME back into an object is technically possible, but rather complex and error-prone, not to mention unnecessary as you can't change the original message after signing/encrypting. This would require re-performing the operation, and introducing this much complexity is not worth it imo.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-05-08T08:05:45Z
+
+@sstok Understood. I'm not sure what people expect when receiving such a message. For an encrypted one, having an empty subject might make sense. But for a signed one, I would expect the original subject to show up. Can you confirm that people would expect no subject and no headers whatsoever?
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-05-13T13:36:31Z
+
+I checked the rendered message and it's actually missing important information, in fact Thunderbird shows a warning because there is no `From` header in the root entity.
+
+Prepending these headers to the generated result solves this, will continue working on this once I feel better.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-05-21T14:58:05Z
+
+I used Thunderbird to send a signed and separate encrypted message to see what the result is. Today I learned that S/MIME only applies to the message itself, not the original headers of the message (including the subject) and you need to apply these yourself.
+
+In fact the envelope headers are not even important for the signed/encrypted message (except for the `To` header when encrypting? will need to test this further).
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-05-24T07:26:19Z
+
+The envelope headers of the original message are now prepended to signed/encrypted message.
+I tested the output and (at least) Mozilla Thunderbird was able to verify and decrypt the message.
+
+Note: The envelope headers are not mandatory for the signing process, but doing so ensures the message is signed as enveloped. Changing the outer headers does not effect the signature.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-04T07:46:43Z
+
+@sstok Can you take into account my comments and change the target to 4.4? Or if you're busy, I can do it for you.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-06-04T15:24:34Z
+
+There seem to be some changes in the way the `SmtpEnvelope` is handled, now it expects a Message but the `SMimeMessage` extends from `RawMessage`.
+
+Now, given we don't keep the original message it should (_as I have said to many times_) be possible to use a `Message` object:
+
+1. Take the whole message (including attachments) (without the Envelope headers), and convert this to a string (generator), as a `SMimePart` object.
+2. Create a new `Message` object with the `SMimePart` as body and original message Headers
+
+When you sign and then encrypt (or vice-versa), take the Body (`SMimePart`) and encrypt this, then assign the new `SMimePart` (containing the encrypted body) as the Message body.
+
+https://github.com/swiftmailer/swiftmailer/pull/1023 introduced "Support for full MIME message wrapping (message/rfc822) as described in RFC5751 section 3.1."
+
+~~BUT! Interesting enough, no mail-client even supports the enveloped format 😐 (Thunderbird complains the message has no Subject or Sender or To), or I'm doing something wrong in the current implementation? Note that Headers are never encrypted, but signing the headers doesn't work as expected with previous attempts.~~
+
+Edit. OK, the `message/rfc822` header part is in-fact missing, which was causing these "errors" 🤦‍♂
+
+I'm going to experiment a little more with this 10 headed monster, should be done before the feature freeze of Symfony 4.4 right? 🙃
+
+Edit2. `message/rfc822` takes the entire message wraps this in a `message/rfc822` mime-entity and signs that, the envelope headers are always present in the root entity (`Message`) but oping an enveloped message shows the message separately. Given this the only difference leys within the body content I'm going to focus on the default version (attached), and letting `message/rfc822` be something for another pr.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-05T02:23:20Z
+
+Right, this would be part of 4.4 :)
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-06-23T15:06:27Z
+
+I finally managed to make this work! I tested it manually with Thunderbird and checked the contents by hand. Everything seems to be good.
+
+In this implementation only the message body is signed/encrypted, the headers are ignored for the S/MIME process itself. The new message has all the "previous" envelope headers and has the S/MIME entity as it's body content (in a raw string format).
+
+To use a fully wrapped message (`message/rfc822`), you first replace the body with a `MessagePart` object (taking the message itself) and then pass this for signing. The signer will sign the body (`MessagePart`) as normal, making the whole message signed 👍
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-29T08:36:05Z
+
+Looks great now. Apart from the small comments I've just made, I think it's ready. Thank you @sstok for your work on this. Can you take the comments into account? I will merge then.
+
+---------------------------------------------------------------------------
+
+by sstok at 2019-06-29T08:53:42Z
+
+Should be good now 👍

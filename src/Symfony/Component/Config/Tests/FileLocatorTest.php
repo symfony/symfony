@@ -115,6 +115,6 @@ class FileLocatorTest extends TestCase
     {
         $loader = new FileLocator([__DIR__.'/Fixtures']);
 
-        $loader->locate(null, __DIR__);
+        $loader->locate('', __DIR__);
     }
 }

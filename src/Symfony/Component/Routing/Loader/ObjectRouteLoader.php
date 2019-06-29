@@ -42,7 +42,7 @@ abstract class ObjectRouteLoader extends Loader
      *
      * @return RouteCollection
      */
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
         if (!preg_match('/^[^\:]+(?:::?(?:[^\:]+))?$/', $resource)) {
             throw new \InvalidArgumentException(sprintf('Invalid resource "%s" passed to the "service" route loader: use the format "service::method" or "service" if your service has an "__invoke" method.', $resource));
@@ -79,7 +79,7 @@ abstract class ObjectRouteLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return 'service' === $type;
     }

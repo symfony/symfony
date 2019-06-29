@@ -103,11 +103,11 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, $type = null)
+    public function load($resource, string $type = null)
     {
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, string $type = null)
     {
         return \is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
     }

@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "symfony/yaml": "^4.4|^5.0",
-        "symfony/config": "^4.4|^5.0",
+        "symfony/config": "^5.0",
         "symfony/expression-language": "^4.4|^5.0"
     },
     "suggest": {
@@ -33,7 +33,7 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "conflict": {
-        "symfony/config": "<4.4",
+        "symfony/config": "<5.0",
         "symfony/finder": "<4.4",
         "symfony/proxy-manager-bridge": "<4.4",
         "symfony/yaml": "<4.4"

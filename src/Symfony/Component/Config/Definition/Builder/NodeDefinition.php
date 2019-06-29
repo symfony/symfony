@@ -59,11 +59,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets info message.
      *
-     * @param string $info The info text
-     *
      * @return $this
      */
-    public function info($info)
+    public function info(string $info)
     {
         return $this->attribute('info', $info);
     }
@@ -83,12 +81,11 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets an attribute on the node.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this
      */
-    public function attribute($key, $value)
+    public function attribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
 
@@ -112,7 +109,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NodeInterface
      */
-    public function getNode($forceRootNode = false)
+    public function getNode(bool $forceRootNode = false)
     {
         if ($forceRootNode) {
             $this->parent = null;
@@ -165,11 +162,9 @@ abstract class NodeDefinition implements NodeParentInterface
      * You can use %node% and %path% placeholders in your message to display,
      * respectively, the node name and its complete path.
      *
-     * @param string $message Deprecation message
-     *
      * @return $this
      */
-    public function setDeprecated($message = 'The child node "%node%" at path "%path%" is deprecated.')
+    public function setDeprecated(string $message = 'The child node "%node%" at path "%path%" is deprecated.')
     {
         $this->deprecationMessage = $message;
 
@@ -287,11 +282,9 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param bool $deny Whether the overwriting is forbidden or not
-     *
      * @return $this
      */
-    public function cannotBeOverwritten($deny = true)
+    public function cannotBeOverwritten(bool $deny = true)
     {
         $this->merge()->denyOverwrite($deny);
 

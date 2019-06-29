@@ -97,17 +97,17 @@ abstract class BaseNode implements NodeInterface
         self::$placeholders = [];
     }
 
-    public function setAttribute($key, $value)
+    public function setAttribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
     }
 
-    public function getAttribute($key, $default = null)
+    public function getAttribute(string $key, $default = null)
     {
         return isset($this->attributes[$key]) ? $this->attributes[$key] : $default;
     }
 
-    public function hasAttribute($key)
+    public function hasAttribute(string $key)
     {
         return isset($this->attributes[$key]);
     }
@@ -122,17 +122,15 @@ abstract class BaseNode implements NodeInterface
         $this->attributes = $attributes;
     }
 
-    public function removeAttribute($key)
+    public function removeAttribute(string $key)
     {
         unset($this->attributes[$key]);
     }
 
     /**
      * Sets an info message.
-     *
-     * @param string $info
      */
-    public function setInfo($info)
+    public function setInfo(string $info)
     {
         $this->setAttribute('info', $info);
     }
@@ -183,9 +181,9 @@ abstract class BaseNode implements NodeInterface
      *
      * @param bool $boolean Required node
      */
-    public function setRequired($boolean)
+    public function setRequired(bool $boolean)
     {
-        $this->required = (bool) $boolean;
+        $this->required = $boolean;
     }
 
     /**
@@ -193,22 +191,18 @@ abstract class BaseNode implements NodeInterface
      *
      * You can use %node% and %path% placeholders in your message to display,
      * respectively, the node name and its complete path.
-     *
-     * @param string|null $message Deprecated message
      */
-    public function setDeprecated($message)
+    public function setDeprecated(?string $message)
     {
         $this->deprecationMessage = $message;
     }
 
     /**
      * Sets if this node can be overridden.
-     *
-     * @param bool $allow
      */
-    public function setAllowOverwrite($allow)
+    public function setAllowOverwrite(bool $allow)
     {
-        $this->allowOverwrite = (bool) $allow;
+        $this->allowOverwrite = $allow;
     }
 
     /**
@@ -257,7 +251,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string
      */
-    public function getDeprecationMessage($node, $path)
+    public function getDeprecationMessage(string $node, string $path)
     {
         return strtr($this->deprecationMessage, ['%node%' => $node, '%path%' => $path]);
     }
@@ -366,9 +360,9 @@ abstract class BaseNode implements NodeInterface
     /**
      * Normalizes the value before any other normalization is applied.
      *
-     * @param $value
+     * @param mixed $value
      *
-     * @return The normalized array value
+     * @return mixed The normalized array value
      */
     protected function preNormalize($value)
     {

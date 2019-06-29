@@ -94,10 +94,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 return;
             }
 
+            $data = $params ?: $files;
             if (\is_array($params) && \is_array($files)) {
                 $data = array_replace_recursive($params, $files);
-            } else {
-                $data = $params ?: $files;
             }
         }
 

@@ -135,11 +135,8 @@ class TextDescriptor extends Descriptor
     {
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
 
-        if ($showHidden) {
-            $options['output']->title('Symfony Container Hidden Tags');
-        } else {
-            $options['output']->title('Symfony Container Tags');
-        }
+        $title = $showHidden ? 'Symfony Container Hidden Tags' : 'Symfony Container Tags';
+        $options['output']->title($title);
 
         foreach ($this->findDefinitionsByTag($builder, $showHidden) as $tag => $definitions) {
             $options['output']->section(sprintf('"%s" tag', $tag));
@@ -474,12 +471,9 @@ class TextDescriptor extends Descriptor
     protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = [])
     {
         $event = \array_key_exists('event', $options) ? $options['event'] : null;
-
-        if (null !== $event) {
-            $title = sprintf('Registered Listeners for "%s" Event', $event);
-        } else {
-            $title = 'Registered Listeners Grouped by Event';
-        }
+        $title = null !== $event
+            ? sprintf('Registered Listeners for "%s" Event', $event)
+            : 'Registered Listeners Grouped by Event';
 
         $options['output']->title($title);
 

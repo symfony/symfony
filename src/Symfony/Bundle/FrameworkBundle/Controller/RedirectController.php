@@ -131,11 +131,7 @@ class RedirectController
         $port = '';
         if ('http' === $scheme) {
             if (null === $httpPort) {
-                if ('http' === $request->getScheme()) {
-                    $httpPort = $request->getPort();
-                } else {
-                    $httpPort = $this->httpPort;
-                }
+                $httpPort = 'http' === $request->getScheme() ?  $request->getPort() : $this->httpPort;
             }
 
             if (null !== $httpPort && 80 != $httpPort) {
@@ -143,10 +139,8 @@ class RedirectController
             }
         } elseif ('https' === $scheme) {
             if (null === $httpsPort) {
-                if ('https' === $request->getScheme()) {
-                    $httpsPort = $request->getPort();
-                } else {
-                    $httpsPort = $this->httpsPort;
+                if (null === $httpPort) {
+                    $httpsPort = 'https' === $request->getScheme() ?  $request->getPort() : $this->httpsPort;
                 }
             }
 

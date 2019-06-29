@@ -51,8 +51,8 @@ class Definition
     private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
     /**
-     * @param string|null $class     The service class
-     * @param array       $arguments An array of arguments to pass to the service constructor
+     * @param string|Parameter|null $class     The service class
+     * @param array                 $arguments An array of arguments to pass to the service constructor
      */
     public function __construct($class = null, array $arguments = [])
     {
@@ -157,7 +157,7 @@ class Definition
     /**
      * Sets the service class.
      *
-     * @param string $class The service class
+     * @param string|Parameter|null $class The service class
      *
      * @return $this
      */
@@ -173,7 +173,7 @@ class Definition
     /**
      * Gets the service class.
      *
-     * @return string|null The service class
+     * @return string|Parameter|null The service class
      */
     public function getClass()
     {

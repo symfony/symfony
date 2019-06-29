@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
 
 class DefinitionTest extends TestCase
 {
@@ -43,6 +44,14 @@ class DefinitionTest extends TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
+    }
+
+    public function testSetGetClassWithParameter()
+    {
+        $def = new Definition('stdClass');
+        $parameter = new Parameter('foo');
+        $this->assertSame($def, $def->setClass($parameter), '->setClass() implements a fluent interface');
+        $this->assertSame($parameter, $def->getClass(), '->getClass() returns the parameterized class name');
     }
 
     public function testSetGetDecoratedService()

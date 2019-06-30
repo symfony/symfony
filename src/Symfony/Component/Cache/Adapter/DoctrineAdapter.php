@@ -73,7 +73,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doClear($namespace)
+    protected function doClear(string $namespace)
     {
         $namespace = $this->provider->getNamespace();
 
@@ -98,7 +98,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime)
     {
         return $this->provider->saveMultiple($values, $lifetime);
     }

@@ -107,7 +107,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      *
      * @return AdapterInterface
      */
-    public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
+    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null)
     {
         $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory, true);
         if (null !== $logger) {
@@ -118,7 +118,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return $opcache;
         }
 
-        $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
+        $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
         if ('cli' === \PHP_SAPI && !filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
             $apcu->setLogger(new NullLogger());
         } elseif (null !== $logger) {
@@ -128,11 +128,8 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         return new ChainAdapter([$apcu, $opcache]);
     }
 
-    public static function createConnection($dsn, array $options = [])
+    public static function createConnection(string $dsn, array $options = [])
     {
-        if (!\is_string($dsn)) {
-            throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, \gettype($dsn)));
-        }
         if (0 === strpos($dsn, 'redis:') || 0 === strpos($dsn, 'rediss:')) {
             return RedisAdapter::createConnection($dsn, $options);
         }

@@ -1,6 +1,6 @@
 <?php
 
-$this->load('merge_import.php', $container);
+$this->load('merge_import.php');
 
 $container->loadFromExtension('security', [
     'providers' => [

@@ -89,7 +89,6 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -1315,10 +1314,6 @@ class FrameworkExtension extends Extension
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('serializer.xml');
-
-        if (!class_exists(DateIntervalNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.dateinterval');
-        }
 
         if (!class_exists(ConstraintViolationListNormalizer::class)) {
             $container->removeDefinition('serializer.normalizer.constraint_violation_list');

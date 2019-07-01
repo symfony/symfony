@@ -1102,10 +1102,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testDateIntervalNormalizerRegistered()
     {
-        if (!class_exists(DateIntervalNormalizer::class)) {
-            $this->markTestSkipped('The DateIntervalNormalizer has been introduced in the Serializer Component version 3.4.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $definition = $container->getDefinition('serializer.normalizer.dateinterval');

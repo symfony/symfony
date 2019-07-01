@@ -130,17 +130,11 @@ class Message extends RawMessage
         return bin2hex(random_bytes(16)).strstr($email, '@');
     }
 
-    /**
-     * @internal
-     */
     public function __serialize(): array
     {
         return [$this->headers, $this->body];
     }
 
-    /**
-     * @internal
-     */
     public function __unserialize(array $data): void
     {
         [$this->headers, $this->body] = $data;

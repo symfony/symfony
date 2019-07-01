@@ -42,7 +42,7 @@ class ProjectTemplateLoader4 extends Loader
         return $this->debugger;
     }
 
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         return false;
     }

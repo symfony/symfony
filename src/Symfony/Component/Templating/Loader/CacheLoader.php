@@ -81,12 +81,11 @@ class CacheLoader extends Loader
     /**
      * Returns true if the template is still fresh.
      *
-     * @param TemplateReferenceInterface $template A template
-     * @param int                        $time     The last modification time of the cached template (timestamp)
+     * @param int $time The last modification time of the cached template (timestamp)
      *
      * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time)
     {
         return $this->loader->isFresh($template, $time);
     }

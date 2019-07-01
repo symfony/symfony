@@ -184,16 +184,16 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $tests[] = [
             [ControllerTestService::class, 'action'],
             \InvalidArgumentException::class,
-            'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
+            'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define the controller as a service?',
         ];
         $tests[] = [
             ControllerTestService::class.'::action',
-            \InvalidArgumentException::class, 'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
+            \InvalidArgumentException::class, 'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define the controller as a service?',
         ];
         $tests[] = [
             InvokableControllerService::class,
             \InvalidArgumentException::class,
-            'Controller "Symfony\Component\HttpKernel\Tests\Controller\InvokableControllerService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
+            'Controller "Symfony\Component\HttpKernel\Tests\Controller\InvokableControllerService" has required constructor arguments and does not exist in the container. Did you forget to define the controller as a service?',
         ];
 
         return $tests;

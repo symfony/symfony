@@ -50,6 +50,11 @@ Console
    $processHelper->run($output, Process::fromShellCommandline('ls -l'));
    ```
 
+Debug
+-----
+
+ * The component has been removed in favor of ErrorCatcher
+
 DependencyInjection
 -------------------
 

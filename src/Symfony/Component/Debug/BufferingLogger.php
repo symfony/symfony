@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Debug;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4 and will be removed in 5.0.', BufferingLogger::class), E_USER_DEPRECATED);
+use Symfony\Component\ErrorCatcher\BufferingLogger as NewBufferingLogger;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4 and will be removed in 5.0, use "%s" instead.', BufferingLogger::class, NewBufferingLogger::class), E_USER_DEPRECATED);
 
 use Psr\Log\AbstractLogger;
 
@@ -20,7 +22,7 @@ use Psr\Log\AbstractLogger;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @deprecated since Symfony 4.4 and will be removed in 5.0.
+ * @deprecated since Symfony 4.4 and will be removed in 5.0, use Symfony\Component\ErrorCatcher\BufferingLogger instead.
  */
 class BufferingLogger extends AbstractLogger
 {

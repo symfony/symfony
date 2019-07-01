@@ -9,14 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Debug\Tests;
+namespace Symfony\Component\ErrorCatcher\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\ErrorCatcher\DebugClassLoader;
 
-/**
- * @group legacy
- */
 class DebugClassLoaderTest extends TestCase
 {
     /**
@@ -52,7 +49,7 @@ class DebugClassLoaderTest extends TestCase
                 $reflProp = $reflClass->getProperty('classLoader');
                 $reflProp->setAccessible(true);
 
-                $this->assertNotInstanceOf('Symfony\Component\Debug\DebugClassLoader', $reflProp->getValue($function[0]));
+                $this->assertNotInstanceOf(DebugClassLoader::class, $reflProp->getValue($function[0]));
 
                 return;
             }
@@ -141,7 +138,7 @@ class DebugClassLoaderTest extends TestCase
 
         $xError = [
             'type' => E_USER_DEPRECATED,
-            'message' => 'The "Test\Symfony\Component\Debug\Tests\\'.$class.'" class '.$type.' "Symfony\Component\Debug\Tests\Fixtures\\'.$super.'" that is deprecated but this is a test deprecation notice.',
+            'message' => 'The "Test\Symfony\Component\ErrorCatcher\Tests\\'.$class.'" class '.$type.' "Symfony\Component\ErrorCatcher\Tests\Fixtures\\'.$super.'" that is deprecated but this is a test deprecation notice.',
         ];
 
         $this->assertSame($xError, $lastError);
@@ -183,7 +180,7 @@ class DebugClassLoaderTest extends TestCase
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
-        class_exists('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent', true);
+        class_exists('Symfony\Bridge\ErrorCatcher\Tests\Fixtures\ExtendsDeprecatedParent', true);
 
         error_reporting($e);
         restore_error_handler();
@@ -217,14 +214,14 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $this->assertSame([
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass1" class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass1".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass2" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass2".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass3" class is considered final comment with @@@ and ***. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass3".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass4" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass4".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass5" class is considered final multiline comment. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass5".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass6" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass6".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass7" class is considered final another multiline comment... It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass7".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalClass8" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsFinalClass8".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass1" class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass1".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass2" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass2".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass3" class is considered final comment with @@@ and ***. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass3".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass4" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass4".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass5" class is considered final multiline comment. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass5".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass6" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass6".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass7" class is considered final another multiline comment... It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass7".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalClass8" class is considered final. It may change without further notice as of its next major version. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsFinalClass8".',
         ], $deprecations);
     }
 
@@ -240,8 +237,8 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $xError = [
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\FinalMethod::finalMethod2()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\Debug\Tests\Fixtures\ExtendedFinalMethod".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalMethod::finalMethod()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\ErrorCatcher\Tests\Fixtures\ExtendedFinalMethod".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\FinalMethod::finalMethod2()" method is considered final. It may change without further notice as of its next major version. You should not extend it from "Symfony\Component\ErrorCatcher\Tests\Fixtures\ExtendedFinalMethod".',
         ];
 
         $this->assertSame($xError, $deprecations);
@@ -276,10 +273,10 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $this->assertSame($deprecations, [
-            'The "Symfony\Component\Debug\Tests\Fixtures\InternalInterface" interface is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternalsParent".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\InternalClass" class is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternalsParent".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\InternalTrait" trait is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
-            'The "Symfony\Component\Debug\Tests\Fixtures\InternalClass::internalMethod()" method is considered internal. It may change without further notice. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsInternals".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\InternalInterface" interface is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsInternalsParent".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\InternalClass" class is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsInternalsParent".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\InternalTrait" trait is considered internal. It may change without further notice. You should not use it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsInternals".',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\InternalClass::internalMethod()" method is considered internal. It may change without further notice. You should not extend it from "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsInternals".',
         ]);
     }
 
@@ -295,14 +292,14 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $this->assertSame([
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::quzMethod()" method will require a new "Quz $quz" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\ClassWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::whereAmI()" method will require a new "bool $matrix" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "$noType" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "callable(\Throwable|null $reason, mixed $value) $callback" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "string $param" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "callable  ($a,  $b) $anotherOne" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "Type$WithDollarIsStillAType $ccc" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
-            'The "Symfony\Component\Debug\Tests\Fixtures\SubClassWithAnnotatedParameters::isSymfony()" method will require a new "true $yes" argument in the next major version of its parent class "Symfony\Component\Debug\Tests\Fixtures\ClassWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::quzMethod()" method will require a new "Quz $quz" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\ClassWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::whereAmI()" method will require a new "bool $matrix" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "$noType" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "callable(\Throwable|null $reason, mixed $value) $callback" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "string $param" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "callable  ($a,  $b) $anotherOne" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::iAmHere()" method will require a new "Type$WithDollarIsStillAType $ccc" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\InterfaceWithAnnotatedParameters", not defining it is deprecated.',
+            'The "Symfony\Component\ErrorCatcher\Tests\Fixtures\SubClassWithAnnotatedParameters::isSymfony()" method will require a new "true $yes" argument in the next major version of its parent class "Symfony\Component\ErrorCatcher\Tests\Fixtures\ClassWithAnnotatedParameters", not defining it is deprecated.',
         ], $deprecations);
     }
 
@@ -332,17 +329,17 @@ class DebugClassLoaderTest extends TestCase
         restore_error_handler();
 
         $this->assertSame([
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::sameLineInterfaceMethodNoBraces()".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::newLineInterfaceMethod()": Some description!',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::newLineInterfaceMethodNoBraces()": Description.',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::invalidInterfaceMethod()".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::invalidInterfaceMethodNoBraces()".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::complexInterfaceMethod($arg, ...$args)".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::complexInterfaceMethodTyped($arg, int ...$args)": Description ...',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::staticMethodNoBraces()".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::staticMethodTyped(int $arg)": Description.',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\Debug\Tests\Fixtures\VirtualInterface::staticMethodTypedNoBraces()".',
-            'Class "Test\Symfony\Component\Debug\Tests\ExtendsVirtual" should implement method "Symfony\Component\Debug\Tests\Fixtures\VirtualSubInterface::subInterfaceMethod()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::sameLineInterfaceMethodNoBraces()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::newLineInterfaceMethod()": Some description!',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::newLineInterfaceMethodNoBraces()": Description.',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::invalidInterfaceMethod()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::invalidInterfaceMethodNoBraces()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::complexInterfaceMethod($arg, ...$args)".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::complexInterfaceMethodTyped($arg, int ...$args)": Description ...',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::staticMethodNoBraces()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::staticMethodTyped(int $arg)": Description.',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtualParent" should implement method "static Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualInterface::staticMethodTypedNoBraces()".',
+            'Class "Test\Symfony\Component\ErrorCatcher\Tests\ExtendsVirtual" should implement method "Symfony\Component\ErrorCatcher\Tests\Fixtures\VirtualSubInterface::subInterfaceMethod()".',
         ], $deprecations);
     }
 
@@ -393,8 +390,8 @@ class ClassLoader
             return $fixtureDir.'reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
             return $fixtureDir.'notPsr0Bis.php';
-        } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
-            eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
+        } elseif ('Symfony\Bridge\ErrorCatcher\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
+            eval('namespace Symfony\Bridge\ErrorCatcher\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {

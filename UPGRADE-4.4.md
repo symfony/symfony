@@ -1,6 +1,11 @@
 UPGRADE FROM 4.3 to 4.4
 =======================
 
+Debug
+-----
+
+ * The component has been deprecated in favor of ErrorCatcher
+
 DependencyInjection
 -------------------
 

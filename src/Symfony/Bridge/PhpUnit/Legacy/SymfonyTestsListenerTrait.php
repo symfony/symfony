@@ -18,7 +18,8 @@ use PHPUnit\Framework\TestSuite;
 use PHPUnit\Util\Blacklist;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bridge\PhpUnit\DnsMock;
-use Symfony\Component\Debug\DebugClassLoader;
+use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
+use Symfony\Component\ErrorCatcher\DebugClassLoader;
 
 /**
  * PHP 5.3 compatible trait-like shared implementation.
@@ -53,7 +54,7 @@ class SymfonyTestsListenerTrait
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
-        $enableDebugClassLoader = class_exists('Symfony\Component\Debug\DebugClassLoader');
+        $debugClassLoader = class_exists(DebugClassLoader::class) ? DebugClassLoader::class : (class_exists(LegacyDebugClassLoader::class) ? LegacyDebugClassLoader::class : null);
 
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!\is_array($namespaces)) {
@@ -69,12 +70,12 @@ class SymfonyTestsListenerTrait
                     DnsMock::register($ns.'\DummyClass');
                 }
             }
-            if ('debug-class-loader' === $type) {
-                $enableDebugClassLoader = $namespaces && $namespaces[0];
+            if ('debug-class-loader' === $type && !($namespaces[0] ?? true)) {
+                $debugClassLoader = null;
             }
         }
-        if ($enableDebugClassLoader) {
-            DebugClassLoader::enable();
+        if ($debugClassLoader) {
+            $debugClassLoader::enable();
         }
         if (self::$globallyEnabled) {
             $this->state = -2;

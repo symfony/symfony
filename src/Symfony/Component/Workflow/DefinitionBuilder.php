@@ -61,22 +61,6 @@ class DefinitionBuilder
     }
 
     /**
-     * @deprecated since Symfony 4.3. Use setInitialPlaces() instead.
-     *
-     * @param string $place
-     *
-     * @return $this
-     */
-    public function setInitialPlace($place)
-    {
-        @trigger_error(sprintf('Calling %s::setInitialPlace() is deprecated since Symfony 4.3. Call setInitialPlaces() instead.', __CLASS__), E_USER_DEPRECATED);
-
-        $this->initialPlaces = $place;
-
-        return $this;
-    }
-
-    /**
      * @param string|string[]|null $initialPlaces
      *
      * @return $this

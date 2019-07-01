@@ -157,7 +157,7 @@ class ClientTest extends TestCase
 
         $client->request('GET', 'https://www.example.com');
         $headers = $client->getRequest()->getServer();
-        $this->assertTrue($headers['HTTPS'], '->request() sets the HTTPS header');
+        $this->assertEquals('on', $headers['HTTPS'], '->request() sets the HTTPS header');
 
         $client = new TestClient();
         $client->request('GET', 'http://www.example.com:8080');
@@ -435,7 +435,6 @@ class ClientTest extends TestCase
             'HTTP_HOST' => 'www.example.com',
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
             'CONTENT_TYPE' => 'application/vnd.custom+xml',
-            'HTTPS' => false,
         ];
 
         $client = new TestClient();
@@ -461,7 +460,6 @@ class ClientTest extends TestCase
         $headers = [
             'HTTP_HOST' => 'www.example.com:8080',
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
-            'HTTPS' => false,
             'HTTP_REFERER' => 'http://www.example.com:8080/',
         ];
 
@@ -675,7 +673,6 @@ class ClientTest extends TestCase
         $client->request('GET', 'https://www.example.com/https/www.example.com', [], [], [
             'HTTP_HOST' => 'testhost',
             'HTTP_USER_AGENT' => 'testua',
-            'HTTPS' => false,
             'NEW_SERVER_KEY' => 'new-server-key-value',
         ]);
 
@@ -696,7 +693,7 @@ class ClientTest extends TestCase
         $this->assertEquals('new-server-key-value', $server['NEW_SERVER_KEY']);
 
         $this->assertArrayHasKey('HTTPS', $server);
-        $this->assertTrue($server['HTTPS']);
+        $this->assertEquals('on', $server['HTTPS']);
     }
 
     public function testRequestWithRelativeUri()
@@ -705,13 +702,12 @@ class ClientTest extends TestCase
 
         $client->request('GET', '/', [], [], [
             'HTTP_HOST' => 'testhost',
-            'HTTPS' => true,
+            'HTTPS' => 'on',
         ]);
         $this->assertEquals('https://testhost/', $client->getRequest()->getUri());
 
         $client->request('GET', 'https://www.example.com/', [], [], [
             'HTTP_HOST' => 'testhost',
-            'HTTPS' => false,
         ]);
         $this->assertEquals('https://www.example.com/', $client->getRequest()->getUri());
     }
@@ -723,7 +719,6 @@ class ClientTest extends TestCase
         $client->request('GET', 'https://www.example.com/https/www.example.com', [], [], [
             'HTTP_HOST' => 'testhost',
             'HTTP_USER_AGENT' => 'testua',
-            'HTTPS' => false,
             'NEW_SERVER_KEY' => 'new-server-key-value',
         ]);
 

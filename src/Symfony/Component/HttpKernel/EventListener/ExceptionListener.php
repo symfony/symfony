@@ -98,13 +98,7 @@ class ExceptionListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * Logs an exception.
-     *
-     * @param \Exception $exception The \Exception instance
-     * @param string     $message   The error message to log
-     */
-    protected function logException(\Exception $exception, $message)
+    protected function logException(\Exception $exception, string $message)
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {

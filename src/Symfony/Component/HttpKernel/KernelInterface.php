@@ -58,13 +58,11 @@ interface KernelInterface extends HttpKernelInterface
     /**
      * Returns a bundle.
      *
-     * @param string $name Bundle name
-     *
      * @return BundleInterface A BundleInterface instance
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle($name);
+    public function getBundle(string $name);
 
     /**
      * Returns the file path for a given bundle resource.
@@ -85,16 +83,14 @@ interface KernelInterface extends HttpKernelInterface
      *
      * before looking in the bundle resource folder.
      *
-     * @param string $name  A resource name to locate
-     * @param string $dir   A directory where to look for the resource first
-     * @param bool   $first Whether to return the first path or paths for all matching bundles
+     * @param bool $first Whether to return the first path or paths for all matching bundles
      *
      * @return string|array The absolute path of the resource or an array if $first is false
      *
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      */
-    public function locateResource($name, $dir = null, $first = true);
+    public function locateResource(string $name, string $dir = null, bool $first = true);
 
     /**
      * Gets the environment.

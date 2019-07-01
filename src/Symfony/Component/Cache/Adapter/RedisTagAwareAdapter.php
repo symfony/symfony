@@ -90,7 +90,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, ?int $lifetime, array $addTagData = [], array $delTagData = []): array
+    protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
     {
         // serialize values
         if (!$serialized = $this->marshaller->marshall($values, $failed)) {

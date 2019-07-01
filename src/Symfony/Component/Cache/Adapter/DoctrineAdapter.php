@@ -65,7 +65,7 @@ class DoctrineAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave(string $id)
     {
         return $this->provider->contains($id);
     }

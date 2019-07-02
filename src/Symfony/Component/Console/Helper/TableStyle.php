@@ -51,11 +51,9 @@ class TableStyle
     /**
      * Sets padding character, used for cell padding.
      *
-     * @param string $paddingChar
-     *
      * @return $this
      */
-    public function setPaddingChar($paddingChar)
+    public function setPaddingChar(string $paddingChar)
     {
         if (!$paddingChar) {
             throw new LogicException('The padding char must not be empty');
@@ -89,9 +87,6 @@ class TableStyle
      * ║ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  ║
      * ╚═══════════════╧══════════════════════════╧══════════════════╝
      * </code>
-     *
-     * @param string      $outside Outside border char (see #1 of example)
-     * @param string|null $inside  Inside border char (see #2 of example), equals $outside if null
      */
     public function setHorizontalBorderChars(string $outside, string $inside = null): self
     {
@@ -115,9 +110,6 @@ class TableStyle
      * ║ 80-902734-1-6 │ And Then There Were None │ Agatha Christie  ║
      * ╚═══════════════╧══════════════════════════╧══════════════════╝
      * </code>
-     *
-     * @param string      $outside Outside border char (see #1 of example)
-     * @param string|null $inside  Inside border char (see #2 of example), equals $outside if null
      */
     public function setVerticalBorderChars(string $outside, string $inside = null): self
     {
@@ -263,7 +255,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setCellRowFormat($cellRowFormat)
+    public function setCellRowFormat(string $cellRowFormat)
     {
         $this->cellRowFormat = $cellRowFormat;
 
@@ -287,7 +279,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setCellRowContentFormat($cellRowContentFormat)
+    public function setCellRowContentFormat(string $cellRowContentFormat)
     {
         $this->cellRowContentFormat = $cellRowContentFormat;
 
@@ -311,7 +303,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setBorderFormat($borderFormat)
+    public function setBorderFormat(string $borderFormat)
     {
         $this->borderFormat = $borderFormat;
 
@@ -331,11 +323,9 @@ class TableStyle
     /**
      * Sets cell padding type.
      *
-     * @param int $padType STR_PAD_*
-     *
      * @return $this
      */
-    public function setPadType($padType)
+    public function setPadType(int $padType)
     {
         if (!\in_array($padType, [STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH], true)) {
             throw new InvalidArgumentException('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');

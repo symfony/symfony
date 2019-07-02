@@ -23,13 +23,9 @@ class FormatterHelper extends Helper
     /**
      * Formats a message within a section.
      *
-     * @param string $section The section name
-     * @param string $message The message
-     * @param string $style   The style to apply to the section
-     *
      * @return string The format section
      */
-    public function formatSection($section, $message, $style = 'info')
+    public function formatSection(string $section, string $message, string $style = 'info')
     {
         return sprintf('<%s>[%s]</%s> %s', $style, $section, $style, $message);
     }
@@ -38,12 +34,10 @@ class FormatterHelper extends Helper
      * Formats a message as a block of text.
      *
      * @param string|array $messages The message to write in the block
-     * @param string       $style    The style to apply to the whole block
-     * @param bool         $large    Whether to return a large block
      *
      * @return string The formatter message
      */
-    public function formatBlock($messages, $style, $large = false)
+    public function formatBlock($messages, string $style, bool $large = false)
     {
         if (!\is_array($messages)) {
             $messages = [$messages];
@@ -75,13 +69,9 @@ class FormatterHelper extends Helper
     /**
      * Truncates a message to the given length.
      *
-     * @param string $message
-     * @param int    $length
-     * @param string $suffix
-     *
      * @return string
      */
-    public function truncate($message, $length, $suffix = '...')
+    public function truncate(string $message, int $length, string $suffix = '...')
     {
         $computedLength = $length - $this->strlen($suffix);
 

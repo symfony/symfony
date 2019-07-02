@@ -192,6 +192,10 @@ class Request
 
     protected static $requestFactory;
 
+    /**
+     * @var string|null
+     */
+    private $preferredFormat;
     private $isHostValid = true;
     private $isForwardedValid = true;
 
@@ -1557,6 +1561,25 @@ class Request
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+    }
+
+    public function getPreferredFormat(?string $default = 'html'): ?string
+    {
+        if (null !== $this->preferredFormat) {
+            return $this->preferredFormat;
+        }
+
+        $this->preferredFormat = $this->getRequestFormat($this->getContentType());
+
+        if (null === $this->preferredFormat) {
+            foreach ($this->getAcceptableContentTypes() as $contentType) {
+                if (null !== $this->preferredFormat = $this->getFormat($contentType)) {
+                    break;
+                }
+            }
+        }
+
+        return $this->preferredFormat ?: $default;
     }
 
     /**

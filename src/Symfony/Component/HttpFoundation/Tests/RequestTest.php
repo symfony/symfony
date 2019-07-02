@@ -399,6 +399,32 @@ class RequestTest extends TestCase
         $this->assertEquals('xml', $dup->getRequestFormat());
     }
 
+    public function testGetPreferredFormat()
+    {
+        $request = new Request();
+        $this->assertNull($request->getPreferredFormat(null));
+        $this->assertSame('html', $request->getPreferredFormat());
+        $this->assertSame('json', $request->getPreferredFormat('json'));
+
+        $request->setRequestFormat('atom');
+        $request->headers->set('Content-Type', 'application/json');
+        $request->headers->set('Accept', 'application/xml');
+        $this->assertSame('atom', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/json');
+        $request->headers->set('Accept', 'application/xml');
+        $this->assertSame('json', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/xml');
+        $this->assertSame('xml', $request->getPreferredFormat());
+
+        $request = new Request();
+        $request->headers->set('Accept', 'application/json;q=0.8,application/xml;q=0.9');
+        $this->assertSame('xml', $request->getPreferredFormat());
+    }
+
     /**
      * @dataProvider getFormatToMimeTypeMapProviderWithAdditionalNullFormat
      */

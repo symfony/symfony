@@ -140,20 +140,23 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function addContent($content, $type = null)
     {
-        if (empty($type)) {
-            $type = 0 === strpos($content, '<?xml') ? 'application/xml' : 'text/html';
-        }
-
-        // DOM only for HTML/XML content
-        if (!preg_match('/(x|ht)ml/i', $type, $xmlMatches)) {
-            return;
-        }
-
         $charset = null;
-        if (false !== $pos = stripos($type, 'charset=')) {
-            $charset = substr($type, $pos + 8);
-            if (false !== $pos = strpos($charset, ';')) {
-                $charset = substr($charset, 0, $pos);
+
+        if (empty($type)) {
+            $type = 0 === strpos($content, '<?xml') ? 'xml' : 'html';
+        } else {
+            if (false !== $start = stripos($type, 'charset=')) {
+                $start += 8;
+                $end = strpos($type, ';', $start) ?: \strlen($type);
+                $charset = substr($type, $start, $end);
+            }
+            // DOM only for HTML/XML content
+            if (stristr($type, 'xml')) {
+                $type = 'xml';
+            } elseif (stristr($type, 'html')) {
+                $type = 'html';
+            } else {
+                return;
             }
         }
 
@@ -168,7 +171,7 @@ class Crawler implements \Countable, \IteratorAggregate
             $charset = preg_match('//u', $content) ? 'UTF-8' : 'ISO-8859-1';
         }
 
-        if ('x' === $xmlMatches[1]) {
+        if ('xml' === $type) {
             $this->addXmlContent($content, $charset);
         } else {
             $this->addHtmlContent($content, $charset);

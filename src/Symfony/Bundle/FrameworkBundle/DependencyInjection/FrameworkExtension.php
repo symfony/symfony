@@ -210,7 +210,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['session'])) {
             if (!\extension_loaded('session')) {
-                throw new \LogicException('PHP extension "session" is required.');
+                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://www.php.net/session.installation for instructions.');
             }
 
             $this->sessionConfigEnabled = true;

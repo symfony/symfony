@@ -1,0 +1,196 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-03T18:01:45Z
+
+So this is similar to TTL in rabbitmq: https://www.rabbitmq.com/ttl.html
+Can't we use redis TTL for this as well? Having random trims of random old items seems strange to me.
+
+If we can implement it for redis and doctrine, we could add a generic `ExpirationStamp` that could work for all transports.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-03T19:29:58Z
+
+There is no such thing as TTL in Redis Streams :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-06-03T19:50:34Z
+
+Redis stream's ID are timestamp, you may run a script to remove older items
+
+```lua
+local t = redis.call('TIME')
+local keys=redis.call('XRANGE', ARGV[1], '-', (t[1]-ARGV[2]) * 1000)
+for i=1,#keys,1 do
+  redis.call('XDEL', ARGV[1], keys[i][1])
+end
+return #keys
+```
+with `ARGV[1]` the name of the stream and `ARGV[2]` the TTL in seconds
+
+note: I'm not an expert of redis, I don't know the performance impact of such script.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-03T20:35:19Z
+
+There‘s a reason why TTL support is not built-in in Redis (yet). You can read more about it here: https://github.com/antirez/redis/issues/4450
+The maxlength feature is the only way to trim it as of today so I think this one has to be Redis-specific.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-03T22:32:59Z
+
+I don't see the need to implement that as a core feature. If messages need to have a ttl then people should use the tools that support it, e.g. rabbitmq. If it's purely about local development where you might not run the workers, then it would be enough to have a script that deletes old items from redis that you can call manually or in a cron or whatever people prefer.
+In it's current form it just deletes arbitrary data. Do you want to enable that in prod? What's the use-case?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-06-04T02:02:07Z
+
+> I don't see the need to implement that as a core feature.
+
+@Tobion with redis implémentation, consumed message are not deleted. This PR is not about providing a feature to delete message. But about cleaning the server.
+
+2 options:
+- using a MAXLEN (fast, but not reliable, because redis may delete unconsumed messages when you push too much messages in the queue)
+- using a TTL (slow, may block the redis thread during the garbage collection, and can consume a lot of memory with high throughput producer)
+
+@Toflar I'm aware of that issue. When using redis stream as a messages storage there is a trade off between performance and reliability
+
+In my experience I already had situation where consumers were out during few hours and queue grown 100 000 times bigger than usual. In such situation, capping with MAXLEN would have lost messages or would requires to set a extremely high MAXLEN (which will consume a lot of space even when the situation is ok)
+
+Maybe we can consider combining the 2 solutions: counting outdated elements with `XRANGE` and using `XLEN` to define a new `MAXLEN`. ie.
+```lua
+local t = redis.call('TIME')
+local keys=redis.call('XRANGE', ARGV[1], '-', (t[1]-ARGV[2]) * 1000, 'COUNT', ARGV[3])
+if #keys > 0 then
+  local l = redis.call('XLEN', ARGV[1])
+  redis.call('XTRIM', ARGV[1], 'MAXLEN', '~', l-#keys)
+  return #keys
+else
+  return 0
+end"
+```
+what do you think?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-04T06:53:46Z
+
+> Do you want to enable that in prod? What's the use-case?
+
+The use case is that I already have Redis running and Streams are pretty much explicitly built for message handling. Why would I want to manage yet another tool if Redis can serve me well? 😄
+
+> In my experience I already had situation where consumers were out during few hours and queue grown 100 000 times bigger than usual. In such situation, capping with MAXLEN would have lost messages or would requires to set a extremely high MAXLEN (which will consume a lot of space even when the situation is ok)
+
+Hmmm, so I see why my PR does not seem practical under certain circumstances.
+So maybe we have to go a different path here and provide an explicit cleanup command?
+
+These are the use cases I see:
+
+* Purge all messages, no matter the age and status
+* Purge messages that are older than `<dateinterval>` no matter the status
+* Purge messages that are older than `<dateinterval>` but only `handled` ones, not `pending`
+* Purge messages of all age but only `handled` ones.
+
+And all of those optionally restricted to receivers.
+
+So I don't know but maybe something like
+
+* `bin/console messenger:cleanup <receivers>`
+* `bin/console messenger:cleanup --older-than=P7D  <receivers>`
+* `bin/console messenger:cleanup --older-than=P7D --handled <receivers>`
+* `bin/console messenger:cleanup --handled <receivers>`
+
+(I did not really think about naming and defaults, I just think aloud here.)
+And then we'll have an interface and every transport can implement that and optimize for the best way in their case. Also, this would ensure things happen in a separate cleanup process that (in best case) do not affect production performance.
+
+Does this seem like a better approach?
+
+---------------------------------------------------------------------------
+
+by jderusse at 2019-06-04T08:20:16Z
+
+hmm. I'm not sure about a dedicated command, because: running a periodic small cleanup (like you did with the trimProbability) or a big one every X minutes, will, in both case, block the Redis thread and block every consumers. BUT, the more you call the trim algorithm, the smaller is the subset of messages to remove, and the shorter will be the blocking time window.
+
+FYI, I've made a small bench with very simple data (I don't know if the result will be the same with larger messages) it takes ~50ms to remove a small subset of ~10 000 (that's why I was thinking about removing the oldest 2 000 messages every 1 000 XADD)
+
+But thinking about that, I really wonder if such complexity worth it. Maybe, I'm just exposing an edge case, and your first idea is the good one. We may warned user in the documentation, and recommend to use a real messaging bus for high throughput cases.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-06-04T08:32:22Z
+
+@toflar
+
+> Note: I could not use the XADD mystream MAXLEN ~ 1000 * notation because the PHP redis extension does not support the MAXLEN option afaics so I went for the extra XTRIM command.
+
+The 4 parameter of the [xadd](https://github.com/phpredis/phpredis/blob/6e4941706835d32bfce6b2843f791ef9720b7b88/tests/RedisTest.php#L5446) function is the maxlen e.g.:
+
+```php
+$redis->xadd("new3", "*", ["key" => "value"], 10);
+```
+
+its just missing in the phpdocs (my fault 🙈 ).
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-04T08:34:56Z
+
+Ah 😄 Well, that can be easily changed. Anything you want to add to the discussion?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-06-11T12:27:48Z
+
+@toflar I think by default we should not autotrim because a default value is difficult to set here, but it would be good to have a way to configure this. Is the performance better when using `xadd`? The 5th argument would be also a boolean flag which represents the approximate (~) operator if set to true so the trim_probability could be removed and used the redis internal mode for this.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-11T12:37:07Z
+
+>  I think by default we should not autotrim because a default value is difficult to set here
+
+Agreed.
+
+> Is the performance better when using `xadd`?
+
+I have absolutely no clue. I don't know which is better, `xadd` with `MAXLEN ~` all the time or an `xtrim` every now and then.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2019-06-12T14:38:18Z
+
+A simple bench the xadd seems to be a better choice:
+
+Testvalues adding 100000 messages with a trim size of 100:
+
+normal xAdd: 4.6s
+xAdd with approximate flag: 4.7s
+xAdd with fixed size: 5.2s
+xAdd with xtrim: 8.9s
+
+So I think we should go with:
+
+```php
+$this->connection->xadd($this->stream, '*', ..., $this->maxlength, (bool) $this->maxlength);
+```
+
+As its optional I think its ok to implement this for the redis transport?
+
+/cc @sroze @chalasr
+
+---------------------------------------------------------------------------
+
+by Toflar at 2019-06-12T15:00:34Z
+
+Thanks for benchmarking 👍 I'll update the PR accordingly but I'd like to wait for feedback by Sam and Robin.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-06-17T09:24:22Z
+
+Thanks for raising the issue @Toflar.
+👍 for passing an approximate max length to `xadd`.

@@ -234,10 +234,10 @@ Workflow
    ```yaml
    framework:
        workflows:
-           type: workflow
            article:
+               type: workflow
                marking_store:
-                   type: multiple
+                   type: multiple_state
                    arguments: states
    ```
 
@@ -245,8 +245,8 @@ Workflow
    ```yaml
    framework:
        workflows:
-           type: workflow
            article:
+               type: workflow
                marking_store:
                    type: method
                    property: states
@@ -267,8 +267,8 @@ Workflow
    ```yaml
    framework:
        workflows:
-           type: state_machine
            article:
+               type: state_machine
                marking_store:
                    type: method
                    property: state

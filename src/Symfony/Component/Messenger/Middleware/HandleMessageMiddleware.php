@@ -22,8 +22,6 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.3
  */
 class HandleMessageMiddleware implements MiddlewareInterface
 {

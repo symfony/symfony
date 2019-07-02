@@ -15,8 +15,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
- *
- * @experimental in 4.3
  */
 class DoctrineReceivedStamp implements NonSendableStampInterface
 {

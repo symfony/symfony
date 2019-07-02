@@ -17,8 +17,6 @@ use Symfony\Component\Messenger\WorkerInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.3
  */
 class StopWhenMessageCountIsExceededWorker implements WorkerInterface
 {

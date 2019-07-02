@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Exception\InvalidArgumentException;
  * @author Samuel Roze <samuel.roze@gmail.com>
  *
  * @final
- *
- * @experimental in 4.3
  */
 class Connection
 {

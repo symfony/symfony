@@ -15,8 +15,6 @@ namespace Symfony\Component\Mime\Header;
  * A MIME Header.
  *
  * @author Chris Corbyn
- *
- * @experimental in 4.3
  */
 interface HeaderInterface
 {

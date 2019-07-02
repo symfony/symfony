@@ -16,8 +16,6 @@ use Symfony\Component\Mime\Part\MessagePart;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class DigestPart extends AbstractMultipartPart
 {

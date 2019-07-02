@@ -24,8 +24,6 @@ use Symfony\Component\Messenger\Handler\HandlerDescriptor;
  * @see \Symfony\Component\Messenger\HandleTrait
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.3
  */
 final class HandledStamp implements StampInterface
 {

@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Envelope;
  * to the Envelopes that it returns.
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 interface ListableReceiverInterface extends ReceiverInterface
 {

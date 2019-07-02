@@ -19,8 +19,6 @@ use Symfony\Component\Mime\NamedAddress;
  * A Mailbox MIME Header for something like Sender (one named address).
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class MailboxHeader extends AbstractHeader
 {

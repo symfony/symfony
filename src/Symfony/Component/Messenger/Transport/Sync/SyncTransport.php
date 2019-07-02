@@ -21,7 +21,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * Transport that immediately marks messages as received and dispatches for handling.
  *
- * @experimental in 4.3
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  */

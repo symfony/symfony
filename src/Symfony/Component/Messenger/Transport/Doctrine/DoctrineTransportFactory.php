@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 /**
  * @author Vincent Touzet <vincent.touzet@gmail.com>
- *
- * @experimental in 4.3
  */
 class DoctrineTransportFactory implements TransportFactoryInterface
 {

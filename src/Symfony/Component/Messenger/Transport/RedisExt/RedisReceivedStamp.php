@@ -15,8 +15,6 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Alexander Schranz <alexander@sulu.io>
- *
- * @experimental in 4.3
  */
 class RedisReceivedStamp implements NonSendableStampInterface
 {

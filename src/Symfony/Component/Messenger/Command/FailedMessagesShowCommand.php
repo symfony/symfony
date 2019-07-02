@@ -23,8 +23,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
- *
- * @experimental in 4.3
  */
 class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 {

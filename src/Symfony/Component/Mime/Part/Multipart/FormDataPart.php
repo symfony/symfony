@@ -20,8 +20,6 @@ use Symfony\Component\Mime\Part\TextPart;
  * Implements RFC 7578.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class FormDataPart extends AbstractMultipartPart
 {

@@ -17,8 +17,6 @@ use Symfony\Component\Mailer\SentMessage;
  * Pretends messages have been sent, but just ignores them.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 final class NullTransport extends AbstractTransport
 {

@@ -19,8 +19,6 @@ use Symfony\Component\Mime\Address;
  * Manipulates the Envelope of a Message.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class EnvelopeListener implements EventSubscriberInterface
 {

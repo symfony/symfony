@@ -13,8 +13,6 @@ namespace Symfony\Component\Mime\Encoder;
 
 /**
  * @author Chris Corbyn
- *
- * @experimental in 4.3
  */
 interface EncoderInterface
 {

@@ -37,8 +37,6 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * If this returns false, the authenticator will be skipped.
      *
-     * @param Request $request
-     *
      * @return bool
      */
     public function supports(Request $request);
@@ -59,8 +57,6 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      * Or for an API token that's on a header, you might use:
      *
      *      return ['api_key' => $request->headers->get('X-API-TOKEN')];
-     *
-     * @param Request $request
      *
      * @return mixed Any non-null value
      *

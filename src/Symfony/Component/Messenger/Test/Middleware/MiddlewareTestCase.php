@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 abstract class MiddlewareTestCase extends TestCase
 {

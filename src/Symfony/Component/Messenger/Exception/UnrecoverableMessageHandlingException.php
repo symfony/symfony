@@ -15,8 +15,6 @@ namespace Symfony\Component\Messenger\Exception;
  * A concrete implementation of UnrecoverableExceptionInterface that can be used directly.
  *
  * @author Frederic Bouchery <frederic@bouchery.fr>
- *
- * @experimental in 4.3
  */
 class UnrecoverableMessageHandlingException extends RuntimeException implements UnrecoverableExceptionInterface
 {

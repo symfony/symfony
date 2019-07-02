@@ -18,8 +18,6 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  * An Authentication mechanism.
  *
  * @author Chris Corbyn
- *
- * @experimental in 4.3
  */
 interface AuthenticatorInterface
 {

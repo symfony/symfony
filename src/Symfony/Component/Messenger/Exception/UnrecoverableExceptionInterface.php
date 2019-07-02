@@ -18,8 +18,6 @@ namespace Symfony\Component\Messenger\Exception;
  * and the message should not be retried, a handler can throw such an exception.
  *
  * @author Tobias Schultze <http://tobion.de>
- *
- * @experimental in 4.3
  */
 interface UnrecoverableExceptionInterface extends \Throwable
 {

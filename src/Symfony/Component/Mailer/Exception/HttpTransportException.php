@@ -13,8 +13,6 @@ namespace Symfony\Component\Mailer\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @experimental in 4.3
  */
 class HttpTransportException extends TransportException
 {

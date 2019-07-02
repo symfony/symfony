@@ -19,8 +19,6 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Samuel Roze <samuel.roze@gmail.com>
- *
- * @experimental in 4.3
  */
 class HandlersLocator implements HandlersLocatorInterface
 {

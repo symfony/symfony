@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * A factory to instantiate the best possible HTTP client for the runtime.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- *
- * @experimental in 4.3
  */
 final class HttpClient
 {

@@ -26,8 +26,6 @@ use Symfony\Component\Messenger\Exception\TransportException;
  * @author Vincent Touzet <vincent.touzet@gmail.com>
  *
  * @final
- *
- * @experimental in 4.3
  */
 class Connection
 {

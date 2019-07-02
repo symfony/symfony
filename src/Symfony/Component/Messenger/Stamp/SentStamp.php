@@ -17,8 +17,6 @@ namespace Symfony\Component\Messenger\Stamp;
  * @see \Symfony\Component\Messenger\Middleware\SendMessageMiddleware
  *
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
- *
- * @experimental in 4.3
  */
 final class SentStamp implements NonSendableStampInterface
 {

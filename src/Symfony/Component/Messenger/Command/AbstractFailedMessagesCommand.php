@@ -25,7 +25,6 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
  * @internal
- * @experimental in 4.3
  */
 abstract class AbstractFailedMessagesCommand extends Command
 {

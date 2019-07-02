@@ -19,8 +19,6 @@ use Symfony\Component\Mime\NamedAddress;
  * A Mailbox list MIME Header for something like From, To, Cc, and Bcc (one or more named addresses).
  *
  * @author Chris Corbyn
- *
- * @experimental in 4.3
  */
 final class MailboxListHeader extends AbstractHeader
 {

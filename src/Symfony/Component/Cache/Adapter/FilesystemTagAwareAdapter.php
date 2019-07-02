@@ -23,8 +23,6 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  * @author André Rømcke <andre.romcke+symfony@gmail.com>
- *
- * @experimental in 4.3
  */
 class FilesystemTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {

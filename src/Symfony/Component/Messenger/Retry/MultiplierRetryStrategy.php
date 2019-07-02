@@ -28,7 +28,6 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
  *
  * @author Ryan Weaver <ryan@symfonycasts.com>
  *
- * @experimental in 4.3
  * @final
  */
 class MultiplierRetryStrategy implements RetryStrategyInterface

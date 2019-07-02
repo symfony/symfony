@@ -100,7 +100,6 @@ use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -227,7 +226,7 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['session'])) {
             if (!\extension_loaded('session')) {
-                throw new \LogicException('PHP extension "session" is required.');
+                throw new LogicException('Session support cannot be enabled as the session extension is not installed. See https://www.php.net/session.installation for instructions.');
             }
 
             $this->sessionConfigEnabled = true;
@@ -1434,10 +1433,6 @@ class FrameworkExtension extends Extension
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('serializer.xml');
-
-        if (!class_exists(DateIntervalNormalizer::class)) {
-            $container->removeDefinition('serializer.normalizer.dateinterval');
-        }
 
         if (!class_exists(ConstraintViolationListNormalizer::class)) {
             $container->removeDefinition('serializer.normalizer.constraint_violation_list');

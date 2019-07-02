@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-06-29T18:26:01Z
+
+CI fails here because of one unit test that does not mock `TokenGeneratorInterface` properly. That test should probably be fixed on a lower branch.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-29T22:52:49Z
+
+Fixed

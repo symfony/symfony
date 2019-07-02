@@ -31,6 +31,7 @@ class Connection
         'group' => 'symfony',
         'consumer' => 'consumer',
         'auto_setup' => true,
+        'stream_max_entries' => 0, // any value higher than 0 defines an approximate maximum number of stream entries
     ];
 
     private $connection;
@@ -38,6 +39,7 @@ class Connection
     private $group;
     private $consumer;
     private $autoSetup;
+    private $maxEntries;
     private $couldHavePendingMessages = true;
 
     public function __construct(array $configuration, array $connectionCredentials = [], array $redisOptions = [], \Redis $redis = null)
@@ -53,6 +55,7 @@ class Connection
         $this->group = $configuration['group'] ?? self::DEFAULT_OPTIONS['group'];
         $this->consumer = $configuration['consumer'] ?? self::DEFAULT_OPTIONS['consumer'];
         $this->autoSetup = $configuration['auto_setup'] ?? self::DEFAULT_OPTIONS['auto_setup'];
+        $this->maxEntries = $configuration['stream_max_entries'] ?? self::DEFAULT_OPTIONS['stream_max_entries'];
     }
 
     public static function fromDsn(string $dsn, array $redisOptions = [], \Redis $redis = null): self
@@ -82,7 +85,19 @@ class Connection
             unset($redisOptions['auto_setup']);
         }
 
-        return new self(['stream' => $stream, 'group' => $group, 'consumer' => $consumer, 'auto_setup' => $autoSetup], $connectionCredentials, $redisOptions, $redis);
+        $maxEntries = null;
+        if (\array_key_exists('stream_max_entries', $redisOptions)) {
+            $maxEntries = filter_var($redisOptions['stream_max_entries'], FILTER_VALIDATE_INT);
+            unset($redisOptions['stream_max_entries']);
+        }
+
+        return new self([
+            'stream' => $stream,
+            'group' => $group,
+            'consumer' => $consumer,
+            'auto_setup' => $autoSetup,
+            'stream_max_entries' => $maxEntries,
+        ], $connectionCredentials, $redisOptions, $redis);
     }
 
     public function get(): ?array
@@ -169,9 +184,15 @@ class Connection
 
         $e = null;
         try {
-            $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
-                ['body' => $body, 'headers' => $headers]
-            )]);
+            if ($this->maxEntries) {
+                $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
+                    ['body' => $body, 'headers' => $headers]
+                )], $this->maxEntries, true);
+            } else {
+                $added = $this->connection->xadd($this->stream, '*', ['message' => json_encode(
+                    ['body' => $body, 'headers' => $headers]
+                )]);
+            }
         } catch (\RedisException $e) {
         }
 

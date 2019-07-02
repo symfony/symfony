@@ -324,7 +324,7 @@ trait RedisTrait
     /**
      * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave(string $id)
     {
         return (bool) $this->redis->exists($id);
     }

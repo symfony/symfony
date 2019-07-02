@@ -165,7 +165,7 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
     /**
      * {@inheritdoc}
      */
-    protected function doHave($id)
+    protected function doHave(string $id)
     {
         if ($this->appendOnly && isset($this->values[$id])) {
             return true;

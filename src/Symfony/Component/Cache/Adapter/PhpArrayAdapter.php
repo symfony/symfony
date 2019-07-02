@@ -69,7 +69,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
      *
      * @return CacheItemPoolInterface
      */
-    public static function create($file, CacheItemPoolInterface $fallbackPool)
+    public static function create(string $file, CacheItemPoolInterface $fallbackPool)
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled
         if (filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {

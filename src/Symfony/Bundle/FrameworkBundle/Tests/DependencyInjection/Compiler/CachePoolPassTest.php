@@ -89,7 +89,7 @@ class CachePoolPassTest extends TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('itantF+pIq', $cachePool->getArgument(1));
+        $this->assertSame('itantF_pIq', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 

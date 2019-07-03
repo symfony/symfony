@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-28T12:53:20Z
+
+Let's do it with BC: 4.4 with deprecation, removal in 5.0. We should play safe.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-06-28T13:19:52Z
+
+Done :+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-28T16:16:19Z
+
+please fix your commit message
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-01T08:46:57Z
+
+Failures on AppVeyor not related
+> KO src\Symfony/Component/Mime

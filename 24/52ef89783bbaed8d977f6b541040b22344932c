@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by bendavies at 2019-06-26T13:11:19Z
+
+Caching is normally done with decoration, isn't it?
+
+---------------------------------------------------------------------------
+
+by bastnic at 2019-06-26T13:15:18Z
+
+@bendavies maybe ;). I wanted to show that there is indeed a problem and a quickfix implementation.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2019-06-26T14:14:03Z
+
+Should have been fixed by https://github.com/symfony/symfony/pull/31452, no?
+
+---------------------------------------------------------------------------
+
+by bastnic at 2019-06-26T14:18:36Z
+
+Not that I'm aware of. The cache added in the PR seems to be at property level. But for each property/method extraction you need to parse the original file. That's what i'm trying to avoid.
+
+---------------------------------------------------------------------------
+
+by bastnic at 2019-06-26T14:22:42Z
+
+Just seen that it was in 4.3-rc1, so nope not fixed!
+
+---------------------------------------------------------------------------
+
+by bastnic at 2019-06-27T08:50:21Z
+
+Great, thanks @lyrixx and @dunglas for the approvals.
+
+The PR is based on 4.4 because I read somewhere that performance stuff should be a minor, not a patch version. Should I put it on 4.3?

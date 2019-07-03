@@ -81,6 +81,11 @@ MonologBridge
 
  * The `RouteProcessor` has been marked final.
 
+PropertyAccess
+--------------
+
+ * Deprecated passing `null` as 2nd argument of `PropertyAccessor::createCache()` method (`$defaultLifetime`), pass `0` instead.
+
 Security
 --------
 

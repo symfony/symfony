@@ -81,7 +81,7 @@ class ServiceReferenceGraphNode
     /**
      * Returns the in edges.
      *
-     * @return array The in ServiceReferenceGraphEdge array
+     * @return ServiceReferenceGraphEdge[]
      */
     public function getInEdges()
     {
@@ -91,7 +91,7 @@ class ServiceReferenceGraphNode
     /**
      * Returns the out edges.
      *
-     * @return array The out ServiceReferenceGraphEdge array
+     * @return ServiceReferenceGraphEdge[]
      */
     public function getOutEdges()
     {

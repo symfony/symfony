@@ -57,13 +57,15 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 
     public function testGroupSequenceWithConstraintsOption()
     {
+        $allowEmptyString = property_exists(Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
+
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, (['validation_groups' => new GroupSequence(['First', 'Second'])]))
             ->add('field', TextTypeTest::TESTED_TYPE, [
                 'constraints' => [
-                    new Length(['min' => 10, 'groups' => ['First']]),
+                    new Length(['min' => 10, 'groups' => ['First']] + $allowEmptyString),
                     new Email(['groups' => ['Second']]),
                 ],
             ])

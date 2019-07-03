@@ -30,7 +30,7 @@ class LengthValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Length');
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value || ('' === $value && $constraint->allowEmptyString)) {
             return;
         }
 

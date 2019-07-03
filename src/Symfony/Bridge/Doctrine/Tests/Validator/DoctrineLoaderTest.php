@@ -40,6 +40,7 @@ class DoctrineLoaderTest extends TestCase
         }
 
         $validator = Validation::createValidatorBuilder()
+            ->addMethodMapping('loadValidatorMetadata')
             ->enableAnnotationMapping()
             ->addLoader(new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), '{^Symfony\\\\Bridge\\\\Doctrine\\\\Tests\\\\Fixtures\\\\DoctrineLoader}'))
             ->getValidator()
@@ -142,6 +143,7 @@ class DoctrineLoaderTest extends TestCase
         }
 
         $validator = Validation::createValidatorBuilder()
+            ->addMethodMapping('loadValidatorMetadata')
             ->enableAnnotationMapping()
             ->addXmlMappings([__DIR__.'/../Resources/validator/BaseUser.xml'])
             ->addLoader(

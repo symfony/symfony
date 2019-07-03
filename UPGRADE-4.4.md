@@ -107,3 +107,7 @@ Validator
 
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
    Pass it as the first argument instead.
+ * The `Length` constraint expects the `allowEmptyString` option to be defined
+   when the `min` option is used.
+   Set it to `true` to keep the current behavior and `false` to reject empty strings.
+   In 5.0, it'll become optional and will default to `false`.

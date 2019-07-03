@@ -33,17 +33,26 @@ class MessageBus implements MessageBusInterface
         } elseif (\is_array($middlewareHandlers)) {
             $this->middlewareAggregate = new \ArrayObject($middlewareHandlers);
         } else {
-            $this->middlewareAggregate = new class() {
-                public $aggregate;
-                public $iterator;
+            // $this->middlewareAggregate should be an instance of IteratorAggregate.
+            // When $middlewareHandlers is an Iterator, we wrap it to ensure it is lazy-loaded and can be rewound.
+            $this->middlewareAggregate = new class($middlewareHandlers) implements \IteratorAggregate {
+                private $middlewareHandlers;
+                private $cachedIterator;
+
+                public function __construct($middlewareHandlers)
+                {
+                    $this->middlewareHandlers = $middlewareHandlers;
+                }
 
                 public function getIterator()
                 {
-                    return $this->aggregate = new \ArrayObject(iterator_to_array($this->iterator, false));
+                    if (null === $this->cachedIterator) {
+                        $this->cachedIterator = new \ArrayObject(iterator_to_array($this->middlewareHandlers, false));
+                    }
+
+                    return $this->cachedIterator;
                 }
             };
-            $this->middlewareAggregate->aggregate = &$this->middlewareAggregate;
-            $this->middlewareAggregate->iterator = $middlewareHandlers;
         }
     }
 

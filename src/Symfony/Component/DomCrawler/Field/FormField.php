@@ -99,10 +99,8 @@ abstract class FormField
 
     /**
      * Sets the value of the field.
-     *
-     * @param string $value The value of the field
      */
-    public function setValue($value)
+    public function setValue(?string $value)
     {
         $this->value = (string) $value;
     }

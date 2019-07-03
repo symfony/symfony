@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ApacheRequest;
 
+/** @group legacy */
 class ApacheRequestTest extends TestCase
 {
     /**

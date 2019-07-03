@@ -21,13 +21,11 @@ class Lexer
     /**
      * Tokenizes an expression.
      *
-     * @param string $expression The expression to tokenize
-     *
      * @return TokenStream A token stream instance
      *
      * @throws SyntaxError
      */
-    public function tokenize($expression)
+    public function tokenize(string $expression)
     {
         $expression = str_replace(["\r", "\n", "\t", "\v", "\f"], ' ', $expression);
         $cursor = 0;

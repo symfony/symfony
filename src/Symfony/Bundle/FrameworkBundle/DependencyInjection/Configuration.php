@@ -339,10 +339,7 @@ class Configuration implements ConfigurationInterface
                                         ->defaultNull()
                                     ->end()
                                     ->arrayNode('initial_marking')
-                                        ->beforeNormalization()
-                                            ->ifTrue(function ($v) { return !\is_array($v); })
-                                            ->then(function ($v) { return [$v]; })
-                                        ->end()
+                                        ->beforeNormalization()->castToArray()->end()
                                         ->defaultValue([])
                                         ->prototype('scalar')->end()
                                     ->end()
@@ -602,6 +599,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('templating')
                     ->info('templating configuration')
                     ->canBeEnabled()
+                    ->setDeprecated('The "%path%.%node%" configuration is deprecated since Symfony 4.3. Use the "twig" service directly instead.')
                     ->beforeNormalization()
                         ->ifTrue(function ($v) { return false === $v || \is_array($v) && false === $v['enabled']; })
                         ->then(function () { return ['enabled' => false, 'engines' => false]; })
@@ -1180,9 +1178,14 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->arrayNode('retry_strategy')
                                         ->addDefaultsIfNotSet()
-                                        ->validate()
-                                            ->ifTrue(function ($v) { return null !== $v['service'] && (isset($v['max_retries']) || isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay'])); })
-                                            ->thenInvalid('"service" cannot be used along with the other retry_strategy options.')
+                                        ->beforeNormalization()
+                                            ->always(function ($v) {
+                                                if (isset($v['service']) && (isset($v['max_retries']) || isset($v['delay']) || isset($v['multiplier']) || isset($v['max_delay']))) {
+                                                    throw new \InvalidArgumentException('The "service" cannot be used along with the other "retry_strategy" options.');
+                                                }
+
+                                                return $v;
+                                            })
                                         ->end()
                                         ->children()
                                             ->scalarNode('service')->defaultNull()->info('Service id to override the retry strategy entirely')->end()

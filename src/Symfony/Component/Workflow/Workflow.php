@@ -43,7 +43,7 @@ class Workflow implements WorkflowInterface
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
-        $this->dispatcher = LegacyEventDispatcherProxy::decorate($dispatcher);
+        $this->dispatcher = null !== $dispatcher ? LegacyEventDispatcherProxy::decorate($dispatcher) : null;
         $this->name = $name;
     }
 

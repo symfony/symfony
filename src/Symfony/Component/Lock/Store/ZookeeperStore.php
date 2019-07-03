@@ -95,7 +95,7 @@ class ZookeeperStore implements StoreInterface
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        throw new NotSupportedException();
+        // do nothing, zookeeper locks forever.
     }
 
     /**

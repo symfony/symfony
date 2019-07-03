@@ -35,6 +35,9 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testDoNoDuplicateDefaultFormResources()
     {
         $input = ['templating' => [

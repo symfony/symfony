@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * support for passing a `null` value to `Filesystem::isAbsolutePath()` is deprecated and will be removed in 5.0
+
 4.3.0
 -----
 

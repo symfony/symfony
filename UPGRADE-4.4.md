@@ -41,6 +41,11 @@ DependencyInjection
        arguments: [!tagged_iterator app.handler]
    ```
 
+Filesystem
+----------
+
+ * Support for passing a `null` value to `Filesystem::isAbsolutePath()` is deprecated.
+
 Form
 ----
 

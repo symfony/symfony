@@ -1397,8 +1397,16 @@ class FilesystemTest extends FilesystemTestCase
             ['var/lib', false],
             ['../var/lib', false],
             ['', false],
-            [null, false],
         ];
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling "Symfony\Component\Filesystem\Filesystem::isAbsolutePath()" with a null in the $file argument is deprecated since Symfony 4.4.
+     */
+    public function testIsAbsolutePathWithNull()
+    {
+        $this->assertFalse($this->filesystem->isAbsolutePath(null));
     }
 
     public function testTempnam()

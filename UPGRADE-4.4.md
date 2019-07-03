@@ -106,6 +106,10 @@ Validator
 ---------
 
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
+ * Deprecated using anything else than a `string` as the code of a `ConstraintViolation`, a `string` type-hint will
+   be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
+   method in 5.0.
+ * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
    Pass it as the first argument instead.
  * The `Length` constraint expects the `allowEmptyString` option to be defined
    when the `min` option is used.

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-05-17T15:36:29Z
+
+Status: Needs work
+
+to only account when a `min` (or `value`, i.e min & max) value is set.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-06-04T17:47:27Z
+
+Rebased & comments fixed
+
+Status: Needs Review

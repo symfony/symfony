@@ -23,7 +23,8 @@ final class SMimeEncrypter extends SMime
     private $cipher;
 
     /**
-     * @param string|string[] $certificate Either a lone X.509 certificate, or an array of X.509 certificates
+     * @param string|string[] $certificate The path (or array of paths) of the file(s) containing the X.509 certificate(s)
+     * @param int             $cipher      A set of algorithms used to encrypt the message. Must be one of these PHP constants: https://www.php.net/manual/en/openssl.ciphers.php
      */
     public function __construct($certificate, int $cipher = OPENSSL_CIPHER_AES_256_CBC)
     {

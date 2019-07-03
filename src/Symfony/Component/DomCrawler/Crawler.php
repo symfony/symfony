@@ -55,9 +55,9 @@ class Crawler implements \Countable, \IteratorAggregate
     private $isHtml = true;
 
     /**
-     * @param mixed  $node     A Node to use as the base for the crawling
-     * @param string $uri      The current URI
-     * @param string $baseHref The base href value
+     * @param mixed|null  $node     A Node to use as the base for the crawling
+     * @param string|null $uri      The current URI
+     * @param string|null $baseHref The base href value
      */
     public function __construct($node = null, $uri = null, $baseHref = null)
     {
@@ -374,8 +374,8 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Slices the list of nodes by $offset and $length.
      *
-     * @param int $offset
-     * @param int $length
+     * @param int      $offset
+     * @param int|null $length
      *
      * @return self
      */
@@ -836,8 +836,8 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Returns a Form object for the first node in the list.
      *
-     * @param array  $values An array of values for the form fields
-     * @param string $method The method for the form
+     * @param array|null  $values An array of values for the form fields
+     * @param string|null $method The method for the form
      *
      * @return Form A Form instance
      *

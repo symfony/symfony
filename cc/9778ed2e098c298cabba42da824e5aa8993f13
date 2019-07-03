@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-28T12:42:32Z
+
+These classes contain a lot of useless `@param` annotation, could you please send a PR to remove them, on 3.4 I suppose?
+
+---------------------------------------------------------------------------
+
+by thomasbisignani at 2019-06-28T13:14:26Z
+
+Done here https://github.com/symfony/symfony/pull/32257 for 3.4 (@nicolas-grekas @derrabus)
+
+---------------------------------------------------------------------------
+
+by thomasbisignani at 2019-07-01T15:29:19Z
+
+Fixed.
+Ok for you @nicolas-grekas @derrabus ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2019-07-02T15:18:32Z
+
+Rebase unlocked :)
+
+---------------------------------------------------------------------------
+
+by thomasbisignani at 2019-07-02T20:46:54Z
+
+Rebased.

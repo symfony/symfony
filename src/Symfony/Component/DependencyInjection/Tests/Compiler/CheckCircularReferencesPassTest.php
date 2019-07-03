@@ -152,6 +152,7 @@ class CheckCircularReferencesPassTest extends TestCase
             new CheckCircularReferencesPass(),
         ]);
         $passConfig->setRemovingPasses([]);
+        $passConfig->setAfterRemovingPasses([]);
 
         $compiler->compile($container);
     }

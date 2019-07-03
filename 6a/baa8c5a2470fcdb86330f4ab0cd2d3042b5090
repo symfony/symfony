@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2019-06-29T06:39:16Z
+
+Thinking about it, would it be feasible to use `int` instead of `string`. That seems more "natural" in PHP to have error codes as `int`s.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-29T09:22:03Z
+
+@fabpot All our built-in constraints already use UUID strings as the code.

@@ -1347,6 +1347,8 @@ class Request
      *  * _format request attribute
      *  * $default
      *
+     * @see getPreferredFormat
+     *
      * @param string|null $default The default format
      *
      * @return string|null The request format
@@ -1563,21 +1565,26 @@ class Request
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
     }
 
+    /**
+     * Gets the preferred format for the response by inspecting, in the following order:
+     *   * the request format set using setRequestFormat
+     *   * the values of the Accept HTTP header
+     *   * the content type of the body of the request.
+     */
     public function getPreferredFormat(?string $default = 'html'): ?string
     {
         if (null !== $this->preferredFormat) {
             return $this->preferredFormat;
         }
 
-        $this->preferredFormat = $this->getRequestFormat($this->getContentType());
-
-        if (null === $this->preferredFormat) {
-            foreach ($this->getAcceptableContentTypes() as $contentType) {
-                if (null !== $this->preferredFormat = $this->getFormat($contentType)) {
-                    break;
-                }
+        $preferredFormat = null;
+        foreach ($this->getAcceptableContentTypes() as $contentType) {
+            if ($preferredFormat = $this->getFormat($contentType)) {
+                break;
             }
         }
+
+        $this->preferredFormat = $this->getRequestFormat($preferredFormat ?: $this->getContentType());
 
         return $this->preferredFormat ?: $default;
     }

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-28T17:06:28Z
+
+This should go in 4.3 because that's where the deprecation happened. You cannot fix the other deprecations without removing the config. So this is a requirement and serves as explanation.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-28T17:12:06Z
+
+Please also add the instructions to UPGRADE-4.3.md as pointed out in #32120
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-29T10:11:05Z
+
+> This should go in 4.3 because that's where the deprecation happened. You cannot fix the other deprecations without removing the config. So this is a requirement and serves as explanation.
+
+You are right. I have just checked this on a fresh installation.

@@ -79,6 +79,16 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
     }
 
+    public function testAuth()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password');
+
+        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
+    }
+
     public function testFirstGetPendingMessagesThenNewMessages()
     {
         $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();

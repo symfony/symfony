@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-02T06:59:57Z
+
+cc @fabpot WDYT ?
+If we merge this one we will drop the new ExpiringStoreInterface since putOffExpiration will be mandatory.

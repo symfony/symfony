@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2019-07-01T07:21:04Z
+
+You could add an entry in UPGRADE-5.0.md as well mentioning the support for `null` was dropped.
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2019-07-01T07:54:54Z
+
+@ogizanagi here you go: https://github.com/symfony/symfony/pull/32234/files#diff-6a06298e7799bf3b02d99b4659f7bff6R341

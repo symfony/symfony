@@ -6,7 +6,7 @@ CHANGELOG
 
  * added a `symbol` option to the `PercentType` that allows to disable or customize the output of the percent character
  * Using the `format` option of `DateType` and `DateTimeType` when the `html5` option is enabled is deprecated.
- * Using names for buttons that do not start with a letter, a digit, or an underscore is deprecated and will lead to an
+ * Using names for buttons that do not start with a lowercase letter, a digit, or an underscore is deprecated and will lead to an
    exception in 5.0.
  * Using names for buttons that do not contain only letters, digits, underscores, hyphens, and colons is deprecated and
    will lead to an exception in 5.0.

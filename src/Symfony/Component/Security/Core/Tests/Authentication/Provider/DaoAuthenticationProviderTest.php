@@ -83,7 +83,7 @@ class DaoAuthenticationProviderTest extends TestCase
         $provider = new DaoAuthenticationProvider($userProvider, $this->getMockBuilder('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface')->getMock(), 'key', $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface')->getMock());
         $reflection = new \ReflectionMethod($provider, 'retrieveUser');
         $reflection->setAccessible(true);
-        $result = $reflection->invoke($provider, null, $token);
+        $result = $reflection->invoke($provider, 'someUser', $token);
 
         $this->assertSame($user, $result);
     }

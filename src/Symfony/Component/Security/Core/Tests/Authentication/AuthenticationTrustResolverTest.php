@@ -159,7 +159,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function setAuthenticated($isAuthenticated)
+    public function setAuthenticated(bool $isAuthenticated)
     {
     }
 
@@ -175,15 +175,15 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
     }
 
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
     }
 
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, $value)
     {
     }
 }

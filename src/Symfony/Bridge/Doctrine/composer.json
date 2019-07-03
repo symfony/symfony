@@ -33,7 +33,7 @@
         "symfony/property-access": "^4.4|^5.0",
         "symfony/property-info": "^4.4|^5.0",
         "symfony/proxy-manager-bridge": "^4.4|^5.0",
-        "symfony/security-core": "^4.4|^5.0",
+        "symfony/security-core": "^5.0",
         "symfony/expression-language": "^4.4|^5.0",
         "symfony/validator": "^4.4|^5.0",
         "symfony/translation": "^4.4|^5.0",
@@ -49,7 +49,8 @@
         "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/form": "<4.4",
-        "symfony/messenger": "<4.4"
+        "symfony/messenger": "<4.4",
+        "symfony/security-core": "<5"
     },
     "suggest": {
         "symfony/form": "",

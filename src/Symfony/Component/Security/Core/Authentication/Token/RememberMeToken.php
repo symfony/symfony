@@ -52,7 +52,7 @@ class RememberMeToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function setAuthenticated($authenticated)
+    public function setAuthenticated(bool $authenticated)
     {
         if ($authenticated) {
             throw new \LogicException('You cannot set this token to authenticated after creation.');

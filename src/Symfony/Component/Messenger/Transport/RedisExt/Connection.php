@@ -51,6 +51,11 @@ class Connection
         $this->connection = $redis ?: new \Redis();
         $this->connection->connect($connectionCredentials['host'] ?? '127.0.0.1', $connectionCredentials['port'] ?? 6379);
         $this->connection->setOption(\Redis::OPT_SERIALIZER, $redisOptions['serializer'] ?? \Redis::SERIALIZER_PHP);
+
+        if (isset($connectionCredentials['auth'])) {
+            $this->connection->auth($connectionCredentials['auth']);
+        }
+
         $this->stream = $configuration['stream'] ?? self::DEFAULT_OPTIONS['stream'];
         $this->group = $configuration['group'] ?? self::DEFAULT_OPTIONS['group'];
         $this->consumer = $configuration['consumer'] ?? self::DEFAULT_OPTIONS['consumer'];
@@ -72,6 +77,7 @@ class Connection
         $connectionCredentials = [
             'host' => $parsedUrl['host'] ?? '127.0.0.1',
             'port' => $parsedUrl['port'] ?? 6379,
+            'auth' => $parsedUrl['pass'] ?? $parsedUrl['user'] ?? null,
         ];
 
         if (isset($parsedUrl['query'])) {

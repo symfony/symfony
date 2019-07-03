@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by smoench at 2019-07-02T15:51:06Z
+
+I did not add them because the deprecations of dumpFile and appendFile are not documented in UPGRADE-4.3.md. I will add them and provide an PR for the missing ones
+
+---------------------------------------------------------------------------
+
+by smoench at 2019-07-03T11:39:14Z
+
+`UPGRADE-4.4.md` is updated now and PR #32337 for the missing ones is created.

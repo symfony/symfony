@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-27T20:56:44Z
+
+Actually, we should create two different traits:
+
+* One containing only visual assertions, that could be made compatible with Panther, but is useless to test an API
+* Another one for HTTP assertions, that are useful for API testing, but not usable with Panther because W3C WebDriver doesn't give access to the main HTTP request (you cannot retrieve the status code, the headers and other non-visual data).
+
+The current trait can `use` both new traits to preserve BC. WDYT?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-28T09:42:10Z
+
+Fixed the `getClient` method to allow Panther too. Can this patch qualifies as a bug fix?
+Also, maybe these two new traits should be moved in their respective components?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-28T11:54:57Z
+
+> The current trait can use both new traits to preserve BC. WDYT?
+
+makes sense to me
+
+---------------------------------------------------------------------------
+
+by dunglas at 2019-06-28T12:00:12Z
+
+Maybe could we just merge this one in 4.3 then?

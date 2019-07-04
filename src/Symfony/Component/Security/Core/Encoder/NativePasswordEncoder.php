@@ -57,7 +57,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     /**
      * {@inheritdoc}
      */
-    public function encodePassword($raw, $salt)
+    public function encodePassword(string $raw, ?string $salt)
     {
         if (\strlen($raw) > self::MAX_PASSWORD_LENGTH) {
             throw new BadCredentialsException('Invalid password.');
@@ -78,7 +78,7 @@ final class NativePasswordEncoder implements PasswordEncoderInterface, SelfSalti
     /**
      * {@inheritdoc}
      */
-    public function isPasswordValid($encoded, $raw, $salt): bool
+    public function isPasswordValid(string $encoded, string $raw, ?string $salt): bool
     {
         if (72 < \strlen($raw) && 0 === strpos($encoded, '$2')) {
             // BCrypt encodes only the first 72 chars

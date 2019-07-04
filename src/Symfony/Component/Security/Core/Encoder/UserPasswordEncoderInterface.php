@@ -23,20 +23,14 @@ interface UserPasswordEncoderInterface
     /**
      * Encodes the plain password.
      *
-     * @param UserInterface $user          The user
-     * @param string        $plainPassword The password to encode
-     *
      * @return string The encoded password
      */
-    public function encodePassword(UserInterface $user, $plainPassword);
+    public function encodePassword(UserInterface $user, string $plainPassword);
 
     /**
-     * @param UserInterface $user The user
-     * @param string        $raw  A raw password
-     *
      * @return bool true if the password is valid, false otherwise
      */
-    public function isPasswordValid(UserInterface $user, $raw);
+    public function isPasswordValid(UserInterface $user, string $raw);
 
     /**
      * Checks if an encoded password would benefit from rehashing.

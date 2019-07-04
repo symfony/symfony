@@ -20,7 +20,17 @@ class JsonErrorRendererTest extends TestCase
     public function testRender()
     {
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
-        $expected = '{"title":"Internal Server Error","status":500,"detail":"Foo","exceptions":[{"message":"Foo","class":"RuntimeException","trace":';
+        $expected = <<<JSON
+{
+    "title": "Internal Server Error",
+    "status": 500,
+    "detail": "Foo",
+    "exceptions": [
+        {
+            "message": "Foo",
+            "class": "RuntimeException",
+            "trace":
+JSON;
 
         $this->assertStringStartsWith($expected, (new JsonErrorRenderer())->render($exception));
     }

@@ -174,4 +174,52 @@ class ExceptionHandler
 
         echo $this->errorRenderer->render($exception);
     }
+
+    /**
+     * Gets the full HTML content associated with the given exception.
+     *
+     * @param \Throwable|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The HTML content as a string
+     *
+     * @deprecated since Symfony 4.4, use the HtmlErrorRenderer::render() method of the ErrorCatcher component instead.
+     */
+    public function getHtml($exception)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the HtmlErrorRenderer::render() method of the ErrorCatcher component instead.', __METHOD__), E_USER_DEPRECATED);
+
+        if ($exception instanceof \Throwable) {
+            $exception = FlattenException::createFromThrowable($exception);
+        }
+
+        return $this->errorRenderer->render($exception);
+    }
+
+    /**
+     * Gets the HTML content associated with the given exception.
+     *
+     * @return string The content as a string
+     *
+     * @deprecated since Symfony 4.4, use the HtmlErrorRenderer::getBody() method of the ErrorCatcher component instead.
+     */
+    public function getContent(FlattenException $exception)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the HtmlErrorRenderer::getBody() method of the ErrorCatcher component instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->errorRenderer->getBody($exception);
+    }
+
+    /**
+     * Gets the stylesheet associated with the given exception.
+     *
+     * @return string The stylesheet as a string
+     *
+     * @deprecated since Symfony 4.4, use the HtmlErrorRenderer::getStylesheet() method of the ErrorCatcher component instead.
+     */
+    public function getStylesheet(FlattenException $exception)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 4.4, use the HtmlErrorRenderer::getStylesheet() method of the ErrorCatcher component instead.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->errorRenderer->getStylesheet();
+    }
 }

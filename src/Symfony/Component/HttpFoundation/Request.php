@@ -1037,7 +1037,7 @@ class Request
             $pos = strrpos($host, ':');
         }
 
-        if (false !== $pos && '' !== $port = substr($host, $pos + 1)) {
+        if (false !== $pos && $port = substr($host, $pos + 1)) {
             return (int) $port;
         }
 

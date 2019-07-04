@@ -14,6 +14,7 @@ CHANGELOG
  * changed default value of `canonicalize` option of `Locale` constraint to `true`
  * removed `ValidatorBuilderInterface`
  * passing a null message when instantiating a `ConstraintViolation` is not allowed
+ * changed the default value of `Length::$allowEmptyString` to `false` and made it optional
 
 4.4.0
 -----

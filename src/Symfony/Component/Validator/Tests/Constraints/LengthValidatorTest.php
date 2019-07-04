@@ -22,20 +22,16 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         return new LengthValidator();
     }
 
-    public function testLegacyNullIsValid()
+    public function testNullIsValid()
     {
-        $this->validator->validate(null, new Length(['value' => 6, 'allowEmptyString' => false]));
+        $this->validator->validate(null, new Length(['value' => 6]));
 
         $this->assertNoViolation();
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using the "Symfony\Component\Validator\Constraints\Length" constraint with the "min" option without setting the "allowEmptyString" one is deprecated and defaults to true. In 5.0, it will become optional and default to false.
-     */
-    public function testLegacyEmptyStringIsValid()
+    public function testAllowEmptyString()
     {
-        $this->validator->validate('', new Length(6));
+        $this->validator->validate('', new Length(['value' => 6, 'allowEmptyString' => true]));
 
         $this->assertNoViolation();
     }
@@ -44,7 +40,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     {
         $this->validator->validate('', new Length([
             'value' => $limit = 6,
-            'allowEmptyString' => false,
             'exactMessage' => 'myMessage',
         ]));
 
@@ -62,7 +57,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testExpectsStringCompatibleType()
     {
-        $this->validator->validate(new \stdClass(), new Length(['value' => 5, 'allowEmptyString' => false]));
+        $this->validator->validate(new \stdClass(), new Length(['value' => 5]));
     }
 
     public function getThreeOrLessCharacters()
@@ -130,7 +125,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesMin($value)
     {
-        $constraint = new Length(['min' => 5, 'allowEmptyString' => false]);
+        $constraint = new Length(['min' => 5]);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -152,7 +147,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidValuesExact($value)
     {
-        $constraint = new Length(['value' => 4, 'allowEmptyString' => false]);
+        $constraint = new Length(4);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -163,7 +158,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
      */
     public function testValidNormalizedValues($value)
     {
-        $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => 'trim', 'allowEmptyString' => false]);
+        $constraint = new Length(['min' => 3, 'max' => 3, 'normalizer' => 'trim']);
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -177,7 +172,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Length([
             'min' => 4,
             'minMessage' => 'myMessage',
-            'allowEmptyString' => false,
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -221,7 +215,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             'min' => 4,
             'max' => 4,
             'exactMessage' => 'myMessage',
-            'allowEmptyString' => false,
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -244,7 +237,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             'min' => 4,
             'max' => 4,
             'exactMessage' => 'myMessage',
-            'allowEmptyString' => false,
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -268,7 +260,6 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
             'max' => 1,
             'charset' => $charset,
             'charsetMessage' => 'myMessage',
-            'allowEmptyString' => false,
         ]);
 
         $this->validator->validate($value, $constraint);
@@ -287,7 +278,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     public function testConstraintDefaultOption()
     {
-        $constraint = new Length(['value' => 5, 'allowEmptyString' => false]);
+        $constraint = new Length(5);
 
         $this->assertEquals(5, $constraint->min);
         $this->assertEquals(5, $constraint->max);
@@ -295,7 +286,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
 
     public function testConstraintAnnotationDefaultOption()
     {
-        $constraint = new Length(['value' => 5, 'exactMessage' => 'message', 'allowEmptyString' => false]);
+        $constraint = new Length(['value' => 5, 'exactMessage' => 'message']);
 
         $this->assertEquals(5, $constraint->min);
         $this->assertEquals(5, $constraint->max);

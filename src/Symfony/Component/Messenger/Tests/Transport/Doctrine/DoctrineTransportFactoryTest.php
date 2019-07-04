@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\Doctrine;
 
+use Doctrine\Common\Persistence\ConnectionRegistry;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Messenger\Transport\Doctrine\Connection;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransport;
 use Symfony\Component\Messenger\Transport\Doctrine\DoctrineTransportFactory;
@@ -23,7 +23,7 @@ class DoctrineTransportFactoryTest extends TestCase
     public function testSupports()
     {
         $factory = new DoctrineTransportFactory(
-            $this->getMockBuilder(RegistryInterface::class)->getMock()
+            $this->getMockBuilder(ConnectionRegistry::class)->getMock()
         );
 
         $this->assertTrue($factory->supports('doctrine://default', []));
@@ -35,7 +35,7 @@ class DoctrineTransportFactoryTest extends TestCase
         $connection = $this->getMockBuilder(\Doctrine\DBAL\Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $registry = $this->getMockBuilder(RegistryInterface::class)->getMock();
+        $registry = $this->getMockBuilder(ConnectionRegistry::class)->getMock();
         $registry->expects($this->once())
             ->method('getConnection')
             ->willReturn($connection);
@@ -55,7 +55,7 @@ class DoctrineTransportFactoryTest extends TestCase
      */
     public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
     {
-        $registry = $this->getMockBuilder(RegistryInterface::class)->getMock();
+        $registry = $this->getMockBuilder(ConnectionRegistry::class)->getMock();
         $registry->expects($this->once())
             ->method('getConnection')
             ->willReturnCallback(function () {

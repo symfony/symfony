@@ -57,6 +57,12 @@ EventDispatcher
  * The signature of the `EventDispatcherInterface::dispatch()` method should be updated to `dispatch($event, string $eventName = null)`, not doing so is deprecated
  * The `Event` class has been deprecated, use `Symfony\Contracts\EventDispatcher\Event` instead
 
+Filesystem
+----------
+
+ * Support for passing arrays to `Filesystem::dumpFile()` is deprecated.
+ * Support for passing arrays to `Filesystem::appendToFile()` is deprecated.
+
 Form
 ----
 
@@ -71,6 +77,7 @@ Form
 FrameworkBundle
 ---------------
 
+ * Deprecated the `framework.templating` option, use Twig instead.
  * Not passing the project directory to the constructor of the `AssetsInstallCommand` is deprecated. This argument will
    be mandatory in 5.0.
  * Deprecated the "Psr\SimpleCache\CacheInterface" / "cache.app.simple" service, use "Symfony\Contracts\Cache\CacheInterface" / "cache.app" instead.

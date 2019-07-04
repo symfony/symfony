@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ORM\Entity
@@ -36,13 +37,11 @@ class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 
     /**
      * @ORM\Column(length=20)
-     * @Assert\Length(min=5)
      */
     public $mergedMaxLength;
 
     /**
      * @ORM\Column(length=20)
-     * @Assert\Length(min=1, max=10)
      */
     public $alreadyMappedMaxLength;
 
@@ -69,4 +68,12 @@ class DoctrineLoaderEntity extends DoctrineLoaderParentEntity
 
     /** @ORM\Column(type="simple_array", length=100) */
     public $simpleArrayField = [];
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $allowEmptyString = property_exists(Assert\Length::class, 'allowEmptyString') ? ['allowEmptyString' => true] : [];
+
+        $metadata->addPropertyConstraint('mergedMaxLength', new Assert\Length(['min' => 5] + $allowEmptyString));
+        $metadata->addPropertyConstraint('alreadyMappedMaxLength', new Assert\Length(['min' => 1, 'max' => 10] + $allowEmptyString));
+    }
 }

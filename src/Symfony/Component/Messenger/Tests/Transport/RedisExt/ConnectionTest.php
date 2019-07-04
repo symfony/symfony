@@ -42,13 +42,13 @@ class ConnectionTest extends TestCase
     public function testFromDsnWithOptions()
     {
         $this->assertEquals(
-            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false], [
+            new Connection(['stream' => 'queue', 'group' => 'group1', 'consumer' => 'consumer1', 'auto_setup' => false, 'stream_max_entries' => 20000], [
                 'host' => 'localhost',
                 'port' => 6379,
             ], [
                 'serializer' => 2,
             ]),
-            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['serializer' => 2, 'auto_setup' => false])
+            Connection::fromDsn('redis://localhost/queue/group1/consumer1', ['serializer' => 2, 'auto_setup' => false, 'stream_max_entries' => 20000])
         );
     }
 
@@ -77,6 +77,16 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
+    }
+
+    public function testAuth()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('auth')
+            ->with('password');
+
+        Connection::fromDsn('redis://password@localhost/queue', [], $redis);
     }
 
     public function testFirstGetPendingMessagesThenNewMessages()
@@ -141,5 +151,17 @@ class ConnectionTest extends TestCase
         $this->assertNotEmpty($message = $connection->get());
         $connection->reject($message['id']);
         $redis->del('messenger-getnonblocking');
+    }
+
+    public function testMaxEntries()
+    {
+        $redis = $this->getMockBuilder(\Redis::class)->disableOriginalConstructor()->getMock();
+
+        $redis->expects($this->exactly(1))->method('xadd')
+            ->with('queue', '*', ['message' => '{"body":"1","headers":[]}'], 20000, true)
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?stream_max_entries=20000', [], $redis); // 1 = always
+        $connection->add('1', []);
     }
 }

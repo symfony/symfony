@@ -170,7 +170,7 @@ class DebugHandlersListener implements EventSubscriberInterface
             $e = $request->attributes->get('exception');
 
             try {
-                return new Response($this->errorFormatter->render($e, $request->getRequestFormat()), $e->getStatusCode(), $e->getHeaders());
+                return new Response($this->errorFormatter->render($e, $request->getPreferredFormat()), $e->getStatusCode(), $e->getHeaders());
             } catch (ErrorRendererNotFoundException $_) {
                 return new Response($this->errorFormatter->render($e), $e->getStatusCode(), $e->getHeaders());
             }

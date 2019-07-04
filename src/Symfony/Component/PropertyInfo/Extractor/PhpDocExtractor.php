@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use phpDocumentor\Reflection\Types\Context;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -37,6 +38,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @var DocBlock[]
      */
     private $docBlocks = [];
+
+    /**
+     * @var Context[]
+     */
+    private $contexts = [];
 
     private $docBlockFactory;
     private $contextFactory;
@@ -191,7 +197,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         try {
-            return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty->getDeclaringClass()));
+            return $this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflectionProperty->getDeclaringClass()));
         } catch (\InvalidArgumentException $e) {
             return null;
         }
@@ -227,9 +233,25 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         try {
-            return [$this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix];
+            return [$this->docBlockFactory->create($reflectionMethod, $this->createFromReflector($reflectionMethod->getDeclaringClass())), $prefix];
         } catch (\InvalidArgumentException $e) {
             return null;
         }
+    }
+
+    /**
+     * Prevents a lot of redundant calls to ContextFactory::createForNamespace().
+     */
+    private function createFromReflector(\ReflectionClass $reflector): Context
+    {
+        $cacheKey = $reflector->getNamespaceName().':'.$reflector->getFileName();
+
+        if (isset($this->contexts[$cacheKey])) {
+            return $this->contexts[$cacheKey];
+        }
+
+        $this->contexts[$cacheKey] = $this->contextFactory->createFromReflector($reflector);
+
+        return $this->contexts[$cacheKey];
     }
 }

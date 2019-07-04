@@ -1763,6 +1763,13 @@ class FrameworkExtension extends Extension
 
         $loader->load('mailer.xml');
         $container->getDefinition('mailer.default_transport')->setArgument(0, $config['dsn']);
+
+        $recipients = $config['envelope']['recipients'] ?? null;
+        $sender = $config['envelope']['sender'] ?? null;
+
+        $envelopeListener = $container->getDefinition('mailer.envelope_listener');
+        $envelopeListener->setArgument(0, $sender);
+        $envelopeListener->setArgument(1, $recipients);
     }
 
     /**

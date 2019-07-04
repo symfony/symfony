@@ -192,6 +192,10 @@ class Request
 
     protected static $requestFactory;
 
+    /**
+     * @var string|null
+     */
+    private $preferredFormat;
     private $isHostValid = true;
     private $isForwardedValid = true;
 
@@ -1342,6 +1346,8 @@ class Request
      *  * _format request attribute
      *  * $default
      *
+     * @see getPreferredFormat
+     *
      * @param string|null $default The default format
      *
      * @return string|null The request format
@@ -1552,6 +1558,30 @@ class Request
     public function isNoCache()
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+    }
+
+    /**
+     * Gets the preferred format for the response by inspecting, in the following order:
+     *   * the request format set using setRequestFormat
+     *   * the values of the Accept HTTP header
+     *   * the content type of the body of the request.
+     */
+    public function getPreferredFormat(?string $default = 'html'): ?string
+    {
+        if (null !== $this->preferredFormat) {
+            return $this->preferredFormat;
+        }
+
+        $preferredFormat = null;
+        foreach ($this->getAcceptableContentTypes() as $contentType) {
+            if ($preferredFormat = $this->getFormat($contentType)) {
+                break;
+            }
+        }
+
+        $this->preferredFormat = $this->getRequestFormat($preferredFormat ?: $this->getContentType());
+
+        return $this->preferredFormat ?: $default;
     }
 
     /**

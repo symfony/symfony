@@ -12,6 +12,7 @@ CHANGELOG
 
  * Deprecated passing a `ContainerInterface` instance as first argument of the `ConsumeMessagesCommand` constructor,
    pass a `RoutableMessageBus`  instance instead.
+ * Added support for auto trimming of Redis streams.
 
 4.3.0
 -----

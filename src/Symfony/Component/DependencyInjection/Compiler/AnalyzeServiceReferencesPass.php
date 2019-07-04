@@ -34,7 +34,6 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
     private $onlyConstructorArguments;
     private $hasProxyDumper;
     private $lazy;
-    private $expressionLanguage;
     private $byConstructor;
     private $definitions;
     private $aliases;

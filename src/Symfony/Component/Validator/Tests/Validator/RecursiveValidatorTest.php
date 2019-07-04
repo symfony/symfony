@@ -103,7 +103,7 @@ class RecursiveValidatorTest extends AbstractTest
     public function testCollectionConstraintValidateAllGroupsForNestedConstraints()
     {
         $this->metadata->addPropertyConstraint('data', new Collection(['fields' => [
-            'one' => [new NotBlank(['groups' => 'one']), new Length(['min' => 2, 'groups' => 'two'])],
+            'one' => [new NotBlank(['groups' => 'one']), new Length(['min' => 2, 'groups' => 'two', 'allowEmptyString' => false])],
             'two' => [new NotBlank(['groups' => 'two'])],
         ]]));
 
@@ -121,7 +121,7 @@ class RecursiveValidatorTest extends AbstractTest
     {
         $this->metadata->addPropertyConstraint('data', new All(['constraints' => [
             new NotBlank(['groups' => 'one']),
-            new Length(['min' => 2, 'groups' => 'two']),
+            new Length(['min' => 2, 'groups' => 'two', 'allowEmptyString' => false]),
         ]]));
 
         $entity = new Entity();
@@ -129,8 +129,9 @@ class RecursiveValidatorTest extends AbstractTest
 
         $violations = $this->validator->validate($entity, null, ['one', 'two']);
 
-        $this->assertCount(2, $violations);
+        $this->assertCount(3, $violations);
         $this->assertInstanceOf(NotBlank::class, $violations->get(0)->getConstraint());
         $this->assertInstanceOf(Length::class, $violations->get(1)->getConstraint());
+        $this->assertInstanceOf(Length::class, $violations->get(2)->getConstraint());
     }
 }

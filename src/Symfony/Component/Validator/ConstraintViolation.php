@@ -49,7 +49,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *                                         caused the violation
      * @param mixed           $cause           The cause of the violation
      */
-    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, $code = null, Constraint $constraint = null, $cause = null)
+    public function __construct(string $message, ?string $messageTemplate, array $parameters, $root, ?string $propertyPath, $invalidValue, int $plural = null, string $code = null, Constraint $constraint = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
@@ -79,13 +79,12 @@ class ConstraintViolation implements ConstraintViolationInterface
         }
 
         $propertyPath = (string) $this->propertyPath;
-        $code = (string) $this->code;
 
         if ('' !== $propertyPath && '[' !== $propertyPath[0] && '' !== $class) {
             $class .= '.';
         }
 
-        if ('' !== $code) {
+        if ('' !== $code = $this->code) {
             $code = ' (code '.$code.')';
         }
 

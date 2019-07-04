@@ -18,10 +18,14 @@ CHANGELOG
 4.4.0
 -----
 
+ * using anything else than a `string` as the code of a `ConstraintViolation` is deprecated, a `string` type-hint will
+   be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
+   method in 5.0
  * deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. Pass it as the first argument instead.
  * added the `compared_value_path` parameter in violations when using any 
    comparison constraint with the `propertyPath` option.
  * added support for checking an array of types in `TypeValidator`
+ * added a new `allowEmptyString` option to the `Length` constraint to allow rejecting empty strings when `min` is set, by setting it to `false`.
 
 4.3.0
 -----

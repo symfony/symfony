@@ -504,6 +504,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response('foo');
         $request = Request::create('/');
         $request->setRequestFormat('json');
+        $request->headers->remove('accept');
 
         $response->prepare($request);
 

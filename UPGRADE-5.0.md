@@ -101,7 +101,7 @@ DependencyInjection
    services:
        App\Handler:
            tags: ['app.handler']
- 
+
        App\HandlerCollection:
            arguments: [!tagged_iterator app.handler]
    ```
@@ -113,7 +113,6 @@ DoctrineBridge
    injected instead
  * Passing an `IdReader` to the `DoctrineChoiceLoader` when the query cannot be optimized with single id field will throw an exception, pass `null` instead
  * Not passing an `IdReader` to the `DoctrineChoiceLoader` when the query can be optimized with single id field will not apply any optimization
-
 
 DomCrawler
 ----------
@@ -135,6 +134,7 @@ EventDispatcher
 Filesystem
 ----------
 
+ * The `Filesystem::isAbsolutePath()` method no longer supports `null` in the `$file` argument.
  * The `Filesystem::dumpFile()` method no longer supports arrays in the `$content` argument.
  * The `Filesystem::appendToFile()` method no longer supports arrays in the `$content` argument.
 
@@ -207,8 +207,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * Removed the `framework.templating` option, use Twig instead.
  * The project dir argument of the constructor of `AssetsInstallCommand` is required.
-
  * Removed support for `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method`
    instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
 
@@ -269,6 +269,7 @@ HttpFoundation
    use `Symfony\Component\Mime\FileBinaryMimeTypeGuesser` instead.
  * The `FileinfoMimeTypeGuesser` class has been removed,
    use `Symfony\Component\Mime\FileinfoMimeTypeGuesser` instead.
+ * `ApacheRequest` has been removed, use the `Request` class instead.
 
 HttpKernel
 ----------
@@ -476,6 +477,8 @@ TwigBridge
 Validator
 --------
 
+ * Removed support for non-string codes of a `ConstraintViolation`. A `string` type-hint was added to the constructor of
+   the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()` method.
  * An `ExpressionLanguage` instance or null must be passed as the first argument of `ExpressionValidator::__construct()`
  * The `checkMX` and `checkHost` options of the `Email` constraint were removed
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
@@ -539,7 +542,6 @@ Workflow
                marking_store:
                    property: state
    ```
-
 
  * Support for using a workflow with a single state marking is dropped. Use a state machine instead.
 

@@ -26,7 +26,7 @@ DependencyInjection
    services:
        App\Handler:
            tags: ['app.handler']
-   
+
        App\HandlerCollection:
            arguments: [!tagged app.handler]
    ```
@@ -36,10 +36,15 @@ DependencyInjection
    services:
        App\Handler:
        tags: ['app.handler']
-    
+
    App\HandlerCollection:
        arguments: [!tagged_iterator app.handler]
    ```
+
+Filesystem
+----------
+
+ * Support for passing a `null` value to `Filesystem::isAbsolutePath()` is deprecated.
 
 Form
 ----
@@ -60,6 +65,11 @@ HttpClient
 
  * Added method `cancel()` to `ResponseInterface`
 
+HttpFoundation
+--------------
+
+ * `ApacheRequest` is deprecated, use `Request` class instead.
+
 HttpKernel
 ----------
 
@@ -76,6 +86,11 @@ MonologBridge
 
  * The `RouteProcessor` has been marked final.
 
+PropertyAccess
+--------------
+
+ * Deprecated passing `null` as 2nd argument of `PropertyAccessor::createCache()` method (`$defaultLifetime`), pass `0` instead.
+
 Security
 --------
 
@@ -84,11 +99,19 @@ Security
 TwigBridge
 ----------
 
- * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the 
+ * Deprecated to pass `$rootDir` and `$fileLinkFormatter` as 5th and 6th argument respectively to the
    `DebugCommand::__construct()` method, swap the variables position.
 
 Validator
 ---------
 
+ * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`.
+ * Deprecated using anything else than a `string` as the code of a `ConstraintViolation`, a `string` type-hint will
+   be added to the constructor of the `ConstraintViolation` class and to the `ConstraintViolationBuilder::setCode()`
+   method in 5.0.
  * Deprecated passing an `ExpressionLanguage` instance as the second argument of `ExpressionValidator::__construct()`. 
    Pass it as the first argument instead.
+ * The `Length` constraint expects the `allowEmptyString` option to be defined
+   when the `min` option is used.
+   Set it to `true` to keep the current behavior and `false` to reject empty strings.
+   In 5.0, it'll become optional and will default to `false`.

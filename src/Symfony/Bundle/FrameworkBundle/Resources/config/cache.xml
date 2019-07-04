@@ -8,7 +8,7 @@
         <defaults public="false" />
 
         <service id="cache.app" parent="cache.adapter.filesystem" public="true">
-            <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
+            <tag name="cache.pool" clearer="cache.app_clearer" />
         </service>
 
         <service id="cache.app.simple" class="Symfony\Component\Cache\Psr16Cache">
@@ -46,7 +46,7 @@
 
         <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
             <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
-            <tag name="cache.pool" clearer="cache.system_clearer" />
+            <tag name="cache.pool" clearer="cache.system_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
@@ -56,7 +56,7 @@
         </service>
 
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
@@ -67,7 +67,7 @@
         </service>
 
         <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
-            <tag name="cache.pool" provider="cache.default_doctrine_provider" clearer="cache.default_clearer" />
+            <tag name="cache.pool" provider="cache.default_doctrine_provider" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Doctrine provider service -->
             <argument /> <!-- namespace -->
@@ -78,7 +78,7 @@
         </service>
 
         <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
@@ -90,14 +90,14 @@
         </service>
 
         <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
-            <tag name="cache.pool" provider="cache.default_psr6_provider" clearer="cache.default_clearer" />
+            <tag name="cache.pool" provider="cache.default_psr6_provider" clearer="cache.default_clearer" reset="reset" />
             <argument /> <!-- PSR-6 provider service -->
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
-            <tag name="cache.pool" provider="cache.default_redis_provider" clearer="cache.default_clearer" />
+            <tag name="cache.pool" provider="cache.default_redis_provider" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Redis connection service -->
             <argument /> <!-- namespace -->
@@ -134,7 +134,7 @@
         </service>
 
         <service id="cache.adapter.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" abstract="true">
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument>0</argument> <!-- default lifetime -->
             <call method="setLogger">

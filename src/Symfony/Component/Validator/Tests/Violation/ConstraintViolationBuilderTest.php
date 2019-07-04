@@ -19,11 +19,6 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 class ConstraintViolationBuilderTest extends TestCase
 {
-    /**
-     * @group legacy
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\Violation\ConstraintViolationBuilder::setCode() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\ConstraintViolation::__construct() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     */
     public function testNonStringCode()
     {
         $constraintViolationList = new ConstraintViolationList();
@@ -31,6 +26,6 @@ class ConstraintViolationBuilderTest extends TestCase
             ->setCode(42)
             ->addViolation();
 
-        self::assertSame(42, $constraintViolationList->get(0)->getCode());
+        self::assertSame('42', $constraintViolationList->get(0)->getCode());
     }
 }

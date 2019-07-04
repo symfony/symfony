@@ -84,7 +84,7 @@ class ConstraintViolation implements ConstraintViolationInterface
             $class .= '.';
         }
 
-        if ('' !== $code = $this->code) {
+        if ('' !== $code = (string) $this->code) {
             $code = ' (code '.$code.')';
         }
 

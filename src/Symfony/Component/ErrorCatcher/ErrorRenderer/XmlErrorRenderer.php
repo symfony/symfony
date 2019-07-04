@@ -41,27 +41,21 @@ class XmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(FlattenException $exception): string
     {
-        $xmlDocument = new \DOMDocument('1.0', $this->charset);
+        $problemElement = new \SimpleXMLElement('<problem/>');
+        $problemElement->addAttribute('xmlns', 'urn:ietf:rfc:7807');
 
-        $problemElement = $xmlDocument->createElement('problem');
-        $problemElement->setAttribute('xmlns', 'urn:ietf:rfc:7807');
-        $xmlDocument->appendChild($problemElement);
-
-        $titleElement = $xmlDocument->createElement('title', $this->escapeXml($exception->getTitle()));
-        $statusElement = $xmlDocument->createElement('status', $exception->getStatusCode());
-        $detailElement = $xmlDocument->createElement('detail', $this->escapeXml($exception->getMessage()));
-        $problemElement->appendChild($titleElement);
-        $problemElement->appendChild($statusElement);
-        $problemElement->appendChild($detailElement);
+        $problemElement->addChild('title', $this->escapeXml($exception->getTitle()));
+        $problemElement->addChild('status', $exception->getStatusCode());
+        $problemElement->addChild('detail', $this->escapeXml($exception->getMessage()));
 
         if ($this->debug) {
-            $exceptionsElement = $xmlDocument->createElement('exceptions');
+            $exceptionsElement = $problemElement->addChild('exceptions');
             foreach ($exception->toArray() as $e) {
-                $exceptionElement = $xmlDocument->createElement('exception');
-                $exceptionElement->setAttribute('class', $e['class']);
-                $exceptionElement->setAttribute('message', $this->escapeXml($e['message']));
+                $exceptionElement = $exceptionsElement->addChild('exception');
+                $exceptionElement->addAttribute('class', $e['class']);
+                $exceptionElement->addAttribute('message', $this->escapeXml($e['message']));
 
-                $tracesElement = $xmlDocument->createElement('traces');
+                $tracesElement = $exceptionElement->addChild('traces');
                 foreach ($e['trace'] as $trace) {
                     $traceContent = '';
                     if ($trace['function']) {
@@ -71,21 +65,14 @@ class XmlErrorRenderer implements ErrorRendererInterface
                         $traceContent .= ' '.$this->formatPath($trace['file'], $trace['line']);
                     }
 
-                    $traceElement = $xmlDocument->createElement('trace', $this->escapeXml($traceContent));
-                    $tracesElement->appendChild($traceElement);
+                    $tracesElement->addChild('trace', $this->escapeXml($traceContent));
                 }
-
-                $exceptionElement->appendChild($tracesElement);
-                $exceptionsElement->appendChild($exceptionElement);
             }
         }
 
-        $problemElement->appendChild($exceptionsElement);
+        $xml = str_replace('<?xml version="1.0"?>', sprintf('<?xml version="1.0" encoding="%s" ?>', $this->charset), $problemElement->saveXML());
 
-        $xmlDocument->preserveWhiteSpace = false;
-        $xmlDocument->formatOutput = true;
-
-        return $xmlDocument->saveXML();
+        return sprintf("<?xml version=\"1.0\" encoding=\"%s\" ?>\n%s", $this->charset, $problemElement->saveXML());
     }
 
     /**

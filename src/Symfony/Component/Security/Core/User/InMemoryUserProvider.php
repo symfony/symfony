@@ -61,7 +61,7 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername(string $username)
     {
         $user = $this->getUser($username);
 
@@ -85,7 +85,7 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         return 'Symfony\Component\Security\Core\User\User' === $class;
     }
@@ -99,7 +99,7 @@ class InMemoryUserProvider implements UserProviderInterface
      *
      * @throws UsernameNotFoundException if user whose given username does not exist
      */
-    private function getUser($username)
+    private function getUser(string $username)
     {
         if (!isset($this->users[strtolower($username)])) {
             $ex = new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));

@@ -109,10 +109,6 @@ EOF;
         $this->assertSame($expected, (string) $violation);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Not using a string as the error code in Symfony\Component\Validator\ConstraintViolation::__construct() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.
-     */
     public function testNonStringCode()
     {
         $violation = new ConstraintViolation(
@@ -126,6 +122,6 @@ EOF;
             42
         );
 
-        self::assertSame(42, $violation->getCode());
+        self::assertSame('42', $violation->getCode());
     }
 }

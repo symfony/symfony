@@ -108,9 +108,9 @@ abstract class AbstractToken implements TokenInterface
     /**
      * {@inheritdoc}
      */
-    public function setAuthenticated($authenticated)
+    public function setAuthenticated(bool $authenticated)
     {
-        $this->authenticated = (bool) $authenticated;
+        $this->authenticated = $authenticated;
     }
 
     /**
@@ -187,11 +187,9 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns true if the attribute exists.
      *
-     * @param string $name The attribute name
-     *
      * @return bool true if the attribute exists, false otherwise
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name)
     {
         return \array_key_exists($name, $this->attributes);
     }
@@ -199,13 +197,11 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Returns an attribute value.
      *
-     * @param string $name The attribute name
-     *
      * @return mixed The attribute value
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         if (!\array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
@@ -217,10 +213,9 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Sets an attribute.
      *
-     * @param string $name  The attribute name
-     * @param mixed  $value The attribute value
+     * @param mixed $value The attribute value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, $value)
     {
         $this->attributes[$name] = $value;
     }

@@ -80,10 +80,8 @@ interface TokenInterface extends \Serializable
 
     /**
      * Sets the authenticated flag.
-     *
-     * @param bool $isAuthenticated The authenticated flag
      */
-    public function setAuthenticated($isAuthenticated);
+    public function setAuthenticated(bool $isAuthenticated);
 
     /**
      * Removes sensitive information from the token.
@@ -107,30 +105,25 @@ interface TokenInterface extends \Serializable
     /**
      * Returns true if the attribute exists.
      *
-     * @param string $name The attribute name
-     *
      * @return bool true if the attribute exists, false otherwise
      */
-    public function hasAttribute($name);
+    public function hasAttribute(string $name);
 
     /**
      * Returns an attribute value.
-     *
-     * @param string $name The attribute name
      *
      * @return mixed The attribute value
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name);
+    public function getAttribute(string $name);
 
     /**
      * Sets an attribute.
      *
-     * @param string $name  The attribute name
-     * @param mixed  $value The attribute value
+     * @param mixed $value The attribute value
      */
-    public function setAttribute($name, $value);
+    public function setAttribute(string $name, $value);
 
     /**
      * Returns all the necessary state of the object for serialization purposes.

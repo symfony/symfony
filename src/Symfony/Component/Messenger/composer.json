@@ -25,7 +25,6 @@
         "symfony/console": "^3.4|^4.0|^5.0",
         "symfony/dependency-injection": "^3.4.19|^4.1.8|^5.0",
         "symfony/error-catcher": "^4.4|^5.0",
-        "symfony/doctrine-bridge": "^3.4|^4.0|^5.0",
         "symfony/event-dispatcher": "^4.3|^5.0",
         "symfony/http-kernel": "^4.4|^5.0",
         "symfony/process": "^3.4|^4.0|^5.0",

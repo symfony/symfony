@@ -5,7 +5,7 @@ display_errors=0
 --FILE--
 <?php
 
-namespace Symfony\Component\ErrorCatcher;
+namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
@@ -26,9 +26,9 @@ if (true) {
 
 ?>
 --EXPECTF--
-object(Symfony\Component\ErrorCatcher\Exception\ClassNotFoundException)#%d (8) {
+object(Symfony\Component\Debug\Exception\ClassNotFoundException)#%d (8) {
   ["message":protected]=>
-  string(138) "Attempted to load class "missing" from namespace "Symfony\Component\ErrorCatcher".
+  string(131) "Attempted to load class "missing" from namespace "Symfony\Component\Debug".
 Did you forget a "use" statement for another namespace?"
   ["string":"Exception":private]=>
   string(0) ""

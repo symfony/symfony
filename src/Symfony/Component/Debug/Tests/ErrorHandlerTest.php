@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests;
+namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use Symfony\Component\ErrorCatcher\BufferingLogger;
-use Symfony\Component\ErrorCatcher\ErrorHandler;
-use Symfony\Component\ErrorCatcher\Exception\SilencedErrorContext;
-use Symfony\Component\ErrorCatcher\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
-use Symfony\Component\ErrorCatcher\Tests\Fixtures\LoggerThatSetAnErrorHandler;
+use Symfony\Component\Debug\BufferingLogger;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\Exception\SilencedErrorContext;
+use Symfony\Component\Debug\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
+use Symfony\Component\Debug\Tests\Fixtures\LoggerThatSetAnErrorHandler;
 
 /**
  * ErrorHandlerTest.
@@ -33,7 +33,7 @@ class ErrorHandlerTest extends TestCase
         $handler = ErrorHandler::register();
 
         try {
-            $this->assertInstanceOf('Symfony\Component\ErrorCatcher\ErrorHandler', $handler);
+            $this->assertInstanceOf('Symfony\Component\Debug\ErrorHandler', $handler);
             $this->assertSame($handler, ErrorHandler::register());
 
             $newHandler = new ErrorHandler();
@@ -151,21 +151,21 @@ class ErrorHandlerTest extends TestCase
             $handler->setDefaultLogger($logger, [E_USER_NOTICE => LogLevel::CRITICAL]);
 
             $loggers = [
-                E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
-                E_COMPILE_WARNING => [null, LogLevel::WARNING],
-                E_CORE_ERROR => [null, LogLevel::CRITICAL],
-                E_CORE_WARNING => [null, LogLevel::WARNING],
                 E_DEPRECATED => [null, LogLevel::INFO],
-                E_ERROR => [null, LogLevel::CRITICAL],
-                E_NOTICE => [$logger, LogLevel::WARNING],
-                E_PARSE => [null, LogLevel::CRITICAL],
-                E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
-                E_STRICT => [null, LogLevel::WARNING],
                 E_USER_DEPRECATED => [null, LogLevel::INFO],
-                E_USER_ERROR => [null, LogLevel::CRITICAL],
+                E_NOTICE => [$logger, LogLevel::WARNING],
                 E_USER_NOTICE => [$logger, LogLevel::CRITICAL],
-                E_USER_WARNING => [null, LogLevel::WARNING],
+                E_STRICT => [null, LogLevel::WARNING],
                 E_WARNING => [null, LogLevel::WARNING],
+                E_USER_WARNING => [null, LogLevel::WARNING],
+                E_COMPILE_WARNING => [null, LogLevel::WARNING],
+                E_CORE_WARNING => [null, LogLevel::WARNING],
+                E_USER_ERROR => [null, LogLevel::CRITICAL],
+                E_RECOVERABLE_ERROR => [null, LogLevel::CRITICAL],
+                E_COMPILE_ERROR => [null, LogLevel::CRITICAL],
+                E_PARSE => [null, LogLevel::CRITICAL],
+                E_ERROR => [null, LogLevel::CRITICAL],
+                E_CORE_ERROR => [null, LogLevel::CRITICAL],
             ];
             $this->assertSame($loggers, $handler->setLoggers([]));
         } finally {
@@ -375,21 +375,21 @@ class ErrorHandlerTest extends TestCase
         $handler = new ErrorHandler($bootLogger);
 
         $loggers = [
-            E_COMPILE_ERROR => [$bootLogger, LogLevel::CRITICAL],
-            E_COMPILE_WARNING => [$bootLogger, LogLevel::WARNING],
-            E_CORE_ERROR => [$bootLogger, LogLevel::CRITICAL],
-            E_CORE_WARNING => [$bootLogger, LogLevel::WARNING],
             E_DEPRECATED => [$bootLogger, LogLevel::INFO],
-            E_ERROR => [$bootLogger, LogLevel::CRITICAL],
-            E_NOTICE => [$bootLogger, LogLevel::WARNING],
-            E_PARSE => [$bootLogger, LogLevel::CRITICAL],
-            E_RECOVERABLE_ERROR => [$bootLogger, LogLevel::CRITICAL],
-            E_STRICT => [$bootLogger, LogLevel::WARNING],
             E_USER_DEPRECATED => [$bootLogger, LogLevel::INFO],
-            E_USER_ERROR => [$bootLogger, LogLevel::CRITICAL],
+            E_NOTICE => [$bootLogger, LogLevel::WARNING],
             E_USER_NOTICE => [$bootLogger, LogLevel::WARNING],
-            E_USER_WARNING => [$bootLogger, LogLevel::WARNING],
+            E_STRICT => [$bootLogger, LogLevel::WARNING],
             E_WARNING => [$bootLogger, LogLevel::WARNING],
+            E_USER_WARNING => [$bootLogger, LogLevel::WARNING],
+            E_COMPILE_WARNING => [$bootLogger, LogLevel::WARNING],
+            E_CORE_WARNING => [$bootLogger, LogLevel::WARNING],
+            E_USER_ERROR => [$bootLogger, LogLevel::CRITICAL],
+            E_RECOVERABLE_ERROR => [$bootLogger, LogLevel::CRITICAL],
+            E_COMPILE_ERROR => [$bootLogger, LogLevel::CRITICAL],
+            E_PARSE => [$bootLogger, LogLevel::CRITICAL],
+            E_ERROR => [$bootLogger, LogLevel::CRITICAL],
+            E_CORE_ERROR => [$bootLogger, LogLevel::CRITICAL],
         ];
 
         $this->assertSame($loggers, $handler->setLoggers([]));
@@ -490,7 +490,7 @@ class ErrorHandlerTest extends TestCase
 
         $handler->handleException($exception);
 
-        $this->assertInstanceOf('Symfony\Component\ErrorCatcher\Exception\ClassNotFoundException', $args[0]);
+        $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"IReallyReallyDoNotExistAnywhereInTheRepositoryISwear\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
     }
 

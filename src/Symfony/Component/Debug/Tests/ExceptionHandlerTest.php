@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\ErrorCatcher\Tests;
+namespace Symfony\Component\Debug\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorCatcher\Exception\OutOfMemoryException;
-use Symfony\Component\ErrorCatcher\ExceptionHandler;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -31,6 +31,9 @@ class ExceptionHandlerTest extends TestCase
         testHeader();
     }
 
+    /**
+     * @group legacy
+     */
     public function testDebug()
     {
         $handler = new ExceptionHandler(false);
@@ -39,7 +42,7 @@ class ExceptionHandlerTest extends TestCase
         $handler->sendPhpResponse(new \RuntimeException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('The server returned a "500 Internal Server Error".', $response);
+        $this->assertContains('Whoops, looks like something went wrong.', $response);
         $this->assertNotContains('<div class="trace trace-as-html">', $response);
 
         $handler = new ExceptionHandler(true);
@@ -69,7 +72,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
         $handler->sendPhpResponse(new NotFoundHttpException('Foo'));
         $response = ob_get_clean();
 
-        $this->assertContains('The server returned a "404 Not Found".', $response);
+        $this->assertContains('Sorry, the page you are looking for could not be found.', $response);
 
         $expectedHeaders = [
             ['HTTP/1.0 404', true, null],
@@ -110,7 +113,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
     {
         $exception = new \Exception('foo');
 
-        $handler = $this->getMockBuilder('Symfony\Component\ErrorCatcher\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
+        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
         $handler
             ->expects($this->exactly(2))
             ->method('sendPhpResponse');
@@ -128,7 +131,7 @@ content="0;url=data:text/html;base64,PHNjcmlwdD5hbGVydCgndGVzdDMnKTwvc2NyaXB0Pg"
     {
         $exception = new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__);
 
-        $handler = $this->getMockBuilder('Symfony\Component\ErrorCatcher\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
+        $handler = $this->getMockBuilder('Symfony\Component\Debug\ExceptionHandler')->setMethods(['sendPhpResponse'])->getMock();
         $handler
             ->expects($this->once())
             ->method('sendPhpResponse');

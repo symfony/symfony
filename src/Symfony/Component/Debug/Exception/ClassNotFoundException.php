@@ -11,13 +11,26 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\ErrorCatcher\Exception\ClassNotFoundException as BaseClassNotFoundException;
-
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', ClassNotFoundException::class, BaseClassNotFoundException::class), E_USER_DEPRECATED);
-
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\ClassNotFoundException instead.
+ * Class (or Trait or Interface) Not Found Exception.
+ *
+ * @author Konstanton Myakshin <koc-dp@yandex.ru>
  */
-class ClassNotFoundException extends BaseClassNotFoundException
+class ClassNotFoundException extends FatalErrorException
 {
+    public function __construct(string $message, \ErrorException $previous)
+    {
+        parent::__construct(
+            $message,
+            $previous->getCode(),
+            $previous->getSeverity(),
+            $previous->getFile(),
+            $previous->getLine(),
+            null,
+            true,
+            null,
+            $previous->getPrevious()
+        );
+        $this->setTrace($previous->getTrace());
+    }
 }

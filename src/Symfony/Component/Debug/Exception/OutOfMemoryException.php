@@ -11,13 +11,11 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\ErrorCatcher\Exception\OutOfMemoryException as BaseOutOfMemoryException;
-
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.4, use "%s" instead.', OutOfMemoryException::class, BaseOutOfMemoryException::class), E_USER_DEPRECATED);
-
 /**
- * @deprecated since Symfony 4.4, use Symfony\Component\ErrorCatcher\Exception\OutOfMemoryException instead.
+ * Out of memory exception.
+ *
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class OutOfMemoryException extends BaseOutOfMemoryException
+class OutOfMemoryException extends FatalErrorException
 {
 }

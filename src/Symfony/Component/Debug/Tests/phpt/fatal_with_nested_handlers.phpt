@@ -3,9 +3,7 @@ Test catching fatal errors when handlers are nested
 --FILE--
 <?php
 
-namespace Symfony\Component\ErrorCatcher;
-
-use Symfony\Component\Debug\Debug;
+namespace Symfony\Component\Debug;
 
 $vendor = __DIR__;
 while (!file_exists($vendor.'/vendor')) {
@@ -37,8 +35,8 @@ array(1) {
   [0]=>
   string(37) "Error and exception handlers do match"
 }
-object(Symfony\Component\ErrorCatcher\Exception\FatalErrorException)#%d (%d) {
+object(Symfony\Component\Debug\Exception\FatalErrorException)#%d (%d) {
   ["message":protected]=>
-  string(186) "Error: Class Symfony\Component\ErrorCatcher\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
+  string(179) "Error: Class Symfony\Component\Debug\Broken contains 1 abstract method and must therefore be declared abstract or implement the remaining methods (JsonSerializable::jsonSerialize)"
 %a
 }

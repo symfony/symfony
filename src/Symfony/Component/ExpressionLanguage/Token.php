@@ -54,12 +54,11 @@ class Token
     /**
      * Tests the current token for a type and/or a value.
      *
-     * @param array|int   $type  The type to test
-     * @param string|null $value The token value
+     * @param array|int $type The type to test
      *
      * @return bool
      */
-    public function test($type, $value = null)
+    public function test($type, string $value = null)
     {
         return $this->type === $type && (null === $value || $this->value == $value);
     }

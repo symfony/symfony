@@ -71,7 +71,7 @@ class XmlErrorRenderer implements ErrorRendererInterface
                         $traceContent .= ' '.$this->formatPath($trace['file'], $trace['line']);
                     }
 
-                    $traceElement =  $xmlDocument->createElement('trace', $this->escapeXml($traceContent));
+                    $traceElement = $xmlDocument->createElement('trace', $this->escapeXml($traceContent));
                     $tracesElement->appendChild($traceElement);
                 }
 

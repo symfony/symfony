@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Templating\Helper\Helper;
+use Twig\Extension\AbstractExtension;
 
 /**
  * SecurityExtension.
@@ -69,8 +71,18 @@ class SecurityExtension extends Extension
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
-        $loader->load('templating_php.xml');
-        $loader->load('templating_twig.xml');
+
+        if (class_exists(Helper::class)) {
+            $loader->load('templating_php.xml');
+
+            $container->getDefinition('templating.helper.logout_url')->setPrivate(true);
+            $container->getDefinition('templating.helper.security')->setPrivate(true);
+        }
+
+        if (class_exists(AbstractExtension::class)) {
+            $loader->load('templating_twig.xml');
+        }
+
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 
@@ -79,8 +91,6 @@ class SecurityExtension extends Extension
         $container->getDefinition('security.firewall.context')->setPrivate(true);
         $container->getDefinition('security.validator.user_password')->setPrivate(true);
         $container->getDefinition('security.rememberme.response_listener')->setPrivate(true);
-        $container->getDefinition('templating.helper.logout_url')->setPrivate(true);
-        $container->getDefinition('templating.helper.security')->setPrivate(true);
         $container->getAlias('security.encoder_factory')->setPrivate(true);
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {

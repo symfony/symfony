@@ -20,7 +20,17 @@ class XmlErrorRendererTest extends TestCase
     public function testRender()
     {
         $exception = FlattenException::createFromThrowable(new \RuntimeException('Foo'));
-        $expected = '<?xml version="1.0" encoding="UTF-8" ?>%A<problem xmlns="urn:ietf:rfc:7807">%A<title>Internal Server Error</title>%A<status>500</status>%A<detail>Foo</detail>%A';
+        $expected = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<problem xmlns="urn:ietf:rfc:7807">
+  <title>Internal Server Error</title>
+  <status>500</status>
+  <detail>Foo</detail>
+  <exceptions>
+    <exception class="RuntimeException" message="Foo">
+      <traces>
+        <trace>%A
+XML;
 
         $this->assertStringMatchesFormat($expected, (new XmlErrorRenderer())->render($exception));
     }

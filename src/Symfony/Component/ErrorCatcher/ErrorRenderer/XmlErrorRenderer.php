@@ -15,6 +15,7 @@ use Symfony\Component\ErrorCatcher\Exception\FlattenException;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
+ * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
 class XmlErrorRenderer implements ErrorRendererInterface
 {
@@ -40,37 +41,51 @@ class XmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(FlattenException $exception): string
     {
-        $message = $this->escapeXml($exception->getMessage());
+        $xmlDocument = new \DOMDocument('1.0', $this->charset);
 
-        $exceptions = '';
+        $problemElement = $xmlDocument->createElement('problem');
+        $problemElement->setAttribute('xmlns', 'urn:ietf:rfc:7807');
+        $xmlDocument->appendChild($problemElement);
+
+        $titleElement = $xmlDocument->createElement('title', $this->escapeXml($exception->getTitle()));
+        $statusElement = $xmlDocument->createElement('status', $exception->getStatusCode());
+        $detailElement = $xmlDocument->createElement('detail', $this->escapeXml($exception->getMessage()));
+        $problemElement->appendChild($titleElement);
+        $problemElement->appendChild($statusElement);
+        $problemElement->appendChild($detailElement);
+
         if ($this->debug) {
-            $exceptions .= '<exceptions>';
+            $exceptionsElement = $xmlDocument->createElement('exceptions');
             foreach ($exception->toArray() as $e) {
-                $exceptions .= sprintf('<exception class="%s" message="%s"><traces>', $e['class'], $this->escapeXml($e['message']));
+                $exceptionElement = $xmlDocument->createElement('exception');
+                $exceptionElement->setAttribute('class', $e['class']);
+                $exceptionElement->setAttribute('message', $this->escapeXml($e['message']));
+
+                $tracesElement = $xmlDocument->createElement('traces');
                 foreach ($e['trace'] as $trace) {
-                    $exceptions .= '<trace>';
+                    $traceContent = '';
                     if ($trace['function']) {
-                        $exceptions .= sprintf('at %s%s%s(%s) ', $trace['class'], $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
+                        $traceContent = sprintf('at %s%s%s(%s)', $trace['class'], $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                     }
                     if (isset($trace['file'], $trace['line'])) {
-                        $exceptions .= $this->formatPath($trace['file'], $trace['line']);
+                        $traceContent .= ' '.$this->formatPath($trace['file'], $trace['line']);
                     }
-                    $exceptions .= '</trace>';
+
+                    $traceElement =  $xmlDocument->createElement('trace', $this->escapeXml($traceContent));
+                    $tracesElement->appendChild($traceElement);
                 }
-                $exceptions .= '</traces></exception>';
+
+                $exceptionElement->appendChild($tracesElement);
+                $exceptionsElement->appendChild($exceptionElement);
             }
-            $exceptions .= '</exceptions>';
         }
 
-        return <<<EOF
-<?xml version="1.0" encoding="{$this->charset}" ?>
-<problem xmlns="urn:ietf:rfc:7807">
-    <title>{$exception->getTitle()}</title>
-    <status>{$exception->getStatusCode()}</status>
-    <detail>{$message}</detail>
-    {$exceptions}
-</problem>
-EOF;
+        $problemElement->appendChild($exceptionsElement);
+
+        $xmlDocument->preserveWhiteSpace = false;
+        $xmlDocument->formatOutput = true;
+
+        return $xmlDocument->saveXML();
     }
 
     /**
@@ -85,7 +100,7 @@ EOF;
     {
         $file = $this->escapeXml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
 
-        return sprintf('in %s %s', $this->escapeXml($path), 0 < $line ? ' line '.$line : '');
+        return sprintf('in %s %s', $this->escapeXml($path), 0 < $line ? 'line '.$line : '');
     }
 
     /**

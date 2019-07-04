@@ -55,14 +55,16 @@ class HtmlErrorRenderer implements ErrorRendererInterface
     {
         $css = $this->getStylesheet();
         $body = $this->getBody($exception);
+        $charset = $this->escapeHtml($this->charset);
+        $title = $this->escapeHtml($exception->getTitle());
 
         return <<<EOF
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="{$this->charset}" />
+        <meta charset="{$charset}" />
         <meta name="robots" content="noindex,nofollow,noarchive" />
-        <title>{$exception->getTitle()}</title>
+        <title>{$title}</title>
         <style>$css</style>
     </head>
     <body>
@@ -94,11 +96,14 @@ EOF;
      */
     public function getBody(FlattenException $exception)
     {
+        $statusCode = $this->escapeHtml($exception->getStatusCode());
+        $title = $this->escapeHtml($exception->getTitle());
+
         if (!$this->debug) {
             return <<<EOF
                 <div class="container">
                     <h1>Oops! An Error Occurred</h1>
-                    <h2>The server returned a "{$exception->getStatusCode()} {$exception->getTitle()}".</h2>
+                    <h2>The server returned a "{$statusCode} {$title}".</h2>
                     <p>
                         Something is broken. Please let us know what you were doing when this error occurred.
                         We will fix it as soon as possible. Sorry for any inconvenience caused.

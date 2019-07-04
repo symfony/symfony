@@ -186,6 +186,10 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
         $bag = $this->getParameterBag();
         $value = $bag->resolveValue($value);
 
+        if (!$bag instanceof EnvPlaceholderParameterBag) {
+            return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);
+        }
+
         foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
             if (false === strpos($env, ':')) {
                 continue;

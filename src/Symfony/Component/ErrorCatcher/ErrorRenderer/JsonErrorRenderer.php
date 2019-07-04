@@ -47,6 +47,6 @@ class JsonErrorRenderer implements ErrorRendererInterface
             $content['exceptions'] = $exception->toArray();
         }
 
-        return (string) json_encode($content);
+        return (string) json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS | JSON_PRESERVE_ZERO_FRACTION);
     }
 }

@@ -41,21 +41,23 @@ class XmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(FlattenException $exception): string
     {
-        $problemElement = new \SimpleXMLElement('<problem/>');
-        $problemElement->addAttribute('xmlns', 'urn:ietf:rfc:7807');
+        $xml = new \XMLWriter();
+        $xml->openMemory();
+        $xml->startDocument('1.0', $this->charset);
+        $xml->setIndent(true);
+        $xml->setIndentString('  ');
 
-        $problemElement->addChild('title', $this->escapeXml($exception->getTitle()));
-        $problemElement->addChild('status', $exception->getStatusCode());
-        $problemElement->addChild('detail', $this->escapeXml($exception->getMessage()));
+        $this->createElementStartTag($xml, 'problem', '', ['xmlns' => 'urn:ietf:rfc:7807']);
+        $this->createElement($xml, 'title', $exception->getTitle());
+        $this->createElement($xml, 'status', $exception->getStatusCode());
+        $this->createElement($xml, 'detail', $exception->getMessage());
 
         if ($this->debug) {
-            $exceptionsElement = $problemElement->addChild('exceptions');
+            $this->createElementStartTag($xml, 'exceptions');
             foreach ($exception->toArray() as $e) {
-                $exceptionElement = $exceptionsElement->addChild('exception');
-                $exceptionElement->addAttribute('class', $e['class']);
-                $exceptionElement->addAttribute('message', $this->escapeXml($e['message']));
+                $this->createElementStartTag($xml, 'exception', '', ['class' => $e['class'], 'message' => $e['message']]);
 
-                $tracesElement = $exceptionElement->addChild('traces');
+                $this->createElementStartTag($xml, 'traces');
                 foreach ($e['trace'] as $trace) {
                     $traceContent = '';
                     if ($trace['function']) {
@@ -65,14 +67,18 @@ class XmlErrorRenderer implements ErrorRendererInterface
                         $traceContent .= ' '.$this->formatPath($trace['file'], $trace['line']);
                     }
 
-                    $tracesElement->addChild('trace', $this->escapeXml($traceContent));
+                    $this->createElement($xml, 'trace', $traceContent);
                 }
+                $xml->endElement(); // </traces>
+                $xml->endElement(); // </exception>
             }
+            $xml->endElement(); // </exceptions>
         }
 
-        $xml = str_replace('<?xml version="1.0"?>', sprintf('<?xml version="1.0" encoding="%s" ?>', $this->charset), $problemElement->saveXML());
+        $xml->endElement(); // </problem>
+        $xml->endDocument();
 
-        return sprintf("<?xml version=\"1.0\" encoding=\"%s\" ?>\n%s", $this->charset, $problemElement->saveXML());
+        return $xml->outputMemory();
     }
 
     /**
@@ -115,5 +121,26 @@ class XmlErrorRenderer implements ErrorRendererInterface
         }
 
         return implode(', ', $result);
+    }
+
+    private function createElementStartTag(\XMLWriter $xml, string $name, string $content = '', array $attributes = [])
+    {
+        $xml->startElement($name);
+
+        foreach ($attributes as $attributeName => $attributeValue) {
+            $xml->startAttribute($attributeName);
+            $xml->text($attributeValue);
+            $xml->endAttribute();
+        }
+
+        if ('' !== $content) {
+            $xml->text($this->escapeXml($content));
+        }
+    }
+
+    private function createElement(\XMLWriter $xml, string $name, string $content = '', array $attributes = [])
+    {
+        $this->createElementStartTag($xml, $name, $content, $attributes);
+        $xml->endElement();
     }
 }

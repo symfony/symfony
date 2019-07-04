@@ -125,7 +125,7 @@
         </service>
 
         <service id="cache.adapter.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" abstract="true">
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument>0</argument> <!-- default lifetime -->
             <call method="setLogger">

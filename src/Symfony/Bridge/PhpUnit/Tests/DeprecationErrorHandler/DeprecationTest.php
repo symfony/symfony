@@ -56,6 +56,66 @@ class DeprecationTest extends TestCase
     }
 
     /**
+     * @param bool $muted
+     * @param string $callingClass
+     * @param string $message
+     *
+     * @dataProvider mutedProvider
+     */
+    public function testItMutesOnlySpecificErrorMessagesWhenTheCallingCodeIsInPhpunit(
+        $muted,
+        $callingClass,
+        $message
+    ) {
+        $trace = $this->debugBacktrace();
+        array_unshift($trace, ['class' => $callingClass]);
+        $deprecation = new Deprecation(
+            $message,
+            $trace,
+            __FILE__
+        );
+        $this->assertSame($muted, $deprecation->isMuted());
+    }
+
+    public function mutedProvider()
+    {
+        yield 'not from phpunit, and not a whitelisted message' => [
+            false,
+            \My\Source\Code::class,
+            'Self deprecating humor is deprecated by itself'
+        ];
+        yield 'from phpunit, but not a whitelisted message' => [
+            false,
+            \PHPUnit\Random\Piece\Of\Code::class,
+            'Self deprecating humor is deprecated by itself'
+        ];
+        yield 'whitelisted message, but not from phpunit' => [
+            false,
+            \My\Source\Code::class,
+            'Function ReflectionType::__toString() is deprecated',
+        ];
+        yield 'from phpunit and whitelisted message' => [
+            true,
+            \PHPUnit\Random\Piece\Of\Code::class,
+            'Function ReflectionType::__toString() is deprecated',
+        ];
+    }
+
+    public function testNotMutedIfNotCalledFromAClass()
+    {
+        $deprecation = new Deprecation(
+            'Function ReflectionType::__toString() is deprecated',
+            [
+                ['file' => 'my-procedural-controller.php'],
+                ['file' => 'my-procedural-framework.php']
+            ],
+            __FILE__
+        );
+        $this->assertFalse($deprecation->isMuted());
+    }
+
+
+    /**
      * This method is here to simulate the extra level from the piece of code
      * triggering an error to the error handler
      */

@@ -37,13 +37,24 @@ class Configuration
     private $verboseOutput = true;
 
     /**
+     * @var bool
+     */
+    private $scream = false;
+
+    /**
      * @param int[]  $thresholds    A hash associating groups to thresholds
      * @param string $regex         Will be matched against messages, to decide
      *                              whether to display a stack trace
      * @param bool   $verboseOutput
+     * @param bool   $scream        whether to display muted notices (they
+     *                              still will not make the build fail)
      */
-    private function __construct(array $thresholds = [], $regex = '', $verboseOutput = true)
-    {
+    private function __construct(
+        array $thresholds = [],
+        $regex = '',
+        $verboseOutput = true,
+        $scream = false
+    ) {
         $groups = ['total', 'indirect', 'direct', 'self'];
 
         foreach ($thresholds as $group => $threshold) {
@@ -73,6 +84,7 @@ class Configuration
         }
         $this->regex = $regex;
         $this->verboseOutput = $verboseOutput;
+        $this->scream = $scream;
     }
 
     /**
@@ -92,7 +104,7 @@ class Configuration
     {
         $deprecationCounts = [];
         foreach ($deprecations as $key => $deprecation) {
-            if (false !== strpos($key, 'Count') && false === strpos($key, 'legacy')) {
+            if (false !== strpos($key, 'Count') && false === strpos($key, 'legacy') && false === strpos($key, 'muted')) {
                 $deprecationCounts[$key] = $deprecation;
             }
         }
@@ -136,6 +148,14 @@ class Configuration
     }
 
     /**
+     * @return bool
+     */
+    public function scream()
+    {
+        return $this->scream;
+    }
+
+    /**
      * @param string $serializedConfiguration an encoded string, for instance
      *                                        max[total]=1234&max[indirect]=42
      *
@@ -145,7 +165,7 @@ class Configuration
     {
         parse_str($serializedConfiguration, $normalizedConfiguration);
         foreach (array_keys($normalizedConfiguration) as $key) {
-            if (!\in_array($key, ['max', 'disabled', 'verbose'], true)) {
+            if (!\in_array($key, ['max', 'disabled', 'verbose', 'scream'], true)) {
                 throw new \InvalidArgumentException(sprintf('Unknown configuration option "%s"', $key));
             }
         }
@@ -159,10 +179,16 @@ class Configuration
             $verboseOutput = (bool) $normalizedConfiguration['verbose'];
         }
 
+        $scream = false;
+        if (isset($normalizedConfiguration['scream'])) {
+            $scream = (bool) $normalizedConfiguration['scream'];
+        }
+
         return new self(
             isset($normalizedConfiguration['max']) ? $normalizedConfiguration['max'] : [],
             '',
-            $verboseOutput
+            $verboseOutput,
+            $scream
         );
     }
 

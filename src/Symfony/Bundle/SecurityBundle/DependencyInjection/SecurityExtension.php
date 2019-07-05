@@ -34,7 +34,8 @@ use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\SodiumPasswordEncoder;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
-use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Templating\Helper\Helper;
+use Twig\Extension\AbstractExtension;
 
 /**
  * SecurityExtension.
@@ -100,10 +101,15 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $loader->load('security.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
-        if (class_exists(PhpEngine::class)) {
+
+        if (class_exists(Helper::class)) {
             $loader->load('templating_php.xml');
         }
-        $loader->load('templating_twig.xml');
+
+        if (class_exists(AbstractExtension::class)) {
+            $loader->load('templating_twig.xml');
+        }
+
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 

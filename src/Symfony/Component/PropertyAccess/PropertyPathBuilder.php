@@ -43,7 +43,7 @@ class PropertyPathBuilder
      * @param int                          $length The length of the appended piece
      *                                             If 0, the full path is appended
      */
-    public function append($path, $offset = 0, $length = 0)
+    public function append($path, int $offset = 0, int $length = 0)
     {
         if (\is_string($path)) {
             $path = new PropertyPath($path);
@@ -66,7 +66,7 @@ class PropertyPathBuilder
      *
      * @param string $name The name of the appended index
      */
-    public function appendIndex($name)
+    public function appendIndex(string $name)
     {
         $this->elements[] = $name;
         $this->isIndex[] = true;
@@ -77,7 +77,7 @@ class PropertyPathBuilder
      *
      * @param string $name The name of the appended property
      */
-    public function appendProperty($name)
+    public function appendProperty(string $name)
     {
         $this->elements[] = $name;
         $this->isIndex[] = false;
@@ -91,7 +91,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException if offset is invalid
      */
-    public function remove($offset, $length = 1)
+    public function remove(int $offset, int $length = 1)
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
@@ -113,7 +113,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replace($offset, $length, $path, $pathOffset = 0, $pathLength = 0)
+    public function replace(int $offset, int $length, $path, int $pathOffset = 0, int $pathLength = 0)
     {
         if (\is_string($path)) {
             $path = new PropertyPath($path);
@@ -146,7 +146,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByIndex($offset, $name = null)
+    public function replaceByIndex(int $offset, string $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
@@ -167,7 +167,7 @@ class PropertyPathBuilder
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
-    public function replaceByProperty($offset, $name = null)
+    public function replaceByProperty(int $offset, string $name = null)
     {
         if (!isset($this->elements[$offset])) {
             throw new OutOfBoundsException(sprintf('The offset %s is not within the property path', $offset));
@@ -233,7 +233,7 @@ class PropertyPathBuilder
      * @param int $cutLength       The length of the removed chunk
      * @param int $insertionLength The length of the inserted chunk
      */
-    private function resize($offset, $cutLength, $insertionLength)
+    private function resize(int $offset, int $cutLength, int $insertionLength)
     {
         // Nothing else to do in this case
         if ($insertionLength === $cutLength) {

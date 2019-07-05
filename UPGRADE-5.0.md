@@ -336,6 +336,11 @@ Process
    $process = Process::fromShellCommandline('ls -l');
    ```
 
+PropertyAccess
+--------------
+
+ * Removed support of passing `null` as 2nd argument of `PropertyAccessor::createCache()` method (`$defaultLifetime`), pass `0` instead.
+
 Routing
 -------
 

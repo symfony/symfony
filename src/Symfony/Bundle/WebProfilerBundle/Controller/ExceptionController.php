@@ -47,13 +47,11 @@ class ExceptionController
     /**
      * Renders the exception panel for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function showAction($token)
+    public function showAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -85,13 +83,11 @@ class ExceptionController
     /**
      * Renders the exception panel stylesheet for the given token.
      *
-     * @param string $token The profiler token
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
      */
-    public function cssAction($token)
+    public function cssAction(string $token)
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -114,7 +110,7 @@ class ExceptionController
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0
-    protected function templateExists($template)
+    protected function templateExists(string $template)
     {
         $loader = $this->twig->getLoader();
         if ($loader instanceof ExistsLoaderInterface) {

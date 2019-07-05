@@ -490,6 +490,7 @@ Validator
  * The `symfony/intl` component is now required for using the `Bic`, `Country`, `Currency`, `Language` and `Locale` constraints
  * The `egulias/email-validator` component is now required for using the `Email` constraint in strict mode
  * The `symfony/expression-language` component is now required for using the `Expression` constraint
+ * Changed the default value of `Length::$allowEmptyString` to `false` and made it optional
 
 Workflow
 --------

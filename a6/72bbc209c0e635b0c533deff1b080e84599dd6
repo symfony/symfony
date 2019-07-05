@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2019-06-30T17:14:59Z
+
+Thank you for this PR. It works as expected =)
+
+I like this way more because we only use one traceable adapter. See `cache.array`, `cache.apcu` and `cache.redis`.
+
+### Before
+
+![Screenshot 2019-06-30 at 18 43 55](https://user-images.githubusercontent.com/1275206/60399824-24a35280-9b6b-11e9-8dd8-12ca86ded2d0.png)
+
+### After
+
+![Screenshot 2019-06-30 at 18 43 48](https://user-images.githubusercontent.com/1275206/60399825-28cf7000-9b6b-11e9-8693-eebd1f2fc1b6.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-30T20:31:31Z
+
+For reference, this leverages a new convention supported by the `cache.pool` tag:
+When a service is defined with the `cache.pool` tag,
+and when the class of this service is `ChainAdapter`
+then the first argument of this service must be defined as a list of strings: the adapters to chain.
+The keys can optionally be used to define the provider for each adapter:
+```yaml
+my_chain_cache:
+    class: Symony\Component\Cache\Adapter\ChainAdapter
+    arguments:
+        0: cache.adapter.array
+        redis://foo: cache.adapter.redis
+```
+This is a bit strange I agree, yet this should be pretty rare - it's mostly for bundles that couldn't use the fwb configuration.
+The `CachePoolPass` will then turn this list to a proper list of adapter services, with their namespace/lifetime/etc properly configured, as really needed by `ChainAdapter`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-06-30T20:47:54Z
+
+For reference too, it should be possible to add a local memory cache to all "app" pools:
+```yaml
+framework:
+    cache:
+        app: cache.app.chain
+        pools:
+            api_cache: ~ # "api_cache" pool uses "cache.app" as template, which is a chain
+            cache.app.chain:
+                adapters:
+                  - cache.adapter.array
+                  - cache.adapter.filesystem # or any other backend
+```
+(this is combining knowledge that the doc already gives - or will after https://github.com/symfony/symfony-docs/pull/11855)
+
+/cc @andrerom you might like this too :)
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-07-03T12:15:07Z
+
+I like it
+
+But if you plan to expose use of ArrayAdapter to a wider audience you should probably also add the following features to it:
+- max item limit to avoid reaching memory limits
+- own _(very low, like default 100-500ms)_ TTL for in-memory caching, as it's in practice stale data when used in concurrent scenarios
+
+If you want to be advance you can also:
+- keep track of use, and evict cache items based on that using LFU when reaching limit
+- in-memory cache is domain & project specific in terms of how long it's somewhat "safe" to keep items in memory, so either describe when to use and not use on a per pool term, or allow use of pool to pass in flags to opt out of in-memory cache for cases developer knows it should be ignored
+
+We opted to _not_ do this as a PSR Pool in eZ Platform 2.5 precisely for the last reason here, some data domains has a in-memory TTL of a few seconds, others just some hundred milliseconds.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-03T16:53:54Z
+
+Thank you for the ideas @andrerom
+For now, I've added the "reset" tag on chain adapters, so that each request always starts with an empty array pool. Should be enough for a 1st iteration, don't you think?
+
+---------------------------------------------------------------------------
+
+by andrerom at 2019-07-04T05:45:08Z
+
+> so that each request always starts with an empty array pool
+
+Normally array pool will be empty on each new request or command execution right? Or are you talking about ReactPHP or future 7.4's pre-loading scenarios?
+
+For normal fpm setup the start of the request is not an issue, it's for instance when something is long lived it becomes increasingly an issue, request or command.
+
+That said, as long as doc does not use array as an example you can move ahead with this and we can try to make it more safe to use before 4.4 is out in order to document usage of it _(including full pros/cons)_.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-04T08:31:44Z
+
+> are you talking about ReactPHP or future 7.4's pre-loading scenarios?
+
+yes, that's what I'm referring to. I've actually submitted https://github.com/symfony/symfony/pull/32361 to reset array pools, this was forgotten.
+
+But I agree, let's deal with these concerns separately.
+
+PR is ready.

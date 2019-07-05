@@ -68,7 +68,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 $sessionMetadata['Last used'] = date(DATE_RFC822, $session->getMetadataBag()->getLastUsed());
                 $sessionMetadata['Lifetime'] = $session->getMetadataBag()->getLifetime();
                 $sessionAttributes = $session->all();
-                $flashes = $session->getFlashBag()->peekAll();
+                $flashes = method_exists($session, 'getFlashBag') ? $session->getFlashBag()->peekAll() : [];
             }
         }
 

@@ -7,6 +7,7 @@ use Symfony\Bridge\Twig\AppVariable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AppVariableTest extends TestCase
 {
@@ -232,6 +233,18 @@ class AppVariableTest extends TestCase
             ['this-does-not-exist' => []],
             $this->appVariable->getFlashes(['this-does-not-exist'])
         );
+    }
+
+    public function testGetFlashesWithoutGetFlashBag()
+    {
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $request->method('getSession')->willReturn($session);
+
+        $this->setRequestStack($request);
+
+        $this->assertEquals([], $this->appVariable->getFlashes());
     }
 
     protected function setRequestStack($request)

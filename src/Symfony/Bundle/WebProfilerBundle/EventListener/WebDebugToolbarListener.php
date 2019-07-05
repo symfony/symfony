@@ -89,7 +89,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
             $session = $request->getSession();
-            if (null !== $session && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
+            if (null !== $session && $session->isStarted() && method_exists($session, 'getFlashBag') && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }

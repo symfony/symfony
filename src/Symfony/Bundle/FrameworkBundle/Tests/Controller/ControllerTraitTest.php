@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
@@ -391,6 +392,23 @@ abstract class ControllerTraitTest extends TestCase
         $controller->addFlash('foo', 'bar');
 
         $this->assertSame(['bar'], $flashBag->get('foo'));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You can not use the addFlash method because the session is missing the getFlashBag() method.
+     */
+    public function testAddFlashWithoutGetFlashBag()
+    {
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+
+        $container = new Container();
+        $container->set('session', $session);
+
+        $controller = $this->createController();
+        $container->setContainer($container);
+
+        $controller->addFlash('foo', 'bar');
     }
 
     public function testCreateAccessDeniedException()

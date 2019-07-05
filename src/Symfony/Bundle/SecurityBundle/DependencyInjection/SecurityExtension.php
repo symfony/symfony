@@ -102,9 +102,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if (class_exists(Helper::class)) {
             $loader->load('templating_php.xml');
-
-            $container->getDefinition('templating.helper.logout_url')->setPrivate(true);
-            $container->getDefinition('templating.helper.security')->setPrivate(true);
         }
 
         if (class_exists(AbstractExtension::class)) {

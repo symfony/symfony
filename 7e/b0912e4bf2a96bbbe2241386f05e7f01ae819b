@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by tigitz at 2019-07-01T12:22:06Z
+
+@derrabus @nicolas-grekas While my initial scope was to take care of new type-hintable params allowed by 5.0, I went a little bit further and took care of others type-hintable params. But fact is, these additional type-hints can already lands in 4.* IMO and be seen as a continuation of https://github.com/symfony/symfony/pull/24722.
+
+So I'll keep this PR exclusively about it's initial 5.0 scope and make another one targeting 4.* version with these additional type-hints.
+
+Sorry for the bother

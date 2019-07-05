@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-30T20:03:16Z
+
+I think requiring Psr\EventDispatcher would be developer friendlier. Currently developing against `\Symfony\Contracts\EventDispatcher\EventDispatcherInterface` is quite annoying because there are multiple definitions: one with and one without extending the PSR interface. In phpstorm you cannot simply follow the definition because it asks you to chose every time.
+
+![multiple-eventdispatcher](https://user-images.githubusercontent.com/610090/60401515-d437ef00-9b82-11e9-971a-36e811d5ae35.png)
+
+This was done because of the min php version requirement in psr/event-dispatcher, I see. I would suggest to create a minor release of https://packagist.org/packages/symfony/event-dispatcher-contracts that raises php requirement to 7.2 as well and requires psr/event-dispatcher. So people on PHP 7.1 would get the current version and php 7.2 and above the better DX.

@@ -27,10 +27,7 @@ class Event extends BaseEvent
     private $transition;
     private $workflow;
 
-    /**
-     * @param object $subject
-     */
-    public function __construct($subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null)
+    public function __construct(object $subject, Marking $marking, Transition $transition = null, WorkflowInterface $workflow = null)
     {
         $this->subject = $subject;
         $this->marking = $marking;
@@ -63,7 +60,7 @@ class Event extends BaseEvent
         return $this->workflow->getName();
     }
 
-    public function getMetadata(string $key, $subject)
+    public function getMetadata(string $key, object $subject)
     {
         return $this->workflow->getMetadataStore()->getMetadata($key, $subject);
     }

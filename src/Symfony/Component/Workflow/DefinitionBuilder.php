@@ -73,11 +73,9 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
-    public function addPlace($place)
+    public function addPlace(string $place)
     {
         if (!$this->places) {
             $this->initialPlaces = $place;

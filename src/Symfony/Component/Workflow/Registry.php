@@ -28,12 +28,9 @@ class Registry
     }
 
     /**
-     * @param object      $subject
-     * @param string|null $workflowName
-     *
      * @return Workflow
      */
-    public function get($subject, $workflowName = null)
+    public function get(object $subject, string $workflowName = null)
     {
         $matched = null;
 
@@ -54,11 +51,9 @@ class Registry
     }
 
     /**
-     * @param object $subject
-     *
      * @return Workflow[]
      */
-    public function all($subject): array
+    public function all(object $subject): array
     {
         $matched = [];
         foreach ($this->workflows as list($workflow, $supportStrategy)) {

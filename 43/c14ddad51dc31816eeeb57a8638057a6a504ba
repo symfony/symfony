@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T13:25:27Z
+
+Failure on AppVeyor is unrelated.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T14:51:41Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T18:40:46Z
+
+Staus: Needs Review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-05T18:57:20Z
+
+Deprecation warning, see https://travis-ci.org/symfony/symfony/jobs/554806241
+The test is also failing in #32266 and needs to be fixed in a lower branch.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T19:09:41Z
+
+> Deprecation warning
+
+Fixed. I'm going to apply the fix on 4.2 in another PR.

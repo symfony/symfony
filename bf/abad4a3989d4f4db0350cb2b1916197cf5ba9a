@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-06-29T22:50:12Z
+
+Fixed dependencies. This will happen anyway eventually with all the types added in master.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-03T13:27:42Z
+
+> Please move all updates to docblocks to a PR on a lower branch.
+
+I can do it for the single `@return ExtensionInterface` I added for autocomplete. But most other changes are about removing phpdocs that are obsolete with type hints. Those we should not apply in lower branches, because the type hints are not there yet.

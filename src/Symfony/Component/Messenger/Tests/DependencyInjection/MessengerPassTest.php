@@ -494,10 +494,8 @@ class MessengerPassTest extends TestCase
 
     public function testRegistersTraceableBusesToCollector()
     {
-        $dataCollector = $this->getMockBuilder(MessengerDataCollector::class)->getMock();
-
         $container = $this->getContainerBuilder($fooBusId = 'messenger.bus.foo');
-        $container->register('data_collector.messenger', $dataCollector);
+        $container->register('data_collector.messenger', MessengerDataCollector::class);
         $container->setParameter('kernel.debug', true);
 
         (new MessengerPass())->process($container);

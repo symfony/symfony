@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\Reader;
 use Http\Client\HttpClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
@@ -144,6 +145,10 @@ class FrameworkExtension extends Extension
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
         $loader->load('error_catcher.xml');
+
+        if (interface_exists(PsrEventDispatcherInterface::class)) {
+            $container->setAlias(PsrEventDispatcherInterface::class, 'event_dispatcher');
+        }
 
         $container->registerAliasForArgument('parameter_bag', PsrContainerInterface::class);
 

@@ -412,7 +412,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
             if ($this->default) {
                 if (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException($node->getPath().': the default value of an array node has to be an array.');
+                    throw new \InvalidArgumentException(sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
                 }
 
                 $node->setDefaultValue($this->defaultValue);

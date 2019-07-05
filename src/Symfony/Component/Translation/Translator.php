@@ -119,12 +119,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      *
      * @param string $format   The name of the loader (@see addLoader())
      * @param mixed  $resource The resource name
-     * @param string $locale   The locale
-     * @param string $domain   The domain
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function addResource(string $format, $resource, string $locale, string $domain = null)
+    public function addResource(string $format, $resource, ?string $locale, string $domain = null)
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -248,7 +246,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @param string $locale
      */
-    protected function loadCatalogue(string $locale)
+    protected function loadCatalogue(?string $locale)
     {
         if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
@@ -260,7 +258,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
     /**
      * @param string $locale
      */
-    protected function initializeCatalogue(string $locale)
+    protected function initializeCatalogue(?string $locale)
     {
         $this->assertValidLocale($locale);
 

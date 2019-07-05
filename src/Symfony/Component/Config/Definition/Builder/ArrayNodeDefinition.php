@@ -66,11 +66,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a prototype for child nodes.
      *
-     * @param string $type The type of node
-     *
      * @return NodeDefinition
      */
-    public function prototype($type)
+    public function prototype(string $type)
     {
         return $this->prototype = $this->getNodeBuilder()->node(null, $type)->setParent($this);
     }
@@ -194,12 +192,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a normalization rule for XML configurations.
      *
-     * @param string $singular The key to remap
-     * @param string $plural   The plural of the key for irregular plurals
+     * @param string      $singular The key to remap
+     * @param string|null $plural   The plural of the key for irregular plurals
      *
      * @return $this
      */
-    public function fixXmlConfig($singular, $plural = null)
+    public function fixXmlConfig(string $singular, string $plural = null)
     {
         $this->normalization()->remap($singular, $plural);
 
@@ -234,7 +232,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return $this
      */
-    public function useAttributeAsKey($name, $removeKeyItem = true)
+    public function useAttributeAsKey(string $name, bool $removeKeyItem = true)
     {
         $this->key = $name;
         $this->removeKeyItem = $removeKeyItem;
@@ -245,11 +243,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets whether the node can be unset.
      *
-     * @param bool $allow
-     *
      * @return $this
      */
-    public function canBeUnset($allow = true)
+    public function canBeUnset(bool $allow = true)
     {
         $this->merge()->allowUnset($allow);
 
@@ -341,7 +337,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @return $this
      */
-    public function ignoreExtraKeys($remove = true)
+    public function ignoreExtraKeys(bool $remove = true)
     {
         $this->ignoreExtraKeys = true;
         $this->removeExtraKeys = $remove;
@@ -350,15 +346,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Sets key normalization.
-     *
-     * @param bool $bool Whether to enable key normalization
+     * Sets whether to enable key normalization.
      *
      * @return $this
      */
-    public function normalizeKeys($bool)
+    public function normalizeKeys(bool $bool)
     {
-        $this->normalizeKeys = (bool) $bool;
+        $this->normalizeKeys = $bool;
 
         return $this;
     }
@@ -417,6 +411,10 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             }
 
             if ($this->default) {
+                if (!\is_array($this->defaultValue)) {
+                    throw new \InvalidArgumentException($node->getPath().': the default value of an array node has to be an array.');
+                }
+
                 $node->setDefaultValue($this->defaultValue);
             }
 

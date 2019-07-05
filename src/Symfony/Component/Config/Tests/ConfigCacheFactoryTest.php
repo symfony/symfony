@@ -17,8 +17,7 @@ use Symfony\Component\Config\ConfigCacheFactory;
 class ConfigCacheFactoryTest extends TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid type for callback argument. Expected callable, but got "object".
+     * @expectedException \TypeError
      */
     public function testCacheWithInvalidCallback()
     {

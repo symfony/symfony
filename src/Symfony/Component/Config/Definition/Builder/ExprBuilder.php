@@ -178,13 +178,11 @@ class ExprBuilder
      *
      * if you want to add the value of the node in your message just use a %s placeholder.
      *
-     * @param string $message
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function thenInvalid($message)
+    public function thenInvalid(string $message)
     {
         $this->thenPart = function ($v) use ($message) { throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 

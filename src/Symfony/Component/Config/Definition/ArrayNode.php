@@ -129,16 +129,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     public function setPerformDeepMerging(bool $boolean)
     {
-        $this->performDeepMerging = (bool) $boolean;
+        $this->performDeepMerging = $boolean;
     }
 
     /**
-     * Whether extra keys should just be ignore without an exception.
+     * Whether extra keys should just be ignored without an exception.
      *
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys(bool $boolean, $remove = true)
+    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true)
     {
         $this->ignoreExtraKeys = $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;

@@ -232,7 +232,7 @@ class ConfigurationTest extends TestCase
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
-                'fallbacks' => ['en'],
+                'fallbacks' => [],
                 'logging' => false,
                 'formatter' => 'translator.formatter.default',
                 'paths' => [],

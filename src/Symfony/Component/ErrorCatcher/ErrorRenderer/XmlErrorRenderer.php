@@ -40,7 +40,10 @@ class XmlErrorRenderer implements ErrorRendererInterface
      */
     public function render(FlattenException $exception): string
     {
+        $title = $this->escapeXml($exception->getTitle());
         $message = $this->escapeXml($exception->getMessage());
+        $statusCode = $this->escapeXml($exception->getStatusCode());
+        $charset = $this->escapeXml($this->charset);
 
         $exceptions = '';
         if ($this->debug) {
@@ -63,10 +66,10 @@ class XmlErrorRenderer implements ErrorRendererInterface
         }
 
         return <<<EOF
-<?xml version="1.0" encoding="{$this->charset}" ?>
+<?xml version="1.0" encoding="{$charset}" ?>
 <problem xmlns="urn:ietf:rfc:7807">
-    <title>{$exception->getTitle()}</title>
-    <status>{$exception->getStatusCode()}</status>
+    <title>{$title}</title>
+    <status>{$statusCode}</status>
     <detail>{$message}</detail>
     {$exceptions}
 </problem>

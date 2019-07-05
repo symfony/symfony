@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\DependencyInjection;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -97,7 +98,50 @@ class CachePoolPass implements CompilerPassInterface
             if (isset($tags[0]['provider'])) {
                 $tags[0]['provider'] = new Reference(static::getServiceProvider($container, $tags[0]['provider']));
             }
-            $i = 0;
+
+            if (ChainAdapter::class === $class) {
+                $adapters = [];
+                foreach ($adapter->getArgument(0) as $provider => $adapter) {
+                    $chainedPool = $adapter = new ChildDefinition($adapter);
+                    $chainedTags = [\is_int($provider) ? [] : ['provider' => $provider]];
+                    $chainedClass = '';
+
+                    while ($adapter instanceof ChildDefinition) {
+                        $adapter = $container->findDefinition($adapter->getParent());
+                        $chainedClass = $chainedClass ?: $adapter->getClass();
+                        if ($t = $adapter->getTag($this->cachePoolTag)) {
+                            $chainedTags[0] += $t[0];
+                        }
+                    }
+
+                    if (ChainAdapter::class === $chainedClass) {
+                        throw new InvalidArgumentException(sprintf('Invalid service "%s": chain of adapters cannot reference another chain, found "%s".', $id, $chainedPool->getParent()));
+                    }
+
+                    $i = 0;
+
+                    if (isset($chainedTags[0]['provider'])) {
+                        $chainedPool->replaceArgument($i++, new Reference(static::getServiceProvider($container, $chainedTags[0]['provider'])));
+                    }
+
+                    if (isset($tags[0]['namespace']) && ArrayAdapter::class !== $adapter->getClass()) {
+                        $chainedPool->replaceArgument($i++, $tags[0]['namespace']);
+                    }
+
+                    if (isset($tags[0]['default_lifetime'])) {
+                        $chainedPool->replaceArgument($i++, $tags[0]['default_lifetime']);
+                    }
+
+                    $adapters[] = $chainedPool;
+                }
+
+                $pool->replaceArgument(0, $adapters);
+                unset($tags[0]['provider'], $tags[0]['namespace']);
+                $i = 1;
+            } else {
+                $i = 0;
+            }
+
             foreach ($attributes as $attr) {
                 if (!isset($tags[0][$attr])) {
                     // no-op
@@ -105,7 +149,7 @@ class CachePoolPass implements CompilerPassInterface
                     if ($tags[0][$attr]) {
                         $pool->addTag($this->kernelResetTag, ['method' => $tags[0][$attr]]);
                     }
-                } elseif ('namespace' !== $attr || ArrayAdapter::class !== $adapter->getClass()) {
+                } elseif ('namespace' !== $attr || ArrayAdapter::class !== $class) {
                     $pool->replaceArgument($i++, $tags[0][$attr]);
                 }
                 unset($tags[0][$attr]);

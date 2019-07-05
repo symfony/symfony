@@ -639,9 +639,10 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('path')
                     ->children()
                         ->arrayNode('fallbacks')
+                            ->info('Defaults to the value of "default_locale".')
                             ->beforeNormalization()->ifString()->then(function ($v) { return [$v]; })->end()
                             ->prototype('scalar')->end()
-                            ->defaultValue(['en'])
+                            ->defaultValue([])
                         ->end()
                         ->booleanNode('logging')->defaultValue(false)->end()
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
@@ -846,8 +847,38 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
+                                ->fixXmlConfig('adapter')
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) { return (isset($v['adapters']) || \is_array($v['adapter'] ?? null)) && isset($v['provider']); })
+                                    ->thenInvalid('Pool cannot have a "provider" while "adapter" is set to a map')
+                                ->end()
                                 ->children()
-                                    ->scalarNode('adapter')->defaultValue('cache.app')->end()
+                                    ->arrayNode('adapters')
+                                        ->info('One or more adapters to chain for creating the pool, defaults to "cache.app".')
+                                        ->beforeNormalization()
+                                            ->always()->then(function ($values) {
+                                                if ([0] === array_keys($values) && \is_array($values[0])) {
+                                                    return $values[0];
+                                                }
+                                                $adapters = [];
+
+                                                foreach ($values as $k => $v) {
+                                                    if (\is_int($k) && \is_string($v)) {
+                                                        $adapters[] = $v;
+                                                    } elseif (!\is_array($v)) {
+                                                        $adapters[$k] = $v;
+                                                    } elseif (isset($v['provider'])) {
+                                                        $adapters[$v['provider']] = $v['name'] ?? $v;
+                                                    } else {
+                                                        $adapters[] = $v['name'] ?? $v;
+                                                    }
+                                                }
+
+                                                return $adapters;
+                                            })
+                                        ->end()
+                                        ->prototype('scalar')->end()
+                                    ->end()
                                     ->scalarNode('tags')->defaultNull()->end()
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
@@ -967,6 +998,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                     ->children()
                         ->arrayNode('routing')
+                            ->normalizeKeys(false)
                             ->useAttributeAsKey('message_class')
                             ->beforeNormalization()
                                 ->always()
@@ -1026,6 +1058,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('transports')
+                            ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->beforeNormalization()
@@ -1073,6 +1106,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_bus')->defaultNull()->end()
                         ->arrayNode('buses')
                             ->defaultValue(['messenger.bus.default' => ['default_middleware' => true, 'middleware' => []]])
+                            ->normalizeKeys(false)
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->addDefaultsIfNotSet()

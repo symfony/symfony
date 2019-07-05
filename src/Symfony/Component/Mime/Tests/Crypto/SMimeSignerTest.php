@@ -18,6 +18,9 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\TextPart;
 
+/**
+ * @requires extension openssl
+ */
 class SMimeSignerTest extends SMimeTestCase
 {
     public function testSignedMessage()

@@ -116,9 +116,6 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
                 $values[$id] = null;
             } elseif (!\is_object($value)) {
                 $values[$id] = $value;
-            } elseif (!$value instanceof LazyValue) {
-                // calling a Closure is for @deprecated BC and should be removed in Symfony 5.0
-                $values[$id] = $value();
             } elseif (false === $values[$id] = include $value->file) {
                 unset($values[$id], $this->values[$id]);
                 $missingIds[] = $id;

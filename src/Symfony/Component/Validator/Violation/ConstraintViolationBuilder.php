@@ -121,10 +121,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     public function setCode(?string $code)
     {
-        if (null !== $code && !\is_string($code)) {
-            @trigger_error(sprintf('Not using a string as the error code in %s() is deprecated since Symfony 4.4. A type-hint will be added in 5.0.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->code = $code;
 
         return $this;

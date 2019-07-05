@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2019-07-04T16:00:03Z
+
+Note: the needed changes in the docs have already been made:
+
+* https://github.com/symfony/symfony-docs/blob/4.4/reference/constraints/Length.rst#allowemptystring
+* https://github.com/symfony/symfony-docs/blob/master/reference/constraints/Length.rst#allowemptystring

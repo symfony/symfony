@@ -495,7 +495,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed
      * @throws RuntimeException In case of failure
      */
-    public function signal($signal)
+    public function signal(int $signal)
     {
         $this->doSignal($signal, true);
 
@@ -897,7 +897,7 @@ class Process implements \IteratorAggregate
      *
      * @return int The exit-code of the process
      */
-    public function stop($timeout = 10, $signal = null)
+    public function stop(float $timeout = 10, int $signal = null)
     {
         $timeoutMicro = microtime(true) + $timeout;
         if ($this->isRunning()) {
@@ -1028,13 +1028,11 @@ class Process implements \IteratorAggregate
     /**
      * Enables or disables the TTY mode.
      *
-     * @param bool $tty True to enabled and false to disable
-     *
      * @return self The current Process instance
      *
      * @throws RuntimeException In case the TTY mode is not supported
      */
-    public function setTty($tty)
+    public function setTty(bool $tty)
     {
         if ('\\' === \DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
@@ -1062,13 +1060,11 @@ class Process implements \IteratorAggregate
     /**
      * Sets PTY mode.
      *
-     * @param bool $bool
-     *
      * @return self
      */
-    public function setPty($bool)
+    public function setPty(bool $bool)
     {
-        $this->pty = (bool) $bool;
+        $this->pty = $bool;
 
         return $this;
     }
@@ -1102,11 +1098,9 @@ class Process implements \IteratorAggregate
     /**
      * Sets the current working directory.
      *
-     * @param string $cwd The new working directory
-     *
      * @return self The current Process instance
      */
-    public function setWorkingDirectory($cwd)
+    public function setWorkingDirectory(string $cwd)
     {
         $this->cwd = $cwd;
 
@@ -1185,11 +1179,9 @@ class Process implements \IteratorAggregate
     /**
      * Sets whether environment variables will be inherited or not.
      *
-     * @param bool $inheritEnv
-     *
      * @return self The current Process instance
      */
-    public function inheritEnvironmentVariables($inheritEnv = true)
+    public function inheritEnvironmentVariables(bool $inheritEnv = true)
     {
         if (!$inheritEnv) {
             throw new InvalidArgumentException('Not inheriting environment variables is not supported.');
@@ -1316,7 +1308,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $blocking Whether to use a blocking read call
      */
-    protected function updateStatus($blocking)
+    protected function updateStatus(bool $blocking)
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;

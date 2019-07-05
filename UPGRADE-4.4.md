@@ -41,6 +41,18 @@ DependencyInjection
        arguments: [!tagged_iterator app.handler]
    ```
 
+ * Passing an instance of `Symfony\Component\DependencyInjection\Parameter` as class name to `Symfony\Component\DependencyInjection\Definition` is deprecated.
+
+   Before:
+   ```php
+   new Definition(new Parameter('my_class'));
+   ```
+
+   After:
+   ```php
+   new Definition('%my_class%');
+   ```
+
 Filesystem
 ----------
 

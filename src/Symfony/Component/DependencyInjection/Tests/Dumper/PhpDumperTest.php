@@ -1082,7 +1082,7 @@ class PhpDumperTest extends TestCase
             'class' => 'stdClass',
         ]));
 
-        $container->setDefinition('foo', new Definition(new Parameter('class')));
+        $container->setDefinition('foo', new Definition('%class%'));
         $container->setDefinition('bar', new Definition('stdClass', [
             new Reference('foo'),
         ]))->setPublic(true);

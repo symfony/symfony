@@ -197,11 +197,12 @@ trait ControllerTrait
             throw new \LogicException('You can not use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".');
         }
 
-        if (!method_exists($this->container->get('session'), 'getFlashBag')) {
+        $session = $this->container->get('session');
+        if (!method_exists($session, 'getFlashBag')) {
             throw new \LogicException('You can not use the addFlash method because the session is missing the getFlashBag() method.');
         }
 
-        $this->container->get('session')->getFlashBag()->add($type, $message);
+        $session->getFlashBag()->add($type, $message);
     }
 
     /**

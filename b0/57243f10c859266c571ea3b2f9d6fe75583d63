@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-05T18:32:08Z
+
+There are still several uneccessary string casts left, e.g.
+
+- https://github.com/symfony/symfony/blob/492df5e21abeef6750f34d3e63a4db63f6a915a0/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L507
+- https://github.com/symfony/symfony/blob/492df5e21abeef6750f34d3e63a4db63f6a915a0/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L859
+- https://github.com/symfony/symfony/blob/492df5e21abeef6750f34d3e63a4db63f6a915a0/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L960
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-05T18:51:36Z
+
+There seems to be something wrong in the failing tests testBindScalarValueToControllerArgument and testRegistersTraceableBusesToCollector
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T18:59:23Z
+
+I'll look into it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-06T17:13:48Z
+
+All right, so the failing test assumes that a service can be a scalar value.
+
+https://github.com/symfony/symfony/blob/6811aaa8e087665769dd66c69fb3109d002196ef/src/Symfony/Component/HttpKernel/Tests/DependencyInjection/RegisterControllerArgumentLocatorsPassTest.php#L348
+
+All docblocks on the DI classes and interfaces however promise me that services are always objects.
+
+https://github.com/symfony/symfony/blob/6811aaa8e087665769dd66c69fb3109d002196ef/src/Symfony/Component/DependencyInjection/ContainerInterface.php#L37
+
+https://github.com/symfony/symfony/blob/6811aaa8e087665769dd66c69fb3109d002196ef/src/Symfony/Component/DependencyInjection/ContainerInterface.php#L47
+
+https://github.com/symfony/symfony/blob/6811aaa8e087665769dd66c69fb3109d002196ef/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L1641
+
+I trusted these docblocks and used `object` type-hints for services and those make the test mentioned by @Tobion fail. Interestingly enough, all tests of the DI component itself are green with the object type-hints. The failing test I linked above comes from the HttpKernel component.
+
+I'm unsure if scalar services should be a thing, but they're possible at the moment, at least to a certain degree. In order to move forward here, I'll remove the `object` type-hints for now, so that we can decide afterwards if we either want to deprecate scalar services or update the docblocks.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-06T17:46:32Z
+
+According to PSR-11 it could also be a scalar value.
+
+> use of a container to obtain objects and parameters
+
+But that seems strange and not the original contract of the symfony container. Also parameters are not fetched individually from the container but through a ParameterBag in Symfony which makes more sense to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-06T18:26:22Z
+
+The remaining failing tests are unrelated to my changes.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-06T18:38:12Z
+
+Follow-up issue: #32411

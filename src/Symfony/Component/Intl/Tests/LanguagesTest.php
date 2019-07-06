@@ -477,7 +477,6 @@ class LanguagesTest extends ResourceBundleTestCase
         'ro_MD',
         'rof',
         'rom',
-        'root',
         'rtm',
         'ru',
         'rue',

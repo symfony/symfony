@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2019-07-05T19:52:14Z
+
+Should be fixed in 4.2
+
+---------------------------------------------------------------------------
+
+by derrabus at 2019-07-05T19:57:23Z
+
+Is this the only place where we do that cast?
+
+---------------------------------------------------------------------------
+
+by brunowowk at 2019-07-06T00:18:33Z
+
+> Is this the only place where we do that cast?
+
+Not sure. That's the only one that triggered the Deprecation notice on my test suite, tough
+
+---------------------------------------------------------------------------
+
+by brunowowk at 2019-07-06T00:27:29Z
+
+> Should be fixed in 4.2
+
+you mean I should retarget this PR to the 4.2 branch?
+@Tobion
+> Should be fixed in 4.2
+
+Do you mean I should retarget this PR to the 4.2 branch or do another one for that one?
+This is my first time doing a PR here...not sure how the backports work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-06T09:48:16Z
+
+@brunowowk Yes, we always apply bugfixes to the lowest maintained branch where the bug occurs. From there we regularly merge branches up into all other still maintained branches.
+
+---------------------------------------------------------------------------
+
+by brunowowk at 2019-07-06T17:59:24Z
+
+Done :v:

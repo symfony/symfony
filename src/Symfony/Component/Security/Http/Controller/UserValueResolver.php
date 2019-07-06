@@ -34,8 +34,9 @@ final class UserValueResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument)
     {
+        $type = $argument->getType();
         // only security user implementations are supported
-        if (UserInterface::class !== $argument->getType()) {
+        if (UserInterface::class !== $type && !is_subclass_of($type, UserInterface::class)) {
             return false;
         }
 
@@ -47,7 +48,11 @@ final class UserValueResolver implements ArgumentValueResolverInterface
         $user = $token->getUser();
 
         // in case it's not an object we cannot do anything with it; E.g. "anon."
-        return $user instanceof UserInterface;
+        if (!$user instanceof UserInterface){
+            return false;
+        }
+        
+        return $user instanceof $type;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument)

@@ -327,8 +327,8 @@ class ContainerBuilderTest extends TestCase
         $builder->register('bar', 'stdClass');
         $this->assertFalse($builder->hasAlias('bar'));
 
-        $builder->set('foobar', 'stdClass');
-        $builder->set('moo', 'stdClass');
+        $builder->set('foobar', new \stdClass());
+        $builder->set('moo', new \stdClass());
         $this->assertCount(2, $builder->getAliases(), '->getAliases() does not return aliased services that have been overridden');
     }
 

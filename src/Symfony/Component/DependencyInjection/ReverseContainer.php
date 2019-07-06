@@ -31,7 +31,7 @@ final class ReverseContainer
         $this->serviceContainer = $serviceContainer;
         $this->reversibleLocator = $reversibleLocator;
         $this->tagName = $tagName;
-        $this->getServiceId = \Closure::bind(function ($service): ?string {
+        $this->getServiceId = \Closure::bind(function (object $service): ?string {
             return array_search($service, $this->services, true) ?: array_search($service, $this->privates, true) ?: null;
         }, $serviceContainer, Container::class);
     }
@@ -40,10 +40,8 @@ final class ReverseContainer
      * Returns the id of the passed object when it exists as a service.
      *
      * To be reversible, services need to be either public or be tagged with "container.reversible".
-     *
-     * @param object $service
      */
-    public function getId($service): ?string
+    public function getId(object $service): ?string
     {
         if ($this->serviceContainer === $service) {
             return 'service_container';

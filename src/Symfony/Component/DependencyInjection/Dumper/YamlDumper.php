@@ -303,7 +303,7 @@ class YamlDumper extends Dumper
         return sprintf('%%%s%%', $id);
     }
 
-    private function getExpressionCall($expression)
+    private function getExpressionCall(string $expression)
     {
         return sprintf('@=%s', $expression);
     }

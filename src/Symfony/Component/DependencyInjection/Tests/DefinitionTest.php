@@ -28,18 +28,6 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['foo'], $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing an instance of Symfony\Component\DependencyInjection\Parameter as class name to Symfony\Component\DependencyInjection\Definition in deprecated in Symfony 4.4 and will result in a TypeError in 5.0. Please pass the string "%parameter%" instead.
-     */
-    public function testConstructorWithParameter()
-    {
-        $parameter = new Parameter('parameter');
-
-        $def = new Definition($parameter);
-        $this->assertSame($parameter, $def->getClass(), '__construct() accepts Parameter instances');
-    }
-
     public function testSetGetFactory()
     {
         $def = new Definition();
@@ -60,28 +48,6 @@ class DefinitionTest extends TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing an instance of Symfony\Component\DependencyInjection\Parameter as class name to Symfony\Component\DependencyInjection\Definition in deprecated in Symfony 4.4 and will result in a TypeError in 5.0. Please pass the string "%parameter%" instead.
-     */
-    public function testSetGetClassWithParameter()
-    {
-        $def = new Definition();
-        $parameter = new Parameter('parameter');
-        $this->assertSame($parameter, $def->setClass($parameter)->getClass(), '->getClass() returns the parameterized class name');
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The class name passed to Symfony\Component\DependencyInjection\Definition is expected to be a string. Passing a stdClass is deprecated in Symfony 4.4 and will result in a TypeError in 5.0.
-     */
-    public function testSetGetClassWithObject()
-    {
-        $def = new Definition();
-        $classObject = new \stdClass();
-        $this->assertSame($classObject, $def->setClass($classObject)->getClass(), '->getClass() returns the parameterized class name');
     }
 
     public function testSetGetDecoratedService()

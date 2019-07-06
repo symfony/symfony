@@ -108,6 +108,11 @@ Security
 
  * Implementations of `PasswordEncoderInterface` and `UserPasswordEncoderInterface` should add a new `needsRehash()` method
 
+Stopwatch
+---------
+
+ * Deprecated passing `null` as 1st (`$id`) argument of `Section::get()` method, pass a valid child section identifier instead.
+
 TwigBridge
 ----------
 

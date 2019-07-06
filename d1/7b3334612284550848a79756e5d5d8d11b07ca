@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-07-06T10:00:16Z
+
+I think it doesn't make much sense to keep tests for legacy behaviour. At best this just gives a false impression of what is supported.

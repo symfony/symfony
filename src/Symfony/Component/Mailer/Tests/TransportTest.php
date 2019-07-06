@@ -40,6 +40,20 @@ class TransportTest extends TestCase
         $this->assertSame($dispatcher, $p->getValue($transport));
     }
 
+    public function testFromDsnInMemory()
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $transport = Transport::fromDsn('in-memory://', $dispatcher, null, $logger);
+
+        $this->assertInstanceOf(Transport\InMemoryTransport::class, $transport);
+
+        $property = new \ReflectionProperty(Transport\AbstractTransport::class, 'dispatcher');
+        $property->setAccessible(true);
+
+        $this->assertSame($dispatcher, $property->getValue($transport));
+    }
+
     public function testFromDsnSendmail()
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);

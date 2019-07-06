@@ -53,6 +53,11 @@ class Transport
             return new Transport\RoundRobinTransport($transports);
         }
 
+        // in-memory
+        if (0 === strpos($dsn, 'in-memory://')) {
+            return new Transport\InMemoryTransport($dispatcher, $logger);
+        }
+
         return self::createTransport($dsn, $dispatcher, $client, $logger);
     }
 

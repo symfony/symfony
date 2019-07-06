@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -105,7 +105,7 @@ class AppVariable
     /**
      * Returns the current session.
      *
-     * @return Session|null The session
+     * @return SessionInterface|null The session
      */
     public function getSession()
     {
@@ -158,14 +158,11 @@ class AppVariable
     {
         try {
             $session = $this->getSession();
-            if (null === $session) {
-                return [];
-            }
         } catch (\RuntimeException $e) {
             return [];
         }
 
-        if (!method_exists($session, 'getFlashBag')) {
+        if (null === $session || !method_exists($session, 'getFlashBag')) {
             return [];
         }
 

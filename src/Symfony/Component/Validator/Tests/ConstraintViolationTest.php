@@ -108,20 +108,4 @@ EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
-
-    public function testNonStringCode()
-    {
-        $violation = new ConstraintViolation(
-            '42 cannot be used here',
-            'this is the message template',
-            [],
-            ['some_value' => 42],
-            'some_value',
-            null,
-            null,
-            42
-        );
-
-        self::assertSame('42', $violation->getCode());
-    }
 }

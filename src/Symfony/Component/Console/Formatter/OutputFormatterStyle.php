@@ -75,11 +75,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets style foreground color.
-     *
-     * @param string|null $color The color name
-     *
-     * @throws InvalidArgumentException When the color name isn't defined
+     * {@inheritdoc}
      */
     public function setForeground($color = null)
     {
@@ -97,11 +93,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets style background color.
-     *
-     * @param string|null $color The color name
-     *
-     * @throws InvalidArgumentException When the color name isn't defined
+     * {@inheritdoc}
      */
     public function setBackground($color = null)
     {
@@ -119,11 +111,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets some specific style option.
-     *
-     * @param string $option The option name
-     *
-     * @throws InvalidArgumentException When the option name isn't defined
+     * {@inheritdoc}
      */
     public function setOption($option)
     {
@@ -137,11 +125,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Unsets some specific style option.
-     *
-     * @param string $option The option name
-     *
-     * @throws InvalidArgumentException When the option name isn't defined
+     * {@inheritdoc}
      */
     public function unsetOption($option)
     {
@@ -168,11 +152,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Applies the style to a given text.
-     *
-     * @param string $text The text to style
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function apply($text)
     {

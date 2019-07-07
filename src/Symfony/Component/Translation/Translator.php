@@ -132,6 +132,10 @@ class Translator implements LegacyTranslatorInterface, TranslatorInterface, Tran
             $domain = 'messages';
         }
 
+        if (null === $locale) {
+            @trigger_error(sprintf('Passing "null" to the third argument of the "%s" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->assertValidLocale($locale);
 
         $this->resources[$locale][] = [$format, $resource, $domain];

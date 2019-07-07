@@ -101,7 +101,7 @@ class DnsMockTest extends TestCase
                     'ip' => '2.3.4.5',
                 ],
             ],
-        ));
+        ]);
 
         $this->assertFalse(DnsMock::gethostbynamel('foobar.com'));
         $this->assertSame(['1.2.3.4', '2.3.4.5'], DnsMock::gethostbynamel('example.com'));

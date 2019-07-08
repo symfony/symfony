@@ -184,10 +184,23 @@ class TranslatorTest extends TestCase
      */
     public function testAddResourceValidLocales($locale)
     {
+        if (null === $locale) {
+            $this->markTestSkipped('null is not a valid locale');
+        }
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
         // no assertion. this method just asserts that no exception is thrown
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
+     */
+    public function testAddResourceNull()
+    {
+        $translator = new Translator('fr');
+        $translator->addResource('array', ['foo' => 'foofoo'], null);
     }
 
     public function testAddResourceAfterTrans()
@@ -367,16 +380,30 @@ class TranslatorTest extends TestCase
     }
 
     /**
-     * @dataProvider      getValidLocalesTests
+     * @dataProvider getValidLocalesTests
      */
     public function testTransValidLocale($locale)
     {
+        if (null === $locale) {
+            $this->markTestSkipped('null is not a valid locale');
+        }
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['test' => 'OK'], $locale);
 
         $this->assertEquals('OK', $translator->trans('test'));
         $this->assertEquals('OK', $translator->trans('test', [], null, $locale));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing "null" to the third argument of the "Symfony\Component\Translation\Translator::addResource" method has been deprecated since Symfony 4.4 and will throw an error in 5.0.
+     */
+    public function testTransNullLocale()
+    {
+        $translator = new Translator(null);
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', ['test' => 'OK'], null);
     }
 
     /**

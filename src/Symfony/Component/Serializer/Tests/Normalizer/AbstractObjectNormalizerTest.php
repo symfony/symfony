@@ -16,13 +16,22 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild;
+use Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\DummySecondChildQuux;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
@@ -147,6 +156,39 @@ class AbstractObjectNormalizerTest extends TestCase
         return $denormalizer;
     }
 
+    public function testDenormalizeWithDiscriminatorMapUsesCorrectClassname()
+    {
+        $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $loaderMock = $this->getMockBuilder(ClassMetadataFactoryInterface::class)->getMock();
+        $loaderMock->method('hasMetadataFor')->willReturnMap([
+            [
+                AbstractDummy::class,
+                true,
+            ],
+        ]);
+
+        $loaderMock->method('getMetadataFor')->willReturnMap([
+            [
+                AbstractDummy::class,
+                new ClassMetadata(
+                    AbstractDummy::class,
+                    new ClassDiscriminatorMapping('type', [
+                        'first' => AbstractDummyFirstChild::class,
+                        'second' => AbstractDummySecondChild::class,
+                    ])
+                ),
+            ],
+        ]);
+
+        $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
+        $normalizer = new AbstractObjectNormalizerDummy($factory, null, new PhpDocExtractor(), $discriminatorResolver);
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+        $normalizedData = $normalizer->denormalize(['foo' => 'foo', 'baz' => 'baz', 'quux' => ['value' => 'quux'], 'type' => 'second'], AbstractDummy::class);
+
+        $this->assertInstanceOf(DummySecondChildQuux::class, $normalizedData->quux);
+    }
+
     /**
      * Test that additional attributes throw an exception if no metadata factory is specified.
      *
@@ -190,7 +232,7 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
-        return \in_array($attribute, ['foo', 'baz']);
+        return \in_array($attribute, ['foo', 'baz', 'quux', 'value']);
     }
 
     public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)

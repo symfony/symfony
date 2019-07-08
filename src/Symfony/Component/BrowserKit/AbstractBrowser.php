@@ -64,12 +64,10 @@ abstract class AbstractBrowser
 
     /**
      * Sets whether to automatically follow redirects or not.
-     *
-     * @param bool $followRedirect Whether to follow redirects
      */
-    public function followRedirects($followRedirect = true)
+    public function followRedirects(bool $followRedirects = true)
     {
-        $this->followRedirects = (bool) $followRedirect;
+        $this->followRedirects = $followRedirects;
     }
 
     /**
@@ -92,10 +90,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets the maximum number of redirects that crawler can follow.
-     *
-     * @param int $maxRedirects
      */
-    public function setMaxRedirects($maxRedirects)
+    public function setMaxRedirects(int $maxRedirects)
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 != $this->maxRedirects;
@@ -118,13 +114,13 @@ abstract class AbstractBrowser
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      */
-    public function insulate($insulated = true)
+    public function insulate(bool $insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \LogicException('Unable to isolate requests as the Symfony Process Component is not installed.');
         }
 
-        $this->insulated = (bool) $insulated;
+        $this->insulated = $insulated;
     }
 
     /**
@@ -141,11 +137,8 @@ abstract class AbstractBrowser
 
     /**
      * Sets single server parameter.
-     *
-     * @param string $key   A key of the parameter
-     * @param string $value A value of the parameter
      */
-    public function setServerParameter($key, $value)
+    public function setServerParameter(string $key, string $value)
     {
         $this->server[$key] = $value;
     }
@@ -153,12 +146,9 @@ abstract class AbstractBrowser
     /**
      * Gets single server parameter for specified key.
      *
-     * @param string $key     A key of the parameter to get
-     * @param string $default A default value when key is undefined
-     *
      * @return string A value of the parameter
      */
-    public function getServerParameter($key, $default = '')
+    public function getServerParameter(string $key, $default = '')
     {
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
@@ -416,7 +406,7 @@ abstract class AbstractBrowser
             return $this->crawler = $this->followRedirect();
         }
 
-        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
+        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type') ?? '');
 
         // Check for meta refresh redirect
         if ($this->followMetaRefresh && null !== $redirect = $this->getMetaRefreshUrl()) {
@@ -515,13 +505,9 @@ abstract class AbstractBrowser
      *
      * This method returns null if the DomCrawler component is not available.
      *
-     * @param string $uri     A URI
-     * @param string $content Content for the crawler to use
-     * @param string $type    Content type
-     *
      * @return Crawler|null
      */
-    protected function createCrawlerFromContent($uri, $content, $type)
+    protected function createCrawlerFromContent(string $uri, string $content, string $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
             return;
@@ -655,7 +641,7 @@ abstract class AbstractBrowser
      *
      * @return string An absolute URI
      */
-    protected function getAbsoluteUri($uri)
+    protected function getAbsoluteUri(string $uri)
     {
         // already absolute?
         if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {

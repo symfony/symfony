@@ -56,6 +56,7 @@ trait WorkflowBuilderTrait
         $placesMetadata = [];
         $placesMetadata['c'] = [
             'bg_color' => 'DeepSkyBlue',
+            'description' => 'My custom place description',
         ];
 
         $transitionsMetadata = new \SplObjectStorage();

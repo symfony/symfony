@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-23T18:26:22Z
+
+That's for 4.4 I believe, and we should display nice runtime deprecation notices also.
+In 5.0, I'd keep the commands as hidden aliases to display a friendly notice too, in FWB this time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-04-26T07:50:24Z
+
+If we go that way, we should maybe add a special case in flex to ease installing the binary?
+That would also need a recipe update, see
+https://github.com/symfony/recipes/blob/master/symfony/framework-bundle/4.2/post-install.txt
+
+See https://github.com/symfony/flex/issues/491
+
+---------------------------------------------------------------------------
+
+by zorn-v at 2019-06-04T05:10:42Z
+
+I think it is bad idea.
+I dont need any soft other than php on my dev environment. Otherwise I'll just install nginx/apache/etc.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-07-08T09:45:12Z
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T09:57:31Z
+
+@zorn-v The deprecation message mention that you can use the Symfony local web server. But you can use whatever you want indeed. I like the removal of web server bundle as the PHP built-in web server lacks too many needed features (concurrency, TLS support, HTTP/2, ...).

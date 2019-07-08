@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Monolog\Formatter\FormatterInterface;
+use Monolog\Logger;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Command\Command;
@@ -85,7 +86,9 @@ EOF
             $this->el = new ExpressionLanguage();
         }
 
-        $this->handler = new ConsoleHandler($output);
+        $this->handler = new ConsoleHandler($output, true, [
+            OutputInterface::VERBOSITY_NORMAL => Logger::DEBUG,
+        ]);
 
         $this->handler->setFormatter(new ConsoleFormatter([
             'format' => str_replace('\n', "\n", $input->getOption('format')),
@@ -143,13 +146,11 @@ EOF
 
     private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record)
     {
-        if ($this->handler->isHandling($record)) {
-            if (isset($record['log_id'])) {
-                $clientId = unpack('H*', $record['log_id'])[1];
-            }
-            $logBlock = sprintf('<bg=%s> </>', self::$bgColor[$clientId % 8]);
-            $output->write($logBlock);
+        if (isset($record['log_id'])) {
+            $clientId = unpack('H*', $record['log_id'])[1];
         }
+        $logBlock = sprintf('<bg=%s> </>', self::$bgColor[$clientId % 8]);
+        $output->write($logBlock);
 
         $this->handler->handle($record);
     }

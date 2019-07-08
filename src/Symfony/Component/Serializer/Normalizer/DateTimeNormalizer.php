@@ -26,11 +26,11 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
     const TIMEZONE_KEY = 'datetime_timezone';
 
     /**
-     * In PHP, The $timezone parameter and the current timezone are ignored when the $time parameter either is a UNIX timestamp (e.g. @946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
+     * In PHP, the $timezone parameter and the current timezone are ignored when the $time parameter either is a UNIX timestamp (e.g. @946684800) or specifies a timezone (e.g. 2010-01-28T15:00:00+02:00).
      *
      * The denormalizer assumes that all DateTimeInterface object returned will have the timezone returned by the getTimezone() method.
      * Default PHP behavior will occur if the getTimezone() method returns null or context[self::PRESERVE_CONTEXT_TIMEZONE] is set to false.
-     * This flag will be ignored in Symfony/Serializer 5.0+
+     * This flag will be ignored in Symfony 5.0+
      */
     const PRESERVE_CONTEXT_TIMEZONE = 'preserve_context_timezone';
 
@@ -53,14 +53,14 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         ];
 
         if (!\is_array($defaultContext)) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing the date time format directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
 
             $defaultContext = [self::FORMAT_KEY => (string) $defaultContext];
             $defaultContext[self::TIMEZONE_KEY] = $timezone;
         }
 
         if (!isset($defaultContext[self::TIMEZONE_KEY]) && null !== $timezone) {
-            @trigger_error('Passing configuration options directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing the time zone directly to the constructor is deprecated since Symfony 4.2, use the default context instead.', E_USER_DEPRECATED);
 
             $defaultContext[self::TIMEZONE_KEY] = $timezone;
         }
@@ -193,7 +193,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     private function isPreserveContextTimezone(array $context): bool
     {
-        //Version 5.0 of Symfony/Serializer will always preserve the context timezone, so this method always will return true, unless the timezone equals null.
+        // Version 5.0 of Symfony/Serializer will always preserve the context timezone, so this method always will return true, unless the timezone equals null.
         if (null === $this->getTimezone($context)) {
             return false;
         }

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-05-21T15:20:18Z
+
+In https://github.com/symfony/symfony/pull/28462#issuecomment-480529128, @curry684 suggest to always use `error`. @linaori WDYT?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T07:56:14Z
+
+IIUC, it should always be an `error`. If that's the case, @berezuev Can you make the change? And rebase on 4.4 where this would be merged?
+
+---------------------------------------------------------------------------
+
+by berezuev at 2019-07-08T09:51:20Z
+
+@fabpot I've done this change and set PR's destination to 4.4 branch.
+Not sure about tests. It fails w/o any warnings or errors.

@@ -4,7 +4,7 @@ CHANGELOG
 4.4.0
 -----
 
-* added `Question::setTrimmable` default to true to allow the answer to be trimmed or not
+* added `Question::setTrimmable` default to true to allow the answer to be trimmed
 
 4.3.0
 -----

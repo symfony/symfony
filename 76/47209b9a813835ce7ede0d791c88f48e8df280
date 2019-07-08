@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T05:56:02Z
+
+I understand, but I'd prefer not if possible, as having a non-leaking core is very important to me. Providing workarounds could lessen the urge to fix and not really help in the long run.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T05:58:48Z
+
+Would making Kernel implement `ResetInterface` be a cleaner alternative? (if we really need this hook)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T07:49:06Z
+
+> I understand, but I'd prefer not if possible, as having a non-leaking core is very important to me. Providing workarounds could lessen the urge to fix and not really help in the long run.
+
+I totally agree but there is two things here:
+
+1.  having a non leaking core is a must have (BTW, you need to [see this comment](https://github.com/symfony/symfony/pull/32421#issuecomment-509110728)?)
+2. be able to reset the framework to a clean state. When you are working on a long running process, you need to reset everything at some point. For example when a new AMQP message comes, you want to empty Monolog's Buffer, to clear the doctrine's Unit Of Work, etc... Because yes, there are some services that leak by nature.
+
+Both points are really wanted. We can already wire everything in Messenger to clear everything (If not done, I did not check). I already open an issue in [swarrot](https://github.com/swarrot/swarrot/issues/193) about that too.
+
+But I'm also writing 100% custom worker that does many things. I need to do that by hand too :)
+
+> Would making Kernel implement `ResetInterface` be a cleaner alternative? (if we really need this hook)
+
+I hesitate between Two approaches. This PR and adding `Command::reset()`. But it's not possible anymore since commands are not 'container aware' anymore.
+
+Adding `Kernel::reset()` is a very nice idea too! I will update update the PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T08:23:15Z
+
+Hmm, I updated the PR and I have a strange feeling. This means injecting the kernel. I think I never injected the kernel. It's a bit like injecting the Container to me. I'm not sure it's cleaner.
+
+> I hesitate between Two approaches. This PR and adding `Command::reset()`. But it's not possible anymore since commands are not 'container aware' anymore.
+
+Actually this is possible: `Command::getApplication()->getKernel()->reset()` :)
+
+So we have Many choices here:
+
+1. Make ServicesResetter "public": autowire + always preset
+2. Add Kernel::reset() and let people inject the kernel where needed
+3. 2 + expose `Command::reset()` to hide the fact you can inject the Kernel , and to make things smoother
+
+WDYT? I would go for 1 or 3, not 2
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2019-07-08T08:57:46Z
+
+Add reset() on Application? Would make sense to me.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T09:22:51Z
+
+Here we go :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2019-07-08T09:59:22Z
+
+@nicolas-grekas Here we go :+1: I addressed your comments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2019-07-08T10:09:40Z
+
+Thank you @lyrixx.

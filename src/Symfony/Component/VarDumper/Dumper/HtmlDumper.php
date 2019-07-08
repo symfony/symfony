@@ -588,6 +588,15 @@ return function (root, x) {
             var isSearchActive = !/\bsf-dump-search-hidden\b/.test(search.className);
             if ((114 === e.keyCode && !isSearchActive) || (isCtrlKey(e) && 70 === e.keyCode)) {
                 /* F3 or CMD/CTRL + F */
+                if (70 === e.keyCode && document.activeElement === searchInput) {
+                   /*
+                    * If CMD/CTRL + F is hit while having focus on search input,
+                    * the user probably meant to trigger browser search instead.
+                    * Let the browser execute its behavior:
+                    */
+                    return;
+                }
+    
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();

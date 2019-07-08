@@ -71,7 +71,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     {
         try {
             if ($blocking) {
-                if (!($this->store instanceof StoreInterface) && !($this->store instanceof BlockingStoreInterface && $this->store->supportsWaitAndSave())) {
+                if (!$this->store instanceof StoreInterface && !($this->store instanceof BlockingStoreInterface && $this->store->supportsWaitAndSave())) {
                     throw new NotSupportedException(sprintf('The store "%s" does not support blocking locks.', \get_class($this->store)));
                 }
                 $this->store->waitAndSave($this->key);

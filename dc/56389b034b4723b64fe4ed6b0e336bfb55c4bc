@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-06T18:52:51Z
+
+@Matts Could you please post a screenshot on how it look ?
+
+---------------------------------------------------------------------------
+
+by Matts at 2019-06-07T07:51:14Z
+
+Option 1 (current)
+![image](https://user-images.githubusercontent.com/3371705/59089169-bec80000-8909-11e9-9620-84b459a7b082.png)
+
+Option 2 (i find this ugly, and not in line with the rest of the tabs)
+![image](https://user-images.githubusercontent.com/3371705/59089072-8a544400-8909-11e9-919e-1ab9e1e11fc4.png)
+
+---------------------------------------------------------------------------
+
+by dFayet at 2019-06-14T13:01:53Z
+
+It seems it does not clear the calls's list just the counter, except if this is wanted?
+
+Also for my last reset (post error), the block is still in "error" mode (red display)
+
+![Capture d’écran de 2019-06-14 14-54-37](https://user-images.githubusercontent.com/7721219/59510857-1986cc00-8eb5-11e9-92b3-25405e1c2109.png)
+
+---------------------------------------------------------------------------
+
+by Matts at 2019-06-19T06:15:22Z
+
+> It seems it does not clear the calls's list just the counter, except if this is wanted?
+>
+> Also for my last reset (post error), the block is still in "error" mode (red display)
+>
+> ![Capture d’écran de 2019-06-14 14-54-37](https://user-images.githubusercontent.com/7721219/59510857-1986cc00-8eb5-11e9-92b3-25405e1c2109.png)
+
+I indeed forgot to clear the request list. See changes
+
+---------------------------------------------------------------------------
+
+by Matts at 2019-07-04T20:00:43Z
+
+Status: ready

@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpClient\Tests;
 use Psr\Log\AbstractLogger;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 
 /**
  * @requires extension curl

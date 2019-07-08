@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 
 class NativeHttpClientTest extends HttpClientTestCase
 {

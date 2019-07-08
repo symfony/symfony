@@ -27,11 +27,9 @@ class SlotsHelper extends Helper
      * This method starts an output buffer that will be
      * closed when the stop() method is called.
      *
-     * @param string $name The slot name
-     *
      * @throws \InvalidArgumentException if a slot with the same name is already started
      */
-    public function start($name)
+    public function start(string $name)
     {
         if (\in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
@@ -63,11 +61,9 @@ class SlotsHelper extends Helper
     /**
      * Returns true if the slot exists.
      *
-     * @param string $name The slot name
-     *
      * @return bool
      */
-    public function has($name)
+    public function has(string $name)
     {
         return isset($this->slots[$name]);
     }
@@ -75,23 +71,19 @@ class SlotsHelper extends Helper
     /**
      * Gets the slot value.
      *
-     * @param string      $name    The slot name
      * @param bool|string $default The default slot content
      *
      * @return string The slot content
      */
-    public function get($name, $default = false)
+    public function get(string $name, $default = false)
     {
         return isset($this->slots[$name]) ? $this->slots[$name] : $default;
     }
 
     /**
      * Sets a slot value.
-     *
-     * @param string $name    The slot name
-     * @param string $content The slot content
      */
-    public function set($name, $content)
+    public function set(string $name, string $content)
     {
         $this->slots[$name] = $content;
     }
@@ -99,12 +91,11 @@ class SlotsHelper extends Helper
     /**
      * Outputs a slot.
      *
-     * @param string      $name    The slot name
      * @param bool|string $default The default slot content
      *
      * @return bool true if the slot is defined or if a default content has been provided, false otherwise
      */
-    public function output($name, $default = false)
+    public function output(string $name, $default = false)
     {
         if (!isset($this->slots[$name])) {
             if (false !== $default) {

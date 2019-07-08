@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Koc at 2019-06-18T10:00:11Z
+
+This looks like BC-break
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-18T19:25:29Z
+
+And I agree with @Koc, this has potential to break lots of tests if I don't miss anything. We could deprecate this in 4.4 though and throw in 5.0 then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2019-06-18T19:27:10Z
+
+By the way, our test suite contains an example of a valid test that would fail with this change (see the failing CI jobs).
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-19T05:38:39Z
+
+PR rebase with 4.4, tests fixed and deprecation added.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2019-06-29T15:28:05Z
+
+cc @fabpot

@@ -45,7 +45,7 @@ class HttpCodeActivationStrategy extends ErrorLevelActivationStrategy
         $this->exclusions = $exclusions;
     }
 
-    public function isHandlerActivated(array $record)
+    public function isHandlerActivated(array $record): bool
     {
         $isActivated = parent::isHandlerActivated($record);
 

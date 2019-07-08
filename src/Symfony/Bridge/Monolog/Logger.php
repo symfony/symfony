@@ -59,7 +59,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface, ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->clear();
 

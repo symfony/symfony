@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by gnat42 at 2019-05-25T14:33:27Z
+
+I haven't added tests yet because I'm not 100% sure what the best way to solve this was. This at least informs the user. However if it were possible to detect this and somehow have ini_set('session.save_path', $save_path); called that would fix the 'bug' but where to put that is a bit of a mystery. I also expect it may be useful to update the documentation related to this setting to explain why which I'd be happy to do if this was deemed the correct solution.

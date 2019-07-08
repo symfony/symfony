@@ -136,7 +136,7 @@ abstract class AbstractUriElement
      *
      * @return string
      */
-    protected function canonicalizePath($path)
+    protected function canonicalizePath(string $path)
     {
         if ('' === $path || '/' === $path) {
             return $path;

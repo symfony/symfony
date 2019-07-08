@@ -364,11 +364,11 @@ abstract class AbstractCrawlerTest extends TestCase
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
-        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
+        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract(['_text']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([['One', 'first'], ['Two', ''], ['Three', '']], $crawler->extract(['_text', 'class']), '->extract() returns an array of extracted data from the node list');
         $this->assertEquals([[], [], []], $crawler->extract([]), '->extract() returns empty arrays if the attribute list is empty');
 
-        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract(['_text']), '->extract() returns an empty array if the node list is empty');
 
         $this->assertEquals([['One', 'li'], ['Two', 'li'], ['Three', 'li']], $crawler->extract(['_text', '_name']), '->extract() returns an array of extracted data from the node list');
     }

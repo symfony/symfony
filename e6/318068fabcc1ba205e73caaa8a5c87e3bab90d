@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Stadly at 2019-04-26T11:32:44Z
+
+I don't think the failing builds has anything to do with this PR.
+
+---------------------------------------------------------------------------
+
+by Stadly at 2019-05-09T15:00:24Z
+
+Is there anything I can do to help this make it into version 4.3? https://github.com/symfony/symfony/pull/31266 should be merged first, at least, as dumping something that is not loaded correctly doesn't make sense.

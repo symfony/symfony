@@ -23,6 +23,7 @@ class Psr16AdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
         'testPrune' => 'Psr16adapter just proxies',
+        'testClearPrefix' => 'SimpleCache cannot clear by prefix',
     ];
 
     public function createCachePool($defaultLifetime = 0)

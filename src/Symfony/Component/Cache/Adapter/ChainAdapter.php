@@ -192,14 +192,21 @@ class ChainAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
         $cleared = true;
         $i = $this->adapterCount;
 
         while ($i--) {
-            $cleared = $this->adapters[$i]->clear() && $cleared;
+            if ($this->adapters[$i] instanceof AdapterInterface) {
+                $cleared = $this->adapters[$i]->clear($prefix) && $cleared;
+            } else {
+                $cleared = $this->adapters[$i]->clear() && $cleared;
+            }
         }
 
         return $cleared;

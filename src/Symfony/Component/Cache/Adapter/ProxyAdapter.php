@@ -147,9 +147,17 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $prefix
      */
-    public function clear()
+    public function clear(/*string $prefix = ''*/)
     {
+        $prefix = 0 < \func_num_args() ? (string) func_get_arg(0) : '';
+
+        if ($this->pool instanceof AdapterInterface) {
+            return $this->pool->clear($this->namespace.$prefix);
+        }
+
         return $this->pool->clear();
     }
 

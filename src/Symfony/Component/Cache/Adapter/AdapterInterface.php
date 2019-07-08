@@ -34,4 +34,11 @@ interface AdapterInterface extends CacheItemPoolInterface
      * @return \Traversable|CacheItem[]
      */
     public function getItems(array $keys = []);
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param string $prefix
+     */
+    public function clear(/*string $prefix = ''*/);
 }
